@@ -1,0 +1,36 @@
+resonances Package
+==================
+
+:mod:`resonances` Package
+-------------------------
+
+.. automodule:: fudge.processing.resonances
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`fudgeReconstructResonances` Module
+----------------------------------------
+
+.. automodule:: fudge.processing.resonances.fudgeReconstructResonances
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`getCoulombWavefunctions` Module
+-------------------------------------
+
+.. automodule:: fudge.processing.resonances.getCoulombWavefunctions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`getScatteringMatrices` Module
+-----------------------------------
+
+.. automodule:: fudge.processing.resonances.getScatteringMatrices
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+

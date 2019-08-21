@@ -1,0 +1,231 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.gnd.link &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for fudge.gnd.link</h1><div class="highlight"><pre>
+<span class="c"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utility to handle linking in gnd.</span>
+<span class="sd">xml representation of the link is implemented as xpath/xpointer</span>
+
+<span class="sd">The &#39;link&#39; class contains a link to a different location in the </span>
+<span class="sd">After reading in a link class instance from xml, use &#39;follow&#39; to get the pointed-to element</span>
+
+<span class="sd">sample links::</span>
+<span class="sd">&lt;element xlink:type=&quot;simple&quot; xlink:href=&#39;/reactionSuite/reaction[@label=&quot;102&quot;]&#39;&gt;</span>
+<span class="sd">or</span>
+<span class="sd">&lt;element xlink:type=&quot;simple&quot; xlink:href=&#39;/covariances.xml#covId&#39;&gt;</span>
+
+<span class="sd">cmattoon, 2/4/2011</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<div class="viewcode-block" id="parseXMLNode"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.link.parseXMLNode">[docs]</a><span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">linkElement</span><span class="p">,</span> <span class="n">linkData</span><span class="o">=</span><span class="p">{}</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; parse the xml-represented link back to python. The resulting link points to None,</span>
+<span class="sd">    and must be resolved by the calling function &quot;&quot;&quot;</span>
+    <span class="n">xlink_namespace</span> <span class="o">=</span> <span class="s">&#39;{http://www.w3.org/1999/xlink}&#39;</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="n">linkElement</span><span class="o">.</span><span class="n">tag</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">linkElement</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">xlink_namespace</span><span class="o">+</span><span class="s">&#39;href&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s">&#39;#&#39;</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span> <span class="n">root</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;#&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span> <span class="n">root</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="c"># all optional (non-xlink) attributes:</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">linkElement</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">xlink_namespace</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">link</span><span class="p">(</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">attributes</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="link"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.link.link">[docs]</a><span class="k">class</span> <span class="nc">link</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    the &#39;link&#39; class contains the path to another element, that could be stored in a different file.</span>
+<span class="sd">    The &#39;resolve&#39; member function is used to get a pointer to the linked-to element,</span>
+<span class="sd">    which will then be stored as self.link.</span>
+<span class="sd">    </span>
+<span class="sd">    Member data ::</span>
+<span class="sd">    </span>
+<span class="sd">        * label : the xml tag name (type: str)</span>
+<span class="sd">        * link  : actual pointer to other data (type: str)</span>
+<span class="sd">        * root  : file name where other data is stored, only needed if it&#39;s not the current file (type: str)</span>
+<span class="sd">        * path  : self.path is an xPath expression that uniquely identifies the other data (type: str)</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;link&#39;</span><span class="p">,</span> <span class="n">link</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">attributes</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>  <span class="c"># becomes the xml tag name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">link</span>    <span class="c"># actual pointer to other data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">root</span>    <span class="c"># file name where other data is stored, only needed if it&#39;s not the current file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>    <span class="c"># self.path is an xPath expression that uniquely identifies the other data</span>
+        <span class="c"># careful with nesting single/double quotes:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;&quot;&#39;</span><span class="p">,</span><span class="s">&quot;&#39;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="n">attributes</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span> <span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="link.updateXPath"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.link.link.updateXPath">[docs]</a>    <span class="k">def</span> <span class="nf">updateXPath</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;ensure the xPath agrees with the linked-to data&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">link</span><span class="p">,</span> <span class="s">&#39;toXLink&#39;</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">toXLink</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="link.toXML"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.link.link.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; pointers show up in the attributes list on an xml element</span>
+<span class="sd">        ie, &lt;element xlink:type=&quot;simple&quot; ...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateXPath</span><span class="p">()</span>
+        <span class="n">extraInfo</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">:</span>
+            <span class="n">extraInfo</span> <span class="o">+=</span> <span class="s">&#39; </span><span class="si">%s</span><span class="s">=&quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span><span class="o">==</span><span class="nb">str</span><span class="p">:</span>    <span class="c"># external link</span>
+            <span class="k">return</span> <span class="n">indent</span><span class="o">+</span><span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s"> xlink:type=&quot;simple&quot; xlink:href=&quot;</span><span class="si">%s</span><span class="s">#</span><span class="si">%s</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">extraInfo</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>                       <span class="c"># link within this file</span>
+            <span class="k">return</span> <span class="n">indent</span><span class="o">+</span><span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s"> xlink:type=&quot;simple&quot; xlink:href=&quot;</span><span class="si">%s</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">extraInfo</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="follow"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.link.follow">[docs]</a><span class="k">def</span> <span class="nf">follow</span><span class="p">(</span><span class="n">xPath</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    find the fudge data member pointed to by an xPath expression</span>
+<span class="sd">    the &#39;node&#39; argument should generally be either a reactionSuite or covarianceSuite instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">re</span>
+    <span class="c"># use regex on xPath expressions like &quot;reaction[@label=&#39;2&#39;]&quot;</span>
+    <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&quot;([a-zA-Z]+)\[@([a-z]+)=&#39;([a-zA-Z0-9_]+|[a-zA-Z]*\([a-zA-Z0-9_,]+\))&#39;\]&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">follow2</span><span class="p">(</span> <span class="n">xPathList</span><span class="p">,</span> <span class="n">node</span> <span class="p">):</span>
+        <span class="c"># recursive helper function: descend the path to find the correct element</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xPathList</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span> <span class="k">return</span> <span class="n">node</span>
+
+        <span class="n">xPathNext</span> <span class="o">=</span> <span class="n">xPathList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">nodeNext</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">xPathNext</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">xPathNext</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">attribute</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">ID</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;summedReaction&#39;</span><span class="p">,</span><span class="s">&#39;fissionComponent&#39;</span><span class="p">,</span><span class="s">&#39;production&#39;</span><span class="p">,</span><span class="s">&#39;reactionSum&#39;</span><span class="p">,</span>
+                        <span class="s">&#39;externalReaction&#39;</span><span class="p">):</span>
+                    <span class="n">nodeNext</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">attribute</span><span class="o">+</span><span class="s">&#39;s&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">label</span><span class="p">)</span><span class="o">==</span><span class="n">ID</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">nodeNext</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">node</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">label</span><span class="p">)</span><span class="o">==</span><span class="n">ID</span><span class="p">]</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">nodeNext</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span>
+                <span class="n">nodeNext</span> <span class="o">=</span> <span class="n">nodeNext</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c"># some special cases:</span>
+            <span class="k">elif</span> <span class="n">xPathNext</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="s">&#39;reactionSuite&#39;</span><span class="p">,</span><span class="s">&#39;covarianceSuite&#39;</span><span class="p">):</span>
+                <span class="n">nodeNext</span> <span class="o">=</span> <span class="n">node</span>
+            <span class="k">elif</span> <span class="n">xPathNext</span><span class="o">==</span><span class="s">&#39;crossSection&#39;</span><span class="p">:</span>
+                <span class="n">nodeNext</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s">&#39;crossSection&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">nodeNext</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">nodeNext</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">data</span>
+            <span class="k">elif</span> <span class="n">xPathNext</span><span class="o">==</span><span class="s">&#39;energy&#39;</span><span class="p">:</span>
+                <span class="n">nodeNext</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="s">&#39;energyComponent&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">nodeNext</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">nodeNext</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="s">&#39;energy&#39;</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">xPathNext</span><span class="o">==</span><span class="s">&#39;angular&#39;</span><span class="p">:</span>
+                <span class="n">nodeNext</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="s">&#39;angularComponent&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">nodeNext</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">nodeNext</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="s">&#39;angular&#39;</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">xPathNext</span><span class="o">==</span><span class="s">&#39;uncorrelated&#39;</span><span class="p">:</span>
+                <span class="n">nodeNext</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="s">&#39;uncorrelated&#39;</span><span class="p">]</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Encountered unknown element in xPath: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">xPathNext</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">follow2</span><span class="p">(</span><span class="n">xPathList</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">nodeNext</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">follow2</span><span class="p">(</span> <span class="n">xPath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">),</span> <span class="n">node</span> <span class="p">)</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

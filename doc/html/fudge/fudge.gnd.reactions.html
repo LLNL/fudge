@@ -1,0 +1,445 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>reactions Package &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../index.html" />
+    <link rel="up" title="gnd Package" href="fudge.gnd.html" />
+    <link rel="next" title="test Package" href="fudge.gnd.test.html" />
+    <link rel="prev" title="reactionData Package" href="fudge.gnd.reactionData.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fudge.gnd.test.html" title="test Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fudge.gnd.reactionData.html" title="reactionData Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="index.html" >fudge Package</a> &raquo;</li>
+          <li><a href="fudge.gnd.html" accesskey="U">gnd Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="reactions-package">
+<h1>reactions Package<a class="headerlink" href="#reactions-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">reactions</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-fudge.gnd.reactions"></span></div>
+<div class="section" id="module-fudge.gnd.reactions.base">
+<span id="base-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">base</span></tt> Module<a class="headerlink" href="#module-fudge.gnd.reactions.base" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="fudge.gnd.reactions.base.base_reaction">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactions.base.</tt><tt class="descname">base_reaction</tt><big>(</big><em>token</em>, <em>label</em>, <em>ENDF_MT</em>, <em>crossSection=None</em>, <em>documentation=None</em>, <em>attributes={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.core.html#fudge.core.ancestry.ancestry" title="fudge.core.ancestry.ancestry"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.ancestry.ancestry</span></tt></a></p>
+<p>base class for all types of reaction</p>
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.addDocumentation">
+<tt class="descname">addDocumentation</tt><big>(</big><em>documentation</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction.addDocumentation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.addDocumentation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.domainMax">
+<tt class="descname">domainMax</tt><big>(</big><em>unitTo=None</em>, <em>asPQU=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction.domainMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.domainMax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.domainMin">
+<tt class="descname">domainMin</tt><big>(</big><em>unitTo=None</em>, <em>asPQU=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction.domainMin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.domainMin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.domainUnitConversionFactor">
+<tt class="descname">domainUnitConversionFactor</tt><big>(</big><em>unitTo</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction.domainUnitConversionFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.domainUnitConversionFactor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.getAttribute">
+<tt class="descname">getAttribute</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction.getAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.getAttribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns value for attribute name if it exists; otherwise, returns None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.getCrossSection">
+<tt class="descname">getCrossSection</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction.getCrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.getCrossSection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the reaction&#8217;s cross section.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.getDocumentation">
+<tt class="descname">getDocumentation</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction.getDocumentation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.getDocumentation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.getDomain">
+<tt class="descname">getDomain</tt><big>(</big><em>unitTo=None</em>, <em>asPQU=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction.getDomain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.getDomain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.getDomainUnit">
+<tt class="descname">getDomainUnit</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction.getDomainUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.getDomainUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.getENDL_CS_ENDF_MT">
+<tt class="descname">getENDL_CS_ENDF_MT</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction.getENDL_CS_ENDF_MT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.getENDL_CS_ENDF_MT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the reaction&#8217;s ENDL C, S and ENDF&#8217;s MT values as integers in a python dictionary with keys &#8216;C&#8217;, &#8216;S&#8217; and &#8216;MT&#8217; 
+(e.g., { &#8216;C&#8217; : 11, &#8216;S&#8217; : 1, &#8216;MT&#8217; : 53 }).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.getLabel">
+<tt class="descname">getLabel</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction.getLabel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.getLabel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the reaction&#8217;s label.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.getQ">
+<tt class="descname">getQ</tt><big>(</big><em>unit</em>, <em>final=True</em>, <em>groundStateQ=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction.getQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.getQ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Q-value for this reaction. Converted to float if possible, otherwis a string value is returned</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.setAttribute">
+<tt class="descname">setAttribute</tt><big>(</big><em>name</em>, <em>value</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction.setAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.setAttribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds attribute name and its value to the list of attributes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.setCrossSection">
+<tt class="descname">setCrossSection</tt><big>(</big><em>crossSection</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction.setCrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.setCrossSection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets channel&#8217;s cross section to crossSection.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.setLabel">
+<tt class="descname">setLabel</tt><big>(</big><em>label</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction.setLabel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.setLabel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the reaction&#8217;s label.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.setQ">
+<tt class="descname">setQ</tt><big>(</big><em>Q</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#base_reaction.setQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.setQ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.base.base_reaction.toXMLList">
+<tt class="descname">toXMLList</tt><big>(</big><em>flags</em>, <em>verbosityIndent=''</em>, <em>indent=''</em><big>)</big><a class="headerlink" href="#fudge.gnd.reactions.base.base_reaction.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="fudge.gnd.reactions.base.isGNDReaction">
+<tt class="descclassname">fudge.gnd.reactions.base.</tt><tt class="descname">isGNDReaction</tt><big>(</big><em>o</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/base.html#isGNDReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.base.isGNDReaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if o is an instance of base_reaction or of a subclass thereof.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.gnd.reactions.fissionComponent">
+<span id="fissioncomponent-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">fissionComponent</span></tt> Module<a class="headerlink" href="#module-fudge.gnd.reactions.fissionComponent" title="Permalink to this headline">¶</a></h2>
+<p>This module contains the fissionComponent class</p>
+<dl class="class">
+<dt id="fudge.gnd.reactions.fissionComponent.fissionComponent">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactions.fissionComponent.</tt><tt class="descname">fissionComponent</tt><big>(</big><em>outputChannel</em>, <em>label</em>, <em>ENDF_MT</em>, <em>crossSection=None</em>, <em>URRProbabilityTable=None</em>, <em>documentation=None</em>, <em>attributes={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/fissionComponent.html#fissionComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.fissionComponent.fissionComponent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.gnd.reactions.reaction.reaction" title="fudge.gnd.reactions.reaction.reaction"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.reactions.reaction.reaction</span></tt></a></p>
+<p>special case of reaction, for storing 1st, 2nd, 3rd, etc fission chances when we also have total</p>
+<dl class="method">
+<dt id="fudge.gnd.reactions.fissionComponent.fissionComponent.check">
+<tt class="descname">check</tt><big>(</big><em>info</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/fissionComponent.html#fissionComponent.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.fissionComponent.fissionComponent.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.fissionComponent.fissionComponent.isBasicReaction">
+<tt class="descname">isBasicReaction</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/fissionComponent.html#fissionComponent.isBasicReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.fissionComponent.fissionComponent.isBasicReaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.fissionComponent.fissionComponent.isCompleteReaction">
+<tt class="descname">isCompleteReaction</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/fissionComponent.html#fissionComponent.isCompleteReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.fissionComponent.fissionComponent.isCompleteReaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.gnd.reactions.production">
+<span id="production-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">production</span></tt> Module<a class="headerlink" href="#module-fudge.gnd.reactions.production" title="Permalink to this headline">¶</a></h2>
+<p>This module contains the production class, for storing production cross section
+of radioactive products</p>
+<dl class="function">
+<dt id="fudge.gnd.reactions.production.parseXMLNode">
+<tt class="descclassname">fudge.gnd.reactions.production.</tt><tt class="descname">parseXMLNode</tt><big>(</big><em>productionElement</em>, <em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/production.html#parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.production.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnd.reactions.production.production">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactions.production.</tt><tt class="descname">production</tt><big>(</big><em>product</em>, <em>label</em>, <em>ENDF_MT</em>, <em>crossSection=None</em>, <em>Q=None</em>, <em>documentation=None</em>, <em>attributes={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/production.html#production"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.production.production" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.gnd.reactions.base.base_reaction" title="fudge.gnd.reactions.base.base_reaction"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.reactions.base.base_reaction</span></tt></a></p>
+<p>Production reactions are another special case of the &lt;reaction&gt; class, used to store the cross section for
+producing specific radioactive products. Requires a cross section and product id, but no distributions.
+As with the summedReaction, &#8216;outputChannel&#8217; should be a channels.simpleOutputChannel instance</p>
+<dl class="method">
+<dt id="fudge.gnd.reactions.production.production.check">
+<tt class="descname">check</tt><big>(</big><em>info</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/production.html#production.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.production.production.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.production.production.isBasicReaction">
+<tt class="descname">isBasicReaction</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/production.html#production.isBasicReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.production.production.isBasicReaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.production.production.isCompleteReaction">
+<tt class="descname">isCompleteReaction</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/production.html#production.isCompleteReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.production.production.isCompleteReaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.production.production.toENDF6">
+<tt class="descname">toENDF6</tt><big>(</big><em>endfMFList</em>, <em>flags</em>, <em>targetInfo</em>, <em>verbosityIndent=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/production.html#production.toENDF6"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.production.production.toENDF6" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.gnd.reactions.reaction">
+<span id="reaction-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">reaction</span></tt> Module<a class="headerlink" href="#module-fudge.gnd.reactions.reaction" title="Permalink to this headline">¶</a></h2>
+<p>This module contains the reaction class.</p>
+<dl class="function">
+<dt id="fudge.gnd.reactions.reaction.parseXMLNode">
+<tt class="descclassname">fudge.gnd.reactions.reaction.</tt><tt class="descname">parseXMLNode</tt><big>(</big><em>reactionElement</em>, <em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/reaction.html#parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.reaction.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate a &lt;reaction&gt; element from xml into a reaction class instance.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnd.reactions.reaction.reaction">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactions.reaction.</tt><tt class="descname">reaction</tt><big>(</big><em>outputChannel</em>, <em>label</em>, <em>ENDF_MT</em>, <em>crossSection=None</em>, <em>URRProbabilityTable=None</em>, <em>documentation=None</em>, <em>attributes={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/reaction.html#reaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.reaction.reaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.gnd.reactions.base.base_reaction" title="fudge.gnd.reactions.base.base_reaction"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.reactions.base.base_reaction</span></tt></a></p>
+<p>This is the class for a normal gnd reaction</p>
+<dl class="method">
+<dt id="fudge.gnd.reactions.reaction.reaction.addData">
+<tt class="descname">addData</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/reaction.html#reaction.addData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.reaction.reaction.addData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.reaction.reaction.calculateDepositionData">
+<tt class="descname">calculateDepositionData</tt><big>(</big><em>processInfo</em>, <em>verbosityIndent</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/reaction.html#reaction.calculateDepositionData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.reaction.reaction.calculateDepositionData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.reaction.reaction.check">
+<tt class="descname">check</tt><big>(</big><em>info</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/reaction.html#reaction.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.reaction.reaction.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.reaction.reaction.getQ">
+<tt class="descname">getQ</tt><big>(</big><em>unit</em>, <em>final=True</em>, <em>groundStateQ=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/reaction.html#reaction.getQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.reaction.reaction.getQ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Q-value for this input/output channel. It will be converted to a float if possible, otherwise a string value is returned.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.reaction.reaction.getThreshold">
+<tt class="descname">getThreshold</tt><big>(</big><em>unit</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/reaction.html#reaction.getThreshold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.reaction.reaction.getThreshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.reaction.reaction.getURRProbabilityTable">
+<tt class="descname">getURRProbabilityTable</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/reaction.html#reaction.getURRProbabilityTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.reaction.reaction.getURRProbabilityTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the channel&#8217;s URR probability table present, else None. This is a kludge</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.reaction.reaction.heatCrossSection">
+<tt class="descname">heatCrossSection</tt><big>(</big><em>temperature</em>, <em>EMin</em>, <em>lowerlimit=None</em>, <em>upperlimit=None</em>, <em>interpolationAccuracy=0.002</em>, <em>heatAllPoints=False</em>, <em>doNotThin=True</em>, <em>heatBelowThreshold=True</em>, <em>heatAllEDomain=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/reaction.html#reaction.heatCrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.reaction.reaction.heatCrossSection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.reaction.reaction.isBasicReaction">
+<tt class="descname">isBasicReaction</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/reaction.html#reaction.isBasicReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.reaction.reaction.isBasicReaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.reaction.reaction.isCompleteReaction">
+<tt class="descname">isCompleteReaction</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/reaction.html#reaction.isCompleteReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.reaction.reaction.isCompleteReaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.reaction.reaction.process">
+<tt class="descname">process</tt><big>(</big><em>processInfo</em>, <em>tempInfo</em>, <em>verbosityIndent</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/reaction.html#reaction.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.reaction.reaction.process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.reaction.reaction.setURRProbabilityTable">
+<tt class="descname">setURRProbabilityTable</tt><big>(</big><em>URRProbabilityTable</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/reaction.html#reaction.setURRProbabilityTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.reaction.reaction.setURRProbabilityTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets channel&#8217;s URR probability table to URRProbabilityTable. This is a kludge</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.reaction.reaction.toENDF6">
+<tt class="descname">toENDF6</tt><big>(</big><em>endfMFList</em>, <em>flags</em>, <em>targetInfo</em>, <em>verbosityIndent=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/reaction.html#reaction.toENDF6"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.reaction.reaction.toENDF6" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.reaction.reaction.toLLNLSnCOut">
+<tt class="descname">toLLNLSnCOut</tt><big>(</big><em>toOtherData</em>, <em>moreOtherData</em>, <em>verbosityIndent</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/reaction.html#reaction.toLLNLSnCOut"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.reaction.reaction.toLLNLSnCOut" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.reaction.reaction.toString">
+<tt class="descname">toString</tt><big>(</big><em>indent=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/reaction.html#reaction.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.reaction.reaction.toString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.gnd.reactions.summedReaction">
+<span id="summedreaction-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">summedReaction</span></tt> Module<a class="headerlink" href="#module-fudge.gnd.reactions.summedReaction" title="Permalink to this headline">¶</a></h2>
+<p>This module contains the summedReaction class</p>
+<dl class="function">
+<dt id="fudge.gnd.reactions.summedReaction.parseXMLNode">
+<tt class="descclassname">fudge.gnd.reactions.summedReaction.</tt><tt class="descname">parseXMLNode</tt><big>(</big><em>reactionElement</em>, <em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/summedReaction.html#parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.summedReaction.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnd.reactions.summedReaction.summedReaction">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactions.summedReaction.</tt><tt class="descname">summedReaction</tt><big>(</big><em>name</em>, <em>label</em>, <em>ENDF_MT</em>, <em>crossSection=None</em>, <em>Q=None</em>, <em>summands=None</em>, <em>documentation=None</em>, <em>attributes={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/summedReaction.html#summedReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.summedReaction.summedReaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.gnd.reactions.base.base_reaction" title="fudge.gnd.reactions.base.base_reaction"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.reactions.base.base_reaction</span></tt></a></p>
+<p>special case for sums of other reactions, such as (n,total), where outgoing particle descriptions are omitted.
+The &#8216;outputChannel&#8217; should be a channels.simpleOutputChannel instance</p>
+<dl class="method">
+<dt id="fudge.gnd.reactions.summedReaction.summedReaction.check">
+<tt class="descname">check</tt><big>(</big><em>info</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/summedReaction.html#summedReaction.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.summedReaction.summedReaction.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.summedReaction.summedReaction.isBasicReaction">
+<tt class="descname">isBasicReaction</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/summedReaction.html#summedReaction.isBasicReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.summedReaction.summedReaction.isBasicReaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.summedReaction.summedReaction.isCompleteReaction">
+<tt class="descname">isCompleteReaction</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/summedReaction.html#summedReaction.isCompleteReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.summedReaction.summedReaction.isCompleteReaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactions.summedReaction.summedReaction.toENDF6">
+<tt class="descname">toENDF6</tt><big>(</big><em>endfMFList</em>, <em>flags</em>, <em>targetInfo</em>, <em>verbosityIndent=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactions/summedReaction.html#summedReaction.toENDF6"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactions.summedReaction.summedReaction.toENDF6" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">reactions Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">reactions</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-fudge.gnd.reactions.base"><tt class="docutils literal"><span class="pre">base</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-fudge.gnd.reactions.fissionComponent"><tt class="docutils literal"><span class="pre">fissionComponent</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-fudge.gnd.reactions.production"><tt class="docutils literal"><span class="pre">production</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-fudge.gnd.reactions.reaction"><tt class="docutils literal"><span class="pre">reaction</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-fudge.gnd.reactions.summedReaction"><tt class="docutils literal"><span class="pre">summedReaction</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fudge.gnd.reactionData.html"
+                        title="previous chapter">reactionData Package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fudge.gnd.test.html"
+                        title="next chapter">test Package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/fudge/fudge.gnd.reactions.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fudge.gnd.test.html" title="test Package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fudge.gnd.reactionData.html" title="reactionData Package"
+             >previous</a> |</li>
+        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="index.html" >fudge Package</a> &raquo;</li>
+          <li><a href="fudge.gnd.html" >gnd Package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

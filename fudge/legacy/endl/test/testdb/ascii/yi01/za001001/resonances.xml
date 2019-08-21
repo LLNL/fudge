@@ -1,0 +1,19 @@
+<!-- 
+	fete: from ENDF to endl...
+	Version: 1.0
+	Revision: 2314
+	SVN commit datetime: 2008-08-13 09:01:04
+	username: brown170
+	datetime: Fri Aug 15 23:08:48 2008
+	hostname: zeus27
+	cwd: /p/lscratcha/brown170/databases/ENDF.B-VII.0/yi01/za001001
+	target ZA: 1001
+	projectile yi: 1
+
+	This is an experimental addition to fete: translated URR parameters.
+	All widths and resonance energies are in MeV
+	All lengths (e.g. scattering radii) are in 10^-12 cm (so length^2 automatically in barns).
+ -->
+<resonance_datasets target_za="1001" projectile_yi="1" abundance="100%">
+  <scattlen_data elow="1e-11" ehigh="0.1" nucleus_gs_spin="0.5" endf_radii_control_flag="0"/>
+</resonance_datasets>

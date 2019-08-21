@@ -1,0 +1,443 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>resonances Package &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../index.html" />
+    <link rel="up" title="processing Package" href="fudge.processing.html" />
+    <link rel="next" title="structure Package" href="fudge.structure.html" />
+    <link rel="prev" title="montecarlo Package" href="fudge.processing.montecarlo.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fudge.structure.html" title="structure Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fudge.processing.montecarlo.html" title="montecarlo Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="index.html" >fudge Package</a> &raquo;</li>
+          <li><a href="fudge.processing.html" accesskey="U">processing Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="resonances-package">
+<h1>resonances Package<a class="headerlink" href="#resonances-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">resonances</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-fudge.processing.resonances"></span></div>
+<div class="section" id="module-fudge.processing.resonances.fudgeReconstructResonances">
+<span id="fudgereconstructresonances-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">fudgeReconstructResonances</span></tt> Module<a class="headerlink" href="#module-fudge.processing.resonances.fudgeReconstructResonances" title="Permalink to this headline">¶</a></h2>
+<p>reconstruct resonance region
+cmattoon, 12/1/2010</p>
+<p>See ENDF-102 (endf documentation) appendix D for equations</p>
+<p>Basic usage:</p>
+<blockquote>
+<div><p>if x is a reactionSuite instance,</p>
+<blockquote>
+<div>&gt;&gt;xsecs = fudgeReconstructResonances.reconstructResonances(x, tolerance=0.01)</div></blockquote>
+<p>This reconstructs all resolved/unresolved resonance sections. In each section,
+the results are accurate under linear interpolation to tolerance of 1% or better.
+All sections are summed together.</p>
+<ul class="simple">
+<li>xsecs = dictionary containing cross sections: {&#8216;total&#8217;:XYs, &#8216;elastic&#8217;:XYs, ...}</li>
+</ul>
+<p>each cross section is an XYs class instance, containing data and also axes with units</p>
+</div></blockquote>
+<p>Alternate use:</p>
+<blockquote>
+<div><p>If desired, reconstruct a single section:</p>
+<p>&gt;&gt; resCls = fudgeReconstructResonances.RMcrossSection(x)   # for Reich_Moore
+&gt;&gt; energy_grid = s.generateEnergyGrid()
+&gt;&gt; crossSections = s.getCrossSection( energy_grid )
+# the input to getCrossSection is the energy (or list of energies) in eV
+# crossSections are returned as a dictionary {&#8216;total&#8217;:,&#8217;elastic&#8217;:,&#8217;capture&#8217;:,&#8217;fission&#8217;:,}</p>
+<p># improve grid to desired tolerance for linear interpolation:
+&gt;&gt; new_energy_grid, new_crossSections, messages = s.refineInterpolation(energy_grid, crossSections, tolerance=0.01)</p>
+</div></blockquote>
+<dl class="class">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.MLBWcrossSection">
+<em class="property">class </em><tt class="descclassname">fudge.processing.resonances.fudgeReconstructResonances.</tt><tt class="descname">MLBWcrossSection</tt><big>(</big><em>reactionSuite</em>, <em>sectionIndex=None</em>, <em>verbose=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#MLBWcrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.MLBWcrossSection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass" title="fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass"><tt class="xref py py-class docutils literal"><span class="pre">fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass</span></tt></a></p>
+<p>given a resonance region in MLBW format,
+create a class with all data required to reconstruct</p>
+<p>only the elastic channel differs from SLBW</p>
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.MLBWcrossSection.getCrossSection">
+<tt class="descname">getCrossSection</tt><big>(</big><em>E</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#MLBWcrossSection.getCrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.MLBWcrossSection.getCrossSection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.RMatrixLimitedcrossSection">
+<em class="property">class </em><tt class="descclassname">fudge.processing.resonances.fudgeReconstructResonances.</tt><tt class="descname">RMatrixLimitedcrossSection</tt><big>(</big><em>reactionSuite</em>, <em>sectionIndex=None</em>, <em>verbose=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#RMatrixLimitedcrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.RMatrixLimitedcrossSection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass" title="fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass"><tt class="xref py py-class docutils literal"><span class="pre">fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass</span></tt></a></p>
+<p>extended Reich_Moore (LRF=7 in ENDF)
+Here, resonances are sorted primarily by J: within each &#8216;spin group&#8217;, total J is conserved
+One or more competitive channels may be used in this case.
+Also, each resonance may have contributions from multiple l-waves</p>
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.RMatrixLimitedcrossSection.coulombPenetrationFactor">
+<tt class="descname">coulombPenetrationFactor</tt><big>(</big><em>L</em>, <em>rho</em>, <em>eta</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#RMatrixLimitedcrossSection.coulombPenetrationFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.RMatrixLimitedcrossSection.coulombPenetrationFactor" title="Permalink to this definition">¶</a></dt>
+<dd><p>for competitive channels with 2 charged particles, 
+calculate coulomb wavefunctions and penetrability.
+Here we use an external subroutine &#8216;coulfg2&#8217; from Thompson et al, converted to c and wrapped</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.RMatrixLimitedcrossSection.eta">
+<tt class="descname">eta</tt><big>(</big><em>E</em>, <em>pA</em>, <em>pB</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#RMatrixLimitedcrossSection.eta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.RMatrixLimitedcrossSection.eta" title="Permalink to this definition">¶</a></dt>
+<dd><p>for competitive channels with 2 charged particles,
+parameter eta used to find penetrability. eq D.79 in ENDF manual:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.RMatrixLimitedcrossSection.getCrossSection">
+<tt class="descname">getCrossSection</tt><big>(</big><em>E</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#RMatrixLimitedcrossSection.getCrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.RMatrixLimitedcrossSection.getCrossSection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.RMatrixLimitedcrossSection.k_competitive">
+<tt class="descname">k_competitive</tt><big>(</big><em>E</em>, <em>pA</em>, <em>pB</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#RMatrixLimitedcrossSection.k_competitive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.RMatrixLimitedcrossSection.k_competitive" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate k for any 2-body output channel. Note that if pA and pB are target and neutron,
+this reduces to self.k(E) as defined above in the resonanceReconstructionBaseClass</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.RMatrixLimitedcrossSection.rho">
+<tt class="descname">rho</tt><big>(</big><em>E</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#RMatrixLimitedcrossSection.rho"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.RMatrixLimitedcrossSection.rho" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.RMcrossSection">
+<em class="property">class </em><tt class="descclassname">fudge.processing.resonances.fudgeReconstructResonances.</tt><tt class="descname">RMcrossSection</tt><big>(</big><em>reactionSuite</em>, <em>sectionIndex=None</em>, <em>verbose=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#RMcrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.RMcrossSection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass" title="fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass"><tt class="xref py py-class docutils literal"><span class="pre">fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass</span></tt></a></p>
+<p>simplified Reich_Moore (LRF=3 in ENDF)
+More complex than Breit-Wigner approximations, but we can still use same __init__</p>
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.RMcrossSection.getCrossSection">
+<tt class="descname">getCrossSection</tt><big>(</big><em>E</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#RMcrossSection.getCrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.RMcrossSection.getCrossSection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass">
+<em class="property">class </em><tt class="descclassname">fudge.processing.resonances.fudgeReconstructResonances.</tt><tt class="descname">RRBaseClass</tt><big>(</big><em>reactionSuite</em>, <em>sectionIndex=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#RRBaseClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass" title="fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass"><tt class="xref py py-class docutils literal"><span class="pre">fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass</span></tt></a></p>
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass.generateEnergyGrid">
+<tt class="descname">generateEnergyGrid</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#RRBaseClass.generateEnergyGrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass.generateEnergyGrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>create the energy grid by merging central resonance energies, fine mesh between resonances,
+and a rough mesh covering the entire region. use the total widths</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass.rho">
+<tt class="descname">rho</tt><big>(</big><em>E</em>, <em>L=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#RRBaseClass.rho"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass.rho" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass.sortLandJ">
+<tt class="descname">sortLandJ</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#RRBaseClass.sortLandJ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass.sortLandJ" title="Permalink to this definition">¶</a></dt>
+<dd><p>SLBW, MLBW and Reich_Moore formalisms have similar structure
+it&#8217;s convenient to sort their resonances by L and J
+This method should NOT be used for R-Matrix Limited</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.SLBWcrossSection">
+<em class="property">class </em><tt class="descclassname">fudge.processing.resonances.fudgeReconstructResonances.</tt><tt class="descname">SLBWcrossSection</tt><big>(</big><em>reactionSuite</em>, <em>sectionIndex=None</em>, <em>verbose=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#SLBWcrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.SLBWcrossSection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass" title="fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass"><tt class="xref py py-class docutils literal"><span class="pre">fudge.processing.resonances.fudgeReconstructResonances.RRBaseClass</span></tt></a></p>
+<p>given a resonance region in SLBW format,
+create a class with all data required to reconstruct</p>
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.SLBWcrossSection.getCrossSection">
+<tt class="descname">getCrossSection</tt><big>(</big><em>E</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#SLBWcrossSection.getCrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.SLBWcrossSection.getCrossSection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.URRcrossSection">
+<em class="property">class </em><tt class="descclassname">fudge.processing.resonances.fudgeReconstructResonances.</tt><tt class="descname">URRcrossSection</tt><big>(</big><em>reactionSuite</em>, <em>verbose=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#URRcrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.URRcrossSection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass" title="fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass"><tt class="xref py py-class docutils literal"><span class="pre">fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass</span></tt></a></p>
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.URRcrossSection.generateEnergyGrid">
+<tt class="descname">generateEnergyGrid</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#URRcrossSection.generateEnergyGrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.URRcrossSection.generateEnergyGrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the energy grid for reconstructing unresolved resonances. Usually this is just the energy grid
+chosen by the evaluator for storing energy-dependent widths.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.URRcrossSection.getCrossSection">
+<tt class="descname">getCrossSection</tt><big>(</big><em>interpolateWidths=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#URRcrossSection.getCrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.URRcrossSection.getCrossSection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get unresolved region cross section for each incident energy in E.
+By default, calculate on the energy grid supplied and then interpolate the resulting cross section.
+If interpolateWidths==True, interpolate the average widths during reconstruction instead.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.URRcrossSection.getFluctuationIntegrals">
+<tt class="descname">getFluctuationIntegrals</tt><big>(</big><em>widths</em>, <em>DOF</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#URRcrossSection.getFluctuationIntegrals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.URRcrossSection.getFluctuationIntegrals" title="Permalink to this definition">¶</a></dt>
+<dd><p>from subroutine GNRL3 in RECENT. If possible, this will be replaced
+with more basic approach (rather than using lookup table)... not finding 
+appropriate equations right now</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.URRcrossSection.rho">
+<tt class="descname">rho</tt><big>(</big><em>E</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#URRcrossSection.rho"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.URRcrossSection.rho" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.blockwise">
+<tt class="descclassname">fudge.processing.resonances.fudgeReconstructResonances.</tt><tt class="descname">blockwise</tt><big>(</big><em>function</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#blockwise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.blockwise" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.getRI_SI">
+<tt class="descclassname">fudge.processing.resonances.fudgeReconstructResonances.</tt><tt class="descname">getRI_SI</tt><big>(</big><em>E</em>, <em>Eres</em>, <em>captureWidth</em>, <em>widths</em>, <em>penetrabilities</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#getRI_SI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.getRI_SI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Both versions of Reich_Moore formalisms (LRF=3 and 7) rely on building matrices R and S,
+which represent symmetric and anti-symmetric scattering respectively</p>
+<p>matrix elements R[i,j] and S[i,j] =</p>
+<p>(summed over resonances) partialWidth[i]*partialWidth[j] * coefficient/(dE**2+captureWidth**2),</p>
+<p>for the ith/jth open channel. For S, the coefficient is &#8216;dE&#8217;, for R &#8216;captureWidth&#8217;
+and partialWidth[i] = widths[i] * penetrabilities[i]</p>
+<blockquote>
+<div>( widths[i] is a row vector of resonance widths, and penetrabilities[i] is a column vector 
+of the penetrability for each incident energy )</div></blockquote>
+<p>Then, invert to find RI and SI such that (I+R+jS)*(I+RI+jSI) = I
+where I is the identity matrix, and j = sqrt(-1)</p>
+<p>incident energy dependence appears in both in E and the penetrabilities</p>
+<p>additional documentation from RECENT:</p>
+<div class="highlight-python"><pre>THE CROSS SECTIONS ARE DEFINED TO BE,
+
+TOTAL        =2*GJ*REAL(I - U(N,N))
+ABSORPTION   =4*GJ*(REAL(RHO(N,N)) - RHO(N,N)**2)
+             =  GJ*(I - U(N,N)**2)
+ELASTIC      =  GJ*(I - U(N,N))**2
+FISSION      =4*GJ*(SUM OVER C)(RHO(N,C)**2)
+CAPTURE      = ABSORPTION - FISSION
+
+WHICH ARE COMPLETELY DEFINED IN TERMS OF U(N,N) AND RHO(N,C),
+
+RHO(N,C)     =I - INVERSE(I - K)
+U(N,N)       =EXP(-I*2*PS)*(2*INVERSE(I - K) - I)
+             =(COS(2*PS) - I*SIN(2*PS))*(2*INVERSE(I - K) - I)
+             =(COS(2*PS) - I*SIN(2*PS))*(1 - 2*RHO(N,N))
+
+             =COS(2*PS)*(I-2*REAL(RHO)) - I*2*SIN(2*PS)*IM(RHO)
+
+... (cmattoon: cutting some of the documentation here) ...
+
+(I - K)      = (R + I) - I*S
+
+R            = SQRT(GAM(C)/2*GAM(C*)/2)*(GAM/2)/DEN
+S            = SQRT(GAM(C)/2*GAM(C*)/2)*(ER-E)/DEN
+GAM(R)       = ELIMINATED RADIATIVE WIDTH
+GAM(C)       = PARTIAL WIDE FOR CHANNEL C FOR A RESONANCE
+DEN          = ((ER - E)**2 + (GAM/2)**2)
+
+SUMMED OVER RESONANCES FOR EACH (L,J) SEQUENCE.</pre>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.reconstructResonances">
+<tt class="descclassname">fudge.processing.resonances.fudgeReconstructResonances.</tt><tt class="descname">reconstructResonances</tt><big>(</big><em>reactionSuite</em>, <em>tolerance=None</em>, <em>verbose=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#reconstructResonances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.reconstructResonances" title="Permalink to this definition">¶</a></dt>
+<dd><p>reconstruct all resonance sections (resolved/unresolved) in reactionSuite, 
+add results together for full (resonance region) pointwise cross section.
+If tolerance is specified, refine grid to required tolerance for (lin-lin) interpolation</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass">
+<em class="property">class </em><tt class="descclassname">fudge.processing.resonances.fudgeReconstructResonances.</tt><tt class="descname">resonanceReconstructionBaseClass</tt><big>(</big><em>reactionSuite</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#resonanceReconstructionBaseClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass.k">
+<tt class="descname">k</tt><big>(</big><em>energy</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#resonanceReconstructionBaseClass.k"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass.k" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass.penetrationFactor">
+<tt class="descname">penetrationFactor</tt><big>(</big><em>L</em>, <em>rho</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#resonanceReconstructionBaseClass.penetrationFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass.penetrationFactor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass.phi">
+<tt class="descname">phi</tt><big>(</big><em>L</em>, <em>rho</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#resonanceReconstructionBaseClass.phi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass.phi" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass.refineInterpolation">
+<tt class="descname">refineInterpolation</tt><big>(</big><em>egrid</em>, <em>xsecs</em>, <em>tolerance=0.01</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#resonanceReconstructionBaseClass.refineInterpolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass.refineInterpolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>generateEnergyGrid may not give a fine enough grid to linearly interpolate to desired tolerance.
+My solution to that: for all consecutive points (x0,y0), (x1,y1) and (x2,y2) do a linear interpolation between
+(x0,y0) and (x2,y2). If the interpolation doesn&#8217;t agree with (x1,y1) within tolerance,
+subdivide up the region by adding two more calculated points.  Keep iterating until interpolation agrees within tolerance.</p>
+<p>This means that in the end we will have more points than required for given tolerance.
+The results can be thinned (implemented in XYs)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass.shiftFactor">
+<tt class="descname">shiftFactor</tt><big>(</big><em>L</em>, <em>rho</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/fudgeReconstructResonances.html#resonanceReconstructionBaseClass.shiftFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.fudgeReconstructResonances.resonanceReconstructionBaseClass.shiftFactor" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate shift factor used in SLBW and MLBW formalisms</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.processing.resonances.getCoulombWavefunctions">
+<span id="getcoulombwavefunctions-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">getCoulombWavefunctions</span></tt> Module<a class="headerlink" href="#module-fudge.processing.resonances.getCoulombWavefunctions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="fudge.processing.resonances.getCoulombWavefunctions.getCoulombWavefunctions">
+<tt class="descclassname">fudge.processing.resonances.getCoulombWavefunctions.</tt><tt class="descname">getCoulombWavefunctions</tt><big>(</big><em>rho</em>, <em>eta</em>, <em>L</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/getCoulombWavefunctions.html#getCoulombWavefunctions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.getCoulombWavefunctions.getCoulombWavefunctions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="fudge.processing.resonances.getCoulombWavefunctions.test_getCoulombWavefunctions">
+<tt class="descclassname">fudge.processing.resonances.getCoulombWavefunctions.</tt><tt class="descname">test_getCoulombWavefunctions</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/getCoulombWavefunctions.html#test_getCoulombWavefunctions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.getCoulombWavefunctions.test_getCoulombWavefunctions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-fudge.processing.resonances.getScatteringMatrices">
+<span id="getscatteringmatrices-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">getScatteringMatrices</span></tt> Module<a class="headerlink" href="#module-fudge.processing.resonances.getScatteringMatrices" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="fudge.processing.resonances.getScatteringMatrices.getScatteringMatrices">
+<tt class="descclassname">fudge.processing.resonances.getScatteringMatrices.</tt><tt class="descname">getScatteringMatrices</tt><big>(</big><em>E</em>, <em>Eres</em>, <em>captureWidth</em>, <em>widths</em>, <em>penetrabilities</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/getScatteringMatrices.html#getScatteringMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.getScatteringMatrices.getScatteringMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="fudge.processing.resonances.getScatteringMatrices.python_getScatteringMatrices">
+<tt class="descclassname">fudge.processing.resonances.getScatteringMatrices.</tt><tt class="descname">python_getScatteringMatrices</tt><big>(</big><em>E</em>, <em>Eres</em>, <em>captureWidth</em>, <em>widths</em>, <em>penetrabilities</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/getScatteringMatrices.html#python_getScatteringMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.getScatteringMatrices.python_getScatteringMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="fudge.processing.resonances.getScatteringMatrices.test_getScatteringMatrices">
+<tt class="descclassname">fudge.processing.resonances.getScatteringMatrices.</tt><tt class="descname">test_getScatteringMatrices</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/processing/resonances/getScatteringMatrices.html#test_getScatteringMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.resonances.getScatteringMatrices.test_getScatteringMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">resonances Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">resonances</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-fudge.processing.resonances.fudgeReconstructResonances"><tt class="docutils literal"><span class="pre">fudgeReconstructResonances</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-fudge.processing.resonances.getCoulombWavefunctions"><tt class="docutils literal"><span class="pre">getCoulombWavefunctions</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-fudge.processing.resonances.getScatteringMatrices"><tt class="docutils literal"><span class="pre">getScatteringMatrices</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fudge.processing.montecarlo.html"
+                        title="previous chapter">montecarlo Package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fudge.structure.html"
+                        title="next chapter">structure Package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/fudge/fudge.processing.resonances.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fudge.structure.html" title="structure Package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fudge.processing.montecarlo.html" title="montecarlo Package"
+             >previous</a> |</li>
+        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="index.html" >fudge Package</a> &raquo;</li>
+          <li><a href="fudge.processing.html" >processing Package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

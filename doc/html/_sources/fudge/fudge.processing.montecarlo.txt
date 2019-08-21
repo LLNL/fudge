@@ -1,0 +1,19 @@
+montecarlo Package
+==================
+
+:mod:`montecarlo` Package
+-------------------------
+
+.. automodule:: fudge.processing.montecarlo
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`fudge2dEqualProbableBinning` Module
+-----------------------------------------
+
+.. automodule:: fudge.processing.montecarlo.fudge2dEqualProbableBinning
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

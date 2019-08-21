@@ -1,0 +1,7 @@
+*.pyc
+*.so
+
+build
+numericalFunctions/build
+crossSectionAdjustForHeatedTarget/build
+

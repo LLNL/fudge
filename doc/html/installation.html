@@ -1,0 +1,205 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installation &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="index.html" />
+    <link rel="next" title="Reporting Bugs" href="reporting-bugs.html" />
+    <link rel="prev" title="Downloading" href="downloading.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="reporting-bugs.html" title="Reporting Bugs"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="downloading.html" title="Downloading"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="installation">
+<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>Fudge is designed to be simple to install and use. For basic use the package only requires
+Python (versions 2.4-2.7, not version 3.0 and higher).  Python is likely already present
+on all unix-based systems (if in doubt, try entering &#8220;python&#8221; on the command-line),
+and is available for all platforms at <a class="reference external" href="http://www.python.org/getit/">http://www.python.org/getit/</a>.</p>
+<div class="section" id="to-install-the-package">
+<h2>To install the package:<a class="headerlink" href="#to-install-the-package" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Obtain the current version (available online at <a class="reference external" href="https://ndclx4.bnl.gov/gf/project/gnd/">https://ndclx4.bnl.gov/gf/project/gnd/</a> or <a class="reference external" href="ftp://gdo-nuclear.ucllnl.org/">ftp://gdo-nuclear.ucllnl.org/</a>),
+and place it on your system.</p>
+</li>
+<li><p class="first">To unzip the package, type</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$tar -xvf fudge-2.0.tar.gz</pre>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">The unzipped directory is named &#8216;fudge-2.0&#8217;. Navigate into the new directory, and type</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$make</pre>
+</div>
+</div></blockquote>
+<p>this builds extra tools for better performance. If you encounter errors at this step, you can still use the ENDF
+translation tool but advanced features will be unavailable.</p>
+</li>
+<li><p class="first">You are now set to use Fudge! For advanced use, see the optional components below.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="optional-extra-python-packages">
+<h2>[Optional] Extra python packages<a class="headerlink" href="#optional-extra-python-packages" title="Permalink to this headline">¶</a></h2>
+<p>For more advanced use, Fudge depends on these additional, optional packages:</p>
+<ul class="simple">
+<li>gnuplot and Gnuplot.py (for plotting, <a class="reference external" href="http://gnuplot-py.sourceforge.net">http://gnuplot-py.sourceforge.net</a>)</li>
+<li>matplotlib (alternate style of plotting, <a class="reference external" href="http://matplotlib.sourceforge.net">http://matplotlib.sourceforge.net</a>)</li>
+<li>numpy (for some advanced features including checking and manipulating covariance matrices, <a class="reference external" href="http://numpy.scipy.org">http://numpy.scipy.org</a>)</li>
+</ul>
+</div>
+<div class="section" id="optional-setting-environment-variables">
+<h2>[Optional] Setting Environment Variables<a class="headerlink" href="#optional-setting-environment-variables" title="Permalink to this headline">¶</a></h2>
+<p>For general use of the fudge package, some changes should be made to your
+computer&#8217;s environment. The following lines make the required change.
+Note that &lt;path_to_fudge&gt; indicates the path to
+the directory containing the Fudge README.txt file:</p>
+<ul>
+<li><p class="first">On unix with bash, ksh, etc, put this line in the .bashrc or equivalent:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$export PYTHONPATH=$PYTHONPATH:&lt;path_to_fudge&gt;</pre>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">On csh, tcsh or similar, do:</p>
+<blockquote>
+<div><div class="highlight-python"><pre>$setenv PYTHONPATH $PYTHONPATH:&lt;path_to_fudge&gt;</pre>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">On Windows, the environment variable should be added to the registry
+(see for example <a class="reference external" href="http://www.support.tabs3.com/main/R10463.htm">http://www.support.tabs3.com/main/R10463.htm</a>)</p>
+</li>
+</ul>
+</div>
+<div class="section" id="optional-building-extensions">
+<h2>[Optional] Building Extensions<a class="headerlink" href="#optional-building-extensions" title="Permalink to this headline">¶</a></h2>
+<p>Fudge is primarily written in python, which is easily portable across many different
+systems. Some advanced features of fudge (computationally intensive tasks) are however
+implemented in C/C++ or fortran, and must be compiled before use. To build these extensions,
+use the Makefile included in the main Fudge directory:</p>
+<div class="highlight-python"><pre>$ make</pre>
+</div>
+<p>If you encounter trouble with installing, building extensions or setting environment
+variables, please let us know (email: <a class="reference external" href="mailto:mattoon1&#37;&#52;&#48;llnl&#46;gov">mattoon1<span>&#64;</span>llnl<span>&#46;</span>gov</a>).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#to-install-the-package">To install the package:</a></li>
+<li><a class="reference internal" href="#optional-extra-python-packages">[Optional] Extra python packages</a></li>
+<li><a class="reference internal" href="#optional-setting-environment-variables">[Optional] Setting Environment Variables</a></li>
+<li><a class="reference internal" href="#optional-building-extensions">[Optional] Building Extensions</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="downloading.html"
+                        title="previous chapter">Downloading</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="reporting-bugs.html"
+                        title="next chapter">Reporting Bugs</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/installation.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="reporting-bugs.html" title="Reporting Bugs"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="downloading.html" title="Downloading"
+             >previous</a> |</li>
+        <li><a href="index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

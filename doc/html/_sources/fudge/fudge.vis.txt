@@ -1,0 +1,19 @@
+vis Package
+===========
+
+:mod:`vis` Package
+------------------
+
+.. automodule:: fudge.vis
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+
+    fudge.vis.gnuplot
+    fudge.vis.matplotlib
+

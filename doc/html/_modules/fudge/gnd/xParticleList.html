@@ -1,0 +1,213 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.gnd.xParticleList &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for fudge.gnd.xParticleList</h1><div class="highlight"><pre>
+<span class="c"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">from</span> <span class="nn">fudge.core.ancestry</span> <span class="kn">import</span> <span class="n">ancestry</span>
+
+<span class="n">monikerParticles</span> <span class="o">=</span> <span class="s">&#39;particles&#39;</span>
+
+<div class="viewcode-block" id="xParticleList"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.xParticleList.xParticleList">[docs]</a><span class="k">class</span> <span class="nc">xParticleList</span><span class="p">(</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">ancestry</span> <span class="p">)</span> <span class="p">:</span> 
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">ancestry</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">monikerParticles</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="xParticleList.addParticle"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.xParticleList.xParticleList.addParticle">[docs]</a>    <span class="k">def</span> <span class="nf">addParticle</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">particle</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Add either a particle or an excited level to xParticleList &quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="s">&#39;mass&#39;</span> <span class="ow">in</span> <span class="n">particle</span><span class="o">.</span><span class="n">attributes</span> <span class="p">)</span> <span class="p">:</span>               <span class="c"># it&#39;s a basic particle</span>
+            <span class="bp">self</span><span class="p">[</span> <span class="n">particle</span><span class="o">.</span><span class="n">name</span> <span class="p">]</span> <span class="o">=</span> <span class="n">particle</span>
+            <span class="n">particle</span><span class="o">.</span><span class="n">setParent</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">baseName</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span><span class="p">(</span> <span class="s">&#39;natural&#39;</span> <span class="ow">in</span> <span class="n">particle</span><span class="o">.</span><span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">baseName</span> <span class="o">=</span> <span class="s">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)[:</span><span class="mi">2</span><span class="p">])</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="s">&#39;FissionProduct&#39;</span> <span class="ow">in</span> <span class="n">particle</span><span class="o">.</span><span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">baseName</span> <span class="o">=</span> <span class="s">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)[:</span><span class="mi">2</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">baseName</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="p">[</span> <span class="n">baseName</span> <span class="p">]</span><span class="o">.</span><span class="n">addLevel</span><span class="p">(</span> <span class="n">particle</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;Can&#39;t add excited level </span><span class="si">%s</span><span class="s"> before ground state!&quot;</span> <span class="o">%</span> <span class="n">particle</span><span class="o">.</span><span class="n">name</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="xParticleList.hasParticle"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.xParticleList.xParticleList.hasParticle">[docs]</a>    <span class="k">def</span> <span class="nf">hasParticle</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="s">&#39;_e&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">baseName</span><span class="p">,</span> <span class="n">levelId</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_e&#39;</span><span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="n">baseName</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="nb">int</span><span class="p">(</span> <span class="n">levelId</span> <span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">baseName</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">elif</span><span class="p">(</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span> <span class="s">&#39;_c&#39;</span> <span class="p">)</span> <span class="ow">or</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span> <span class="s">&#39;_s&#39;</span> <span class="p">)</span> <span class="p">):</span>
+            <span class="n">baseName</span><span class="p">,</span> <span class="n">levelId</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">name</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="n">baseName</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">levelId</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">baseName</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">elif</span><span class="p">(</span> <span class="s">&#39;_m&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="p">):</span>
+            <span class="n">baseName</span><span class="p">,</span> <span class="n">m_index</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_m&#39;</span><span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="n">baseName</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="nb">bool</span><span class="p">(</span> <span class="p">[</span> <span class="n">lev</span> <span class="k">for</span> <span class="n">lev</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">baseName</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">lev</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;metaStableIndex&#39;</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span> <span class="n">m_index</span> <span class="p">)</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="xParticleList.getParticle"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.xParticleList.xParticleList.getParticle">[docs]</a>    <span class="k">def</span> <span class="nf">getParticle</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="s">&#39;_e&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">baseName</span><span class="p">,</span> <span class="n">levelId</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_e&#39;</span><span class="p">)</span>
+                <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="n">baseName</span><span class="p">][</span> <span class="nb">int</span><span class="p">(</span><span class="n">levelId</span><span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;_c&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;_s&#39;</span><span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">baseName</span><span class="p">,</span> <span class="n">levelId</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">name</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="n">baseName</span><span class="p">][</span> <span class="n">levelId</span> <span class="p">]</span> <span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="s">&#39;_m&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">baseName</span><span class="p">,</span> <span class="n">m_index</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_m&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">lev</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">baseName</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="p">:</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">lev</span><span class="o">.</span><span class="n">getMetaStableIndex</span><span class="p">()</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">m_index</span><span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">lev</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">,</span> <span class="p">(</span><span class="s">&quot;Particle &#39;</span><span class="si">%s</span><span class="s">&#39; is missing from the particle list!&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="xParticleList.names"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.xParticleList.xParticleList.names">[docs]</a>    <span class="k">def</span> <span class="nf">names</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="xParticleList.check"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.xParticleList.xParticleList.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">fudge.gnd</span> <span class="kn">import</span> <span class="n">warning</span>
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">particle</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">particleWarnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getParticle</span><span class="p">(</span><span class="n">particle</span><span class="p">)</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">particleWarnings</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">particle</span><span class="p">,</span> <span class="n">particleWarnings</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">warnings</span>
+</div></div>
+<div class="viewcode-block" id="parseXMLNode"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.xParticleList.parseXMLNode">[docs]</a><span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">particlesElement</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; starting with the xml &#39;&lt;particles&gt;&#39; element, translate XML into xParticleList &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">physicalQuantityWithUncertainty</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">xParticle</span>
+    <span class="k">def</span> <span class="nf">toIntIfPossible</span><span class="p">(</span> <span class="n">label</span> <span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span> <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span> <span class="k">return</span> <span class="n">label</span>
+    <span class="k">def</span> <span class="nf">fq</span><span class="p">(</span> <span class="n">val</span> <span class="p">):</span>
+        <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;u:&#39;</span><span class="p">):</span>
+            <span class="kn">from</span> <span class="nn">fudge.gnd</span> <span class="kn">import</span> <span class="n">miscellaneous</span>
+            <span class="k">return</span> <span class="n">miscellaneous</span><span class="o">.</span><span class="n">undefinedLevel</span><span class="p">(</span> <span class="n">physicalQuantityWithUncertainty</span><span class="o">.</span><span class="n">PhysicalQuantityWithUncertainty</span><span class="p">(</span> <span class="n">val</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">physicalQuantityWithUncertainty</span><span class="o">.</span><span class="n">PhysicalQuantityWithUncertainty</span><span class="p">(</span> <span class="n">val</span> <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">getAttrs</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">conversionTable</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;mass&#39;</span><span class="p">:</span><span class="n">fq</span><span class="p">,</span> <span class="s">&#39;energy&#39;</span><span class="p">:</span><span class="n">fq</span><span class="p">,</span> <span class="s">&#39;probability&#39;</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="s">&#39;label&#39;</span><span class="p">:</span><span class="n">toIntIfPossible</span><span class="p">,</span>
+                <span class="s">&#39;spin&#39;</span><span class="p">:</span><span class="n">xParticle</span><span class="o">.</span><span class="n">spin</span><span class="p">,</span> <span class="s">&#39;parity&#39;</span><span class="p">:</span><span class="n">xParticle</span><span class="o">.</span><span class="n">parity</span><span class="p">}</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="p">)</span>
+        <span class="n">retD</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">conversionTable</span><span class="p">:</span> <span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">conversionTable</span><span class="p">[</span><span class="n">key</span><span class="p">](</span> <span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required</span><span class="p">:</span> <span class="n">retD</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">attrs</span><span class="p">:</span> <span class="n">retD</span><span class="p">[</span><span class="s">&#39;attributes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">attrs</span>
+        <span class="k">return</span> <span class="n">retD</span>
+
+    <span class="n">particles</span> <span class="o">=</span> <span class="n">xParticleList</span><span class="p">()</span>
+    <span class="n">gammas</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">particlesElement</span><span class="p">:</span>
+        <span class="n">particle</span> <span class="o">=</span> <span class="n">xParticle</span><span class="o">.</span><span class="n">xParticle</span><span class="p">(</span> <span class="o">**</span><span class="n">getAttrs</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span><span class="s">&#39;genre&#39;</span><span class="p">,</span><span class="s">&#39;mass&#39;</span><span class="p">))</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">p</span><span class="p">:</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">xParticle</span><span class="o">.</span><span class="n">nuclearLevel</span><span class="p">(</span> <span class="n">groundState</span><span class="o">=</span><span class="n">particle</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">getAttrs</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span><span class="s">&#39;label&#39;</span><span class="p">,</span><span class="s">&#39;energy&#39;</span><span class="p">))</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
+                <span class="n">gamma</span> <span class="o">=</span> <span class="n">xParticle</span><span class="o">.</span><span class="n">nuclearLevelGamma</span><span class="p">(</span> <span class="n">angularDistribution</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">getAttrs</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;finalLevel&#39;</span><span class="p">,</span><span class="s">&#39;probability&#39;</span><span class="p">))</span> <span class="p">)</span>
+                <span class="n">level</span><span class="o">.</span><span class="n">addGamma</span><span class="p">(</span> <span class="n">gamma</span> <span class="p">)</span>
+                <span class="n">gammas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">gamma</span> <span class="p">)</span>
+            <span class="n">particle</span><span class="o">.</span><span class="n">addLevel</span><span class="p">(</span> <span class="n">level</span> <span class="p">)</span>
+        <span class="n">particles</span><span class="o">.</span><span class="n">addParticle</span><span class="p">(</span> <span class="n">particle</span> <span class="p">)</span>
+    <span class="k">for</span> <span class="n">gamma</span> <span class="ow">in</span> <span class="n">gammas</span><span class="p">:</span>    <span class="c"># link to final levels</span>
+        <span class="n">gamma</span><span class="o">.</span><span class="n">finalLevel</span> <span class="o">=</span> <span class="n">particles</span><span class="o">.</span><span class="n">getParticle</span><span class="p">(</span> <span class="n">gamma</span><span class="o">.</span><span class="n">finalLevel</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">particles</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,59 @@
+evaluationBuilder Package
+=========================
+
+:mod:`evaluationBuilder` Package
+--------------------------------
+
+.. automodule:: fudge.evaluationBuilder
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`base` Module
+------------------
+
+.. automodule:: fudge.evaluationBuilder.base
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`reactionSuiteBuilder` Module
+----------------------------------
+
+.. automodule:: fudge.evaluationBuilder.reactionSuiteBuilder
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`reactionBuilder` Module
+-----------------------------
+
+.. automodule:: fudge.evaluationBuilder.reactionBuilder
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`crossSectionBuilder` Module
+---------------------------------
+
+.. automodule:: fudge.evaluationBuilder.crossSectionBuilder
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`distributionBuilder` Module
+---------------------------------
+
+.. automodule:: fudge.evaluationBuilder.distributionBuilder
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`productBuilder` Module
+----------------------------
+
+.. automodule:: fudge.evaluationBuilder.productBuilder
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

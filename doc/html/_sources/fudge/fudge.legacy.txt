@@ -1,0 +1,19 @@
+legacy Package
+==============
+
+:mod:`legacy` Package
+---------------------
+
+.. automodule:: fudge.legacy
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+
+    fudge.legacy.converting
+    fudge.legacy.endl
+

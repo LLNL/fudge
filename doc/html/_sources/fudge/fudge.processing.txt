@@ -1,0 +1,44 @@
+processing Package
+==================
+
+:mod:`processing` Package
+-------------------------
+
+.. automodule:: fudge.processing
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`bdfls` Module
+-------------------
+
+.. automodule:: fudge.processing.bdfls
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`miscellaneous` Module
+---------------------------
+
+.. automodule:: fudge.processing.miscellaneous
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`processingInfo` Module
+----------------------------
+
+.. automodule:: fudge.processing.processingInfo
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+
+    fudge.processing.deterministic
+    fudge.processing.montecarlo
+    fudge.processing.resonances
+

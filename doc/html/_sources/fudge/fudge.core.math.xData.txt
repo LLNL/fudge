@@ -1,0 +1,69 @@
+xData Package
+=============
+
+:mod:`xData` Package
+--------------------
+
+.. automodule:: fudge.core.math.xData
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`LegendreSeries` Module
+----------------------------
+
+.. automodule:: fudge.core.math.xData.LegendreSeries
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`V_W_XYs` Module
+---------------------
+
+.. automodule:: fudge.core.math.xData.V_W_XYs
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`W_XYs` Module
+-------------------
+
+.. automodule:: fudge.core.math.xData.W_XYs
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`XYs` Module
+-----------------
+
+.. automodule:: fudge.core.math.xData.XYs
+    :members:
+    :undoc-members:
+    :private-members:
+    :special-members:
+    :show-inheritance:
+
+:mod:`axes` Module
+------------------
+
+.. automodule:: fudge.core.math.xData.axes
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`polynomial` Module
+------------------------
+
+.. automodule:: fudge.core.math.xData.polynomial
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`regions` Module
+---------------------
+
+.. automodule:: fudge.core.math.xData.regions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

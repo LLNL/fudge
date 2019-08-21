@@ -1,0 +1,206 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.evaluationBuilder.reactionBuilder &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for fudge.evaluationBuilder.reactionBuilder</h1><div class="highlight"><pre>
+<span class="c"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">crossSectionBuilder</span><span class="p">,</span> <span class="n">productBuilder</span>
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">gnd</span>
+<span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span>
+
+<div class="viewcode-block" id="reactionBuilder"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.reactionBuilder.reactionBuilder">[docs]</a><span class="k">class</span> <span class="nc">reactionBuilder</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crossSection</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">products</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="k">if</span> <span class="n">crossSection</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">addCrossSection</span><span class="p">(</span> <span class="n">crossSection</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">products</span><span class="p">:</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">addProduct</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">products</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residualInfo</span> <span class="o">=</span> <span class="p">()</span>
+
+<div class="viewcode-block" id="reactionBuilder.addCrossSection"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.reactionBuilder.reactionBuilder.addCrossSection">[docs]</a>    <span class="k">def</span> <span class="nf">addCrossSection</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">crossSection</span> <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">crossSectionBuilder</span><span class="o">.</span><span class="n">crossSectionBuilder</span> <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span> <span class="o">=</span> <span class="n">crossSection</span><span class="o">.</span><span class="n">component</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">crossSection</span><span class="p">,</span> <span class="n">gnd</span><span class="o">.</span><span class="n">reactionData</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">component</span> <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span> <span class="o">=</span> <span class="n">crossSection</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;addCrossSection() requires an evaluator.crossSectionBuilder instance&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="reactionBuilder.addProduct"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.reactionBuilder.reactionBuilder.addProduct">[docs]</a>    <span class="k">def</span> <span class="nf">addProduct</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">product</span> <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">product</span><span class="p">,</span> <span class="n">productBuilder</span><span class="o">.</span><span class="n">productBuilder</span> <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">product</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">product</span><span class="p">,</span> <span class="n">gnd</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">product</span> <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">product</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;addProduct() requires a gnd.product or evaluator.productBuilder instance&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="reactionBuilder.addResidual"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.reactionBuilder.reactionBuilder.addResidual">[docs]</a>    <span class="k">def</span> <span class="nf">addResidual</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">excitationLevel</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">excitationEnergy</span> <span class="o">=</span> <span class="bp">None</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residualInfo</span> <span class="o">=</span> <span class="p">(</span><span class="n">excitationLevel</span><span class="p">,</span> <span class="n">excitationEnergy</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="reactionBuilder.addDocumentation"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.reactionBuilder.reactionBuilder.addDocumentation">[docs]</a>    <span class="k">def</span> <span class="nf">addDocumentation</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">documentation</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span> <span class="o">=</span> <span class="n">gnd</span><span class="o">.</span><span class="n">documentation</span><span class="o">.</span><span class="n">documentation</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="n">documentation</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="reactionBuilder.finalize"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.reactionBuilder.reactionBuilder.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">reactionSuite</span><span class="p">,</span> <span class="n">particleGenerator</span> <span class="p">):</span>
+
+        <span class="kn">import</span> <span class="nn">datetime</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%Y-%m-</span><span class="si">%d</span><span class="s">&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">calculateZA</span><span class="p">(</span> <span class="n">ZA1</span><span class="p">,</span> <span class="n">ZA2</span> <span class="p">):</span>    <span class="c"># compute the residual</span>
+            <span class="n">minus</span> <span class="o">=</span> <span class="p">(</span><span class="n">ZA2</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">ZA2</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span> <span class="n">ZA2</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">ZA1</span> <span class="o">%</span> <span class="mi">1000</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">):</span> <span class="n">ZA2</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="p">(</span> <span class="n">ZA2</span> <span class="o">//</span> <span class="mi">1000</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">minus</span><span class="p">:</span> <span class="k">return</span> <span class="n">ZA1</span> <span class="o">-</span> <span class="n">ZA2</span>
+            <span class="k">return</span> <span class="n">ZA1</span> <span class="o">+</span> <span class="n">ZA2</span>
+
+        <span class="c"># add the residual particle (as computed from ZA of target, projectile and products)</span>
+        <span class="c"># If the reaction is 2-body, set the residual&#39;s distribution to &#39;recoil&#39;, otherwise &#39;none&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">twoBody</span> <span class="o">=</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span> <span class="c"># in case multiplicity not constant</span>
+            <span class="n">twoBody</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">residualInfo</span><span class="p">:</span>
+            <span class="n">ZAresidual</span> <span class="o">=</span> <span class="n">calculateZA</span><span class="p">(</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">getZ_A_SuffixAndZA</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">reactionSuite</span><span class="o">.</span><span class="n">projectile</span><span class="o">.</span><span class="n">getZ_A_SuffixAndZA</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">prod</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;gamma&#39;</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="n">ZAproduct</span> <span class="o">=</span> <span class="n">prod</span><span class="o">.</span><span class="n">particle</span><span class="o">.</span><span class="n">getZ_A_SuffixAndZA</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">prod</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span>
+                <span class="n">ZAresidual</span> <span class="o">=</span> <span class="n">calculateZA</span><span class="p">(</span> <span class="n">ZAresidual</span><span class="p">,</span> <span class="o">-</span><span class="n">ZAproduct</span> <span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">fudge.particles</span> <span class="kn">import</span> <span class="n">nuclear</span>
+            <span class="n">residualName</span> <span class="o">=</span> <span class="n">nuclear</span><span class="o">.</span><span class="n">nucleusNameFromZA</span><span class="p">(</span> <span class="n">ZAresidual</span> <span class="p">)</span>
+            <span class="n">level</span><span class="p">,</span> <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">residualInfo</span>
+            <span class="n">residual</span> <span class="o">=</span> <span class="n">particleGenerator</span><span class="o">.</span><span class="n">newProduct</span><span class="p">(</span> <span class="n">residualName</span><span class="p">,</span> <span class="n">levelIndex</span> <span class="o">=</span> <span class="n">level</span><span class="p">,</span>
+                    <span class="n">levelEnergy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">,</span> <span class="n">multiplicity</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">twoBody</span><span class="p">:</span>
+                <span class="n">residual</span><span class="o">.</span><span class="n">addDistribution</span><span class="p">(</span> <span class="s">&#39;Recoil&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addProduct</span><span class="p">(</span> <span class="n">residual</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">needResidual</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="k">if</span> <span class="n">twoBody</span><span class="p">:</span>
+            <span class="n">channel_</span> <span class="o">=</span> <span class="n">gnd</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">twoBodyOutputChannel</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">channel_</span> <span class="o">=</span> <span class="n">gnd</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">NBodyOutputChannel</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reaction</span> <span class="o">=</span> <span class="n">gnd</span><span class="o">.</span><span class="n">reactions</span><span class="o">.</span><span class="n">reaction</span><span class="o">.</span><span class="n">reaction</span><span class="p">(</span> <span class="n">channel_</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;-1&quot;</span><span class="p">,</span> <span class="n">ENDF_MT</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;date&#39;</span><span class="p">:</span><span class="n">date</span><span class="p">}</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reaction</span><span class="o">.</span><span class="n">setCrossSection</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span> <span class="p">)</span>
+
+        <span class="c"># ensure each product has a unique label:</span>
+        <span class="kn">from</span> <span class="nn">fudge.legacy.converting</span> <span class="kn">import</span> <span class="n">endlToGND</span>
+        <span class="n">labler</span> <span class="o">=</span> <span class="n">endlToGND</span><span class="o">.</span><span class="n">tokenAndIndices</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="p">:</span>
+            <span class="n">prod</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">labler</span><span class="o">.</span><span class="n">getLabel</span><span class="p">(</span> <span class="n">prod</span><span class="o">.</span><span class="n">getToken</span><span class="p">()</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">prod_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reaction</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">addProduct</span><span class="p">(</span> <span class="n">prod_</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reaction</span>
+</div></div>
+<div class="viewcode-block" id="summedReactionBuilder"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.reactionBuilder.summedReactionBuilder">[docs]</a><span class="k">class</span> <span class="nc">summedReactionBuilder</span><span class="p">(</span> <span class="n">reactionBuilder</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">crossSection</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">if</span> <span class="n">crossSection</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">addCrossSection</span><span class="p">(</span> <span class="n">crossSection</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="summedReactionBuilder.addProduct"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.reactionBuilder.summedReactionBuilder.addProduct">[docs]</a>    <span class="k">def</span> <span class="nf">addProduct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;No products allowed for summed channel&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="summedReactionBuilder.finalize"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.reactionBuilder.summedReactionBuilder.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reactionSuite</span><span class="p">,</span> <span class="n">particleGenerator</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div></div>
+<div class="viewcode-block" id="fissionReactionBuilder"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.reactionBuilder.fissionReactionBuilder">[docs]</a><span class="k">class</span> <span class="nc">fissionReactionBuilder</span><span class="p">(</span> <span class="n">reactionBuilder</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crossSection</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">products</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="k">pass</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

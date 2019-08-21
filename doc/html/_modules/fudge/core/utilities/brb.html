@@ -1,0 +1,400 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.core.utilities.brb &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for fudge.core.utilities.brb</h1><div class="highlight"><pre>
+<span class="c"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains a set of functions that are hopefully useful when using python.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+
+<div class="viewcode-block" id="uniquify"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.uniquify">[docs]</a><span class="k">def</span> <span class="nf">uniquify</span><span class="p">(</span><span class="n">seq</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; </span>
+<span class="sd">    Fast implimentation of a function to strip out non-unique entries in a Python list, but preserving list order.</span>
+<span class="sd">    Usage:</span>
+<span class="sd">        &gt;&gt;&gt; print uniquify( [1,4,2,4,7,2,1,1,1,&#39;s&#39;,&#39;a&#39;,0.1] ) </span>
+<span class="sd">            [1, 4, 2, 7, &#39;s&#39;, &#39;a&#39;, 0.10000000000000001]</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">seen_add</span> <span class="o">=</span> <span class="n">seen</span><span class="o">.</span><span class="n">add</span>
+    <span class="k">return</span> <span class="p">[</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">seq</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">seen_add</span><span class="p">(</span><span class="n">x</span><span class="p">)]</span> 
+</div>
+<div class="viewcode-block" id="banner"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.banner">[docs]</a><span class="k">def</span> <span class="nf">banner</span><span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">justification</span> <span class="o">=</span> <span class="s">&#39;c&#39;</span> <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;A flower-box ascii banner generator.  The input string can have line feeds.  Each line will get centered in the box.&#39;&#39;&#39;</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="n">justification</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span> <span class="s">&#39;l&#39;</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span> <span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&#39;Invalid justification = &quot;</span><span class="si">%s</span><span class="s">&quot;, must be &quot;l&quot;, &quot;c&quot;, &quot;r&quot;&#39;</span> <span class="o">%</span> <span class="n">justification</span> <span class="p">)</span>
+    <span class="n">ss</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ss</span><span class="p">:</span> <span class="n">m</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="n">m</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">l</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">ans</span> <span class="o">=</span> <span class="s">&#39;+-&#39;</span> <span class="o">+</span> <span class="n">m</span><span class="o">*</span><span class="s">&#39;-&#39;</span> <span class="o">+</span> <span class="s">&#39;-+</span><span class="se">\n</span><span class="s">&#39;</span>
+    <span class="k">if</span><span class="p">(</span>   <span class="n">justification</span> <span class="o">==</span> <span class="s">&#39;l&#39;</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ss</span><span class="p">:</span> <span class="n">ans</span> <span class="o">+=</span> <span class="s">&#39;| &#39;</span> <span class="o">+</span> <span class="n">l</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span> <span class="n">m</span> <span class="p">)</span> <span class="o">+</span> <span class="s">&#39; |</span><span class="se">\n</span><span class="s">&#39;</span>
+    <span class="k">elif</span><span class="p">(</span> <span class="n">justification</span> <span class="o">==</span> <span class="s">&#39;c&#39;</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ss</span><span class="p">:</span> <span class="n">ans</span> <span class="o">+=</span> <span class="s">&#39;| &#39;</span> <span class="o">+</span> <span class="n">l</span><span class="o">.</span><span class="n">center</span><span class="p">(</span> <span class="n">m</span> <span class="p">)</span> <span class="o">+</span> <span class="s">&#39; |</span><span class="se">\n</span><span class="s">&#39;</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ss</span><span class="p">:</span> <span class="n">ans</span> <span class="o">+=</span> <span class="s">&#39;| &#39;</span> <span class="o">+</span> <span class="n">l</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span> <span class="n">m</span> <span class="p">)</span> <span class="o">+</span> <span class="s">&#39; |</span><span class="se">\n</span><span class="s">&#39;</span>
+    <span class="n">ans</span> <span class="o">+=</span> <span class="s">&#39;+-&#39;</span> <span class="o">+</span> <span class="n">m</span><span class="o">*</span><span class="s">&#39;-&#39;</span> <span class="o">+</span> <span class="s">&#39;-+&#39;</span>
+    <span class="k">return</span> <span class="n">ans</span>
+    </div>
+<div class="viewcode-block" id="Pause"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.Pause">[docs]</a><span class="k">def</span> <span class="nf">Pause</span><span class="p">(</span> <span class="n">Prompt</span> <span class="o">=</span> <span class="s">&quot;Enter &lt;RET&gt; to continue : &quot;</span><span class="p">,</span> <span class="n">ExtraStr</span> <span class="o">=</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="s">&quot;Prompts and waits for user to enter a line. The line is returned. ExtraStr is added to the prompt string.&quot;</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="n">ExtraStr</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span> <span class="n">Prompt</span> <span class="o">=</span> <span class="n">Prompt</span> <span class="o">+</span> <span class="s">&quot;(</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="n">ExtraStr</span>
+    <span class="k">try</span> <span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span> <span class="n">Prompt</span> <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">EOFError</span> <span class="p">:</span>
+        <span class="k">print</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">except</span> <span class="p">:</span>
+        <span class="k">raise</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="tlist"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.tlist">[docs]</a><span class="k">def</span> <span class="nf">tlist</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="s">&quot;Calls tylist with arguments passed.&quot;</span>
+
+    <span class="n">tylist</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="n">sep</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="o">=</span> <span class="n">rightJustify</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="txlist"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.txlist">[docs]</a><span class="k">def</span> <span class="nf">txlist</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Prints the list given by the first argument in a tabled format. The purpose of this </span>
+<span class="sd">    function is to print a python list in a more readable format. The number of items from list</span>
+<span class="sd">    printed per line is set by w.  The argument sep, if not None, is printed as a separator</span>
+<span class="sd">    between each item on a line. The items are left justified unless the argument rightJustify</span>
+<span class="sd">    is true. This function prints each w consecutive items horizontally. Also see tylist.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">w</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">tlistMaxLen</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s">&quot;&quot;</span> <span class="p">:</span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span> <span class="p">:</span> <span class="n">ll</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="sb">`i`</span> <span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">tlistMaxLen</span><span class="p">(</span> <span class="n">ll</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="n">l</span>
+    <span class="n">Counter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ll</span> <span class="p">:</span>
+        <span class="k">print</span> <span class="n">s</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span>
+        <span class="n">Counter</span> <span class="o">=</span> <span class="n">Counter</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">Counter</span> <span class="o">==</span> <span class="n">w</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">Counter</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">print</span> <span class="s">&quot;&quot;</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">sep</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">print</span> <span class="n">sep</span><span class="p">,</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">Counter</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">print</span> <span class="s">&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="tylist"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.tylist">[docs]</a><span class="k">def</span> <span class="nf">tylist</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Prints the list given by the first argument in a tabled format. The purpose of this </span>
+<span class="sd">    function is to print a python list in a more readable format. The number of items from list</span>
+<span class="sd">    printed per line is set by w.  The argument sep, if not None, is printed as a separator</span>
+<span class="sd">    between each item on a line. The items are left justified unless the argument rightJustify</span>
+<span class="sd">    is true. This function prints each consecutive item vertically while maintaining w columns. </span>
+<span class="sd">    Also see txlist.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">w</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">tlistMaxLen</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s">&quot;&quot;</span> <span class="p">:</span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span> <span class="p">:</span> <span class="n">ll</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="sb">`i`</span> <span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">tlistMaxLen</span><span class="p">(</span> <span class="n">ll</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="n">l</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">ll</span> <span class="p">)</span> <span class="o">+</span> <span class="n">w</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="o">/</span> <span class="n">w</span>
+    <span class="k">for</span> <span class="n">ir</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">r</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">iw</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">ir</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">ll</span> <span class="p">),</span> <span class="n">r</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">print</span> <span class="n">s</span> <span class="o">%</span> <span class="n">ll</span><span class="p">[</span> <span class="n">i</span> <span class="p">],</span>
+            <span class="n">iw</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">sep</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">iw</span> <span class="o">&lt;</span> <span class="n">w</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">print</span> <span class="n">sep</span><span class="p">,</span>
+        <span class="k">print</span> <span class="s">&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="tlistMaxLen"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.tlistMaxLen">[docs]</a><span class="k">def</span> <span class="nf">tlistMaxLen</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">rightJustify</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;For internal use only.&quot;&quot;&quot;</span>
+
+    <span class="n">MaxLen</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span> <span class="p">:</span> 
+        <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">MaxLen</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="n">MaxLen</span><span class="p">,</span> <span class="mi">8</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">MaxLen</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="n">MaxLen</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span> <span class="k">return</span> <span class="s">&quot;&quot;</span>
+    <span class="n">justify</span> <span class="o">=</span> <span class="s">&quot;-&quot;</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">rightJustify</span> <span class="p">)</span> <span class="p">:</span> <span class="n">justify</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+    <span class="k">return</span> <span class="s">&quot;</span><span class="si">%%%s%d</span><span class="s">s&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">justify</span><span class="p">,</span> <span class="n">MaxLen</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="tdir"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.tdir">[docs]</a><span class="k">def</span> <span class="nf">tdir</span><span class="p">(</span> <span class="n">a</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">pattern</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">wpattern</span> <span class="o">=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This function is an attempt at improving the output of python&#39;s dir function. It uses</span>
+<span class="sd">    tlist to print the output in a more readable format. The argument w is passed to tlist.</span>
+<span class="sd">    The argument pattern, if not None, is used to restrict the items displayed to those that match it.</span>
+<span class="sd">    Pattern can be any pattern understood by the re module (e.g., to display all items</span>
+<span class="sd">    containing the two consecutive letters &quot;2d&quot; set pattern to &quot;.*2d.*&quot;). If pattern is None</span>
+<span class="sd">    and wpattern is NOT None then pattern is set to &quot;.*&quot; + wpattern + &quot;.*&quot;.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">pattern</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">wpattern</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">pattern</span> <span class="o">=</span> <span class="s">&quot;.*&quot;</span> <span class="o">+</span> <span class="n">wpattern</span> <span class="o">+</span> <span class="s">&quot;.*&quot;</span>
+    <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">()</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">a</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">{}</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">pattern</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span> <span class="n">pattern</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">p</span><span class="o">.</span><span class="n">match</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">m</span>
+    <span class="n">tlist</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">w</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="doc"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.doc">[docs]</a><span class="k">def</span> <span class="nf">doc</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This function simply executes &quot;print a.__doc__&quot; where &quot;a&quot; is the argument.&quot;&quot;&quot;</span>
+
+    <span class="k">print</span> <span class="n">a</span><span class="o">.</span><span class="n">__doc__</span>
+</div>
+<div class="viewcode-block" id="docmethods"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.docmethods">[docs]</a><span class="k">def</span> <span class="nf">docmethods</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">Full</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This function attempts to print all methods and their documentation contained in the first argument.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">docmethods2</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">typeslist</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="ow">in</span> <span class="n">typeslist</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">------------------ </span><span class="si">%-30s</span><span class="s"> ------------------&quot;</span> <span class="o">%</span> <span class="n">i</span>
+                <span class="k">print</span> <span class="n">a</span><span class="o">.</span><span class="n">__doc__</span>
+
+    <span class="n">typeslist</span> <span class="o">=</span> <span class="p">[</span> <span class="n">types</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">UnboundMethodType</span> <span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">Full</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">typeslist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">Full</span> <span class="o">&gt;</span> <span class="mi">5</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">typeslist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">types</span><span class="o">.</span><span class="n">BuiltinFunctionType</span> <span class="p">)</span>
+        <span class="n">typeslist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">types</span><span class="o">.</span><span class="n">BuiltinMethodType</span> <span class="p">)</span>
+    <span class="k">if</span>   <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">InstanceType</span> <span class="p">)</span> <span class="p">:</span> <span class="n">docmethods2</span><span class="p">(</span> <span class="n">o</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="n">typeslist</span> <span class="p">)</span>    <span class="c"># Instance of a class.</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">ClassType</span> <span class="p">)</span> <span class="p">:</span> <span class="n">docmethods2</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">typeslist</span> <span class="p">)</span>                 <span class="c"># Class</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span> <span class="p">)</span> <span class="p">:</span> <span class="n">docmethods2</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">typeslist</span> <span class="p">)</span>                <span class="c"># Function</span>
+</div>
+<div class="viewcode-block" id="py"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.py">[docs]</a><span class="k">def</span> <span class="nf">py</span><span class="p">(</span> <span class="n">depth</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This routine prints all python scripts in sys.path[start:start+depth] in a nice format.&quot;&quot;&quot;</span>
+
+    <span class="n">Counter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="ow">not</span> <span class="n">d</span> <span class="o">==</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">Counter</span> <span class="o">&gt;=</span> <span class="n">start</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">d</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">d</span><span class="p">,</span> <span class="s">&quot;*.py&quot;</span> <span class="p">)</span>
+                <span class="n">fs</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span> <span class="n">p</span> <span class="p">)</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fs</span> <span class="p">:</span> <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="n">f</span> <span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+                <span class="n">txlist</span><span class="p">(</span> <span class="n">l</span> <span class="p">)</span>
+            <span class="n">Counter</span> <span class="o">=</span> <span class="n">Counter</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">Counter</span> <span class="o">==</span> <span class="p">(</span> <span class="n">start</span> <span class="o">+</span> <span class="n">depth</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span>
+</div>
+<div class="viewcode-block" id="objectoutline"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectoutline">[docs]</a><span class="k">def</span> <span class="nf">objectoutline</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">MaxLevel</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Full</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This routine attempts to print the objects - methods, members and possible other things - that are a part</span>
+<span class="sd">    of the first argument. It will recursively traverse each object found down to level MaxLevel.&quot;&quot;&quot;</span>
+
+    <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="objectoutline2"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectoutline2">[docs]</a><span class="k">def</span> <span class="nf">objectoutline2</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="s">&quot;For internal use only.&quot;</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">name</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="n">name</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">level</span> <span class="o">==</span> <span class="p">(</span> <span class="n">MaxLevel</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span>
+    <span class="n">DoNextLevel</span> <span class="o">=</span> <span class="ow">not</span> <span class="p">(</span> <span class="n">level</span> <span class="o">==</span> <span class="n">MaxLevel</span> <span class="p">)</span>
+    <span class="n">nextlevel</span> <span class="o">=</span> <span class="n">level</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">sm</span> <span class="o">=</span> <span class="s">&quot; &quot;</span> <span class="o">*</span> <span class="p">(</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">level</span> <span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">sm</span>
+    <span class="n">isInstance</span> <span class="o">=</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">InstanceType</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="s">&#39;__class__&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">isInstance</span> <span class="o">|=</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">o</span><span class="o">.</span><span class="n">__class__</span> <span class="p">)</span>    <span class="c"># New style class instance.</span>
+    
+    <span class="k">try</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">name</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span> <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span>
+    <span class="k">except</span> <span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s">&gt; &lt;</span><span class="si">%s</span><span class="s">&gt;, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="sb">`s`</span><span class="p">,</span> <span class="sb">`name`</span><span class="p">,</span> <span class="sb">`type( s )`</span><span class="p">,</span> <span class="sb">`type( name )`</span> <span class="p">)</span>
+        <span class="k">raise</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span> <span class="p">)</span> <span class="p">:</span>                    <span class="c"># Function</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">method </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">__name__</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="nb">getattr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span> <span class="p">),</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                          <span class="c"># List of objects</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">list of len </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="p">(</span> <span class="n">Full</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">CheckListForSameTypeOfObjects</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">DoNextLevel</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">o</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">i</span><span class="p">,</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">o</span> <span class="o">!=</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">()</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                          <span class="c"># Tuple of objects</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">tuple of len </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">Full</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">DoNextLevel</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">o</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">i</span><span class="p">,</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">o</span> <span class="o">!=</span> <span class="p">()</span> <span class="p">)</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">{}</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                          <span class="c"># Dictionary</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">dictionary of </span><span class="si">%d</span><span class="s"> items&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">o</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">ClassType</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">TypeType</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                     <span class="c"># Class old and new style</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">class </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">__name__</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">DoNextLevel</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">o</span><span class="o">.</span><span class="n">__bases__</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">  -- base(s) --&quot;</span> <span class="o">%</span> <span class="n">sm</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">__bases__</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">i</span><span class="p">,</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+            <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">  -- methods --&quot;</span> <span class="o">%</span> <span class="n">sm</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="nb">getattr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span> <span class="p">),</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mf">1.</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="s">u&quot;&quot;</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="bp">True</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s%s</span><span class="s"> = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="sb">`type( o )`</span><span class="p">,</span> <span class="sb">`o`</span> <span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span> <span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span> <span class="n">isInstance</span> <span class="p">)</span> <span class="p">:</span>                  <span class="c"># Instance of a class.</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">instance of class </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">DoNextLevel</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">o</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__bases__</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">  -- bases --&quot;</span> <span class="o">%</span> <span class="n">sm</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__bases__</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="n">i</span><span class="p">,</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+            <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">  -- member --&quot;</span> <span class="o">%</span> <span class="n">sm</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span> 
+                <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="nb">getattr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span> <span class="p">)</span> <span class="p">)</span> <span class="o">!=</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span> <span class="p">)</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="nb">getattr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span> <span class="p">),</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+            <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">  -- methods --&quot;</span> <span class="o">%</span> <span class="n">sm</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="nb">getattr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span> <span class="p">)</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span> <span class="p">)</span> <span class="p">:</span> <span class="n">objectoutline2</span><span class="p">(</span> <span class="nb">getattr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span> <span class="p">),</span> <span class="n">MaxLevel</span><span class="p">,</span> <span class="n">nextlevel</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">Full</span> <span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>                                                      <span class="c"># Integer, Float, etc...</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="sb">`type( o )`</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="CheckListForSameTypeOfObjects"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.CheckListForSameTypeOfObjects">[docs]</a><span class="k">def</span> <span class="nf">CheckListForSameTypeOfObjects</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">e</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;For internal use only.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="n">l</span> <span class="o">==</span> <span class="n">e</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="mi">0</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">t</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="mi">0</span>
+</div>
+<div class="viewcode-block" id="objectvalues"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectvalues">[docs]</a><span class="k">def</span> <span class="nf">objectvalues</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Prints a list of all objects return by dir( o ) and their data (or object type) where &quot;o&quot; </span>
+<span class="sd">    is the first argument.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">InstanceType</span> <span class="p">)</span> <span class="p">:</span>                  <span class="c"># Instance of a class.</span>
+        <span class="k">print</span> <span class="s">&quot;class </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">o</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+        <span class="k">print</span> <span class="s">&quot;  -- member --&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span> <span class="n">objectvalues2</span><span class="p">(</span> <span class="nb">getattr</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span> <span class="p">),</span> <span class="n">i</span> <span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">objectvalues2</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="s">&quot;&quot;</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="objectvalues2"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectvalues2">[docs]</a><span class="k">def</span> <span class="nf">objectvalues2</span><span class="p">(</span> <span class="n">o</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;For internal use only.&quot;&quot;&quot;</span>
+    <span class="k">if</span>   <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">InstanceType</span> <span class="p">)</span> <span class="p">:</span>                  <span class="c"># Instance of a class.</span>
+        <span class="k">return</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span> <span class="p">)</span> <span class="p">:</span>                    <span class="c"># Function</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                            <span class="c"># List of objects</span>
+        <span class="k">print</span> <span class="s">&quot;  </span><span class="si">%s</span><span class="s">: list of len </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">()</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                          <span class="c"># Tuple of objects</span>
+        <span class="k">print</span> <span class="s">&quot;  </span><span class="si">%s</span><span class="s">: tuple of len </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">{}</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>                          <span class="c"># Dictionary</span>
+        <span class="k">print</span> <span class="s">&quot;  </span><span class="si">%s</span><span class="s"> dictionary of </span><span class="si">%d</span><span class="s"> items&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="nb">dir</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">o</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span> <span class="k">print</span> <span class="s">&quot;    </span><span class="si">%s</span><span class="s"> = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">i</span><span class="p">,</span> <span class="n">o</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">ClassType</span> <span class="p">)</span> <span class="p">:</span>                     <span class="c"># Class</span>
+        <span class="k">return</span>
+    <span class="k">else</span> <span class="p">:</span>                                                      <span class="c"># Integer, Float, etc...</span>
+        <span class="k">print</span> <span class="s">&quot;  </span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s"> = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="sb">`type( o )`</span><span class="p">,</span> <span class="sb">`o`</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="getType"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.getType">[docs]</a><span class="k">def</span> <span class="nf">getType</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">try</span> <span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">o</span><span class="o">.</span><span class="n">im_class</span> <span class="p">),</span> <span class="nb">str</span><span class="p">(</span> <span class="n">o</span><span class="o">.</span><span class="n">im_func</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">except</span> <span class="p">:</span>
+        <span class="k">try</span> <span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="n">o</span><span class="o">.</span><span class="n">__class__</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

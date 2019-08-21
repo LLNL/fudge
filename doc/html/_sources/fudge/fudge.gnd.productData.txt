@@ -1,0 +1,50 @@
+productData Package
+===================
+
+:mod:`productData` Package
+--------------------------
+
+.. automodule:: fudge.gnd.productData
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`base` Module
+------------------
+
+.. automodule:: fudge.gnd.productData.base
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`energyDeposition` Module
+------------------------------
+
+.. automodule:: fudge.gnd.productData.energyDeposition
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`momentumDeposition` Module
+--------------------------------
+
+.. automodule:: fudge.gnd.productData.momentumDeposition
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`multiplicity` Module
+--------------------------
+
+.. automodule:: fudge.gnd.productData.multiplicity
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+
+    fudge.gnd.productData.distributions
+

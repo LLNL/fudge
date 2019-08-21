@@ -1,0 +1,2 @@
+# <<BEGIN-copyright>>
+# <<END-copyright>>

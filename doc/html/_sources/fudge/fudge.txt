@@ -1,0 +1,49 @@
+fudge Package
+=============
+
+:mod:`fudge` Package
+--------------------
+
+.. automodule:: fudge.__init__
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`__doc__` Module
+---------------------
+
+.. automodule:: fudge.__doc__
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`fudgeDefaults` Module
+---------------------------
+
+.. automodule:: fudge.fudgeDefaults
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`fudgeParameters` Module
+-----------------------------
+
+.. automodule:: fudge.fudgeParameters
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+
+    fudge.core
+    fudge.gnd
+    fudge.evaluationBuilder
+    fudge.legacy
+    fudge.particles
+    fudge.processing
+    fudge.structure
+    fudge.vis
+

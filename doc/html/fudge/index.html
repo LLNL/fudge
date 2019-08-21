@@ -1,0 +1,588 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge Package &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../index.html" />
+    <link rel="next" title="core Package" href="fudge.core.html" />
+    <link rel="prev" title="Fudge and GND" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fudge.core.html" title="core Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Fudge and GND"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="fudge-package">
+<h1>fudge Package<a class="headerlink" href="#fudge-package" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">THE <cite>fudge</cite>, <cite>__doc__</cite>, <cite>fudgeDefaults</cite>, AND <cite>fudgeParameters</cite> MODULES CORRESPOND TO LEGACY FUDGE</p>
+</div>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">fudge</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-fudge.__init__"></span><p>Fudge is a python package which allows one to view, plot and modify LLNL&#8217;s evaluated nuclear data, and use LLNL&#8217;s processing codes
+that convert the evaluated data into processed data. Processed data is evaluatated nuclear transport data that has been converted into a format 
+used by the deterministic (libndf.a) and and Monte Carlo (MCAPM) transport libraries. The deterministic library reads data
+from the ndf files (ndf1, ndf2, etc.) and the Monte Carlo library reads data from the mcf files (mcf1.pdb, mcf2.pdb, etc.).</p>
+<div class="section" id="getting-at-fudge-s-python-scripts">
+<h3>Getting at fudge&#8217;s python scripts.<a class="headerlink" href="#getting-at-fudge-s-python-scripts" title="Permalink to this headline">¶</a></h3>
+<p>To use fudge, one must add the location of the fudge scripts to the environment variable PYTHONPATH. (PYTHONPATH is the environment variable
+used by python when searching for imported python modules (files). On LLNL&#8217;s computing system (LC) this would look something like,</p>
+<p>export PYTHONPATH=$PYTHONPATH:/usr/apps/fudge/current/Src</p>
+<p>for the bash shell.</p>
+<p>Alternatively, one can add the following lines near the top of a python script (or type them at the prompt)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s">&quot;/usr/apps/fudge/current/Src&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="other-environment-variables">
+<h3>Other environment variables.<a class="headerlink" href="#other-environment-variables" title="Permalink to this headline">¶</a></h3>
+<p>Besides PYTHONPATH, there are four other environment variables used by fudge. They are:</p>
+<div class="highlight-python"><pre>FUDGEPATH   Where fudges expects all platform dependent (e.g., binary) files to be.
+ENDLPATH    If defined, this is used to initialize fudgeDefaults.ENDL_DATABASE_DIR
+MCFPATH     If defined, this is used to initialize fudgeDefaults.MCF_DATABASE_DIR
+NDFPATH     If defined, this is used to initialize fudgeDefaults.NDF_DATABASE_DIR</pre>
+</div>
+<p>If the environment variable FUDGEPATH is not set, fudge sets it to fudgeDefaults.DefaultFudgePath.
+For more information on ENDL_DATABASE_DIR, MCF_DATABASE_DIR and NDF_DATABASE_DIR set the documentation
+for the fudgeDefaults module.</p>
+<p>Thus, there are three ways to set the variables fudge uses to search for files.</p>
+<ol class="arabic simple">
+<li>Do nothing and fudge will use the variables in the module fudgeDefaults.</li>
+<li>Set the appropriate environment variable (i.e., FUDGEPATH, ENDLPATH, MCFPATH or NDFPATH).</li>
+<li>Set variables in the fudgeDefaults module. For example,</li>
+</ol>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">fudgeDefaults</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fudgeDefaults</span><span class="o">.</span><span class="n">NDF_DATABASE_DIR</span> <span class="o">=</span> <span class="o">/</span><span class="n">my</span><span class="o">/</span><span class="n">personal</span><span class="o">/</span><span class="n">database</span><span class="o">/</span><span class="n">processed</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="reading-fudge-s-documentation">
+<h3>Reading fudge&#8217;s documentation.<a class="headerlink" href="#reading-fudge-s-documentation" title="Permalink to this headline">¶</a></h3>
+<p>In general, one should first instantiate an endlProject class object and work from it. For example the beginning of a fudge session may look like,</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">project</span> <span class="o">=</span> <span class="n">endlProject</span><span class="p">(</span> <span class="n">database</span> <span class="o">=</span> <span class="s">&quot;endl99&quot;</span><span class="p">,</span> <span class="n">workDir</span> <span class="o">=</span> <span class="s">&quot;tmp&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>It is therefore important to read the documentation on the module endlProject; and in particular, the class endlProject.  
+Also, see the module fudgeDefaults for default locations fudge searches to find evaluated and processed data files, 
+and where it searches to find platform dependent files (e.g., executable files).</p>
+</div>
+</div>
+<div class="section" id="module-fudge.__doc__">
+<span id="doc-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">__doc__</span></tt> Module<a class="headerlink" href="#module-fudge.__doc__" title="Permalink to this headline">¶</a></h2>
+<p>Fudge is a python package which allows one to view, plot and modify LLNL&#8217;s evaluated nuclear data, and use LLNL&#8217;s processing codes
+that convert the evaluated data into processed data. Processed data is evaluatated nuclear transport data that has been converted into a format 
+used by the deterministic (libndf.a) and and Monte Carlo (MCAPM) transport libraries. The deterministic library reads data
+from the ndf files (ndf1, ndf2, etc.) and the Monte Carlo library reads data from the mcf files (mcf1.pdb, mcf2.pdb, etc.).</p>
+<div class="section" id="id2">
+<h3>Getting at fudge&#8217;s python scripts.<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>To use fudge, one must add the location of the fudge scripts to the environment variable PYTHONPATH. (PYTHONPATH is the environment variable
+used by python when searching for imported python modules (files). On LLNL&#8217;s computing system (LC) this would look something like,</p>
+<p>export PYTHONPATH=$PYTHONPATH:/usr/apps/fudge/current/Src</p>
+<p>for the bash shell.</p>
+<p>Alternatively, one can add the following lines near the top of a python script (or type them at the prompt)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s">&quot;/usr/apps/fudge/current/Src&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h3>Other environment variables.<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Besides PYTHONPATH, there are four other environment variables used by fudge. They are:</p>
+<div class="highlight-python"><pre>FUDGEPATH   Where fudges expects all platform dependent (e.g., binary) files to be.
+ENDLPATH    If defined, this is used to initialize fudgeDefaults.ENDL_DATABASE_DIR
+MCFPATH     If defined, this is used to initialize fudgeDefaults.MCF_DATABASE_DIR
+NDFPATH     If defined, this is used to initialize fudgeDefaults.NDF_DATABASE_DIR</pre>
+</div>
+<p>If the environment variable FUDGEPATH is not set, fudge sets it to fudgeDefaults.DefaultFudgePath.
+For more information on ENDL_DATABASE_DIR, MCF_DATABASE_DIR and NDF_DATABASE_DIR set the documentation
+for the fudgeDefaults module.</p>
+<p>Thus, there are three ways to set the variables fudge uses to search for files.</p>
+<ol class="arabic simple">
+<li>Do nothing and fudge will use the variables in the module fudgeDefaults.</li>
+<li>Set the appropriate environment variable (i.e., FUDGEPATH, ENDLPATH, MCFPATH or NDFPATH).</li>
+<li>Set variables in the fudgeDefaults module. For example,</li>
+</ol>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">fudgeDefaults</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fudgeDefaults</span><span class="o">.</span><span class="n">NDF_DATABASE_DIR</span> <span class="o">=</span> <span class="o">/</span><span class="n">my</span><span class="o">/</span><span class="n">personal</span><span class="o">/</span><span class="n">database</span><span class="o">/</span><span class="n">processed</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id4">
+<h3>Reading fudge&#8217;s documentation.<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>In general, one should first instantiate an endlProject class object and work from it. For example the beginning of a fudge session may look like,</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">project</span> <span class="o">=</span> <span class="n">endlProject</span><span class="p">(</span> <span class="n">database</span> <span class="o">=</span> <span class="s">&quot;endl99&quot;</span><span class="p">,</span> <span class="n">workDir</span> <span class="o">=</span> <span class="s">&quot;tmp&quot;</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>It is therefore important to read the documentation on the module endlProject; and in particular, the class endlProject.  
+Also, see the module fudgeDefaults for default locations fudge searches to find evaluated and processed data files, 
+and where it searches to find platform dependent files (e.g., executable files).</p>
+</div>
+</div>
+<div class="section" id="module-fudge.fudgeDefaults">
+<span id="fudgedefaults-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">fudgeDefaults</span></tt> Module<a class="headerlink" href="#module-fudge.fudgeDefaults" title="Permalink to this headline">¶</a></h2>
+<p>This module contains default parameters used by fudge.</p>
+<p>Variables:</p>
+<div class="highlight-python"><pre>NeedPythonPathToFudge   Fudge attempts to determine if the location of fudge is included
+                        in python's search path (e.g., locations set by PYTHONPATH).
+                        If fudge determines that it is not in the python search path then
+                        it adds its location - as given by DefaultFudgePath/Src - to the
+                        python search path. However, if NeedPythonPathToFudge is false 
+                        fudge will not add its location to the python search path.
+DefaultFudgePath        Location where fudge scripts and binaries can be found.
+                            Scripts are to be in DefaultFudgePath/Src.
+                            Binaries are to be in DefaultFudgePath/bin.
+NUCLEAR_DATABASE_DIR    Location of the nuclear data root.
+ENDL_DATABASE_DIR       Location of the default evaluated databases.
+TRANSLATED_DATABASE_DIR Location of the translated database
+ENDL_DEFAULT_DATABASE   Default evaluated database in ENDL_DATABASE_DIR.
+                        This can be set with the envirnoment varialbe ENDLPATH.
+MCF_DATABASE_DIR        Location of the default mcf (Monte Carlo transport) processed files.
+                        This can be set with the envirnoment varialbe MCFPATH.
+NDF_DATABASE_DIR        Location of the default ndf (deterministic transport) processed files.
+                        This can be set with the envirnoment varialbe NDFPATH.</pre>
+</div>
+<p>Also see the description of the variables PYTHONPATH and FUDGEPATH in the module fudge.py.
+The module fudge.py describes the proper procedure to follow to override these parameters.</p>
+</div>
+<div class="section" id="module-fudge.fudgeParameters">
+<span id="fudgeparameters-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">fudgeParameters</span></tt> Module<a class="headerlink" href="#module-fudge.fudgeParameters" title="Permalink to this headline">¶</a></h2>
+<p>This module contains the parameters VerboseMode and ReadOnly.</p>
+</div>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="fudge.core.html">Core library</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fudge.core.html#id1"><tt class="docutils literal"><span class="pre">core</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.core.html#module-fudge.core.ancestry"><tt class="docutils literal"><span class="pre">ancestry</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.core.html#module-fudge.core.fudgemisc"><tt class="docutils literal"><span class="pre">fudgemisc</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.core.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fudge.core.math.html">math Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#id1"><tt class="docutils literal"><span class="pre">math</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.endl1dmathClasses"><tt class="docutils literal"><span class="pre">endl1dmathClasses</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.endl1dmathmisc"><tt class="docutils literal"><span class="pre">endl1dmathmisc</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.endl2dmathClasses"><tt class="docutils literal"><span class="pre">endl2dmathClasses</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.endl2dmathmisc"><tt class="docutils literal"><span class="pre">endl2dmathmisc</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.endl3dmathClasses"><tt class="docutils literal"><span class="pre">endl3dmathClasses</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.endl3dmathmisc"><tt class="docutils literal"><span class="pre">endl3dmathmisc</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.endl4dmathClasses"><tt class="docutils literal"><span class="pre">endl4dmathClasses</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.endl4dmathmisc"><tt class="docutils literal"><span class="pre">endl4dmathmisc</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.fudge2dGrouping"><tt class="docutils literal"><span class="pre">fudge2dGrouping</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.fudgemath"><tt class="docutils literal"><span class="pre">fudgemath</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.parameters"><tt class="docutils literal"><span class="pre">parameters</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.pointwiseXY"><tt class="docutils literal"><span class="pre">pointwiseXY</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.table"><tt class="docutils literal"><span class="pre">table</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.matrix"><tt class="docutils literal"><span class="pre">matrix</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.linearAlgebra"><tt class="docutils literal"><span class="pre">linearAlgebra</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fudge.core.math.test.html">test Package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="fudge.core.math.test.html#id1"><tt class="docutils literal"><span class="pre">test</span></tt> Package</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.core.math.test.html#module-fudge.core.math.test.testFudgeMath"><tt class="docutils literal"><span class="pre">testFudgeMath</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.core.math.test.html#module-fudge.core.math.test.testXYs"><tt class="docutils literal"><span class="pre">testXYs</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="fudge.core.math.xData.html">xData Package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="fudge.core.math.xData.html#id1"><tt class="docutils literal"><span class="pre">xData</span></tt> Package</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.core.math.xData.html#module-fudge.core.math.xData.LegendreSeries"><tt class="docutils literal"><span class="pre">LegendreSeries</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.core.math.xData.html#module-fudge.core.math.xData.V_W_XYs"><tt class="docutils literal"><span class="pre">V_W_XYs</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.core.math.xData.html#module-fudge.core.math.xData.W_XYs"><tt class="docutils literal"><span class="pre">W_XYs</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.core.math.xData.html#module-fudge.core.math.xData.XYs"><tt class="docutils literal"><span class="pre">XYs</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.core.math.xData.html#module-fudge.core.math.xData.axes"><tt class="docutils literal"><span class="pre">axes</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.core.math.xData.html#module-fudge.core.math.xData.polynomial"><tt class="docutils literal"><span class="pre">polynomial</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.core.math.xData.html#module-fudge.core.math.xData.regions"><tt class="docutils literal"><span class="pre">regions</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fudge.core.utilities.html">utilities Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.html#id1"><tt class="docutils literal"><span class="pre">utilities</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.argparse"><tt class="docutils literal"><span class="pre">argparse</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.brb"><tt class="docutils literal"><span class="pre">brb</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.fudgeExceptions"><tt class="docutils literal"><span class="pre">fudgeExceptions</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.fudgeFileMisc"><tt class="docutils literal"><span class="pre">fudgeFileMisc</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.fudgeZA"><tt class="docutils literal"><span class="pre">fudgeZA</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.pyparsing"><tt class="docutils literal"><span class="pre">pyparsing</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.reactionStrings"><tt class="docutils literal"><span class="pre">reactionStrings</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.subprocessing"><tt class="docutils literal"><span class="pre">subprocessing</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.xmlNode"><tt class="docutils literal"><span class="pre">xmlNode</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fudge.core.utilities.test.html">test Package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="fudge.core.utilities.test.html#id1"><tt class="docutils literal"><span class="pre">test</span></tt> Package</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.core.utilities.test.html#module-fudge.core.utilities.test.testUtilities"><tt class="docutils literal"><span class="pre">testUtilities</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fudge.gnd.html">GND hierarchy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#id1"><tt class="docutils literal"><span class="pre">gnd</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.baseClasses"><tt class="docutils literal"><span class="pre">baseClasses</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.channels"><tt class="docutils literal"><span class="pre">channels</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.covariances"><tt class="docutils literal"><span class="pre">covariances</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.documentation"><tt class="docutils literal"><span class="pre">documentation</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.link"><tt class="docutils literal"><span class="pre">link</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.miscellaneous"><tt class="docutils literal"><span class="pre">miscellaneous</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.product"><tt class="docutils literal"><span class="pre">product</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.reactionSuite"><tt class="docutils literal"><span class="pre">reactionSuite</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.referredData"><tt class="docutils literal"><span class="pre">referredData</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.resonances"><tt class="docutils literal"><span class="pre">resonances</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.tokens"><tt class="docutils literal"><span class="pre">tokens</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.warning"><tt class="docutils literal"><span class="pre">warning</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.xParticle"><tt class="docutils literal"><span class="pre">xParticle</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.xParticleList"><tt class="docutils literal"><span class="pre">xParticleList</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fudge.gnd.channelData.html">channelData Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.channelData.html#id1"><tt class="docutils literal"><span class="pre">channelData</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.channelData.html#module-fudge.gnd.channelData.Q"><tt class="docutils literal"><span class="pre">Q</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.channelData.html#module-fudge.gnd.channelData.base"><tt class="docutils literal"><span class="pre">base</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.channelData.html#module-fudge.gnd.channelData.fissionEnergyReleased"><tt class="docutils literal"><span class="pre">fissionEnergyReleased</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fudge.gnd.productData.html">productData Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.productData.html#id1"><tt class="docutils literal"><span class="pre">productData</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.productData.html#module-fudge.gnd.productData.base"><tt class="docutils literal"><span class="pre">base</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.productData.html#module-fudge.gnd.productData.energyDeposition"><tt class="docutils literal"><span class="pre">energyDeposition</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.productData.html#module-fudge.gnd.productData.momentumDeposition"><tt class="docutils literal"><span class="pre">momentumDeposition</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.productData.html#module-fudge.gnd.productData.multiplicity"><tt class="docutils literal"><span class="pre">multiplicity</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.productData.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fudge.gnd.productData.distributions.html">distributions Package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#id1"><tt class="docutils literal"><span class="pre">distributions</span></tt> Package</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="fudge.gnd.productData.distributions.html#components-forms">Components                  Forms</a></li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.Legendre"><tt class="docutils literal"><span class="pre">Legendre</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.angular"><tt class="docutils literal"><span class="pre">angular</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.angularEnergy"><tt class="docutils literal"><span class="pre">angularEnergy</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.base"><tt class="docutils literal"><span class="pre">base</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.energy"><tt class="docutils literal"><span class="pre">energy</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.energyAngular"><tt class="docutils literal"><span class="pre">energyAngular</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.miscellaneous"><tt class="docutils literal"><span class="pre">miscellaneous</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.uncorrelated"><tt class="docutils literal"><span class="pre">uncorrelated</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="fudge.gnd.productData.distributions.test.html">test Package</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="fudge.gnd.productData.distributions.test.html#id1"><tt class="docutils literal"><span class="pre">test</span></tt> Package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fudge.gnd.reactionData.html">reactionData Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactionData.html#id1"><tt class="docutils literal"><span class="pre">reactionData</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactionData.html#module-fudge.gnd.reactionData.availableEnergy"><tt class="docutils literal"><span class="pre">availableEnergy</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactionData.html#module-fudge.gnd.reactionData.availableMomentum"><tt class="docutils literal"><span class="pre">availableMomentum</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactionData.html#module-fudge.gnd.reactionData.base"><tt class="docutils literal"><span class="pre">base</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactionData.html#module-fudge.gnd.reactionData.crossSection"><tt class="docutils literal"><span class="pre">crossSection</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fudge.gnd.reactions.html">reactions Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactions.html#id1"><tt class="docutils literal"><span class="pre">reactions</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactions.html#module-fudge.gnd.reactions.base"><tt class="docutils literal"><span class="pre">base</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactions.html#module-fudge.gnd.reactions.fissionComponent"><tt class="docutils literal"><span class="pre">fissionComponent</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactions.html#module-fudge.gnd.reactions.production"><tt class="docutils literal"><span class="pre">production</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactions.html#module-fudge.gnd.reactions.reaction"><tt class="docutils literal"><span class="pre">reaction</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactions.html#module-fudge.gnd.reactions.summedReaction"><tt class="docutils literal"><span class="pre">summedReaction</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fudge.gnd.test.html">test Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.test.html#id1"><tt class="docutils literal"><span class="pre">test</span></tt> Package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fudge.evaluationBuilder.html">Evaluator Support</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fudge.evaluationBuilder.html#id1"><tt class="docutils literal"><span class="pre">evaluationBuilder</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.evaluationBuilder.html#module-fudge.evaluationBuilder.base"><tt class="docutils literal"><span class="pre">base</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.evaluationBuilder.html#module-fudge.evaluationBuilder.reactionSuiteBuilder"><tt class="docutils literal"><span class="pre">reactionSuiteBuilder</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.evaluationBuilder.html#module-fudge.evaluationBuilder.reactionBuilder"><tt class="docutils literal"><span class="pre">reactionBuilder</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.evaluationBuilder.html#module-fudge.evaluationBuilder.crossSectionBuilder"><tt class="docutils literal"><span class="pre">crossSectionBuilder</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.evaluationBuilder.html#module-fudge.evaluationBuilder.distributionBuilder"><tt class="docutils literal"><span class="pre">distributionBuilder</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.evaluationBuilder.html#module-fudge.evaluationBuilder.productBuilder"><tt class="docutils literal"><span class="pre">productBuilder</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fudge.legacy.html">Legacy data support</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.html#id1"><tt class="docutils literal"><span class="pre">legacy</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.legacy.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fudge.legacy.converting.html">converting Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#id1"><tt class="docutils literal"><span class="pre">converting</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#module-fudge.legacy.converting.endfFileToGND"><tt class="docutils literal"><span class="pre">endfFileToGND</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#module-fudge.legacy.converting.endfFileToGNDMisc"><tt class="docutils literal"><span class="pre">endfFileToGNDMisc</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#module-fudge.legacy.converting.endfFormats"><tt class="docutils literal"><span class="pre">endfFormats</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#module-fudge.legacy.converting.endf_endl"><tt class="docutils literal"><span class="pre">endf_endl</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#module-fudge.legacy.converting.endlToGND"><tt class="docutils literal"><span class="pre">endlToGND</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#module-fudge.legacy.converting.gndToENDF6"><tt class="docutils literal"><span class="pre">gndToENDF6</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fudge.legacy.endl.html">endl Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#id1"><tt class="docutils literal"><span class="pre">endl</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl2"><tt class="docutils literal"><span class="pre">endl2</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlFile"><tt class="docutils literal"><span class="pre">endlFile</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlIClasses"><tt class="docutils literal"><span class="pre">endlIClasses</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlIClassesParameters"><tt class="docutils literal"><span class="pre">endlIClassesParameters</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlNd"><tt class="docutils literal"><span class="pre">endlNd</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlParameters"><tt class="docutils literal"><span class="pre">endlParameters</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlProject"><tt class="docutils literal"><span class="pre">endlProject</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlReactionParameters"><tt class="docutils literal"><span class="pre">endlReactionParameters</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlSplit"><tt class="docutils literal"><span class="pre">endlSplit</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlZA"><tt class="docutils literal"><span class="pre">endlZA</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl_C"><tt class="docutils literal"><span class="pre">endl_C</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl_I"><tt class="docutils literal"><span class="pre">endl_I</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl_Z"><tt class="docutils literal"><span class="pre">endl_Z</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endl_y"><tt class="docutils literal"><span class="pre">endl_y</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endlmisc"><tt class="docutils literal"><span class="pre">endlmisc</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.endltdf"><tt class="docutils literal"><span class="pre">endltdf</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.fudgeDocumentationFile"><tt class="docutils literal"><span class="pre">fudgeDocumentationFile</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#module-fudge.legacy.endl.fudgemiscLegacy"><tt class="docutils literal"><span class="pre">fudgemiscLegacy</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.endl.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fudge.legacy.endl.test.html">test Package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="fudge.legacy.endl.test.html#id1"><tt class="docutils literal"><span class="pre">test</span></tt> Package</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.legacy.endl.test.html#module-fudge.legacy.endl.test.test_endlProject"><tt class="docutils literal"><span class="pre">test_endlProject</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fudge.particles.html">Particle properties</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fudge.particles.html#id1"><tt class="docutils literal"><span class="pre">particles</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.particles.html#module-fudge.particles.nuclear"><tt class="docutils literal"><span class="pre">nuclear</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fudge.processing.html">Processing support</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fudge.processing.html#id1"><tt class="docutils literal"><span class="pre">processing</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.processing.html#module-fudge.processing.bdfls"><tt class="docutils literal"><span class="pre">bdfls</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.processing.html#module-fudge.processing.miscellaneous"><tt class="docutils literal"><span class="pre">miscellaneous</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.processing.html#module-fudge.processing.processingInfo"><tt class="docutils literal"><span class="pre">processingInfo</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.processing.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fudge.processing.deterministic.html">deterministic Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.processing.deterministic.html#id1"><tt class="docutils literal"><span class="pre">deterministic</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.processing.deterministic.html#module-fudge.processing.deterministic.gndToLLNLSnCOut"><tt class="docutils literal"><span class="pre">gndToLLNLSnCOut</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.processing.deterministic.html#module-fudge.processing.deterministic.transferMatrices"><tt class="docutils literal"><span class="pre">transferMatrices</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fudge.processing.montecarlo.html">montecarlo Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.processing.montecarlo.html#id1"><tt class="docutils literal"><span class="pre">montecarlo</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.processing.montecarlo.html#module-fudge.processing.montecarlo.fudge2dEqualProbableBinning"><tt class="docutils literal"><span class="pre">fudge2dEqualProbableBinning</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fudge.processing.resonances.html">resonances Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.html#id1"><tt class="docutils literal"><span class="pre">resonances</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances.fudgeReconstructResonances"><tt class="docutils literal"><span class="pre">fudgeReconstructResonances</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances.getCoulombWavefunctions"><tt class="docutils literal"><span class="pre">getCoulombWavefunctions</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances.getScatteringMatrices"><tt class="docutils literal"><span class="pre">getScatteringMatrices</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fudge.structure.html">Structure data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fudge.structure.html#id1"><tt class="docutils literal"><span class="pre">structure</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.structure.html#module-fudge.structure.ElementTree"><tt class="docutils literal"><span class="pre">ElementTree</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.structure.html#module-fudge.structure.masses"><tt class="docutils literal"><span class="pre">masses</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.structure.html#module-fudge.structure.xensl"><tt class="docutils literal"><span class="pre">xensl</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.structure.html#module-fudge.structure.xml2py"><tt class="docutils literal"><span class="pre">xml2py</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fudge.vis.html">Visualization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fudge.vis.html#id1"><tt class="docutils literal"><span class="pre">vis</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.vis.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fudge.vis.gnuplot.html">gnuplot Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.vis.gnuplot.html#id1"><tt class="docutils literal"><span class="pre">gnuplot</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.vis.gnuplot.html#module-fudge.vis.gnuplot.fudge2dMultiPlotClass"><tt class="docutils literal"><span class="pre">fudge2dMultiPlotClass</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.vis.gnuplot.html#module-fudge.vis.gnuplot.fudgeMultiPlots"><tt class="docutils literal"><span class="pre">fudgeMultiPlots</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.vis.gnuplot.html#module-fudge.vis.gnuplot.fudgeNdMultiPlotMisc"><tt class="docutils literal"><span class="pre">fudgeNdMultiPlotMisc</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.vis.gnuplot.html#module-fudge.vis.gnuplot.plotbase"><tt class="docutils literal"><span class="pre">plotbase</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fudge.vis.matplotlib.html">matplotlib Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.vis.matplotlib.html#id1"><tt class="docutils literal"><span class="pre">matplotlib</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.vis.matplotlib.html#module-fudge.vis.matplotlib.plot2d"><tt class="docutils literal"><span class="pre">plot2d</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pqu.html">Physical quantities with uncertainty framework</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pqu.html#module-pqu"><tt class="docutils literal"><span class="pre">pqu</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pqu.html#module-pqu.physicalQuantityWithUncertainty"><tt class="docutils literal"><span class="pre">physicalQuantityWithUncertainty</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pqu.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pqu.test.html">test Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pqu.test.html#id1"><tt class="docutils literal"><span class="pre">test</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pqu.test.html#module-pqu.test.testPhysicalQuantityWithUncertainty"><tt class="docutils literal"><span class="pre">testPhysicalQuantityWithUncertainty</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="numericalFunctions.html">C extensions for low-level numerics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="numericalFunctions.html#module-numericalFunctions.lib.nf_specialFunctions_C"><tt class="docutils literal"><span class="pre">specialFunctions</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="numericalFunctions.html#module-numericalFunctions.lib.nf_Legendre_C"><tt class="docutils literal"><span class="pre">Legendre</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="numericalFunctions.html#module-numericalFunctions.lib.pointwiseXY_C"><tt class="docutils literal"><span class="pre">pointwiseXY_C</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="numericalFunctions.html#pointwisexy-c-pointwisexy-c-class"><tt class="docutils literal"><span class="pre">pointwiseXY_C.pointwiseXY_C</span></tt> Class</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="crossSectionAdjustForHeatedTarget.html">Cross section heating module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="crossSectionAdjustForHeatedTarget.html#module-crossSectionAdjustForHeatedTarget.lib.crossSectionAdjustForHeatedTarget"><tt class="docutils literal"><span class="pre">crossSectionAdjustForHeatedTarget</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="xmlrunner.html">XML formatter for unit testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="xmlrunner.html#module-xmlrunner"><tt class="docutils literal"><span class="pre">xmlrunner</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">fudge Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">fudge</span></tt> Package</a><ul>
+<li><a class="reference internal" href="#getting-at-fudge-s-python-scripts">Getting at fudge&#8217;s python scripts.</a></li>
+<li><a class="reference internal" href="#other-environment-variables">Other environment variables.</a></li>
+<li><a class="reference internal" href="#reading-fudge-s-documentation">Reading fudge&#8217;s documentation.</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-fudge.__doc__"><tt class="docutils literal"><span class="pre">__doc__</span></tt> Module</a><ul>
+<li><a class="reference internal" href="#id2">Getting at fudge&#8217;s python scripts.</a></li>
+<li><a class="reference internal" href="#id3">Other environment variables.</a></li>
+<li><a class="reference internal" href="#id4">Reading fudge&#8217;s documentation.</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-fudge.fudgeDefaults"><tt class="docutils literal"><span class="pre">fudgeDefaults</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-fudge.fudgeParameters"><tt class="docutils literal"><span class="pre">fudgeParameters</span></tt> Module</a></li>
+<li><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../index.html"
+                        title="previous chapter">Fudge and GND</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fudge.core.html"
+                        title="next chapter">core Package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/fudge/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fudge.core.html" title="core Package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="Fudge and GND"
+             >previous</a> |</li>
+        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,134 @@
+gnd Package
+===========
+
+:mod:`gnd` Package
+------------------
+
+.. automodule:: fudge.gnd
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`baseClasses` Module
+-------------------------
+
+.. automodule:: fudge.gnd.baseClasses
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`channels` Module
+----------------------
+
+.. automodule:: fudge.gnd.channels
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`covariances` Module
+-------------------------
+
+.. automodule:: fudge.gnd.covariances
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`documentation` Module
+---------------------------
+
+.. automodule:: fudge.gnd.documentation
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`link` Module
+------------------
+
+.. automodule:: fudge.gnd.link
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`miscellaneous` Module
+---------------------------
+
+.. automodule:: fudge.gnd.miscellaneous
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`product` Module
+---------------------
+
+.. automodule:: fudge.gnd.product
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`reactionSuite` Module
+---------------------------
+
+.. automodule:: fudge.gnd.reactionSuite
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`referredData` Module
+--------------------------
+
+.. automodule:: fudge.gnd.referredData
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`resonances` Module
+------------------------
+
+.. automodule:: fudge.gnd.resonances
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`tokens` Module
+--------------------
+
+.. automodule:: fudge.gnd.tokens
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`warning` Module
+---------------------
+
+.. automodule:: fudge.gnd.warning
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`xParticle` Module
+-----------------------
+
+.. automodule:: fudge.gnd.xParticle
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`xParticleList` Module
+---------------------------
+
+.. automodule:: fudge.gnd.xParticleList
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+
+    fudge.gnd.channelData
+    fudge.gnd.productData
+    fudge.gnd.reactionData
+    fudge.gnd.reactions
+    fudge.gnd.test
+

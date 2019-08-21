@@ -1,0 +1,284 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.core.math.xData.regions &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for fudge.core.math.xData.regions</h1><div class="highlight"><pre>
+<span class="c"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="kn">import</span> <span class="n">brb</span>
+<span class="kn">import</span> <span class="nn">XYs</span><span class="o">,</span> <span class="nn">axes</span><span class="o">,</span> <span class="nn">LegendreSeries</span>
+<span class="kn">from</span> <span class="nn">fudge.core</span> <span class="kn">import</span> <span class="n">ancestry</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<span class="n">monikerRegions</span> <span class="o">=</span> <span class="s">&#39;regions&#39;</span>
+<span class="n">monikerRegion</span> <span class="o">=</span> <span class="s">&#39;region&#39;</span>
+
+<div class="viewcode-block" id="regions"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.xData.html#fudge.core.math.xData.regions.regions">[docs]</a><span class="k">class</span> <span class="nc">regions</span><span class="p">(</span> <span class="n">ancestry</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">regionClass</span><span class="p">,</span> <span class="n">axes_</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">isPrimaryXData</span> <span class="o">=</span> <span class="bp">True</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">ancestry</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">monikerRegions</span><span class="p">,</span> <span class="n">parent</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regionClass</span> <span class="o">=</span> <span class="n">regionClass</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">axes</span><span class="o">.</span><span class="n">isValidAxes</span><span class="p">(</span> <span class="n">axes_</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&#39;axes_ argument is not instance of axes class: it is </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">brb</span><span class="o">.</span><span class="n">getType</span><span class="p">(</span> <span class="n">axes_</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="o">=</span> <span class="n">axes_</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isPrimaryXData</span> <span class="o">=</span> <span class="n">isPrimaryXData</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the number of regions in self.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">i</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the (i-1)^th region of self.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">region_</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Set region (the right-hand-side) to the :math:`{i-1}^{th}` region of self. Region must be an instance of self&#39;s regionClass.</span>
+<span class="sd">        If :math:`i &gt; 0`, the following must also be met:</span>
+<span class="sd">        </span>
+<span class="sd">            - all the prior regions must already exists,</span>
+<span class="sd">            - region&#39;s minimum domain value must be equal to the prior region&#39;s maximum domain value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">region_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">regionClass</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&#39;Region must be an instance of </span><span class="si">%s</span><span class="s">. It is </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> \
+            <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">regionClass</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="n">brb</span><span class="o">.</span><span class="n">getType</span><span class="p">(</span> <span class="n">region_</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">n</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span> <span class="s">&#39;Index = </span><span class="si">%s</span><span class="s"> not in range 0 &lt;= index &lt;= </span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">XYs</span><span class="o">.</span><span class="n">raiseNotSameUnit</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">region_</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">XYs</span><span class="o">.</span><span class="n">raiseNotSameUnit</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">region_</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">region_</span> <span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&#39;Region must contain at least 2 points; it has </span><span class="si">%s</span><span class="s">.&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span> <span class="n">region_</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">region_</span><span class="p">,</span> <span class="p">(</span> <span class="n">XYs</span><span class="o">.</span><span class="n">XYs</span><span class="p">,</span> <span class="n">LegendreSeries</span><span class="o">.</span><span class="n">W_XYs_LegendreSeries</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="n">region_</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="p">,</span> <span class="n">moniker</span> <span class="o">=</span> <span class="n">monikerRegion</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">i</span><span class="p">,</span> <span class="n">isPrimaryXData</span> <span class="o">=</span> <span class="bp">False</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="n">region_</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="p">,</span> <span class="n">moniker</span> <span class="o">=</span> <span class="n">monikerRegion</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="n">i</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">region</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">domainMax</span><span class="p">(</span> <span class="p">)</span> <span class="o">!=</span> <span class="n">region</span><span class="o">.</span><span class="n">domainMin</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;Prior region&#39;s domainMax </span><span class="si">%s</span><span class="s"> != new region&#39;s domainMin = </span><span class="si">%s</span><span class="s">&quot;</span> \
+                    <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">domainMax</span><span class="p">(</span> <span class="p">),</span> <span class="n">region</span><span class="o">.</span><span class="n">domainMin</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="p">(</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">domainMin</span><span class="p">(</span> <span class="p">)</span> <span class="o">!=</span> <span class="n">region</span><span class="o">.</span><span class="n">domainMax</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>  <span class="s">&quot;Next region&#39;s domainMin </span><span class="si">%s</span><span class="s"> != new region&#39;s domainMax = </span><span class="si">%s</span><span class="s">&quot;</span> \
+                    <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">domainMin</span><span class="p">(</span> <span class="p">),</span> <span class="n">region</span><span class="o">.</span><span class="n">domainMax</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">i</span> <span class="o">==</span> <span class="n">n</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">region</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">region</span>
+
+<div class="viewcode-block" id="regions.append"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.xData.html#fudge.core.math.xData.regions.regions.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">region</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="bp">self</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)]</span> <span class="o">=</span> <span class="n">region</span>
+</div>
+<div class="viewcode-block" id="regions.domainMin"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.xData.html#fudge.core.math.xData.regions.regions.domainMin">[docs]</a>    <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitTo</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="bp">False</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">domainMin</span><span class="p">(</span> <span class="n">unitTo</span> <span class="o">=</span> <span class="n">unitTo</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="n">asPQU</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="regions.domainMax"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.xData.html#fudge.core.math.xData.regions.regions.domainMax">[docs]</a>    <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitTo</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="bp">False</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">domainMax</span><span class="p">(</span> <span class="n">unitTo</span> <span class="o">=</span> <span class="n">unitTo</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="n">asPQU</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="regions.getDomain"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.xData.html#fudge.core.math.xData.regions.regions.getDomain">[docs]</a>    <span class="k">def</span> <span class="nf">getDomain</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitTo</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="bp">False</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">(</span> <span class="n">unitTo</span> <span class="o">=</span> <span class="n">unitTo</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="n">asPQU</span> <span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">(</span> <span class="n">unitTo</span> <span class="o">=</span> <span class="n">unitTo</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="n">asPQU</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="regions.getDomainUnit"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.xData.html#fudge.core.math.xData.regions.regions.getDomainUnit">[docs]</a>    <span class="k">def</span> <span class="nf">getDomainUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">getUnit</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="regions.toXMLList"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.xData.html#fudge.core.math.xData.regions.regions.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s">&#39;tag&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span>       <span class="c"># See note 1</span>
+        <span class="n">xDataString</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPrimaryXData</span> <span class="ow">and</span> <span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s">&#39;xData&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">xDataString</span> <span class="o">=</span> <span class="s">&#39; xData=&quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">xData</span>   <span class="c"># See note 1</span>
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="s">&#39;  &#39;</span>
+        <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">&lt;</span><span class="si">%s%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">xDataString</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="p">:</span> <span class="n">xmlString</span> <span class="o">+=</span> <span class="n">region</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent2</span><span class="p">,</span> <span class="n">pairsPerLine</span> <span class="o">=</span> <span class="mi">100</span> <span class="p">)</span>
+        <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s">&#39;&lt;/</span><span class="si">%s</span><span class="s">&gt;&#39;</span> <span class="o">%</span> <span class="n">tag</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">xmlString</span> <span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="regionsXYs"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.xData.html#fudge.core.math.xData.regions.regionsXYs">[docs]</a><span class="k">class</span> <span class="nc">regionsXYs</span><span class="p">(</span> <span class="n">regions</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">xData</span> <span class="o">=</span> <span class="s">&#39;regionsXYs&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">axes_</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">isPrimaryXData</span> <span class="o">=</span> <span class="bp">True</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">regions</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">XYs</span><span class="o">.</span><span class="n">XYs</span><span class="p">,</span> <span class="n">axes_</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="p">,</span> <span class="n">isPrimaryXData</span> <span class="o">=</span> <span class="n">isPrimaryXData</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="regionsXYs.toPointwiseLinear"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.xData.html#fudge.core.math.xData.regions.regionsXYs.toPointwiseLinear">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwiseLinear</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">lowerEps</span><span class="p">,</span> <span class="n">upperEps</span><span class="p">,</span> <span class="n">removeOverAdjustedPoints</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="n">axes_</span> <span class="o">=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts the regions of self into a single ``XYs.XYs`` instance that has &#39;linear,linear&#39; interpolation. At the</span>
+<span class="sd">        boundary between two abutting regions, the x-values are the same, which is not allowed for an ``XYs.XYs`` instance.</span>
+<span class="sd">        The arguments ``lowerEps``, ``upperEps`` are used to smear the x-values at a boundary as follows. Let :math:`(x_l, y_l)` and</span>
+<span class="sd">        :math:`(x_u, y_u)` be the abutting points for two abutting regions. If :math:`y_l = y_u` then the point :math:`(x_u, y_u)` is removed.</span>
+<span class="sd">        Otherwise, if( lowerEps &gt; 0 ) the point :math:`(x_l, y_l)` is moved to :math:`x = x_l * ( 1 - lowerEps )` (or :math:`x = x_l * ( 1 + lowerEps )`</span>
+<span class="sd">        if :math:`x_l &lt; 0`) and the :math:`y` value is interpolated at :math:`x`. If :math:`x` is less than the x-value of the point below :math:`(x_l, y_l)`</span>
+<span class="sd">        and ``removeOverAdjustedPoints`` is True then the point :math:`(x_l, y_l)` is removed; otherwise, a raise is executed. Similarly </span>
+<span class="sd">        for upperEps and the point :math:`(x_u, y_u)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">getAdjustedX</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="n">eps</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="k">if</span><span class="p">(</span> <span class="n">x</span> <span class="o">==</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">x_</span> <span class="o">=</span> <span class="n">eps</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">x_</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="p">(</span> <span class="mf">1.</span> <span class="o">-</span> <span class="n">eps</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">x_</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="p">(</span> <span class="mf">1.</span> <span class="o">+</span> <span class="n">eps</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="n">x_</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">axes_</span> <span class="ow">is</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">axes_</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">defaultAxes</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="n">XYs</span><span class="p">(</span> <span class="n">axes_</span><span class="p">,</span> <span class="p">[],</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">xUnit</span><span class="p">,</span> <span class="n">yUnit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">getUnit</span><span class="p">(</span> <span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">getUnit</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">lowerEps</span> <span class="o">&lt;</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&#39;lowerEps = </span><span class="si">%s</span><span class="s"> must &gt;= 0.&#39;</span> <span class="o">%</span> <span class="n">lowerEps</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">upperEps</span> <span class="o">&lt;</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&#39;upperEps = </span><span class="si">%s</span><span class="s"> must &gt;= 0.&#39;</span> <span class="o">%</span> <span class="n">upperEps</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">lowerEps</span> <span class="o">==</span> <span class="mf">0.</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">upperEps</span> <span class="o">==</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&#39;lowerEps and upperEps cannot both be 0.&#39;</span> <span class="p">)</span>
+        <span class="n">xys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">region</span><span class="o">.</span><span class="n">getAccuracy</span><span class="p">(</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="n">accuracy</span> <span class="p">)</span> <span class="p">:</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">getAccuracy</span><span class="p">(</span> <span class="p">)</span>
+        <span class="n">interpolationStr</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">,</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">axes</span><span class="o">.</span><span class="n">linearToken</span><span class="p">,</span> <span class="n">axes</span><span class="o">.</span><span class="n">linearToken</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">iRegion</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">region_</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">changeInterpolation</span><span class="p">(</span> <span class="n">axes</span><span class="o">.</span><span class="n">linearToken</span><span class="p">,</span> <span class="n">axes</span><span class="o">.</span><span class="n">linearToken</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">lowerEps</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">lowerEps</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">upperEps</span> <span class="p">)</span>
+            <span class="n">region_</span> <span class="o">=</span> <span class="n">region_</span><span class="o">.</span><span class="n">copyDataToXYs</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">iRegion</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> 
+                <span class="n">x12</span><span class="p">,</span> <span class="n">y12</span> <span class="o">=</span> <span class="n">xys</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">x21</span><span class="p">,</span> <span class="n">y21</span> <span class="o">=</span> <span class="n">region_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">y12</span> <span class="o">==</span> <span class="n">y21</span> <span class="p">)</span> <span class="p">:</span>              <span class="c"># Remove first point of region as it is the same as the last point.</span>
+                    <span class="n">region_</span> <span class="o">=</span> <span class="n">region_</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">lowerEps</span> <span class="o">!=</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="n">x11</span><span class="p">,</span> <span class="n">y11</span> <span class="o">=</span> <span class="n">xys</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+                        <span class="n">x</span> <span class="o">=</span> <span class="n">getAdjustedX</span><span class="p">(</span> <span class="n">x12</span><span class="p">,</span> <span class="o">-</span><span class="n">lowerEps</span> <span class="p">)</span>
+                        <span class="k">if</span><span class="p">(</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">x11</span> <span class="p">)</span> <span class="p">:</span>
+                            <span class="k">if</span><span class="p">(</span> <span class="n">removeOverAdjustedPoints</span> <span class="p">)</span> <span class="p">:</span>
+                                <span class="k">del</span> <span class="n">xys</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                            <span class="k">else</span> <span class="p">:</span>
+                                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&#39;Adjustment at </span><span class="si">%s</span><span class="s"> makes new x = </span><span class="si">%s</span><span class="s"> &gt;= prior x = </span><span class="si">%s</span><span class="s">; eps = </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">x12</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x11</span><span class="p">,</span> <span class="n">lowerEps</span> <span class="p">)</span> <span class="p">)</span>
+                        <span class="k">else</span> <span class="p">:</span>
+                            <span class="n">xys</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span><span class="p">,</span> <span class="n">XYs</span><span class="o">.</span><span class="n">pointwiseXY_C</span><span class="o">.</span><span class="n">interpolatePoint</span><span class="p">(</span> <span class="n">interpolationStr</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x11</span><span class="p">,</span> <span class="n">y11</span><span class="p">,</span> <span class="n">x12</span><span class="p">,</span> <span class="n">y12</span> <span class="p">)</span> <span class="p">]</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">upperEps</span> <span class="o">!=</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="n">x22</span><span class="p">,</span> <span class="n">y22</span> <span class="o">=</span> <span class="n">region_</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="n">x</span> <span class="o">=</span> <span class="n">getAdjustedX</span><span class="p">(</span> <span class="n">x21</span><span class="p">,</span> <span class="n">upperEps</span> <span class="p">)</span>
+                        <span class="k">if</span><span class="p">(</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="n">x22</span> <span class="p">)</span> <span class="p">:</span>
+                            <span class="k">if</span><span class="p">(</span> <span class="n">removeOverAdjustedPoints</span> <span class="p">)</span> <span class="p">:</span>
+                                <span class="k">del</span> <span class="n">region_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                            <span class="k">else</span> <span class="p">:</span>
+                                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&#39;Adjustment at </span><span class="si">%s</span><span class="s"> makes new x = </span><span class="si">%s</span><span class="s"> &gt;= next x = </span><span class="si">%s</span><span class="s">; eps = </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">x21</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x22</span><span class="p">,</span> <span class="n">upperEps</span> <span class="p">)</span> <span class="p">)</span>
+                        <span class="k">else</span> <span class="p">:</span>
+                            <span class="n">region_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x</span><span class="p">,</span> <span class="n">XYs</span><span class="o">.</span><span class="n">pointwiseXY_C</span><span class="o">.</span><span class="n">interpolatePoint</span><span class="p">(</span> <span class="n">interpolationStr</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x21</span><span class="p">,</span> <span class="n">y21</span><span class="p">,</span> <span class="n">x22</span><span class="p">,</span> <span class="n">y22</span> <span class="p">)</span> <span class="p">]</span>
+            <span class="n">xys</span> <span class="o">+=</span> <span class="n">region_</span>
+        <span class="n">newAxes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="n">standAlone</span> <span class="o">=</span> <span class="bp">True</span> <span class="p">)</span>
+        <span class="n">newAxes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setInterpolation</span><span class="p">(</span> <span class="n">axes</span><span class="o">.</span><span class="n">interpolationXY</span><span class="p">(</span> <span class="n">axes</span><span class="o">.</span><span class="n">linearToken</span><span class="p">,</span> <span class="n">axes</span><span class="o">.</span><span class="n">linearToken</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">pointwise</span> <span class="o">=</span> <span class="n">XYs</span><span class="o">.</span><span class="n">XYs</span><span class="p">(</span> <span class="n">newAxes</span><span class="p">,</span> <span class="n">xys</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">pointwise</span> <span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="regionsXYs.parseXMLNode"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.xData.html#fudge.core.math.xData.regions.regionsXYs.parseXMLNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">cls</span><span class="p">,</span> <span class="n">regionsElement</span><span class="p">,</span> <span class="n">linkData</span><span class="o">=</span><span class="p">{}</span> <span class="p">):</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="n">regionsElement</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="p">)</span>
+        <span class="n">axes_</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">regionsElement</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">regions_</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span> <span class="n">axes_</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">regionsElement</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">xys</span> <span class="o">=</span> <span class="n">XYs</span><span class="o">.</span><span class="n">XYs</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">region</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+            <span class="n">xys</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">regions_</span><span class="p">;</span> <span class="n">xys</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">tag</span><span class="p">;</span> <span class="n">xys</span><span class="o">.</span><span class="n">isPrimaryXData</span><span class="o">=</span><span class="bp">False</span>
+            <span class="n">regions_</span><span class="o">.</span><span class="n">regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">xys</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">regions_</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../../index.html">
+              <img class="logo" src="../../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

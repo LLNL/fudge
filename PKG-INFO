@@ -1,0 +1,270 @@
+Metadata-Version: 1.0
+Name: fudge
+Version: 4.0.0
+Summary: UNKNOWN
+Home-page: http://nuclear.llnl.gov/fudge
+Author: Computational Nuclear Physics Group, LLNL
+Author-email: mattoon1@llnl.gov
+License: OUR NOTICE AND TERMS AND CONDITIONS OF THE GNU GENERAL PUBLIC LICENSE
+
+					Our Preamble Notice
+
+A. This notice is required to be provided under our contract with the U.S. Department of Energy (DOE). This work was
+produced at the Lawrence Livermore National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+
+B. Neither the United States Government nor Lawrence Livermore National Security, LLC nor any of their employees, makes
+any warranty, express or implied, or assumes any liability or responsibility for the accuracy, completeness, or
+usefulness of any information, apparatus, product, or process disclosed, or represents that its use would not infringe
+privately-owned rights.
+
+C. Also, reference herein to any specific commercial products, process, or services by trade name, trademark,
+manufacturer or otherwise does not necessarily constitute or imply its endorsement, recommendation, or favoring by the
+United States Government or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+herein do not necessarily state or reflect those of the United States Government or Lawrence Livermore National
+Security, LLC, and shall not be used for advertising or product endorsement purposes.
+
+The precise terms and conditions for copying, distribution and modification follows.
+
+			GNU Terms and Conditions for Copying, Distribution, and Modification
+
+	0. This License applies to any program or other work which contains a notice placed by the copyright holder
+saying it may be distributed under the terms of this General Public License. The "Program," below, refers to any such
+program or work, and a "work based on the Program" means either the Program or any derivative work under copyright law:
+that is to say, a work containing the Program or a portion of it, either verbatim or with modifications and/or trans-
+lated into another language. (Hereinafter, translation is included without limitation in the term "modification".) Each
+licensee is addressed as "you."
+
+	Activities other than copying, distribution and modification are not covered by this License; they are outside
+its scope. The act of running the Program is not restricted, and the output from the Program is covered only if its
+contents constitute a work based on the Program (independent of having been made by running the Program). Whether that
+is true depends on what the Program does.
+
+	1. You may copy and distribute verbatim copies of the Program's source code as you receive it, in any medium,
+provided that you conspicuously and appropriately publish on each copy an appropriate copyright notice and disclaimer
+of warranty; keep intact all the notices that refer to this License and to the absence of any warranty; and give any
+other recipients of the Program a copy of this License along with the Program. You may charge a fee for the physical
+act of transferring a copy, and you may at your option offer warranty protection in exchange for a fee.
+2	You may modify your copy or copies of the Program or any portion of it, thus forming a work based on the
+Program, and copy and distribute such modifications or work under the terms of Section 1 above, provided that you also
+meet all of these conditions:
+    a) You must cause the modified files to carry prominent notices stating that you changed the files and the date of
+any change.
+    b) You must cause any work that you distribute or publish, that in whole or in part contains or is derived from the
+Program or any part thereof, to be licensed as a whole at no charge to all third parties under the terms of this
+License.
+    c) If the modified program normally reads commands interactively when run, you must cause it, when started running
+for such interactive use in the most ordinary way, to print or display an announcement including an appropriate
+copyright notice and a notice that there is no warranty (or else, saying that you provide a warranty) and that users
+may redistribute the program under these conditions, and telling the user how to view a copy of this License.
+(Exception: if the Program itself is interactive but does not normally print such an announcement, your work based on
+the Program is not required to print an announcement.)
+These requirements apply to the modified work as a whole. If identifiable sections of that work are not derived from
+the Program, and can be reasonably considered independent and separate works in themselves, then this License, and its
+terms, do not apply to those sections when you distribute them as separate work. But when you distribute the same
+section as part of a whole which is a work based on the Program, the distribution of the whole must be on the terms of
+this License, whose permissions for other licensees extend to the entire whole, and thus to each and every part
+regardless of who wrote it.
+Thus, it is not the intent of this section to claim rights or contest your rights to work written entirely by you;
+rather, the intent is to exercise the right to control the distribution of derivative or collective works based on the
+Program.
+In addition, mere aggregation of another work not based on the Program with the Program (or with a work based on the
+Program) on a volume of a storage or distribution medium does not bring the other work under the scope of this License.
+3 	You may copy and distribute the Program (or a work based on it, under Section 2) in object code or executable
+form under the terms of Sections 1 and 2 above provided that you also do one of the following:
+    a) Accompany it with the complete corresponding machine-readable source code, which must be distributed under the
+terms of Sections 1 and 2 above on a medium customarily used for software interchange; or,
+    b) Accompany it with a written offer, valid for at least three years, to give any third party, for a charge no more
+than your cost of physically performing source distribution, a complete machine-readable copy of the corresponding
+source code, to be distributed under the terms of Sections 1 and 2 above on a medium customarily used for software
+interchange; or,
+    c) Accompany it with the information you received as to the offer to distribute corresponding source code. (This
+alternative is allowed only for noncommercial distribution and only if you received the program in object code or
+executable form with such an offer, in accord with Subsection b above.)
+
+The source code for a work means the preferred form the work for making modifications to it. For an executable work,
+complete source code means all the source code for all modules it contains, plus any associated interface definition
+files, plus the scripts used to control compilation and installation of the executable. However, as a special exception,
+the source code distributed need not include anything that is normally distributed (in either source or binary form)
+with the major components (compiler, kernel, and so on) of the operating system on which the executable runs, unless
+that component itself accompanies the executable.
+
+If distribution of executable or object code is made by offering access to copy from a designated place, then offering
+equivalent access to copy the source code from the same place counts as distribution of the source code, even though
+third parties are not compelled to copy the source along with the object code.
+
+	4. You may not copy, modify, sublicense, or distribute the Program except as expressly provided under this
+License. Any attempt otherwise to copy, modify, sublicense or distribute the Program is void, and will automatically
+terminate your rights under this License. However, parties who have received copies, or rights, from you under this
+License will not have their licenses terminated so long as such parties remain in full compliance.
+2	You are not required to accept this License, since you have not signed it. However, nothing else grants you
+permission to modify or distribute the Program or its derivative works. These actions are prohibited by law if you do
+not accept this License. Therefore, by modifying or distributing the Program (or any work based on the Program), you
+indicate your acceptance of this License to do so, and all its terms and conditions for copying, distributing or
+modifying the Program or works based on it.
+3	Each time you redistribute the Program (or any work based on the Program), the recipient automatically receives
+a license from the original licensor to copy, distribute or modify the Program subject to these terms and conditions.
+You may not impose any further restrictions on the recipients’ exercise of the rights granted herein. You are not
+responsible for enforcing compliance by third parties to this License.
+4	If, as a consequence of a court judgment or allegation of patent infringement or for any other reason (not
+limited to patent issues), conditions are imposed on you (whether by court order, agreement or otherwise) that
+contradict the conditions of this License, they do not excuse you from the conditions of this License. If you cannot
+distribute so as to satisfy simultaneously your obligations under this License and any other pertinent obligations, then
+as a consequence you may not distribute the Program at all. For example, if a patent license would not permit royalty-
+free redistribution of the Program by all those who receive copies directly or indirectly through you, then the only way
+you could satisfy both it and this License would be to refrain entirely from distribution of the Program.
+If any portion of this section is held invalid or unenforceable under any particular circumstance, the balance of the
+section is intended to apply and the section as a whole is intended to apply in other circumstances.
+It is not the purpose to this section to induce you to infringe any patents or other property right claims or to contest
+validity of any such claims; this section has the sole purpose of protecting the integrity of the free software
+distribution system, which is implemented by public license practices. Many people have made generous contributions to
+the wide range of software distributed through that system in reliance on consistent application of that system; it is
+up to the author/donor to decide if he or she is willing to distribute software through any other system and a licensee
+cannot impose that choice.
+
+
+This section is intended to make thoroughly clear what is believed to be a consequence of the rest of this License.
+
+1	If the distribution and/or use of the Program is restricted in certain countries either by patents or by
+copyrighted interfaces, the original copyright holder who places the Program under this License may add an explicit
+geographical distribution limitation excluding those countries, so that distribution is permitted only in or among
+countries not thus excluded. In such case, this License incorporates the limitation as if written in the body of this
+License.
+	9. The Free Software Foundation may publish revised and/or new versions of the General Public License from time
+to time. Such new versions will be similar in spirit to the present version, but may differ in detail to address new
+problems or concerns.
+Each version is given a distinguishing version number. If the Program specifies a version number of this License which
+applies to it and “any later version,” you have the option of following the terms and conditions either of that version
+of any later version published by the Free Software Foundation. If the Program does not specify a version number of this
+License, you may choose any version ever published by the Free Software Foundation. 2	If you wish to incorporate parts
+of the Program into other free programs whose distribution conditions are different, write to the author to ask for
+permission. For software which is copyrighted by the Free Software Foundation, write to the Free Software Foundation; we
+sometimes make exceptions for this. Our decision to grant permission will be guided by the two goals of preserving the
+free status of all derivatives of our free software and or promoting the sharing and reuse of software generally .
+
+NO WARRANTY
+
+11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
+APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM
+"AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
+PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR
+CORRECTION.
+2	IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER
+PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY
+GENERAL, SPECIAL INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING
+BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGES.
+
+END OF TERMS AND CONDITIONS
+
+
+Description: Welcome to FUDGE (For Updating Data and GEnerating Evaluations), a nuclear data platform built in python that permits
+        reading, viewing, modifying, writing and processing of nuclear data. FUDGE is a product of the Computational Nuclear
+        Physics Group (CNP) at Lawrence Livermore National Lab (LLNL).
+        
+        This current release of Fudge focuses on introducing the new Generalized Nuclear Data (GND) format, intended to
+        modernize storage of nuclear data. The package includes tools to translate other formats to and from GND, plus tools
+        for testing and visualizing GND-formatted data.
+        
+        Contents of this README:
+            - 1) Getting Started
+            - 2) Basic Use (translating ENDF files)
+            - 3) Plotting
+            - 4) Getting Help
+            - 5) Notes on translated ENDF files
+        
+            More information is also available in the GND manual (fudge-2.0/doc/GND_beta2_manual.pdf) and in
+        fudge-2.0/doc/code-ref
+        
+        1) Getting Started:
+          Fudge is designed to be simple to install and use. For basic use the package only requires python (version 2.4-2.7).
+        Python is likely already present on all unix-based systems (if in doubt, try entering "python" on the command-line),
+        and is available for all platforms at www.python.org/getit
+        
+          To install the package:
+            1) obtain the current version (available online at nuclear.llnl.gov), and place it on your system.
+            2) to unzip the package, type
+                >tar -xvf fudge-2.0.tar.gz
+            3) The unzipped directory is named 'fudge-2.0'. Navigate into the new directory, and type 
+                >make
+               this builds extra tools for better performance. If you encounter errors at this step, you can still use the ENDF
+               translation tool but advanced features will be unavailable.
+            3) You are now set to use Fudge! For advanced use, see the optional components below.
+        
+          [Optional] Extra python packages: For more advanced use, Fudge depends on these additional, optional packages:
+            gnuplot and Gnuplot.py (for plotting, http://gnuplot-py.sourceforge.net)
+            matplotlib (alternate style of plotting, http://matplotlib.sourceforge.net)
+            numpy (for some advanced features including checking and manipulating covariance matrices, http://numpy.scipy.org)
+        
+          [Optional] Setting Environment Variables: for general use of the fudge package, some changes should be made to your
+        computer's environment. The following lines make the required change. Note that <path_to_fudge> indicates the path to
+        the directory containing this README file:
+        
+          on unix with bash, ksh, etc, put this line in the .bashrc or equivalent:
+            export PYTHONPATH=$PYTHONPATH:<path_to_fudge>
+        
+          on csh, tcsh or similar, do:
+            setenv PYTHONPATH $PYTHONPATH:<path_to_fudge>
+        
+          on Windows, the environment variable should be added to the registry (see for example
+               http://www.support.tabs3.com/main/R10463.htm)
+        
+          [Optional] Building Extensions: Fudge is primarily written in python, which is easily portable across many different
+        systems. Some advanced features of fudge (computationally intensive tasks) are however implemented in c or fortran, and
+        must be compiled before use. To build these extensions, use the Makefile included in this directory:
+            >make
+        
+          If you encounter trouble with installing, building extensions or setting environment variables, please let us know
+             (email: mattoon1@llnl.gov)
+        
+        
+        2) Basic Use:
+          After installing Fudge, most users will be interested in translating ENDF files to the new format and in measuring how
+        well the translation works. Two tools for translating ENDF are included in the 'bin' directory:
+        
+          rePrint.py: translate one ENDF-formatted file to GND, then translate back to ENDF for comparison with the original.
+        Usage:
+            <path_to_fudge>/bin/rePrint.py filename.endf
+          Several files are produced:
+            -test.endf6.xml	(the gnd-formatted file)
+            -test.endf6-covar.xml  (covariances in gnd, produced only if the original file has covariances)
+            -test.endf6.noLineNumbers  (the gnd file translated back to ENDF format)
+            -test.endf6.orig.noLineNumbers  (the original ENDF file with line numbers stripped for easy comparison)
+        
+          After running rePrint.py, you may wish to compare the original/new ENDF files using diff,kompare, etc:
+            >diff test.endf6.orig.noLineNumbers test.endf6.noLineNumbers
+        
+          See Section 5 below for a discussion of the most common differences between original/translated ENDF files.
+        
+          Another tool included in the release is 'rePrintSample.py'. This is very similar to rePrint, except it randomly picks 
+        an ENDF-formatted file from the included samples.
+        
+        3) Making Plots:
+          After translating an ENDF file to GND, fudge can be used to make plots from the data. Plotting in fudge may require
+        installing extra components (gnuplot and/or matplotlib). A sample plotting script is included in the 'examples'
+        directory:
+          >python <path_to_fudge>/examples/plotCrossSection.py
+        
+        4) Getting Help:
+          Documentation in html is packaged along with Fudge. To view the documentation, open the file "doc/code-ref/index.html"
+        inside fudge. This offers extensive documentation of all the python code included in the package, and is meant to be
+        used as a reference.
+          For other questions about the package, please feel free to contact the maintainer at mattoon1@llnl.gov
+        
+        5) Notes on translated ENDF files:
+          When translating from ENDF, you may notice some substantial differences between the original and re-translated file.
+        Some differences are due to sections that are not yet translated to the new format (for example, ENDF file 32 containing
+        resonance parameter covariances is not yet translated). Other differences include:
+            - masses, which appear many times in ENDF and are often inconsistent. In a GND file, the mass is stored only once,
+        so upon translation back to ENDF inconsistent masses are overwritten.
+            - interpolation regions: ENDF files permit using different interpolation (lin-lin, log-lin, etc) in different
+        regions. GND also supports this, but where possible we have merged two or more regions into a single region (for
+        example, 'flat' interpolation regions can be merged with lin-lin regions with no loss of precision).
+            - Improperly-formatted ENDF files: the GND translation tool strictly interprets the ENDF format as defined in the
+        June 2010 version of the ENDF manual (available at https://ndclx4.bnl.gov/gf/project/endf6man). Some differences come
+        from files in the ENDF library that do not strictly follow the format. As a common example, some ENDF files contain
+        non-zero data in a reserved field. After translation, the entry is reset to '0'.
+        
+        
+Platform: UNKNOWN

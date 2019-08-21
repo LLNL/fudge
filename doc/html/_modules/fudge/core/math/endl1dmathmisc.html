@@ -1,0 +1,186 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.core.math.endl1dmathmisc &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for fudge.core.math.endl1dmathmisc</h1><div class="highlight"><pre>
+<span class="c"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains miscellaneous routines for supporting the endl1dmath class from module endl1dmathClasses.</span>
+
+<span class="sd">Module&#39;s global variables::</span>
+<span class="sd">    endl1d_repr_xFormat : Default format string used for converting an element of the data of</span>
+<span class="sd">                          an endl1dmath object to a string.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">endl1dmathClasses</span>
+<span class="kn">import</span> <span class="nn">fudgemath</span>
+
+<span class="n">endl1d_repr_xFormat</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%14.7e</span><span class="s">&quot;</span>
+
+<div class="viewcode-block" id="get1dmathData"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathmisc.get1dmathData">[docs]</a><span class="k">def</span> <span class="nf">get1dmathData</span><span class="p">(</span> <span class="nb">object</span><span class="p">,</span> <span class="n">callingRoutine</span><span class="p">,</span> <span class="n">msg</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;If object is a python list, then it is returned. Else, if object is a sub-class</span>
+<span class="sd">    of endl1dmath its data is return otherwise a raise is executed.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="nb">object</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">object</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">valid1dClassType</span><span class="p">(</span> <span class="nb">object</span><span class="p">,</span> <span class="n">callingRoutine</span><span class="p">,</span> <span class="n">msg</span> <span class="p">)</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="valid1dClassType"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathmisc.valid1dClassType">[docs]</a><span class="k">def</span> <span class="nf">valid1dClassType</span><span class="p">(</span> <span class="nb">object</span><span class="p">,</span> <span class="n">callingRoutine</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the first argument, object, if it is a subclass of the endl1dmath class; else, triggers a raise.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="nb">object</span><span class="p">,</span> <span class="n">endl1dmathClasses</span><span class="o">.</span><span class="n">endl1dmath</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="nb">object</span> <span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in </span><span class="si">%s</span><span class="s">: invalid type = </span><span class="si">%s</span><span class="s"> for </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">callingRoutine</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span> <span class="nb">object</span> <span class="p">),</span> <span class="n">msg</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="check1dData"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathmisc.check1dData">[docs]</a><span class="k">def</span> <span class="nf">check1dData</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Checks that data is a python list of numbers. Triggers a raise if it is not.  Data may be a</span>
+<span class="sd">python list or an instance that is a subclass of endl1dmath.&quot;&quot;&quot;</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">get1dmathData</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="s">&quot;check1dData&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span> <span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">data</span> <span class="p">:</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">fudgemath</span><span class="o">.</span><span class="n">isNumber</span><span class="p">(</span> <span class="n">p</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in check1dData: data at index </span><span class="si">%d</span><span class="s"> is not a number.&quot;</span> <span class="o">%</span> <span class="n">i</span> <span class="p">)</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+</div>
+<div class="viewcode-block" id="list1dToXMLPointwiseString"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathmisc.list1dToXMLPointwiseString">[docs]</a><span class="k">def</span> <span class="nf">list1dToXMLPointwiseString</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">varString</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">floatFormat</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%16.9e</span><span class="s">&#39;</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="n">iscomplex</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span> <span class="p">[</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="nb">complex</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span> <span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">&lt;xData type=&quot;1d.x&quot; length=&quot;</span><span class="si">%d</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">varString</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">)</span> <span class="p">]</span>
+    <span class="k">if</span> <span class="n">iscomplex</span><span class="p">:</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="s">&#39; complex=&quot;True&quot;&#39;</span>
+    <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="s">&#39;&gt;&#39;</span>
+    <span class="k">if</span> <span class="n">iscomplex</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&#39; </span><span class="si">%s</span><span class="s">+</span><span class="si">%s</span><span class="s">j&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">floatFormat</span><span class="p">,</span><span class="n">floatFormat</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">real</span><span class="p">,</span><span class="n">x</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span> <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&#39; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">floatFormat</span> <span class="o">%</span> <span class="n">x</span> <span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span> <span class="p">]</span>
+    <span class="n">s</span> <span class="o">+=</span> <span class="n">d</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s">&#39;&lt;/xData&gt;&#39;</span> <span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="list1dToXMLEqualProbableBins1dString"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathmisc.list1dToXMLEqualProbableBins1dString">[docs]</a><span class="k">def</span> <span class="nf">list1dToXMLEqualProbableBins1dString</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">floatFormat</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%16.9e</span><span class="s">&#39;</span> <span class="p">)</span> <span class="p">:</span>
+    
+    <span class="n">s</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&#39;&lt;xData type=&quot;1d.x&quot; length=&quot;</span><span class="si">%d</span><span class="s">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">]</span>
+    <span class="n">s</span> <span class="o">+=</span> <span class="p">[</span> <span class="s">&#39; </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">floatFormat</span> <span class="o">%</span> <span class="n">x</span> <span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span> <span class="p">]</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s">&#39;&lt;/xData&gt;&#39;</span> <span class="p">)</span> 
+    <span class="k">return</span><span class="p">(</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endl1dToXMLGroup1dStringList"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathmisc.endl1dToXMLGroup1dStringList">[docs]</a><span class="k">def</span> <span class="nf">endl1dToXMLGroup1dStringList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">floatFormat</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%16.9e</span><span class="s">&#39;</span> <span class="p">)</span> <span class="p">:</span>
+
+<span class="c"># ?????????? This should no long be used.</span>
+
+    <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">gnd</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">&lt;</span><span class="si">%s</span><span class="s">&gt;</span><span class="si">%s%s</span><span class="s">&lt;/</span><span class="si">%s</span><span class="s">&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="n">datasVariableInfoToXML</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">indent</span><span class="o">+</span><span class="s">&#39;  &#39;</span> <span class="p">),</span> 
+        <span class="n">list1dToXMLEqualProbableBins1dString</span><span class="p">(</span> <span class="n">data</span> <span class="p">),</span> <span class="n">form</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="datasVariableInfoToXML"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathmisc.datasVariableInfoToXML">[docs]</a><span class="k">def</span> <span class="nf">datasVariableInfoToXML</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="s">&#39;variables&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="s">&#39;&#39;</span> <span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">variableInfoToXML</span><span class="p">(</span> <span class="n">data</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="variableInfoToXML"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathmisc.variableInfoToXML">[docs]</a><span class="k">def</span> <span class="nf">variableInfoToXML</span><span class="p">(</span> <span class="n">variables</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">varList</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">variables</span> <span class="p">:</span>
+        <span class="n">fStr</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="p">:</span> <span class="n">fStr</span> <span class="o">+=</span> <span class="s">&#39; </span><span class="si">%s</span><span class="s">=&quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="n">variables</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">varList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s">&#39;&lt;variable index=&quot;</span><span class="si">%d</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">index</span><span class="p">,</span> <span class="n">fStr</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">varList</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">+</span><span class="n">indent</span><span class="o">+</span><span class="n">var</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">varList</span><span class="p">])</span>
+    <span class="k">return</span><span class="p">(</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">varList</span><span class="p">)</span> <span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

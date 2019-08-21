@@ -1,0 +1,38 @@
+.. _installation:
+
+Installation
+============
+
+pqu is designed to be simple to install and use. For basic use the package only 
+requires Python (versions 2.4-2.7, not version 3.0 and higher).  Python is 
+likely already present on all unix-based systems (if in doubt, try entering 
+"python" on the command-line), and is available for all platforms at 
+http://www.python.org/getit/.
+
+
+[Optional] Setting Environment Variables
+----------------------------------------
+
+For general use of the pqu package, some changes should be made to your 
+computer's environment. The following lines make the required change. Note that 
+<path_to_pqu> indicates the path to the directory containing the 
+physicalQuantityWithUncertainty.py file:
+
+* On unix with bash, ksh, etc, put this line in the .bashrc or equivalent:
+
+    ::
+
+        $export PYTHONPATH=$PYTHONPATH:<path_to_pqu>
+
+* On csh, tcsh or similar, do:
+
+    ::
+
+        $setenv PYTHONPATH $PYTHONPATH:<path_to_pqu>
+
+* On Windows, the environment variable should be added to the registry 
+  (see for example http://www.support.tabs3.com/main/R10463.htm)
+
+
+If you encounter problems using pqu, please let us know (email: infinidhi@llnl.gov).
+

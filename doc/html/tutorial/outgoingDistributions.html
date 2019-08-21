@@ -1,0 +1,175 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3.3. Outgoing Distributions &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../index.html" />
+    <link rel="up" title="3. Digging deeper in Fudge" href="diggingDeeper.html" />
+    <link rel="next" title="3.4. Fission" href="fission.html" />
+    <link rel="prev" title="3.2. Resonances" href="resonances.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fission.html" title="3.4. Fission"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="resonances.html" title="3.2. Resonances"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="index.html" >The Fudge Tutorial</a> &raquo;</li>
+          <li><a href="diggingDeeper.html" accesskey="U">3. Digging deeper in <tt class="docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal"><span class="pre">Fudge</span></tt></a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="outgoing-distributions">
+<h1>3.3. Outgoing Distributions<a class="headerlink" href="#outgoing-distributions" title="Permalink to this headline">¶</a></h1>
+<p>Applications of nuclear data are often sensitive not only to the reaction cross section, but also to the angular distributions and energy spectra of the reaction products. Each product in GND therefore contains a &#8216;distribution&#8217; element. The distribution data may be given in several different ways:</p>
+<div class="section" id="angular-distributions">
+<h2>3.3.1. Angular distributions<a class="headerlink" href="#angular-distributions" title="Permalink to this headline">¶</a></h2>
+<p>For reactions producing exactly two outgoing products (such as n + Mn55 -&gt; p + Cr55), the evaluation only needs to include an angular distribution for one product. The kinematics of these &#8216;two-body&#8217; reactions mean that the angular distribution for the other product (and the energy spectra for both) can be computed from the first product.</p>
+<p>There are several ways of describing angular distributions in GND:</p>
+<ul class="simple">
+<li>Isotropic</li>
+<li>Legendre coefficients for each incident energy,</li>
+<li>Pointwise data for each incident energy, where P(mu) is given explicitly for mu from -1 to 1 (mu = cosine of the scattering angle theta)</li>
+<li>&#8216;Mixed&#8217; form, where Legendre coefficients are used at smaller incident energies and pointwise at higher energies (Legendre coefficients can cause trouble with negative probabilities, especially for very forward-peaked distributions).</li>
+</ul>
+</div>
+<div class="section" id="energy-distributions">
+<h2>3.3.2. Energy distributions<a class="headerlink" href="#energy-distributions" title="Permalink to this headline">¶</a></h2>
+<p>For a two-body reaction, an energy distribution could be supplied instead of an angular distribution. In practice, however, energy distributions are only given for non-2-body reactions. In GND, these distributions are used when the outgoing angle and energy are assumed to be uncorrelated. There are many ways of storing energy spectra, including:</p>
+<div class="highlight-python"><pre>- Pointwise
+- Watt spectra
+- Maxwellian
+- and many others</pre>
+</div>
+</div>
+<div class="section" id="joint-energy-angle-distributions">
+<h2>3.3.3. Joint energy-angle distributions<a class="headerlink" href="#joint-energy-angle-distributions" title="Permalink to this headline">¶</a></h2>
+<p>For non-two-body reactions, the distribution can be best described using a double-differential form that gives the probability as a functon of both outgoing angle <em>and</em> energy. Some types of double-differential distribution forms include:</p>
+<ul class="simple">
+<li>Legendre coefficients listed as a function of both incident and outgoing energy,</li>
+<li>Pointwise data, where P(mu | E, E&#8217; ) is given for each combination of incident energy E and outgoing energy E&#8217;,</li>
+<li>Kalbach-Mann data, a parameterized form that can efficiently describe the average outgoing spectra.</li>
+</ul>
+</div>
+<div class="section" id="multiplicity">
+<h2>3.3.4. Multiplicity<a class="headerlink" href="#multiplicity" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="where-are-the-discrete-gammas">
+<h2>3.3.5. Where are the discrete gammas?<a class="headerlink" href="#where-are-the-discrete-gammas" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">3.3. Outgoing Distributions</a><ul>
+<li><a class="reference internal" href="#angular-distributions">3.3.1. Angular distributions</a></li>
+<li><a class="reference internal" href="#energy-distributions">3.3.2. Energy distributions</a></li>
+<li><a class="reference internal" href="#joint-energy-angle-distributions">3.3.3. Joint energy-angle distributions</a></li>
+<li><a class="reference internal" href="#multiplicity">3.3.4. Multiplicity</a></li>
+<li><a class="reference internal" href="#where-are-the-discrete-gammas">3.3.5. Where are the discrete gammas?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="resonances.html"
+                        title="previous chapter">3.2. Resonances</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fission.html"
+                        title="next chapter">3.4. Fission</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/tutorial/outgoingDistributions.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fission.html" title="3.4. Fission"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="resonances.html" title="3.2. Resonances"
+             >previous</a> |</li>
+        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="index.html" >The Fudge Tutorial</a> &raquo;</li>
+          <li><a href="diggingDeeper.html" >3. Digging deeper in <tt class="docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal"><span class="pre">Fudge</span></tt></a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

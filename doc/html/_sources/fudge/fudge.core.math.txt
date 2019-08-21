@@ -1,0 +1,141 @@
+math Package
+============
+
+:mod:`math` Package
+-------------------
+
+.. automodule:: fudge.core.math
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`endl1dmathClasses` Module
+-------------------------------
+
+.. automodule:: fudge.core.math.endl1dmathClasses
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`endl1dmathmisc` Module
+----------------------------
+
+.. automodule:: fudge.core.math.endl1dmathmisc
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`endl2dmathClasses` Module
+-------------------------------
+
+.. automodule:: fudge.core.math.endl2dmathClasses
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`endl2dmathmisc` Module
+----------------------------
+
+.. automodule:: fudge.core.math.endl2dmathmisc
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`endl3dmathClasses` Module
+-------------------------------
+
+.. automodule:: fudge.core.math.endl3dmathClasses
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`endl3dmathmisc` Module
+----------------------------
+
+.. automodule:: fudge.core.math.endl3dmathmisc
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`endl4dmathClasses` Module
+-------------------------------
+
+.. automodule:: fudge.core.math.endl4dmathClasses
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`endl4dmathmisc` Module
+----------------------------
+
+.. automodule:: fudge.core.math.endl4dmathmisc
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`fudge2dGrouping` Module
+-----------------------------
+
+.. automodule:: fudge.core.math.fudge2dGrouping
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`fudgemath` Module
+-----------------------
+
+.. automodule:: fudge.core.math.fudgemath
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`parameters` Module
+------------------------
+
+.. automodule:: fudge.core.math.parameters
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`pointwiseXY` Module
+-------------------------
+
+.. automodule:: fudge.core.math.pointwiseXY
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`table` Module
+-------------------------------
+
+.. automodule:: fudge.core.math.table
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`matrix` Module
+-------------------------------
+
+.. automodule:: fudge.core.math.matrix
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`linearAlgebra` Module
+-------------------------------
+
+.. automodule:: fudge.core.math.linearAlgebra
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+
+Subpackages
+-----------
+
+.. toctree::
+
+    fudge.core.math.test
+    fudge.core.math.xData
+

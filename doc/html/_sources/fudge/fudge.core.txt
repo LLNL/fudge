@@ -1,0 +1,35 @@
+core Package
+============
+
+:mod:`core` Package
+-------------------
+
+.. automodule:: fudge.core
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`ancestry` Module
+----------------------
+
+.. automodule:: fudge.core.ancestry
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`fudgemisc` Module
+-----------------------
+
+.. automodule:: fudge.core.fudgemisc
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+
+    fudge.core.math
+    fudge.core.utilities
+

@@ -1,0 +1,290 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.vis.gnuplot.fudgeMultiPlots &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for fudge.vis.gnuplot.fudgeMultiPlots</h1><div class="highlight"><pre>
+<span class="c"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains routines for plotting multiple data sets on the same plot.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">types</span>
+<span class="kn">from</span> <span class="nn">fudge.core</span> <span class="kn">import</span> <span class="n">fudgemisc</span>
+<span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="kn">import</span> <span class="n">fudgeFileMisc</span><span class="p">,</span> <span class="n">subprocessing</span>
+<span class="kn">from</span> <span class="nn">fudge.core.math</span> <span class="kn">import</span> <span class="n">endl2dmathmisc</span><span class="p">,</span> <span class="n">endl3dmathmisc</span><span class="p">,</span> <span class="n">endl3dmathClasses</span>
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">__path__</span>
+<span class="kn">import</span> <span class="nn">plotbase</span>
+
+
+<div class="viewcode-block" id="multiPlot"><a class="viewcode-back" href="../../../../fudge/fudge.vis.gnuplot.html#fudge.vis.gnuplot.fudgeMultiPlots.multiPlot">[docs]</a><span class="k">def</span> <span class="nf">multiPlot</span><span class="p">(</span> <span class="n">dataList</span><span class="p">,</span> <span class="n">xylog</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">xMin</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">xMax</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">yMin</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">yMax</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">xLabel</span> <span class="o">=</span> <span class="s">&quot;Energy (MeV)&quot;</span><span class="p">,</span>
+        <span class="n">yLabel</span> <span class="o">=</span> <span class="s">&quot;Cross section (barn)&quot;</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">lineWidth</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fontSize</span> <span class="o">=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This routine sends all data objects of the first argument, dataList, to the module fudge2dMultiPlot for interactive plotting. </span>
+<span class="sd">Here, dataList must be a list or tuple, and each element must be an endl2dmath object or subclass of it. </span>
+<span class="sd">The legend for each data element of dataList is taken from that object&#39;s label member.&quot;</span>
+
+<span class="sd">See module fudge2dMultiPlot for a description of the following parameters::</span>
+<span class="sd">    xylog    xMin     xMax     yMin     </span>
+<span class="sd">    yMax     xLabel   yLabel   title    </span>
+
+<span class="sd">Currently, lineWitdh and fontSize are not implemented.</span>
+
+<span class="sd">Examples of usages where d1, d2 and d3 are endl2dmath objects.</span>
+
+<span class="sd">&gt;&gt;&gt; d2.label = &quot;Bad data from boss&quot;                     # Sets the legend for d2 to &quot;Bad data from boss&quot;.</span>
+<span class="sd">&gt;&gt;&gt; multiPlot( ( d1, d2, d3 ), xylog = 3 )</span>
+<span class="sd">&gt;&gt;&gt; I0Data = za.findDatas( I = 0, C = ( 12, 13, 14 ) )  # za is an endlZA object.</span>
+<span class="sd">&gt;&gt;&gt; multiPlot( I0Data )</span>
+
+<span class="sd">Also see the routine qmultiPlot.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">fudge.core.math.xData</span> <span class="kn">import</span> <span class="n">XYs</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">dataList</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span>
+    <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">dataList</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">dataList</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span> <span class="p">()</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">dataList</span> <span class="o">=</span> <span class="p">[</span> <span class="n">dataList</span> <span class="p">]</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">dataList</span> <span class="p">:</span>
+        <span class="n">isInstance</span> <span class="o">=</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">InstanceType</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="n">a</span><span class="p">,</span> <span class="s">&#39;__class__&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">isInstance</span> <span class="o">|=</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="o">==</span> <span class="n">a</span><span class="o">.</span><span class="n">__class__</span> <span class="p">)</span>    <span class="c"># New style class instance.</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">isInstance</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">Msg</span> <span class="o">=</span> <span class="s">&quot;cannot plot object of type </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">a</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">a</span><span class="p">,</span> <span class="n">XYs</span><span class="o">.</span><span class="n">XYs</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">fudgeFileMisc</span><span class="o">.</span><span class="n">fudgeTempFile</span><span class="p">(</span> <span class="p">)</span>
+                <span class="n">fs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">f</span><span class="o">.</span><span class="n">getName</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">a</span> <span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s">&quot;</span><span class="si">%.10e</span><span class="s"> </span><span class="si">%14.8e</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">endl2dmathmisc</span><span class="o">.</span><span class="n">valid2dClassType</span><span class="p">(</span> <span class="n">a</span><span class="p">,</span> <span class="s">&quot;multiPlot&quot;</span><span class="p">,</span> <span class="n">Msg</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">fudgeFileMisc</span><span class="o">.</span><span class="n">fudgeTempFile</span><span class="p">(</span> <span class="p">)</span>
+                <span class="n">fs</span> <span class="o">+=</span> <span class="p">[</span> <span class="n">f</span><span class="o">.</span><span class="n">getName</span><span class="p">(</span> <span class="p">),</span> <span class="s">&#39;title&#39;</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">label</span> <span class="p">]</span>
+                <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s">&quot;</span><span class="si">%.10e</span><span class="s"> </span><span class="si">%14.8e</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;Warning in multiPlot: cannot plot object named </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">a</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in multiPlot: cannot plot none instance object&quot;</span> <span class="p">)</span>
+    <span class="n">o</span> <span class="o">=</span> <span class="n">plotbase</span><span class="o">.</span><span class="n">parsePlotOptions</span><span class="p">(</span> <span class="n">xMin</span><span class="p">,</span> <span class="n">xMax</span><span class="p">,</span> <span class="n">yMin</span><span class="p">,</span> <span class="n">yMax</span><span class="p">,</span> <span class="n">xLabel</span><span class="p">,</span> <span class="n">yLabel</span><span class="p">,</span> <span class="n">title</span> <span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">fudgemisc</span><span class="o">.</span><span class="n">findPythonFile</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">__path__</span> <span class="o">+</span> <span class="p">[</span> <span class="s">&quot;vis&quot;</span><span class="p">,</span> <span class="s">&quot;gnuplot&quot;</span><span class="p">,</span> <span class="s">&quot;fudge2dMultiPlot.py&quot;</span> <span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&#39;python&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="s">&#39;xylog&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span> <span class="n">xylog</span> <span class="p">)</span> <span class="p">]</span> <span class="o">+</span> <span class="n">o</span> <span class="o">+</span> <span class="p">[</span> <span class="s">&#39;files&#39;</span> <span class="p">]</span> <span class="o">+</span> <span class="n">fs</span>
+    <span class="n">subprocessing</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="qmultiPlot"><a class="viewcode-back" href="../../../../fudge/fudge.vis.gnuplot.html#fudge.vis.gnuplot.fudgeMultiPlots.qmultiPlot">[docs]</a><span class="k">def</span> <span class="nf">qmultiPlot</span><span class="p">(</span> <span class="n">dataList</span><span class="p">,</span> <span class="n">xylog</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">xMin</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">xMax</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">yMin</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">yMax</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">xLabel</span> <span class="o">=</span> <span class="s">&quot;Energy (MeV)&quot;</span><span class="p">,</span> 
+        <span class="n">yLabel</span> <span class="o">=</span> <span class="s">&quot;Cross section (barn)&quot;</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">legends</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">lineWidth</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fontSize</span> <span class="o">=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This routine plots the data objects of the first argument, dataList, to a non-interactive plot.</span>
+<span class="sd">The argument lineWidth sets the width of the lines and fontSize sets the font size for the plot.</span>
+<span class="sd">The argument legends is a deprecated argument. To specify a legend for a data set, use that data&#39;s</span>
+<span class="sd">label member.</span>
+
+<span class="sd">Examples of usages where d1, d2 and d3 are endl2dmath objects.</span>
+
+<span class="sd">&gt;&gt;&gt; d2.label = &quot;Bad data from boss&quot;                     # Sets the legend for d2 to &quot;Bad data from boss&quot;.</span>
+<span class="sd">&gt;&gt;&gt; multiPlot( ( d1, d2, d3 ), xylog = 3 )</span>
+<span class="sd">&gt;&gt;&gt; I0Data = za.findDatas( I = 0, C = ( 12, 13, 14 ) )  # za is an endlZA object.</span>
+<span class="sd">&gt;&gt;&gt; multiPlot( I0Data )</span>
+
+<span class="sd">See the routine multiPlot for additional information.&quot;&quot;&quot;</span>
+
+    <span class="kn">import</span> <span class="nn">Gnuplot</span>
+    <span class="n">xylog</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">xylog</span> <span class="p">)</span>            <span class="c"># Allow argument to be a string</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">xMin</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">xMin</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">xMin</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">xMax</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">xMax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">xMax</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">yMin</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">yMin</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">yMin</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">yMax</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">yMax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">yMax</span> <span class="p">)</span>
+    <span class="n">lineWidth</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">lineWidth</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">qmultiPlotAddPlot</span><span class="p">(</span> <span class="n">d</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">withLineWidth</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">f</span> <span class="o">=</span> <span class="n">fudgeFileMisc</span><span class="o">.</span><span class="n">fudgeTempFile</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%.12e</span><span class="s"> </span><span class="si">%.12e</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="n">d</span> <span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">(</span> <span class="p">)</span>
+        <span class="n">gf</span> <span class="o">=</span> <span class="n">Gnuplot</span><span class="o">.</span><span class="n">File</span><span class="p">(</span> <span class="n">f</span><span class="o">.</span><span class="n">getName</span><span class="p">(</span> <span class="p">),</span> <span class="n">title</span> <span class="o">=</span> <span class="n">t</span> <span class="p">)</span> <span class="c"># , with = withLineWidth )</span>
+        <span class="n">gf</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="s">&#39;with&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span> <span class="n">withLineWidth</span><span class="p">,</span> <span class="s">&#39;with &#39;</span> <span class="o">+</span> <span class="n">withLineWidth</span> <span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">_add_to_queue</span><span class="p">(</span> <span class="p">[</span> <span class="n">gf</span> <span class="p">]</span> <span class="p">)</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">dataList</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">Gnuplot</span><span class="o">.</span><span class="n">Gnuplot</span><span class="p">(</span> <span class="p">)</span>
+    <span class="n">withLineWidth</span> <span class="o">=</span> <span class="s">&#39;line linewidth </span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">lineWidth</span>
+    <span class="n">nl</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">legends</span> <span class="p">)</span>
+    <span class="n">il</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">dataList</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">dataList</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span> <span class="p">()</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">dataList</span> <span class="o">=</span> <span class="p">[</span> <span class="n">dataList</span> <span class="p">]</span>
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">dataList</span> <span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">label</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">il</span> <span class="o">&lt;</span> <span class="n">nl</span> <span class="p">)</span> <span class="p">:</span> <span class="n">t</span> <span class="o">=</span> <span class="n">legends</span><span class="p">[</span><span class="n">il</span><span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">InstanceType</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">Msg</span> <span class="o">=</span> <span class="s">&quot;cannot plot object of type </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">a</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">endl2dmathmisc</span><span class="o">.</span><span class="n">valid2dClassType</span><span class="p">(</span> <span class="n">a</span><span class="p">,</span> <span class="s">&quot;qmultiPlot&quot;</span><span class="p">,</span> <span class="n">Msg</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">qmultiPlotAddPlot</span><span class="p">(</span> <span class="n">a</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">withLineWidth</span> <span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">a</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;endlZA&quot;</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">for</span> <span class="n">F</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">filelist</span> <span class="p">:</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">F</span><span class="o">.</span><span class="n">levels</span> <span class="o">!=</span> <span class="p">[]</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">F</span><span class="o">.</span><span class="n">levels</span><span class="o">.</span><span class="n">columns</span><span class="p">(</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">F</span><span class="o">.</span><span class="n">levels</span> <span class="p">:</span> <span class="n">qmultiPlotAddPlot</span><span class="p">(</span> <span class="n">i</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">withLineWidth</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;Warning in qmultiPlot: cannot plot object named </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">a</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+            <span class="n">il</span> <span class="o">=</span> <span class="n">il</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">title</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">title</span> <span class="o">=</span> <span class="s">&quot;Untitled&quot;</span>
+    <span class="n">g</span><span class="p">(</span> <span class="s">&#39;set title &quot;&#39;</span> <span class="o">+</span> <span class="n">title</span> <span class="o">+</span> <span class="s">&#39;&quot;&#39;</span> <span class="p">)</span>
+    <span class="n">g</span><span class="p">(</span> <span class="s">&#39;set style data linespoints&#39;</span> <span class="p">)</span>
+    <span class="k">if</span>  <span class="p">(</span> <span class="n">xylog</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="n">g</span><span class="p">(</span> <span class="s">&#39;set logscale x&#39;</span> <span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span> <span class="n">xylog</span> <span class="o">==</span> <span class="mi">2</span> <span class="p">)</span> <span class="p">:</span> <span class="n">g</span><span class="p">(</span> <span class="s">&#39;set logscale y&#39;</span> <span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span> <span class="n">xylog</span> <span class="o">==</span> <span class="mi">3</span> <span class="p">)</span> <span class="p">:</span> <span class="n">g</span><span class="p">(</span> <span class="s">&#39;set logscale xy&#39;</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">xMin</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="n">xMax</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">xMin</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;set xrange [ * to </span><span class="si">%e</span><span class="s"> ]&#39;</span> <span class="o">%</span> <span class="n">xMax</span>
+        <span class="k">elif</span><span class="p">(</span> <span class="n">xMax</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;set xrange [ </span><span class="si">%e</span><span class="s"> to * ]&#39;</span> <span class="o">%</span> <span class="n">xMin</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;set xrange [ </span><span class="si">%e</span><span class="s"> to </span><span class="si">%e</span><span class="s"> ]&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">xMin</span><span class="p">,</span> <span class="n">xMax</span> <span class="p">)</span>
+        <span class="n">g</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">yMin</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="n">yMax</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">yMin</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;set yrange [ * to </span><span class="si">%e</span><span class="s"> ]&#39;</span> <span class="o">%</span>  <span class="n">yMax</span>
+        <span class="k">elif</span><span class="p">(</span> <span class="n">yMax</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;set yrange [ </span><span class="si">%e</span><span class="s"> to * ]&#39;</span> <span class="o">%</span> <span class="n">yMin</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;set yrange [ </span><span class="si">%e</span><span class="s"> to </span><span class="si">%e</span><span class="s"> ]&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">yMin</span><span class="p">,</span> <span class="n">yMax</span> <span class="p">)</span>
+        <span class="n">g</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">fontSize</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">g</span><span class="p">(</span> <span class="s">&#39;set terminal x11 font &quot;times,</span><span class="si">%d</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="n">fontSize</span> <span class="p">)</span>
+    <span class="n">g</span><span class="p">(</span> <span class="s">&quot;set xlabel </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="sb">`xLabel`</span> <span class="p">)</span>
+    <span class="n">g</span><span class="p">(</span> <span class="s">&quot;set ylabel </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="sb">`yLabel`</span> <span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">replot</span><span class="p">(</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">g</span>
+</div>
+<div class="viewcode-block" id="multiPlot3d"><a class="viewcode-back" href="../../../../fudge/fudge.vis.gnuplot.html#fudge.vis.gnuplot.fudgeMultiPlots.multiPlot3d">[docs]</a><span class="k">def</span> <span class="nf">multiPlot3d</span><span class="p">(</span> <span class="n">dataList</span><span class="p">,</span> <span class="n">xyzlog</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">xMin</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">xMax</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">yMin</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">yMax</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">zMin</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">zMax</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">xLabel</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+        <span class="n">yLabel</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">zLabel</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">lineWidth</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fontSize</span> <span class="o">=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This routine sends all data objects of the first argument, dataList, to the module fudge3dMultiPlot for interactive plotting.</span>
+<span class="sd">Here, dataList must be a list or tuple, and each element must be an endl3dmath object or subclass of it.</span>
+<span class="sd">The legend for each data element of dataList is taken from that object&#39;s label member.&quot;</span>
+
+<span class="sd">See module fudge3dMultiPlot for a description of the following parameters::</span>
+<span class="sd">    xyzlog   xMin     xMax     yMin     yMax</span>
+<span class="sd">    zMin     zMax     xLabel   yLabel   zLabel</span>
+<span class="sd">    title</span>
+
+<span class="sd">Currently, lineWitdh and fontSize are not implemented.</span>
+
+<span class="sd">Examples of usages where d1, d2 and d3 are endl3dmath objects.</span>
+
+<span class="sd">&gt;&gt;&gt; d2.label = &quot;Bad data from boss&quot;                     # Sets the legend for d2 to &quot;Bad data from boss&quot;.</span>
+<span class="sd">&gt;&gt;&gt; multiPlot3d( ( d1, d2, d3 ), xyzlog = 3 )           # x log, y log and z linear.</span>
+<span class="sd">&gt;&gt;&gt; I1Data = za.findDatas( I = 1, C = ( 12, 13, 14 ) )  # za is an endlZA object.</span>
+<span class="sd">&gt;&gt;&gt; multiPlot( I1Data )</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">dataList</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span>
+    <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">dataList</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">dataList</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span> <span class="p">()</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">dataList</span> <span class="o">=</span> <span class="p">[</span> <span class="n">dataList</span> <span class="p">]</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">dataList</span> <span class="p">:</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">a</span><span class="p">,</span> <span class="n">endl3dmathClasses</span><span class="o">.</span><span class="n">endl3dmath</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">fudgeFileMisc</span><span class="o">.</span><span class="n">fudgeTempFile</span><span class="p">(</span> <span class="p">)</span>
+            <span class="n">fs</span> <span class="o">+=</span> <span class="p">[</span> <span class="n">f</span><span class="o">.</span><span class="n">getName</span><span class="p">(</span> <span class="p">)</span> <span class="p">]</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="n">a</span><span class="p">,</span> <span class="s">&#39;label&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">fs</span> <span class="o">+=</span> <span class="p">[</span> <span class="s">&#39;title&#39;</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">label</span> <span class="p">]</span>
+            <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">yz</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span>
+                <span class="n">xs</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%.10e</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">x</span>
+                <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">yz</span> <span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%.10e</span><span class="s"> </span><span class="si">%14.8e</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">xs</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span> <span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">a</span> <span class="o">==</span> <span class="n">dataList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">xLabel</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">xLabel</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">xLabel</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">yLabel</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">yLabel</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">yLabel</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">zLabel</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">zLabel</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">zLabel</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in multiPlot: cannot plot instance object&quot;</span> <span class="p">)</span>
+    <span class="n">o</span> <span class="o">=</span> <span class="n">plotbase</span><span class="o">.</span><span class="n">parsePlotOptions</span><span class="p">(</span> <span class="n">xMin</span><span class="p">,</span> <span class="n">xMax</span><span class="p">,</span> <span class="n">yMin</span><span class="p">,</span> <span class="n">yMax</span><span class="p">,</span> <span class="n">xLabel</span><span class="p">,</span> <span class="n">yLabel</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">zMin</span><span class="p">,</span> <span class="n">zMax</span><span class="p">,</span> <span class="n">zLabel</span> <span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">fudgemisc</span><span class="o">.</span><span class="n">findPythonFile</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">__path__</span> <span class="o">+</span> <span class="p">[</span> <span class="s">&quot;vis&quot;</span><span class="p">,</span> <span class="s">&quot;gnuplot&quot;</span><span class="p">,</span> <span class="s">&quot;fudge3dMultiPlot.py&quot;</span> <span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&#39;python&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="s">&#39;xyzlog&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span> <span class="n">xyzlog</span> <span class="p">)</span> <span class="p">]</span> <span class="o">+</span> <span class="n">o</span> <span class="o">+</span> <span class="p">[</span> <span class="s">&#39;files&#39;</span> <span class="p">]</span> <span class="o">+</span> <span class="n">fs</span>
+    <span class="n">subprocessing</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

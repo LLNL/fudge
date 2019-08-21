@@ -1,0 +1,82 @@
+distributions Package
+=====================
+
+:mod:`distributions` Package
+----------------------------
+
+.. automodule:: fudge.gnd.productData.distributions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`Legendre` Module
+----------------------
+
+.. automodule:: fudge.gnd.productData.distributions.Legendre
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`angular` Module
+---------------------
+
+.. automodule:: fudge.gnd.productData.distributions.angular
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`angularEnergy` Module
+---------------------------
+
+.. automodule:: fudge.gnd.productData.distributions.angularEnergy
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`base` Module
+------------------
+
+.. automodule:: fudge.gnd.productData.distributions.base
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`energy` Module
+--------------------
+
+.. automodule:: fudge.gnd.productData.distributions.energy
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`energyAngular` Module
+---------------------------
+
+.. automodule:: fudge.gnd.productData.distributions.energyAngular
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`miscellaneous` Module
+---------------------------
+
+.. automodule:: fudge.gnd.productData.distributions.miscellaneous
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`uncorrelated` Module
+--------------------------
+
+.. automodule:: fudge.gnd.productData.distributions.uncorrelated
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+
+    fudge.gnd.productData.distributions.test
+

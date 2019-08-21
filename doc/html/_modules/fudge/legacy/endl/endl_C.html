@@ -1,0 +1,274 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.endl.endl_C &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for fudge.legacy.endl.endl_C</h1><div class="highlight"><pre>
+<span class="c"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains a set of routines that return information about the outgoing</span>
+<span class="sd">particles for a given C-value as defined in ENDL.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c">#  endl_CLabels is a structure of ( C, Lable, ( n, yo0, yo1, ... yon ) ).</span>
+<span class="c">#  Special cases for yo-tuple</span>
+<span class="c">#  ( )          Does not make sense to have an outgoing particle</span>
+<span class="c">#  ( -1, )      -1 = yoUnknown</span>
+<span class="c">#  ( -2, )      -2 = yo_eq_yi</span>
+<span class="c">#  ( -3, )      -3 = yoFission</span>
+<span class="c">#  ( -4, yo )   -4 = yoX</span>
+
+<span class="n">yoUnknown</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="n">yo_eq_yi</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
+<span class="n">yoFission</span> <span class="o">=</span> <span class="o">-</span><span class="mi">3</span>
+<span class="n">yoX</span> <span class="o">=</span> <span class="o">-</span><span class="mi">4</span>
+
+<span class="n">endl_CLabels</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span>   <span class="mi">1</span><span class="p">,</span>      <span class="s">&quot;tot&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>   <span class="mi">5</span><span class="p">,</span>     <span class="s">&quot;prod&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>   <span class="mi">6</span><span class="p">,</span>     <span class="s">&quot;dest&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>   <span class="mi">8</span><span class="p">,</span>     <span class="s">&quot;lacs&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>   <span class="mi">9</span><span class="p">,</span>      <span class="s">&quot;n+i&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">10</span><span class="p">,</span>     <span class="s">&quot;elas&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">11</span><span class="p">,</span>        <span class="s">&quot;n&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">12</span><span class="p">,</span>       <span class="s">&quot;2n&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">13</span><span class="p">,</span>       <span class="s">&quot;3n&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">14</span><span class="p">,</span>       <span class="s">&quot;4n&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">15</span><span class="p">,</span>        <span class="s">&quot;f&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">16</span><span class="p">,</span>      <span class="s">&quot;3np&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1001</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">17</span><span class="p">,</span>      <span class="s">&quot;n2p&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1001</span><span class="p">,</span> <span class="mi">1001</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">18</span><span class="p">,</span>       <span class="s">&quot;2p&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1001</span><span class="p">,</span> <span class="mi">1001</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">19</span><span class="p">,</span>       <span class="s">&quot;pd&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1001</span><span class="p">,</span> <span class="mi">1002</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">20</span><span class="p">,</span>      <span class="s">&quot;n p&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1001</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">21</span><span class="p">,</span>      <span class="s">&quot;p n&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1001</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">22</span><span class="p">,</span>      <span class="s">&quot;n d&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1002</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">23</span><span class="p">,</span>    <span class="s">&quot;n d a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1002</span><span class="p">,</span> <span class="mi">2004</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">24</span><span class="p">,</span>      <span class="s">&quot;n t&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1003</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">25</span><span class="p">,</span>    <span class="s">&quot;n He3&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2003</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">26</span><span class="p">,</span>      <span class="s">&quot;n a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2004</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">27</span><span class="p">,</span>     <span class="s">&quot;n 2a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2004</span><span class="p">,</span> <span class="mi">2004</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">28</span><span class="p">,</span>    <span class="s">&quot;n t a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1003</span><span class="p">,</span> <span class="mi">2004</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">29</span><span class="p">,</span>     <span class="s">&quot;2n p&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1001</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">30</span><span class="p">,</span>    <span class="s">&quot;g n a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2004</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">31</span><span class="p">,</span>   <span class="s">&quot;2n p a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1001</span><span class="p">,</span> <span class="mi">2004</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">32</span><span class="p">,</span>     <span class="s">&quot;2n d&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1002</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">33</span><span class="p">,</span>     <span class="s">&quot;2n a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2004</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">34</span><span class="p">,</span>    <span class="s">&quot;n p a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1001</span><span class="p">,</span> <span class="mi">2004</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">35</span><span class="p">,</span>      <span class="s">&quot;d n&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1002</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">36</span><span class="p">,</span>     <span class="s">&quot;n 3a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2004</span><span class="p">,</span> <span class="mi">2004</span><span class="p">,</span> <span class="mi">2004</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">37</span><span class="p">,</span>       <span class="s">&quot;2a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">2004</span><span class="p">,</span> <span class="mi">2004</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">38</span><span class="p">,</span>    <span class="s">&quot;He3 a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">2003</span><span class="p">,</span> <span class="mi">2004</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">39</span><span class="p">,</span>      <span class="s">&quot;p t&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1001</span><span class="p">,</span> <span class="mi">1003</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">40</span><span class="p">,</span>        <span class="s">&quot;p&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1001</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">41</span><span class="p">,</span>        <span class="s">&quot;d&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1002</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">42</span><span class="p">,</span>        <span class="s">&quot;t&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1003</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">43</span><span class="p">,</span>      <span class="s">&quot;t a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1003</span><span class="p">,</span> <span class="mi">2004</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">44</span><span class="p">,</span>      <span class="s">&quot;He3&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">2003</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">45</span><span class="p">,</span>        <span class="s">&quot;a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">2004</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">46</span><span class="p">,</span>        <span class="s">&quot;g&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">7</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">47</span><span class="p">,</span>      <span class="s">&quot;d a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1002</span><span class="p">,</span> <span class="mi">2004</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">48</span><span class="p">,</span>      <span class="s">&quot;p a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1001</span><span class="p">,</span> <span class="mi">2004</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">49</span><span class="p">,</span>     <span class="s">&quot;2p a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">1001</span><span class="p">,</span> <span class="mi">1001</span><span class="p">,</span> <span class="mi">2004</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">50</span><span class="p">,</span>      <span class="s">&quot;X p&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1001</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">51</span><span class="p">,</span>      <span class="s">&quot;X d&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1002</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">52</span><span class="p">,</span>      <span class="s">&quot;X t&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1003</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">53</span><span class="p">,</span>    <span class="s">&quot;X He3&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2003</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">54</span><span class="p">,</span>      <span class="s">&quot;X a&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2004</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">55</span><span class="p">,</span>      <span class="s">&quot;X g&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">7</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">56</span><span class="p">,</span>      <span class="s">&quot;X n&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">57</span><span class="p">,</span>      <span class="s">&quot;X e&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">65</span><span class="p">,</span>      <span class="s">&quot;act&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">66</span><span class="p">,</span>    <span class="s">&quot;yield&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">70</span><span class="p">,</span>     <span class="s">&quot;totp&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">71</span><span class="p">,</span>      <span class="s">&quot;coh&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">72</span><span class="p">,</span>    <span class="s">&quot;incoh&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">73</span><span class="p">,</span>    <span class="s">&quot;photo&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">9</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">74</span><span class="p">,</span>     <span class="s">&quot;pair&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">75</span><span class="p">,</span>  <span class="s">&quot;triplet&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">9</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">78</span><span class="p">,</span>       <span class="s">&quot;ic&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">81</span><span class="p">,</span>      <span class="s">&quot;ion&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">9</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">82</span><span class="p">,</span>     <span class="s">&quot;brem&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">7</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">83</span><span class="p">,</span>    <span class="s">&quot;excit&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">84</span><span class="p">,</span>     <span class="s">&quot;coll&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">91</span><span class="p">,</span>    <span class="s">&quot;shell&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">92</span><span class="p">,</span>    <span class="s">&quot;trans&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">)</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">93</span><span class="p">,</span>    <span class="s">&quot;whole&quot;</span><span class="p">,</span> <span class="p">(</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="endl_nCMax"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_C.endl_nCMax">[docs]</a><span class="k">def</span> <span class="nf">endl_nCMax</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the largest C-value for which information exist.&quot;&quot;&quot;</span>
+
+    <span class="k">return</span><span class="p">(</span> <span class="n">endl_CLabels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endl_CLabel"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_C.endl_CLabel">[docs]</a><span class="k">def</span> <span class="nf">endl_CLabel</span><span class="p">(</span> <span class="n">C</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns a short string (i.e., mnemonic) describing the outgoing particles - called yos in ENDL - </span>
+<span class="sd">or reaction type for the specified C-value. If C-value is not defined then None is returned.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">endl_CLabels</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">C</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="endl_CLabelMaxWidth"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_C.endl_CLabelMaxWidth">[docs]</a><span class="k">def</span> <span class="nf">endl_CLabelMaxWidth</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the maximum length of a string returned by endl_CLabel.&quot;&quot;&quot;</span>
+
+    <span class="n">w</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">endl_CLabels</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">w</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">w</span>
+</div>
+<div class="viewcode-block" id="endl_C_yoInfo"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_C.endl_C_yoInfo">[docs]</a><span class="k">def</span> <span class="nf">endl_C_yoInfo</span><span class="p">(</span> <span class="n">C</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns a tuple of integers describing the outgoing particles - called yos in ENDL -</span>
+<span class="sd">for the specified C-value, or a negative number (see &quot;Special cases ...&quot; below) if outgoing particle</span>
+<span class="sd">types/numbers are not defined. Each particle is defined by its ZA = 1000 * Z + A value, with the</span>
+<span class="sd">exceptions of gammas, positrons and electrons whose integer designations are 7, 8 and 9 respectively. For</span>
+<span class="sd">example, neutron, Helium-3 and Pu-239 are designated as 1, 2003 and 94239 respectively.</span>
+<span class="sd">If C-value is not defined then None is returned.</span>
+
+<span class="sd">Special cases for first integer of returned tuple::</span>
+<span class="sd">  -1  Unknown outgoing particles.</span>
+<span class="sd">  -2  Outgoing particle is the same as the incident particle.</span>
+<span class="sd">  -3  Unknown number of fission neutrons.</span>
+<span class="sd">  -4  Unknown number of particles of type of the second integer of the tuple.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">endl_CLabels</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">C</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="p">(</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="endl_C_CList"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_C.endl_C_CList">[docs]</a><span class="k">def</span> <span class="nf">endl_C_CList</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns a list of C-values.&quot;&quot;&quot;</span>
+
+    <span class="n">CList</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">C</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">yos</span> <span class="ow">in</span> <span class="n">endl_CLabels</span> <span class="p">:</span> <span class="n">CList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">C</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">CList</span>
+</div>
+<span class="n">yoDict</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">1</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1001</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1002</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1003</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2003</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2004</span><span class="p">:</span><span class="mi">6</span> <span class="p">}</span>
+
+<div class="viewcode-block" id="endl_C_yosMultiplicity"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_C.endl_C_yosMultiplicity">[docs]</a><span class="k">def</span> <span class="nf">endl_C_yosMultiplicity</span><span class="p">(</span> <span class="n">C</span><span class="p">,</span> <span class="n">yi</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the list [ nn, np, nd, nt, nHe3, na, ng ] where nn is the multiplicity</span>
+<span class="sd">    for neutrons, np is the multiplicity for protons, etc. If C-value is not defined</span>
+<span class="sd">    then None is returned. If the reaction is fission then -1 is returned for neutron</span>
+<span class="sd">    multiplity (i.e., C = 15 returns  [ -1, 0, 0, 0, 0, 0, 0 ] ). If multiplity for a</span>
+<span class="sd">    particle is indeterminate then -2 is returned for that multiplity.  If multiplicities</span>
+<span class="sd">    are undefined then nYos * [ None ] is returned. yi is only needed for elastic (C = 10)</span>
+<span class="sd">    scattering.&quot;&quot;&quot;</span>
+
+    <span class="n">nYos</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">yosMultiplicities</span> <span class="o">=</span> <span class="n">nYos</span> <span class="o">*</span> <span class="p">[</span> <span class="mi">0</span> <span class="p">]</span>
+    <span class="n">yos</span> <span class="o">=</span> <span class="n">endl_C_yoInfo</span><span class="p">(</span> <span class="n">C</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">yos</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">None</span> <span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span> <span class="n">yos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">yoUnknown</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">nYos</span> <span class="o">*</span> <span class="p">[</span> <span class="bp">None</span> <span class="p">]</span> <span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span> <span class="n">yos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">yo_eq_yi</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">yo</span> <span class="o">=</span> <span class="n">yi</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">yo</span> <span class="ow">in</span> <span class="n">yoDict</span> <span class="p">)</span> <span class="p">:</span> <span class="n">yo</span> <span class="o">=</span> <span class="n">yoDict</span><span class="p">[</span><span class="n">yo</span><span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">yo</span> <span class="o">&lt;=</span> <span class="mi">7</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">yosMultiplicities</span><span class="p">[</span><span class="n">yo</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&#39;Error from endl_C.endl_C_yosMultiplicity: unsupported yi = </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="sb">`yi`</span> <span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span> <span class="n">yos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">yoFission</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">yosMultiplicities</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">elif</span><span class="p">(</span> <span class="n">yos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">yoX</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">yos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">yoDict</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">yosMultiplicities</span><span class="p">[</span><span class="n">yoDict</span><span class="p">[</span><span class="n">yos</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span> <span class="n">nYos</span> <span class="o">*</span> <span class="p">[</span> <span class="mi">0</span> <span class="p">]</span> <span class="p">)</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="k">for</span> <span class="n">yo</span> <span class="ow">in</span> <span class="n">yos</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">yo</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span> <span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">yosMultiplicities</span><span class="p">[</span><span class="n">yoDict</span><span class="p">[</span><span class="n">yo</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span><span class="p">(</span> <span class="n">yosMultiplicities</span> <span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

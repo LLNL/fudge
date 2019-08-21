@@ -1,0 +1,355 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.gnd.reactions.base &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for fudge.gnd.reactions.base</h1><div class="highlight"><pre>
+<span class="c"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">from</span> <span class="nn">fudge.core.ancestry</span> <span class="kn">import</span> <span class="n">ancestry</span>
+<span class="kn">import</span> <span class="nn">fudge</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<span class="n">reactionToken</span> <span class="o">=</span> <span class="s">&#39;reaction&#39;</span>
+<span class="n">productionToken</span> <span class="o">=</span> <span class="s">&#39;production&#39;</span>
+<span class="n">summedReactionToken</span> <span class="o">=</span> <span class="s">&#39;summedReaction&#39;</span>
+<span class="n">fissionComponentToken</span> <span class="o">=</span> <span class="s">&#39;fissionComponent&#39;</span>
+<span class="n">partialGammaProductionToken</span> <span class="o">=</span> <span class="s">&#39;partialGammaProduction&#39;</span>
+
+<div class="viewcode-block" id="base_reaction"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction">[docs]</a><span class="k">class</span> <span class="nc">base_reaction</span><span class="p">(</span> <span class="n">ancestry</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; base class for all types of reaction &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">ENDF_MT</span><span class="p">,</span> <span class="n">crossSection</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">documentation</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span> <span class="p">):</span>
+
+        <span class="n">ancestry</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">attribute</span> <span class="o">=</span> <span class="s">&#39;label&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setLabel</span><span class="p">(</span> <span class="n">label</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setCrossSection</span><span class="p">(</span> <span class="n">crossSection</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span> <span class="s">&#39;ENDF_MT&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">ENDF_MT</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">attributes</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">setAttribute</span><span class="p">(</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">attributes</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">documentation</span> <span class="ow">is</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">addDocumentation</span><span class="p">(</span> <span class="n">documentation</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__checkCrossSection__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check for Z/A balance, correct Q/Thresholds, plus check within the reaction</span>
+<span class="sd">        for problems with cross section. &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.gnd</span> <span class="kn">import</span> <span class="n">warning</span>
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">info</span><span class="p">[</span><span class="s">&#39;Q&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getQ</span><span class="p">(</span><span class="s">&#39;eV&#39;</span><span class="p">)</span>
+        <span class="n">crossSectionWarnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">crossSectionWarnings</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s">&quot;Cross section:&quot;</span><span class="p">,</span> <span class="n">crossSectionWarnings</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;Q&#39;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">warnings</span>
+
+    <span class="k">def</span> <span class="nf">__checkOutputChannel__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check for problems in reaction outputChannel, distributions and multiplicities,</span>
+<span class="sd">        energy balance. &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.gnd</span> <span class="kn">import</span> <span class="n">warning</span>
+        <span class="kn">from</span> <span class="nn">pqu.physicalQuantityWithUncertainty</span> <span class="kn">import</span> <span class="n">PhysicalQuantityWithUncertainty</span> <span class="k">as</span> <span class="n">PQU</span>
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c"># compare calculated and listed Q-values:</span>
+        <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getQ</span><span class="p">(</span><span class="s">&#39;eV&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">Qcalc</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;availableEnergy_eV&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">Qcalc</span> <span class="o">-=</span> <span class="n">prod</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="s">&#39;eV/c**2&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="n">prod</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>   <span class="c"># multiplicity is not constant</span>
+                    <span class="k">if</span> <span class="n">prod</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;gamma&#39;</span><span class="p">:</span> <span class="k">continue</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="s">&quot;Non-constant multiplicity&quot;</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">Q</span><span class="o">-</span><span class="n">Qcalc</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">PQU</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s">&#39;dQ&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span><span class="s">&#39;eV&#39;</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">Q_mismatch</span><span class="p">(</span> <span class="n">PQU</span><span class="p">(</span><span class="n">Qcalc</span><span class="p">,</span><span class="s">&#39;eV&#39;</span><span class="p">),</span> <span class="n">PQU</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span><span class="s">&#39;eV&#39;</span><span class="p">),</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>    <span class="c"># this test only works if multiplicity is constant</span>
+ 
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">genre</span> <span class="ow">is</span> <span class="n">fudge</span><span class="o">.</span><span class="n">gnd</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">sumOfRemainingOutputChannelsGenre</span>
+                <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">isFission</span><span class="p">()):</span>
+            <span class="c"># check that ZA balances:</span>
+            <span class="n">ZAsum</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">product</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;gamma&#39;</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="n">ZAsum</span> <span class="o">+=</span> <span class="n">product</span><span class="o">.</span><span class="n">particle</span><span class="o">.</span><span class="n">getZ_A_SuffixAndZA</span><span class="p">()[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">product</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">ZAsum</span> <span class="o">!=</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;compoundZA&#39;</span><span class="p">]:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">ZAbalanceWarning</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">fissionEnergyReleased</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">info</span><span class="p">[</span><span class="s">&#39;crossSectionDomain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">getDomain</span><span class="p">(</span><span class="n">asPQU</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">FERwarnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">fissionEnergyReleased</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">FERwarnings</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s">&quot;fissionEnergyReleased:&quot;</span><span class="p">,</span> <span class="n">FERwarnings</span><span class="p">)</span> <span class="p">)</span>
+            <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;crossSectionDomain&#39;</span><span class="p">]</span>
+
+        <span class="c"># disabling for now: only complain if distributions are missing for transportables:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        if (not any( [product.distributions.components for product in self.outputChannel] ) and not any(</span>
+<span class="sd">                [dProd.distributions.components for prod in [p for p in self.outputChannel</span>
+<span class="sd">                    if p.decayChannel is not None] for dProd in prod.decayChannel] ) ):</span>
+<span class="sd">            # no distributions found for any reaction product or subsequent decay product</span>
+<span class="sd">            warnings.append( warning.noDistributions( self ) )</span>
+<span class="sd">            return warnings &quot;&quot;&quot;</span>
+
+        <span class="n">info</span><span class="p">[</span><span class="s">&#39;crossSectionDomain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">getDomain</span><span class="p">()</span>
+        <span class="n">info</span><span class="p">[</span><span class="s">&#39;isTwoBody&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">genre</span> <span class="ow">is</span> <span class="n">fudge</span><span class="o">.</span><span class="n">gnd</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">twoBodyGenre</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="p">:</span>
+            <span class="n">productWarnings</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">productWarnings</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s">&quot;Product: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">product</span><span class="o">.</span><span class="n">getLabel</span><span class="p">(),</span> <span class="n">productWarnings</span><span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;crossSectionDomain&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;isTwoBody&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;checkEnergyBalance&#39;</span><span class="p">]:</span>
+            <span class="c"># get list of energy deposition data for all products. If a product has no energy dep. data,</span>
+            <span class="c"># but its decay product does, use that instead. Also determine whether reaction has *full*</span>
+            <span class="c"># energy deposition info: do all products (or all their decay prods) have energy dep info?</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calculateDepositionData</span><span class="p">(</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;processInfo&#39;</span><span class="p">],</span> <span class="s">&#39;&#39;</span> <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">EnergyDepositionExceptionRaised</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="k">return</span> <span class="n">warnings</span>
+
+            <span class="n">energyDep</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">energyDepCount</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s">&#39;depositionEnergy&#39;</span> <span class="ow">in</span> <span class="n">product</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+                    <span class="n">energyDep</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span><span class="n">product</span><span class="o">.</span><span class="n">getLabel</span><span class="p">(),</span> <span class="n">product</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;depositionEnergy&#39;</span><span class="p">][</span><span class="s">&#39;pointwise&#39;</span><span class="p">]</span> <span class="p">]</span> <span class="p">)</span>
+                    <span class="n">energyDepCount</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">product</span><span class="o">.</span><span class="n">decayChannel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">decayEnergyDep</span> <span class="o">=</span> <span class="p">[[</span><span class="n">dProd</span><span class="o">.</span><span class="n">getLabel</span><span class="p">(),</span> <span class="n">dProd</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;depositionEnergy&#39;</span><span class="p">][</span><span class="s">&#39;pointwise&#39;</span><span class="p">]]</span>
+                            <span class="k">for</span> <span class="n">dProd</span> <span class="ow">in</span> <span class="n">product</span><span class="o">.</span><span class="n">decayChannel</span> <span class="k">if</span> <span class="s">&#39;depositionEnergy&#39;</span> <span class="ow">in</span> <span class="n">dProd</span><span class="o">.</span><span class="n">data</span><span class="p">]</span>
+                    <span class="n">energyDep</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span> <span class="n">decayEnergyDep</span> <span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">decayEnergyDep</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">decayChannel</span><span class="p">):</span> <span class="n">energyDepCount</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">energyDep</span><span class="p">:</span>
+                <span class="n">totalEDep</span> <span class="o">=</span> <span class="n">energyDep</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">energyDep</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">totalEDep</span><span class="o">.</span><span class="n">getDomain</span><span class="p">()</span> <span class="o">!=</span> <span class="n">energyDep</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">getDomain</span><span class="p">():</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">totalEDep</span><span class="p">,</span> <span class="n">energyDep</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">totalEDep</span><span class="o">.</span><span class="n">mutualify</span><span class="p">(</span><span class="mf">1e-8</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="n">energyDep</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="mf">1e-8</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">EnergyDepositionExceptionRaised</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+                            <span class="k">return</span> <span class="n">warnings</span>
+                    <span class="n">totalEDep</span> <span class="o">+=</span> <span class="n">energyDep</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span> <span class="n">totalEDep</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">def</span> <span class="nf">energyDepositedPerProduct</span><span class="p">(</span> <span class="n">energyDep</span><span class="p">,</span> <span class="n">ein</span> <span class="p">):</span>
+                <span class="sd">&quot;&quot;&quot; if energy doesn&#39;t balance, determine how much is deposited in each product &quot;&quot;&quot;</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">prod</span><span class="p">,</span> <span class="n">edep</span> <span class="ow">in</span> <span class="n">energyDep</span><span class="p">:</span>
+                    <span class="n">edep</span> <span class="o">=</span> <span class="n">edep</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span> <span class="n">ein</span> <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">edep</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span><span class="n">prod</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span> <span class="n">prod</span><span class="p">,</span> <span class="mf">100.0</span> <span class="o">*</span> <span class="n">edep</span><span class="o">/</span><span class="p">(</span><span class="n">ein</span> <span class="o">+</span> <span class="n">Q</span><span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">foo</span><span class="p">:</span> <span class="n">foo</span><span class="p">[</span><span class="mi">1</span><span class="p">])[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="c"># now we have total energy deposition for all particles, use to check energy balance.</span>
+            <span class="c"># a few special cases to consider:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">isFission</span><span class="p">():</span>
+                <span class="c"># fission products aren&#39;t listed (so far, anyway), so about 85% of available energy should be missing:</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,(</span><span class="n">ein</span><span class="p">,</span><span class="n">edep</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">totalEDep</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">edep</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">((</span><span class="n">ein</span> <span class="o">+</span> <span class="n">Q</span><span class="p">)</span> <span class="o">*</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;fissionEnergyBalanceLimit&#39;</span><span class="p">]):</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">fissionEnergyImbalance</span><span class="p">(</span> <span class="n">PQU</span><span class="p">(</span><span class="n">ein</span><span class="p">,</span> <span class="n">totalEDep</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">),</span>
+                            <span class="n">i</span><span class="p">,</span> <span class="n">energyDepositedPerProduct</span><span class="p">(</span><span class="n">energyDep</span><span class="p">,</span> <span class="n">ein</span><span class="p">),</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="p">)</span> <span class="o">==</span> <span class="n">energyDepCount</span><span class="p">:</span>
+                <span class="c"># have full energy dep. data for all products, so we can rigorously check energy balance:</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,(</span><span class="n">ein</span><span class="p">,</span><span class="n">edep</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">totalEDep</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="p">(</span> <span class="nb">abs</span><span class="p">(</span><span class="n">edep</span> <span class="o">-</span> <span class="p">(</span><span class="n">ein</span><span class="o">+</span><span class="n">Q</span><span class="p">))</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">((</span><span class="n">ein</span><span class="o">+</span><span class="n">Q</span><span class="p">)</span> <span class="o">*</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;dEnergyBalanceRelative&#39;</span><span class="p">])</span>
+                            <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">edep</span> <span class="o">-</span> <span class="p">(</span><span class="n">ein</span><span class="o">+</span><span class="n">Q</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;dEnergyBalanceAbsolute&#39;</span><span class="p">]</span> <span class="p">):</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">energyImbalance</span><span class="p">(</span> <span class="n">PQU</span><span class="p">(</span><span class="n">ein</span><span class="p">,</span> <span class="n">totalEDep</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">),</span>
+                            <span class="n">i</span><span class="p">,</span> <span class="n">energyDepositedPerProduct</span><span class="p">(</span><span class="n">energyDep</span><span class="p">,</span> <span class="n">ein</span><span class="p">),</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># missing some products, so just check that outgoing energy doesn&#39;t exceed incoming:</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,(</span><span class="n">ein</span><span class="p">,</span><span class="n">edep</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">totalEDep</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="n">edep</span> <span class="o">-</span> <span class="p">(</span><span class="n">ein</span><span class="o">+</span><span class="n">Q</span><span class="p">))</span> <span class="o">&gt;</span> <span class="p">((</span><span class="n">ein</span><span class="o">+</span><span class="n">Q</span><span class="p">)</span> <span class="o">*</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;dEnergyBalanceRelative&#39;</span><span class="p">])</span>
+                            <span class="ow">and</span> <span class="p">(</span><span class="n">edep</span> <span class="o">-</span> <span class="p">(</span><span class="n">ein</span><span class="o">+</span><span class="n">Q</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;dEnergyBalanceAbsolute&#39;</span><span class="p">]</span> <span class="p">):</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">energyImbalance</span><span class="p">(</span> <span class="n">PQU</span><span class="p">(</span><span class="n">ein</span><span class="p">,</span> <span class="n">totalEDep</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">),</span>
+                            <span class="n">i</span><span class="p">,</span> <span class="n">energyDepositedPerProduct</span><span class="p">(</span><span class="n">energyDep</span><span class="p">,</span> <span class="n">ein</span><span class="p">),</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">warnings</span>
+
+<div class="viewcode-block" id="base_reaction.domainUnitConversionFactor"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction.domainUnitConversionFactor">[docs]</a>    <span class="k">def</span> <span class="nf">domainUnitConversionFactor</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitTo</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainUnitConversionFactor</span><span class="p">(</span> <span class="n">unitTo</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="base_reaction.domainMin"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction.domainMin">[docs]</a>    <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitTo</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="bp">False</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainMin</span><span class="p">(</span> <span class="n">unitTo</span> <span class="o">=</span> <span class="n">unitTo</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="n">asPQU</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="base_reaction.domainMax"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction.domainMax">[docs]</a>    <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitTo</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="bp">False</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">domainMax</span><span class="p">(</span> <span class="n">unitTo</span> <span class="o">=</span> <span class="n">unitTo</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="n">asPQU</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="base_reaction.getDomain"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction.getDomain">[docs]</a>    <span class="k">def</span> <span class="nf">getDomain</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitTo</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="bp">False</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">(</span> <span class="n">unitTo</span> <span class="o">=</span> <span class="n">unitTo</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="n">asPQU</span> <span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">(</span> <span class="n">unitTo</span> <span class="o">=</span> <span class="n">unitTo</span><span class="p">,</span> <span class="n">asPQU</span> <span class="o">=</span> <span class="n">asPQU</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="base_reaction.getDomainUnit"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction.getDomainUnit">[docs]</a>    <span class="k">def</span> <span class="nf">getDomainUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">getDomainUnit</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="base_reaction.getAttribute"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction.getAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">getAttribute</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns value for attribute name if it exists; otherwise, returns None.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">None</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="base_reaction.setAttribute"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction.setAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">setAttribute</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Adds attribute name and its value to the list of attributes.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+</div>
+<div class="viewcode-block" id="base_reaction.getCrossSection"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction.getCrossSection">[docs]</a>    <span class="k">def</span> <span class="nf">getCrossSection</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the reaction&#39;s cross section.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="base_reaction.setCrossSection"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction.setCrossSection">[docs]</a>    <span class="k">def</span> <span class="nf">setCrossSection</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">crossSection</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Sets channel&#39;s cross section to crossSection.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span><span class="o">.</span><span class="n">setParent</span><span class="p">(</span> <span class="bp">None</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crossSection</span> <span class="o">=</span> <span class="n">crossSection</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">crossSection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">crossSection</span><span class="o">.</span><span class="n">setParent</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="base_reaction.getENDL_CS_ENDF_MT"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction.getENDL_CS_ENDF_MT">[docs]</a>    <span class="k">def</span> <span class="nf">getENDL_CS_ENDF_MT</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the reaction&#39;s ENDL C, S and ENDF&#39;s MT values as integers in a python dictionary with keys &#39;C&#39;, &#39;S&#39; and &#39;MT&#39; </span>
+<span class="sd">        (e.g., { &#39;C&#39; : 11, &#39;S&#39; : 1, &#39;MT&#39; : 53 }).&quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.legacy.converting</span> <span class="kn">import</span> <span class="n">endf_endl</span>
+
+        <span class="n">MT</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s">&#39;ENDF_MT&#39;</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">C</span><span class="p">,</span> <span class="n">S</span> <span class="o">=</span> <span class="n">endf_endl</span><span class="o">.</span><span class="n">getCSFromMT</span><span class="p">(</span> <span class="n">MT</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="p">{</span> <span class="s">&#39;C&#39;</span> <span class="p">:</span> <span class="n">C</span><span class="p">,</span> <span class="s">&#39;S&#39;</span> <span class="p">:</span> <span class="n">S</span><span class="p">,</span> <span class="s">&#39;MT&#39;</span> <span class="p">:</span> <span class="n">MT</span> <span class="p">}</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="base_reaction.getLabel"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction.getLabel">[docs]</a>    <span class="k">def</span> <span class="nf">getLabel</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the reaction&#39;s label.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="base_reaction.setLabel"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction.setLabel">[docs]</a>    <span class="k">def</span> <span class="nf">setLabel</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Sets the reaction&#39;s label.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+</div>
+<div class="viewcode-block" id="base_reaction.addDocumentation"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction.addDocumentation">[docs]</a>    <span class="k">def</span> <span class="nf">addDocumentation</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">documentation</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span><span class="p">[</span><span class="n">documentation</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">documentation</span>
+</div>
+<div class="viewcode-block" id="base_reaction.getDocumentation"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction.getDocumentation">[docs]</a>    <span class="k">def</span> <span class="nf">getDocumentation</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span><span class="p">[</span><span class="n">doc</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="base_reaction.getQ"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction.getQ">[docs]</a>    <span class="k">def</span> <span class="nf">getQ</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">groundStateQ</span> <span class="o">=</span> <span class="bp">False</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the Q-value for this reaction. Converted to float if possible, otherwis a string value is returned&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="s">&#39;constant&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">forms</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">getConstantAs</span><span class="p">(</span> <span class="n">unit</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span>
+</div>
+<div class="viewcode-block" id="base_reaction.setQ"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.base_reaction.setQ">[docs]</a>    <span class="k">def</span> <span class="nf">setQ</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">Q</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">setParent</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span> <span class="o">=</span> <span class="n">Q</span>
+</div></div>
+<div class="viewcode-block" id="isGNDReaction"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.reactions.html#fudge.gnd.reactions.base.isGNDReaction">[docs]</a><span class="k">def</span> <span class="nf">isGNDReaction</span><span class="p">(</span> <span class="n">o</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns True if o is an instance of base_reaction or of a subclass thereof. &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">base_reaction</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

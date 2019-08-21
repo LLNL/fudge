@@ -1,0 +1,27 @@
+test Package
+============
+
+:mod:`test` Package
+-------------------
+
+.. automodule:: fudge.core.math.test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`testFudgeMath` Module
+---------------------------
+
+.. automodule:: fudge.core.math.test.testFudgeMath
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`testXYs` Module
+---------------------
+
+.. automodule:: fudge.core.math.test.testXYs
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

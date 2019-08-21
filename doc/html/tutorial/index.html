@@ -1,0 +1,187 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The Fudge Tutorial &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../index.html" />
+    <link rel="next" title="1. Basic translating between ENDF and GND" href="translating.html" />
+    <link rel="prev" title="Generalized Interaction Data Interface (GIDI)" href="../gidi.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="translating.html" title="1. Basic translating between ENDF and GND"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../gidi.html" title="Generalized Interaction Data Interface (GIDI)"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="the-fudge-tutorial">
+<h1>The Fudge Tutorial<a class="headerlink" href="#the-fudge-tutorial" title="Permalink to this headline">¶</a></h1>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Release:</th><td class="field-body">1.2</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Date:</th><td class="field-body">February 21, 2013</td>
+</tr>
+</tbody>
+</table>
+<p>The Generalized Nuclear Data (GND) language is a proposed successor to the venerable
+Evaluated Nuclear Data File (ENDF) format.  Currently, GND can be expressed in either
+the XML or HDF5 formats.  The <tt class="docutils literal"><span class="pre">fudge</span></tt> Python package provides tools to read, write,
+manipulate and process nuclear reaction evaluations in either the ENDF format or GND
+formats.  You can find more about <tt class="docutils literal"><span class="pre">fudge</span></tt> from the <a class="reference external" href="https://ndclx4.bnl.gov/gf/project/gnd/">GND Project Page</a> and about GND from <a class="reference external" href="http://dx.doi.org/10.1016/j.nds.2012.11.008">C. Mattoon, et al.,
+Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145–3171</a>.</p>
+<p>In this tutorial, we will work through the development of several simple
+fudge scripts that will:</p>
+<blockquote>
+<div><ul class="simple">
+<li>translate to/from the GND and ENDF nuclear reaction data formats;</li>
+<li>check the physics content of an evaluation in either GND or ENDF format;</li>
+<li>dig deeper into the GND hierarchy and the <tt class="docutils literal"><span class="pre">fudge</span></tt> code</li>
+<li>outline a larger script for processing an evaluation for use
+in a transport code;</li>
+</ul>
+</div></blockquote>
+<p>I will assume throughout this tutorial that you have correctly installed fudge
+(see <a class="reference internal" href="../installation.html#installation"><em>Installation</em></a> if you haven&#8217;t), the Python scripting language and the Python
+extensions numpy and matplotlib.  I will also assume that you have working knowledge
+of the Python scripting language and that you are involved in nuclear data enterprise in
+some fashion (so I don&#8217;t have to define things like &#8220;evaluation&#8221;).</p>
+<p>Let&#8217;s begin with the most important thing.  Make sure fudge is in your PYTHONPATH!
+You can do this a few different ways:</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Using the bash shell, at the command line do:</p>
+<div class="highlight-python"><pre>$ export PYTHONPATH="/full/path/to/directory/containing/fudge"</pre>
+</div>
+</li>
+<li><p class="first">Add this export directive to your <tt class="docutils literal"><span class="pre">.bashrc</span></tt> file.</p>
+</li>
+<li><p class="first">Alternatively, you can amend the <tt class="docutils literal"><span class="pre">sys.path</span></tt> variable to point to the directory
+containing the <tt class="docutils literal"><span class="pre">fudge</span></tt> python module <em>inside</em> any python script you write.</p>
+</li>
+</ul>
+</div></blockquote>
+<p>OK, with that settled, you can start with the section on translating between ENDF and GND.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you find yourself lost, the Python interpretor has excellent built-in help
+(just type <tt class="docutils literal"><span class="pre">help(</span> <span class="pre">object</span> <span class="pre">)</span></tt> to learn about an object.  Then, of course, there
+is the Fudge Documentation itself which should have been included with your
+Fudge installation in <tt class="docutils literal"><span class="pre">doc/html/index.html</span></tt>.</p>
+</div>
+<p><strong>Contents:</strong></p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="translating.html">1. Basic translating between ENDF and GND</a></li>
+<li class="toctree-l1"><a class="reference internal" href="checking.html">2. Checking ENDF or GND files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="diggingDeeper.html">3. Digging deeper in <tt class="docutils literal"><span class="pre">Fudge</span></tt></a></li>
+<li class="toctree-l1"><a class="reference internal" href="processing.html">4. Processing GND files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other-examples.html">5. Other Fudge Examples</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../gidi.html"
+                        title="previous chapter">Generalized Interaction Data Interface (GIDI)</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="translating.html"
+                        title="next chapter">1. Basic translating between ENDF and GND</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/tutorial/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="translating.html" title="1. Basic translating between ENDF and GND"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../gidi.html" title="Generalized Interaction Data Interface (GIDI)"
+             >previous</a> |</li>
+        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

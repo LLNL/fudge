@@ -1,0 +1,148 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.endl.endlReactionParameters &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for fudge.legacy.endl.endlReactionParameters</h1><div class="highlight"><pre>
+<span class="c"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<div class="viewcode-block" id="endlReactionParameters"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlReactionParameters.endlReactionParameters">[docs]</a><span class="k">class</span> <span class="nc">endlReactionParameters</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This class contains the parameters C, S, X1, X2, X3, X4, Q for a reaction.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">X1</span><span class="p">,</span> <span class="n">X2</span><span class="p">,</span> <span class="n">X3</span><span class="p">,</span> <span class="n">X4</span><span class="p">,</span> <span class="n">Q</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Creates a new endlReactionParameters object.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="n">C</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">S</span> <span class="o">=</span> <span class="n">S</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X1</span> <span class="o">=</span> <span class="n">X1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X2</span> <span class="o">=</span> <span class="n">X2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X3</span> <span class="o">=</span> <span class="n">X3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X4</span> <span class="o">=</span> <span class="n">X4</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span> <span class="o">=</span> <span class="n">Q</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Creates a string of self.&quot;&quot;&quot;</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;C = </span><span class="si">%2d</span><span class="s">, S = </span><span class="si">%3d</span><span class="s">, X1 = </span><span class="si">%14.7e</span><span class="s">, X2 = </span><span class="si">%14.7e</span><span class="s">, X3 = </span><span class="si">%14.7e</span><span class="s">, X4 = </span><span class="si">%14.7e</span><span class="s">, Q = </span><span class="si">%14.7e</span><span class="s">&quot;</span> \
+            <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X4</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">index</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">index</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="s">&#39;&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">==</span> <span class="s">&#39;C&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">==</span> <span class="s">&#39;S&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">==</span> <span class="s">&#39;X1&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">X1</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">==</span> <span class="s">&#39;X2&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">X2</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">==</span> <span class="s">&#39;X3&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">X3</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">==</span> <span class="s">&#39;X4&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">X4</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">==</span> <span class="s">&#39;Q&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span> <span class="p">)</span>
+            <span class="k">raise</span> <span class="s">&#39;invalid string index = </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">index</span>
+        <span class="k">elif</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">index</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">2</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">X1</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">3</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">X2</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">4</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">X3</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">5</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">X4</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">6</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span> <span class="p">)</span>
+            <span class="k">raise</span> <span class="s">&#39;invalid integer index = </span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">index</span>
+        <span class="k">raise</span> <span class="s">&#39;invalid index type = </span><span class="si">%s</span><span class="s">; index must be string or integer&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span> <span class="n">index</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="endlReactionParameters.toPythonList"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlReactionParameters.endlReactionParameters.toPythonList">[docs]</a>    <span class="k">def</span> <span class="nf">toPythonList</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the [ self.C, self.S, self.X1, self.X2, self.X3, self.X4, self.Q ]&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">S</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X3</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X4</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span> <span class="p">]</span> <span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

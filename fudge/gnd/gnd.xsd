@@ -1,0 +1,1015 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlink.xsd"/>
+
+  <!-- xml schema defining structure of a GND file
+       author: cmattoon
+       IM #: LLNL-MI-491437
+       versions: 
+       - version 0.2, July 2011
+       - version 0.1, November 2010
+
+       this schema can be used to validate that a gnd file has the correct structure:
+       >xmllint -schema gnd.xsd filename.gnd  # may wish to use the '-noout' option
+
+       Find definitions of some common data containers at the end of the schema. 
+       For example, a crossSection element often contains pointwise or piecewise data,
+       which inherit from the 'xData_XYs' and 'regionsXYs' data containers. -->
+
+
+  <!-- We start by defining <reactionSuite>, the root element of a GND file.
+       A reactionSuite contains
+       - one each of:
+         'styles' (may be 'evaluated', 'processed', etc)
+         'documentations'
+         'particles' (list of all particles going in and out of each reaction in the file)
+         'resonances' (optional)
+       - followed by one or more of:
+         'reaction' (defines a single reaction, includes cross section and product information)
+       - optionally 1 of:
+         'partialGammaProduction' (for all gammas coming from unknown reactions)
+       - and 0 or more of:
+         'summedReaction' (for total, nonelastic, etc)
+         'fissionComponent' (for 1st-, 2nd-, etc fissions, to avoid double-counting if total is present)
+         'production' (for storing production cross section for radioactive products)
+  -->
+
+  <xs:element name="reactionSuite">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="styles"/>
+        <xs:element ref="documentations"/>
+        <xs:element ref="aliases" minOccurs="0"/>
+        <xs:element ref="particles"/>
+        <xs:element ref="resonances" minOccurs="0"/>
+        <xs:element ref="reaction" maxOccurs="unbounded"/>
+        <xs:element ref="partialGammaProduction" minOccurs="0"/>
+        <xs:element ref="summedReaction" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="fissionComponent" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="production" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="projectile" type="xs:NCName" use="required"/>
+      <xs:attribute name="target" type="xs:NCName" use="required"/>
+      <xs:attribute name="temperature" use="required"/>
+      <xs:attribute name="format" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="styles">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="style">
+          <xs:complexType>
+            <xs:attribute name="name" type="xs:NCName" use="required"/>
+            <xs:attribute name="version" use="required"/>
+            <xs:attribute name="library" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="documentations">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="documentation" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="documentation">
+    <xs:complexType mixed="true">
+      <xs:attribute name="name" type="xs:NCName" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="aliases">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="alias" type="alias"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+    <xs:complexType name="alias">
+      <xs:attribute name="key" type="xs:NCName" use="required"/>
+      <xs:attribute name="value" type="xs:NCName" use="required"/>
+    </xs:complexType>
+
+  <!-- list of particles, excited levels and gammas -->
+  <xs:element name="particles">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="particle" type="particle"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+    <xs:complexType name="particle">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="level" type="nuclearLevel"/>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:NCName" use="required"/>
+      <xs:attribute name="genre" type="xs:NCName" use="required"/>
+      <xs:attribute name="mass" type="PhysicalQuantity" use="required"/>
+      <xs:attribute name="transportable" type="xs:boolean"/>
+      <xs:attribute name="unstable" type="xs:boolean"/>
+      <xs:attribute name="spin"/>
+      <xs:attribute name="parity"/>
+    </xs:complexType>
+
+    <xs:complexType name="nuclearLevel">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="gamma" type="gamma"/>
+      </xs:sequence>
+      <xs:attribute name="energy" type="PhysicalQuantity" use="required"/>
+      <xs:attribute name="label" type="xs:NMTOKEN" use="required"/>
+      <xs:attribute name="metaStableIndex" type="xs:integer"/>
+      <xs:attribute name="name" type="xs:NCName" use="required"/>
+      <xs:attribute name="spin"/>
+      <xs:attribute name="parity"/>
+    </xs:complexType>
+
+    <xs:complexType name="gamma">
+      <xs:attribute name="finalLevel" type="xs:NCName" use="required"/>
+      <xs:attribute name="probability" type="xs:double" use="required"/>
+    </xs:complexType>
+
+  <!-- resonances may contain just a scattering radius, or may contain resolved/unresolved sections -->
+  <xs:element name="resonances">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="scatteringRadius"/>
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="1" ref="resolved"/>
+          <xs:element minOccurs="0" maxOccurs="1" ref="unresolved"/>
+        </xs:sequence>
+      </xs:choice>
+      <xs:attribute name="reconstructCrossSection" use="required" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="scatteringRadius">
+    <xs:complexType>
+      <xs:attribute name="lowerBound" type="PhysicalQuantity" use="required"/>
+      <xs:attribute name="upperBound" type="PhysicalQuantity" use="required"/>
+      <xs:attribute name="value" type="PhysicalQuantity" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="resolved">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="SingleLevel_BreitWigner"/>
+        <xs:element ref="MultiLevel_BreitWigner"/>
+        <xs:element ref="Reich_Moore"/>
+        <xs:element ref="R_Matrix_Limited"/>
+
+        <!-- multiple resolved regions are currently allowed but deprecated (only in Pu239 right now) --> 
+        <xs:element maxOccurs="unbounded" name="region">
+          <xs:complexType>
+            <xs:choice>
+              <xs:element ref="SingleLevel_BreitWigner"/>
+              <xs:element ref="MultiLevel_BreitWigner"/>
+              <xs:element ref="Reich_Moore"/>
+              <xs:element ref="R_Matrix_Limited"/>
+            </xs:choice>
+            <xs:attribute name="index" type="xs:integer" use="required"/>
+            <xs:attribute name="lowerBound" type="PhysicalQuantity" use="required"/>
+            <xs:attribute name="upperBound" type="PhysicalQuantity" use="required"/>
+            <xs:attribute name="nativeData" type="xs:NCName" use="required"/>
+          </xs:complexType>
+        </xs:element>
+
+      </xs:choice>
+      <xs:attribute name="multipleRegions" type="xs:NCName"/>
+      <xs:attribute name="lowerBound" type="PhysicalQuantity"/>
+      <xs:attribute name="upperBound" type="PhysicalQuantity"/>
+      <xs:attribute name="nativeData" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- types of resolved resonance data -->
+  <xs:element name="SingleLevel_BreitWigner">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="resonanceParameters"/>
+      </xs:sequence>
+      <xs:attribute name="calculateChannelRadius" type="xs:boolean" use="required"/>
+      <xs:attribute name="scatteringRadius" type="PhysicalQuantity" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MultiLevel_BreitWigner">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="scatteringRadius" type="xData_XYs" minOccurs="0"/>
+        <xs:element ref="resonanceParameters"/>
+      </xs:sequence>
+      <xs:attribute name="calculateChannelRadius" type="xs:boolean"/>
+      <xs:attribute name="scatteringRadius" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Reich_Moore">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="LdependentScatteringRadius"
+                    type="LdependentScatteringRadius"/>
+        <xs:element ref="resonanceParameters"/>
+      </xs:sequence>
+      <xs:attribute name="LvaluesNeededForConvergence" type="xs:integer" use="required"/>
+      <xs:attribute name="calculateChannelRadius" type="xs:boolean"/>
+      <xs:attribute name="computeAngularDistribution" type="xs:boolean"/>
+      <!-- Reich_Moore may only contain l-dependent values, so scatteringRadius not required -->
+      <xs:attribute name="scatteringRadius" type="PhysicalQuantity"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="R_Matrix_Limited">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="openChannel" type="RML_openChannel"/>
+        <xs:element maxOccurs="unbounded" name="spinGroup" type="RML_spinGroup"/>
+      </xs:sequence>
+      <xs:attribute name="approximation" type="xs:NCName" use="required"/>
+      <xs:attribute name="scatteringRadius" type="PhysicalQuantity"/>
+      <xs:attribute name="calculateShift" type="xs:boolean"/>
+      <xs:attribute name="calculatePenetrability" type="xs:boolean"/>
+      <xs:attribute name="calculateChannelRadius" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- For Reich_Moore format, scattering radius may depend on L -->
+  <xs:complexType name="LdependentScatteringRadius">
+    <xs:attribute name="L" type="xs:integer" use="required"/>
+    <xs:attribute name="radius" type="PhysicalQuantity" use="required"/>
+  </xs:complexType>
+
+  <!-- for R-Matrix format, specify each output channel followed by list of resonances grouped by 'spinGroup' -->
+  <xs:complexType name="RML_openChannel">
+    <xs:attribute name="index" type="xs:integer" use="required"/>
+    <xs:attribute name="channel" use="required"/>
+    <xs:attribute name="ENDF_MT" type="xs:integer" use="required"/>
+    <xs:attribute name="Qvalue" type="PhysicalQuantity"/>
+    <xs:attribute name="scatteringRadius" type="PhysicalQuantity"/>
+    <xs:attribute name="calculatePenetrability" type="xs:boolean"/>
+    <xs:attribute name="calculateShift" type="xs:boolean"/>
+  </xs:complexType>
+  <xs:complexType name="RML_spinGroup">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" ref="resonanceParameters"/>
+    </xs:sequence>
+    <xs:attribute name="index" type="xs:integer" use="required"/>
+    <xs:attribute name="spin" use="required"/>
+    <xs:attribute name="parity" use="required"/>
+  </xs:complexType>
+  <xs:element name="resonanceParameters">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="table" type="table"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- unresolved resonance region -->
+  <xs:element name="unresolved">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="tabulatedWidths"/>
+      </xs:choice>
+      <xs:attribute name="lowerBound" type="PhysicalQuantity" use="required"/>
+      <xs:attribute name="upperBound" type="PhysicalQuantity" use="required"/>
+      <xs:attribute name="nativeData" type="xs:NCName" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- currently only support one format for unresolved: -->
+  <xs:element name="tabulatedWidths">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="L_section" type="URR_L_section"/>
+      </xs:sequence>
+      <xs:attribute name="interpolation" use="required"/>
+      <xs:attribute name="forSelfShieldingOnly" type="xs:boolean"/>
+      <xs:attribute name="scatteringRadius" type="PhysicalQuantity" use="required"/>
+      <xs:attribute name="ENDFconversionFlag" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+    <xs:complexType name="URR_L_section">
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="J_section" type="URR_J_section"/>
+      </xs:sequence>
+      <xs:attribute name="L" use="required" type="xs:integer"/>
+    </xs:complexType>
+
+    <xs:complexType name="URR_J_section">
+      <xs:sequence>
+        <xs:element minOccurs="0" name="constantWidths" type="URR_constantWidths"/>
+        <xs:element minOccurs="0" ref="energyDependentWidths"/>
+      </xs:sequence>
+      <xs:attribute name="J" use="required"/>
+      <xs:attribute name="neutronDOF" type="xs:integer" use="required"/>
+      <xs:attribute name="fissionDOF" type="xs:integer"/>
+      <xs:attribute name="competitiveDOF" type="xs:decimal"/>
+    </xs:complexType>
+
+    <xs:complexType name="URR_constantWidths">
+      <xs:attribute name="neutronWidth" type="PhysicalQuantity"/>
+      <xs:attribute name="captureWidth" type="PhysicalQuantity"/>
+      <xs:attribute name="fissionWidthA" type="PhysicalQuantity"/>
+      <xs:attribute name="levelSpacing" type="PhysicalQuantity"/>
+    </xs:complexType>
+
+    <xs:element name="energyDependentWidths">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element name="table" type="table"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:element>
+
+
+
+  <!-- after the documentation, particles and resonances the GND file continues
+       with a list of '<reaction>' elements, one for each reaction channel. Each reaction
+       must contain a cross section and outputChannel: -->
+  <xs:element name="reaction">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="documentation" minOccurs="0"/>
+        <xs:element ref="crossSection"/>
+        <xs:element ref="outputChannel"/>
+      </xs:sequence>
+      <xs:attribute name="label" type="xs:integer" use="required"/>
+      <xs:attribute name="outputChannel" use="required"/>
+      <xs:attribute name="date" type="xs:date" use="required"/>
+      <xs:attribute name="fissionGenre" type="xs:NCName"/>
+      <xs:attribute name="partialReaction" type="xs:integer"/>
+      <xs:attribute name="ENDF_MT" type="xs:integer" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- some special-purpose reaction elements: -->
+  <xs:element name="partialGammaProduction">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="documentation" minOccurs="0"/>
+        <xs:element ref="crossSection"/>
+        <xs:element ref="outputChannel"/>
+      </xs:sequence>
+      <xs:attribute name="label" type="xs:integer" use="required"/>
+      <xs:attribute name="outputChannel" use="required"/>
+      <xs:attribute name="date" type="xs:date" use="required"/>
+      <xs:attribute name="ENDF_MT" type="xs:integer" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="summedReaction">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="documentation" minOccurs="0"/>
+        <xs:element name="summand" type="xlink" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="crossSection"/>
+      </xs:sequence>
+      <xs:attribute name="label" type="xs:integer" use="required"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="Q" type="PhysicalQuantity" use="required"/>
+      <xs:attribute name="date" type="xs:date" use="required"/>
+      <xs:attribute name="ENDF_MT" type="xs:integer" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="fissionComponent">  <!-- for 1st-chance, 2nd-chance etc -->
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="documentation" minOccurs="0"/>
+        <xs:element ref="crossSection"/>
+        <xs:element ref="outputChannel"/>
+      </xs:sequence>
+      <xs:attribute name="label" type="xs:integer" use="required"/>
+      <xs:attribute name="outputChannel" use="required"/>
+      <xs:attribute name="date" type="xs:date" use="required"/>
+      <xs:attribute name="fissionGenre" type="xs:NCName" use="required"/>
+      <xs:attribute name="ENDF_MT" type="xs:integer" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="production">  <!-- for storing radioactive production cross sections -->
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="documentation" minOccurs="0"/>
+        <xs:element ref="crossSection"/>
+      </xs:sequence>
+      <xs:attribute name="label" type="xs:integer" use="required"/>
+      <xs:attribute name="product" use="required"/>
+      <xs:attribute name="Q" type="PhysicalQuantity" use="required"/>
+      <xs:attribute name="date" type="xs:date" use="required"/>
+      <xs:attribute name="ENDF_MT" type="xs:integer" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- contents of reaction elements: -->
+
+  <xs:element name="crossSection">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="pointwise" type="xData_XYs"/>
+        <xs:element name="linear" type="xData_XYs"/>
+        <xs:element name="piecewise" type="regionsXYs"/>
+        <xs:element name="weightedPointwise" type="weightedPointwise"/>
+        <xs:element name="weightedPiecewise" type="weightedPiecewise"/>
+        <xs:element name="resonancesWithBackground" type="resonancesWithBackground"/>
+      </xs:choice>
+      <xs:attribute name="nativeData" type="xs:NCName" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+    <!-- possible forms of crossSection: -->
+
+      <xs:complexType name="weightedPointwise">
+        <xs:sequence>
+          <xs:element name="weight" type="xData_XYs"/>
+        </xs:sequence>
+        <xs:attribute ref="xlink:href" use="required"/>
+        <xs:attribute ref="xlink:type" use="required"/>
+      </xs:complexType>
+
+      <xs:complexType name="weightedPiecewise">
+        <xs:sequence>
+          <xs:element name="piecewise" type="regionsXYs"/>
+        </xs:sequence>
+        <xs:attribute ref="xlink:href" use="required"/>
+        <xs:attribute ref="xlink:type" use="required"/>
+      </xs:complexType>
+
+      <xs:complexType name="resonancesWithBackground">
+        <xs:sequence>
+          <xs:element name="resonanceRegion" type="xlink"/>
+          <xs:choice>
+            <xs:element name="pointwise" type="xData_XYs"/>
+            <xs:element name="linear" type="xData_XYs"/>
+            <xs:element name="piecewise" type="regionsXYs"/>
+            <xs:element name="weightedPointwise" type="weightedPointwise"/>
+            <xs:element name="weightedPiecewise" type="weightedPiecewise"/>
+          </xs:choice>
+        </xs:sequence>
+      </xs:complexType>
+
+  <!-- products of a reaction are listed within 'outputChannel'. If a product decays, the 
+      resulting decay products are listed within 'decayChannel' -->
+  <xs:element name="outputChannel">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="fissionEnergyReleased" type="fissionEnergyReleased"/>
+        <xs:element maxOccurs="unbounded" ref="product"/>
+      </xs:sequence>
+      <xs:attribute name="genre" type="xs:NCName" use="required"/>
+      <xs:attribute name="Q" type="PhysicalQuantity"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="decayChannel">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="product"/>
+      </xs:sequence>
+      <xs:attribute name="genre" type="xs:NCName" use="required"/>
+      <xs:attribute name="Q" type="PhysicalQuantity"/>
+    </xs:complexType>
+  </xs:element>
+
+    <!-- for 'fission' outputChannel: -->
+    <xs:complexType name="fissionEnergyReleased">
+      <xs:sequence>
+        <xs:element name="polynomial" type="fissionEnergyPolynomial"/>
+      </xs:sequence>
+      <xs:attribute name="nativeData" use="required" type="xs:NCName"/>
+    </xs:complexType>
+    <xs:complexType name="fissionEnergyPolynomial">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="delayedBetaEnergy" type="datalist"/>
+        <xs:element name="delayedGammaEnergy" type="datalist"/>
+        <xs:element name="delayedNeutronKE" type="datalist"/>
+        <xs:element name="neutrinoEnergy" type="datalist"/>
+        <xs:element name="nonNeutrinoEnergy" type="datalist"/>
+        <xs:element name="promptGammaEnergy" type="datalist"/>
+        <xs:element name="promptNeutronKE" type="datalist"/>
+        <xs:element name="promptProductKE" type="datalist"/>
+        <xs:element name="totalEnergy" type="datalist"/>
+      </xs:choice>
+      <xs:attribute name="energyUnit" type="xs:string" use="required"/>
+      <xs:attribute name="hasUncertainties" type="xs:boolean"/>
+      <xs:attribute name="order" type="xs:integer"/>
+    </xs:complexType>
+
+  <!-- outputChannel and decayChannel both contain a list of products: -->
+  <xs:element name="product">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="distributions"/>
+        <xs:element minOccurs="0" ref="decayChannel"/>
+        <xs:element minOccurs="0" ref="depositionEnergy"/>
+        <xs:element minOccurs="0" ref="multiplicity"/>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:NCName" use="required"/>
+      <xs:attribute name="label" type="xs:NCName" use="required"/>
+      <xs:attribute name="multiplicity" type="xs:NMTOKEN" use="required"/>
+      <xs:attribute name="decayRate"/>
+      <xs:attribute name="emissionMode" type="xs:NCName"/>
+      <xs:attribute name="primary"/>
+      <xs:attribute name="discrete"/>
+      <xs:attribute name="originationLevel"/>
+      <xs:attribute name="ENDFconversionFlag"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="distributions">
+    <xs:complexType>
+      <xs:choice minOccurs="0">
+        <xs:element name="angular" type="angular"/>
+        <xs:element name="energy" type="energy"/>
+        <xs:element name="angularEnergy" type="angularEnergy"/>
+        <xs:element name="energyAngular" type="energyAngular"/>
+        <xs:element name="uncorrelated" type="uncorrelated"/>
+        <xs:element name="reference" type="xlink"/>
+        <xs:element name="Legendre" type="Legendre"/>
+        <xs:element name="CoulombElastic" type="CoulombElastic"/>
+        <xs:element name="unknown" type="unknown"/>
+      </xs:choice>
+      <xs:attribute name="nativeData" type="xs:NCName" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+    <!-- distribution components (angular, energy, etc) -->
+    <xs:complexType name="angular">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="pointwise" type="xData_W_XYs"/>
+        <!-- <xs:element name="piecewise" type="regions_W_XYs"/> not present in ENDF -->
+        <xs:element name="LegendrePointwise" type="xData_W_XYs"/>
+        <xs:element name="LegendrePiecewise" type="regions_W_XYs"/>
+        <xs:element name="mixedRanges" type="mixedRanges"/>
+        <xs:element name="isotropic" type="isotropic"/>
+        <xs:element name="recoil" type="xlink"/>
+      </xs:choice>
+      <xs:attribute name="nativeData" type="xs:NCName" use="required"/>
+    </xs:complexType>
+
+        <!-- angular distribution forms -->
+        <xs:complexType name="mixedRanges">
+          <xs:sequence>
+            <xs:choice minOccurs="2" maxOccurs="unbounded">
+              <xs:element name="pointwise" type="xData_W_XYs"/>
+              <xs:element name="LegendrePointwise" type="xData_W_XYs"/>
+              <xs:element name="LegendrePiecewise" type="regions_W_XYs"/>
+            </xs:choice>
+          </xs:sequence>
+          <xs:attribute name="Legendre" type="xs:string" use="required"/>
+          <xs:attribute name="tabulated" type="xs:string" use="required"/>
+        </xs:complexType>
+
+        <xs:complexType name="isotropic">
+          <xs:attribute name="frame" use="required"/>
+        </xs:complexType>
+
+    <xs:complexType name="energy">
+      <xs:choice>
+        <xs:element name="pointwise" type="xData_W_XYs"/>
+        <xs:element name="piecewise" type="regions_W_XYs"/>
+        <xs:element name="evaporation" type="evaporation"/>
+        <xs:element name="MadlandNix" type="MadlandNix"/>
+        <xs:element name="Watt" type="Watt"/>
+        <xs:element name="generalEvaporation" type="generalEvaporation"/>
+        <xs:element name="simpleMaxwellianFission" type="simpleMaxwellianFission"/>
+        <xs:element name="weightedFunctionals" type="weightedFunctionals"/>
+        <xs:element name="NBodyPhaseSpace" type="NBodyPhaseSpace"/>
+        <xs:element name="semiPiecewise" type="semiPiecewise"/>
+      </xs:choice>
+      <xs:attribute name="nativeData" type="xs:NCName" use="required"/>
+    </xs:complexType>
+
+      <!-- energy distribution forms -->
+        <xs:complexType name="evaporation">
+          <xs:sequence>
+            <xs:element name="theta" type="xData_XYs"/>
+          </xs:sequence>
+          <xs:attribute name="U" type="PhysicalQuantity" use="required"/>
+        </xs:complexType>
+
+        <xs:complexType name="MadlandNix">
+          <xs:sequence>
+            <xs:element name="T_M" type="xData_XYs"/>
+          </xs:sequence>
+          <xs:attribute name="EFL" type="PhysicalQuantity" use="required"/>
+          <xs:attribute name="EFH" type="PhysicalQuantity" use="required"/>
+        </xs:complexType>
+
+        <xs:complexType name="Watt">
+          <xs:sequence>
+            <xs:element name="a" type="xData_XYs"/>
+            <xs:element name="b" type="xData_XYs"/>
+          </xs:sequence>
+          <xs:attribute name="U" type="PhysicalQuantity" use="required"/>
+        </xs:complexType>
+
+        <xs:complexType name="generalEvaporation">
+          <xs:sequence>
+            <xs:element name="theta" type="xData_XYs"/>
+            <xs:element name="g" type="xData_XYs"/>
+          </xs:sequence>
+          <xs:attribute name="U" type="PhysicalQuantity" use="required"/>
+        </xs:complexType>
+
+        <xs:complexType name="simpleMaxwellianFission">
+          <xs:sequence>
+            <xs:element name="theta" type="xData_XYs"/>
+          </xs:sequence>
+          <xs:attribute name="U" type="PhysicalQuantity" use="required"/>
+        </xs:complexType>
+
+        <!-- energy distribution may be expressed as weighted sum of two or more
+             functional forms: -->
+        <xs:complexType name="weightedFunctionals">
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="weighted">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="weight" type="xData_XYs"/>
+                  <xs:choice>
+                    <xs:element name="evaporation" type="evaporation"/>
+                  </xs:choice>
+                </xs:sequence>
+                <xs:attribute name="index" type="xs:integer" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+
+        <xs:complexType name="NBodyPhaseSpace">
+          <xs:attribute name="mass" type="PhysicalQuantity" use="required"/>
+          <xs:attribute name="numberOfProducts" type="xs:integer" use="required"/>
+        </xs:complexType>
+
+        <!-- semiPiecewise, for when the interpolation on energy_out / P(e_in|e_out) changes: -->
+        <xs:complexType name="semiPiecewise">
+          <xs:sequence>
+            <xs:element name="axes" type="axes"/>
+            <xs:element name="energy_in" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="regions" type="semiPiecewiseRegions"/>
+                </xs:sequence>
+                <xs:attribute name="value" type="xs:float" use="required"/>
+                <xs:attribute name="index" type="xs:integer" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+        <xs:complexType name="semiPiecewiseRegions">
+          <xs:sequence>
+            <xs:element name="region" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="interpolationAxes" type="interpolationAxes"/>
+                  <xs:element name="data" type="datalist"/>
+                </xs:sequence>
+                <xs:attribute name="index" type="xs:integer" use="required"/>
+                <xs:attribute name="length" type="xs:integer" use="required"/>
+                <xs:attribute name="accuracy" type="xs:float" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+        <!-- end of energy distribution forms -->
+
+    <xs:complexType name="angularEnergy">
+      <xs:sequence>
+        <xs:element name="pointwise" type="xData_V_W_XYs"/>
+      </xs:sequence>
+      <xs:attribute name="nativeData" type="xs:NCName" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="energyAngular">
+      <xs:choice>
+        <xs:element name="KalbachMann" type="KalbachMann"/>
+      </xs:choice>
+      <xs:attribute name="nativeData" type="xs:NCName" use="required"/>
+    </xs:complexType>
+
+        <!-- double-differential distribution -->
+        <xs:complexType name="KalbachMann">
+          <xs:sequence>
+            <xs:element name="axes" type="axes"/>
+            <xs:element name="energy_in" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="datalist">
+                    <xs:attribute name="value" type="xs:float" use="required"/>
+                    <xs:attribute name="index" type="xs:integer" use="required"/>
+                    <xs:attribute name="length" type="xs:integer" use="required"/>
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="form" type="xs:NCName" use="required"/>
+        </xs:complexType>
+
+        <!-- end of double-differential distribution forms -->
+
+    <xs:complexType name="uncorrelated">
+      <xs:sequence>
+        <xs:element name="angular" type="angular"/>
+        <xs:element name="energy" type="energy"/>
+      </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="Legendre">
+      <xs:sequence>
+        <xs:element name="LegendrePointwise" type="Legendre_V_W_XYs"/>
+      </xs:sequence>
+      <xs:attribute name="nativeData" type="xs:NCName" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="CoulombElastic">
+      <xs:choice>
+        <xs:element name="nuclearPlusCoulombInterference" type="nuclearPlusCoulombInterference"/>
+        <xs:element name="pointwise" type="xData_W_XYs"/>
+      </xs:choice>
+      <xs:attribute name="nativeData" type="xs:NCName" use="required"/>
+      <xs:attribute name="identicalParticles" type="xs:boolean"/>
+      <xs:attribute name="spin" type="xs:string"/>
+    </xs:complexType>
+
+      <xs:complexType name="nuclearPlusCoulombInterference">
+        <xs:sequence>
+          <xs:element name="nuclear_term" type="nuclearPlusCoulombInterferenceTerm"/>
+          <xs:element name="interferenceReal_term" type="nuclearPlusCoulombInterferenceTerm"/>
+          <xs:element name="interferenceImaginary_term" type="nuclearPlusCoulombInterferenceTerm"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="nuclearPlusCoulombInterferenceTerm">
+        <xs:choice>
+          <xs:element name="LegendrePointwise" type="xData_W_XYs"/>
+          <xs:element name="LegendrePiecewise" type="regions_W_XYs"/>
+        </xs:choice>
+      </xs:complexType>
+
+    <xs:complexType name="unknown">
+      <xs:attribute name="nativeData" type="xs:NCName" use="required"/>
+    </xs:complexType>
+  
+  <!-- end of distribution components. In addition to distributions, a product has a multiplicity: -->
+
+  <xs:element name="multiplicity">
+    <xs:complexType>
+      <xs:choice minOccurs="0">
+        <xs:element name="pointwise" type="xData_XYs"/>
+        <xs:element name="piecewise" type="regionsXYs"/>
+        <xs:element name="reference" type="xlink"/>
+        <xs:element name="polynomial" type="multiplicityPolynomial"/>
+        <xs:element ref="weightedReference"/>
+      </xs:choice>
+      <xs:attribute name="nativeData" type="xs:NCName" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+    <!-- types of multiplicity data -->
+      <xs:complexType name="multiplicityPolynomial">
+        <xs:sequence>
+          <xs:element name="axes" type="axes"/>
+          <xs:element name="data" type="datalist"/>
+        </xs:sequence>
+        <xs:attribute name="xData" type="xs:string" use="required"/>
+        <xs:attribute name="length" type="xs:integer" use="required"/>
+      </xs:complexType>
+      <xs:element name="weightedReference">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="reference" type="xlink"/>
+            <xs:element ref="weights"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="weights">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="pointwise" type="xData_XYs"/>
+          </xs:sequence>
+          <xs:attribute name="nativeData" type="xs:NCName" use="required"/>
+        </xs:complexType>
+      </xs:element>
+
+  <!-- ENDL data may also have energy deposition -->
+  <xs:element name="depositionEnergy">
+    <xs:complexType>
+      <xs:choice minOccurs="0">
+        <xs:element name="pointwise" type="xData_XYs"/>
+        <xs:element name="piecewise" type="regionsXYs"/>
+      </xs:choice>
+      <xs:attribute name="nativeData" type="xs:NCName" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+
+
+
+
+  <!-- Some basic data containers are used throughout GND files, and are defined here.
+       These include 'pointwise' and 'piecewise' (which have 2,3, and 4-dimensional versions).
+       They also include 'axes' which contains information on units, reference frame and interpolation;
+       and they include the 'table' element: -->
+  
+  <xs:complexType name="xlink">
+    <xs:attribute ref="xlink:href" use="required"/>
+    <xs:attribute ref="xlink:type" use="required"/>
+  </xs:complexType>
+
+  <!-- check that 'PhysicalQuantity' attributes have both number and unit: '7.24e+7 eV' for example.
+      In special cases, they can also start with 'u:' (for undefined levels) -->
+  <xs:simpleType name="PhysicalQuantity">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(u:)?(-?[0-9]+)(\.[0-9]*)?(e(\+|\-)?[0-9]+)? [a-zA-Z]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="axes">
+    <xs:sequence>
+      <xs:element name="axis" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="index" use="required" type="xs:integer"/>
+          <xs:attribute name="label" use="required"/>
+          <xs:attribute name="unit" use="required"/>
+          <xs:attribute name="frame" use="required"/>
+          <xs:attribute name="interpolation"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="interpolationAxes">
+    <xs:attribute name="index" use="required" type="xs:integer"/>
+    <xs:attribute name="interpolation" use="required"/>
+  </xs:complexType>
+
+  <!-- plain text data (except for documentation) may only contain a list of floats: -->
+  <xs:simpleType name="datalist">
+    <xs:list itemType="xs:float"/>
+  </xs:simpleType>
+
+  <!-- pointwise 2d data (for cross section, multiplicity, etc) -->
+  <xs:complexType name="xData_XYs">
+    <xs:sequence>
+      <xs:element name="axes" type="axes"/>
+      <xs:element name="data" type="datalist"/>
+    </xs:sequence>
+    <xs:attribute name="index" type="xs:integer"/>
+    <xs:attribute name="xData" type="xs:NMTOKEN" use="required"/>
+    <xs:attribute name="length" type="xs:integer" use="required"/>
+    <xs:attribute name="accuracy" type="xs:float" use="required"/>
+  </xs:complexType>
+
+  <!-- piecewise 2d data -->
+  <xs:complexType name="regionsXYs">
+    <xs:sequence>
+      <xs:element name="axes" type="axes"/>
+      <xs:element name="region" minOccurs="2" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="interpolationAxes" type="interpolationAxes" maxOccurs="unbounded"/>
+            <xs:element name="data" type="datalist"/>
+          </xs:sequence>
+          <xs:attribute name="index" type="xs:integer" use="required"/>
+          <xs:attribute name="length" type="xs:integer" use="required"/>
+          <xs:attribute name="accuracy" type="xs:float" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="xData" type="xs:NMTOKEN" use="required"/>
+  </xs:complexType>
+
+  <!-- pointwise 3d data: energy or angular distribution -->
+  <xs:complexType name="xData_W_XYs">
+    <xs:sequence>
+      <xs:element name="axes" type="axes"/>
+      <xs:element name="energy_in" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="datalist">
+              <xs:attribute name="value" type="xs:float" use="required"/>
+              <xs:attribute name="index" type="xs:integer" use="required"/>
+              <xs:attribute name="length" type="xs:integer" use="required"/>
+              <xs:attribute name="accuracy" type="xs:float"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="index" type="xs:integer"/>
+    <xs:attribute name="accuracy" type="xs:float"/>
+    <xs:attribute name="xData" type="xs:NMTOKEN" use="required"/>
+  </xs:complexType>
+
+  <!-- piecewise 3d data -->
+  <xs:complexType name="regions_W_XYs">
+    <xs:sequence>
+      <xs:element name="axes" type="axes"/>
+      <xs:element name="region" minOccurs="2" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="interpolationAxes" type="interpolationAxes"/>
+            <xs:element name="energy_in" maxOccurs="unbounded">
+              <xs:complexType mixed="true">
+                <xs:attribute name="value" type="xs:float" use="required"/>
+                <xs:attribute name="index" type="xs:integer" use="required"/>
+                <xs:attribute name="length" type="xs:integer" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="index" use="required" type="xs:integer"/>
+          <xs:attribute name="xData" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="xData" use="required" type="xs:NMTOKEN"/>
+  </xs:complexType>
+
+  <!-- pointwise 4d data: double-differential distribution -->
+  <xs:complexType name="xData_V_W_XYs">
+    <xs:sequence>
+      <xs:element name="axes" type="axes"/>
+      <xs:element name="energy_in" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="mu" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="datalist">
+                    <xs:attribute name="value" type="xs:float" use="required"/>
+                    <xs:attribute name="index" type="xs:integer" use="required"/>
+                    <xs:attribute name="length" type="xs:integer" use="required"/>
+                    <xs:attribute name="accuracy" type="xs:float" use="required"/>
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="value" use="required" type="xs:float"/>
+          <xs:attribute name="index" use="required" type="xs:integer"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="xData" use="required" type="xs:NMTOKEN"/>
+  </xs:complexType>
+
+  <!-- Legendre 4d data: Legendre coefficients for each incident/outgoing energy -->
+  <xs:complexType name="Legendre_V_W_XYs">
+    <xs:sequence>
+      <xs:element name="axes" type="axes"/>
+      <xs:element name="energy_in" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="energy_out" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="datalist">
+                    <xs:attribute name="value" type="xs:float" use="required"/>
+                    <xs:attribute name="index" type="xs:integer" use="required"/>
+                    <xs:attribute name="length" type="xs:integer" use="required"/>
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="value" type="xs:float" use="required"/>
+          <xs:attribute name="index" type="xs:integer" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="xData" type="xs:NMTOKEN" use="required"/>
+  </xs:complexType>
+
+  <!-- 'table' has a list of columns + a rectangular array of data -->
+  <xs:complexType name="table">
+    <xs:sequence>
+      <xs:element name="columnHeaders">
+        <xs:complexType>
+          <xs:sequence minOccurs="1">
+            <xs:element name="column" type="column" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="data" type="datalist"/>
+    </xs:sequence>
+    <xs:attribute name="rows" type="xs:integer" use="required"/>
+    <xs:attribute name="columns" type="xs:integer" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="column">
+    <xs:attribute name="index" type="xs:integer" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="units" type="xs:string"/>
+    <xs:attribute name="L" type="xs:integer"/>
+    <xs:attribute name="channelSpin" type="xs:float"/>
+    <xs:attribute name="effectiveRadius" type="PhysicalQuantity"/>
+  </xs:complexType>
+
+
+</xs:schema>

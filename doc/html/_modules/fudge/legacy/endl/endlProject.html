@@ -1,0 +1,497 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.endl.endlProject &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for fudge.legacy.endl.endlProject</h1><div class="highlight"><pre>
+<span class="c"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The main content of this module is the class endlProject.</span>
+
+<span class="sd">To resolve the location of the bdfls file, endlProject does the following,</span>
+<span class="sd">    1) Uses the bdflsFileName argument if it is None; else,</span>
+<span class="sd">    2) Uses &quot;./bdfls&quot; if it exists; else,</span>
+<span class="sd">    3) Uses the bdfls in the database (at the same level as the &quot;ascii&quot; file) if it exists; else,</span>
+<span class="sd">    4) Uses the bdlfs pointed to by the environmental variable BDFLSPATH if it exists; else,</span>
+<span class="sd">    5) Uses &quot;/usr/gapps/data/nuclear/bdfls&quot;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">types</span>
+
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">fudgeDefaults</span><span class="p">,</span> <span class="n">fudgeParameters</span>
+<span class="kn">from</span> <span class="nn">fudge.processing</span> <span class="kn">import</span> <span class="n">bdfls</span>
+<span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="kn">import</span> <span class="n">brb</span>
+<span class="kn">import</span> <span class="nn">fudgeDocumentationFile</span>
+<span class="kn">import</span> <span class="nn">endlZA</span>
+<span class="kn">import</span> <span class="nn">endl2</span>
+<span class="kn">import</span> <span class="nn">endlmisc</span>
+<span class="kn">import</span> <span class="nn">endl_Z</span>
+
+<span class="n">endlProjectList</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="exit"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.exit">[docs]</a><span class="k">def</span> <span class="nf">exit</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="s">&quot;Does some house cleaning and then exits python. This is the recommended way to exit fudge.&quot;</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">endlProjectList</span> <span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="p">(</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">endlProjectList</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">delWorkDirWhenDone</span> <span class="p">)</span> <span class="p">:</span> <span class="k">del</span> <span class="n">endlProjectList</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+        <span class="n">n</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ll"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.ll">[docs]</a><span class="k">def</span> <span class="nf">ll</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="s">&quot;Currently, the same as ls( ).&quot;</span>
+
+    <span class="n">ls</span><span class="p">(</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ls"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.ls">[docs]</a><span class="k">def</span> <span class="nf">ls</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;List instantiated databases.&quot;&quot;&quot;</span>
+
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">endlProjectList</span> <span class="p">:</span> <span class="k">print</span> <span class="s">&quot;   endlProjectList[</span><span class="si">%d</span><span class="s">] = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">database</span> <span class="p">);</span> <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+</div>
+<div class="viewcode-block" id="removeProject"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.removeProject">[docs]</a><span class="k">def</span> <span class="nf">removeProject</span><span class="p">(</span> <span class="n">p</span><span class="p">,</span> <span class="n">delWorkDirWhenDone</span> <span class="o">=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="s">&quot;Removes endlProject p from Fudge&#39;s internal list and returns None.&quot;</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">p</span> <span class="p">)</span> <span class="o">==</span> <span class="n">types</span><span class="o">.</span><span class="n">InstanceType</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">p</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;endlProject&quot;</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">delWorkDirWhenDone</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">delWorkDirWhenDone</span> <span class="o">=</span> <span class="n">delWorkDirWhenDone</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">endlProjectList</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">r</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">p</span> <span class="o">==</span> <span class="n">endlProjectList</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">del</span> <span class="n">endlProjectList</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in removeProject: project not found in endlProjectList&quot;</span> <span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in removeProject: object is not an endlProject instance&quot;</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endlProject"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject">[docs]</a><span class="k">class</span> <span class="nc">endlProject</span> <span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">database</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">projectile</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">yi</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">workDir</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">delWorkDirWhenDone</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">readOnly</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">release</span> <span class="o">=</span> <span class="s">&#39;current&#39;</span><span class="p">,</span>
+        <span class="n">bdflsFile</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">cleanWorkDirOfZAs</span> <span class="o">=</span> <span class="bp">False</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Creates a new endlProject with database as the default database to use when reading ZAs. If bdflsFile is not None, then</span>
+<span class="sd">        it is the bdfls class instance associated with self.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">yi</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">endlmisc</span><span class="o">.</span><span class="n">printWarning</span><span class="p">(</span> <span class="s">&#39;Argument &quot;yi&quot; for Constructor of endlProject is deprecated, please use argument &quot;projectile&quot; instead.&#39;</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">projectile</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&#39;Both &quot;yi&quot; and &quot;projectile&quot; argument specified, only use &quot;projectile&quot;.&#39;</span> <span class="p">)</span>
+            <span class="n">projectile</span> <span class="o">=</span> <span class="n">yi</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">database</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">database</span> <span class="o">=</span> <span class="n">fudgeDefaults</span><span class="o">.</span><span class="n">ENDL_DEFAULT_DATABASE</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">bdflsFile</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">bdflsFileName</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="s">&#39;bdfls&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">bdflsFileName</span> <span class="o">=</span> <span class="s">&#39;./bdfls&#39;</span>    <span class="c"># Else logic handled below.</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">bdflsFileName</span> <span class="o">=</span> <span class="n">bdflsFile</span><span class="o">.</span><span class="n">Source</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readOnly</span> <span class="o">=</span> <span class="n">readOnly</span> <span class="ow">or</span> <span class="n">fudgeParameters</span><span class="o">.</span><span class="n">ReadOnly</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delWorkDirWhenDone</span> <span class="o">=</span> <span class="n">delWorkDirWhenDone</span>
+        <span class="n">dbInDatabaseName</span><span class="p">,</span> <span class="n">yiInDatabaseName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="n">database</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">yiInDatabaseName</span> <span class="ow">in</span> <span class="p">[</span> <span class="s">&quot;yi01&quot;</span><span class="p">,</span> <span class="s">&quot;yi02&quot;</span><span class="p">,</span> <span class="s">&quot;yi03&quot;</span><span class="p">,</span> <span class="s">&quot;yi04&quot;</span><span class="p">,</span> <span class="s">&quot;yi05&quot;</span><span class="p">,</span>  <span class="s">&quot;yi06&quot;</span><span class="p">,</span> <span class="s">&quot;yi07&quot;</span><span class="p">,</span> <span class="s">&quot;yi09&quot;</span> <span class="p">]</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">database</span> <span class="o">=</span> <span class="n">dbInDatabaseName</span>
+            <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">projectile</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">yiInDatabaseName</span> <span class="o">!=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">incidentParticleTags</span><span class="p">(</span> <span class="n">projectile</span> <span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in endlProject.__init__: yi in database name and yi differ&quot;</span> <span class="p">)</span>
+            <span class="n">projectile</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">incidentParticleTags</span><span class="p">(</span> <span class="n">yiInDatabaseName</span> <span class="p">)[</span><span class="mi">5</span><span class="p">]</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">projectile</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">projectile</span> <span class="o">=</span> <span class="s">&#39;n&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yiTags</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">incidentParticleTags</span><span class="p">(</span> <span class="n">projectile</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yiTags</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+        <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">,</span> <span class="n">Status</span> <span class="p">)</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">getFullPath</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">database</span><span class="p">,</span> <span class="s">&#39;ascii&#39;</span> <span class="p">),</span> <span class="n">fudgeDefaults</span><span class="o">.</span><span class="n">ENDL_DATABASE_DIR</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">Status</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">,</span> <span class="n">Status</span> <span class="p">)</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">getFullPath</span><span class="p">(</span> <span class="n">database</span><span class="p">,</span> <span class="n">fudgeDefaults</span><span class="o">.</span><span class="n">ENDL_DATABASE_DIR</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">Status</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">,</span> <span class="n">Status</span> <span class="p">)</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">getFullPath</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">database</span><span class="p">,</span> <span class="s">&#39;ascii&#39;</span> <span class="p">),</span> \
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">fudgeDefaults</span><span class="o">.</span><span class="n">TRANSLATED_DATABASE_DIR</span><span class="p">,</span> <span class="n">release</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">Status</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>                                <span class="c"># File or directory does not exist</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">yiTags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span> <span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in endlProject.__init__: invalid projectile = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yiTags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">fudgeParameters</span><span class="o">.</span><span class="n">VerboseMode</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">yiTags</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="p">(</span> <span class="n">Status</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in endlProject.__init__: database is not a directory&quot;</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yiTags</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">bdflsFileName</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">bdflsFileName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s">&#39;/ascii&#39;</span> <span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#39;bdfls&#39;</span> <span class="p">)</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="n">bdflsFileName</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">bdflsFileName</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yiTags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bdflsFile</span> <span class="o">=</span> <span class="n">bdflsFile</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">bdflsFile</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">bdflsFile</span> <span class="o">=</span> <span class="n">bdfls</span><span class="o">.</span><span class="n">getBdflsFile</span><span class="p">(</span> <span class="n">name</span> <span class="o">=</span> <span class="n">bdflsFileName</span> <span class="p">)</span>   <span class="c"># endlProject relies on bdfls class to search BDFLSPATH </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bdflsFileName</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">getAbsPath_withDefaultDBCheck</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">bdflsFile</span><span class="o">.</span><span class="n">Source</span> <span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c"># and &quot;/usr/gapps/data/nuclear/bdfls&quot;, in that order,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="mi">0</span>                                                                           <span class="c"># for the bdfls file.</span>
+        <span class="n">yoZA</span> <span class="o">=</span> <span class="n">endl2</span><span class="o">.</span><span class="n">yoToZA</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">yiTags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">yiTags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">7</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bdflsFile</span><span class="o">.</span><span class="n">mass</span><span class="p">(</span> <span class="nb">abs</span><span class="p">(</span> <span class="n">yoZA</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">yoZA</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">yoZA</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">endl2</span><span class="o">.</span><span class="n">ZandAFromZA</span><span class="p">(</span> <span class="n">yoZA</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">fudgeParameters</span><span class="o">.</span><span class="n">VerboseMode</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;Using bdfls&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bdflsFileName</span>
+            <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span>
+        <span class="n">gappsDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span> <span class="s">&#39;/usr/gapps/data/nuclear&#39;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">readOnly</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">workDir</span> <span class="o">==</span> <span class="s">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="n">workDir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">workDir</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="o">=</span> <span class="n">workDir</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">gappsDir</span> <span class="o">==</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="p">)[:</span><span class="nb">len</span><span class="p">(</span> <span class="n">gappsDir</span> <span class="p">)]</span> <span class="p">)</span> <span class="p">:</span> 
+                <span class="k">if</span><span class="p">(</span> <span class="s">&#39;development&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&#39;cannot make workDir point to /usr/gapps/data/nuclear, except in a development sub-directory&#39;</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">appendyiDirIfNeeded</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yiTags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="ow">is</span> <span class="bp">None</span> <span class="p">)</span> <span class="ow">and</span> <span class="n">cleanWorkDirOfZAs</span> <span class="p">)</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span> <span class="s">&#39;rm -rf </span><span class="si">%s</span><span class="s">/za[0-9][0-9][0-9][0-9][0-9][0-9]*&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zas</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">documentationFileName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">,</span> <span class="s">&#39;documentation.txt&#39;</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="n">documentationFileName</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span> <span class="o">=</span> <span class="n">fudgeDocumentationFile</span><span class="o">.</span><span class="n">fudgeDocumentationFile</span><span class="p">(</span> <span class="n">documentationFileName</span> <span class="p">)</span>
+        <span class="n">endlProjectList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">target</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns True if target is in self database, otherwise returns False.&quot;&quot;&quot;</span>
+
+        <span class="n">strZA</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">strZASuffix</span><span class="p">(</span> <span class="n">target</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">strZA</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ZAList</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;For internal use only.</span>
+<span class="sd">        Does house cleaning on self.  Note, self is not deleted until all references to it are removed.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s">&#39;zas&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">while</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s">&#39;workDir&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">delWorkDirWhenDone</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> 
+                <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span> <span class="s">&quot;rm -rf &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">index</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the ZA at self&#39;s zas[index].&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="p">)</span>
+
+        
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s">&quot;Returns the number of ZAs instantiated within self.&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span> <span class="p">)</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="endlProject.addZA"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.addZA">[docs]</a>    <span class="k">def</span> <span class="nf">addZA</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">ZA</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Adds a new empty endlZA class to self and returns a reference to it.  Also see readZA.&quot;&quot;&quot;</span>
+
+        <span class="n">sZA</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">strZASuffix</span><span class="p">(</span> <span class="n">ZA</span><span class="p">,</span> <span class="n">suffix</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">z</span><span class="o">.</span><span class="n">sZA</span> <span class="o">==</span> <span class="n">sZA</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in endlProject.addZA: za = </span><span class="si">%s</span><span class="s"> already present in this endlProject&quot;</span> <span class="o">%</span> <span class="n">sZA</span> <span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">endlZA</span><span class="o">.</span><span class="n">endlZA</span><span class="p">(</span> <span class="n">sZA</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yi</span><span class="p">,</span> <span class="n">database</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">workDir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">readOnly</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">readOnly</span><span class="p">,</span> <span class="n">bdflsFile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bdflsFile</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">z</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">z</span>
+</div>
+<div class="viewcode-block" id="endlProject.getDocumentation"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.getDocumentation">[docs]</a>    <span class="k">def</span> <span class="nf">getDocumentation</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return None if there is not documentation file, otherwise, the text of the documentation file is returned.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">None</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span><span class="o">.</span><span class="n">getText</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endlProject.getMass"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.getMass">[docs]</a>    <span class="k">def</span> <span class="nf">getMass</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the mass of the projectile in MeV.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endlProject.info"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Prints yi, the database directory name, za sub-directory name, work directory name and delWorkDirWhenDone flag for self.&quot;&quot;&quot;</span>
+
+        <span class="k">print</span> <span class="s">&quot;yi = </span><span class="si">%2d</span><span class="s">  symbol = </span><span class="si">%s</span><span class="s">  name = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">yi</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yiTags</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">yiTags</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">print</span> <span class="s">&quot;Database directory =&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span>
+        <span class="k">print</span> <span class="s">&quot;Working directory =&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span>
+        <span class="k">print</span> <span class="s">&quot;delWorkDirWhenDone =&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delWorkDirWhenDone</span>
+</div>
+<div class="viewcode-block" id="endlProject.ll"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.ll">[docs]</a>    <span class="k">def</span> <span class="nf">ll</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">Z</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">A</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="mi">5</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Prints a table of all ZA directories in self&#39;s default source database that match Z and A.  The table is printed with w columns.&quot;&quot;&quot;</span>
+
+        <span class="k">try</span> <span class="p">:</span>
+            <span class="n">zalist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ZAList</span><span class="p">(</span> <span class="n">Z</span> <span class="o">=</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span> <span class="o">=</span> <span class="n">A</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="p">:</span>
+            <span class="n">zalist</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;No default database&quot;</span> <span class="p">]</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">for</span> <span class="n">za</span> <span class="ow">in</span> <span class="n">zalist</span> <span class="p">:</span> <span class="n">l</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">za</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">Fmt</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%%</span><span class="s">-</span><span class="si">%d</span><span class="s">s&quot;</span> <span class="o">%</span> <span class="n">l</span>
+        <span class="n">zal</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">za</span> <span class="ow">in</span> <span class="n">zalist</span> <span class="p">:</span> <span class="n">zal</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">Fmt</span> <span class="o">%</span> <span class="n">za</span> <span class="p">)</span>
+        <span class="n">brb</span><span class="o">.</span><span class="n">tylist</span><span class="p">(</span> <span class="n">zal</span><span class="p">,</span> <span class="n">w</span> <span class="p">)</span>
+        <span class="k">print</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endlProject.ls"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.ls">[docs]</a>    <span class="k">def</span> <span class="nf">ls</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Prints a list of ZAs instantiated in self.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;            ZA        Source&quot;</span>
+            <span class="k">print</span> <span class="s">&quot;--------------------------------------------------------------------&quot;</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">print</span> <span class="s">&quot;zas[</span><span class="si">%3d</span><span class="s">] </span><span class="si">%-11.11s</span><span class="s">  </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">i</span><span class="p">,</span> <span class="sb">`self.zas[i].sZA`</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">source</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endlProject.process"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">oldfile</span><span class="p">,</span> <span class="n">newfile</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">options</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">defines</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">bdflsFile</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">ndfgen</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">mcfgen</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">endep</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">extraZAs</span> <span class="o">=</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Processes the active ZAs in self, using oldfile as a template to </span>
+<span class="sd">create newfile.  Active ZAs are ones that have been read-in-to (readZA) </span>
+<span class="sd">or added-to (addZA) self.  Uses bdfls pointed to by bdflsFile if not None; otherwise,</span>
+<span class="sd">used search in the standard algorithm. The options argument sets internal flags (see below).</span>
+<span class="sd">The defines argument must contain a list of ksh environmental assignments (e.g.,</span>
+<span class="sd">defines = ( &#39;greeting=&quot;Hello world&quot;&#39;, &#39;NDFGENINPUTSPATH=./ndf.inputs&#39; ), note that</span>
+<span class="sd">since &quot;Hello world&quot; is 2 words, it is quoted).</span>
+
+<span class="sd">Valid options are::</span>
+<span class="sd">    -i   Creates a &quot;.index&quot; file (this should generally be included),</span>
+<span class="sd">    -u   Update: newfile is oldfile amended by the active ZAs, </span>
+<span class="sd">         otherwise newfile only contains the active ZAs in self,</span>
+<span class="sd">    -v   Verbose mode (additional information is printed to screen and </span>
+<span class="sd">         intermediate files are kept,</span>
+<span class="sd">    -e   Stop processing after endep has been called (mainly for internal use).</span>
+
+<span class="sd">All options can be negated by prepending with &#39;no_&#39; (e.g., -no_u&#39;).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">bdflsFile</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">bdflsFile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bdflsFile</span><span class="o">.</span><span class="n">Source</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in endlProject.process: project does not have a work directory.&quot;</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="n">oldfile</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span> <span class="n">string</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span> <span class="n">oldfile</span><span class="p">,</span> <span class="s">&quot;/&quot;</span> <span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">f</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">fudgeDefaults</span><span class="o">.</span><span class="n">NDF_DATABASE_DIR</span><span class="p">,</span> <span class="n">oldfile</span> <span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="n">f</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">f</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">fudgeDefaults</span><span class="o">.</span><span class="n">MCF_DATABASE_DIR</span><span class="p">,</span> <span class="n">oldfile</span> <span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="n">f</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">oldfile</span> <span class="o">=</span> <span class="n">f</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="n">oldfile</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in endlProject.process: old file does not exist (</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="n">oldfile</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">newfile</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span> <span class="n">oldfile</span><span class="p">,</span> <span class="s">&quot;/&quot;</span> <span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>        <span class="c"># rfind returns -1 if &quot;/&quot; not found. This is great.</span>
+                <span class="n">newfile</span> <span class="o">=</span> <span class="n">oldfile</span><span class="p">[</span><span class="n">i</span><span class="p">:]</span> <span class="o">+</span> <span class="s">&quot;.new&quot;</span>
+            <span class="n">endlmisc</span><span class="o">.</span><span class="n">processDataBase</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span><span class="p">,</span> <span class="n">oldfile</span><span class="p">,</span> <span class="n">newfile</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="n">defines</span> <span class="o">=</span> <span class="n">defines</span><span class="p">,</span> <span class="n">bdflsFile</span> <span class="o">=</span> <span class="n">bdflsFile</span><span class="p">,</span> <span class="n">ndfgen</span> <span class="o">=</span> <span class="n">ndfgen</span><span class="p">,</span>
+                <span class="n">mcfgen</span> <span class="o">=</span> <span class="n">mcfgen</span><span class="p">,</span> <span class="n">endep</span> <span class="o">=</span> <span class="n">endep</span><span class="p">,</span> <span class="n">extraZAs</span> <span class="o">=</span> <span class="n">extraZAs</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endlProject.readZA"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.readZA">[docs]</a>    <span class="k">def</span> <span class="nf">readZA</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">ZA</span><span class="p">,</span> <span class="n">database</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Reads in ZA from database, creating a new endlZA in self.  If database = None, the database from self is used. Also see addZA.&quot;&quot;&quot;</span>
+
+        <span class="n">sZA</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">strZASuffix</span><span class="p">(</span> <span class="n">ZA</span><span class="p">,</span> <span class="n">suffix</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span> <span class="p">:</span> 
+            <span class="k">if</span> <span class="p">(</span> <span class="n">z</span><span class="o">.</span><span class="n">sZA</span> <span class="o">==</span> <span class="n">sZA</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">endlmisc</span><span class="o">.</span><span class="n">printWarning</span><span class="p">(</span> <span class="s">&quot;za = </span><span class="si">%s</span><span class="s"> already present in this endlProject&quot;</span> <span class="o">%</span> <span class="n">sZA</span> <span class="p">)</span>
+                <span class="k">return</span> <span class="n">z</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">database</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">database</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">endlZA</span><span class="o">.</span><span class="n">endlZA</span><span class="p">(</span> <span class="n">sZA</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yi</span><span class="p">,</span> <span class="n">database</span> <span class="o">=</span> <span class="n">database</span><span class="p">,</span> <span class="n">workDir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">readOnly</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">readOnly</span><span class="p">,</span> <span class="n">bdflsFile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bdflsFile</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">z</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">z</span>
+</div>
+<div class="viewcode-block" id="endlProject.read"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">database</span> <span class="o">=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">target</span><span class="p">[:</span><span class="mi">19</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;FissionProduct_ENDL&#39;</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">ZAs</span> <span class="o">=</span> <span class="n">target</span><span class="p">[</span><span class="mi">19</span><span class="p">:]</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">ZA</span> <span class="o">=</span> <span class="n">endl2</span><span class="o">.</span><span class="n">gndNameToEndlZ_A_Suffix</span><span class="p">(</span> <span class="n">target</span> <span class="p">)</span>
+            <span class="n">ZAs</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">strZASuffix</span><span class="p">(</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">Z</span> <span class="o">+</span> <span class="n">A</span><span class="p">,</span> <span class="n">suffix</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">readZA</span><span class="p">(</span> <span class="n">ZAs</span><span class="p">,</span> <span class="n">database</span> <span class="o">=</span> <span class="n">database</span> <span class="p">)</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endlProject.remove"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">target</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Removes self&#39;s reference to target and deletes target&#39;s directory from self&#39;s work </span>
+<span class="sd">        directory (i.e., if process( ) is called this target will not be processed).  Also see unread.&quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">target</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">workDir</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span> <span class="s">&quot;rm -rf &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">workDir</span> <span class="p">)</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">return</span>
+        <span class="n">endlmisc</span><span class="o">.</span><span class="n">printWarning</span><span class="p">(</span> <span class="s">&quot;Warning in endlProject.remove: target = </span><span class="si">%s</span><span class="s"> is not a part of project&quot;</span> <span class="o">%</span> <span class="n">target</span><span class="o">.</span><span class="n">name</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endlProject.removeZA"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.removeZA">[docs]</a>    <span class="k">def</span> <span class="nf">removeZA</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">ZA</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Removes self&#39;s reference to ZA and deletes ZA&#39;s directory from self&#39;s work </span>
+<span class="sd">        directory (i.e., if process( ) is called this ZA will not be processed).  Also see unreadZA.&quot;&quot;&quot;</span>
+
+        <span class="n">sZA</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">strZASuffix</span><span class="p">(</span> <span class="n">ZA</span><span class="p">,</span> <span class="n">suffix</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">sZA</span> <span class="o">==</span> <span class="n">sZA</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">workDir</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span> <span class="s">&quot;rm -rf &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">workDir</span> <span class="p">)</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">return</span>
+        <span class="n">endlmisc</span><span class="o">.</span><span class="n">printWarning</span><span class="p">(</span> <span class="s">&quot;Warning in endlProject.removeZA: za = </span><span class="si">%s</span><span class="s"> not in project&quot;</span> <span class="o">%</span> <span class="n">sZA</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endlProject.save"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s">&quot;Saves all ZAs instantiated within self.&quot;</span>
+
+        <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span> <span class="p">:</span> <span class="n">z</span><span class="o">.</span><span class="n">save</span><span class="p">(</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endlProject.saveProcess"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.saveProcess">[docs]</a>    <span class="k">def</span> <span class="nf">saveProcess</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">oldfile</span><span class="p">,</span> <span class="n">newfile</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">options</span> <span class="o">=</span> <span class="s">&quot; -i -u &quot;</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Saves all ZAs instantiated within self and then calls process( oldfile, newfile, options ).&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span> <span class="n">oldfile</span><span class="p">,</span> <span class="n">newfile</span><span class="p">,</span> <span class="n">options</span> <span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="endlProject.targetList"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.targetList">[docs]</a>    <span class="k">def</span> <span class="nf">targetList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">Symbol</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">A</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of target sub-directories in self&#39;s database matching Symbol, A and suffix.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;No default database defined.&quot;</span> <span class="p">)</span>
+        <span class="n">targetList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="p">)</span>
+        <span class="n">targets</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">Symbol</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">Symbol</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="s">&#39;&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">Symbol</span> <span class="o">=</span> <span class="p">[</span> <span class="n">Symbol</span> <span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">A</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">A</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">A</span> <span class="o">=</span> <span class="p">[</span> <span class="n">A</span> <span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">suffix</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">suffix</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="s">&#39;&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">suffix</span> <span class="o">=</span> <span class="p">[</span> <span class="n">suffix</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">targets</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">validZADirectoryName_</span><span class="p">(</span> <span class="n">target</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">S_</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">Symbol</span> <span class="o">!=</span> <span class="p">[</span> <span class="bp">None</span> <span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">S_</span> <span class="o">=</span> <span class="n">endl_Z</span><span class="o">.</span><span class="n">endl_ZSymbol</span><span class="p">(</span> <span class="nb">int</span><span class="p">(</span> <span class="n">target</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">A_</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">A</span> <span class="o">!=</span> <span class="p">[</span> <span class="bp">None</span> <span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">A_</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">target</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">8</span><span class="p">]</span> <span class="p">)</span>
+                <span class="n">s_</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">suffix</span> <span class="o">!=</span> <span class="p">[</span> <span class="bp">None</span> <span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">s_</span> <span class="o">=</span> <span class="n">target</span><span class="p">[</span><span class="mi">8</span><span class="p">:]</span>
+                <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">S_</span> <span class="ow">in</span> <span class="n">Symbol</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">A_</span> <span class="ow">in</span> <span class="n">A</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">s_</span> <span class="ow">in</span> <span class="n">suffix</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">,</span> <span class="n">target</span> <span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="n">d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">targetList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">endl2</span><span class="o">.</span><span class="n">endlToGNDName</span><span class="p">(</span> <span class="n">target</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">targetList</span>
+</div>
+<div class="viewcode-block" id="endlProject.unread"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.unread">[docs]</a>    <span class="k">def</span> <span class="nf">unread</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">target</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Removes self&#39;s reference to target, but does not delete target&#39;s directory from self&#39;s work </span>
+<span class="sd">        directory (i.e., if process( ) is called this target will be processed). Also see remove.&quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">target</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">return</span>
+        <span class="n">endlmisc</span><span class="o">.</span><span class="n">printWarning</span><span class="p">(</span> <span class="s">&quot;Warning in endlProject.unread: target = </span><span class="si">%s</span><span class="s"> is not a part of project&quot;</span> <span class="o">%</span> <span class="n">target</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endlProject.unreadZA"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.unreadZA">[docs]</a>    <span class="k">def</span> <span class="nf">unreadZA</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">ZA</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Removes self&#39;s reference to ZA, but does not delete ZA&#39;s directory from self&#39;s work </span>
+<span class="sd">        directory (i.e., if process( ) is called this ZA will be processed). Also see removeZA.&quot;&quot;&quot;</span>
+
+        <span class="n">sZA</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">strZASuffix</span><span class="p">(</span> <span class="n">ZA</span><span class="p">,</span> <span class="n">suffix</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">sZA</span> <span class="o">==</span> <span class="n">sZA</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">return</span>
+        <span class="n">endlmisc</span><span class="o">.</span><span class="n">printWarning</span><span class="p">(</span> <span class="s">&quot;Warning in endlProject.unreadZA: za = &quot;</span> <span class="o">+</span> <span class="n">sZA</span> <span class="o">+</span> <span class="s">&quot; not in project&quot;</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endlProject.ZA"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.ZA">[docs]</a>    <span class="k">def</span> <span class="nf">ZA</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">ZA</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a reference to the endlZA matching ZA in self.  ZA is passed to endlmisc.intZA </span>
+<span class="sd">        and its return value to used for matching ZAs. If ZA has not been instantiated then None is returned.&quot;&quot;&quot;</span>
+
+        <span class="n">sZA</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">strZASuffix</span><span class="p">(</span> <span class="n">ZA</span><span class="p">,</span> <span class="n">suffix</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">zas</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">z</span><span class="o">.</span><span class="n">sZA</span> <span class="o">==</span> <span class="n">sZA</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="n">z</span> 
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="endlProject.ZAList"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.ZAList">[docs]</a>    <span class="k">def</span> <span class="nf">ZAList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">Z</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">A</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of ZA sub-directories in self&#39;s database matching Z and A.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in endlProject.ZAList: no default database defined.&quot;</span> <span class="p">)</span>
+        <span class="n">Zb</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">Ze</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">ZStr</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">Ab</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">Ae</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">AStr</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">Z</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">ZStr</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%3.3d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">Z</span>
+            <span class="n">Ze</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">A</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">AStr</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%3.3d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">A</span>
+            <span class="n">Ae</span> <span class="o">=</span> <span class="mi">8</span>
+        <span class="n">zalist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ZAs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="p">)</span>
+        <span class="n">ZAs</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">za</span> <span class="ow">in</span> <span class="n">ZAs</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">validZADirectoryName_</span><span class="p">(</span> <span class="n">za</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span> <span class="n">ZStr</span> <span class="o">==</span> <span class="n">za</span><span class="p">[</span><span class="n">Zb</span><span class="p">:</span><span class="n">Ze</span><span class="p">]</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">AStr</span> <span class="o">==</span> <span class="n">za</span><span class="p">[</span><span class="n">Ab</span><span class="p">:</span><span class="n">Ae</span><span class="p">]</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="p">(</span> <span class="n">suffix</span> <span class="o">==</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="n">suffix</span> <span class="o">==</span> <span class="n">za</span><span class="p">[</span><span class="mi">8</span><span class="p">:]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span><span class="p">,</span> <span class="n">za</span> <span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="n">d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">zalist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">za</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">zalist</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,214 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.evaluationBuilder.productBuilder &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for fudge.evaluationBuilder.productBuilder</h1><div class="highlight"><pre>
+<span class="c"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">base</span>
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">particles</span>
+<span class="kn">from</span> <span class="nn">fudge.gnd</span> <span class="kn">import</span> <span class="n">product</span><span class="p">,</span> <span class="n">xParticle</span><span class="p">,</span> <span class="n">xParticleList</span><span class="p">,</span> <span class="n">productData</span>
+<span class="kn">from</span> <span class="nn">pqu</span> <span class="kn">import</span> <span class="n">PQU</span> <span class="c"># for physical quantities</span>
+
+<span class="c"># particleLibrary keeps track of all particles that have been defined,</span>
+<span class="c"># so that an evaluation contains only one copy of each particle.</span>
+<div class="viewcode-block" id="particleLibrary"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.productBuilder.particleLibrary">[docs]</a><span class="k">class</span> <span class="nc">particleLibrary</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">database</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;No support yet for using external particle database!&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">particleList</span> <span class="o">=</span> <span class="n">xParticleList</span><span class="o">.</span><span class="n">xParticleList</span><span class="p">()</span>
+
+<div class="viewcode-block" id="particleLibrary.getParticle"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.productBuilder.particleLibrary.getParticle">[docs]</a>    <span class="k">def</span> <span class="nf">getParticle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">levelIndex</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">levelEnergy</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Each particle should be defined only once. This checks whether the particle is already defined,</span>
+<span class="sd">        and either returns it or defines and returns the result.</span>
+
+<span class="sd">        Currently we must manually add the energy level for an excited state.</span>
+<span class="sd">        for example:</span>
+<span class="sd">            &gt;prod = getParticle(&#39;Fe56&#39;)</span>
+<span class="sd">            &gt;lev1 = getParticle(&#39;Fe56_e1&#39;, levelIndex=1, levelEnergy=PQU(&#39;...&#39;) )</span>
+<span class="sd">            &gt;lev2 = getParticle(&#39;Fe56&#39;, levelIndex=2, levelEnergy=PQU(&#39;...&#39;) )</span>
+
+<span class="sd">        In the future we&#39;ll get that information from the particle database instead.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Particle name must be a string, not </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">levelIndex</span> <span class="ow">and</span> <span class="s">&#39;_&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">levelIndex</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="mi">0</span><span class="p">):</span> <span class="n">name</span> <span class="o">+=</span> <span class="s">&#39;_e</span><span class="si">%i</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">levelIndex</span>
+            <span class="k">else</span><span class="p">:</span> <span class="n">name</span> <span class="o">+=</span> <span class="s">&#39;_</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">levelIndex</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">mass</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span> <span class="n">mass</span> <span class="o">=</span> <span class="n">PQU</span><span class="p">(</span><span class="n">mass</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">particleList</span><span class="o">.</span><span class="n">hasParticle</span><span class="p">(</span> <span class="n">name</span> <span class="p">):</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">particleList</span><span class="o">.</span><span class="n">getParticle</span><span class="p">(</span> <span class="n">name</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s">&quot;gamma&quot;</span><span class="p">:</span>
+            <span class="n">particle</span> <span class="o">=</span> <span class="n">xParticle</span><span class="o">.</span><span class="n">xParticle</span><span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="n">genre</span><span class="o">=</span><span class="s">&quot;photon&quot;</span><span class="p">,</span> <span class="n">mass</span> <span class="o">=</span> <span class="n">PQU</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s">&quot;amu&quot;</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">levelIndex</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">particle</span> <span class="o">=</span> <span class="n">xParticle</span><span class="o">.</span><span class="n">nuclearLevel</span><span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="n">energy</span> <span class="o">=</span> <span class="n">PQU</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s">&#39;eV&#39;</span><span class="p">),</span> <span class="n">label</span> <span class="o">=</span> <span class="n">levelIndex</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">levelEnergy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="n">particle</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">levelEnergy</span>
+            <span class="k">else</span><span class="p">:</span> <span class="n">particle</span><span class="o">.</span><span class="n">needsEnergy</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">particle</span> <span class="o">=</span> <span class="n">xParticle</span><span class="o">.</span><span class="n">xParticle</span><span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="n">xParticle</span><span class="o">.</span><span class="n">particleType_Nuclear</span><span class="p">,</span> <span class="n">mass</span> <span class="o">=</span> <span class="n">PQU</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="s">&quot;amu&quot;</span><span class="p">)</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">mass</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="n">particle</span><span class="o">.</span><span class="n">setMass</span><span class="p">(</span> <span class="n">mass</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span> <span class="n">particle</span><span class="o">.</span><span class="n">needsMass</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">particleList</span><span class="o">.</span><span class="n">addParticle</span><span class="p">(</span> <span class="n">particle</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">particle</span>
+</div>
+<div class="viewcode-block" id="particleLibrary.newProduct"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.productBuilder.particleLibrary.newProduct">[docs]</a>    <span class="k">def</span> <span class="nf">newProduct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">levelIndex</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">levelEnergy</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">particle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getParticle</span><span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">levelIndex</span><span class="o">=</span><span class="n">levelIndex</span><span class="p">,</span> <span class="n">levelEnergy</span><span class="o">=</span><span class="n">levelEnergy</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">productBuilder</span><span class="p">(</span> <span class="n">particle</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="particleLibrary.setMass"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.productBuilder.particleLibrary.setMass">[docs]</a>    <span class="k">def</span> <span class="nf">setMass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">mass</span><span class="p">,</span> <span class="n">massUnit</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the mass for particle named &lt;name&gt;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">particle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">particleList</span><span class="o">.</span><span class="n">getParticle</span><span class="p">(</span> <span class="n">name</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="n">particle</span><span class="p">,</span> <span class="s">&#39;needsMass&#39;</span> <span class="p">)</span> <span class="ow">and</span> <span class="n">particle</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="n">massUnit</span><span class="p">)</span> <span class="o">!=</span> <span class="n">mass</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;Encountered multiple values for </span><span class="si">%s</span><span class="s"> mass: </span><span class="si">%s</span><span class="s"> vs </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">particle</span><span class="p">,</span>
+                <span class="n">particle</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="n">massUnit</span><span class="p">),</span> <span class="n">mass</span><span class="p">,</span> <span class="n">massUnit</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">particle</span><span class="o">.</span><span class="n">setMass</span><span class="p">(</span> <span class="n">PQU</span><span class="p">(</span> <span class="n">mass</span><span class="p">,</span> <span class="n">massUnit</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="n">particle</span><span class="p">,</span> <span class="s">&#39;needsMass&#39;</span> <span class="p">):</span> <span class="k">del</span> <span class="n">particle</span><span class="o">.</span><span class="n">needsMass</span>
+</div>
+<div class="viewcode-block" id="particleLibrary.setExcitationEnergy"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.productBuilder.particleLibrary.setExcitationEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">setExcitationEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">energyUnit</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the excitation for level named &lt;name&gt;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">particleList</span><span class="o">.</span><span class="n">getParticle</span><span class="p">(</span> <span class="n">name</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="n">level</span><span class="p">,</span> <span class="s">&#39;needsEnergy&#39;</span> <span class="p">)</span> <span class="ow">and</span> <span class="n">level</span><span class="o">.</span><span class="n">getLevelAsFloat</span><span class="p">(</span><span class="n">energyUnit</span><span class="p">)</span> <span class="o">!=</span> <span class="n">energy</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;Encountered multiple values for </span><span class="si">%s</span><span class="s"> energy: </span><span class="si">%s</span><span class="s"> vs </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">level</span><span class="o">.</span><span class="n">getLevelAsFloat</span><span class="p">(</span><span class="n">energyUnit</span><span class="p">),</span> <span class="n">energy</span><span class="p">,</span> <span class="n">energyUnit</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">level</span><span class="o">.</span><span class="n">energy</span> <span class="o">=</span> <span class="n">PQU</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">energyUnit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="n">level</span><span class="p">,</span> <span class="s">&#39;needsEnergy&#39;</span> <span class="p">):</span> <span class="k">del</span> <span class="n">level</span><span class="o">.</span><span class="n">needsEnergy</span>
+</div>
+<div class="viewcode-block" id="particleLibrary.checkForUnknownMassOrExcitation"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.productBuilder.particleLibrary.checkForUnknownMassOrExcitation">[docs]</a>    <span class="k">def</span> <span class="nf">checkForUnknownMassOrExcitation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">unknownMass</span><span class="p">,</span> <span class="n">unknownExcitation</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">particle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">particleList</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">particle</span><span class="p">,</span><span class="s">&#39;needsMass&#39;</span><span class="p">):</span> <span class="n">unknownMass</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">particle</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">particle</span><span class="o">.</span><span class="n">levels</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">level</span><span class="p">,</span><span class="s">&#39;needsEnergy&#39;</span><span class="p">):</span> <span class="n">unknownExcitation</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">level</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">unknownMass</span><span class="p">,</span> <span class="n">unknownExcitation</span>
+</div></div>
+<div class="viewcode-block" id="productBuilder"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.productBuilder.productBuilder">[docs]</a><span class="k">class</span> <span class="nc">productBuilder</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">particle</span><span class="p">,</span> <span class="n">multiplicity</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">distributionForm</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">distributionData</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">product</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">product</span><span class="p">(</span> <span class="n">particle</span><span class="p">,</span> <span class="s">&quot;product&quot;</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">particle</span><span class="o">.</span><span class="n">name</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">multiplicity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addMultiplicity</span><span class="p">(</span> <span class="n">multiplicity</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">distributionForm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addDistribution</span><span class="p">(</span> <span class="n">distributionForm</span><span class="p">,</span> <span class="n">distributionData</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="productBuilder.addMultiplicity"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.productBuilder.productBuilder.addMultiplicity">[docs]</a>    <span class="k">def</span> <span class="nf">addMultiplicity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mult</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add product multiplicity. &#39;mult&#39; may be an integer (for constant multiplicity)</span>
+<span class="sd">        or a list of energy-dependent multiplicities of form [ [energies], [multiplicities] ].</span>
+<span class="sd">        </span>
+<span class="sd">        Currently, only one linear-linear interpolation region is supported for energy-dependent multiplicities.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">mult</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">setMultiplicity</span><span class="p">(</span> <span class="n">productData</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">mult</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">mult</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="n">axes_</span> <span class="o">=</span> <span class="n">productData</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">pointwise</span><span class="o">.</span><span class="n">defaultAxes</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mult</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span> <span class="n">dataForm</span> <span class="o">=</span> <span class="s">&quot;XsAndYs&quot;</span>
+            <span class="k">else</span><span class="p">:</span> <span class="n">dataForm</span> <span class="o">=</span> <span class="s">&quot;XYs&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">setMultiplicity</span><span class="p">(</span> <span class="n">productData</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">pointwise</span><span class="p">(</span> <span class="n">axes_</span><span class="p">,</span> <span class="n">mult</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">defaultAccuracy</span><span class="p">,</span>
+                <span class="n">dataForm</span><span class="o">=</span><span class="n">dataForm</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Can&#39;t understand multiplicity of form &#39;</span><span class="si">%s</span><span class="s">&#39;!&quot;</span> <span class="o">%</span> <span class="n">mult</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="productBuilder.addDistribution"><a class="viewcode-back" href="../../../fudge/fudge.evaluationBuilder.html#fudge.evaluationBuilder.productBuilder.productBuilder.addDistribution">[docs]</a>    <span class="k">def</span> <span class="nf">addDistribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataForm</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">distributionBuilder</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">distributionBuilder</span><span class="p">(</span> <span class="n">dataForm</span><span class="p">,</span> <span class="n">data</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">addComponent</span><span class="p">(</span> <span class="n">db</span><span class="o">.</span><span class="n">component</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">distributions</span><span class="o">.</span><span class="n">setNativeData</span><span class="p">(</span> <span class="n">db</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">name</span> <span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

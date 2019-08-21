@@ -1,0 +1,407 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.core.math.endl1dmathClasses &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for fudge.core.math.endl1dmathClasses</h1><div class="highlight"><pre>
+<span class="c"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the endl1dmath class. Also see the supporting module endl1dmathmisc.py.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">math</span><span class="o">,</span> <span class="nn">copy</span><span class="o">,</span> <span class="nn">types</span>
+<span class="kn">from</span> <span class="nn">fudge.core</span> <span class="kn">import</span> <span class="n">fudgemisc</span>
+<span class="kn">import</span> <span class="nn">endl1dmathmisc</span>
+<span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="kn">import</span> <span class="n">fudgeFileMisc</span><span class="p">,</span> <span class="n">subprocessing</span>
+<span class="kn">from</span> <span class="nn">fudge.vis.gnuplot</span> <span class="kn">import</span> <span class="n">plotbase</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<div class="viewcode-block" id="endl1dmath"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathClasses.endl1dmath">[docs]</a><span class="k">class</span> <span class="nc">endl1dmath</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This class is designed to support operations on a list of numbers (e.g., [ number, number, ..., number ]) that may be useful to scientists.</span>
+<span class="sd">A number is an integer or a float.</span>
+
+<span class="sd">Members::</span>
+<span class="sd">    data        | A python list of numbers.</span>
+<span class="sd">    columns     | This is always 1 as this is 1d data.</span>
+<span class="sd">    yLabel      | Labelled used as the y-Label when plotting.</span>
+
+<span class="sd">Some examples are,</span>
+
+<span class="sd">&gt;&gt;&gt; my1d = endl1dmath( [ 1, 2, 3 ] )</span>
+<span class="sd">&gt;&gt;&gt; print my1d</span>
+<span class="sd"> 1.0000000e+00</span>
+<span class="sd"> 2.0000000e+00</span>
+<span class="sd"> 3.0000000e+00</span>
+<span class="sd">&gt;&gt;&gt; new1d = 2. * my1d + 3.14</span>
+<span class="sd">&gt;&gt;&gt; print new1d</span>
+<span class="sd"> 5.1400000e+00</span>
+<span class="sd"> 7.1400000e+00</span>
+<span class="sd"> 9.1400000e+00</span>
+<span class="sd">&gt;&gt;&gt; f1d = new1d.mapFunction( &quot;math.exp(x)&quot; )</span>
+<span class="sd">&gt;&gt;&gt; print f1d</span>
+<span class="sd"> 1.7071577e+02</span>
+<span class="sd"> 1.2614284e+03</span>
+<span class="sd"> 9.3207651e+03</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">checkDataType</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="n">yLabel</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s">&quot;unknown&quot;</span><span class="p">,</span> <span class="n">toFloat</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns an endl1dmath object. Data must be a python list of numbers (e.g., [ number, number, ..., number ]).&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">data</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">endl1dmathmisc</span><span class="o">.</span><span class="n">get1dmathData</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="s">&quot;endl1dmath.__init__&quot;</span><span class="p">,</span> <span class="s">&quot;data&quot;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">checkDataType</span> <span class="p">)</span> <span class="p">:</span> <span class="n">endl1dmathmisc</span><span class="o">.</span><span class="n">check1dData</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yLabel</span> <span class="o">=</span> <span class="n">yLabel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">toFloat</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">toFloat</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xInterpolation</span> <span class="o">=</span> <span class="s">&#39;flat&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">i</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns self&#39;s value at index i.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Sets self&#39;s value at index i to v.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">v</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span> <span class="n">v</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span> <span class="mf">1.</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in endl1dmath.__setitem__: invalid data type.&quot;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s">&quot;Returns the number of points in self&#39;s data (i.e., return len( self.data )).&quot;</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s">&quot;Returns a printable string of self&#39;s data. Uses endl1dmathmisc.endl1d_repr_xFormat to convert each point to a string.&quot;</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span> <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="n">endl1dmathmisc</span><span class="o">.</span><span class="n">endl1d_repr_xFormat</span> <span class="o">%</span> <span class="n">v</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="k">return</span> <span class="n">s</span>
+
+    <span class="k">def</span> <span class="nf">__cmp__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">endl1dmathmisc</span><span class="o">.</span><span class="n">valid1dClassType</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="s">&quot;endl1dmath.__cmp__&quot;</span><span class="p">,</span> <span class="s">&quot;comparison&quot;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__neg__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s">&quot;Returns an endl1dmath object whose points are the negation of self&#39;s points.&quot;</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">endl1dmath</span><span class="p">(</span> <span class="n">d</span><span class="p">,</span> <span class="n">checkDataType</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">yLabel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yLabel</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">v</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns an endl1dmath object whose points are self&#39;s points plus v.  v can be a number or</span>
+<span class="sd">        an endl1dmath object that is the same length as self.&quot;&quot;&quot;</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">v</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">v</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mf">1.</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">p</span> <span class="o">+</span> <span class="n">v</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">endl1dmathmisc</span><span class="o">.</span><span class="n">valid1dClassType</span><span class="p">(</span> <span class="n">v</span><span class="p">,</span> <span class="s">&quot;endl1dmath.__add__&quot;</span><span class="p">,</span> <span class="s">&quot;addition&quot;</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in endl1dmath.__add__: data lengths differ.&quot;</span> <span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">p</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">endl1dmath</span><span class="p">(</span> <span class="n">d</span><span class="p">,</span> <span class="n">checkDataType</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">yLabel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yLabel</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__radd__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">v</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Same as __add__( self, v ).&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span> <span class="o">+</span> <span class="n">v</span>
+
+    <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">v</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns an endl1dmath object that is self&#39;s points minus v.  v can be a number or</span>
+<span class="sd">        an endl1dmath object that must be the same length as self.&quot;&quot;&quot;</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">v</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">v</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mf">1.</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">p</span> <span class="o">-</span> <span class="n">v</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">endl1dmathmisc</span><span class="o">.</span><span class="n">valid1dClassType</span><span class="p">(</span> <span class="n">v</span><span class="p">,</span> <span class="s">&quot;endl1dmath.__sub__&quot;</span><span class="p">,</span> <span class="s">&quot;subtraction&quot;</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in endl1dmath.__add__: data lengths differ.&quot;</span> <span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">p</span> <span class="o">-</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">endl1dmath</span><span class="p">(</span> <span class="n">d</span><span class="p">,</span> <span class="n">checkDataType</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">yLabel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yLabel</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__rsub__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">v</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns an endl1dmath object that is v minus self&#39;s points.  v must be a number.&quot;&quot;&quot;</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">v</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">v</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mf">1.</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">v</span> <span class="o">-</span> <span class="n">p</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in endl1dmath.__rsub__: invalid type for subtraction&quot;</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">endl1dmath</span><span class="p">(</span> <span class="n">d</span><span class="p">,</span> <span class="n">checkDataType</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">yLabel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yLabel</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">v</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns an endl1dmath object that is self&#39;s points multiplied by v. v can be a number or</span>
+<span class="sd">        an endl1dmath object that must be the same length as self.&quot;&quot;&quot;</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">v</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">v</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mf">1.</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">v</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">p</span> <span class="o">*</span> <span class="n">v</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">endl1dmathmisc</span><span class="o">.</span><span class="n">valid1dClassType</span><span class="p">(</span> <span class="n">v</span><span class="p">,</span> <span class="s">&quot;endl1dmath.__mul__&quot;</span><span class="p">,</span> <span class="s">&quot;multiplication&quot;</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in endl1dmath.__mul__: data lengths differ.&quot;</span> <span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">p</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">endl1dmath</span><span class="p">(</span> <span class="n">d</span><span class="p">,</span> <span class="n">checkDataType</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">yLabel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yLabel</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__rmul__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">v</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Same as __mul__( self, v ).&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mul__</span><span class="p">(</span> <span class="n">v</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__div__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">v</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns an endl1dmath object that is self&#39;s points divided by v.  v can be a number or</span>
+<span class="sd">        an endl1dmath object that must be the same length as self.&quot;&quot;&quot;</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">v</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">v</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="mf">1.</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">v</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">p</span> <span class="o">/</span> <span class="n">v</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">endl1dmathmisc</span><span class="o">.</span><span class="n">valid1dClassType</span><span class="p">(</span> <span class="n">v</span><span class="p">,</span> <span class="s">&quot;endl1dmath.__div__&quot;</span><span class="p">,</span> <span class="s">&quot;division&quot;</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Error in endl1dmath.__div__: data lengths differ.&quot;</span> <span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">p</span> <span class="o">/</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">endl1dmath</span><span class="p">(</span> <span class="n">d</span><span class="p">,</span> <span class="n">checkDataType</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">yLabel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yLabel</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="endl1dmath.check"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathClasses.endl1dmath.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s">&quot;Check that self&#39;s data is a list of numbers.&quot;</span>
+
+        <span class="n">endl1dmathmisc</span><span class="o">.</span><span class="n">check1dData</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endl1dmath.copyData"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathClasses.endl1dmath.copyData">[docs]</a>    <span class="k">def</span> <span class="nf">copyData</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns an endl1dmath object that is a copy, and not a reference, of self.&quot;&quot;&quot;</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">x</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">endl1dmath</span><span class="p">(</span> <span class="n">d</span><span class="p">,</span> <span class="n">checkDataType</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">yLabel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yLabel</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endl1dmath.mapFunction"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathClasses.endl1dmath.mapFunction">[docs]</a>    <span class="k">def</span> <span class="nf">mapFunction</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">function</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Maps &#39;function&#39; onto every point of self&#39;s data. &#39;Function&#39; must be a string of the form &#39;f(x)&#39; where</span>
+<span class="sd">f(x) evaluates to a number (e.g. &#39;math.sin(x)&#39;). That is, self.data[i] = f( self.data[i] ).  For example, to</span>
+<span class="sd">exponentiate the points of instance my1d enter</span>
+
+<span class="sd">&gt;&gt;&gt; my1d.mapFunction( &#39;exp(x)&#39; )</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span>
+            <span class="k">exec</span><span class="p">(</span> <span class="s">&#39;d.append( &#39;</span> <span class="o">+</span> <span class="n">function</span> <span class="o">+</span> <span class="s">&#39; )&#39;</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">endl1dmath</span><span class="p">(</span> <span class="n">d</span><span class="p">,</span> <span class="n">checkDataType</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">yLabel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yLabel</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endl1dmath.plot"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathClasses.endl1dmath.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">xMin</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">xMax</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">yMin</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">yMax</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">xylog</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">xLabel</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">yLabel</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;This routine is like qplot (quick plot) except it spawns an interactive plot.  qplot is faster while plot is more flexible.</span>
+
+<span class="sd">    xylog   plot-type::</span>
+<span class="sd">     --------------------</span>
+<span class="sd">      0     linear-linear</span>
+<span class="sd">      1     log-linear</span>
+<span class="sd">      2     linear-log</span>
+<span class="sd">      3     log-log&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">xLabel</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">xLabel</span> <span class="o">=</span> <span class="s">&#39;indice&#39;</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">yLabel</span> <span class="o">==</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">yLabel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yLabel</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">plotbase</span><span class="o">.</span><span class="n">parsePlotOptions</span><span class="p">(</span> <span class="n">xMin</span><span class="p">,</span> <span class="n">xMax</span><span class="p">,</span> <span class="n">yMin</span><span class="p">,</span> <span class="n">yMax</span><span class="p">,</span> <span class="n">xLabel</span><span class="p">,</span> <span class="n">yLabel</span><span class="p">,</span> <span class="n">title</span> <span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">fudgeFileMisc</span><span class="o">.</span><span class="n">fudgeTempFile</span><span class="p">(</span> <span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s">&quot;</span><span class="si">%d</span><span class="s"> </span><span class="si">%14.8e</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">(</span> <span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">__file__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s">&#39;/fudge/core/&#39;</span> <span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&quot;fudge&quot;</span><span class="p">,</span> <span class="s">&quot;vis&quot;</span><span class="p">,</span> <span class="s">&quot;gnuplot&quot;</span><span class="p">,</span> <span class="s">&quot;endl2dplot.py&quot;</span> <span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&#39;python&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="s">&#39;xylog&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span> <span class="n">xylog</span> <span class="p">)</span> <span class="p">]</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">+</span> <span class="p">[</span> <span class="n">f</span><span class="o">.</span><span class="n">getName</span><span class="p">(</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="n">subprocessing</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endl1dmath.qplot"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathClasses.endl1dmath.qplot">[docs]</a>    <span class="k">def</span> <span class="nf">qplot</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">xMin</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">xMax</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">yMin</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">yMax</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">xylog</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">xLabel</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">yLabel</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Also see plot( ).</span>
+
+<span class="sd">    xylog   plot-type::</span>
+<span class="sd">     --------------------</span>
+<span class="sd">      0     linear-linear</span>
+<span class="sd">      1     log-linear</span>
+<span class="sd">      2     linear-log</span>
+<span class="sd">      3     log-log&quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">Gnuplot</span>
+        <span class="n">xylog</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">xylog</span> <span class="p">)</span>            <span class="c"># Allow argument to be a string</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">xMin</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">xMin</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">xMin</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">xMax</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">xMax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">xMax</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">yMin</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">yMin</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">yMin</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">yMax</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">yMax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">yMax</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">Gnuplot</span><span class="o">.</span><span class="n">Gnuplot</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&#39;set style data linespoints&#39;</span> <span class="p">)</span>
+        <span class="n">xylog</span> <span class="o">=</span> <span class="n">xylog</span> <span class="o">%</span> <span class="mi">4</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">my</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span> <span class="n">my</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span> <span class="n">my</span><span class="p">,</span> <span class="n">d</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">my</span> <span class="o">&lt;=</span> <span class="mf">0.</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">xylog</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="n">xylog</span> <span class="o">=</span> <span class="n">xylog</span> <span class="o">-</span> <span class="mi">2</span>
+        <span class="k">if</span>   <span class="p">(</span> <span class="n">xylog</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&#39;set logscale x&#39;</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span> <span class="n">xylog</span> <span class="o">==</span> <span class="mi">2</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&#39;set logscale y&#39;</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span> <span class="n">xylog</span> <span class="o">==</span> <span class="mi">3</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&#39;set logscale xy&#39;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">xMin</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="n">xMax</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">xMin</span> <span class="o">=</span> <span class="sb">`xMin`</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">xMin</span> <span class="o">==</span> <span class="s">&quot;None&quot;</span> <span class="p">)</span> <span class="p">:</span> <span class="n">xMin</span> <span class="o">=</span> <span class="s">&quot;*&quot;</span>
+            <span class="n">xMax</span> <span class="o">=</span> <span class="sb">`xMax`</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">xMax</span> <span class="o">==</span> <span class="s">&quot;None&quot;</span> <span class="p">)</span> <span class="p">:</span> <span class="n">xMax</span> <span class="o">=</span> <span class="s">&quot;*&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set xrange [ </span><span class="si">%s</span><span class="s"> : </span><span class="si">%s</span><span class="s"> ]&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">xMin</span><span class="p">,</span> <span class="n">xMax</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">yMin</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="n">yMax</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">yMin</span> <span class="o">=</span> <span class="sb">`yMin`</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">yMin</span> <span class="o">==</span> <span class="s">&quot;None&quot;</span> <span class="p">)</span> <span class="p">:</span> <span class="n">yMin</span> <span class="o">=</span> <span class="s">&quot;*&quot;</span>
+            <span class="n">yMax</span> <span class="o">=</span> <span class="sb">`yMax`</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="n">yMax</span> <span class="o">==</span> <span class="s">&quot;None&quot;</span> <span class="p">)</span> <span class="p">:</span> <span class="n">yMax</span> <span class="o">=</span> <span class="s">&quot;*&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set yrange [ </span><span class="si">%s</span><span class="s"> : </span><span class="si">%s</span><span class="s"> ]&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">yMin</span><span class="p">,</span> <span class="n">yMax</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">xLabel</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set xlabel </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">xLabel</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">yLabel</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set ylabel </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">yLabel</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">title</span>  <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set title </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="sb">`title`</span> <span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="p">]</span> <span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span> <span class="n">d</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endl1dmath.set"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathClasses.endl1dmath.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">duplicate</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">checkDataType</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Sets self.data = other.data. If duplicate is true (i.e., not 0) than a copy of other&#39;s data </span>
+<span class="sd">        is made so that other&#39;s and self&#39;s data can be modified independently.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">other</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">endl1dmathmisc</span><span class="o">.</span><span class="n">valid1dClassType</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="s">&quot;endl1dmath.set&quot;</span><span class="p">,</span> <span class="s">&quot;setting&quot;</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">checkDataType</span> <span class="p">)</span> <span class="p">:</span> <span class="n">endl1dmathmisc</span><span class="o">.</span><span class="n">check1dData</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">duplicate</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">d</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+</div>
+<div class="viewcode-block" id="endl1dmath.toFloat"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathClasses.endl1dmath.toFloat">[docs]</a>    <span class="k">def</span> <span class="nf">toFloat</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s">&quot;Converts every point of self to a float.&quot;&quot;&quot;</span>
+
+        <span class="nb">map</span><span class="p">(</span> <span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endl1dmath.toString"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathClasses.endl1dmath.toString">[docs]</a>    <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">format</span> <span class="o">=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s">&quot;Returns the string returned by the endl1dmath&#39;s __repr__ function.&quot;</span>
+
+        <span class="n">endl1d_repr_xFormat</span> <span class="o">=</span> <span class="n">endl1dmathmisc</span><span class="o">.</span><span class="n">endl1d_repr_xFormat</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">format</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">endl1dmathmisc</span><span class="o">.</span><span class="n">endl1d_repr_xFormat</span> <span class="o">=</span> <span class="n">format</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">endl1dmath</span><span class="o">.</span><span class="n">__repr__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="n">endl1dmathmisc</span><span class="o">.</span><span class="n">endl1d_repr_xFormat</span> <span class="o">=</span> <span class="n">endl1d_repr_xFormat</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="endl1dmath.toStringWithPrefixSuffix"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.endl1dmathClasses.endl1dmath.toStringWithPrefixSuffix">[docs]</a>    <span class="k">def</span> <span class="nf">toStringWithPrefixSuffix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">Prefix</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">Suffix</span> <span class="o">=</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s">&quot;Returns a printable string of the points in self. Each point is a separate line surrounded by Prefix and Suffix.&quot;</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="p">[</span> <span class="n">endl1dmathmisc</span><span class="o">.</span><span class="n">endl1d_repr_xFormat</span> <span class="o">%</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">]</span>
+        <span class="k">return</span> <span class="n">fudgemisc</span><span class="o">.</span><span class="n">stringWithPrefixSuffix</span><span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">Prefix</span><span class="p">,</span> <span class="n">Suffix</span> <span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

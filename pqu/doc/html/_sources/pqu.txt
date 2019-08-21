@@ -1,0 +1,26 @@
+physicalQuantityWithUncertainty Package
+=======================================
+
+:mod:`pqu` Package
+------------------
+
+.. automodule:: pqu
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`physicalQuantityWithUncertainty` Module
+---------------------------------------------
+
+.. automodule:: pqu.physicalQuantityWithUncertainty
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+
+    pqu.test
+

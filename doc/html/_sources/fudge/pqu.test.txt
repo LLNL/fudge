@@ -1,0 +1,19 @@
+test Package
+============
+
+:mod:`test` Package
+-------------------
+
+.. automodule:: pqu.test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`testPhysicalQuantityWithUncertainty` Module
+-------------------------------------------------
+
+.. automodule:: pqu.test.testPhysicalQuantityWithUncertainty
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

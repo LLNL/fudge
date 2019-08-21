@@ -1,0 +1,483 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>structure Package &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../index.html" />
+    <link rel="up" title="fudge Package" href="index.html" />
+    <link rel="next" title="vis Package" href="fudge.vis.html" />
+    <link rel="prev" title="resonances Package" href="fudge.processing.resonances.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fudge.vis.html" title="vis Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fudge.processing.resonances.html" title="resonances Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">fudge Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="structure-package">
+<h1>structure Package<a class="headerlink" href="#structure-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">structure</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-fudge.structure"></span></div>
+<div class="section" id="module-fudge.structure.ElementTree">
+<span id="elementtree-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">ElementTree</span></tt> Module<a class="headerlink" href="#module-fudge.structure.ElementTree" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="fudge.structure.ElementTree.Comment">
+<tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">Comment</tt><big>(</big><em>text=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#Comment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.Comment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="fudge.structure.ElementTree.dump">
+<tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">dump</tt><big>(</big><em>elem</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.dump" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="fudge.structure.ElementTree.Element">
+<tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">Element</tt><big>(</big><em>tag</em>, <em>attrib={}</em>, <em>**extra</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#Element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.Element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="fudge.structure.ElementTree.ElementTree">
+<em class="property">class </em><tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">ElementTree</tt><big>(</big><em>element=None</em>, <em>file=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#ElementTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.ElementTree" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="fudge.structure.ElementTree.ElementTree.find">
+<tt class="descname">find</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#ElementTree.find"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.ElementTree.find" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.ElementTree.ElementTree.findall">
+<tt class="descname">findall</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#ElementTree.findall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.ElementTree.findall" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.ElementTree.ElementTree.findtext">
+<tt class="descname">findtext</tt><big>(</big><em>path</em>, <em>default=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#ElementTree.findtext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.ElementTree.findtext" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.ElementTree.ElementTree.getiterator">
+<tt class="descname">getiterator</tt><big>(</big><em>tag=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#ElementTree.getiterator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.ElementTree.getiterator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.ElementTree.ElementTree.getroot">
+<tt class="descname">getroot</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#ElementTree.getroot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.ElementTree.getroot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.ElementTree.ElementTree.parse">
+<tt class="descname">parse</tt><big>(</big><em>source</em>, <em>parser=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#ElementTree.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.ElementTree.parse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.ElementTree.ElementTree.write">
+<tt class="descname">write</tt><big>(</big><em>file</em>, <em>encoding='us-ascii'</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#ElementTree.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.ElementTree.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="fudge.structure.ElementTree.fromstring">
+<tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">fromstring</tt><big>(</big><em>text</em><big>)</big><a class="headerlink" href="#fudge.structure.ElementTree.fromstring" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="fudge.structure.ElementTree.iselement">
+<tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">iselement</tt><big>(</big><em>element</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#iselement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.iselement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="fudge.structure.ElementTree.iterparse">
+<em class="property">class </em><tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">iterparse</tt><big>(</big><em>source</em>, <em>events=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#iterparse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.iterparse" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="fudge.structure.ElementTree.iterparse.next">
+<tt class="descname">next</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#iterparse.next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.iterparse.next" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="fudge.structure.ElementTree.parse">
+<tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">parse</tt><big>(</big><em>source</em>, <em>parser=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.parse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="fudge.structure.ElementTree.PI">
+<tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">PI</tt><big>(</big><em>target</em>, <em>text=None</em><big>)</big><a class="headerlink" href="#fudge.structure.ElementTree.PI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="fudge.structure.ElementTree.ProcessingInstruction">
+<tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">ProcessingInstruction</tt><big>(</big><em>target</em>, <em>text=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#ProcessingInstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.ProcessingInstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="fudge.structure.ElementTree.QName">
+<em class="property">class </em><tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">QName</tt><big>(</big><em>text_or_uri</em>, <em>tag=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#QName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.QName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="fudge.structure.ElementTree.SubElement">
+<tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">SubElement</tt><big>(</big><em>parent</em>, <em>tag</em>, <em>attrib={}</em>, <em>**extra</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#SubElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.SubElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="fudge.structure.ElementTree.tostring">
+<tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">tostring</tt><big>(</big><em>element</em>, <em>encoding=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#tostring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.tostring" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="fudge.structure.ElementTree.TreeBuilder">
+<em class="property">class </em><tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">TreeBuilder</tt><big>(</big><em>element_factory=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#TreeBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.TreeBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="fudge.structure.ElementTree.TreeBuilder.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#TreeBuilder.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.TreeBuilder.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.ElementTree.TreeBuilder.data">
+<tt class="descname">data</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#TreeBuilder.data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.TreeBuilder.data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.ElementTree.TreeBuilder.end">
+<tt class="descname">end</tt><big>(</big><em>tag</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#TreeBuilder.end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.TreeBuilder.end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.ElementTree.TreeBuilder.start">
+<tt class="descname">start</tt><big>(</big><em>tag</em>, <em>attrs</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#TreeBuilder.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.TreeBuilder.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="fudge.structure.ElementTree.XML">
+<tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">XML</tt><big>(</big><em>text</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#XML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.XML" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.structure.ElementTree.XMLParser">
+<tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">XMLParser</tt><a class="headerlink" href="#fudge.structure.ElementTree.XMLParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#fudge.structure.ElementTree.XMLTreeBuilder" title="fudge.structure.ElementTree.XMLTreeBuilder"><tt class="xref py py-class docutils literal"><span class="pre">XMLTreeBuilder</span></tt></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.structure.ElementTree.XMLTreeBuilder">
+<em class="property">class </em><tt class="descclassname">fudge.structure.ElementTree.</tt><tt class="descname">XMLTreeBuilder</tt><big>(</big><em>html=0</em>, <em>target=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#XMLTreeBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.XMLTreeBuilder" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="fudge.structure.ElementTree.XMLTreeBuilder.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#XMLTreeBuilder.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.XMLTreeBuilder.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.ElementTree.XMLTreeBuilder.doctype">
+<tt class="descname">doctype</tt><big>(</big><em>name</em>, <em>pubid</em>, <em>system</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#XMLTreeBuilder.doctype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.XMLTreeBuilder.doctype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.ElementTree.XMLTreeBuilder.feed">
+<tt class="descname">feed</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/ElementTree.html#XMLTreeBuilder.feed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.ElementTree.XMLTreeBuilder.feed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.structure.masses">
+<span id="masses-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">masses</span></tt> Module<a class="headerlink" href="#module-fudge.structure.masses" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="fudge.structure.masses.getMassFromZA">
+<tt class="descclassname">fudge.structure.masses.</tt><tt class="descname">getMassFromZA</tt><big>(</big><em>ZA</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/masses.html#getMassFromZA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.masses.getMassFromZA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="fudge.structure.masses.getMassWithUnitFromZA">
+<tt class="descclassname">fudge.structure.masses.</tt><tt class="descname">getMassWithUnitFromZA</tt><big>(</big><em>ZA</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/masses.html#getMassWithUnitFromZA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.masses.getMassWithUnitFromZA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-fudge.structure.xensl">
+<span id="xensl-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">xensl</span></tt> Module<a class="headerlink" href="#module-fudge.structure.xensl" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="fudge.structure.xensl.Levels">
+<em class="property">class </em><tt class="descclassname">fudge.structure.xensl.</tt><tt class="descname">Levels</tt><big>(</big><em>isotope</em>, <em>database=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xensl.html#Levels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xensl.Levels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Class containing the levels for one nucleus.
+The levels can be accessed via their index in the list or via an attribute e0, e1, e2, etc.
+where 0 is the ground state, 1 the first excited state and so on.
+A dict of metastable states is stored in self.metastables with keys m0, m1, m2, etc. which
+map to the associated level e?. m0 is the ground state if this is a metastable state, 
+otherwise the first metastable state is labeled m1. Note stable states are not labeled metastable.
+The metastable states can be defined using the method defineMetastable( seconds ) with the
+argument defining the minimum halflife for a metastable state.
+Default is to use the global variable isomerMinimumHalflife which defaults to 1e-6s.
+If any isomers are listed in XENSL database, then these overide the default cutoff at 1e-6s.
+The metastable states can be also looked up via an attribute m1, m2 etc.
+A call to this class with a numerical argument will return the level with the nearest energy, 
+while a call with a string argument, e.g. &#8216;e1&#8217;, &#8216;m1&#8217; will look up the corresponding level.</p>
+<dl class="method">
+<dt id="fudge.structure.xensl.Levels.defineLevelMetastables">
+<tt class="descname">defineLevelMetastables</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xensl.html#Levels.defineLevelMetastables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xensl.Levels.defineLevelMetastables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.xensl.Levels.defineMetastables">
+<tt class="descname">defineMetastables</tt><big>(</big><em>minHalflife</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xensl.html#Levels.defineMetastables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xensl.Levels.defineMetastables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the metastable states, filling the dict mapping the metastable states to the
+actual level, for levels with halflives greater than minHalflife. If ground state is
+metastable then the labeling begins with &#8216;m0&#8217;, else it starts with &#8216;m1&#8217;.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.xensl.Levels.getIsomerMinimumHalflife">
+<tt class="descname">getIsomerMinimumHalflife</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xensl.html#Levels.getIsomerMinimumHalflife"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xensl.Levels.getIsomerMinimumHalflife" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the minimum halflife for defining an isomer</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.xensl.Levels.getLevel">
+<tt class="descname">getLevel</tt><big>(</big><em>i</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xensl.html#Levels.getLevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xensl.Levels.getLevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the level (depends on type of argument)
+integer : returns the level with index i
+str     : &#8216;e1&#8217; &#8216;m1&#8217; returns the level via energy label or metastable label</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.xensl.Levels.getMetastable">
+<tt class="descname">getMetastable</tt><big>(</big><em>l</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xensl.html#Levels.getMetastable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xensl.Levels.getMetastable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the metastable level with label l. e.g. &#8216;m1&#8217; if in list of known metastables</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.xensl.Levels.getMetastables">
+<tt class="descname">getMetastables</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xensl.html#Levels.getMetastables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xensl.Levels.getMetastables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the metastable states from XENSL,
+filling the dict mapping the metastable states to the actual level.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.xensl.Levels.getNearestLevelAtEnergy">
+<tt class="descname">getNearestLevelAtEnergy</tt><big>(</big><em>energy</em>, <em>printWarning=True</em>, <em>onMiddleChoose=0</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xensl.html#Levels.getNearestLevelAtEnergy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xensl.Levels.getNearestLevelAtEnergy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the level with an energy nearest to the energy given as an argument. If the energy is
+exactly between two levels and onMiddleChoose is 0, a raise is executed. Otherwise, if 
+onMiddleChoose is less ( greater ) than 0 the lower ( upper ) level is returned.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.xensl.Levels.levelString">
+<tt class="descname">levelString</tt><big>(</big><em>level</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xensl.html#Levels.levelString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xensl.Levels.levelString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.xensl.Levels.setIsomerMinimumHalflife">
+<tt class="descname">setIsomerMinimumHalflife</tt><big>(</big><em>halflife</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xensl.html#Levels.setIsomerMinimumHalflife"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xensl.Levels.setIsomerMinimumHalflife" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the minimum halflife for defining an isomer.
+Recalculates isomer labels for level scheme from this new definition.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.xensl.Levels.toString">
+<tt class="descname">toString</tt><big>(</big><em>metastablesOnly=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xensl.html#Levels.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xensl.Levels.toString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.structure.xensl.XENSL">
+<em class="property">class </em><tt class="descclassname">fudge.structure.xensl.</tt><tt class="descname">XENSL</tt><big>(</big><em>ZA</em>, <em>database=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xensl.html#XENSL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xensl.XENSL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.structure.xml2py.XML2PY" title="fudge.structure.xml2py.XML2PY"><tt class="xref py py-class docutils literal"><span class="pre">fudge.structure.xml2py.XML2PY</span></tt></a></p>
+<p>Class to manipulate the XENSL database found in fudgeDefaults.XENSL_DATABASE_DIR.
+This location can be overrode with the environment variable XENSLPATH.
+This class inherits from xml2py.XML2PY, overriding the read and write with automatic lookup of file based on ZA.</p>
+<dl class="method">
+<dt id="fudge.structure.xensl.XENSL.read">
+<tt class="descname">read</tt><big>(</big><em>ZA</em>, <em>database=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xensl.html#XENSL.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xensl.XENSL.read" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.xensl.XENSL.write">
+<tt class="descname">write</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xensl.html#XENSL.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xensl.XENSL.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.structure.xml2py">
+<span id="xml2py-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">xml2py</span></tt> Module<a class="headerlink" href="#module-fudge.structure.xml2py" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="fudge.structure.xml2py.XML2PY">
+<em class="property">class </em><tt class="descclassname">fudge.structure.xml2py.</tt><tt class="descname">XML2PY</tt><a class="reference internal" href="../_modules/fudge/structure/xml2py.html#XML2PY"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xml2py.XML2PY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="fudge.structure.xml2py.XML2PY.fixIndentation">
+<tt class="descname">fixIndentation</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xml2py.html#XML2PY.fixIndentation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xml2py.XML2PY.fixIndentation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.xml2py.XML2PY.newXMLElement">
+<tt class="descname">newXMLElement</tt><big>(</big><em>attr</em>, <em>val={}</em>, <em>index=0</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xml2py.html#XML2PY.newXMLElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xml2py.XML2PY.newXMLElement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.xml2py.XML2PY.read">
+<tt class="descname">read</tt><big>(</big><em>xmlfile</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xml2py.html#XML2PY.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xml2py.XML2PY.read" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="fudge.structure.xml2py.XML2PY.textTail">
+<em class="property">static </em><tt class="descname">textTail</tt><big>(</big><em>elements</em>, <em>indentation=0</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xml2py.html#XML2PY.textTail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xml2py.XML2PY.textTail" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.xml2py.XML2PY.toxml">
+<tt class="descname">toxml</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xml2py.html#XML2PY.toxml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xml2py.XML2PY.toxml" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.structure.xml2py.XML2PY.write">
+<tt class="descname">write</tt><big>(</big><em>xmlfile</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xml2py.html#XML2PY.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xml2py.XML2PY.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.structure.xml2py.XMLElement">
+<em class="property">class </em><tt class="descclassname">fudge.structure.xml2py.</tt><tt class="descname">XMLElement</tt><big>(</big><em>l=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xml2py.html#XMLElement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xml2py.XMLElement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></p>
+<dl class="method">
+<dt id="fudge.structure.xml2py.XMLElement.remove">
+<tt class="descname">remove</tt><big>(</big><em>item</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xml2py.html#XMLElement.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xml2py.XMLElement.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="fudge.structure.xml2py.evaluate">
+<tt class="descclassname">fudge.structure.xml2py.</tt><tt class="descname">evaluate</tt><big>(</big><em>item</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xml2py.html#evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xml2py.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="fudge.structure.xml2py.update">
+<tt class="descclassname">fudge.structure.xml2py.</tt><tt class="descname">update</tt><big>(</big><em>obj</em>, <em>element</em><big>)</big><a class="reference internal" href="../_modules/fudge/structure/xml2py.html#update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.structure.xml2py.update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">structure Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">structure</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-fudge.structure.ElementTree"><tt class="docutils literal"><span class="pre">ElementTree</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-fudge.structure.masses"><tt class="docutils literal"><span class="pre">masses</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-fudge.structure.xensl"><tt class="docutils literal"><span class="pre">xensl</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-fudge.structure.xml2py"><tt class="docutils literal"><span class="pre">xml2py</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fudge.processing.resonances.html"
+                        title="previous chapter">resonances Package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fudge.vis.html"
+                        title="next chapter">vis Package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/fudge/fudge.structure.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fudge.vis.html" title="vis Package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fudge.processing.resonances.html" title="resonances Package"
+             >previous</a> |</li>
+        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="index.html" >fudge Package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,5 @@
+Downloading
+===========
+
+The latest version of pqu is available at LLNL's as an svn repository on LC
+

@@ -1,0 +1,917 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>reactionData Package &mdash; Fudge and GND 1.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../index.html" />
+    <link rel="up" title="gnd Package" href="fudge.gnd.html" />
+    <link rel="next" title="reactions Package" href="fudge.gnd.reactions.html" />
+    <link rel="prev" title="test Package" href="fudge.gnd.productData.distributions.test.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fudge.gnd.reactions.html" title="reactions Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fudge.gnd.productData.distributions.test.html" title="test Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="index.html" >fudge Package</a> &raquo;</li>
+          <li><a href="fudge.gnd.html" accesskey="U">gnd Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="reactiondata-package">
+<h1>reactionData Package<a class="headerlink" href="#reactiondata-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">reactionData</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-fudge.gnd.reactionData"></span></div>
+<div class="section" id="module-fudge.gnd.reactionData.availableEnergy">
+<span id="availableenergy-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">availableEnergy</span></tt> Module<a class="headerlink" href="#module-fudge.gnd.reactionData.availableEnergy" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="fudge.gnd.reactionData.availableEnergy.component">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactionData.availableEnergy.</tt><tt class="descname">component</tt><a class="reference internal" href="../_modules/fudge/gnd/reactionData/availableEnergy.html#component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.availableEnergy.component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.gnd.html#fudge.gnd.baseClasses.componentBase" title="fudge.gnd.baseClasses.componentBase"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.baseClasses.componentBase</span></tt></a></p>
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.availableEnergy.component.genre">
+<tt class="descname">genre</tt><em class="property"> = 'availableEnergy'</em><a class="headerlink" href="#fudge.gnd.reactionData.availableEnergy.component.genre" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.availableEnergy.component.makeGrouped">
+<tt class="descname">makeGrouped</tt><big>(</big><em>processInfo</em>, <em>tempInfo</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/availableEnergy.html#component.makeGrouped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.availableEnergy.component.makeGrouped" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnd.reactionData.availableEnergy.grouped">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactionData.availableEnergy.</tt><tt class="descname">grouped</tt><big>(</big><em>axes_</em>, <em>groupData</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/availableEnergy.html#grouped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.availableEnergy.grouped" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.gnd.html#fudge.gnd.baseClasses.groupedFormBase" title="fudge.gnd.baseClasses.groupedFormBase"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.baseClasses.groupedFormBase</span></tt></a></p>
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.availableEnergy.grouped.genre">
+<tt class="descname">genre</tt><em class="property"> = 'availableEnergy'</em><a class="headerlink" href="#fudge.gnd.reactionData.availableEnergy.grouped.genre" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnd.reactionData.availableEnergy.groupedWithCrossSection">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactionData.availableEnergy.</tt><tt class="descname">groupedWithCrossSection</tt><big>(</big><em>axes_</em>, <em>groupData</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/availableEnergy.html#groupedWithCrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.availableEnergy.groupedWithCrossSection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.gnd.html#fudge.gnd.baseClasses.groupedWithCrossSectionFormBase" title="fudge.gnd.baseClasses.groupedWithCrossSectionFormBase"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.baseClasses.groupedWithCrossSectionFormBase</span></tt></a></p>
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.availableEnergy.groupedWithCrossSection.genre">
+<tt class="descname">genre</tt><em class="property"> = 'availableEnergy'</em><a class="headerlink" href="#fudge.gnd.reactionData.availableEnergy.groupedWithCrossSection.genre" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="fudge.gnd.reactionData.availableEnergy.parseXMLNode">
+<tt class="descclassname">fudge.gnd.reactionData.availableEnergy.</tt><tt class="descname">parseXMLNode</tt><big>(</big><em>element</em>, <em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/availableEnergy.html#parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.availableEnergy.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads an xml &lt;availableEnergy&gt; component element into fudge, including all forms in the component.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.gnd.reactionData.availableMomentum">
+<span id="availablemomentum-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">availableMomentum</span></tt> Module<a class="headerlink" href="#module-fudge.gnd.reactionData.availableMomentum" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="fudge.gnd.reactionData.availableMomentum.calculateMomentumPoints">
+<tt class="descclassname">fudge.gnd.reactionData.availableMomentum.</tt><tt class="descname">calculateMomentumPoints</tt><big>(</big><em>massInE</em>, <em>EMin</em>, <em>EMax</em>, <em>energyUnit</em>, <em>accuracy=0.0001</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/availableMomentum.html#calculateMomentumPoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.availableMomentum.calculateMomentumPoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a temporary function (hopefully) to calculate momentum vs E.
+What is really needed is a function like rriint in mcfgen.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnd.reactionData.availableMomentum.component">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactionData.availableMomentum.</tt><tt class="descname">component</tt><a class="reference internal" href="../_modules/fudge/gnd/reactionData/availableMomentum.html#component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.availableMomentum.component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.gnd.html#fudge.gnd.baseClasses.componentBase" title="fudge.gnd.baseClasses.componentBase"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.baseClasses.componentBase</span></tt></a></p>
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.availableMomentum.component.genre">
+<tt class="descname">genre</tt><em class="property"> = 'availableMomentum'</em><a class="headerlink" href="#fudge.gnd.reactionData.availableMomentum.component.genre" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.availableMomentum.component.makeGrouped">
+<tt class="descname">makeGrouped</tt><big>(</big><em>processInfo</em>, <em>tempInfo</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/availableMomentum.html#component.makeGrouped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.availableMomentum.component.makeGrouped" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnd.reactionData.availableMomentum.grouped">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactionData.availableMomentum.</tt><tt class="descname">grouped</tt><big>(</big><em>axes_</em>, <em>groupData</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/availableMomentum.html#grouped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.availableMomentum.grouped" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.gnd.html#fudge.gnd.baseClasses.groupedFormBase" title="fudge.gnd.baseClasses.groupedFormBase"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.baseClasses.groupedFormBase</span></tt></a></p>
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.availableMomentum.grouped.genre">
+<tt class="descname">genre</tt><em class="property"> = 'availableMomentum'</em><a class="headerlink" href="#fudge.gnd.reactionData.availableMomentum.grouped.genre" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="fudge.gnd.reactionData.availableMomentum.parseXMLNode">
+<tt class="descclassname">fudge.gnd.reactionData.availableMomentum.</tt><tt class="descname">parseXMLNode</tt><big>(</big><em>element</em>, <em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/availableMomentum.html#parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.availableMomentum.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads an xml &lt;availableMomentum&gt; component element into fudge, including all forms in the component.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-fudge.gnd.reactionData.base">
+<span id="base-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">base</span></tt> Module<a class="headerlink" href="#module-fudge.gnd.reactionData.base" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-fudge.gnd.reactionData.crossSection">
+<span id="crosssection-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">crossSection</span></tt> Module<a class="headerlink" href="#module-fudge.gnd.reactionData.crossSection" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="fudge.gnd.reactionData.crossSection.baseCrossSectionForm">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactionData.crossSection.</tt><tt class="descname">baseCrossSectionForm</tt><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#baseCrossSectionForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.baseCrossSectionForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.gnd.html#fudge.gnd.baseClasses.formBase" title="fudge.gnd.baseClasses.formBase"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.baseClasses.formBase</span></tt></a></p>
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.crossSection.baseCrossSectionForm.genre">
+<tt class="descname">genre</tt><em class="property"> = 'crossSection'</em><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.baseCrossSectionForm.genre" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="fudge.gnd.reactionData.crossSection.chargeParticle_changeInterpolationSubFunction">
+<tt class="descclassname">fudge.gnd.reactionData.crossSection.</tt><tt class="descname">chargeParticle_changeInterpolationSubFunction</tt><big>(</big><em>self</em>, <em>xInterpolation</em>, <em>yInterpolation</em>, <em>accuracy</em>, <em>lowerEps=0</em>, <em>upperEps=0</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#chargeParticle_changeInterpolationSubFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.chargeParticle_changeInterpolationSubFunction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnd.reactionData.crossSection.component">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactionData.crossSection.</tt><tt class="descname">component</tt><big>(</big><em>nativeData='unknown'</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.gnd.html#fudge.gnd.baseClasses.componentBase" title="fudge.gnd.baseClasses.componentBase"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.baseClasses.componentBase</span></tt></a></p>
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.check">
+<tt class="descname">check</tt><big>(</big><em>info</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check cross section data for correct threshold, negative cross sections, etc.
+Returns a list of any warnings encountered during checking.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>info</strong> (<em>dict</em>) &#8211; A Python dictionary containing the parameters that control the cross section checking.</li>
+<li><strong>Q</strong> (<em>float</em>) &#8211; a parameter of <cite>info</cite>: if Q is positive, cross section must start at 1e-5 eV, otherwise, cross section threshold must agree with Q-value</li>
+<li><strong>kinematicFactor</strong> (<em>float</em>) &#8211; a parameter of <cite>info</cite>:</li>
+<li><strong>dThreshold</strong> (<em>string</em>) &#8211; a parameter of <cite>info</cite>: allowable threshold energy mismatch as a string suitable for the PQU class</li>
+<li><strong>crossSectionEnergyMax</strong> (<em>float</em>) &#8211; a parameter of <cite>info</cite>: the cross section must extend up to limit (usually 20 MeV)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.computeAstrophysicalReactionRate">
+<tt class="descname">computeAstrophysicalReactionRate</tt><big>(</big><em>T</em>, <em>covariance=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.computeAstrophysicalReactionRate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.computeAstrophysicalReactionRate" title="Permalink to this definition">¶</a></dt>
+<dd><p>The astrophysical reaction rate R is defined as <span class="math">\(R = N_A &lt;\sigma v&gt;\)</span>, where 
+<span class="math">\(N_A\)</span> is Avagadro&#8217;s number.  It is typically reported in units of [cm^3/mole s].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>T</strong> (<em>PQU</em>) &#8211; temperature as a physical quantity</li>
+<li><strong>covariance</strong> (<em>covariance instance or None</em>) &#8211; covariance to use when computing uncertainty on the spectral average.  
+If None (default: None), no uncertainty is computed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">PQU</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Not implemented yet</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.computeCf252SpectrumAve">
+<tt class="descname">computeCf252SpectrumAve</tt><big>(</big><em>covariance=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.computeCf252SpectrumAve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.computeCf252SpectrumAve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the Cf252 spontaneous fission neutron spectrum average:</p>
+<div class="math">
+\[ave = \exp( -0.789 * E ) * \sinh( \sqrt{ 0.447 * E } )\]</div>
+<p>(where did this come from?  Found it in the sigma QA system I think. DAB 12/1/2012)</p>
+<p>If the covariance is provided, the uncertainty on the average will be computed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>covariance</strong> (<em>covariance instance or None</em>) &#8211; covariance to use when computing uncertainty on the spectral average.  
+If None (default: None), no uncertainty is computed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">PQU</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Not implemented yet</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.computeFourteenMeVPoint">
+<tt class="descname">computeFourteenMeVPoint</tt><big>(</big><em>covariance=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.computeFourteenMeVPoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.computeFourteenMeVPoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the value of the cross section at 14.2 MeV.</p>
+<p>If the covariance is provided, the uncertainty on the 14.2 MeV point will be computed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>covariance</strong> (<em>covariance instance or None</em>) &#8211; covariance to use when computing uncertainty on the spectral average.  
+If None (default: None), no uncertainty is computed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">PQU</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.computeMACS">
+<tt class="descname">computeMACS</tt><big>(</big><em>T</em>, <em>covariance=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.computeMACS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.computeMACS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the Maxwellian average cross section (MACS):</p>
+<div class="math">
+\[MACS(kT) = {\frac{2}{\sqrt{\pi}}} {\frac{a^2}{(kT)^2}} \int_0^{\infty}dE_n^{lab} \sigma(E_n^{lab})*E_n^{lab}*\exp{(-a E_n^{lab}/kT)}\]</div>
+<p>Here <span class="math">\(E_n^{lab}\)</span> is the incident neutron energy in the lab frame and <span class="math">\(a=m_2/(m_1+m_2)\)</span>.
+If the covariance is provided, the uncertainty on the MACS will be computed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>T</strong> (<em>PQU</em>) &#8211; Temperature (as a physical quantity of the Maxwellian with which to average</li>
+<li><strong>covariance</strong> (<em>covariance instance or None</em>) &#8211; covariance to use when computing uncertainty on the spectral average.  
+If None (default: None), no uncertainty is computed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">PQU</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Not implemented yet</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.computePWaveScatteringLength">
+<tt class="descname">computePWaveScatteringLength</tt><big>(</big><em>covariance=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.computePWaveScatteringLength"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.computePWaveScatteringLength" title="Permalink to this definition">¶</a></dt>
+<dd><p>S1, the P-wave scattering length???</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>covariance</strong> (<em>covariance instance or None</em>) &#8211; covariance to use when computing uncertainty on the spectral average.  
+If None (default: None), no uncertainty is computed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">PQU</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Not implemented yet</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.computeRI">
+<tt class="descname">computeRI</tt><big>(</big><em>Ec='0.5 eV'</em>, <em>covariance=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.computeRI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.computeRI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the resonance integral (RI):</p>
+<div class="math">
+\[RI = \int_{Ec}^{\infty} \sigma(E) dE/E\]</div>
+<p>Where the lower cut-off is usually taken to be the Cadmium cut-off energy of 
+Ec = 0.5 eV (see S. Mughabghab, Atlas of Neutron Resonances).  If the covariance 
+is provided, the uncertainty on the resonance integral will be computed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>Ec</strong> (<em>string</em>) &#8211; lower bound of integration.  
+Usually taken to be the Cadmium cut-off energy (default: &#8216;0.5 eV&#8217;)</li>
+<li><strong>covariance</strong> (<em>covariance instance or None</em>) &#8211; covariance to use when computing uncertainty on the spectral average.  
+If None (default: None), no uncertainty is computed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">PQU</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Not implemented yet</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.computeRoomTempCS">
+<tt class="descname">computeRoomTempCS</tt><big>(</big><em>covariance=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.computeRoomTempCS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.computeRoomTempCS" title="Permalink to this definition">¶</a></dt>
+<dd><p>The cross section exactly at room temperature E=2.5e-4 eV or v=2200 m/s</p>
+<p>If the covariance is provided, the uncertainty on the 2.5e-4 eV point will be computed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>covariance</strong> (<em>covariance instance or None</em>) &#8211; covariance to use when computing uncertainty on the spectral average.  
+If None (default: None), no uncertainty is computed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">PQU</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.computeSWaveScatteringLength">
+<tt class="descname">computeSWaveScatteringLength</tt><big>(</big><em>covariance=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.computeSWaveScatteringLength"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.computeSWaveScatteringLength" title="Permalink to this definition">¶</a></dt>
+<dd><p>S0, the S-wave scattering length???</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>covariance</strong> (<em>covariance instance or None</em>) &#8211; covariance to use when computing uncertainty on the spectral average.  
+If None (default: None), no uncertainty is computed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">PQU</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Not implemented yet</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.computeScatteringRadius">
+<tt class="descname">computeScatteringRadius</tt><big>(</big><em>covariance=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.computeScatteringRadius"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.computeScatteringRadius" title="Permalink to this definition">¶</a></dt>
+<dd><p>R&#8217; the scattering radius</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>covariance</strong> (<em>covariance instance or None</em>) &#8211; covariance to use when computing uncertainty on the spectral average.  
+If None (default: None), no uncertainty is computed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">PQU</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Not implemented yet</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.computeSpectrumAverage">
+<tt class="descname">computeSpectrumAverage</tt><big>(</big><em>spectrum</em>, <em>Emin=None</em>, <em>Emax=None</em>, <em>covariance=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.computeSpectrumAverage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.computeSpectrumAverage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the spectrum (i.e. weighted) average of self with the spectrum (i.e. weight) 
+specified by <tt class="docutils literal"><span class="pre">spectrum</span></tt>  optionally from Emin to Emax.  If the covariance is 
+provided, the uncertainty on the spectrum average will be computed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>spectrum</strong> (<em>XYs instance</em>) &#8211; spectrum over which to average</li>
+<li><strong>Emin</strong> (<em>PQU or None</em>) &#8211; Lower integration limit.  
+If None (the default), then the lower limit of self&#8217;s domain is used</li>
+<li><strong>Emax</strong> (<em>PQU or None</em>) &#8211; Upper integration limit.  
+If None (the default), then the upper limit of self&#8217;s domain is used</li>
+<li><strong>covariance</strong> (<em>covariance instance or None</em>) &#8211; covariance to use when computing uncertainty on the spectral average.  
+If None (default: None), no uncertainty is computed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">PQU</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">How does it work?:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first">Given a  weighting spectrum <span class="math">\(\phi(E)\)</span>, we intend to average the cross section in self as follows:</p>
+<div class="math">
+\[\begin{split}&lt; \sigma &gt; = \int_{E_{min}}^{E_{max}} dE \phi(E) \sigma(E)\end{split}\]</div>
+<p>To compute the uncertainty, we resort to the basis function expansion of the covariance
+as follows:</p>
+<div class="math">
+\[\Delta^2\sigma(E,E') = \sum_{ij} \Delta^2\sigma_{ij} B_i(E) B_j(E')\]</div>
+<p>In the ENDF format, all covariances are assumed to be grouped in energy so the 
+basis functions are simple window functions.   With this,</p>
+<div class="last math">
+\[\begin{split}\delta &lt;\sigma&gt; = \sqrt{ \int dE dE' \phi(E)\phi(E') \Delta^2\sigma(E,E') } 
+                = \sqrt{ \sum_{ij} \Delta^2\sigma_{ij} &lt;B_i&gt; &lt;B_j&gt; }\end{split}\]</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Not implemented yet</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.computeStellerEnhancementFactor">
+<tt class="descname">computeStellerEnhancementFactor</tt><big>(</big><em>covariance=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.computeStellerEnhancementFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.computeStellerEnhancementFactor" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>covariance</strong> (<em>covariance instance or None</em>) &#8211; covariance to use when computing uncertainty on the spectral average.  
+If None (default: None), no uncertainty is computed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">PQU</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Not implemented yet</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.computeWestcottFactor">
+<tt class="descname">computeWestcottFactor</tt><big>(</big><em>covariance=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.computeWestcottFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.computeWestcottFactor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wescott G-factor is the ratio of Maxwellian averaged cross section 
+(at room temparature) and the room temperature cross section.  
+Should be pretty close to 1 if cross section goes like 1/v.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>covariance</strong> (<em>covariance instance or None</em>) &#8211; covariance to use when computing uncertainty on the spectral average.  
+If None (default: None), no uncertainty is computed.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">PQU</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.domainMax">
+<tt class="descname">domainMax</tt><big>(</big><em>unitTo=None</em>, <em>asPQU=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.domainMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.domainMax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.domainMin">
+<tt class="descname">domainMin</tt><big>(</big><em>unitTo=None</em>, <em>asPQU=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.domainMin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.domainMin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.crossSection.component.genre">
+<tt class="descname">genre</tt><em class="property"> = 'crossSection'</em><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.genre" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.getDomain">
+<tt class="descname">getDomain</tt><big>(</big><em>unitTo=None</em>, <em>asPQU=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.getDomain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.getDomain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.getDomainUnit">
+<tt class="descname">getDomainUnit</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.getDomainUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.getDomainUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.getIncidentEnergyUnit">
+<tt class="descname">getIncidentEnergyUnit</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.getIncidentEnergyUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.getIncidentEnergyUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.heat">
+<tt class="descname">heat</tt><big>(</big><em>temperature</em>, <em>EMin</em>, <em>lowerlimit=None</em>, <em>upperlimit=None</em>, <em>interpolationAccuracy=0.002</em>, <em>heatAllPoints=False</em>, <em>doNotThin=True</em>, <em>heatBelowThreshold=True</em>, <em>heatAllEDomain=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.heat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.heat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the result of self.toPointwiseLinear( ).heat( ... ). See method pointwise.heat for more information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.process">
+<tt class="descname">process</tt><big>(</big><em>processInfo</em>, <em>tempInfo</em>, <em>verbosityIndent</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process self into a form suitable for a specific application</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.toENDF6">
+<tt class="descname">toENDF6</tt><big>(</big><em>MT</em>, <em>endfMFList</em>, <em>targetInfo</em>, <em>level</em>, <em>LR</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.toENDF6"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.toENDF6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert self into ENDF format</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>MT</strong> (<em>int</em>) &#8211; The ENDF reaction designator, MT</li>
+<li><strong>endfMFList</strong> &#8211; </li>
+<li><strong>targetInfo</strong> &#8211; </li>
+<li><strong>level</strong> &#8211; </li>
+<li><strong>LR</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.component.toPointwiseLinear">
+<tt class="descname">toPointwiseLinear</tt><big>(</big><em>lowerEps=1e-08</em>, <em>upperEps=1e-08</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#component.toPointwiseLinear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.component.toPointwiseLinear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="fudge.gnd.reactionData.crossSection.crossSectionForms">
+<tt class="descclassname">fudge.gnd.reactionData.crossSection.</tt><tt class="descname">crossSectionForms</tt><em class="property"> = ['pointwise', 'linear', 'piecewise', 'resonancesWithBackground', 'weightedPointwise', 'grouped']</em><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.crossSectionForms" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of valid cross section forms</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnd.reactionData.crossSection.grouped">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactionData.crossSection.</tt><tt class="descname">grouped</tt><big>(</big><em>axes_</em>, <em>groupData</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#grouped"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.grouped" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="fudge.gnd.html#fudge.gnd.baseClasses.groupedFormBase" title="fudge.gnd.baseClasses.groupedFormBase"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.baseClasses.groupedFormBase</span></tt></a></p>
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.crossSection.grouped.genre">
+<tt class="descname">genre</tt><em class="property"> = 'crossSection'</em><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.grouped.genre" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnd.reactionData.crossSection.linear">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactionData.crossSection.</tt><tt class="descname">linear</tt><big>(</big><em>axes_</em>, <em>data</em>, <em>accuracy</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#linear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.linear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.gnd.reactionData.crossSection.pointwise" title="fudge.gnd.reactionData.crossSection.pointwise"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.reactionData.crossSection.pointwise</span></tt></a></p>
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.crossSection.linear.form">
+<tt class="descname">form</tt><em class="property"> = 'linear'</em><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.linear.form" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.linear.process">
+<tt class="descname">process</tt><big>(</big><em>component_</em>, <em>processInfo</em>, <em>tempInfo</em>, <em>verbosityIndent</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#linear.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.linear.process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.crossSection.linear.tag">
+<tt class="descname">tag</tt><em class="property"> = 'linear'</em><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.linear.tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="fudge.gnd.reactionData.crossSection.parseXMLNode">
+<tt class="descclassname">fudge.gnd.reactionData.crossSection.</tt><tt class="descname">parseXMLNode</tt><big>(</big><em>crossSectionElement</em>, <em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads an xml &lt;crossSection&gt; element into fudge, including all cross section forms (pointwise, linear, piecewise etc)
+contained inside the crossSection.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnd.reactionData.crossSection.piecewise">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactionData.crossSection.</tt><tt class="descname">piecewise</tt><big>(</big><em>axes</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#piecewise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.piecewise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.gnd.reactionData.crossSection.baseCrossSectionForm" title="fudge.gnd.reactionData.crossSection.baseCrossSectionForm"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.reactionData.crossSection.baseCrossSectionForm</span></tt></a>, <a class="reference internal" href="fudge.core.math.xData.html#fudge.core.math.xData.regions.regionsXYs" title="fudge.core.math.xData.regions.regionsXYs"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.xData.regions.regionsXYs</span></tt></a></p>
+<p>This class stores a cross section in two or more regions, which may have different interpolations.
+Each region must contain at least two points. Each pair of adjacent regions must overlap at exactly one point.</p>
+<dl class="staticmethod">
+<dt id="fudge.gnd.reactionData.crossSection.piecewise.defaultAxes">
+<em class="property">static </em><tt class="descname">defaultAxes</tt><big>(</big><em>energyUnit='eV'</em>, <em>energyInterpolation='byRegion'</em>, <em>crossSectionUnit='b'</em>, <em>crossSectionInterpolation='byRegion'</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#piecewise.defaultAxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.piecewise.defaultAxes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.crossSection.piecewise.form">
+<tt class="descname">form</tt><em class="property"> = 'piecewise'</em><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.piecewise.form" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.piecewise.getIncidentEnergyUnit">
+<tt class="descname">getIncidentEnergyUnit</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#piecewise.getIncidentEnergyUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.piecewise.getIncidentEnergyUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.crossSection.piecewise.moniker">
+<tt class="descname">moniker</tt><em class="property"> = 'piecewise'</em><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.piecewise.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.crossSection.piecewise.tag">
+<tt class="descname">tag</tt><em class="property"> = 'piecewise'</em><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.piecewise.tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.piecewise.toENDF6Data">
+<tt class="descname">toENDF6Data</tt><big>(</big><em>MT</em>, <em>endfMFList</em>, <em>targetInfo</em>, <em>level</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#piecewise.toENDF6Data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.piecewise.toENDF6Data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.piecewise.toPointwiseLinear">
+<tt class="descname">toPointwiseLinear</tt><big>(</big><em>lowerEps</em>, <em>upperEps</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#piecewise.toPointwiseLinear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.piecewise.toPointwiseLinear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnd.reactionData.crossSection.pointwise">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactionData.crossSection.</tt><tt class="descname">pointwise</tt><big>(</big><em>axes</em>, <em>data</em>, <em>accuracy</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#pointwise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.pointwise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.gnd.reactionData.crossSection.baseCrossSectionForm" title="fudge.gnd.reactionData.crossSection.baseCrossSectionForm"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.reactionData.crossSection.baseCrossSectionForm</span></tt></a>, <a class="reference internal" href="fudge.core.math.xData.html#fudge.core.math.xData.XYs.XYs" title="fudge.core.math.xData.XYs.XYs"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.xData.XYs.XYs</span></tt></a></p>
+<dl class="staticmethod">
+<dt id="fudge.gnd.reactionData.crossSection.pointwise.defaultAxes">
+<em class="property">static </em><tt class="descname">defaultAxes</tt><big>(</big><em>energyUnit='eV'</em>, <em>energyInterpolation='linear'</em>, <em>crossSectionUnit='b'</em>, <em>crossSectionInterpolation='linear'</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#pointwise.defaultAxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.pointwise.defaultAxes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.crossSection.pointwise.form">
+<tt class="descname">form</tt><em class="property"> = 'pointwise'</em><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.pointwise.form" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.pointwise.getIncidentEnergyUnit">
+<tt class="descname">getIncidentEnergyUnit</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#pointwise.getIncidentEnergyUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.pointwise.getIncidentEnergyUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.pointwise.heat">
+<tt class="descname">heat</tt><big>(</big><em>ancestors</em>, <em>temperature</em>, <em>EMin</em>, <em>lowerlimit=None</em>, <em>upperlimit=None</em>, <em>interpolationAccuracy=0.002</em>, <em>heatAllPoints=False</em>, <em>doNotThin=True</em>, <em>heatBelowThreshold=True</em>, <em>heatAllEDomain=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#pointwise.heat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.pointwise.heat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a linear version of the cross section heated to &#8216;temperature&#8217;. If the current temperature of the cross section
+is greater than &#8216;temperature&#8217; a raise is executed.
+If lowerlimit is None, it is set to &#8216;oneOverV&#8217; except when the reaction is determined to be a threshold reaction, 
+then it is set to &#8216;threshold&#8217;. Any cross section with domainMin greater than 2.5e-4 eV is determined to be a
+threshold reaction. If upperlimit is None it is set to &#8216;constant&#8217;.
+If heatBelowThreshold is False, then EMin is set to the larger of EMin and self&#8217;s domainMin.</p>
+<p>For more information on EMin, lowerlimit, upperlimit, interpolationAccuracy, heatAllPoints, doNotThin and heatAllEDomain
+see the module crossSectionAdjustForHeatedTarget.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.crossSection.pointwise.tag">
+<tt class="descname">tag</tt><em class="property"> = 'pointwise'</em><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.pointwise.tag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.pointwise.toENDF6Data">
+<tt class="descname">toENDF6Data</tt><big>(</big><em>MT</em>, <em>endfMFList</em>, <em>targetInfo</em>, <em>level</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#pointwise.toENDF6Data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.pointwise.toENDF6Data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.pointwise.toPointwiseLinear">
+<tt class="descname">toPointwiseLinear</tt><big>(</big><em>lowerEps</em>, <em>upperEps</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#pointwise.toPointwiseLinear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.pointwise.toPointwiseLinear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.pointwise.toXMLList">
+<tt class="descname">toXMLList</tt><big>(</big><em>indent=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#pointwise.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.pointwise.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnd.reactionData.crossSection.resonancesWithBackground">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactionData.crossSection.</tt><tt class="descname">resonancesWithBackground</tt><big>(</big><em>tabulatedData</em>, <em>resonanceLink</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#resonancesWithBackground"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.resonancesWithBackground" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.gnd.reactionData.crossSection.baseCrossSectionForm" title="fudge.gnd.reactionData.crossSection.baseCrossSectionForm"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.reactionData.crossSection.baseCrossSectionForm</span></tt></a></p>
+<p>This class stores cross sections that include resonances along with a background contribution.
+Contains a link to the resonances, and the &#8216;background&#8217; which could be pointwise or piecewise data.
+The full pointwise cross section can be obtained by first reconstructing resonances
+and then adding the background contribution (users should use the reactionSuite.reconstructResonances method).</p>
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.resonancesWithBackground.domainMax">
+<tt class="descname">domainMax</tt><big>(</big><em>unitTo=None</em>, <em>asPQU=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#resonancesWithBackground.domainMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.resonancesWithBackground.domainMax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.resonancesWithBackground.domainMin">
+<tt class="descname">domainMin</tt><big>(</big><em>unitTo=None</em>, <em>asPQU=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#resonancesWithBackground.domainMin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.resonancesWithBackground.domainMin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.crossSection.resonancesWithBackground.form">
+<tt class="descname">form</tt><em class="property"> = 'resonancesWithBackground'</em><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.resonancesWithBackground.form" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.resonancesWithBackground.getDomain">
+<tt class="descname">getDomain</tt><big>(</big><em>unitTo=None</em>, <em>asPQU=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#resonancesWithBackground.getDomain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.resonancesWithBackground.getDomain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.resonancesWithBackground.getDomainUnit">
+<tt class="descname">getDomainUnit</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#resonancesWithBackground.getDomainUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.resonancesWithBackground.getDomainUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.resonancesWithBackground.getIncidentEnergyUnit">
+<tt class="descname">getIncidentEnergyUnit</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#resonancesWithBackground.getIncidentEnergyUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.resonancesWithBackground.getIncidentEnergyUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="fudge.gnd.reactionData.crossSection.resonancesWithBackground.parseXMLNode">
+<em class="property">static </em><tt class="descname">parseXMLNode</tt><big>(</big><em>BRelement</em>, <em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#resonancesWithBackground.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.resonancesWithBackground.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.resonancesWithBackground.toENDF6Data">
+<tt class="descname">toENDF6Data</tt><big>(</big><em>MT</em>, <em>endfMFList</em>, <em>targetInfo</em>, <em>level</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#resonancesWithBackground.toENDF6Data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.resonancesWithBackground.toENDF6Data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.resonancesWithBackground.toPointwiseLinear">
+<tt class="descname">toPointwiseLinear</tt><big>(</big><em>lowerEps</em>, <em>upperEps</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#resonancesWithBackground.toPointwiseLinear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.resonancesWithBackground.toPointwiseLinear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.resonancesWithBackground.toXMLList">
+<tt class="descname">toXMLList</tt><big>(</big><em>indent=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#resonancesWithBackground.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.resonancesWithBackground.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnd.reactionData.crossSection.weightedPointwise">
+<em class="property">class </em><tt class="descclassname">fudge.gnd.reactionData.crossSection.</tt><tt class="descname">weightedPointwise</tt><big>(</big><em>crossSection</em>, <em>weights</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#weightedPointwise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.weightedPointwise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.gnd.reactionData.crossSection.baseCrossSectionForm" title="fudge.gnd.reactionData.crossSection.baseCrossSectionForm"><tt class="xref py py-class docutils literal"><span class="pre">fudge.gnd.reactionData.crossSection.baseCrossSectionForm</span></tt></a></p>
+<p>This class is used to store one cross section as a weighted multiple of another cross section.
+This is typically used to express the &#8216;production&#8217; cross section for radioactive products of a reaction.
+The production cross section can be given as an energy-dependent multiple of the reaction cross section.</p>
+<p>The weightedPointwise class contains a link to another cross section, and also contains a set of
+energy-dependent weights that should be multiplied by the other cross section.</p>
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.weightedPointwise.domainMax">
+<tt class="descname">domainMax</tt><big>(</big><em>unitTo=None</em>, <em>asPQU=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#weightedPointwise.domainMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.weightedPointwise.domainMax" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.weightedPointwise.domainMin">
+<tt class="descname">domainMin</tt><big>(</big><em>unitTo=None</em>, <em>asPQU=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#weightedPointwise.domainMin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.weightedPointwise.domainMin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnd.reactionData.crossSection.weightedPointwise.form">
+<tt class="descname">form</tt><em class="property"> = 'weightedPointwise'</em><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.weightedPointwise.form" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.weightedPointwise.getDomain">
+<tt class="descname">getDomain</tt><big>(</big><em>unitTo=None</em>, <em>asPQU=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#weightedPointwise.getDomain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.weightedPointwise.getDomain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.weightedPointwise.getDomainUnit">
+<tt class="descname">getDomainUnit</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#weightedPointwise.getDomainUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.weightedPointwise.getDomainUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.weightedPointwise.getIncidentEnergyUnit">
+<tt class="descname">getIncidentEnergyUnit</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#weightedPointwise.getIncidentEnergyUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.weightedPointwise.getIncidentEnergyUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="fudge.gnd.reactionData.crossSection.weightedPointwise.parseXMLNode">
+<em class="property">static </em><tt class="descname">parseXMLNode</tt><big>(</big><em>WPelement</em>, <em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#weightedPointwise.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.weightedPointwise.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.weightedPointwise.setReference">
+<tt class="descname">setReference</tt><big>(</big><em>crossSection</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#weightedPointwise.setReference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.weightedPointwise.setReference" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.weightedPointwise.toENDF6Data">
+<tt class="descname">toENDF6Data</tt><big>(</big><em>MT</em>, <em>endfMFList</em>, <em>targetInfo</em>, <em>level</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#weightedPointwise.toENDF6Data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.weightedPointwise.toENDF6Data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.weightedPointwise.toPointwiseLinear">
+<tt class="descname">toPointwiseLinear</tt><big>(</big><em>lowerEps</em>, <em>upperEps</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#weightedPointwise.toPointwiseLinear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.weightedPointwise.toPointwiseLinear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnd.reactionData.crossSection.weightedPointwise.toXMLList">
+<tt class="descname">toXMLList</tt><big>(</big><em>indent=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/gnd/reactionData/crossSection.html#weightedPointwise.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnd.reactionData.crossSection.weightedPointwise.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">reactionData Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">reactionData</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-fudge.gnd.reactionData.availableEnergy"><tt class="docutils literal"><span class="pre">availableEnergy</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-fudge.gnd.reactionData.availableMomentum"><tt class="docutils literal"><span class="pre">availableMomentum</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-fudge.gnd.reactionData.base"><tt class="docutils literal"><span class="pre">base</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-fudge.gnd.reactionData.crossSection"><tt class="docutils literal"><span class="pre">crossSection</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fudge.gnd.productData.distributions.test.html"
+                        title="previous chapter">test Package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fudge.gnd.reactions.html"
+                        title="next chapter">reactions Package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/fudge/fudge.gnd.reactionData.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fudge.gnd.reactions.html" title="reactions Package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fudge.gnd.productData.distributions.test.html" title="test Package"
+             >previous</a> |</li>
+        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+          <li><a href="index.html" >fudge Package</a> &raquo;</li>
+          <li><a href="fudge.gnd.html" >gnd Package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
