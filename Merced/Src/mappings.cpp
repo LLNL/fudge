@@ -7,63 +7,6 @@
  * ******** merced: calculate the transfer matrix *********
  *
  * # <<BEGIN-copyright>>
-  Copyright (c) 2017, Lawrence Livermore National Security, LLC.
-  Produced at the Lawrence Livermore National Laboratory.
-  Written by the LLNL Nuclear Data and Theory group
-          (email: mattoon1@llnl.gov)
-  LLNL-CODE-725546.
-  All rights reserved.
-  
-  This file is part of the Merced package, used to generate nuclear reaction
-  transfer matrices for deterministic radiation transport.
-  
-  
-      Please also read this link - Our Notice and Modified BSD License
-  
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
-      * Redistributions of source code must retain the above copyright
-        notice, this list of conditions and the disclaimer below.
-      * Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the disclaimer (as noted below) in the
-        documentation and/or other materials provided with the distribution.
-      * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-        to endorse or promote products derived from this software without specific
-        prior written permission.
-  
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-  THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  
-  
-  Additional BSD Notice
-  
-  1. This notice is required to be provided under our contract with the U.S.
-  Department of Energy (DOE). This work was produced at Lawrence Livermore
-  National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-  
-  2. Neither the United States Government nor Lawrence Livermore National Security,
-  LLC nor any of their employees, makes any warranty, express or implied, or assumes
-  any liability or responsibility for the accuracy, completeness, or usefulness of any
-  information, apparatus, product, or process disclosed, or represents that its use
-  would not infringe privately-owned rights.
-  
-  3. Also, reference herein to any specific commercial products, process, or services
-  by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-  or imply its endorsement, recommendation, or favoring by the United States Government
-  or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-  herein do not necessarily state or reflect those of the United States Government or
-  Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-  product endorsement purposes.
-  
  * # <<END-copyright>>
 */
 
@@ -199,17 +142,36 @@ void two_body_map::set_map( particleInfo &particle_info, double Q )
 {
   particle_info.check_data( );
   Q_value = Q;
+  Ecm_photon_residual = -1.0;  // this is reset if it is used
 
-  // calculate the mass of the residual from the Q value
-  double true_mRes = ( particle_info.mProj - particle_info.mProd ) +
-    particle_info.mTarg - Q_value;
   static double etol = Global.Value( "E_tol" );
-  if( ( particle_info.mRes > 0.0 ) && 
-      ( abs( true_mRes - particle_info.mRes ) > etol*true_mRes ) )
+
+  // check for photon as residual
+  if( particle_info.mRes == 0.0 )
   {
-    Warning( "two_body_map::set_map", "mass of residual inconsistent with Q value" );
+    double true_Q = ( particle_info.mProj + particle_info.mTarg ) -
+      particle_info.mProd;
+    if( abs( true_Q - Q_value ) > etol*abs( true_Q ) )
+    {
+      Warning( "two_body_map::set_map", "Q value inconsistent with photon residual" );
+    }
+    Q_value = true_Q;
+    Ecm_photon_residual = Q_value * Q_value /
+      ( 2.0 * ( particle_info.mProj + particle_info.mTarg ) );
   }
-  particle_info.mRes = true_mRes;
+  else
+  {
+    // calculate the mass of the residual from the Q value
+    double true_mRes = ( particle_info.mProj - particle_info.mProd ) +
+      particle_info.mTarg - Q_value;
+    if( ( particle_info.mRes > 0.0 ) && 
+        ( abs( true_mRes - particle_info.mRes ) > etol*true_mRes ) )
+    {
+      Warning( "two_body_map::set_map", "mass of residual inconsistent with Q value" );
+    }
+    particle_info.mRes = true_mRes;
+  }
+
   setup_params( particle_info.mProj, particle_info.mTarg, particle_info.mProd,
                particle_info.mRes );
 
@@ -264,27 +226,38 @@ void two_body_map::two_body_get_E_mu_lab( double E_in, double mu_cm, double *Eou
 // For endothermic reactions, returns the incident energy for zero outgoing lab energy
 double two_body_map::zero_Eout( )
 {
+  double E_zero_in;
+
   if( ( Q_value == 0.0 ) && ( alpha == gamma ) )
   {
-    return 0.0;
+    E_zero_in = 0.0;
   }
-  if( ( ( Q_value > 0.0 ) && ( alpha > gamma ) ) ||
-      ( ( Q_value < 0.0 ) && ( alpha < gamma ) ) )
+  else if( ( ( Q_value > 0.0 ) && ( alpha > gamma ) ) ||
+	   ( ( Q_value < 0.0 ) && ( alpha < gamma ) ) ||
+	   ( ( Q_value < 0.0 ) && ( Ecm_photon_residual > 0.0 ) ) )
   {
     Warning( "two_body_map::zero_Eout", "no zero outgoing energy" );
-    return 0.0;
+    E_zero_in = threshold;
   }
-  double E_zero_in = -beta_eject*Q_value/( alpha - gamma );
+  else if( Ecm_photon_residual < 0.0 ) // the residual is not a photon
+  {
+    E_zero_in = -beta_eject*Q_value/( alpha - gamma );
+  }
+  else  // Q > 0 and the residual is a photon
+  {
+    E_zero_in = Ecm_photon_residual / gamma;
+  }
+
   return E_zero_in;
 }
 // ------------- two_body_map::min_Eout --------------------
 // For exothermic reactions, returns the incident energy for minimal outgoing lab energy
 double two_body_map::min_Eout( )
 {
-  if( Q_value <= 0.0 )
+  if( ( Q_value <= 0.0 ) && ( Ecm_photon_residual < 0.0 ) )
   {
     Warning( "two_body_map::min_Eout", "only for exothermic reactions" );
-    return 0.0;
+    return threshold;
   }
   // For mu = -1 find E_in such that dV_0/dE_in = dvcm_out/dE_in
   // parameters Newt_gamma and Newt_delta such that
@@ -297,60 +270,57 @@ double two_body_map::min_Eout( )
 // ********* class Newton_map_param **********************
 // ------------- Newton_map_param::find_bottom --------------------
 // For mu < 0 find the incident energy which minimizes Eout
-// On exit pair_0 and pair_1 are tighter bounds.
-dd_entry Newton_map_param::find_bottom( double mu, dd_entry *pair_0,
-  dd_entry *pair_1, double tol )
+dd_entry Newton_map_param::find_bottom( double mu )
 {
   if( ( masses->Q_value == 0.0 ) || ( mu >= 0.0 ) )
   {
     FatalError( "two_body_map::find_bottom",
 		"improper input" );
   }
-  double Ein;
-  double Eout;
+
+  double alpha_gamma = masses->alpha + masses->gamma;
+  double Delta = sqrt( alpha_gamma * alpha_gamma -
+		       4 * mu * mu * masses->alpha * masses->gamma );
+  double numerator;
+  double denominator;
+
+  if( masses->Ecm_photon_residual < 0.0 ) // the residual is not a photon
+  {
+    if( masses->Q_value > 0.0 )
+    {
+      double diff_sq = alpha_gamma - Delta;
+      diff_sq *= diff_sq;
+      numerator = masses->beta_eject * diff_sq * masses->Q_value;
+      denominator = masses->alpha * ( 4 * mu * mu * masses->alpha * masses->gamma -
+				    diff_sq );
+    }
+    else
+    {
+      double sum_sq = alpha_gamma + Delta;
+      sum_sq *= sum_sq;
+      numerator = masses->beta_eject * sum_sq * masses->Q_value;
+      denominator = masses->alpha * ( 4 * mu * mu * masses->alpha * masses->gamma -
+				      sum_sq );
+    }
+  }
+  else
+  {
+    numerator = mu * mu * masses->Ecm_photon_residual;
+    denominator = masses->gamma;
+  }
+
+  double Ein = numerator / denominator;
+
   // parameters for the function Newtonian_F::T_out_lab
   mu_cm = mu;
   void *params = static_cast< void *>( this );
-  while( abs( pair_1->x - pair_0->x ) > tol * pair_1->x )
+  // don't go below the threshold
+  if( Ein < masses->threshold )
   {
-    Ein = math_F::parabola_bottom( Newtonian_F::T_out_lab, pair_0,
-					  pair_1, params );
-    // don't go below the threshold
-    if( Ein < masses->threshold )
-    {
-      Ein = masses->threshold;
-    }
-    Eout = Newtonian_F::T_out_lab( Ein, params );
-
-    // set up the next iteration
-    if( Ein <  pair_0->x )
-    {
-      pair_1->x = pair_0->x;
-      pair_1->y = pair_0->y;
-      pair_0->x = Ein;
-      pair_0->y = Eout;
-    }
-    else if( Ein <  pair_1->x )
-    {
-      if( pair_0->y < pair_1->y )
-      {
-	pair_1->x = Ein;
-	pair_1->y = Eout;
-      }
-      else
-      {
-	pair_0->x = Ein;
-	pair_0->y = Eout;
-      }
-    }
-    else // Ein >=  pair_1->x
-    {
-      pair_0->x = pair_1->x;
-      pair_0->y = pair_1->y;
-      pair_1->x = Ein;
-      pair_1->y = Eout;
-    }
+    Ein = masses->threshold;
   }
+  double Eout = Newtonian_F::T_out_lab( Ein, params );
+
   dd_entry ans( Ein, Eout );
   return ans;
 }

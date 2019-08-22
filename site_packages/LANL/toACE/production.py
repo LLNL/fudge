@@ -65,7 +65,7 @@
 This module adds the method toACE to the production class.
 """
 
-from fudge.gnd.reactions import production as productionModule
+from fudge.gnds.reactions import production as productionModule
 
 def toACE( self, temperature, EMin, data, verbose ) :
 

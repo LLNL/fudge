@@ -62,7 +62,7 @@
 # <<END-copyright>>
 
 """
-Example of how to use the evaluator toolkit to generate a new evaluation in GND.
+Example of how to use the evaluator toolkit to generate a new evaluation in GNDS.
 This includes examples of how to create several different types of cross sections,
 distributions and multiplicities including:
 
@@ -77,7 +77,7 @@ distributions and multiplicities including:
     constant multiplicity, and
     pointwise (energy-dependent) multiplicity
 
-The resulting GND file is written out to 'newEvaluation.xml'
+The resulting GNDS file is written out to 'newEvaluation.xml'
 
 Particle masses and excited level energies must be supplied by the evaluator, to ensure that the same values
 used during the evaluation are stored in the resulting file. The 'particleLibrary' class helps with this:

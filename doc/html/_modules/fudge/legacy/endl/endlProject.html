@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.legacy.endl.endlProject &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.legacy.endl.endlProject &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,7 +25,7 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +35,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
       </ul>
@@ -332,7 +329,7 @@ All options can be negated by prepending with &#39;no_&#39; (e.g., -no_u&#39;).
         if( target[:18] == &#39;FissionProductENDL&#39; ) :
             ZAs = target[18:]
         else :
-            Z, A, suffix, ZA = endl2.gndNameToEndlZ_A_Suffix( target )
+            Z, A, suffix, ZA = endl2.gndsNameToEndlZ_A_Suffix( target )
             ZAs = endlmisc.strZASuffix( 1000 * Z + A, suffix )
         return( self.readZA( ZAs, database = database ) )</div>
 
@@ -391,7 +388,7 @@ All options can be negated by prepending with &#39;no_&#39; (e.g., -no_u&#39;).
                 if( suffix != [ None ] ) : s_ = target[8:]
                 if( ( S_ in Symbol ) and ( A_ in A ) and ( s_ in suffix ) ) :
                     d = os.path.join( self.database, target )
-                    if ( os.path.exists( d ) ) : targetList.append( endl2.endlToGNDName( target ) )
+                    if ( os.path.exists( d ) ) : targetList.append( endl2.endlToGNDSName( target ) )
         return targetList</div>
 
 <div class="viewcode-block" id="endlProject.unread"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlProject.endlProject.unread">[docs]</a>    def unread( self, target ) :
@@ -482,14 +479,14 @@ All options can be negated by prepending with &#39;no_&#39; (e.g., -no_u&#39;).
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

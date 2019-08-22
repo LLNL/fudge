@@ -152,7 +152,7 @@ def check2dData( data, allowNegativeX = True, allowSameX = False, allowZeroX = T
                 if( pl[0] >= pn[0] ) :
                     checkCloseness = False
                     if( not allowSameX ) :
-                        s = 'check2dData: x value x[%d] >= x[%d] (%e >= %e)' % ( i - 1, i, pl[0], pn[0] )
+                        s = 'check2dData: x value x[%d] >= x[%d] (%.8e >= %.8e)' % ( i - 1, i, pl[0], pn[0] )
                         messages.append( s )
                         if( printErrors ) : fudgemisc.printWarning( '\n'.join( fudgemisc.checkMessagesToString( s, indentation = '      ' ) ) )
                 if( checkCloseness and ( pn[0] - pl[0] ) < ( ( pn[0] + pl[0] ) * xCloseEps ) ) :

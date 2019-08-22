@@ -1,0 +1,11 @@
+Icon*
+.idea/
+.project
+.pydevproject
+test-results/
+MANIFEST
+dist/
+.test-results/
+*.DS_Store
+*.pyc
+*.swp

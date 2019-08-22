@@ -63,7 +63,7 @@
 
 TARGETS = ids.py quantities.py gaugeBoson.py lepton.py baryon.py nuclearLevel.py isotope.py \
     chemicalElement.py database.py database2.py database3.py database4.py alias.py copyDBs.py \
-	build.py
+	build.py iterate.py
 
 default:
 

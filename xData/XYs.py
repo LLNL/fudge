@@ -61,6 +61,8 @@
 # 
 # <<END-copyright>>
 
+from __future__ import print_function
+
 """
     This module contains the class ``XYs1d``. This class treats a list of :math:`(x_i, y_i)` pairs as if they were 
     the function :math:`y(x)`.  That is, it is a numerical representation of :math:`f(x)`. The function :math:`y(x)` 
@@ -100,6 +102,7 @@ __metaclass__ = type
 import math
 
 import base as baseModule
+import link as linkModule
 import axes as axesModule
 import values as valuesModule
 import standards as standardsModule
@@ -113,12 +116,12 @@ xAxisIndex = 1
 yAxisIndex = 0
 domainEpsilon = 1e-15
 
-def return_pointwiseXY_AsXYs( self, C, units = {}, index = None, value = None, axes = None ) :
+def return_pointwiseXY_AsXYs( self, C, units = None, index = None, value = None, axes = None ) :
 
     if( index is None ) : index = self.index
     if( axes is None ) : axes = self.axes
     c = XYs1d( C, axes = axes, infill = True, safeDivide = False, index = index, value = value )
-    if( c.axes is not None ) :
+    if( c.axes is not None and units is not None ) :
         for k in units : c.axes[k].unit = units[k]
     return( c )
 
@@ -176,7 +179,7 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
     dimension = 1
     mutableYUnit = True     # For __imul__ and __idiv__.
 
-    def __init__( self, data, dataForm = "xys", interpolation = standardsModule.interpolation.linlinToken, axes = None,
+    def __init__( self, data = None, dataForm = "xys", interpolation = standardsModule.interpolation.linlinToken, axes = None,
             index = None, valueType = standardsModule.types.float64Token, value = None, label = None, 
             sep = ' ', initialSize = 10, overflowSize = 10, infill = True, safeDivide = False ) :
         """
@@ -191,6 +194,8 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         if( not( isinstance( sep, str ) ) ) : raise TypeError( 'sep must be of type str' )
         if( len( sep ) != 1 ) : raise TypeError( 'sep length must be 1 not %d' % len( sep ) )
         self.__sep = sep
+
+        if data is None: data = []
 
         initialSize = max( initialSize, len( data ) )
         pointwiseXY.__init__( self, data = data, dataForm = dataForm, initialSize = initialSize, overflowSize = overflowSize,
@@ -353,7 +358,7 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
         """
 
-        if( self.axes is None ) : print self.toXLink( )
+        if( self.axes is None ) : print(self.toXLink())
         factors = self.axes.convertUnits( unitMap )
         if( factors[:2] != [ 1., 1. ] ) : self.scaleOffsetXAndY( xScale = factors[1], yScale = factors[0], insitu = True )
         self.fixValuePerUnitChange( factors )
@@ -410,7 +415,7 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
 
     def dullEdges( self, lowerEps = 0., upperEps = 0., positiveXOnly = 0 ) :
 
-        d = pointwiseXY.dullEdges( self, lowerEps = lowerEps, upperEps = upperEps, positiveXOnly = positiveXOnly );
+        d = pointwiseXY.dullEdges( self, lowerEps = lowerEps, upperEps = upperEps, positiveXOnly = positiveXOnly )
         return( self.returnAsClass( self, d ) )
 
     def evaluate( self, x ) :
@@ -797,7 +802,7 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
             xys.append( x )
             xys.append( y )
         XMLList += valuesModule.values( xys, valueType = self.valueType, sep = self.__sep ).toXMLList( indent2, **kwargs )
-        if( self.uncertainties ) : XMLList += self.uncertainties.toXMLList( indent = indent2, **kwargs )
+        if( self.uncertainty ) : XMLList += self.uncertainty.toXMLList( indent = indent2, **kwargs )
         XMLList[-1] += '</%s>' % self.moniker
         if( oneLine ) : return( [ ''.join( XMLList ) ] )
         return( XMLList )
@@ -846,6 +851,13 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         args = [ "python", p, 'xylog', str( xylog ) ] + dt + [ f.getName( ) ]
         subprocess.Popen( args )
 
+    def ysMappedToXs( self, cls, grid, label = None ) :
+
+        offset, Ys = pointwiseXY.ysMappedToXs( self, grid.values )
+        Ys1d = cls( valuesModule.values( Ys, start = offset ), axes = self.axes.copy( ), label = label )
+        Ys1d.axes[1] = linkModule.link2( grid.moniker, instance = grid, keyName = 'index', keyValue = 1 )
+        return( Ys1d )
+
     @classmethod
     def returnAsClass( cls, self, other, index = None, value = None, axes = None, interpolation = None ) :
         """
@@ -880,14 +892,14 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
             if( key not in attributes ) : raise TypeError( 'Invalid attribute "%s"' % key )
             attrs[key] = attributes[key]( item )
 
-        values, uncertainties = None, None
+        values, uncertainty = None, None
         for subElement in xDataElement :
             if( subElement.tag == 'axes' ) :
                 axes = axesModule.axes.parseXMLNode( subElement, xPath, linkData )
             elif( subElement.tag == 'values' ) :
                 values = valuesModule.values.parseXMLNode( subElement, xPath, linkData )
-            elif( subElement.tag == 'uncertainties' ) :
-                uncertainties = uncertaintiesModule.uncertainties.parseXMLNode( subElement, xPath, linkData )
+            elif( subElement.tag == 'uncertainty' ) :
+                uncertainty = uncertaintiesModule.uncertainty.parseXMLNode( subElement, xPath, linkData )
             else :
                 raise TypeError( 'sub-element "%s" not valid' % subElement.tag )
 
@@ -895,7 +907,7 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         attrs['sep'] = values.sep
 
         xys = cls( data = values, dataForm = "list", axes = axes, **attrs )
-        if uncertainties is not None: xys.uncertainties = uncertainties
+        if uncertainty is not None: xys.uncertainty = uncertainty
         xPath.pop( )
         return( xys )
 

@@ -64,9 +64,9 @@
 from pqu import PQU as PQUModule
 from xData import standards as standardsModule
 
-from fudge.gnd.productData.distributions import angularEnergy as angularEnergyModule
+from fudge.gnds.productData.distributions import angularEnergy as angularEnergyModule
 
-from ... import gndToENDF6 as gndToENDF6Module
+from ... import gndsToENDF6 as gndsToENDF6Module
 from ... import endfFormats as endfFormatsModule
 
 #
@@ -77,7 +77,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     subform = self.angularEnergySubform
     if( hasattr( subform, 'toENDF6' ) ) :
         LAW, frame, MF6 = subform.toENDF6( flags, targetInfo )
-        gndToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, frame, MF6 )
+        gndsToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, frame, MF6 )
     else :
         print 'WARNING: angularEnergy subform "%s" has no toENDF6 method' % subform.moniker
 
@@ -89,17 +89,17 @@ angularEnergyModule.form.toENDF6 = toENDF6
 def toENDF6( self, flags, targetInfo ) :
 
     MF6 = [ endfFormatsModule.endfContLine( 0, 0, 0, 0, 1, len( self ) ) ]
-    EInInterpolation = gndToENDF6Module.gndToENDF2PlusDInterpolationFlag( self.interpolation, self.interpolationQualifier )
+    EInInterpolation = gndsToENDF6Module.gndsToENDF2PlusDInterpolationFlag( self.interpolation, self.interpolationQualifier )
     energyConversionFactor = PQUModule.PQU(1, self.axes[-1].unit ).getValueAs('eV')
     MF6 += endfFormatsModule.endfInterpolationList( [ len( self ), EInInterpolation ] )
     for oneEin in self :
-        muInterpolation = gndToENDF6Module.gndToENDF2PlusDInterpolationFlag( self.interpolation, self.interpolationQualifier )
+        muInterpolation = gndsToENDF6Module.gndsToENDF2PlusDInterpolationFlag( self.interpolation, self.interpolationQualifier )
         Ein = oneEin.value * energyConversionFactor
         numMu = len( oneEin )
         MF6 += [ endfFormatsModule.endfContLine( 0, Ein, 0, 0, 1, numMu ) ]
         MF6 += endfFormatsModule.endfInterpolationList( [ numMu, muInterpolation ] )
         for entries in oneEin :
-            pdf_of_EpInterpolation = gndToENDF6Module.gndToENDFInterpolationFlag( self.interpolation )
+            pdf_of_EpInterpolation = gndsToENDF6Module.gndsToENDFInterpolationFlag( entries.interpolation )
             mu = entries.value
             numEout = len( entries )
             MF6 += [ endfFormatsModule.endfContLine( 0, mu, 0, 0, 1, numEout ) ]
@@ -113,7 +113,7 @@ angularEnergyModule.XYs3d.toENDF6 = toENDF6
 #
 # LLNLAngularEnergyForm
 #
-def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
+def toENDF6( self, MT, endfMFList, flags, targetInfo ) :    # FIXME appears to be broken code
 
     angularForm = self.angularForm
     angularEnergyForm = self.angularEnergyForm
@@ -146,6 +146,6 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
         LAW7.append( w_xys )
 
     LAW, frame, MF6 = LAW7.toENDF6( flags, targetInfo )
-    gndToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, frame, MF6 )
+    gndsToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, frame, MF6 )
 
 angularEnergyModule.LLNLAngularEnergyForm.toENDF6 = toENDF6

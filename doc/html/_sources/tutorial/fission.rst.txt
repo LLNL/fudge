@@ -1,7 +1,7 @@
 Fission
 =======
 
-While fission is treated as a single reaction in both ENDF and GND, in reality it is composed of many different reactions each of which produces a different set of outgoing particles. Fission poses a special challenge for GND since, unlike most other reactions, we cannot explicitly list all the outgoing products. Instead we list average values for outgoing neutrons and gammas, and ignore the fission fragments (except to give the average energy deposited in them).
+While fission is treated as a single reaction in both ENDF and GNDS, in reality it is composed of many different reactions each of which produces a different set of outgoing particles. Fission poses a special challenge for GNDS since, unlike most other reactions, we cannot explicitly list all the outgoing products. Instead we list average values for outgoing neutrons and gammas, and ignore the fission fragments (except to give the average energy deposited in them).
 
 A neutron-induced fission channel generally contains several outgoing products::
 
@@ -17,7 +17,7 @@ First, second, third chance, ...
 For most evaluations in major libraries, total fission (MT=18) contains a full description of the cross section,
 product multiplicities and distributions. Additional fission cross sections like first-chance, 2nd-chance, etc.
 are often also listed, but do not contain any description of outgoing products.
-GND (and Fudge) handle these with the ``fissionComponent`` container, which contains a cross section
+GNDS (and Fudge) handle these with the ``fissionComponent`` container, which contains a cross section
 and Q-value but not necessarily a list of products.
 
 The cross section
@@ -34,7 +34,7 @@ The average neutron multiplicity 'nubar' is stored as the multiplicity of outgoi
 Nubar is typically separated into two components: 'prompt', for neutrons produced during the fission process,
 and 'delayed' for beta-delayed neutrons emitted by the fission fragments.
 Evaluations typically contain multiple delayed fission neutrons, grouped by the average beta-decay lifetime of
-the parent fission products.  The ENDF-6 format only supports storing a single delayed nubar, so in GND
+the parent fission products.  The ENDF-6 format only supports storing a single delayed nubar, so in GNDS
 we typically see multiple delayed neutrons with multiplicities that link back to the first delayed neutron using
 the ``reference`` multiplicity class.
 

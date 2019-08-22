@@ -551,7 +551,7 @@ class DataSet3d( DataSetParameters ):
         axes_3d[0] = axesModule.axis( 'z', 0, zUnit )
         axes_3d[1] = axesModule.axis( 'y', 0, yUnit )
         axes_3d[2] = axesModule.axis( 'x', 0, xUnit )
-        w_xys = multiD_XYsModule.multiD_XYs( axes = axes_3d )
+        w_xys = multiD_XYsModule.XYs2d( axes = axes_3d )
 
         axes_2d = axesModule.axes( )
         axes_2d[0] = axes_3d[0]
@@ -559,7 +559,7 @@ class DataSet3d( DataSetParameters ):
 
         for ix, x in enumerate( self.x ) :
             xys = [ [ y, self.z[iy][ix] ] for iy, y in enumerate( self.y ) ]
-            w_xys[ix] = XYsModule.XYs( xys, axes = axes_2d, value = x )
+            w_xys[ix] = XYsModule.XYs1d( xys, axes = axes_2d, value = x )
         return( w_xys )
 
     @property
@@ -574,11 +574,12 @@ def __makePlot2d( datasets, xAxisSettings=None, yAxisSettings=None, theTitle=Non
     Main driver routine for all 2d plots (regular, contour, slices, ...)
     '''
 
-    if outFile is None: defaultBackend = 'TkAgg'
-    else:  defaultBackend = 'Agg'
-    backendMap = { 'png':'AGG', 'ps':'PS', 'eps':'PS', 'pdf':'PDF', 'svg':'SVG' }
-    import matplotlib
-    if matplotlib.get_backend() != defaultBackend: matplotlib.use( defaultBackend )
+    # Sometimes we'll adjust the layout of the plot external to this routine so the backend may already be set
+    if outFile is not None:
+        defaultBackend = 'Agg'
+        backendMap = { 'png':'AGG', 'ps':'PS', 'eps':'PS', 'pdf':'PDF', 'svg':'SVG' }
+        import matplotlib
+        if matplotlib.get_backend() != defaultBackend: matplotlib.use( defaultBackend )
     import matplotlib.pyplot as plt
 
     # Check the axis settings.  If they are set to None and we can safely initialize them using information in the
@@ -790,9 +791,8 @@ def makePlot2dSlice( datasets, xyAxisSettings = None, zAxisSettings = None, slic
                 for x in sliceXCoords :
                     _datasets.append( DataSet2d( likeW_XYs.getValue( x ), legend = asDataSet3d.legend + ' @ ' + str( x ) + ' ' + sliceUnits ) )
             if( sliceYCoords is not None ) :
-                print sliceYCoords
                 for y in sliceYCoords :
-                    _datasets.append( DataSet2d( [ [ x, likeW_XYs.evaluate( ( x, y ) ) ] for x in asDataSet3d.x ], legend = asDataSet3d.legend + ' @ ' + str( y ) + ' ' + sliceUnits ) )
+                    _datasets.append( DataSet2d( [ [ x, likeW_XYs.evaluate( x ).evaluate( y ) ] for x in asDataSet3d.x ], legend = asDataSet3d.legend + ' @ ' + str( y ) + ' ' + sliceUnits ) )
         else :
             raise TypeError( 'Can only put 2d or 3d objects in slice plots' )
     __makePlot2d( _datasets, xyAxisSettings, zAxisSettings, theTitle = theTitle, legendOn = legendOn, outFile = outFile, legendXY = legendXY, figsize = figsize, useBokeh=useBokeh )
@@ -859,7 +859,7 @@ def plotTests( tests = 11*[ False ] ):
     if tests[0]:
         xSec = za.findData( I = 0, C = 46 )
         makePlot2d( [ xSec ], xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,\gamma)$ Cross Section', outFile = None )
-        xys = XYsModule.XYs( xSec.data, axes = xyAxes )
+        xys = XYsModule.XYs1d( xSec.data, axes = xyAxes )
         makePlot2d( ( xys ), xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,\gamma)$ Cross Section', outFile = None )
         dataset = DataSet2d( xys, xUnit = xAxis.unit, yUnit = yAxis.unit )
         dataset.convertUnits( 'eV', 'mb' )
@@ -873,7 +873,7 @@ def plotTests( tests = 11*[ False ] ):
     if tests[2]:
         xSecs = za.findDatas( I = 0 )
         makePlot2d( xSecs, xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,*)$ Cross Sections', outFile = None )   
-        xySecs = [ XYsModule.XYs( xSec.data, axes = xyAxes ) for xSec in xSecs ]
+        xySecs = [ XYsModule.XYs1d( xSec.data, axes = xyAxes ) for xSec in xSecs ]
         xySecs = ( xySecs[0], xySecs[1], xySecs[2] )
         makePlot2d( xySecs, xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,*)$ Cross Sections', outFile = None )   
 
@@ -893,8 +893,8 @@ def plotTests( tests = 11*[ False ] ):
         muAxis = AxisSettings( isLog = False, label = '$\mu$ = cos( $\\theta$ )', axisMin = -1.0, axisMax = 1.0, autoscale = False, gridOn = True )
         makePlot2dContour( DataSet3d( data = endfData, legend = 'ENDF/B-VII.0', xUnit = EAxis.unit, yUnit = muAxis.unit ), 
             xAxisSettings = EAxis, yAxisSettings = muAxis, title = '$^1$H$(n,el)$ Angular Distribution', outFile = None )
-        w_xys = multiD_XYsModule.multiD_XYs( axes = axesModule.axes( rank = 3, labelsUnits = { 2 : ( '$E_n$', 'MeV' ) } ) )
-        for w, xy in endfData.data : w_xys.append( XYsModule.XYs( xy, axes = axesModule.axes( ), value = w ) )
+        w_xys = multiD_XYsModule.XYs2d( axes = axesModule.axes( rank = 3, labelsUnits = { 2 : ( '$E_n$', 'MeV' ) } ) )
+        for w, xy in endfData.data : w_xys.append( XYsModule.XYs1d( xy, axes = axesModule.axes( ), value = w ) )
         dataset = DataSet3d( data = w_xys, legend = 'ENDF/B-VII.0' )
         dataset.convertUnits( 'eV', None, None )
         makePlot2dContour( dataset, xAxisSettings = EAxis, yAxisSettings = muAxis, 
@@ -945,7 +945,7 @@ def plotTests( tests = 11*[ False ] ):
 if __name__ == "__main__":
 
     for i in xrange( 10 ) :
-        if( i != 8 ) : continue
+#        if( i != 8 ) : continue
         tests = 10 * [ False ]
         tests[i] = True
         if( i in [ 4, 5, 9 ] ) :

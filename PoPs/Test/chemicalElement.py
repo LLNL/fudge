@@ -63,6 +63,8 @@
 # 
 # <<END-copyright>>
 
+from PoPs.groups import misc as chemicalElementMiscModule
+
 from PoPs.quantities import quantity as quantityModule
 from PoPs.quantities import mass as massModule
 from PoPs.quantities import spin as spinModule
@@ -71,35 +73,31 @@ from PoPs.quantities import charge as chargeModule
 from PoPs.quantities import halflife as halflifeModule
 from PoPs.quantities import nuclearEnergyLevel as nuclearEnergyLevelModule
 
-from PoPs.families import nucleus as nucleusModule
-from PoPs.families import nuclearLevel as nuclearLevelModule
+from PoPs.families import nuclide as nuclideModule
 
 from PoPs.groups import isotope as isotopeModule
 from PoPs.groups import chemicalElement as chemicalElementModule
 
-O16Data = [ [ '0', 15.99491461956, 0,       None, None, None, None ],
-            [ '1',           None, 6049400, None, None, None, None ],
-            [ '2',           None, 6129893, None, None, None, None ],
-            [ '3',           None, 6917100, None, None, None, None ] ]
+O16Data = [ [ 0, 15.99491461956, 0,       None, None, None, None ],
+            [ 1,           None, 6049400, None, None, None, None ],
+            [ 2,           None, 6129893, None, None, None, None ],
+            [ 3,           None, 6917100, None, None, None, None ] ]
 
 Z = 8
 symbol = 'O'
 
-chemicalElement = chemicalElementModule.suite( symbol, Z, 'Oxygen' )
+chemicalElement = chemicalElementModule.chemicalElement( symbol, Z, 'Oxygen' )
 
-for A in [ '14', '15', '16', '17', '18' ] :
-    isotopeID = isotopeModule.isotopeIDFromElementIDAndA( symbol, A )
-    isotope = isotopeModule.suite( isotopeID, A )
-    if( A == '16' ) :
+for A in [ 14, 15, 16, 17, 18 ] :
+    isotopeID = chemicalElementMiscModule.isotopeSymbolFromChemicalElementIDAndA( symbol, A )
+    isotope = isotopeModule.isotope( isotopeID, A )
+    if( A == 16 ) :
         for index, mass, energy, charge, halflife, spin, parity in O16Data :
-            name = nucleusModule.nucleusNameFromNucleusNameAndIndex( isotopeID, index )
-            nucleus = nucleusModule.particle( name, index )
+            name = chemicalElementMiscModule.nuclideIDFromIsotopeSymbolAndIndex( isotopeID, index )
+            level = nuclideModule.particle( name )
+
             energy = nuclearEnergyLevelModule.double( 'base', energy, quantityModule.stringToPhysicalUnit( 'eV' ) )
-            nucleus.energy.add( energy )
-
-            name = nucleusModule.levelNameFromIsotopeNameAndIndex( isotopeID, index )
-            level = nuclearLevelModule.particle( name, nucleus )
-
+            nucleus = level.nucleus.energy.add( energy )
 
             if( mass is not None ) :
                 mass = massModule.double( 'base', mass, quantityModule.stringToPhysicalUnit( 'amu' ) )

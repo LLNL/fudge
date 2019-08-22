@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.legacy.endl.endlIClasses &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.legacy.endl.endlIClasses &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,7 +25,7 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +35,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
       </ul>
@@ -288,9 +285,9 @@ fixThreshold_deltaFunctionEpsilon = 1e-4
         &quot;&quot;&quot;Constructor for the endlI10 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
 
-        from fudge import gnd
+        from fudge import gnds
 
-        self.name = gnd.productData.energyDeposition.component.moniker
+        self.name = gnds.productData.energyDeposition.component.moniker
         endlNd.endlNd.__init__( self, f, 10, yo, C, I, S, h, points, bdflsFile = bdflsFile )
         self.variablesUnits = &#39;energy_in[MeV];energy_deposition[MeV]&#39;
 
@@ -335,9 +332,9 @@ fixThreshold_deltaFunctionEpsilon = 1e-4
         &quot;&quot;&quot;Constructor for the endlI11 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
 
-        from fudge import gnd
+        from fudge import gnds
 
-        self.name = gnd.productData.energyDeposition.component.moniker
+        self.name = gnds.productData.energyDeposition.component.moniker
         endlNd.endlNd.__init__( self, f, 11, yo, C, I, S, h, points, bdflsFile = bdflsFile )
         self.variablesUnits = &#39;energy_in[MeV];energy_deposition[MeV]&#39;
 
@@ -427,9 +424,9 @@ fixThreshold_deltaFunctionEpsilon = 1e-4
         &quot;&quot;&quot;Constructor for the endlI13 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
 
-        from fudge import gnd
+        from fudge import gnds
 
-        self.name = gnd.productData.momentumDeposition.component.moniker
+        self.name = gnds.productData.momentumDeposition.component.moniker
         endlNd.endlNd.__init__( self, f, 13, yo, C, I, S, h, points, bdflsFile = bdflsFile )
         self.variablesUnits = &#39;energy_in[MeV];momentum_deposition[MeV/c]&#39;
 
@@ -594,7 +591,7 @@ fixThreshold_deltaFunctionEpsilon = 1e-4
         &quot;&quot;&quot;Constructor for the endlI941 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
 
-        from fudge import gnd
+        from fudge import gnds
 
         self.name = &#39;pointwise&#39;
         endlNd.endlNd.__init__( self, f, 941, yo, C, I, S, h, points, bdflsFile = bdflsFile )
@@ -633,7 +630,7 @@ fixThreshold_deltaFunctionEpsilon = 1e-4
         &quot;&quot;&quot;Constructor for the endlI942 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
 
-        from fudge import gnd
+        from fudge import gnds
 
         self.name = &#39;pointwise&#39;
         endlNd.endlNd.__init__( self, f, 942, yo, C, I, S, h, points, bdflsFile = bdflsFile )
@@ -696,7 +693,7 @@ fixThreshold_deltaFunctionEpsilon = 1e-4
         &quot;&quot;&quot;Constructor for the endlI1 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl3dmath class data structure.&quot;&quot;&quot;
 
-        from fudge import gnd
+        from fudge import gnds
 
         self.name = &#39;pointwise&#39;
         endlNd.endlNd.__init__( self, f, 1, yo, C, I, S, h, points, i2 = 2, bdflsFile = bdflsFile )
@@ -858,7 +855,7 @@ fixThreshold_deltaFunctionEpsilon = 1e-4
         &quot;&quot;&quot;Constructor for the endlI21 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl3dmath class data structure.&quot;&quot;&quot;
 
-        from fudge import gnd
+        from fudge import gnds
 
         self.name = &#39;&#39;
         self.form = &#39;pointwise&#39;
@@ -1024,7 +1021,7 @@ fixThreshold_deltaFunctionEpsilon = 1e-4
         &quot;&quot;&quot;Constructor for the endlI3 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl4dmath class data structure.&quot;&quot;&quot;
 
-        from fudge import gnd
+        from fudge import gnds
 
         self.name = &#39;pointwise&#39;
         endlNd.endlNd.__init__( self, f, 3, yo, C, I, S, h, points, i2 = 2, i3 = 3, bdflsFile = bdflsFile )
@@ -1406,7 +1403,7 @@ xyzlog values and meaning::
         &quot;&quot;&quot;Constructor for the endlI4 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl4dmath class data structure.&quot;&quot;&quot;
 
-        from fudge import gnd
+        from fudge import gnds
 
         self.name = &#39;pointwise&#39;
         endlNd.endlNd.__init__( self, f, 4, yo, C, I, S, h, points, i0 = 2, i1 = 0, i2 = 1, i3 = 3, bdflsFile = bdflsFile )
@@ -2030,14 +2027,14 @@ xyzlog values and meaning::
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

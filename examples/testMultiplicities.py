@@ -63,9 +63,9 @@
 # 
 # <<END-copyright>>
 
-""" demonstrates checking data in the new GND format.
+""" demonstrates checking data in the new GNDS format.
 
-python testMultiplicities.py *.xml  # to check all translated gnd files in a directory """
+python testMultiplicities.py *.xml  # to check all translated gnds files in a directory """
 
 import os
 import sys

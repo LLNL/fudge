@@ -64,7 +64,7 @@
 # <<END-copyright>>
 
 import argparse
-from fudge.legacy.converting.ENDFToGND import endfFileToGNDMisc
+from fudge.legacy.converting.ENDFToGNDS import endfFileToGNDSMisc
 
 parser = argparse.ArgumentParser( '' )
 parser.add_argument( '-v', '--verbose', action = 'store_true', 
@@ -75,14 +75,14 @@ args = parser.parse_args( )
 
 filesWithBreakup = 0
 for file in args.paths :
-    header, MAT, MTDatas = endfFileToGNDMisc.parseENDFByMT_MF( file )
+    header, MAT, MTDatas = endfFileToGNDSMisc.parseENDFByMT_MF( file )
     if( args.verbose ) : print file
     doPrintHeader, counter = True, 0
     for MT in sorted( MTDatas.keys( ) ) :
         MTData = MTDatas[MT]
         if( 3 in MTData ) :
             MF3 = MTData[3]
-            dummy, dummy, dummy, LR, dummy, dummy = endfFileToGNDMisc.sixFunkyFloatStringsToFloats( MF3[1] )
+            dummy, dummy, dummy, LR, dummy, dummy = endfFileToGNDSMisc.sixFunkyFloatStringsToFloats( MF3[1] )
             if( LR != 0 ) :
                 counter += 1
                 if( args.verbose ) : 

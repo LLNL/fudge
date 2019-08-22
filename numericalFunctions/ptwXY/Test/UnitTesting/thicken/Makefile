@@ -64,12 +64,10 @@
 SMR_PATH = ../../../../../statusMessageReporting
 NUMERICALFUNCTIONS_PATH = ../../../..
 
-CC = gcc
-CDEBUGFLAGS = -g -O0 -Wall
 ptwXYCFLAGS = -lnfut_utilities -lptwXY_utilities \
 			  -I$(NUMERICALFUNCTIONS_PATH)/include -L$(NUMERICALFUNCTIONS_PATH)/lib -lnumericalfunctions \
-              -I$(SMR_PATH)/include -L$(SMR_PATH)/lib -lstatusMessageReporting
-localCFLAGS = $(CDEBUGFLAGS) $(CFLAGS) $(ptwXYCFLAGS) -lm
+			  -I$(SMR_PATH)/include -L$(SMR_PATH)/lib -lstatusMessageReporting
+localCFLAGS = $(CFLAGS) $(ptwXYCFLAGS)
 
 TARGETS = thicken
 

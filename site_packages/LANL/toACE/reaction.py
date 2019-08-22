@@ -67,26 +67,24 @@ This module adds the method toACE to the reaction class.
 
 from pqu import PQU as PQUModule
 
-from fudge.gnd.reactions import reaction as reactionModule
+from PoPs import IDs as IDsPoPsModule
 
-def toACE( self, temperature, EMin, data, verbose ) :
+from fudge.gnds.reactions import reaction as reactionModule
+
+def toACE( self, styleName, cdf_style, ACE_data, verbose ) :
 
     MT = self.ENDF_MT
     if( verbose > 1 ) : print '   %s: MT = %d' % ( str( self ), MT )
 
     MTData = {}
     MTData['isFission'] = self.outputChannel.isFission( )
-    if( self.domainMin > EMin ) :        # Do not heat cross section if it starts above EMin.
-        MTData['ESZ'] = self.crossSection.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-8 )
-    else :                                  # Heat cross section.
-        EMinUnit = PQUModule.PQU( EMin, self.domainUnit )
-        MTData['ESZ'] = self.heatCrossSection( temperature, EMinUnit, heatBelowThreshold = False, 
-                heatAllEDomain = True, interpolationAccuracy = 0.002 )
-    MTData['Q'] = self.getQ( 'MeV' )
-    MTData['n'] = []
+    MTData['ESZ'] = self.crossSection[styleName]
+    MTData['Q_final'] = self.getQ( 'MeV' )
+    MTData['Q_initial'] = self.getQ( 'MeV', final = False )
+    MTData[IDsPoPsModule.neutron] = []
     MTData['n_fissionDelayed'] = []
-    MTData['gamma'] = []
-    self.outputChannel.toACE( MTData, MT, verbose )
-    data.append( ( MT, MTData ) )
+    MTData[IDsPoPsModule.photon] = []
+    self.outputChannel.toACE( cdf_style, MTData, MT, verbose )
+    ACE_data.append( ( MT, MTData ) )
 
 reactionModule.reaction.toACE = toACE

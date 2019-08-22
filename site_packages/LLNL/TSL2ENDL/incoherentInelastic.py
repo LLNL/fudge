@@ -140,7 +140,7 @@ def toENDL( incoherentInelastic, energyMin_MeV, energyMax_MeV, temperature_MeV )
     principalAtom = incoherentInelastic.scatteringAtoms[0]
     secondaryAtoms = list(incoherentInelastic.scatteringAtoms)[1:]
 
-    principalAWR = principalAtom.mass.value    # FIXME GND files should store actual mass, not ratio to neutron mass
+    principalAWR = principalAtom.mass.value    # FIXME GNDS files should store actual mass, not ratio to neutron mass
     prefactor = principalAtom.numberPerMolecule * principalAtom.boundCrossSection() / (
                 2*temperature_MeV)
 

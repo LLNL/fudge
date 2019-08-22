@@ -66,13 +66,10 @@ TARGETS = gammaTest incompleteGammaTest
 SMR_PATH = ../../../../../statusMessageReporting
 NUMERICALFUNCTIONS_PATH = ../../../..
 
-CC = gcc
-CFLAGS = -g -O0 -Wall
-
 ptwXYCFLAGS = -I$(NUMERICALFUNCTIONS_PATH)/include -L$(NUMERICALFUNCTIONS_PATH)/lib -lnumericalfunctions \
               -I$(SMR_PATH)/include -L$(SMR_PATH)/lib -lstatusMessageReporting \
               -lptwXY_utilities -lnfut_utilities
-localCFLAGS = $(CDEBUGFLAGS) $(CFLAGS) $(ptwXYCFLAGS) -lm
+localCFLAGS = $(CFLAGS) $(ptwXYCFLAGS)
 
 .PHONY: default clean realclean m gammaMathematica.m incompleteGammaMathematica.m
 
@@ -85,10 +82,10 @@ check: default
 m: gammaMathematica.m incompleteGammaMathematica.m
 
 gammaTest: gammaTest.c
-	$(CC) -o gammaTest gammaTest.c $(localCFLAGS)
+	$(CC) -o gammaTest gammaTest.c $(localCFLAGS) -lm
 
 incompleteGammaTest: incompleteGammaTest.c
-	$(CC) -o incompleteGammaTest incompleteGammaTest.c $(localCFLAGS)
+	$(CC) -o incompleteGammaTest incompleteGammaTest.c $(localCFLAGS) -lm
 
 gammaMathematica.m:
 	$(CC) $(CFLAGS) -o gammaMathematica gammaMathematica.c

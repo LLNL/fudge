@@ -79,7 +79,7 @@ except ImportError:
 setup( 
     name = 'fudge',
     #    version = fudge.__version__,\
-    version = '4.2.1',
+    version = '4.2.3.dev',
     author = 'Computational Nuclear Physics Group, LLNL',
     author_email  = 'mattoon1@llnl.gov',
     maintainer_email = 'mattoon1@llnl.gov',
@@ -90,31 +90,28 @@ setup(
         'fudge.core.math.test',
         'fudge.core.utilities',
         'fudge.core.utilities.test',
-        'fudge.gnd',
-        'fudge.gnd.channelData',
-        'fudge.gnd.covariances',
-        'fudge.gnd.covariances.test',
-        'fudge.gnd.differentialCrossSection',
-        'fudge.gnd.productData',
-        'fudge.gnd.productData.distributions',
-        'fudge.gnd.productData.distributions.test',
-        'fudge.gnd.reactionData',
-        'fudge.gnd.reactionData.test',
-        'fudge.gnd.reactions',
-        'fudge.gnd.test',
+        'fudge.gnds',
+        'fudge.gnds.channelData',
+        'fudge.gnds.covariances',
+        'fudge.gnds.covariances.test',
+        'fudge.gnds.productData',
+        'fudge.gnds.productData.distributions',
+        'fudge.gnds.productData.distributions.test',
+        'fudge.gnds.reactionData',
+        'fudge.gnds.reactionData.test',
+        'fudge.gnds.reactions',
+        'fudge.gnds.test',
         'fudge.legacy',
         'fudge.legacy.converting',
-        'fudge.legacy.converting.ENDFToGND',
+        'fudge.legacy.converting.ENDFToGNDS',
         'fudge.legacy.endl',
+        'fudge.legacy.endl.structure',
         'fudge.legacy.endl.test',
-        'fudge.particles',
-        'fudge.particles.test',
         'fudge.processing',
         'fudge.processing.deterministic',
         'fudge.processing.montecarlo',
         'fudge.processing.resonances',
         'fudge.processing.resonances.test',
-        'fudge.structure',
         'fudge.vis',
         'fudge.vis.gnuplot',
         'fudge.vis.matplotlib',
@@ -125,9 +122,9 @@ setup(
     ],
     package_data = {
         'fudge.legacy.endl.test': [ 'testdb/ascii/yi01/za001001/y*', 'testdb/ascii/yi01/za001001/*.txt', 'testdb/ascii/yi01/za001001/*xml' ],
-        'fudge.processing.resonances.test': ['*.endf', '*.py', '*.xml'],
+        'fudge.processing.resonances.test': ['*.py'],
         'fudge.legacy.endl': ['bdfls'],
-        'fudge.gnd.covariances.test': ['*.endf', '*.py', '*.xml'],
+        'fudge.gnds.covariances.test': ['*.py'],
     },
     ext_modules=[
         Extension( 'fudge.processing.resonances._getScatteringMatrices',
@@ -145,7 +142,7 @@ setup(
 
 # Also call the setup.py in externals packages
 curdir = os.path.realpath( os.curdir )
-for extension in ('numericalFunctions', 'crossSectionAdjustForHeatedTarget'):
+for extension in ('numericalFunctions', 'crossSectionAdjustForHeatedTarget'): #'Merced', 'statusMessageReporting'):
     os.chdir( extension )
     run_setup('setup.py', ['--quiet','build'])
     os.chdir( curdir )

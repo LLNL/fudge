@@ -3,7 +3,7 @@ from fudge.vis.matplotlib import plot2d
 from fudge.core.utilities.brb import banner, winged_banner
 from xData.table import blank
 from datatables import *
-from fudge.gnd.physicalQuantity import temperature
+from fudge.gnds.physicalQuantity import temperature
 from html import *
 from metrics import *
 from utils import *
@@ -266,7 +266,7 @@ def getEvaluationReport( rs, title=None, saveDoc=False ):
     if saveDoc: globalMetadata['ENDF documentation'] = rs.documentation['endfDoc']
     globalMetadata['Projectile frame'] = rs.getProjectileFrame()
     globalMetadata['Temperature'] = rs.getTemperature('eval')
-    globalMetadata['GND version'] = rs.GND_version
+    globalMetadata['GNDS version'] = rs.GNDS_version
     return globalMetadata
 
 
@@ -354,7 +354,7 @@ def getRRRReport( rs, title="RRR information" ):
         rrrReport["Upper bound"] = rs.resonances.resolved.domainMax
         rrrReport['Lower bound'] = rs.resonances.resolved.domainMin
         try:
-            resCls = RRReconstruct.getResonanceReconstructionClass(rs.resonances.resolved.evaluated.moniker)
+            resCls = RRReconstruct.getResonanceReconstructionClass(rs.resonances.resolved.evaluated)
             rrr = resCls(rs, None, enableAngDists=False, verbose=False)
             rrr.setResonanceParametersByChannel()
             rrrReport["Scattering length (R')"]=PQU.PQU(rrr.getScatteringLength()*10, "fm")
@@ -419,7 +419,7 @@ def getParticlePairsReport( rs, title="Particle Pairs" ):
     # Get the particle pairs
     if hasattr(rs.resonances, 'resolved') and rs.resonances.resolved is not None:
         import fudge.processing.resonances.reconstructResonances as RRReconstruct
-        resCls = RRReconstruct.getResonanceReconstructionClass(rs.resonances.resolved.evaluated.moniker)
+        resCls = RRReconstruct.getResonanceReconstructionClass(rs.resonances.resolved.evaluated)
         rrr = resCls(rs, None, enableAngDists=False, verbose=False)
         try:
             rrr.setResonanceParametersByChannel(warnOnly=True)
@@ -505,10 +505,10 @@ def getChannelPlots( rs, metricMenu, title="Channels", channelMatchFunction=lamb
 
     # get RRR parameter averages
     if hasattr(rs.resonances, 'resolved') and rs.resonances.resolved is not None:
-        resCls = RRReconstruct.getResonanceReconstructionClass(rs.resonances.resolved.evaluated.moniker)
+        resCls = RRReconstruct.getResonanceReconstructionClass(rs.resonances.resolved.evaluated)
         rrr = resCls(rs, None, enableAngDists=False, verbose=verbose)
         rrr.setResonanceParametersByChannel()
-        rrrAveQuant = rrr.getAverageQuantities(computeUncertainty=True, resonancesPerBin=50)
+        rrrAveQuant = rrr.getAverageQuantities(computeUncertainty=True, nBins=3) #resonancesPerBin=50)
     else:
         rrr = None
         rrrAveQuant = None
@@ -601,7 +601,7 @@ def getChannelPlots( rs, metricMenu, title="Channels", channelMatchFunction=lamb
                     XYs.xAxisIndex: ('Ex', 'eV')})
                 p = Plot(
                     title="Cummulative level distribution for %s channel" % get_key_from_channel(c),
-                    datasets=[XYs.XYs1d(data=theData, axes=theAxes, accuracy=1e-5, interpolation='flat')])
+                    datasets=[XYs.XYs1d(data=theData, axes=theAxes, interpolation='flat')])
                 p.doit()
 
     # GOE related diagnostics...
@@ -612,8 +612,8 @@ def getChannelPlots( rs, metricMenu, title="Channels", channelMatchFunction=lamb
                 if not channelMatchFunction(c): continue
                 if verbose: print winged_banner("PorterThomas for %s" % get_key_from_channel(c))
                 print rrrResults[c]['bin_edges'], rrrResults[c]['hist']
-                PD=grouped_values_to_XYs(rrrResults[c]['bin_edges'], rrrResults[c]['hist'], \
-                          domainUnit='', domainName='D/<D>', rangeUnit='', rangeName='P(D/<D>)', \
+                PD=grouped_values_to_XYs(rrrResults[c]['bin_edges'], rrrResults[c]['hist'],
+                          domainUnit='', domainName='D/<D>', rangeUnit='', rangeName='P(D/<D>)',
                           accuracy=upperEps, domainMin=0.0, domainMax=8.0)
                 p = Plot(title="Porter-Thomas analysis for %s channel" % get_key_from_channel(c), datasets=[PD])
                 p.doit()
@@ -649,7 +649,14 @@ def getChannelPlots( rs, metricMenu, title="Channels", channelMatchFunction=lamb
                 p.doit()
 
     if (hasattr(metricMenu, 'shiftPlot') and metricMenu.shiftPlot):
-        print NotImplementedError("shiftPlot: FIXME: it's probably a boring constant")
+        if rrr is not None:
+            for c in rrr.channels:
+                if not channelMatchFunction(c): continue
+                if verbose: print winged_banner("shiftPlot for %s" % get_key_from_channel(c))
+                phic = function_to_XYs(func=lambda E, x: rrr.shiftFactorByChannel(c, E), fpars={}, rangeUnit='',
+                                       rangeName='Channel shift factor, phi_c(E)')
+                p = Plot(title="Shift for %s channel" % get_key_from_channel(c), datasets=[phic])
+                p.doit()
 
     if (hasattr(metricMenu, 'backgroundXSPlot') and metricMenu.backgroundXSPlot):
         if verbose: print winged_banner("backgroundXSPlot")
@@ -710,10 +717,10 @@ def getChannelDataTable( rs, metricMenu, title="Channels", doURR=False, verbose=
 
     # get RRR parameter averages
     if hasattr(rs.resonances, 'resolved') and rs.resonances.resolved is not None:
-        resCls = RRReconstruct.getResonanceReconstructionClass(rs.resonances.resolved.evaluated.moniker)
+        resCls = RRReconstruct.getResonanceReconstructionClass(rs.resonances.resolved.evaluated)
         rrr = resCls(rs, None, enableAngDists=False, verbose=verbose)
         rrr.setResonanceParametersByChannel(warnOnly=True)
-        rrrAveQuant = rrr.getAverageQuantities(computeUncertainty=True, resonancesPerBin=50)
+        rrrAveQuant = rrr.getAverageQuantities(computeUncertainty=True)
     else:
         rrr = None
         rrrAveQuant = None
@@ -751,19 +758,19 @@ def getChannelDataTable( rs, metricMenu, title="Channels", doURR=False, verbose=
             updateColumnsAndRow(columnHeaders, data[key], icol, 'gfact', c.gfact, '')
             if False: updateColumnsAndRow(columnHeaders, data[key], icol, 'Q', -13, 'eV') #FIXME
             updateColumnsAndRow(columnHeaders, data[key], icol, 'Threshold E', c.Xi, 'eV')
-            updateColumnsAndRow(columnHeaders, data[key], icol, 'Eliminated?', c.eliminated, '')
-#            print data[key]
-#            print [x[0] for x in columnHeaders]
-            updateColumnsAndRow(columnHeaders, data[key], icol, 'Competative?', c.channelClass==RRReconstruct.COMPETATIVECHANNEL, '')
-            updateColumnsAndRow(columnHeaders, data[key], icol, 'Relativistic?', c.useRelativistic, '' )
-            if False: updateColumnsAndRow(columnHeaders, data[key], icol, 'Has background xs?s', False, '') #FIXME
-            if False: updateColumnsAndRow(columnHeaders, data[key], icol, 'B_c', False, '') #FIXME
+            updateColumnsAndRow(columnHeaders, data[key], icol, 'Eliminated?', str(c.eliminated), '')
+            updateColumnsAndRow(columnHeaders, data[key], icol, 'Competative?', str(c.channelClass==RRReconstruct.COMPETATIVECHANNEL), '')
+            updateColumnsAndRow(columnHeaders, data[key], icol, 'Relativistic?', str(c.useRelativistic), '' )
+            if False: updateColumnsAndRow(columnHeaders, data[key], icol, 'Has background xs?', str(False), '') #FIXME
+            if False: updateColumnsAndRow(columnHeaders, data[key], icol, 'B_c', str(False), '') #FIXME
             if not c.eliminated:
-                updateColumnsAndRow(columnHeaders, data[key], icol, 'Pot. scatt. only?', len([ x for x in rrr.allChannels[c] if rrr.allChannels[c][x]!=0.0])==0, '')
+                updateColumnsAndRow(columnHeaders, data[key], icol, 'Pot. scatt. only?', str(len([ x for x in rrr.allChannels[c] if rrr.allChannels[c][x]!=0.0])==0), '')
+            else: updateColumnsAndRow(columnHeaders, data[key], icol, 'Pot. scatt. only?', str(False), '')
         for c in rrrAveQuant:
             key=get_key_from_channel(c)
-            updateColumnsAndRow(columnHeaders, data[key], icol, 'RRR <D>', rrrAveQuant[c]['spacings'][0], 'eV')
-            updateColumnsAndRow(columnHeaders, data[key], icol, 'RRR <Gamma>', rrrAveQuant[c]['widths'][0], 'eV')
+ #           print rrrAveQuant[c]['spacings']
+            updateColumnsAndRow(columnHeaders, data[key], icol, 'RRR <D>', str(rrrAveQuant[c]['spacings'][0]), 'eV')
+            updateColumnsAndRow(columnHeaders, data[key], icol, 'RRR <Gamma>', str(rrrAveQuant[c]['widths'][0]), 'eV')
     if doURR and urr is not None:
         raise NotImplementedError("TODO: URR average extraction")
         for reaction in reactions:
@@ -787,7 +794,7 @@ def getChannelDataTable( rs, metricMenu, title="Channels", doURR=False, verbose=
             for c in rrrResults:
                 nu = PQU.PQU(rrrResults[c]['dof'], uncertainty=rrrResults[c]['ddof'])
                 key=get_key_from_channel(c)
-                updateColumnsAndRow(columnHeaders, data[key], icol, 'RRR DOF', nu, '')
+                updateColumnsAndRow(columnHeaders, data[key], icol, 'RRR DOF', str(nu), '')
         if doURR and urr is not None:
             raise NotImplementedError("TODO: URR average extraction")
             for reaction in reactions:
@@ -801,7 +808,7 @@ def getChannelDataTable( rs, metricMenu, title="Channels", doURR=False, verbose=
             Sc = rrr.getStrengthFunction(computeUncertainty=True)
             for c in Sc:
                 key=get_key_from_channel(c)
-                updateColumnsAndRow(columnHeaders, data[key], icol, 'RRR Sc', Sc[c], '')
+                updateColumnsAndRow(columnHeaders, data[key], icol, 'RRR Sc', str(Sc[c]), '')
 
     nCols=len(columnHeaders.values())
     tmpData=[]
@@ -811,9 +818,6 @@ def getChannelDataTable( rs, metricMenu, title="Channels", doURR=False, verbose=
             for icell in range(len(row),nCols): row.append(0)
             tmpData.append(row)
         else: tmpData.append(row)
-#    print tmpData, data.keys(), len(tmpData), len(data.keys())
-#    print len(columnHeaders.values()), len(tmpData[0])
-#    print map(str,columnHeaders.values())
     result = DataTable(data=tmpData, columns=columnHeaders.values(), rows=data.keys())
     result.title = title
     return result
@@ -875,7 +879,7 @@ def getReactionDataTable( rs, metricMenu, title="Reactions", MTList=[], useCovar
         if key not in columns: addColumn(columns,icol,key,unit=unit)
         row.append(val)
 
-    import fudge.gnd.reactions.reaction, fudge.gnd.sums
+    import fudge.gnds.reactions.reaction, fudge.gnds.sums
 
     # ---------------------------------
     #  Process each requested reaction
@@ -883,7 +887,7 @@ def getReactionDataTable( rs, metricMenu, title="Reactions", MTList=[], useCovar
     for r in rs:
 
         # Get rid of all reactions that are not plain reactions or sums of reactions (e.g. no fission components of production stuff)
-        if not isinstance(r, (fudge.gnd.reactions.reaction.reaction, fudge.gnd.sums.crossSectionSum)): continue
+        if not isinstance(r, (fudge.gnds.reactions.reaction.reaction, fudge.gnds.sums.crossSectionSum)): continue
 
         # Keep only the MT's we actually want to test
         mt = r.ENDF_MT
@@ -926,7 +930,7 @@ def getReactionDataTable( rs, metricMenu, title="Reactions", MTList=[], useCovar
         # Window average
         if hasattr(metricMenu, 'windowCenter') and hasattr(metricMenu, 'windowWidth') and metricMenu.windowCenter and metricMenu.windowWidth:
             window=computeAverageOverWindow( r.crossSection, PQU.PQU(metricMenu.windowCenter,unit='keV'), PQU.PQU(metricMenu.windowWidth,unit='keV'), useCovariance=useCovariance )
-            updateColumnsAndRow(columnHeaders, row, icol, 'Ave. over %s+/-%s keV'%(str(metricMenu.windowCenter), str(metricMenu.windowWidth)), window, window.unit)
+            updateColumnsAndRow(columnHeaders, row, icol, 'Ave. over %s+/-%s keV'%(str(metricMenu.windowCenter), str(metricMenu.windowWidth/2.0)), window, window.unit)
 
         # User defined spectrum average
         if hasattr(metricMenu, 'userDefinedSpecAve') and metricMenu.userDefinedSpecAve:
@@ -1152,18 +1156,22 @@ class OtherReport(Report):
 # -------------------------------------------------------------------------------
 
 if __name__=="__main__":
-    import unittest
-    from fudge.gnd import reactionSuite
+    import unittest, sys
+    from fudge.gnds import reactionSuite
     from xData.isclose import isclose
 
     TEST_DATA_PATH, this_filename = os.path.split(os.path.realpath(__file__))
     TEST_DATA_PATH += '/testData/'
-    VERBOSE = False
+    VERBOSE = '-v' in sys.argv or '--verbose' in sys.argv
+    DOPLOTS = '-p' in sys.argv or '--plots' in sys.argv
+    if DOPLOTS:
+        if '-p' in sys.argv: sys.argv.remove('-p')
+        if '--plots' in sys.argv: sys.argv.remove('--plots')
 
     if VERBOSE: print 'reading test data...'
-    H1TestData = reactionSuite.readXML(open(TEST_DATA_PATH + os.sep + 'n-001_H_001.endf.gnd.xml'))
-    Fe56TestData = reactionSuite.readXML(open(TEST_DATA_PATH + os.sep + 'n-026_Fe_056.endf.gnd.xml'))
-    U241TestData = reactionSuite.readXML(open(TEST_DATA_PATH + os.sep + 'n-092_U_241.endf.gnd.xml'))
+    H1TestData = reactionSuite.readXML(open(TEST_DATA_PATH + os.sep + 'n-001_H_001.endf.gnds.xml'))
+    Fe56TestData = reactionSuite.readXML(open(TEST_DATA_PATH + os.sep + 'n-026_Fe_056.endf.gnds.xml'))
+    U241TestData = reactionSuite.readXML(open(TEST_DATA_PATH + os.sep + 'n-092_U_241.endf.gnds.xml'))
 
 
     class TestCaseWithExtras(unittest.TestCase):
@@ -1230,8 +1238,8 @@ if __name__=="__main__":
 
         def test_getEvaluationReport(self):
             self.maxDiff = None
-            self.assertJSONEqual( getEvaluationReport(Fe56TestData, title='n-026_Fe_056.endf.gnd.xml').text_report(), '''{
-    "n-026_Fe_056.endf.gnd.xml": {
+            self.assertJSONEqual( getEvaluationReport(Fe56TestData, title='n-026_Fe_056.endf.gnds.xml').text_report(), '''{
+    "n-026_Fe_056.endf.gnds.xml": {
         "Authors": "IAEA Consortium",
         "Lab": "IAEA",
         "Evaluation date": "2016-03-22",
@@ -1241,7 +1249,7 @@ if __name__=="__main__":
         "Compound nucleus": "Fe57",
         "Projectile frame": "lab",
         "Temperature": "0. K",
-        "GND version": "GND 1.8"
+        "GNDS version": "GNDS 1.8"
     }
 }''' )
 
@@ -1400,9 +1408,9 @@ if __name__=="__main__":
     }
 }""" )
 
-        @unittest.skip("Need to discuss what channels should be there now that LRF=3 translated into GND analog of LRF=7")
+        #@unittest.skip("Need to discuss what channels should be there now that LRF=3 translated into GNDS analog of LRF=7")
         def test_getChannelDataTable(self):
-            #self.maxDiff=None
+            self.maxDiff=None
             metricMenu=collections.namedtuple('metricMenu','effectiveDOF strengthFunction poleStrengthPlot scatteringRadiusPlot PorterThomas staircasePlot aveSpacingPlot aveWidthPlot shiftPlot penetrabilityPlot phasePlot DysonMehtaDelta3 transmissionCoeff')
             x = getChannelDataTable(Fe56TestData, metricMenu(effectiveDOF=True,
                                                              strengthFunction=True,
@@ -1434,18 +1442,18 @@ capture (j=2.5,l=2,s=0.5)             56                      0   3.0         0.
 elastic (j=2.5,l=3,s=0.5)              0                      0   3.0         0.0       False        False         False              True                    0                                  0             1.                   -1
 elastic (j=3.5,l=3,s=0.5)              0                      0   4.0         0.0       False        False         False              True                    0                                  0             1.                   -1''')
 
-        @unittest.skip("Not really a unit test, really more of an interactive test")
+        @unittest.skipIf(not DOPLOTS,"Not really a unit test, really more of an interactive test")
         def test_getChannelPlots(self):
             metricMenu = collections.namedtuple('metricMenu',
                                                 'poleStrengthPlot scatteringRadiusPlot PorterThomas staircasePlot aveSpacingPlot aveWidthPlot backgroundXSPlot penetrabilityPlot shiftPlot phasePlot DysonMehtaDelta3 spacingDistributionPlot transmissionCoeff')
             def channelMatchFunction(c): return True #return not c.eliminated and int(2.*c.J)==1 and c.l==0 and c.channelClass == 1
             getChannelPlots(Fe56TestData, metricMenu( poleStrengthPlot=False,
                                                       scatteringRadiusPlot=False,
-                                                      PorterThomas=True,
+                                                      PorterThomas=False,
                                                       staircasePlot=False,
                                                       aveSpacingPlot=False,
                                                       aveWidthPlot=False,
-                                                      backgroundXSPlot=False,
+                                                      backgroundXSPlot=True,
                                                       penetrabilityPlot=False,
                                                       shiftPlot=False,
                                                       phasePlot=False,

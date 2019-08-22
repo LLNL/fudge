@@ -67,39 +67,22 @@ This module contains the product classes.
 
 import abc
 
-from xData import ancestry as ancestryModule
-
+from .. import misc as miscModule
 from .. import suite as suiteModule
 
-class product( ancestryModule.ancestry ) :
+class product( miscModule.classWithLabelKey ) :
 
     moniker = 'product'
 
     def __init__( self, label, pid ) :
 
-        ancestryModule.ancestry.__init__( self )
+        miscModule.classWithLabelKey.__init__( self, label )
 
         if( not( isinstance( label, str ) ) ) : raise TypeError( 'label not str' )
         self.__label = label
 
         if( not( isinstance( pid, str ) ) ) : raise TypeError( 'pid not str' )
         self.__pid = pid
-
-    @property
-    def key( self ) :
-
-        return( self.__label )
-
-    @key.setter
-    def key( self, value ) :
-
-        if( not( isinstance( value, str ) ) ) : raise TypeError( 'label must be a string instance.' )
-        self.__label = value
-
-    @property
-    def label( self ) :
-
-        return( self.__label )
 
     @property
     def pid( self ) :
@@ -130,6 +113,16 @@ class product( ancestryModule.ancestry ) :
         xPath.pop( )
         return( self )
 
+    @classmethod
+    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+
+        xPath.append( element.tag )
+        self = cls( element.attrib['label'], element.attrib['pid'] )
+        xPath.pop( )
+
+        self.parseXMLNode( element, xPath, linkData )
+        return( self )
+
 class suite( suiteModule.suite ) :
 
     moniker = 'products'
@@ -140,11 +133,11 @@ class suite( suiteModule.suite ) :
 
     def parseXMLNode( self, element, xPath, linkData ) :
 
+        if( element is None ) : return
         xPath.append( element.tag )
 
         for child in element :
-            _product = product( child.attrib['label'], child.attrib['pid'] )
-            self.add( _product.parseXMLNode( child, xPath, linkData ) )
+            self.add( product.parseXMLNodeAsClass( child, xPath, linkData ) )
 
         xPath.pop( )
         return( self )

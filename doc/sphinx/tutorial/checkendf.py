@@ -64,7 +64,7 @@
 # <<END-copyright>>
 
 import argparse
-from fudge.legacy.converting.endfFileToGND import endfFileToGND
+from fudge.legacy.converting.endfFileToGNDS import endfFileToGNDS
 
 # Process command line options
 parser = argparse.ArgumentParser(description='Check and ENDF file')
@@ -72,7 +72,7 @@ parser.add_argument('inFile', type=str, help='The ENDF file you want to translat
 args = parser.parse_args()
 
 # Now translate
-rce = endfFileToGND( args.inFile, toStdOut=True, skipBadData=True )
+rce = endfFileToGNDS( args.inFile, toStdOut=True, skipBadData=True )
 myEval, myCov = rce['reactionSuite'], rce['covarianceSuite']
 print '\n\n'
 

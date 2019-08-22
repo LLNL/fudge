@@ -71,10 +71,10 @@ from xData import series1d as series1dModule
 
 from fudge.core.utilities import brb
 
-from fudge.gnd.productData.distributions import angular as angularModule
+from fudge.gnds.productData.distributions import angular as angularModule
 
 from ... import endfFormats as endfFormatsModule
-from ... import gndToENDF6 as gndToENDF6Module
+from ... import gndsToENDF6 as gndsToENDF6Module
 
 #
 # form
@@ -144,7 +144,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
                 return      # recoil partners only get written to file 6
             LI, LTT, MF4 = angularSubform.toENDF6( flags, targetInfo )
             MF = 6
-        elif( isinstance( angularSubform, angularModule.isotropic ) ) :
+        elif( isinstance( angularSubform, angularModule.isotropic2d ) ) :
             LI, LTT, MF4 = angularSubform.toENDF6( flags, targetInfo )
             MF = 4
             if( doMF4AsMF6 ) : MF = 6
@@ -160,7 +160,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
                 LAW = 4
             else :
                 raise Exception( 'LTT = %s needs a LAW' % LTT )
-            gndToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, frame, MF4 )
+            gndsToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, frame, MF4 )
         else :
             LCT = { standardsModule.frames.labToken : 1, standardsModule.frames.centerOfMassToken : 2 }[frame]
             if( MT not in endfMFList[MF] ) : endfMFList[MF][MT] = []
@@ -168,7 +168,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
             endfMFList[MF][MT] += [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'],  0, LTT, 0, 0 ),
                                   endfFormatsModule.endfHeadLine(                0, targetInfo['mass'], LI, LCT, 0, NM ) ] + MF4
     else :
-        print 'WARNING: subform %s does not have method toENDF6 for form %s' % ( targetInfo['style'], self.moniker )
+        print( 'WARNING: subform %s does not have method toENDF6 for form %s' % ( targetInfo['style'], self.moniker ) )
 
 angularModule.form.toENDF6 = toENDF6
 angularModule.twoBodyForm.toENDF6 = toENDF6
@@ -179,7 +179,7 @@ def toAngularPointwise( angularSubform, targetInfo, insertSENDL ) :
 
     def angularPointwiseEnergy2ENDF6( self, targetInfo ) :
 
-        interpolation = gndToENDF6Module.gndToENDFInterpolationFlag( self.interpolation )
+        interpolation = gndsToENDF6Module.gndsToENDFInterpolationFlag( self.interpolation )
         energy_in_eV = self.value * energyConversionFactor
         if( targetInfo['doMF4AsMF6'] ) :
             ENDFDataList = [ endfFormatsModule.endfContLine( 0, energy_in_eV, interpolation + 10, 0, 2 * len( self ), len( self ) ) ]
@@ -190,7 +190,7 @@ def toAngularPointwise( angularSubform, targetInfo, insertSENDL ) :
         return( ENDFDataList )
 
     ENDFDataList = [ endfFormatsModule.endfContLine( 0, 0, 0, 0, 1, len( angularSubform ) ) ]
-    interpolation = ( gndToENDF6Module.gndToENDFInterpolationFlag( angularSubform.interpolation ) )
+    interpolation = ( gndsToENDF6Module.gndsToENDFInterpolationFlag( angularSubform.interpolation ) )
     ENDFDataList += endfFormatsModule.endfInterpolationList( [ len( angularSubform ), interpolation ] )
     start = 0
     if( targetInfo.get( 'skipFirstEnergy' ) ) : start = 1
@@ -202,7 +202,7 @@ def toAngularLegendre( angularSubform, targetInfo, insertSENDL ) :
     """This should only be called from this module."""
 
     NM = 0
-    interpolation = gndToENDF6Module.gndToENDFInterpolationFlag( angularSubform.interpolation )
+    interpolation = gndsToENDF6Module.gndsToENDFInterpolationFlag( angularSubform.interpolation )
     energyConversionFactor = PQUModule.PQU(1, angularSubform.axes[-1].unit ).getValueAs('eV')
     ENDFDataList = []
     start = 0
@@ -225,7 +225,7 @@ def toENDF6( self, flags, targetInfo ) :
     if( not( targetInfo['doMF4AsMF6'] ) ) : ENDFDataList.append( endfFormatsModule.endfSENDLineNumber( ) )
     return( 1, 0, ENDFDataList )
 
-angularModule.isotropic.toENDF6 = toENDF6
+angularModule.isotropic2d.toENDF6 = toENDF6
 
 #
 # forward
@@ -251,14 +251,14 @@ angularModule.recoil.toENDF6 = toENDF6
 def toENDF6( self, flags, targetInfo ) :
 
     ENDFDataList = [ endfFormatsModule.endfContLine( 0, 0, 0, 0, 1, len( self ) ) ]
-    interpolation = gndToENDF6Module.gndToENDF2PlusDInterpolationFlag( self.interpolation, self.interpolationQualifier )
+    interpolation = gndsToENDF6Module.gndsToENDF2PlusDInterpolationFlag( self.interpolation, self.interpolationQualifier )
     ENDFDataList += endfFormatsModule.endfInterpolationList( [ len( self ), interpolation ] )
     EInFactor = PQUModule.PQU( 1, self.axes[-1].unit ).getValueAs( 'eV' )
     for energy_in in self : 
         if( isinstance( energy_in, XYsModule.XYs1d ) ) :
-            ENDFDataList += gndToENDF6Module.angularPointwiseEnergy2ENDF6( energy_in, targetInfo, EInFactor )
+            ENDFDataList += gndsToENDF6Module.angularPointwiseEnergy2ENDF6( energy_in, targetInfo, EInFactor )
         elif( isinstance( energy_in, series1dModule.LegendreSeries ) ) :
-            ENDFDataList += gndToENDF6Module.angularLegendreEnergy2ENDF6( energy_in, targetInfo, EInFactor )
+            ENDFDataList += gndsToENDF6Module.angularLegendreEnergy2ENDF6( energy_in, targetInfo, EInFactor )
         else :
             raise 'hell - fix me'
     if( not( targetInfo['doMF4AsMF6'] ) ) : ENDFDataList.append( endfFormatsModule.endfSENDLineNumber( ) )

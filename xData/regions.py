@@ -218,6 +218,13 @@ class regions( baseModule.xDataFunctional ) :
         return( self.regions[-1].domainMax )
 
     @property
+    def domainGrid( self ) :
+
+        grid = set()
+        for region in self: grid.update( region.domainGrid )
+        return sorted( grid )
+
+    @property
     def domainUnit( self ) :
 
         return( self.getAxisUnitSafely( self.dimension ) )
@@ -233,10 +240,11 @@ class regions( baseModule.xDataFunctional ) :
                                        else only existing points in the range [domainMin, domainMax] are included.
         :param dullEps:     [optional] (Currently not implemented) the lower and upper points are dulled, default is 0.
         """
+
         if( domainMin is None ) : domainMin = self.domainMin
         domainMin = max( domainMin, self.domainMin )
         if( domainMax is None ) : domainMax = self.domainMax
-        domainMax = min( domainMin, self.domainMax )
+        domainMax = min( domainMax, self.domainMax )
 
         for ridx1, region in enumerate( self ) :
             if( region.domainMax  > domainMin ) : break
@@ -276,6 +284,19 @@ class regions( baseModule.xDataFunctional ) :
 
         if( unitTo is None ) : return( 1. )
         return( PQUModule.PQU( '1 ' + self.rangeUnit ).getValueAs( unitTo ) )
+
+    def evaluate( self, domainValue ) :
+        """
+        Evaluate function at requested domain point. If at discontinuity, return upper region's value.
+
+        :param domainValue:
+        :return interpolated point at domainValue:
+        """
+
+        for region in self.regions :
+            if( domainValue < region.domainMax ) : return( region.evaluate( domainValue ) )
+
+        return( self.regions[-1].evaluate( domainValue ) )  # Domain value is above the last region. Let the last region determine what to do.
 
     def integrate( self, **limits ):
         """
@@ -320,7 +341,7 @@ class regions( baseModule.xDataFunctional ) :
         if self.isPrimaryXData( ) :
             if( self.axes is not None ) : XMLList += self.axes.toXMLList( indent2, **kwargs )
         for region in self.regions : XMLList += region.toXMLList( indent2, **kwargs )
-        if( self.uncertainties ) : XMLList += self.uncertainties.toXMLList( indent2, **kwargs )
+        if( self.uncertainty ) : XMLList += self.uncertainty.toXMLList( indent2, **kwargs )
         XMLList[-1] += '</%s>' % self.moniker
         return( XMLList )
 
@@ -338,13 +359,13 @@ class regions( baseModule.xDataFunctional ) :
         label = element.get( 'label', None )
 
         regions = cls( axes = axes, index = index, value = value, label = label )
-        uncertainties = None
+        uncertainty = None
 
         for child in element :
             if( child.tag == 'axes' ) :
                 continue
-            elif( child.tag == 'uncertainties' ) :
-                uncertainties = uncertaintiesModule.uncertainties.parseXMLNode( child, xPath, linkData )
+            elif( child.tag == 'uncertainty' ) :
+                uncertainty = uncertaintiesModule.uncertainty.parseXMLNode( child, xPath, linkData )
                 continue
             else :
                 subElementClass = None
@@ -354,8 +375,8 @@ class regions( baseModule.xDataFunctional ) :
                         break
                 if( subElementClass is None ) : raise TypeError( 'unknown sub-element "%s" in element "%s"' % ( child.tag, cls.moniker ) )
                 regions.append( subElementClass.parseXMLNode( child, xPath, linkData, axes = axes, **kwargs ) )
-# FIXME, Should set regions.uncertainties in method
-        if( uncertainties is not None ) : regions.uncertainties = uncertainties
+# FIXME, Should set regions.uncertainty in method
+        if( uncertainty is not None ) : regions.uncertainty = uncertainty
 
         xPath.pop( )
         return regions
@@ -542,7 +563,18 @@ class regions1d( regions ) :
 
         return( ( XYsModule.XYs1d, series1dModule.series ) )
 
-class regions2d( regions ) :
+class regionsMultiD( regions ) :
+
+    __metaclass__ = abc.ABCMeta
+
+    def getBoundingSubFunctions( self, domainValue ) :
+
+        for region in self.regions :
+            if( domainValue < region.domainMax ) : return( region.getBoundingSubFunctions( domainValue ) )
+
+        return( self.regions[-1].getBoundingSubFunctions( domainValue ) )  # Domain value is above the last region. Let the last region determine what to do.
+
+class regions2d( regionsMultiD ) :
 
     moniker = 'regions2d'
     dimension = 2
@@ -556,7 +588,7 @@ class regions2d( regions ) :
 
         return( ( multiD_XYsModule.XYs2d, ) )
 
-class regions3d( regions ) :
+class regions3d( regionsMultiD ) :
 
     moniker = 'regions3d'
     dimension = 3

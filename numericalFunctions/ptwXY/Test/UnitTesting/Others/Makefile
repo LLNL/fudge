@@ -64,14 +64,12 @@
 SMR_PATH = ../../../../../statusMessageReporting
 NUMERICALFUNCTIONS_PATH = ../../../..
 
-CC = gcc
-CDEBUGFLAGS = -g -O0 -Wall
 ptwXYCFLAGS = -lnfut_utilities -lptwXY_utilities \
 			  -I$(NUMERICALFUNCTIONS_PATH)/include -L$(NUMERICALFUNCTIONS_PATH)/lib -lnumericalfunctions \
               -I$(SMR_PATH)/include -L$(SMR_PATH)/lib -lstatusMessageReporting
-localCFLAGS = $(CDEBUGFLAGS) $(CFLAGS) $(ptwXYCFLAGS) -lm
+localCFLAGS = $(CFLAGS) $(ptwXYCFLAGS)
 
-TARGETS = xArray clip trim dullEdges mutualify mod areDomainsMutual mergeClosePoints copy
+TARGETS = xArray clip trim dullEdges mutualify mod areDomainsMutual mergeClosePoints copy clone ysMappedToXs
 
 .PHONY: default check clean realclean $(TARGETS)
 
@@ -103,6 +101,12 @@ mergeClosePoints: mergeClosePoints.c
 
 copy: copy.c
 	$(CC) -o copy copy.c $(localCFLAGS) -lm
+
+clone: clone.c
+	$(CC) -o clone clone.c $(localCFLAGS) -lm
+
+ysMappedToXs: ysMappedToXs.c
+	$(CC) -o ysMappedToXs ysMappedToXs.c $(localCFLAGS) -lm
 
 check: default
 	for f in $(TARGETS); do ./$$f $(CHECKOPTIONS); done

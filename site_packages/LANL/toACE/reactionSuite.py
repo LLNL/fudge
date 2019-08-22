@@ -65,28 +65,28 @@
 This module adds the method toACE to the reactionSuite class.
 """
 
-from fudge.gnd import reactionSuite as reactionSuiteModule
+from fudge.gnds import styles as stylesModule
+from fudge.gnds import reactionSuite as reactionSuiteModule
 
-def toACE( self, fileName, evaluationId, temperature, addAnnotation = False, verbose = 0 ) :
+def toACE( self, styleName, fileName, evaluationId, addAnnotation = False, verbose = 0 ) :
     """
     Produce an ACE file with data from self.
 
-    :param str fileName: path to save resulting ACE file
+    :param styleName: The name of the griddedCrossSection style whose data are to be translated to ACE.
+    :param str fileName: path to save resulting ACE file.
     :param int evaluationId:  evaluation identifier, 2 digits max.
         That is the 'nn' in the HZ string 'ZZZAAA.nnC'
-    :param temperature: The temperature to heat the cross section data to for the ACE file.
-        This parameter can be either a PQU, or a string that can be converted to PQU.
-        Both energy and temperature units are supported (i.e., '300 K' or '0.025 eV')
     :type temperature: PQU or string
     :param bool addAnnotation: if True, adds comments to help navigate the resulting ACE file
     """
 
-    from . import gndToACE
+    from . import gndsToACE
 
     if( verbose > 0 ) : print self.inputParticlesToReactionString( )
-    data = []
-    EMin = min( [ reaction.domainMin for reaction in self.reactions ] )
-    for reaction in self.reactions : reaction.toACE( temperature, EMin, data, verbose )
-    gndToACE.toACE( self, fileName, evaluationId, temperature, data, addAnnotation = addAnnotation )
+
+    cdf_style = self.styles[styleName].findDerivedFromStyle( stylesModule.MonteCarlo_cdf )
+    ACE_data = []
+    for reaction in self.reactions : reaction.toACE( styleName, cdf_style, ACE_data, verbose )
+    gndsToACE.toACE( self, styleName, fileName, evaluationId, ACE_data, addAnnotation = addAnnotation )
 
 reactionSuiteModule.reactionSuite.toACE = toACE

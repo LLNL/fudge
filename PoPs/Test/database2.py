@@ -67,6 +67,8 @@ import random
 
 from PoPs import database as databaseModule
 
+from PoPs.groups import misc as chemicalElementMiscModule
+
 from PoPs.quantities import quantity as quantityModule
 from PoPs.quantities import mass as massModule
 from PoPs.quantities import spin as spinModule
@@ -77,35 +79,30 @@ from PoPs.quantities import nuclearEnergyLevel as nuclearEnergyLevelModule
 
 from PoPs.families import gaugeBoson as gaugeBosonModule
 
-from PoPs.families import nucleus as nucleusModule
-from PoPs.families import nuclearLevel as nuclearLevelModule
+from PoPs.families import nuclide as nuclideModule
 
 from PoPs.groups import isotope as isotopeModule
 from PoPs.groups import chemicalElement as chemicalElementModule
 
 database = databaseModule.database( 'test', '1.2.3' )
 
-O16Data = { '0' : [ 15.99491461956, 0,       None, None, None, None ],
-            '1' : [           None, 6049400, None, None, None, None ],
-            '2' : [           None, 6129893, None, None, None, None ],
-            '3' : [           None, 6917100, None, None, None, None ] }
+O16Data = { 0 : [ 15.99491461956, 0,       None, None, None, None ],
+            1 : [           None, 6049400, None, None, None, None ],
+            2 : [           None, 6129893, None, None, None, None ],
+            3 : [           None, 6917100, None, None, None, None ] }
 
 
-symbol = chemicalElementModule.symbolFromZ[8]
-for A, data in [ [ '17', O16Data ], [ '16', O16Data ] ] :
-    isotopeID = isotopeModule.isotopeIDFromElementIDAndA( symbol, A )
+symbol = chemicalElementMiscModule.symbolFromZ[8]
+for A, data in [ [ 17, O16Data ], [ 16, O16Data ] ] :
+    isotopeID = chemicalElementMiscModule.isotopeSymbolFromChemicalElementIDAndA( symbol, A )
     keys = random.sample( [ key for key in data ], len( data ) )
     for index in keys :
         mass, energy, charge, halflife, spin, parity = data[index]
 
-        name = nucleusModule.nucleusNameFromNucleusNameAndIndex( isotopeID, index )
-        nucleus = nucleusModule.particle( name, index )
+        name = chemicalElementMiscModule.nuclideIDFromIsotopeSymbolAndIndex( isotopeID, index )
+        level = nuclideModule.particle( name )
         energy = nuclearEnergyLevelModule.double( 'base', energy, quantityModule.stringToPhysicalUnit( 'keV' ) )
-        nucleus.energy.add( energy )
-
-        name = nucleusModule.levelNameFromIsotopeNameAndIndex( isotopeID, index )
-        level = nuclearLevelModule.particle( name, nucleus )
-
+        level.nucleus.energy.add( energy )
 
         if( mass is not None ) :
             mass = massModule.double( 'base', mass, quantityModule.stringToPhysicalUnit( 'amu' ) )
@@ -149,7 +146,7 @@ photon.parity.add( parity )
 database.add( photon )
 
 print database['photon']
-print database['O']
+print database.chemicalElements.getSymbol( 'O' )
 print database['O16']
 print database['O16_e2']
 try :

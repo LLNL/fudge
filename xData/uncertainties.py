@@ -75,6 +75,7 @@
 
 __metaclass__ = type
 
+import ancestry as ancestryModule
 import base as baseModule
 import link as linkModule
 import XYs as XYsModule
@@ -197,8 +198,57 @@ class uncertainty( baseModule.xDataCoreMembers ):
             linkModule.link.moniker: linkModule.link,
             XYsModule.XYs1d.moniker: XYsModule.XYs1d,
             series1dModule.polynomial1d.moniker: series1dModule.polynomial1d,
+            covariance.moniker: covariance,
+            listOfCovariances.moniker: listOfCovariances,
         }.get( element[0].tag )
         kwargs['functional'] = functionalClass.parseXMLNode( element[0], xPath, linkData )
         uncertainty_ = uncertainty( **kwargs )
         xPath.pop()
         return uncertainty_
+
+
+class covariance(linkModule.link):
+
+    moniker = 'covariance'
+
+class listOfCovariances(ancestryModule.ancestry):
+
+    moniker = 'listOfCovariances'
+
+    def __init__(self):
+        ancestryModule.ancestry.__init__(self)
+        self.__items = []
+
+    def __getitem__(self, item):
+        return self.__items[item]
+
+    def add(self, obj):
+        if not isinstance(obj, covariance):
+            raise TypeError("Expected covariance instance, got '%s'" % type(obj))
+        obj.setAncestor(self)
+        obj.label = 'cov%d' % len(self.__items)
+        self.__items.append(obj)
+
+    def toXMLList(self, indent='', **kwargs):
+
+        indent2 = indent + kwargs.get('incrementalIndent','  ')
+        xml = ['%s<%s>' % (indent, self.moniker)]
+        for item in self:
+            xml += item.toXMLList(indent2, **kwargs)
+        xml[-1] += '</%s>' % self.moniker
+
+        return xml
+
+    @classmethod
+    def parseXMLNode(cls, element, xPath, linkData):
+
+        xPath.append(element.tag)
+        CL = cls()
+        for child in element:
+            covClass = {
+                covariance.moniker: covariance
+            }.get( child.tag )
+            CL.add( covClass.parseXMLNode(child, xPath, linkData) )
+
+        xPath.pop()
+        return CL

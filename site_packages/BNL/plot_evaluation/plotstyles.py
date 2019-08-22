@@ -289,9 +289,9 @@ DEFAULT_STYLE_DICT = {
             "lineColor":"k", 
             "lineWidth":2,
             "errorColor":"k"},
-        "GNDFile": {
-            "filePattern":"*.gnd.xml",
-            "legend":"GND, 0 K",
+        "GNDSFile": {
+            "filePattern":"*.gnds.xml",
+            "legend":"GNDS, 0 K",
             "lineStyle":"-", 
             "lineColor":"b", 
             "lineWidth":2,
@@ -534,6 +534,4 @@ if __name__=="__main__":
             self.assertEqual( readUserStyles( styleFileName ), self.userdefs )
             os.remove(styleFileName)
 
-    
     unittest.main()
-    

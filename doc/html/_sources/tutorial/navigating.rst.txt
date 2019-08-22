@@ -7,21 +7,71 @@ How to find data within a ``reactionSuite``
 The Fudge reactionSuite and covarianceSuite classes are meant to reflect the GNDS data hierarchy.
 Finding data within them is often just a matter of using the same name as appears in GNDS.  For example,
 
-    >>> from fudge.gnd import reactionSuite
-    >>> RS = reactionSuite.readXML("path_to_GND_file.xml")
+    >>> from fudge.gnds import reactionSuite
+    >>> RS = reactionSuite.readXML("path_to_GNDS_file.xml")
     >>> elastic = RS.getReaction("elastic")
     >>> elastic
-    <fudge.gnd.reactions.reaction.reaction object at 0x1020dc590>
+    <fudge.gnds.reactions.reaction.reaction object at 0x1020dc590>
     >>> elastic.crossSection
-    <fudge.gnd.reactionData.crossSection.component object at 0x10220dcd0>
+    <fudge.gnds.reactionData.crossSection.component object at 0x10220dcd0>
     >>> elastic.outputChannel.Q
-    <fudge.gnd.channelData.Q.component object at 0x10212a0d0>
+    <fudge.gnds.channelData.Q.component object at 0x10212a0d0>
     >>> elastic.outputChannel.products
-    <fudge.gnd.product.products object at 0x102608e10>
+    <fudge.gnds.product.products object at 0x102608e10>
     >>> elastic.outputChannel.products[0].multiplicity
-    <fudge.gnd.productData.multiplicity.component object at 0x102610310>
+    <fudge.gnds.productData.multiplicity.component object at 0x102610310>
     >>> elastic.outputChannel.products[0].distribution
-    <fudge.gnd.productData.distributions.distribution.component object at 0x1026103d0>
+    <fudge.gnds.productData.distributions.distribution.component object at 0x1026103d0>
+
+The 'getReaction' method of reactionSuite provides a simple way to search for a desired reaction.
+In addition to strings like "elastic", "fission" or "n + Fe56_e3" (to search for a reaction that emits a neutron
+plus an Fe56 atom with the nucleus in its third excited state),  getReaction also accepts ENDF MT numbers.
+
+Within a reaction, data like the cross section, list of products, product multiplicity and distribution information
+can all be accessed by using (hopefully) intuitive names. Note, however, that the results are not lists of actual data,
+instead they are instances of Fudge classes like
+Finding data within them is often just a matter of using the same name as appears in GNDS.  For example,
+
+    >>> from fudge.gnds import reactionSuite
+    >>> RS = reactionSuite.readXML("path_to_GNDS_file.xml")
+    >>> elastic = RS.getReaction("elastic")
+    >>> elastic
+    <fudge.gnds.reactions.reaction.reaction object at 0x1020dc590>
+    >>> elastic.crossSection
+    <fudge.gnds.reactionData.crossSection.component object at 0x10220dcd0>
+    >>> elastic.outputChannel.Q
+    <fudge.gnds.channelData.Q.component object at 0x10212a0d0>
+    >>> elastic.outputChannel.products
+    <fudge.gnds.product.products object at 0x102608e10>
+    >>> elastic.outputChannel.products[0].multiplicity
+    <fudge.gnds.productData.multiplicity.component object at 0x102610310>
+    >>> elastic.outputChannel.products[0].distribution
+    <fudge.gnds.productData.distributions.distribution.component object at 0x1026103d0>
+
+The 'getReaction' method of reactionSuite provides a simple way to search for a desired reaction.
+In addition to strings like "elastic", "fission" or "n + Fe56_e3" (to search for a reaction that emits a neutron
+plus an Fe56 atom with the nucleus in its third excited state),  getReaction also accepts ENDF MT numbers.
+
+Within a reaction, data like the cross section, list of products, product multiplicity and distribution information
+can all be accessed by using (hopefully) intuitive names. Note, however, that the results are not lists of actual data,
+instead they are instances of Fudge classes like
+Finding data within them is often just a matter of using the same name as appears in GNDS.  For example,
+
+    >>> from fudge.gnds import reactionSuite
+    >>> RS = reactionSuite.readXML("path_to_GNDS_file.xml")
+    >>> elastic = RS.getReaction("elastic")
+    >>> elastic
+    <fudge.gnds.reactions.reaction.reaction object at 0x1020dc590>
+    >>> elastic.crossSection
+    <fudge.gnds.reactionData.crossSection.component object at 0x10220dcd0>
+    >>> elastic.outputChannel.Q
+    <fudge.gnds.channelData.Q.component object at 0x10212a0d0>
+    >>> elastic.outputChannel.products
+    <fudge.gnds.product.products object at 0x102608e10>
+    >>> elastic.outputChannel.products[0].multiplicity
+    <fudge.gnds.productData.multiplicity.component object at 0x102610310>
+    >>> elastic.outputChannel.products[0].distribution
+    <fudge.gnds.productData.distributions.distribution.component object at 0x1026103d0>
 
 The 'getReaction' method of reactionSuite provides a simple way to search for a desired reaction.
 In addition to strings like "elastic", "fission" or "n + Fe56_e3" (to search for a reaction that emits a neutron
@@ -30,7 +80,7 @@ plus an Fe56 atom with the nucleus in its third excited state),  getReaction als
 Within a reaction, data like the cross section, list of products, product multiplicity and distribution information
 can all be accessed by using (hopefully) intuitive names. Note, however, that the results are not lists of actual data,
 instead they are instances of Fudge classes like ``crossSection.component``, ``Q.component``, ``distribution.component``,
-etc.  This reflects the basic design of GND: each physical quantity can potentially contain more than one form of data
+etc.  This reflects the basic design of GNDS: each physical quantity can potentially contain more than one form of data
 including the original 'evaluated' data as well as other types that may be processed by heating, grouping, etc.
 Each ``component`` class contains a list of one or more ``form`` instances containing the actual data.
 
@@ -48,9 +98,9 @@ Evaluated nuclear data is sometimes stored in a form that is not easily plotted 
 example, cross section data may be given as a combination of resonance parameters and a piecewise 'background', but
 for plotting it must be converted to pointwise, linearly-interpolable data.
 
-GND permits storing both of these data types (or 'styles' of data) together in the same hierarchy, so that the user has easy access to the
+GNDS permits storing both of these data types (or 'styles' of data) together in the same hierarchy, so that the user has easy access to the
 original style used by the evaluator as well as to the reconstructed style that was derived from it for easy plotting.
-Since multiple styles of data can appear in an evaluation, GND needs to be able to keep them straight. A GND file contains
+Since multiple styles of data can appear in an evaluation, GNDS needs to be able to keep them straight. A GNDS file contains
 a 'styles' section near the top, where each style is defined and given a unique label.  Those same labels are used
 throughout the file to indicate what style each data form is associated with.
 

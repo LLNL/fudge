@@ -61,9 +61,10 @@
 # 
 # <<END-copyright>>
 
+from __future__ import print_function
 import unittest, os
 import numpy as np
-from fudge.gnd import reactionSuite
+from fudge.gnds import reactionSuite
 from fudge.processing.resonances.reconstructResonances import *
 import fudge.processing.resonances.getCoulombWavefunctions as getCoulombWavefunctions
 from xData.isclose import isclose
@@ -87,47 +88,47 @@ except:
 
 if VERBOSE:
     print('reading SLBWExample1SRes...')
-SLBWExample1SRes = reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'SLBWExample1SRes_testFile.gnd.xml'))
+SLBWExample1SRes = reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'SLBWExample1SRes_testFile.gnds.xml'))
 
 if VERBOSE:
     print('reading SLBWExample1PRes...')
-SLBWExample1PRes = reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'SLBWExample1PRes_testFile.gnd.xml'))
+SLBWExample1PRes = reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'SLBWExample1PRes_testFile.gnds.xml'))
 
 if VERBOSE:
     print('reading SLBWExample...')
-SLBWExample = reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'SLBWExampleFull_testFile.gnd.xml'))
+SLBWExample = reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'SLBWExampleFull_testFile.gnds.xml'))
 
 if VERBOSE:
     print('reading MLBWExample...')
-MLBWExample = reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'MLBWExampleFull_testFile.gnd.xml'))
+MLBWExample = reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'MLBWExampleFull_testFile.gnds.xml'))
 
 if VERBOSE:
     print('reading MLBWExample1PRes...')
-MLBWExample1PRes = reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'MLBWExample1PRes_testFile.gnd.xml'))
+MLBWExample1PRes = reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'MLBWExample1PRes_testFile.gnds.xml'))
 
 if VERBOSE: print('reading MLBWExampleZr90...')
-MLBWExampleZr90 = reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'MLBWExampleZr90_testFile.gnd.xml'))
+MLBWExampleZr90 = reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'MLBWExampleZr90_testFile.gnds.xml'))
 
 if VERBOSE:
     print('reading RMExample...')
-RMExample = reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'RMExampleFull_testFile.gnd.xml'))
+RMExample = reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'RMExampleFull_testFile.gnds.xml'))
 
 if VERBOSE:
     print('reading RMExampleSmall...')
-RMExampleSmall =  reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'RMExampleSmall_testFile.gnd.xml'))
+RMExampleSmall =  reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'RMExampleSmall_testFile.gnds.xml'))
 
 if VERBOSE:
     print('reading RMLExample...')
-RMLExample =  reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'RMLExampleFull_testFile.gnd.xml'))
+RMLExample =  reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'RMLExampleFull_testFile.gnds.xml'))
 
 if VERBOSE:
     print('reading RMLExampleSmall...')
-RMLExampleSmall =  reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'RMLExampleSmall_testFile.gnd.xml'))
+RMLExampleSmall =  reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'RMLExampleSmall_testFile.gnds.xml'))
 
 if DOFETESTS:
     if VERBOSE:
         print('reading RMLExampleFe...')
-    RMLExampleFe =  reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'RMLExampleFe_testFile.gnd.xml'))
+    RMLExampleFe =  reactionSuite.readXML(open(TEST_DATA_PATH+os.sep+'RMLExampleFe_testFile.gnds.xml'))
 
 # ----------------------------------------------------------------------------------
 #
@@ -226,7 +227,7 @@ class TestResonanceReconstruction( TestWithIsClose ):
         x = reconstructResonances(SLBWExample, tolerance=0.001, verbose=False)
         self.assertEqual( set( x.keys() ), set( [ 'capture', 'fission', 'elastic', 'total', 'nonelastic' ] ) )
         # Test thermal point and a few others, computed below
-        answers = [ \
+        answers = [
             (0.0235339347844, {'capture':1.18726303, 'total':7.24518429, 'fission':0., 'elastic':6.05792126}),
             (1009.0,          {'capture':290.05432779892004, 'total':507.80854074065803, 'fission':0., 'elastic':217.75421294173799})]
         for answer in answers:
@@ -415,9 +416,9 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
         ER = self.RRR1SRes.channels[0][c][0][0]
         GN = self.RRR1SRes.channels[0][c][0][1]
         for E in [ ER-0.05+0.01*i for i in range( 11 ) ]:
-            ERp = ER + ( \
-                    self.RRR1SRes.shiftFactor( c.l, self.RRR1SRes.rho( abs( ER ), c.l ) ) - \
-                    self.RRR1SRes.shiftFactor( c.l, self.RRR1SRes.rho( E,         c.l ) ) \
+            ERp = ER + (
+                    self.RRR1SRes.shiftFactor( c.l, self.RRR1SRes.rho( abs( ER ), c.l ) ) -
+                    self.RRR1SRes.shiftFactor( c.l, self.RRR1SRes.rho( E,         c.l ) )
                 ) * GN / (2.0 * self.RRR1SRes.penetrationFactor( c.l, self.RRR1SRes.rho( abs(ER), c.l) ) )
             spin_thingee = self.RRR1SRes.Ls[0]['Js'][0]['channelSpins'][0]
             ERp_correct = spin_thingee['energy'] + spin_thingee['neutronWidth'] * ( spin_thingee['shiftFactor'] - 0.5 * self.RRR1SRes.shiftFactor( 0, self.RRR1SRes.rho(E) ) )
@@ -428,9 +429,9 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
         ER = self.RRR1PRes.channels[0][c][0][0]
         GN = self.RRR1PRes.channels[0][c][0][1]
         for E in [ ER-0.05+0.01*i for i in range( 11 ) ]:
-            ERp = ER + ( \
-                    self.RRR1PRes.shiftFactor( c.l, self.RRR1PRes.rho( abs( ER ), c.l ) ) - \
-                    self.RRR1PRes.shiftFactor( c.l, self.RRR1PRes.rho( E,         c.l ) ) \
+            ERp = ER + (
+                    self.RRR1PRes.shiftFactor( c.l, self.RRR1PRes.rho( abs( ER ), c.l ) ) -
+                    self.RRR1PRes.shiftFactor( c.l, self.RRR1PRes.rho( E,         c.l ) )
                 ) * GN / (2.0 * self.RRR1PRes.penetrationFactor( c.l, self.RRR1PRes.rho( abs(ER), c.l) ) )
             spin_thingee = self.RRR1PRes.Ls[1]['Js'][0]['channelSpins'][0]
             self.assertAlmostEqual( self.RRR1PRes.shiftFactor( c.l, self.RRR1PRes.rho( abs( ER ), c.l ) ), 2.0 * spin_thingee['shiftFactor'] )
@@ -493,13 +494,13 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
             self.assertAlmostEqual( GT, self.RRR._widths[i], nDigits )
 
     def test_getScatteringMatrixUUnitarity( self ):
-        '''
+        """
         Each level in the SLBW parameterization should have a unitary U matrix.  Here we have two tests:
 
             * just plain multiplication: U^+ * U == one
 
             * check the Frobenius norm, which is ||A|| = sqrt(| sum_{i,j} |A[i,j]|^2 |), so the norm of the identity matrix is sqrt( ndim )
-        '''
+        """
         self.RRR.setResonanceParametersByChannel(multipleSScheme='NJOY')
         U = self.RRR.getScatteringMatrixU( 0.0235339347844 )
         rtol= 1e-04 # nominal value: 1e-03
@@ -508,15 +509,15 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
             one = numpy.diag( U[i].shape[0]*[ complex( 1.0 ) ] )
             testResult = numpy.allclose( numpy.conj(U[i].T)*U[i], one, rtol=rtol, atol=atol )
             if not testResult:
-                print i,'\n  U:\n', U[i]
-                print '\nU^+:\n', U[i].T.conj()
-                print '\n', U[i].T.conj()*U[i]
-                print '\nFrobenius norm:', numpy.linalg.norm( U[i] )
+                print(i,'\n  U:\n', U[i])
+                print('\nU^+:\n', U[i].T.conj())
+                print('\n', U[i].T.conj()*U[i])
+                print('\nFrobenius norm:', numpy.linalg.norm( U[i] ))
             self.assertTrue( testResult )
             self.assertAlmostEqual( numpy.linalg.norm( U[i] ), math.sqrt( U[i].shape[0] ), 5 )
 
     def test_getScatteringMatrixUValue0( self ):
-        '''On resonance nearest to 1 keV of evaluation with many resonances'''
+        """On resonance nearest to 1 keV of evaluation with many resonances"""
         self.RRR.setResonanceParametersByChannel(multipleSScheme='NJOY')
         U = self.RRR.getScatteringMatrixU( 1009.0, False )
         eiphi = complex( 0.99903310472611739, -0.043964254358450666 )
@@ -531,7 +532,7 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
         self.assertAlmostEqual( U[28][1][1], complex( 1.0-2.0*GG/GT, 0.0 ) )
 
     def test_getScatteringMatrixUValue1( self ):
-        '''On first resonance > 0 of evaluation with many resonances'''
+        """On first resonance > 0 of evaluation with many resonances"""
         self.RRR.setResonanceParametersByChannel(multipleSScheme='NJOY')
         U = self.RRR.getScatteringMatrixU( 35.9, False )
         eiphi = complex( 0.9999999999999819, -1.9027638215908413e-07 ) # one for each GN
@@ -546,7 +547,7 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
         self.assertAlmostEqual( U[1][1][1], complex( 1.0-2.0*GG/GT, 0.0 ) )
 
     def test_getScatteringMatrixUValue_1S( self ):
-        '''On first resonance > 0, it is an S wave resonance of evaluation with one resonance'''
+        """On first resonance > 0, it is an S wave resonance of evaluation with one resonance"""
         self.RRR.setResonanceParametersByChannel(multipleSScheme='NJOY')
         ER = 0.169 #eV
         U = self.RRR1SRes.getScatteringMatrixU( ER, False )
@@ -563,7 +564,7 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
         self.assertAlmostEqual( U[0][1][1], complex( 1.0-2.0*GG/GT, 0.0 ) )
 
     def test_getScatteringMatrixUValue_1P( self ):
-        '''On first resonance > 0, it is an P wave resonance of evaluation with one resonance'''
+        """On first resonance > 0, it is an P wave resonance of evaluation with one resonance"""
         self.RRR.setResonanceParametersByChannel(multipleSScheme='NJOY')
         ER = 0.169 #eV
         U = self.RRR1PRes.getScatteringMatrixU( ER, False )
@@ -589,8 +590,10 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
         ER = 0.169 #eV
         AP = 0.63809 #in b^{-1/2}
 
-        if debug: print '\nS Wave, g-factor (fudge)=',cN.gfact
-        if debug: print '     E (eV)       SigTotU (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   SigNeuU (b)    SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  dSigPotActual/dSigPotCalc  '
+        if debug: print('\nS Wave, g-factor (fudge)=',cN.gfact)
+        if debug: print(
+            '     E (eV)       SigTotU (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   SigNeuU (b)    ' +
+            'SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  dSigPotActual/dSigPotCalc  ')
 
         for E in self.RRR1SRes.generateEnergyGrid():
             nLs = { 0:0 }
@@ -608,19 +611,21 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
             sigNeuInt   = 4*numpy.pi*B[0].real
             sigs = self.RRR1SRes.getCrossSection( E )
 
-            if debug: print 10*'%10g     ' % ( E, sigTotWithU, sigs['total'][0], sigGamWithU, sigs['capture'][0], sigNeuWithU, sigs['elastic'][0], sigNeuInt,  sigNeuWithU/sigNeuInt, -(sigNeuWithU-sigs['elastic'][0])/sigPot )
+            if debug: print(10*'%10g     ' %
+                    ( E, sigTotWithU, sigs['total'][0], sigGamWithU, sigs['capture'][0], sigNeuWithU,
+                    sigs['elastic'][0], sigNeuInt,  sigNeuWithU/sigNeuInt, -(sigNeuWithU-sigs['elastic'][0])/sigPot ) )
 
             # Check they sum up correctly (really just another test of unitarity)
-            self.assertTrue( withinXPercent( sigTotWithU, sigGamWithU + sigNeuWithU ) )
+            self.assertWithinXPercent( sigTotWithU, sigGamWithU + sigNeuWithU )
 
             # Check elastic channel agrees with L=0 term of angular distribution
-            if doTests: self.assertTrue( withinXPercent( sigNeuWithU, sigNeuInt ) )
+            if doTests: self.assertWithinXPercent( sigNeuWithU, sigNeuInt )
 
             # Check agree with getCrossSection()
             if doTests:
-                self.assertTrue( withinXPercent( sigTotWithU+sigPot, sigs['total'][0] ) )
-                self.assertTrue( withinXPercent( sigGamWithU, sigs['capture'][0] ) )
-                self.assertTrue( withinXPercent( sigNeuWithU+sigPot, sigs['elastic'][0] ) )
+                self.assertWithinXPercent( sigTotWithU+sigPot, sigs['total'][0] )
+                self.assertWithinXPercent( sigGamWithU, sigs['capture'][0] )
+                self.assertWithinXPercent( sigNeuWithU+sigPot, sigs['elastic'][0] )
 
     @unittest.skip("SLBW getAngularDistribution now NotImplemented")
     def test_scatteringMatrixUInCrossSectionCalculation_PWave( self ):
@@ -632,8 +637,10 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
         ER = 0.169 #eV
         AP = 0.63809 #in b^{-1/2}
 
-        if debug: print '\nP Wave, g-factor (fudge)=',cN.gfact
-        if debug: print '     E (eV)       SigTotU (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   SigNeuU (b)    SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  dSigPotActual/dSigPotCalc '
+        if debug: print('\nP Wave, g-factor (fudge)=', cN.gfact)
+        if debug: print(
+                '     E (eV)       SigTotU (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   SigNeuU (b)    ' +
+                'SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  dSigPotActual/dSigPotCalc ')
 
         for E in self.RRR1PRes.generateEnergyGrid():
             nLs = { 0:0, 1:0 }
@@ -651,19 +658,22 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
             sigNeuInt   = 4*numpy.pi*B[0].real
             sigs = self.RRR1PRes.getCrossSection( E )
 
-            if debug: print 10*'%10g     ' % ( E, sigTotWithU, sigs['total'][0], sigGamWithU, sigs['capture'][0], sigNeuWithU, sigs['elastic'][0], sigNeuInt,  sigNeuWithU/sigNeuInt, -(sigNeuWithU-sigs['elastic'][0])/sigPot )
+            if debug:
+                print(10 * '%10g     ' % (
+                    E, sigTotWithU, sigs['total'][0], sigGamWithU, sigs['capture'][0], sigNeuWithU, sigs['elastic'][0],
+                    sigNeuInt, sigNeuWithU / sigNeuInt, -(sigNeuWithU - sigs['elastic'][0]) / sigPot))
 
             # Check they sum up correctly (really just another test of unitarity)
-            self.assertTrue( withinXPercent( sigTotWithU, sigGamWithU + sigNeuWithU ) )
+            self.assertWithinXPercent( sigTotWithU, sigGamWithU + sigNeuWithU )
 
             # Check elastic channel agrees with L=0 term of angular distribution
-            if doTests: self.assertTrue( withinXPercent( sigNeuWithU, sigNeuInt ) )
+            if doTests: self.assertWithinXPercent( sigNeuWithU, sigNeuInt )
 
             # Check agree with getCrossSection()
             if doTests:
-                self.assertTrue( withinXPercent( sigTotWithU+sigPot, sigs['total'][0] ) )
-                self.assertTrue( withinXPercent( sigGamWithU, sigs['capture'][0] ) )
-                self.assertTrue( withinXPercent( sigNeuWithU+sigPot, sigs['elastic'][0] ) )
+                self.assertWithinXPercent( sigTotWithU+sigPot, sigs['total'][0] )
+                self.assertWithinXPercent( sigGamWithU, sigs['capture'][0] )
+                self.assertWithinXPercent( sigNeuWithU+sigPot, sigs['elastic'][0] )
 
     @unittest.skip("SLBW getAngularDistribution now NotImplemented")
     def test_scatteringMatrixUInCrossSectionCalculation_Full( self ):
@@ -674,8 +684,10 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
         AP = 0.69 #in b^{-1/2}
         allowedSs = getAllowedTotalSpins( 9/2., 1/2., False )
 
-        if debug: print '\nAll Waves (course grid), %i resonances' % nLev
-        if debug: print '     E (eV)       SigTotU (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   SigNeuU (b)    SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  dSigPotActual/dSigPotCalc '
+        if debug: print('\nAll Waves (course grid), %i resonances' % nLev)
+        if debug: print(
+                '     E (eV)       SigTotU (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   SigNeuU (b)    ' +
+                'SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  dSigPotActual/dSigPotCalc ')
 
         egrid = self.RRR.generateEnergyGrid()
         eStep = 10 #int( len( egrid )/95)
@@ -700,37 +712,40 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
             sigNeuInt   = 4*numpy.pi*B[0].real
             sigs = self.RRR.getCrossSection( E )
 
-            if debug: print 10*'%10g     ' % ( E, sigTotWithU, sigs['total'][0], sigGamWithU, sigs['capture'][0], sigNeuWithU, sigs['elastic'][0], sigNeuInt,  sigNeuWithU/sigNeuInt, -(sigNeuWithU-sigs['elastic'][0])/sigPot )
+            if debug:
+                print(10 * '%10g     ' % (
+                    E, sigTotWithU, sigs['total'][0], sigGamWithU, sigs['capture'][0], sigNeuWithU, sigs['elastic'][0],
+                    sigNeuInt, sigNeuWithU / sigNeuInt, -(sigNeuWithU - sigs['elastic'][0]) / sigPot))
 
             # Check they sum up correctly (really just another test of unitarity)
-            self.assertTrue( withinXPercent( sigTotWithU, sigGamWithU + sigNeuWithU ) )
+            self.assertWithinXPercent( sigTotWithU, sigGamWithU + sigNeuWithU )
 
             # Check elastic channel agrees with L=0 term of angular distribution
-            if doTests: self.assertTrue( withinXPercent( sigNeuWithU, sigNeuInt, 50. ) ) # fails badly for some high energy P wave resonances??
+            if doTests: self.assertWithinXPercent( sigNeuWithU, sigNeuInt, 50. ) # fails badly for some high energy P wave resonances??
 
             # Check agree with getCrossSection()
             if doTests:
-                self.assertTrue( withinXPercent( sigTotWithU+sigPot, sigs['total'][0] ) )
-                self.assertTrue( withinXPercent( sigGamWithU, sigs['capture'][0] ) )
-                self.assertTrue( withinXPercent( sigNeuWithU+sigPot, sigs['elastic'][0] ) )
+                self.assertWithinXPercent( sigTotWithU+sigPot, sigs['total'][0] )
+                self.assertWithinXPercent( sigGamWithU, sigs['capture'][0] )
+                self.assertWithinXPercent( sigNeuWithU+sigPot, sigs['elastic'][0] )
 
     @unittest.skip("SLBW getAngularDistribution now NotImplemented")
     def test_getAngularDistribution_SWave( self ):
-        '''
+        """
         Note, Blatt-Biedenharn's Z coefficient has a factor of (l1,l2,0,0;L,0) (a Clebsch-Gordan coefficient) in it.
         As a result, if l1 and l2 cannot couple to L, one gets zero.
 
         For a single S-wave resonance, both l's are 0 so can only couple to L=0, resulting in pure isotropic angular distributions.
-        '''
+        """
         egrid = self.RRR1SRes.generateEnergyGrid()
         eStep = int( len( egrid )/95)
         for E in egrid[::eStep]:
             B = self.RRR1SRes.getAngularDistribution( E )
-            self.assertTrue( allWithinXPercent( [ x/B[0] for x in B ], [ 1.0, 0, 0 ] ) )
+            self.assertAllWithinXPercent( [ x/B[0] for x in B ], [ 1.0, 0, 0 ] )
 
     @unittest.skip("SLBW getAngularDistribution now NotImplemented")
     def test_getAngularDistribution_PWave( self ):
-        '''
+        """
         Note, Blatt-Biedenharn's Z coefficient has a factor of (l1,l2,0,0;L,0) (a Clebsch-Gordan coefficient) in it.
         As a result, if l1 and l2 cannot couple to L, one gets zero.
 
@@ -739,7 +754,7 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
         Because there is only one resonance, the U matrix has one neutron-neutron element in it.
         So, all L's end up with the same (1-U)^2 factor and the energy dependence of the angular distribution divides out, leaving basically a constant factor of Z^2 for L=0 and 2.
         For L=0, Z ~ 3.5 and for L=2, Z ~ 2.  So, expect B[0]/B[0] == 1 and B[2]/B[0] ~ (2/3.5)^2 ~ 0.33.
-        '''
+        """
         egrid = self.RRR1PRes.generateEnergyGrid()
         eStep = 1
         J = 5.5 # for this test data
@@ -748,14 +763,14 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
         self.assertAlmostEqual( nf_amc.z_coefficient( 2, int(2*J), 2, int(2*J), int(2*S), 4 ) / nf_amc.z_coefficient( 2, int(2*J), 2, int(2*J), int(2*S), 0 ), math.sqrt(0.33090909) ) # nf_amc functions use the 2J trick
         for E in egrid[::eStep]:
             B = self.RRR1PRes.getAngularDistribution( E )
-            self.assertTrue( allWithinXPercent( [ x/B[0] for x in B ], [ 1.0, 0.0, 0.33090909 ] ) )
+            self.assertAllWithinXPercent( [ x/B[0] for x in B ], [ 1.0, 0.0, 0.33090909 ] )
 
     @unittest.skip("SLBW getAngularDistribution now NotImplemented")
     def test_getAngularDistribution( self ):
-        '''
+        """
         Use version of channels where we strip out the channels with spins that have zero width.
         The unit test is way faster than the full BB version, so we need to weaponize that one.
-        '''
+        """
         debug = False
         doTest = True
         NJOYStyleSpinTreatment = True
@@ -779,18 +794,18 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
             self.maxDiff = None
             # First list is edited out of all the terms that correspond to spin channels with zero width
             if NJOYStyleSpinTreatment:
-                self.assertEqual( angCoeffSqrList, [ \
-                    { (3, 4, 1): 7.000000000000003, (4, 4, 0): 9.0, (4, 4, 1): 9.0, (5, 4, 1): 11.0, (5, 5, 0): 11.0, (6, 5, 1): 12.999999999999993}, \
-                    { (3, 4, 1): 0.0, (4, 4, 0): 0.0, (4, 4, 1): 0.0, (5, 4, 1): 0.0,(5, 5, 0): 0.0, (6, 5, 1): 0.0 }, \
+                self.assertEqual( angCoeffSqrList, [
+                    { (3, 4, 1): 7.000000000000003, (4, 4, 0): 9.0, (4, 4, 1): 9.0, (5, 4, 1): 11.0, (5, 5, 0): 11.0, (6, 5, 1): 12.999999999999993},
+                    { (3, 4, 1): 0.0, (4, 4, 0): 0.0, (4, 4, 1): 0.0, (5, 4, 1): 0.0,(5, 5, 0): 0.0, (6, 5, 1): 0.0 },
                     { (3, 4, 1): 0.5833333333213947, (4, 4, 0): 0.0, (4, 4, 1): 6.929999999908832, (5, 4, 1): 3.8133333328735186, (5, 5, 0): 0.0,  (6, 5, 1): 4.136363636490839 } ] )
             # Second list has all the angular terms
             else:
-                self.assertEqual( angCoeffSqrList, [ \
-                    { (3, 4, 1): 6.999999999953966, (4, 4, 0): 8.99999999942597, (4, 4, 1): 8.999999999408963, (4, 5, 1): 8.999999999408963, (5, 4, 1): 10.99999999996129, (5, 5, 0): 10.999999999982087, (5, 5, 1): 10.999999999961286, (6, 5, 1): 13.000000000775405}, \
-                    { (3, 4, 1): 0.0, (4, 4, 0): 0.0, (4, 4, 1): 0.0, (4, 5, 1): 0.0,  (5, 4, 1): 0.0,(5, 5, 0): 0.0, (5, 5, 1): 0.0, (6, 5, 1): 0.0 }, \
+                self.assertEqual( angCoeffSqrList, [
+                    { (3, 4, 1): 6.999999999953966, (4, 4, 0): 8.99999999942597, (4, 4, 1): 8.999999999408963, (4, 5, 1): 8.999999999408963, (5, 4, 1): 10.99999999996129, (5, 5, 0): 10.999999999982087, (5, 5, 1): 10.999999999961286, (6, 5, 1): 13.000000000775405},
+                    { (3, 4, 1): 0.0, (4, 4, 0): 0.0, (4, 4, 1): 0.0, (4, 5, 1): 0.0,  (5, 4, 1): 0.0,(5, 5, 0): 0.0, (5, 5, 1): 0.0, (6, 5, 1): 0.0 },
                     { (3, 4, 1): 0.5833333333213947, (4, 4, 0): 0.0, (4, 4, 1): 6.929999999908832, (4, 5, 1): 0.9163636362571602, (5, 4, 1): 3.8133333328735186, (5, 5, 0): 0.0, (5, 5, 1): 8.579999999854891, (6, 5, 1): 4.136363636490839 } ] )
 
-        if debug: print
+        if debug: print()
         for E in egrid[::eStep]:
             if not ( E >= 7300. and E<= 7400. ): continue # Run test only in a problem area because it is expensive
             U = self.RRR.getScatteringMatrixU( E, True )
@@ -806,15 +821,18 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
                         if not (cN.J,S,cN.l) in angCoeffSqrList[L]: continue
                         answer[L] +=  angCoeffSqrList[L][(cN.J,S,cN.l)] * ( ( 1.0 - U[iLev][iN][iN] ).conj() * ( 1.0 - U[iLev][iN][iN] ) ).real / k**2
             B = self.RRR.getAngularDistribution( E )
-            if debug: print E, ' '.join( map( str, [ x/B[0] for x in B ] ) ), ' '.join( map( str, [ x/answer[0] for x in answer ] ) ), ( answer[-1]/answer[0] ) / ( B[-1]/B[0] )
+            if debug:
+                print(
+                    E, ' '.join(map(str, [x / B[0] for x in B])), ' '.join(map(str, [x / answer[0] for x in answer])),
+                    repr((answer[-1] / answer[0]) / (B[-1] / B[0])))
             if doTest:
                 # if we are within 2 eV of the resonance, the Legendre moment is big enough to notice
                 if abs( E - ERtoTest ) <= 2:
-                    self.assertTrue( allWithinXPercent( [ x/B[0] for x in B ], [ x/answer[0] for x in answer ], absTol=1e-6 ) )
+                    self.assertAllWithinXPercent( [ x/B[0] for x in B ], [ x/answer[0] for x in answer ], absTol=1e-6 )
 
     def test_getCrossSectionFull( self ):
-        '''Test thermal & a few other points'''
-        answers = [ \
+        """Test thermal & a few other points"""
+        answers = [
             ( 0.0235339347844, { 'capture':1.18726303, 'total':7.24518429, 'fission':0., 'elastic':6.05792126 } ),
             ( 1009.0, { 'capture':290.05432779892004, 'total':507.80854074065803, 'fission':0., 'elastic':217.75421294173799 } ) ]
         for answer in answers:
@@ -823,8 +841,8 @@ class TestSLBWClassAndBaseClasses( TestWithIsClose ):
                 self.assertAlmostEqual( answer[1][k], result[k][0] )
 
     def test_getCrossSection1SRes( self ):
-        '''Test thermal & a few other points'''
-        answers = [ \
+        """Test thermal & a few other points"""
+        answers = [
             ( 0.0235339347844, { 'capture':11957.883139892736, 'total':11977.291733536884, 'fission':0., 'elastic':19.408593644148297 } ),
             ( 1009.0, { 'capture':1.2911030236464319e-06, 'total':5.1160670269419093, 'fission':0., 'elastic':5.1160657358388857 } ) ]
         for answer in answers:
@@ -862,8 +880,7 @@ class TestMLBWClassAndBaseClasses( TestWithIsClose ):
         debug = False
         self.RRR.setResonanceParametersByChannel( )
         cDict = self.RRR.channels
-        if debug: print
-        if debug: print '\n'.join( map( str, cDict.items() ) )
+        if debug: print('\n'.join(map(str, cDict.items())))
         self.assertEqual( len( cDict ), 13 ) # This is number of distinct MLBW channels
         self.assertEqual( len( self.RRR._energies ), 15 ) # This is number of MLBW resonances.  Better equal the _energies array of level energies.
         self.assertEqual( sum( [ len(cDict[cs]) for cs in cDict ] ), 31 ) # this is double the number of resonances (1/2 for elastic, 1/2 for capture)
@@ -877,11 +894,11 @@ class TestMLBWClassAndBaseClasses( TestWithIsClose ):
                 for iR, G in cDict[c].items():
                     if iR == i: GT += G
             # Check all the widths for a level add up to the tabulated total
-            if debug: print i, E, GT, self.RRR._widths[i]
+            if debug: print(i, E, GT, self.RRR._widths[i])
             self.assertWithinXPercent( GT, self.RRR._widths[i], 0.1 )
 
     def test_getScatteringMatrixUValue_1PWave( self ):
-        '''On first resonance > 0, it is an P wave resonance of evaluation with one resonance.  For one res, SLBW == MLBW.'''
+        """On first resonance > 0, it is an P wave resonance of evaluation with one resonance.  For one res, SLBW == MLBW."""
         ER = 0.169 #eV
         U = self.RRR1Res.getScatteringMatrixU( numpy.array(ER).reshape(1,1), False )
         phi = self.RRR1Res.phi( 1, self.RRR1Res.rho( ER, 1 ) )
@@ -897,7 +914,7 @@ class TestMLBWClassAndBaseClasses( TestWithIsClose ):
         self.assertAlmostEqual( U[0][1,1], complex( 1.0-2.0*GG/GT, 0.0 ) )
 
     def test_getScatteringMatrixUUnitarity_1PWave( self ):
-        '''
+        """
         The MLBW parameterization might have a unitary U matrix.  Here we have two tests:
 
             * just plain multiplication: U^+ * U == one
@@ -905,13 +922,13 @@ class TestMLBWClassAndBaseClasses( TestWithIsClose ):
             * check the Frobenius norm, which is ||A|| = sqrt(| sum_{i,j} |A[i,j]|^2 |), so the norm of the identity matrix is sqrt( ndim )
 
         Note:   For one res, SLBW == MLBW.
-        '''
+        """
         debug = False
         doTest = True
         if debug:
             for EE in self.RRR1Res.generateEnergyGrid():
                 UU = self.RRR1Res.getScatteringMatrixU( EE )
-                print EE, UU[0,0].real, UU[0,0].imag, numpy.linalg.norm(UU)/math.sqrt( UU.shape[0] )
+                print(EE, UU[0, 0].real, UU[0, 0].imag, numpy.linalg.norm(UU) / math.sqrt(UU.shape[0]))
         rtol= 1e-03 # nominal value: 1e-03
         atol= 1e-04 # nominal value: 1e-04
         E = numpy.array(1.0).reshape(1,1)
@@ -921,19 +938,20 @@ class TestMLBWClassAndBaseClasses( TestWithIsClose ):
         if doTest: self.assertTrue( numpy.allclose( numpy.conj(U.T)*U, one, rtol=rtol, atol=atol ) )
 
     def test_getScatteringMatrixUUnitarity_Full( self ):
-        '''
+        """
         The MLBW parameterization might have a unitary U matrix.  Here we have two tests:
 
             * just plain multiplication: U^+ * U == one
 
             * check the Frobenius norm, which is ||A|| = sqrt(| sum_{i,j} |A[i,j]|^2 |), so the norm of the identity matrix is sqrt( ndim )
-        '''
+        """
         debug = False
         doTest = True
         if debug:
             for EE in self.RRR.generateEnergyGrid()[::10]:
                 UU = self.RRR.getScatteringMatrixU( EE )
-                print EE, UU[0,0].real, UU[0,0].imag, UU[0,1].real, UU[0,1].imag, UU[1,1].real, UU[1,1].imag, numpy.linalg.norm(UU)/math.sqrt( UU.shape[0] )
+                print(EE, UU[0, 0].real, UU[0, 0].imag, UU[0, 1].real, UU[0, 1].imag, UU[1, 1].real, UU[1, 1].imag,
+                       numpy.linalg.norm(UU) / math.sqrt(UU.shape[0]))
         rtol= 1e-03 # nominal value: 1e-03
         atol= 1e-04 # nominal value: 1e-04
         E = numpy.array(1.0).reshape(1,1)
@@ -943,9 +961,9 @@ class TestMLBWClassAndBaseClasses( TestWithIsClose ):
         if doTest: self.assertTrue( numpy.allclose( numpy.conj(U.T)*U, one, rtol=rtol, atol=atol ) )
 
     def test_scatteringMatrixUInCrossSectionCalculation_1PWave( self ):
-        '''
+        """
         For one res, SLBW == MLBW.
-        '''
+        """
         debug = False
         doTests = True
 
@@ -954,8 +972,10 @@ class TestMLBWClassAndBaseClasses( TestWithIsClose ):
         nRes = len( self.RRR1Res._energies )
         AP = 0.63809 #in b^{-1/2}
 
-        if debug: print '\n1 P Wave (course grid), %i channels, %i resonances' % ( nChan, nRes )
-        if debug: print '     E (eV)       SigTotU (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   SigNeuU (b)    SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  sigPot' #  dSigPotActual/dSigPotCalc '
+        if debug: print('\n1 P Wave (course grid), %i channels, %i resonances' % (nChan, nRes))
+        if debug: print(
+                '     E (eV)       SigTotU (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   SigNeuU (b)    ' +
+                'SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  sigPot')  # dSigPotActual/dSigPotCalc '
 
         eStep = 10 #int( len( egrid )/95)
         egrid = self.RRR1Res.generateEnergyGrid()[::eStep]
@@ -985,7 +1005,9 @@ class TestMLBWClassAndBaseClasses( TestWithIsClose ):
             sigPot = sum([ ( ( 2.0 * l + 1 ) ) * fourpi * pow( numpy.sin( self.RRR1Res.phi( l, rhohat[iE] ) ) / k[iE], 2.0 ) for l in nLs ])
             sigNeuInt = fourpi * B[iE][0].real
 
-            if debug: print 10*'%10g     ' % ( E, sigTotWithU, sigs['total'][iE], sigGamWithU, sigs['capture'][iE], sigNeuWithU, sigs['elastic'][iE], sigNeuInt,  sigNeuWithU/sigNeuInt, sigPot ) #, -(sigNeuWithU-sigs['elastic'][iE])/sigPot )
+            if debug: print(10 * '%10g     ' % (
+                E, sigTotWithU, sigs['total'][iE], sigGamWithU, sigs['capture'][iE], sigNeuWithU, sigs['elastic'][iE],
+                sigNeuInt, sigNeuWithU / sigNeuInt, sigPot))  # , -(sigNeuWithU-sigs['elastic'][iE])/sigPot )
 
             # Check they sum up correctly (really just another test of unitarity)
             if doTests: self.assertWithinXPercent( sigTotWithU, sigGamWithU + sigNeuWithU )
@@ -1007,8 +1029,10 @@ class TestMLBWClassAndBaseClasses( TestWithIsClose ):
         nRes = self.RRR.nResonances
         AP = 0.41 #in b^{-1/2}
 
-        if debug: print '\nAll Waves (course grid), %i channels, %i resonances' % ( nChan, nRes )
-        if debug: print '     E (eV)       SigTotU (b)    SigTotSum (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   SigNeuU (b)    SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  sigPot'
+        if debug: print('\nAll Waves (course grid), %i channels, %i resonances' % (nChan, nRes))
+        if debug: print(
+            '     E (eV)       SigTotU (b)    SigTotSum (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   ' +
+            'SigNeuU (b)    SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  sigPot')
 
         # We can't eat the whole energy grid, so we'll do it in parts
         fullEgrid = self.RRR.generateEnergyGrid()
@@ -1046,7 +1070,10 @@ class TestMLBWClassAndBaseClasses( TestWithIsClose ):
                 sigPot = sum( [ ( ( 2.0 * l + 1 ) ) * 4.0 * numpy.pi * ( numpy.sin( self.RRR.phi( l, rhohat[iE] ) ) )**2 / k[iE]**2 for l in nLs ] )
                 sigNeuInt   = 4*numpy.pi*B[0].real
 
-                if debug: print 11*'%10g     ' % ( E, sigTotWithU, sigGamWithU + sigNeuWithU, sigs['total'][iE], sigGamWithU, sigs['capture'][iE], sigNeuWithU, sigs['elastic'][iE], sigNeuInt,  sigNeuWithU/sigNeuInt, sigPot ) #, -(sigNeuWithU-sigs['elastic'][iE])/sigPot )
+                if debug: print(11 * '%10g     ' % (
+                        E, sigTotWithU, sigGamWithU + sigNeuWithU, sigs['total'][iE], sigGamWithU, sigs['capture'][iE],
+                        sigNeuWithU, sigs['elastic'][iE], sigNeuInt, sigNeuWithU / sigNeuInt,
+                        sigPot))  # , -(sigNeuWithU-sigs['elastic'][iE])/sigPot )
 
                 # Check they sum up correctly (really just another test of unitarity)
                 if doTests and False:  self.assertWithinXPercent( sigTotWithU, sigGamWithU + sigNeuWithU, 10. ) # expected to fail
@@ -1063,7 +1090,7 @@ class TestMLBWClassAndBaseClasses( TestWithIsClose ):
                     self.assertWithinXPercent( sigNeuWithU, sigs['elastic'][iE], 10. )
 
     def test_getAngularDistribution_PWave( self ):
-        '''
+        """
         Note, Blatt-Biedenharn's Z coefficient has a factor of (l1,l2,0,0;L,0) (a Clebsch-Gordan coefficient) in it.
         As a result, if l1 and l2 cannot couple to L, one gets zero.
 
@@ -1079,7 +1106,7 @@ class TestMLBWClassAndBaseClasses( TestWithIsClose ):
         smaller than that in the l=0 elements.  This allows us to ignore all but the purely resonance elements when directly on
         resonance (Ein=ER).   In our P-wave example, that means that our MLBW on resonance angular distribution should match the
         SLBW result (_but only on resonance_).  We reuse the test below, but only approximately.
-        '''
+        """
         debug = False
         doTest = True
         egrid = self.RRR1Res.generateEnergyGrid()
@@ -1092,9 +1119,9 @@ class TestMLBWClassAndBaseClasses( TestWithIsClose ):
             one = numpy.diag( 9*[0.0] )
             for E in egrid[::eStep]:
                 U = self.RRR1Res.getScatteringMatrixU( E )
-                print '\n',E,one - U
+                print('\n', E, one - U)
                 B = self.RRR1Res.getAngularDistribution( E )
-                print E, ' '.join( map( str, B ) )
+                print(E, ' '.join(map(str, B)))
         if doTest:
             ER = 0.169
             B = self.RRR1Res.getAngularDistribution( ER )['elastic']
@@ -1108,7 +1135,7 @@ class TestMLBWClassAndBaseClasses( TestWithIsClose ):
         eStep = 10
         if debug:
             for E in egrid[::eStep]:
-                print E, ' '.join( map( str, self.RRR.getAngularDistribution( E ) ) )
+                print(E, ' '.join(map(str, self.RRR.getAngularDistribution(E))))
 
     @unittest.skipIf(True,"need answer to compare to")
     def test_getElasticAngularDistribution_Zr90( self ):
@@ -1118,10 +1145,10 @@ class TestMLBWClassAndBaseClasses( TestWithIsClose ):
         eStep = 5
         if debug:
             for E in egrid[::eStep]:
-                print E, ' '.join( map( str, theRRR.getAngularDistribution( E ) ) )
+                print(E, ' '.join(map(str, theRRR.getAngularDistribution(E))))
 
     def test_getCrossSection( self ):
-        '''Test thermal point'''
+        """Test thermal point"""
         result = self.RRR.getCrossSection( 0.0235339347844 )
         #print 'MLBW',result
         answer = {'capture':0.00015987, 'total':3.11326583, 'fission':0., 'elastic':3.11310596}
@@ -1129,13 +1156,13 @@ class TestMLBWClassAndBaseClasses( TestWithIsClose ):
             self.assertAlmostEqual( answer[k], result[k][0]  )
 
 
-@unittest.skip("Major changes to class means tests always fail, they need to be refactored")
 class TestRMClassAndBaseClasses( TestWithIsClose ):
 
     def setUp( self ):
-        self.RRR = RMcrossSection( RMExample, enableAngDists=True, verbose=False )
-        self.RRRSmall = RMcrossSection( RMExampleSmall, enableAngDists=True, verbose=False )
+        self.RRR = RMatrixLimitedcrossSection( RMExample, enableAngDists=True, verbose=False )
+        self.RRRSmall = RMatrixLimitedcrossSection( RMExampleSmall, enableAngDists=True, verbose=False )
 
+    @unittest.skip("Major changes to class means tests always fail, they need to be refactored")
     def test_memberData( self ):
         self.maxDiff = None
         self.assertEqual( str(self.RRR.projectile), 'n' )
@@ -1161,6 +1188,7 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
         self.assertEqual( str( self.RRR.RR.scatteringRadius.getValueAs('fm',L=1) ), "4.9437" )
         self.assertEqual( str( self.RRR.RR.scatteringRadius.getValueAs('fm',L=2) ), "4.1364" )
 
+    @unittest.skip("Major changes to class means tests always fail, they need to be refactored")
     def test_getL0Matrix( self ):
         E = 31740.0
         B = self.RRRSmall.getChannelConstantsBc()
@@ -1177,16 +1205,15 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
         debug = False
         self.RRR.setResonanceParametersByChannel( useReichMooreApproximation = True  )
         cDict = self.RRR.channels
-        if debug: print
-        if debug: print '\n'.join( map( str, cDict.items() ) )
-        self.assertEqual( len( self.RRR.allChannels ), 12 ) # This is number of channels, whether eliminated or not
-        self.assertEqual( len( self.RRR.channels ), 7 ) # This is number of distinct un-eliminated RM channels
+        if debug: print('\n'.join(map(str, cDict.items())))
+        self.assertEqual( len( self.RRR.allChannels ), 10 ) # This is number of channels, whether eliminated or not
+        self.assertEqual( len( self.RRR.channels ), 5 ) # This is number of distinct un-eliminated RM channels
         self.assertEqual( len( self.RRR.eliminatedChannels ), 5 ) # This is number of distinct eliminated RM channels
         self.assertEqual( len( self.RRR._energies ), 58 ) # This is number of RM resonances.  Better equal the _energies array of level energies.
-        self.assertEqual( sum( [ len(self.RRR.allChannels[cs]) for cs in self.RRR.allChannels ] ), 118 ) # this the number of resonances (elastic only in our example)
-        self.assertEqual( self.RRR.allChannels.items()[0][0], ChannelDesignator(l=0, J=0.5, reaction='elastic', index=0, s=0.5, gfact=1.0, particleA='n', particleB='Si28', isElastic=True, channelClass=NEUTRONCHANNEL, useRelativistic=False, eliminated=False) )
-        self.assertEqual( self.RRR.allChannels.items()[1][1], {0: 145.36, 1: 1.0253, 2: 1.0, 3: 1.0, 4: 1.0, 6: 1.5803, 33: 3.6, 10: 5.6, 12: 3.6, 34: 3.6, 18: 3.6, 55: 3.6, 56: 3.6, 57: 3.6, 29: 3.6, 31: 3.8} )
-        self.assertEqual( self.RRR.allChannels.items()[2][1], {35: 843.64, 5: 0.015667, 8: 0.029617, 11: 9.886, 13: 14.46, 46: 21555.0, 45: 15293.0, 40: 91.493, 51: 35515.0, 21: 53.139, 54: 5734.1, 24: 32.14, 27: 76.192, 28: 933.7, 30: 3.1469, 53: 1017.1} )
+        self.assertEqual( sum( [ len(self.RRR.allChannels[cs]) for cs in self.RRR.allChannels ] ), 116 ) # this the number of resonances (elastic only in our example)
+        self.assertEqual( self.RRR.allChannels.items()[1][0], ChannelDesignator(l=0, J=0.5, reaction='elastic', index=0, s=0.5, gfact=1.0, particleA='n', particleB='Si28', isElastic=True, channelClass=NEUTRONCHANNEL, useRelativistic=False, eliminated=False) )
+        self.assertEqual( self.RRR.allChannels.items()[0][1], {0: 145.36, 1: 1.0253, 2: 1.0, 3: 1.0, 4: 1.0, 6: 1.5803, 33: 3.6, 10: 5.6, 12: 3.6, 34: 3.6, 18: 3.6, 55: 3.6, 56: 3.6, 57: 3.6, 29: 3.6, 31: 3.8} )
+        self.assertEqual( self.RRR.allChannels.items()[9][1], {35: 843.64, 5: 0.015667, 8: 0.029617, 11: 9.886, 13: 14.46, 46: 21555.0, 45: 15293.0, 40: 91.493, 51: 35515.0, 21: 53.139, 54: 5734.1, 24: 32.14, 27: 76.192, 28: 933.7, 30: 3.1469, 53: 1017.1} )
         for i,E in enumerate(self.RRR._energies):
             # Sum all the widths with matching resonance energy.  Done by brute force.
             GT = 0.0
@@ -1194,13 +1221,14 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
                 for iR, G in self.RRR.allChannels[c].items():
                     if iR == i: GT += G
             # Check all the widths for a level add up to the tabulated total
-            if debug: print i, E, GT, self.RRR._widths[i]
+            if debug: print(i, E, GT, self.RRR._widths[i])
             self.assertWithinXPercent( GT, self.RRR._widths[i], 0.1 )
 
+    @unittest.skip("Major changes to class means tests always fail, they need to be refactored")
     def test_getRMatrix_Full( self ):
-        '''
+        """
         Test the value on resonances, full example
-        '''
+        """
         # Basic property tests
         R = self.RRR.getRMatrix( [[1.0]] )
         self.assertEqual( R.shape, (1, 7, 7 ) )
@@ -1220,6 +1248,7 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
                     break
             self.assertWithinXPercent( R[iR,ic,ic].imag, GN/GG/Pc[0] )
 
+    @unittest.skip("Major changes to class means tests always fail, they need to be refactored")
     def test_background_RMatrix(self):
         gamWidth      = 1.0 # gamma widths in Atlas for 28Si are around 1 eV
         k_over_sqrt_E = (2.196807122623e-3 * self.RRR.targetToNeutronMassRatio / (self.RRR.targetToNeutronMassRatio+1.0)) #in units of b^-0.5
@@ -1237,10 +1266,10 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
         self.assertTrue(abs(R[imidE,0,0])>10*abs(Rb[imidE]))
 
         if False:
-            print self.RRR.nChannels
+            print(self.RRR.nChannels)
             firstChannel=self.RRR.channels.items()[0]
-            print firstChannel
-            print [self.RRR._energies[i] for i in firstChannel[1].keys()]
+            print(firstChannel)
+            print( [self.RRR._energies[i] for i in firstChannel[1].keys()] )
             rFile = open('RTest.dat',mode='w')
             for iE,E in enumerate(egrid):
                 rFile.write( '  '.join( [
@@ -1251,17 +1280,18 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
                     str(abs(Rb[iE])).ljust(20)
                 ])+'\n')
 
+    @unittest.skip("Major changes to class means tests always fail, they need to be refactored")
     def test_getRMatrix_Small( self ):
-        '''
+        """
         Test the value on resonances, small example
-        '''
+        """
         # Print a table for plotting the R matrix
         debug=False
         if debug:
             egrid = self.RRRSmall.generateEnergyGrid()[::2]
             RR = self.RRRSmall.getRMatrix( egrid )
             for iEE,EE in enumerate(egrid):
-                print EE, RR[iEE,0,0].real, RR[iEE,0,0].imag, RR[iEE,1,1].real, RR[iEE,1,1].imag
+                print(EE, RR[iEE, 0, 0].real, RR[iEE, 0, 0].imag, RR[iEE, 1, 1].real, RR[iEE, 1, 1].imag)
 
         # Basic properties of the R matrix test
         R = self.RRRSmall.getRMatrix( [[1.0]] )
@@ -1286,6 +1316,7 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
             R00answer = GN/GG/Pc[0] # to 10 % or better
             self.assertWithinXPercent( R[ iR, ic, ic ].imag, R00answer )
 
+    @unittest.skip("Major changes to class means tests always fail, they need to be refactored")
     def test_getXMatrix_Small( self ):
         # Print a table for plotting the X matrix
         debug=False
@@ -1296,30 +1327,31 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
 
         if debug:
             for iEE,EE in enumerate(egrid):
-                print EE, X[iEE,0,0].real, X[iEE,0,0].imag, X[iEE,1,1].real, X[iEE,1,1].imag
+                print(EE, X[iEE, 0, 0].real, X[iEE, 0, 0].imag, X[iEE, 1, 1].real, X[iEE, 1, 1].imag)
 
         # Test specific values
         for iE in range(len(egrid)):
             self.assertAlmostEqual( X[iE,0,0], L0[iE,0,0].imag*R[iE,0,0]/(1.0-R[iE,0,0]*L0[iE,0,0] ), 9 )
             self.assertAlmostEqual( X[iE,1,1], L0[iE,1,1].imag*R[iE,1,1]/(1.0-R[iE,1,1]*L0[iE,1,1] ), 9 )
 
+    @unittest.skip("Major changes to class means tests always fail, they need to be refactored")
     def test_getScatteringMatrixUUnitarity_Full( self ):
-        '''
+        """
         The RM parameterization might have a unitary U matrix.  Here we have two tests:
 
             * just plain multiplication: U^+ * U == one
 
             * check the Frobenius norm, which is ||A|| = sqrt(| sum_{i,j} |A[i,j]|^2 |), so the norm of the identity matrix is sqrt( ndim )
-        '''
+        """
         debug = False
         doTest = True
         if debug:
             egrid = self.RRR.generateEnergyGrid()[::10]
             UU = self.RRR.getScatteringMatrixU( egrid )
             for iEE,EE in enumerate(egrid):
-                print EE, UU[iEE,0,0].real, UU[iEE,0,0].imag, \
-                    UU[iEE,0,1].real, UU[iEE,0,1].imag, UU[iEE,1,1].real, \
-                    UU[iEE,1,1].imag, numpy.linalg.norm(UU[iEE])/math.sqrt( UU[iEE].shape[0] )
+                print(EE, UU[iEE, 0, 0].real, UU[iEE, 0, 0].imag,
+                       UU[iEE, 0, 1].real, UU[iEE, 0, 1].imag, UU[iEE, 1, 1].real,
+                       UU[iEE, 1, 1].imag, numpy.linalg.norm(UU[iEE]) / math.sqrt(UU[iEE].shape[0]))
         rtol= 1e-03 # nominal value: 1e-03
         atol= 1e-04 # nominal value: 1e-04
         E = numpy.array([[1.0]])
@@ -1328,22 +1360,23 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
         if doTest: self.assertAlmostEqual( numpy.linalg.norm( U[0] ), math.sqrt( U[0].shape[0] ), 5 )
         if doTest: self.assertTrue( numpy.allclose( numpy.conj(U[0].T)*U[0], one, rtol=rtol, atol=atol ) )
 
+    @unittest.skip("Major changes to class means tests always fail, they need to be refactored")
     def test_getScatteringMatrixUUnitarity_Small( self ):
-        '''
+        """
         The RM parameterization might have a unitary U matrix.  Here we have two tests:
 
             * just plain multiplication: U^+ * U == one
 
             * check the Frobenius norm, which is ||A|| = sqrt(| sum_{i,j} |A[i,j]|^2 |), so the norm of the identity matrix is sqrt( ndim )
-        '''
+        """
         debug = False
         if debug:
             egrid = self.RRRSmall.generateEnergyGrid()[::2]
             UU = self.RRRSmall.getScatteringMatrixU( egrid )
             for iEE,EE in enumerate(egrid):
-                print EE, UU[iEE,0,0].real, UU[iEE,0,0].imag, \
-                    UU[iEE,0,1].real, UU[iEE,0,1].imag, UU[iEE,1,1].real, \
-                    UU[iEE,1,1].imag, numpy.linalg.norm(UU[0])/math.sqrt( UU[0].shape[0] )
+                print(EE, UU[iEE, 0, 0].real, UU[iEE, 0, 0].imag,
+                       UU[iEE, 0, 1].real, UU[iEE, 0, 1].imag, UU[iEE, 1, 1].real,
+                       UU[iEE, 1, 1].imag, numpy.linalg.norm(UU[0]) / math.sqrt(UU[0].shape[0]))
         egrid = numpy.array([ 1.0, 31733.7, 31740.0 ])[:,numpy.newaxis]
         U = self.RRRSmall.getScatteringMatrixU( egrid, useTabulatedScatteringRadius = True )
         for iE,E in enumerate(egrid):
@@ -1359,6 +1392,7 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
             self.assertAlmostEqual( numpy.linalg.norm( U[iE] ), math.sqrt( U[iE].shape[0] ), numDecimalPlaces )
             self.assertTrue( numpy.allclose( numpy.conj(U[iE].T)*U[iE], one, rtol=rtol, atol=atol ) )
 
+    @unittest.skip("Major changes to class means tests always fail, they need to be refactored")
     def test_scatteringMatrixUInCrossSectionCalculation_Full( self ):
         debug = False
         doTests = True
@@ -1370,8 +1404,12 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
         nRes = len( self.RRR._energies )
         AP = 0.41 #in b^{-1/2}
 
-        if debug: print '\nAll Waves (course grid), %i kept channels, %i eliminated channels, %i resonances' % ( nChan, nElim, nRes )
-        if debug: print '     E (eV)       SigTotU (b)    SigTotSum (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   SigNeuU (b)    SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  sigPot'
+        if debug:
+            print('\nAll Waves (course grid), %i kept channels, %i eliminated channels, %i resonances'
+                % (nChan, nElim, nRes))
+        if debug:
+            print('     E (eV)       SigTotU (b)    SigTotSum (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   ' +
+                  'SigNeuU (b)    SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  sigPot')
 
         # We can't eat the whole energy grid, so we'll do it in parts
         fullEgrid = self.RRR.generateEnergyGrid()
@@ -1408,7 +1446,10 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
                 sigPot = sum( [ ( ( 2.0 * l + 1 ) ) * 4.0 * numpy.pi * ( numpy.sin( self.RRR.phi( l, rhohat[iE] ) ) )**2 / k[iE]**2 for l in nLs ] )
                 sigNeuInt   = 4*numpy.pi*B[0][iE].real
 
-                if debug: print 11*'%10g     ' % ( E, sigTotWithU, sigGamWithU + sigNeuWithU, sigs['total'][iE], sigGamWithU, sigs['capture'][iE], sigNeuWithU, sigs['elastic'][iE], sigNeuInt,  sigNeuWithU/sigNeuInt, sigPot ) #, -(sigNeuWithU-sigs['elastic'][iE])/sigPot )
+                if debug: print(11 * '%10g     ' % (
+                        E, sigTotWithU, sigGamWithU + sigNeuWithU, sigs['total'][iE], sigGamWithU, sigs['capture'][iE],
+                        sigNeuWithU, sigs['elastic'][iE], sigNeuInt, sigNeuWithU / sigNeuInt,
+                        sigPot))  # , -(sigNeuWithU-sigs['elastic'][iE])/sigPot )
 
                 # Check they sum up correctly (really just another test of unitarity)
                 if doTests: self.assertWithinXPercent( sigTotWithU, sigGamWithU + sigNeuWithU, 10. )
@@ -1424,6 +1465,7 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
                     if False: self.assertWithinXPercent( sigGamWithU, sigs['capture'][iE] )  # expected to fail
                     self.assertWithinXPercent( sigNeuWithU, sigs['elastic'][iE] )
 
+    @unittest.skip("Major changes to class means tests always fail, they need to be refactored")
     def test_scatteringMatrixUInCrossSectionCalculation_Small( self ):
         debug = False
         doTests = True
@@ -1433,8 +1475,10 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
         nRes = len( self.RRRSmall._energies )
         AP = 0.41364 #in b^{-1/2}
 
-        if debug: print '\nAll Waves (course grid), %i kept channels, %i eliminated channels, %i resonances' % ( nChan, nElim, nRes )
-        if debug: print '     E (eV)       SigTotU (b)    SigTotSum (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   SigNeuU (b)    SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  sigPot'
+        if debug:
+            print('\nAll Waves (course grid), %i kept channels, %i eliminated channels, %i resonances' % (nChan, nElim, nRes))
+            print('     E (eV)       SigTotU (b)    SigTotSum (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   ' +
+                  'SigNeuU (b)    SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  sigPot')
 
         eStep = 10 #int( len( egrid )/95)
         egrid = self.RRRSmall.generateEnergyGrid()[::eStep]
@@ -1464,7 +1508,10 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
             sigPot = sum( [ ( ( 2.0 * l + 1.0 ) ) * 4.0 * numpy.pi * ( numpy.sin( self.RRRSmall.phi( l, rhohat[iE] ) ) )**2 / k[iE]**2 for l in nLs ] )
             sigNeuInt   = 4.0*numpy.pi*B[0][iE].real
 
-            if debug: print 11*'%10g     ' % ( E, sigTotWithU, sigGamWithU + sigNeuWithU, sigs['total'][iE], sigGamWithU, sigs['capture'][iE], sigNeuWithU, sigs['elastic'][iE], sigNeuInt,  sigNeuWithU/sigNeuInt, sigPot ) #, -(sigNeuWithU-sigs['elastic'][iE])/sigPot )
+            if debug: print(11 * '%10g     ' % (
+                    E, sigTotWithU, sigGamWithU + sigNeuWithU, sigs['total'][iE], sigGamWithU, sigs['capture'][iE], sigNeuWithU,
+                    sigs['elastic'][iE], sigNeuInt, sigNeuWithU / sigNeuInt,
+                    sigPot))  # , -(sigNeuWithU-sigs['elastic'][iE])/sigPot )
 
             # Check they sum up correctly (really just another test of unitarity)
             if doTests: self.assertWithinXPercent( sigTotWithU, sigGamWithU + sigNeuWithU, 10. )
@@ -1495,7 +1542,7 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
         if debug:
             for E in egrid[::eStep]:
                 B = self.RRRSmall.getAngularDistribution( E )
-                print E, ' '.join( map( str, B ) )
+                print(E, ' '.join(map(str, B)))
         if doTest:
             ER = 0.169
             B = self.RRRSmall.getAngularDistribution( numpy.array([ER]) )
@@ -1517,7 +1564,7 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
         if debug:
             for E in egrid[::eStep]:
                 B = self.RRR.getAngularDistribution( E )
-                print E, ' '.join( map( str, B ) )
+                print(E, ' '.join(map(str, B)))
         if doTest:
             ER = 0.169
             B = self.RRR.getAngularDistribution( numpy.array([ER]) )
@@ -1525,7 +1572,7 @@ class TestRMClassAndBaseClasses( TestWithIsClose ):
             self.assertAlmostEqual( B[1]/B[0], 0.0, 3 )
 
     def test_getCrossSection( self ):
-        '''Test thermal point'''
+        """Test thermal point"""
         result = self.RRR.getCrossSection( 0.0235339347844 )
         #print 'RM',result
         answer = {'capture':0.17536290484357434, 'total':2.1313431546619341, 'fission':0., 'elastic':1.9559802498183596}
@@ -1582,16 +1629,16 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
         self.assertEqual( self.RRRSmall.RR.calculateChannelRadius, True )
 
     def test_RR_spinGroup_memberData(self):
-        self.assertEqual( self.RRRSmall.RR.spinGroups[0].index, 0 )
+        self.assertEqual( self.RRRSmall.RR.spinGroups[0].label, '0' )
         self.assertEqual( str(self.RRRSmall.RR.spinGroups[0].spin), '1' )
         self.assertEqual( str(self.RRRSmall.RR.spinGroups[0].parity), '1' )
-        self.assertEqual( self.RRRSmall.RR.spinGroups[0].background, False )
-        self.assertEqual( self.RRRSmall.RR.spinGroups[0].applyPhaseShift, False )
         #self.assertEqual( self.RRRSmall.RR.spinGroups[0].overrides[0].label, '1' )
         #for attr in [ 'scatteringRadius', 'effectiveRadius', 'penetrability', 'shiftFactor', 'phaseShift' ]:
         #    self.assertTrue( hasattr(self.RRRSmall.RR.spinGroups[0].overrides[0], attr ) )
-        self.assertItemsEqual( [x.name for x in self.RRRSmall.RR.spinGroups[0].resonanceParameters.table.columns], ['energy','photon + Cl36 width','n + Cl35 width','H1 + S35 width'] )
-        self.assertItemsEqual( [x.unit for x in self.RRRSmall.RR.spinGroups[0].resonanceParameters.table.columns], ['eV','eV','eV','eV'] )
+        self.assertItemsEqual( [x.name for x in self.RRRSmall.RR.spinGroups[0].resonanceParameters.table.columns],
+            ['energy','photon + Cl36 width','n + Cl35 width','H1 + S35 width'] )
+        self.assertItemsEqual( [x.unit for x in self.RRRSmall.RR.spinGroups[0].resonanceParameters.table.columns],
+            ['eV','eV','eV','eV'] )
 
     def test_RR_openChannel_memberData(self):
         self.assertEqual( self.RRRSmall.RR.resonanceReactions[1].label, 'n + Cl35' )
@@ -1611,7 +1658,8 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
         self.assertAlmostEqual( self.RRRSmall.RR.resonanceReactions[1].reactionInfo['particles'][1].particle.getMass('amu'), 34.9688491980864 )
         if False:
             for i in range(len(self.RRRSmall.RR.resonanceReactions)):
-                print i, self.RRRSmall.RR.resonanceReactions[i].name, self.RRRSmall.RR.resonanceReactions[i].reactionInfo['Xi']
+                print(i, self.RRRSmall.RR.resonanceReactions[i].name,
+                       self.RRRSmall.RR.resonanceReactions[i].reactionInfo['Xi'])
 
     def test_isElastic(self):
         self.assertTrue( self.RRRSmall.isElastic('n + Cl35') )
@@ -1664,9 +1712,9 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
             ChannelDesignator(l=1, J=3.0, reaction='gamma + Cl36', index=21, s=2.0, gfact=1.0, particleA='Cl36', particleB='photon', Xi=-8827250.63441, isElastic=False, channelClass=GAMMACHANNEL, useRelativistic=False, eliminated=True),
             ChannelDesignator(l=1, J=3.0, reaction='n + Cl35', index=22, s=2.0, gfact=0.875, particleA='n', particleB='Cl35', Xi=-0.0, isElastic=True, channelClass=NEUTRONCHANNEL, useRelativistic=False, eliminated=False),
             ChannelDesignator(l=1, J=3.0, reaction='H1 + S35', index=23, s=2.0, gfact=0.875, particleA='H1', particleB='S35', Xi=-632965.817883, isElastic=False, channelClass=CPCHANNEL, useRelativistic=False, eliminated=False)] )
-        self.assertEqual( self.RRRSmall.channels[ChannelDesignator(l=1, J=3.0, reaction='H1 + S35', index=23, s=2.0, gfact=0.875, particleA='H1', particleB='S35', Xi=-632965.817883, isElastic=False, channelClass=CPCHANNEL, useRelativistic=False, eliminated=False)],\
-                               {4: 0.164019})
-        self.assertEqual( self.RRRSmall.channels[ChannelDesignator(l=0, J=2.0, reaction='n + Cl35', index=4, s=2.0, gfact=0.625, particleA='n', particleB='Cl35', Xi=-0.0, isElastic=True, channelClass=NEUTRONCHANNEL, useRelativistic=False, eliminated=False)],\
+        self.assertEqual(self.RRRSmall.channels[ChannelDesignator(l=1, J=3.0, reaction='H1 + S35', index=23, s=2.0, gfact=0.875, particleA='H1', particleB='S35', Xi=-632965.817883, isElastic=False, channelClass=CPCHANNEL, useRelativistic=False, eliminated=False)],
+            {4: 0.164019})
+        self.assertEqual( self.RRRSmall.channels[ChannelDesignator(l=0, J=2.0, reaction='n + Cl35', index=4, s=2.0, gfact=0.625, particleA='n', particleB='Cl35', Xi=-0.0, isElastic=True, channelClass=NEUTRONCHANNEL, useRelativistic=False, eliminated=False)],
                                {1: 13.277, 12: 621905.0})
 
         if VERBOSE:
@@ -1693,10 +1741,10 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
                         else:
                             row[9]=ic
                             row[10]=res[ir]
-                print ' & '.join(map(str,row)),'\\\\ \\hline'
+                print(' & '.join(map(str, row)), '\\\\ \\hline')
 
     def test_getCrossSection_thermal( self ):
-        '''Test thermal point'''
+        """Test thermal point"""
         result = self.RRR.getCrossSection( 0.0235339347844 )
         answer = { 'capture':45.04182664, 'total':66.22034846, 'fission':0., 'elastic':20.68451381, 'H1 + S35':0.49400801 }
         for k in answer:
@@ -1735,7 +1783,7 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
         if False:
             egrid=self.RRRSmall.generateEnergyGrid()
             rhos=self.RRRSmall.rho(egrid, c)
-            for E,rho in zip(egrid,rhos): print E,rho
+            for E,rho in zip(egrid,rhos): print(E, rho)
 
     def test_rhohat(self):
         self.RRRSmall.setResonanceParametersByChannel( )
@@ -1757,7 +1805,7 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
         if False:
             egrid=self.RRRSmall.generateEnergyGrid()
             etas=self.RRR.eta(Ex=egrid, pA=pSi[0], pB=pSi[1])
-            for E,eta in zip(egrid,etas): print E,eta
+            for E,eta in zip(egrid,etas): print(E, eta)
 
     def test_omega(self):
         vals='''-336933.4       4.64807322355   0.559844234898
@@ -1815,9 +1863,9 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
         #                               -8.13196123e-01,  -3.29225536e-01,  -2.29347373e-01,   1.03427445e+00,   5.45296368e-06])
         #
         # These are the numbers from Abramowitz and Stegun:
-        answerF = numpy.array([ 5.1660e-01,   2.2753e-01,   2.0413e-05,   3.6966e-11,   2.9556e-23,\
-                               -4.9046e-01,   6.8494e-01,   2.7673e-02,   1.7207e-06,   1.6477e-16,\
-                                9.3919e-01,   4.7756e-01,   9.1794e-01,   1.6263e-03,   8.0470e-12,\
+        answerF = numpy.array([ 5.1660e-01,   2.2753e-01,   2.0413e-05,   3.6966e-11,   2.9556e-23,
+                               -4.9046e-01,   6.8494e-01,   2.7673e-02,   1.7207e-06,   1.6477e-16,
+                                9.3919e-01,   4.7756e-01,   9.1794e-01,   1.6263e-03,   8.0470e-12,
                                -8.1320e-01,  -3.2923e-01,  -2.2935e-01,   1.0343e+00,   5.4529e-06])
         #
         # These are the full precision values returned by COULFG:
@@ -1828,9 +1876,9 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
         #                                6.03865910e-01,  -9.72428399e-01,   1.16571667e+00,   1.79968757e+00,   9.17224865e+04])
         #
         # These are the numbers from Abramowitz and Stegun:
-        answerG = numpy.array([ 1.1975e+00,   2.0431e+00,   8.0855e+03,   3.0882e+09,   2.7024e+21,\
-                               -9.3493e-01,  -8.9841e-01,   1.8193e+01,   1.6764e+05,   1.1464e+15,\
-                               -4.1435e-01,   9.4287e-01,   1.6085e+00,   3.0787e+02,   3.5867e+10,\
+        answerG = numpy.array([ 1.1975e+00,   2.0431e+00,   8.0855e+03,   3.0882e+09,   2.7024e+21,
+                               -9.3493e-01,  -8.9841e-01,   1.8193e+01,   1.6764e+05,   1.1464e+15,
+                               -4.1435e-01,   9.4287e-01,   1.6085e+00,   3.0787e+02,   3.5867e+10,
                                 6.0387e-01,  -9.7243e-01,   1.1657e+00,   1.7997e+00,   9.1723e+04])
         F,G     = getCoulombWavefunctions.getCoulombWavefunctions(rho=rho, eta=eta, L=0)
         self.assertAllWithinXPercent(     F,     answerF, 0.01, 1e-8), 'F0(rho,eta), %s should be %s'%(str(F),str(answerF))  # agreement terrible as exponent gets small
@@ -1844,10 +1892,10 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
         for L in [0,1,2]:
             eta=numpy.array([0.0, 0.0, 0.0])
             rho=numpy.array([1.0, 0.1, 0.01])
-            self.assertAllWithinXPercent(\
-                    getCoulombWavefunctions.coulombPenetrationFactor(L=L, rho=rho, eta=eta), \
-                    self.RRRSmall.penetrationFactor(L=L, rho=rho),\
-                    0.5, 1e-8), \
+            self.assertAllWithinXPercent(
+                getCoulombWavefunctions.coulombPenetrationFactor(L=L, rho=rho, eta=eta),
+                self.RRRSmall.penetrationFactor(L=L, rho=rho),
+                0.5, 1e-8), \
                 'L=%i, %s vs. %s'%(L, str(getCoulombWavefunctions.coulombPenetrationFactor(L=L, rho=rho, eta=eta)),str(self.RRRSmall.penetrationFactor(L=L, rho=rho)))
 
     def test_coulombShiftFactor(self):
@@ -1858,10 +1906,10 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
         for L in [0,1,2]:
             eta=numpy.array([0.0, 0.0, 0.0])
             rho=numpy.array([1.0, 0.1, 0.01])
-            self.assertAllWithinXPercent(\
-                    getCoulombWavefunctions.coulombShiftFactor(L=L, rho=rho, eta=eta), \
-                    self.RRRSmall.shiftFactor(L=L, rho=rho),\
-                    0.5, 1e-8), \
+            self.assertAllWithinXPercent(
+                getCoulombWavefunctions.coulombShiftFactor(L=L, rho=rho, eta=eta),
+                self.RRRSmall.shiftFactor(L=L, rho=rho),
+                0.5, 1e-8), \
                 'L=%i, %s vs. %s'%(L, str(getCoulombWavefunctions.coulombShiftFactor(L=L, rho=rho, eta=eta)),str(self.RRRSmall.shiftFactor(L=L, rho=rho)))
 
     def test_coulombPhi(self):
@@ -1872,30 +1920,30 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
         for L in [0,1,2]:
             eta=numpy.array([   0.0,  0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0  ])
             rho=numpy.array([ 100.0, 50.0, 10.0, 5.0, 3.5, 2.0, 1.0, 0.1, 0.01 ])
-            self.assertAllWithinXPercent(\
-                numpy.mod( getCoulombWavefunctions.coulombPhi(L=L, rho=rho, eta=eta), numpy.pi ),\
-                numpy.mod( self.RRRSmall.phi(L=L, rho=rho),                 numpy.pi ),\
+            self.assertAllWithinXPercent(
+                numpy.mod( getCoulombWavefunctions.coulombPhi(L=L, rho=rho, eta=eta), numpy.pi ),
+                numpy.mod( self.RRRSmall.phi(L=L, rho=rho),                 numpy.pi ),
                 0.01, 1e-6), \
             'L=%i, %s vs. %s'%( L,
                                 str( numpy.mod( getCoulombWavefunctions.coulombPhi(L=L, rho=rho, eta=eta), numpy.pi) ),
                                 str( numpy.mod( self.RRRSmall.phi(L=L, rho=rho),                 numpy.pi) ) )
             if False:
                 eta=numpy.array([ 0.01, 0.01,  0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01  ])
-                print '\n eta=0.01'
-                print 'no coul',L,numpy.mod( self.RRRSmall.phi(L=L, rho=rho), numpy.pi )
-                print 'coul',L,numpy.mod( getCoulombWavefunctions.coulombPhi(L=L, rho=rho, eta=eta), numpy.pi )
+                print('\n eta=0.01')
+                print('no coul', L, numpy.mod(self.RRRSmall.phi(L=L, rho=rho), numpy.pi))
+                print('coul',L,numpy.mod( getCoulombWavefunctions.coulombPhi(L=L, rho=rho, eta=eta), numpy.pi ))
                 eta=numpy.array([ 0.1, 0.1,  0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1  ])
-                print '\n eta=0.1'
-                print 'no coul',L,numpy.mod( self.RRRSmall.phi(L=L, rho=rho), numpy.pi )
-                print 'coul',L,numpy.mod( getCoulombWavefunctions.coulombPhi(L=L, rho=rho, eta=eta), numpy.pi )
+                print('\n eta=0.1')
+                print('no coul',L,numpy.mod( self.RRRSmall.phi(L=L, rho=rho), numpy.pi ))
+                print('coul',L,numpy.mod( getCoulombWavefunctions.coulombPhi(L=L, rho=rho, eta=eta), numpy.pi ))
                 eta=numpy.array([ 0.5, 0.5,  0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5  ])
-                print '\n eta=0.5'
-                print 'no coul',L,numpy.mod( self.RRRSmall.phi(L=L, rho=rho), numpy.pi )
-                print 'coul',L,numpy.mod( getCoulombWavefunctions.coulombPhi(L=L, rho=rho, eta=eta), numpy.pi )
+                print('\n eta=0.5')
+                print('no coul',L,numpy.mod( self.RRRSmall.phi(L=L, rho=rho), numpy.pi ))
+                print('coul',L,numpy.mod( getCoulombWavefunctions.coulombPhi(L=L, rho=rho, eta=eta), numpy.pi ))
                 eta=numpy.array([ 1.0, 1.0,  1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0  ])
-                print '\n eta=1.0'
-                print 'no coul',L,numpy.mod( self.RRRSmall.phi(L=L, rho=rho), numpy.pi )
-                print 'coul',L,numpy.mod( getCoulombWavefunctions.coulombPhi(L=L, rho=rho, eta=eta), numpy.pi )
+                print('\n eta=1.0')
+                print('no coul',L,numpy.mod( self.RRRSmall.phi(L=L, rho=rho), numpy.pi ))
+                print('coul',L,numpy.mod( getCoulombWavefunctions.coulombPhi(L=L, rho=rho, eta=eta), numpy.pi ))
 
     def test_coulombNormalizationFactor(self):
         """
@@ -1917,9 +1965,9 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
             return numpy.sqrt(L*L+eta[i]*eta[i])*CL_answers(L-1,i)/L/(2.0*L+1.0)
         answers = { L:[ CL_answers(L,i) for i in range(len(eta)) ] for L in range(4) }
         for L in [0,1,2]:
-            self.assertAllWithinXPercent(\
-                    getCoulombWavefunctions.coulombNormalizationFactor(L, eta),\
-                    answers[L],\
+            self.assertAllWithinXPercent(
+                getCoulombWavefunctions.coulombNormalizationFactor(L, eta),
+                answers[L],
                 0.0001),\
             'L=%i, %s vs. %s'%(L, str(getCoulombWavefunctions.coulombNormalizationFactor(L, eta)),str(answers[L]))
 
@@ -1981,7 +2029,7 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
                     self.assertAlmostEqual( L0cc, 1j*getCoulombWavefunctions.coulombPenetrationFactor(c.l,numpy.array([rho]),real_eta) )
 
     def test_getRMatrix( self ):
-        '''
+        """
         iER == 4 details:
             ER = 16356.12 eV
             GAMg = 0.3865 eV
@@ -1990,7 +2038,7 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
                 ChannelDesignator(1, 3.0, 'n + Cl35', 0, 2, gfact=0.875, particleA=n, particleB=Cl35, Xi=-0.0, isElastic=True, channelClass=1, useRelativistic=False, eliminated=False) and
                 ChannelDesignator(1, 3.0, 'H1 + S35', 0, 2, gfact=0.875, particleA=H1, particleB=S35, Xi=-632965.817883, isElastic=False, channelClass=2, useRelativistic=False, eliminated=False)
         :return:
-        '''
+        """
         self.RRRSmall.setResonanceParametersByChannel( )
         energy_indices = [1,4,10]
         ERs = numpy.array([self.RRRSmall._energies[i] for i in energy_indices]).reshape(len(energy_indices),1)
@@ -2029,9 +2077,9 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
         L0 = self.RRRSmall.getL0Matrix(egrid)
 
         if debug:
-            print 'these channels:',self.RRRSmall.channels.keys()[-2:]
+            print('these channels:', self.RRRSmall.channels.keys()[-2:])
             for iEE,EE in enumerate(egrid):
-                print EE, X[iEE,-2,-2].real, X[iEE,-2,-2].imag, X[iEE,-1,-1].real, X[iEE,-1,-1].imag
+                print(EE, X[iEE, -2, -2].real, X[iEE, -2, -2].imag, X[iEE, -1, -1].real, X[iEE, -1, -1].imag)
 
         # Test specific values, last two rows/columns correspond to an isolated resonance so reuse LRF=3 unit test
         for iE in range(len(egrid)):
@@ -2060,18 +2108,18 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
         xsEta  = self.RRRSmall.eta(Es-Xi, pA, pB)
         xsRho  = self.RRRSmall.rho(Es-Xi, c)
 
-        print '\n# E (eV)        eta             rho'
-        for x in zip(Es,xsEta,xsRho): print ' '.join([y.ljust(15) for y in map(str,x)])
-        for x in zip(ERs,resEta,resRho): print ' '.join([y.ljust(15) for y in map(str,x)])
+        print('\n# E (eV)        eta             rho')
+        for x in zip(Es,xsEta,xsRho): print(' '.join([y.ljust(15) for y in map(str, x)]))
+        for x in zip(ERs,resEta,resRho): print(' '.join([y.ljust(15) for y in map(str, x)]))
 
     def test_getScatteringMatrixUUnitarity_Small( self ):
-        '''
+        """
         The RML parameterization might have a unitary U matrix.  Here we have two tests:
 
             * just plain multiplication: U^+ * U == one
 
             * check the Frobenius norm, which is ||A|| = sqrt(| sum_{i,j} |A[i,j]|^2 |), so the norm of the identity matrix is sqrt( ndim )
-        '''
+        """
         debug = False
         self.RRRSmall.setResonanceParametersByChannel( )
 
@@ -2079,9 +2127,9 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
             egrid = self.RRRSmall.generateEnergyGrid()[::2]
             UU = self.RRRSmall.getScatteringMatrixU( egrid )
             for iEE,EE in enumerate(egrid):
-                print EE, UU[iEE,0,0].real, UU[iEE,0,0].imag, \
-                    UU[iEE,0,1].real, UU[iEE,0,1].imag, UU[iEE,1,1].real, \
-                    UU[iEE,1,1].imag, numpy.linalg.norm(UU[0])/math.sqrt( UU[0].shape[0] )
+                print(EE, UU[iEE, 0, 0].real, UU[iEE, 0, 0].imag,
+                       UU[iEE, 0, 1].real, UU[iEE, 0, 1].imag, UU[iEE, 1, 1].real,
+                       UU[iEE, 1, 1].imag, numpy.linalg.norm(UU[0]) / math.sqrt(UU[0].shape[0]))
 
         egrid = numpy.array([ 1.0, 42.0, 16356.12 ]).reshape(3,1)
         U = self.RRRSmall.getScatteringMatrixU( egrid, useTabulatedScatteringRadius = True )
@@ -2116,8 +2164,12 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
         nRes = len( self.RRRSmall._energies )
 
         # Column labels!
-        if debug: print '#\n# All Waves (full grid), %i kept channels, %i eliminated channels, %i resonances' % ( nChan, nElim, nRes )
-        if debug: print '#      E (eV)       SigTotU (b)    SigTotSum (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   SigNeuU (b)    SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  SigPot       rho            eta         SigNPU (b)   SigNPOK (b)   SigNPInt (b)'
+        if debug: print('#\n# All Waves (full grid), %i kept channels, %i eliminated channels, %i resonances'
+                        %(nChan, nElim, nRes))
+        if debug: print(
+            '#      E (eV)       SigTotU (b)    SigTotSum (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   ' +
+            'SigNeuU (b)    SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  SigPot       rho            eta         ' +
+            'SigNPU (b)   SigNPOK (b)   SigNPInt (b)')
 
         # We can't eat the whole energy grid, so we'll do it in parts
         fullEgrid = self.RRRSmall.generateEnergyGrid()
@@ -2162,7 +2214,10 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
                 sigNeuInt  = 4.0*numpy.pi*Bn[0][iE].real
                 sigNPInt   = 4.0*numpy.pi*Bp[0][iE].real
 
-                if debug: print 16*'%10g     ' % ( E, sigTotWithU, sigGamWithU + sigNeuWithU, sigs['total'][iE], sigGamWithU, sigs['capture'][iE], sigNeuWithU, sigs['elastic'][iE], sigNeuInt,  sigNeuWithU/sigNeuInt, sigPot, rho, eta, sigNPWithU, sigs['H1 + S35'][iE], sigNPInt ) #, -(sigNeuWithU-sigs['elastic'][iE])/sigPot )
+                if debug: print(16 * '%10g     ' % (
+                    E, sigTotWithU, sigGamWithU + sigNeuWithU, sigs['total'][iE], sigGamWithU, sigs['capture'][iE],
+                    sigNeuWithU, sigs['elastic'][iE], sigNeuInt, sigNeuWithU / sigNeuInt, sigPot, rho, eta, sigNPWithU,
+                    sigs['H1 + S35'][iE], sigNPInt))  # , -(sigNeuWithU-sigs['elastic'][iE])/sigPot )
 
                 # Check they sum up correctly (really just another test of unitarity)
                 if doTests: self.assertWithinXPercent( sigTotWithU, sigGamWithU + sigNeuWithU + sigNPWithU, 1. )
@@ -2183,8 +2238,11 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
         enableExtraCoulombPhase=True
 
         # Column labels!
-        if debug: print '#'
-        if debug: print '#      E (eV)       SigTotU (b)    SigTotSum (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   SigNeuU (b)    SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  SigPot       SigNPU (b)   SigNPOK (b)   SigNPInt (b)'
+        if debug: print('#')
+        if debug: print(
+                '#      E (eV)       SigTotU (b)    SigTotSum (b)    SigTotOK (b)   SigGamU (b)    SigGamOK (b)   ' +
+                'SigNeuU (b)    SigNeuOK (b)   SigNeuInt (b) SigNeuInt/SigNeuU  SigPot       SigNPU (b)   ' +
+                'SigNPOK (b)   SigNPInt (b)')
 
         # We can't eat the whole energy grid, so we'll do it in parts
         fullEgrid = self.RRRFe.generateEnergyGrid()
@@ -2265,7 +2323,7 @@ class TestRMLClassAndBaseClasses( TestWithIsClose ):
 
     @unittest.skip("in dev")
     def test_getAngularDistribution( self ):
-        '''
+        """
         Note, Blatt-Biedenharn's Z coefficient has a factor of (l1,l2,0,0;L,0) (a Clebsch-Gordan coefficient) in it.
         As a result, if l1 and l2 cannot couple to L, one gets zero.
 
@@ -2283,7 +2341,7 @@ update this: spingroup 5 has l=1, j=1, s=2, single P-wave resonance
         smaller than that in the l=0 elements.  This allows us to ignore all but the purely resonance elements when directly on
         resonance (Ein=ER).   In our P-wave example, that means that our MLBW on resonance angular distribution should match the
         SLBW result (_but only on resonance_).  We reuse the test below, but only approximately.
-        '''
+        """
         debug = True
         doTest = True
         enableExtraCoulombPhase=True
@@ -2313,10 +2371,10 @@ update this: spingroup 5 has l=1, j=1, s=2, single P-wave resonance
                 Bp = self.RRRSmall.getAngularDistribution( egrid, renormalize=True, reaction='n + Cl35', reactionp='H1 + S35', enableExtraCoulombPhase=enableExtraCoulombPhase )
                 if False:
                     for iE, E in enumerate(egrid):
-                        print E[0], ' '.join( map( str, [Bn[L][iE][0] for L in range(len(Bn))] ) )
+                        print(E[0], ' '.join(map(str, [Bn[L][iE][0] for L in range(len(Bn))])))
                 if True:
                     for iE, E in enumerate(egrid):
-                        print E[0], ' '.join( map( str, [Bp[L][iE][0] for L in range(len(Bp))] ) )
+                        print(E[0], ' '.join(map(str, [Bp[L][iE][0] for L in range(len(Bp))])))
         if doTest:
             ER = 133988.4
             Bn = self.RRRSmall.getAngularDistribution( ER, renormalize=False, reaction='n + Cl35', reactionp='n + Cl35', enableExtraCoulombPhase=enableExtraCoulombPhase )
@@ -2341,27 +2399,17 @@ class TestURRClassAndBaseClasses( TestWithIsClose ):
         self.assertWithinXPercent( self.Zr90URR.targetToNeutronMassRatio, 89.13240000000002, 0.01 )
         self.assertEqual( self.Zr90URR.verbose, False)
         self.assertEqual( self.Zr90URR.targetSpin, 0.0)
-        self.assertEqual( self.Zr90URR.URR.ENDFconversionFlag, "LRF,LFW=2,0")
-        self.assertEqual( [ x.L for x in self.Zr90URR.URR.L_values ], [0, 1, 2])
-#        self.assertEqual( self.Zr90URR.URR.reconstructCrossSection, False)
-        self.assertEqual( self.Zr90URR.URR.interpolation, 'lin-lin')
+        self.assertEqual( [ x.L for x in self.Zr90URR.URR.Ls ], [0, 1, 2])
+        self.assertEqual( self.Zr90URR.URR.useForSelfShieldingOnly, True)
         self.assertEqual( self.Zr90URR.URR.moniker, 'tabulatedWidths')
-        self.assertItemsEqual( self.Zr90URR.URR.optAttrList,  ('interpolation', 'ENDFconversionFlag') ) #'forSelfShieldingOnly',
         self.assertEqual( str(self.Zr90URR.URR.scatteringRadius.getValueAs('fm')), '7.16' )
-        for LSection in self.Zr90URR.URR.L_values:
-            for JSection in LSection.J_values:
-                self.assertEqual( JSection.neutronDOF, 1.0 )
-                self.assertEqual( JSection.gammaDOF, False )
-                self.assertEqual( JSection.fissionDOF, False )
-                self.assertEqual( JSection.competitiveDOF, False )
-                self.assertEqual( getattr(JSection.constantWidths,'levelSpacing'), None )
-                self.assertEqual( getattr(JSection.constantWidths,'neutronWidth'), None )
-                self.assertEqual( getattr(JSection.constantWidths,'captureWidth'), None )
-                self.assertEqual( str(getattr(JSection.constantWidths,'competitiveWidth')), '0. eV' )
-                self.assertEqual( str(getattr(JSection.constantWidths,'fissionWidthA')), '0. eV' )
-                self.assertEqual( getattr(JSection.constantWidths,'fissionWidthB'), None )
-                self.assertEqual(''.join(JSection.energyDependentWidths.toXMLList()),
-                                 '<table rows="17" columns="4">  <columnHeaders>    <column index="0" name="energy" unit="eV"/>    <column index="1" name="levelSpacing" unit="eV"/>    <column index="2" name="neutronWidth" unit="eV"/>    <column index="3" name="captureWidth" unit="eV"/></columnHeaders>  <data>   <!-- energy | levelSpacing | neutronWidth | captureWidth  -->            2e5        8655.91      0.5280105      0.1416092            3e5       7811.708      0.4765142      0.1476385            4e5       7054.611      0.4303313      0.1538193            5e5       6375.102      0.3888812      0.1601527            6e5       5764.775      0.3516513      0.1666401            7e5       5216.188      0.3181875      0.1732827            8e5       4722.749      0.2880877      0.1800816            9e5       4278.602      0.2609947      0.1870381            1e6       3878.548      0.2365914      0.1941535          1.1e6       3517.969      0.2145961      0.2014288          1.2e6       3192.751      0.1947578      0.2088653          1.3e6       2899.241      0.1768537      0.2164641          1.4e6        2634.18       0.160685      0.2242264          1.5e6        2394.66      0.1460743      0.2321535          1.6e6       2178.092      0.1328636      0.2402462          1.7e6       1982.151      0.1209112       0.248506        1780460       1838.063      0.1121218      0.2552738</data></table>')
+        for LSection in self.Zr90URR.URR.Ls:
+            for JSection in LSection.Js:
+                self.assertEqual( JSection.widths['n + Zr90'].degreesOfFreedom, 1.0 )
+                self.assertEqual( JSection.widths['Zr91 + photon'].degreesOfFreedom, 0 )
+                self.assertEqual( len(JSection.widths), 2 )
+                #self.assertEqual(''.join(JSection.energyDependentWidths.toXMLList()),
+                #                 '<table rows="17" columns="4">  <columnHeaders>    <column index="0" name="energy" unit="eV"/>    <column index="1" name="levelSpacing" unit="eV"/>    <column index="2" name="neutronWidth" unit="eV"/>    <column index="3" name="captureWidth" unit="eV"/></columnHeaders>  <data>   <!-- energy | levelSpacing | neutronWidth | captureWidth  -->            2e5        8655.91      0.5280105      0.1416092            3e5       7811.708      0.4765142      0.1476385            4e5       7054.611      0.4303313      0.1538193            5e5       6375.102      0.3888812      0.1601527            6e5       5764.775      0.3516513      0.1666401            7e5       5216.188      0.3181875      0.1732827            8e5       4722.749      0.2880877      0.1800816            9e5       4278.602      0.2609947      0.1870381            1e6       3878.548      0.2365914      0.1941535          1.1e6       3517.969      0.2145961      0.2014288          1.2e6       3192.751      0.1947578      0.2088653          1.3e6       2899.241      0.1768537      0.2164641          1.4e6        2634.18       0.160685      0.2242264          1.5e6        2394.66      0.1460743      0.2321535          1.6e6       2178.092      0.1328636      0.2402462          1.7e6       1982.151      0.1209112       0.248506        1780460       1838.063      0.1121218      0.2552738</data></table>')
                 break
             break
 
@@ -2369,7 +2417,7 @@ class TestURRClassAndBaseClasses( TestWithIsClose ):
 
         # Setup
         egrid,flag=self.Zr90URR.generateEnergyGrid()
-        self.Zr90URR.getWidthsAndSpacings(egrid,interpolateWidths=flag)
+        self.Zr90URR.getWidthsAndSpacings()
 
         expectedResults = [
             1.10423,  1.19709086,  1.29434685,  1.39570657,  1.50079576,
@@ -2377,9 +2425,13 @@ class TestURRClassAndBaseClasses( TestWithIsClose ):
             2.1787089 ,  2.29297545,  2.40541568,  2.51515507,  2.62133055,
             2.72311404,  2.80128048]
 
+        LJ = (2,1.5)
+        widths = {}
+        for key in self.Zr90URR.averageWidths[LJ]:
+            widths[key] = numpy.array( [self.Zr90URR.averageWidths[LJ][key].evaluate(energy) for energy in egrid] )
+
         computedResults = list(self.Zr90URR.getFluctuationIntegrals(
-            widths=self.Zr90URR.averageWidths[(2,1.5)],
-            DOF=self.Zr90URR.DOFs[(2,1.5)] )[0])
+            egrid, widths=widths, DOF=self.Zr90URR.DOFs[LJ] )[0] )
 
         # Now compare them
         self.assertEqual(len(computedResults),len(expectedResults))
@@ -2387,10 +2439,10 @@ class TestURRClassAndBaseClasses( TestWithIsClose ):
             self.assertAlmostEqual(expectedResults[i], computedResults[i])
 
     def test_getCrossSection( self ):
-        '''Test 1 MeV point'''
-        result = self.Zr90URR.getCrossSection()
+        """Test 1 MeV point"""
+        result = self.Zr90URR.getCrossSection(1e+6)
         answer = { 'total':6.6530426032410315, 'elastic':6.648122758610173, 'fission':0.0, 'capture':0.004919844630858361 }
-        for k in answer: self.assertAlmostEqual( answer[k], result[k].evaluate(1e6) )
+        for k in answer: self.assertAlmostEqual( answer[k], result[k] )
 
     def test_rho(self):
         self.assertEqual( self.Zr90URR.rho(E=0.), 0.0 )
@@ -2410,7 +2462,7 @@ class TestURRClassAndBaseClasses( TestWithIsClose ):
     def test_getWidthsAndSpacings(self):
         # Setup
         egrid,flag=self.Zr90URR.generateEnergyGrid()
-        self.Zr90URR.getWidthsAndSpacings(egrid,interpolateWidths=flag)
+        self.Zr90URR.getWidthsAndSpacings()
 
         # Test level spacing stuff
         levelSpacingAnswer = [
@@ -2418,22 +2470,22 @@ class TestURRClassAndBaseClasses( TestWithIsClose ):
             4722.749,  4278.602,  3878.548,  3517.969,  3192.751,  2899.241,
             2634.179,  2394.66 ,  2178.092,  1982.151,  1838.063]
         for i,D in enumerate(levelSpacingAnswer):
-            self.assertEqual(self.Zr90URR.levelSpacings[(1, 0.5)][i],D)
-            self.assertEqual(self.Zr90URR.levelSpacingFuncs[(1, 0.5)].evaluate(egrid[i]),D)
-            self.assertEqual(self.Zr90URR.levelDensityFuncs[(1, 0.5)].evaluate(egrid[i]),1.0/D)
+            self.assertEqual(self.Zr90URR.levelSpacings[(1, 0.5)][i][1],D)
+            self.assertEqual(self.Zr90URR.levelSpacings[(1, 0.5)].evaluate(egrid[i]),D)
+            self.assertEqual(self.Zr90URR.levelDensities[(1, 0.5)].evaluate(egrid[i]),1.0/D)
 
         # Test DOFs
-        self.assertEqual(self.Zr90URR.DOFs[(2, 1.5)],{'competitiveDOF': False, 'neutronDOF': 1, 'fissionDOF': False})
+        self.assertEqual(self.Zr90URR.DOFs[(2, 1.5)],{'capture': 0, 'elastic': 1})
 
         # Test width stuff
-        neutronWidthAnswer = [
+        elasticWidthAnswer = [
             0.751608 ,  0.6783044,  0.6125643,  0.5535613,  0.5005656,
             0.4529308,  0.4100846,  0.3715186,  0.3367811,  0.3054714,
             0.2772322,  0.2517462,  0.2287304,  0.2079326,  0.1891276,
             0.1721136,  0.1596022]
-        for i,Gam in enumerate(neutronWidthAnswer):
-            self.assertEqual(self.Zr90URR.averageWidths[(2, 1.5)]['neutronWidth'][i], Gam)
-            self.assertEqual(self.Zr90URR.averageWidthFuncs[(2, 1.5)]['neutronWidth'].evaluate(egrid[i]), Gam)
+        for i,Gam in enumerate(elasticWidthAnswer):
+            self.assertEqual(self.Zr90URR.averageWidths[(2, 1.5)]['elastic'][i][1], Gam)
+            self.assertEqual(self.Zr90URR.averageWidths[(2, 1.5)]['elastic'].evaluate(egrid[i]), Gam)
 
         # Test width stuff
         captureWidthAnswer = [
@@ -2441,15 +2493,15 @@ class TestURRClassAndBaseClasses( TestWithIsClose ):
             0.3116797,  0.3237198,  0.3360349,  0.3486268,  0.3614976,  0.3746494,
             0.3880842,  0.401804,   0.4158108,  0.4301065,  0.44182  ]
         for i,Gam in enumerate(captureWidthAnswer):
-            self.assertEqual(self.Zr90URR.averageWidths[(2, 1.5)]['captureWidth'][i], Gam)
-            self.assertEqual(self.Zr90URR.averageWidthFuncs[(2, 1.5)]['captureWidth'].evaluate(egrid[i]), Gam)
+            self.assertEqual(self.Zr90URR.averageWidths[(2, 1.5)]['capture'][i][1], Gam)
+            self.assertEqual(self.Zr90URR.averageWidths[(2, 1.5)]['capture'].evaluate(egrid[i]), Gam)
 
     def test_generateEnergyGrid(self):
         answerGrid = [
             200000., 300000., 400000., 500000., 600000., 700000.,
             800000., 900000., 1000000., 1100000., 1200000., 1300000.,
             1400000.,  1500000.,  1600000.,  1700000.,  1780460.]
-        computedGrid,flag = self.Zr90URR.generateEnergyGrid()
+        computedGrid,flag = self.Zr90URR.generateEnergyGrid(interpolateWidths=False)
         for i in range(len(answerGrid)):
             self.assertAlmostEqual(computedGrid[i],answerGrid[i])
         self.assertEqual(flag, False)
@@ -2461,63 +2513,12 @@ class TestURRClassAndBaseClasses( TestWithIsClose ):
     @unittest.skip("FIXME: needs work")
     def test_getTransmissionCoefficientsFromSumRule(self):
         egrid,flag=self.Zr90URR.generateEnergyGrid()
-        self.Zr90URR.getWidthsAndSpacings(egrid,interpolateWidths=flag)
+        self.Zr90URR.getWidthsAndSpacings()
         Tcs = self.Zr90URR.getTransmissionCoefficientsFromSumRule()
         c=ChannelDesignator(1, 1.5, 'elastic', 7, 1, gfact=None, particleA=None, particleB=None, isElastic=True,
                             channelClass=NEUTRONCHANNEL, useRelativistic=False, eliminated=False )
         self.assertTrue(c in Tcs)
         self.assertAlmostEqual(Tcs[c].evaluate(3.0e+05),0.35007858733963815)
-
-    @unittest.skipIf(not HAVEBLURR,"needs blurr")
-    def test_sampleRR(self):
-        LJs={(0,0.5), (1, 1.5), (1, 0.5), (2, 1.5), (2, 2.5)}
-
-        # Setup
-        lastEnergies={lj:self.Zr90URR.getLastResolvedResonanceEnergy(*lj) for lj in LJs}
-        egrid,flag=self.Zr90URR.generateEnergyGrid()
-        self.Zr90URR.getWidthsAndSpacings(egrid,interpolateWidths=flag)
-
-        # Generate fake resonance set
-        URRset = self.Zr90URR.sampleRR(lastEnergies)
-
-        # Count them & see if a reasonable number are made and that they are made in the right energy range
-        okGuys=0
-        badGuys=0
-        for row in URRset.data:
-            if self.Zr90URR.lowerBound <= row[0] and row[0] <= self.Zr90URR.upperBound: okGuys+=1
-            else: badGuys+=1
-        self.assertEqual(badGuys,0)
-        self.assertTrue(abs(okGuys-2630)<200)
-
-        # Check the energy of the first fake resonance, should be in ballpark of 0.36 MeV, so we give a 50 keV tolerance
-        self.assertTrue(abs(URRset[0,0]-360000.0)<50000.0)
-
-        # Check that the sum of partial widths equals the total
-        for i in range(0,200,20):
-            self.assertTrue(URRset[i,3],sum(URRset[i,4:]))
-
-    @unittest.skipIf(not HAVEBLURR,"needs burr")
-    def test_getURRPDF(self):
-        urrPdfs = {}
-        from fudge.core.utilities.brb import banner
-#        from fudge.vis.matplotlib.plot_matrix import plot_matrix
-#        import matplotlib.pyplot as plt
-
-        for m in RRClassMap.keys():
-            if m == "R_Matrix_Limited": continue #RML doesn't work well with others currently
-            if m == "Reich_Moore": continue #ENDF parameters in a little different order
-            if m == "SingleLevel_BreitWigner": continue #SLBW sucks
-            print(banner(m))
-            urrPdfs[m] = self.Zr90URR.getURRPDF(getResonanceReconstructionClass(m),memory=True,timing=True,restart=True)
-#            for r in urrPdfs[m]:
-#                title = m+' '+r #''$^{' + args.A + '}$' + args.sym + '(' + rxnMap[args.MT].lower() + ') cross section PDF'
-#                # Fancy way
-#                plot_matrix(urrPdfs[m][r].T, energyBoundariesX=eBins, energyBoundariesY=xsBins,
-#                            title=title,
-#                            xyTitle=('energy (MeV)', 'cross section (b)'),
-#                            switchY=False)
-#                plt.show()
-            urrPdfs[m].save(m+'_urrPdfs.txt')
 
     def test_URRPDFTable(self):
         u = URRPDFTable()

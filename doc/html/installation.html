@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Installation &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>Installation &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -30,7 +27,7 @@
     <link rel="next" title="Reporting Bugs" href="reporting-bugs.html" />
     <link rel="prev" title="Downloading" href="downloading.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -46,7 +43,7 @@
         <li class="right" >
           <a href="downloading.html" title="Downloading"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -59,7 +56,7 @@
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <p>Fudge is designed to be simple to install and use. For basic use the package only requires
 Python (versions 2.6-2.7, not version 3.0 and higher).  Python 2.7 is likely already present
-on all unix-based systems (if in doubt, try entering &#8220;python&#8221; on the command-line),
+on all unix-based systems (if in doubt, try entering “python” on the command-line),
 and is available for all platforms at <a class="reference external" href="http://www.python.org/getit/">http://www.python.org/getit/</a>.</p>
 <div class="section" id="to-install-the-package">
 <h2>To install the package:<a class="headerlink" href="#to-install-the-package" title="Permalink to this headline">¶</a></h2>
@@ -69,12 +66,12 @@ and place it on your system.</p>
 </li>
 <li><p class="first">To unzip the package, type</p>
 <blockquote>
-<div><div class="highlight-default"><div class="highlight"><pre><span></span>$tar -xvf fudge-4.2.2.tar.gz
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>$tar -xvf fudge-4.2.3.tar.gz
 </pre></div>
 </div>
 </div></blockquote>
 </li>
-<li><p class="first">The unzipped directory is named &#8216;fudge-4.2.2&#8217;. Navigate into the new directory, and type</p>
+<li><p class="first">The unzipped directory is named ‘fudge-4.2.3’. Navigate into the new directory, and type</p>
 <blockquote>
 <div><div class="highlight-default"><div class="highlight"><pre><span></span>$make
 </pre></div>
@@ -101,7 +98,7 @@ and place it on your system.</p>
 <div class="section" id="optional-setting-environment-variables">
 <h2>[Optional] Setting Environment Variables<a class="headerlink" href="#optional-setting-environment-variables" title="Permalink to this headline">¶</a></h2>
 <p>For general use of the fudge package, some changes should be made to your
-computer&#8217;s environment. The following lines make the required change.
+computer’s environment. The following lines make the required change.
 Note that &lt;path_to_fudge&gt; indicates the path to
 the directory containing the Fudge README.txt file:</p>
 <ul>
@@ -138,7 +135,7 @@ for deterministic transport.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ make merced
 </pre></div>
 </div>
-<p>Merced uses OpenMP threading. Some users may run into a &#8216;missing omp.h&#8217; error when compiling Merced (in particular
+<p>Merced uses OpenMP threading. Some users may run into a ‘missing omp.h’ error when compiling Merced (in particular
 on OS X where the default C++ compiler does not support OpenMP). If so, we recommend installing the g++-mp-4.9
 compiler instead (available via MacPorts) and compiling with that:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ make merced CXX=g++-mp-4.9
@@ -211,12 +208,12 @@ variables, please let us know (email: <a class="reference external" href="mailto
         <li class="right" >
           <a href="downloading.html" title="Downloading"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

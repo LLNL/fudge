@@ -61,16 +61,11 @@
 # 
 # <<END-copyright>>
 
-from PoPs import misc as miscPoPsModule
+from PoPs.groups import misc as chemicalElementMiscPoPsModule
 
-from xData import standards as standardsModule
-
-from fudge.gnd.productData.distributions import distribution as distributionModule
-from fudge.gnd.productData.distributions import reference as referenceModule
-from fudge.gnd.productData.distributions import unspecified as unspecifiedModule
+from fudge.gnds.productData.distributions import distribution as distributionModule
 
 from ... import endfFormats as endfFormatsModule
-from ... import gndToENDF6 as gndToENDF6Module
 
 def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
@@ -79,7 +74,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
         if( MT in [ 452, 455, 456 ] ) : return
         targetInfo['MF6LCTs'].append( None )
         particle = targetInfo['reactionSuite'].PoPs[targetInfo['zapID']]
-        ZAP = miscPoPsModule.ZA( particle )
+        ZAP = chemicalElementMiscPoPsModule.ZA( particle )
         nPoints, multiplicityList = targetInfo['multiplicity'].endfMultiplicityList( targetInfo )
         AWP = targetInfo['massTracker'].getMassAWR(ZAP, asTarget = False)
         endfMFList[6][MT] += [ endfFormatsModule.endfContLine( ZAP, AWP, 0, 0, 1, nPoints ) ]
@@ -88,28 +83,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     form = self[targetInfo['style']]
     if( hasattr( form, 'toENDF6' ) ) :
         form.toENDF6( MT, endfMFList, flags, targetInfo )
-    elif( isinstance( form, unspecifiedModule.form ) ) :
-        if( MT in [ 527, 528 ] ) : energyLoss( self, MT, endfMFList, flags, targetInfo )
     else :
-        print 'WARNING: Distribution, no toENDF6 for class = %s' % form.__class__
+        print( 'WARNING: Distribution, no toENDF6 for class = %s' % form.__class__ )
 
 distributionModule.component.toENDF6 = toENDF6
-
-def energyLoss( self, MT, endfMFList, flags, targetInfo ) :
-
-    energyDeposition = self.getAncestor( ).energyDeposition
-    try :
-        energyLoss = energyDeposition[targetInfo['style']]
-    except :
-        return
-    data = [ [ energyLoss.domainMin, energyLoss.domainMin ], [ energyLoss.domainMax, energyLoss.domainMax ] ]
-    energyLoss = energyLoss.__class__( data = data, axes = energyLoss.axes ) - energyLoss
-    data = []
-    for xy in energyLoss.copyDataToXYs( ) : data += xy
-    NE = len( energyLoss )
-    EInInterpolation = gndToENDF6Module.gndToENDFInterpolationFlag( energyLoss.interpolation )
-    ENDFDataList = [ endfFormatsModule.endfContLine( 0, 0, 0, 0, 1, NE ) ] + \
-            endfFormatsModule.endfInterpolationList( [ NE, EInInterpolation ] )
-    ENDFDataList += endfFormatsModule.endfDataList( data )
-    frame = standardsModule.frames.labToken
-    gndToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, 8, frame, ENDFDataList )

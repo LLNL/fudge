@@ -31,9 +31,9 @@ def readXYdYData(filename, commentCharacter='#'):
 
 
 def readEvaluation( filename, targ=None, proj=None, verbose=True, skipBadData=True, reconstructResonances=True, continuumSpectraFix=False,
-                    skipCovariances=False, verboseWarnings=True, printBadNK14=False, ignoreBadDate=True, ignoreMF10Fission=True):
+                    skipCovariances=False, verboseWarnings=True, printBadNK14=False, ignoreBadDate=True, acceptBadMF10FissionZAP=True):
     '''
-    Read in an evaluation in either Fudge/GND, ENDF or AMPX/BOF format and return result as Fudge classes
+    Read in an evaluation in either Fudge/GNDS, ENDF or AMPX/BOF format and return result as Fudge classes
     '''
     import fnmatch
     
@@ -44,21 +44,21 @@ def readEvaluation( filename, targ=None, proj=None, verbose=True, skipBadData=Tr
             ampx_za, bounds = ampx.readEvaluation( filename, str(targ), str(proj) )
             return [ 
                 ampx2fudge.convertAmpxNuclideToFudgeReactionSuite(ampx_za, bounds), 
-                fudge.gnd.covariances.covarianceSuite.covarianceSuite() ]
+                fudge.gnds.covariances.covarianceSuite.covarianceSuite() ]
         except ImportError:
             print "WARNING: Could not load AMPX module.  Is it in your path?"
     
     else:
         firstline = open(filename).readline()
         
-        # Is the file a GND file?
+        # Is the file a GNDS file?
         if firstline.startswith( "<?xml" ) or firstline.startswith("<reactionSuite "):
-            import fudge.gnd
-            RS = fudge.gnd.reactionSuite.readXML( filename )
+            import fudge.gnds
+            RS = fudge.gnds.reactionSuite.readXML( filename)
             try: 
-                CS = fudge.gnd.covariances.covarianceSuite.readXML( filename.replace( '.gnd.', '.gndCov.' ) )
+                CS = fudge.gnds.covariances.covarianceSuite.readXML( filename.replace('.gnds.', '.gndsCov.'))
             except: 
-                CS = fudge.gnd.covariances.covarianceSuite.covarianceSuite()
+                CS = fudge.gnds.covariances.covarianceSuite.covarianceSuite()
             return [ RS, CS ]
 
         # Maybe its an ENDF file?
@@ -69,8 +69,8 @@ def readEvaluation( filename, targ=None, proj=None, verbose=True, skipBadData=Tr
                 firstline.endswith(' 0  0\r') or \
                 firstline.endswith(' 0  0\r\n') or \
                 filename.endswith('.endf'):
-            from fudge.legacy.converting import endfFileToGND
-            results = endfFileToGND.endfFileToGND( filename,
+            from fudge.legacy.converting import endfFileToGNDS
+            results = endfFileToGNDS.endfFileToGNDS( filename,
                                                    toStdOut=verbose,
                                                    skipBadData=skipBadData,
                                                    reconstructResonances=reconstructResonances,
@@ -79,14 +79,14 @@ def readEvaluation( filename, targ=None, proj=None, verbose=True, skipBadData=Tr
                                                    verboseWarnings=verboseWarnings,
                                                    printBadNK14=printBadNK14,
                                                    ignoreBadDate=ignoreBadDate,
-                                                   ignoreMF10Fission=ignoreMF10Fission)
+                                                   acceptBadMF10FissionZAP=acceptBadMF10FissionZAP)
 
             if type( results ) == dict:
                 return [ results['reactionSuite'], results['covarianceSuite'] ]
             elif type( results ) == tuple:
                 return [ results[0], results[1] ]
             else:
-                raise TypeError( "endfFileToGND.endfFileToGND() returned a "+str(type(results))+", I don't know what to do with it" )
+                raise TypeError( "endfFileToGNDS.endfFileToGNDS() returned a "+str(type(results))+", I don't know what to do with it" )
 
         # Failed!
         else: print "WARNING: Unknown file type, not reading %s"% filename

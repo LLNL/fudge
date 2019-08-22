@@ -61,7 +61,7 @@
 # 
 # <<END-copyright>>
 
-from fudge.structure import masses as massModule
+from fudge.legacy.endl.structure import masses as massModule
 import collections
 
 class massTracker:
@@ -180,7 +180,13 @@ class massTracker:
 
     def getMassAWR(self, ZA, asTarget=True, levelEnergyInEv=0):
         """For going back to ENDF. Convert light charged particles back to nuclear masses (except for targets)."""
-        massAMU = self.amuMasses[ZA]
+
+        try :           # BRBFIXME - fails for ENDF-B-VII.1/photoat/photoat-001_H_000.endf because ZA = 1000 not in self.amuMasses.
+            massAMU = self.amuMasses[ZA]
+        except :
+            if( ( ZA % 1000 ) != 0 ) : raise
+            massAMU = massModule.getMassFromZA( ZA )
+
         if not asTarget:
             Z,A = divmod(ZA,1000)
             if Z in (1,2):

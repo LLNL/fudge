@@ -65,6 +65,8 @@
 This module contains the class for the database class.
 """
 
+import os
+
 from xData import ancestry as ancestryModule
 
 from .groups import chemicalElements as chemicalElementsModule
@@ -74,12 +76,13 @@ from .families import particle as particleModule
 from .families import gaugeBoson as gaugeBosonModule
 from .families import lepton as leptonModule
 from .families import baryon as baryonModule
-from .families import nuclearLevel as nuclearLevelModule
+from .families import nuclide as nuclideModule
 from .families import unorthodox as unorthodoxModule
 
+from . import styles as stylesModule
 from . import alias as aliasModule
 
-format = 'PoPs 0.1'
+format = '0.1'
 
 class database( ancestryModule.ancestry ) :
 
@@ -97,6 +100,9 @@ class database( ancestryModule.ancestry ) :
         if( not( isinstance( version, str ) ) ) : raise TypeError( 'version must be a str' )
         self.version = version
 
+        self.__styles = stylesModule.styles( )
+        self.__styles.setAncestor( self )
+
         self.__gaugeBosons = gaugeBosonModule.suite( )
         self.__gaugeBosons.setAncestor( self )
 
@@ -106,7 +112,7 @@ class database( ancestryModule.ancestry ) :
         self.__baryons = baryonModule.suite( )
         self.__baryons.setAncestor( self )
 
-        self.__chemicalElements = chemicalElementsModule.suite( )
+        self.__chemicalElements = chemicalElementsModule.chemicalElements( )
         self.__chemicalElements.setAncestor( self )
 
         self.__unorthodoxes = unorthodoxModule.suite( )
@@ -155,12 +161,10 @@ class database( ancestryModule.ancestry ) :
         for lepton in self.__leptons : yield lepton
         for baryon in self.__baryons : yield baryon
         for chemicalElement in self.__chemicalElements :
-            yield chemicalElement
             for isotope in chemicalElement :
-                yield isotope
-                for nuclearLevel in isotope :
-                    yield nuclearLevel
-                    if( nuclearLevel.nucleus is not None ) : yield nuclearLevel.nucleus
+                for nuclide in isotope :
+                    yield nuclide
+                    yield nuclide.nucleus
         for item in self.__unorthodoxes : yield item
         for item in self.__aliases : yield item
 
@@ -194,6 +198,11 @@ class database( ancestryModule.ancestry ) :
 
         if( not( isinstance( value, str ) ) ) : raise TypeError( 'version must be a string' )
         self.__version = value
+
+    @property
+    def styles( self ) :
+
+        return( self.__styles )
 
     @property
     def gaugeBosons( self ) :
@@ -244,13 +253,13 @@ class database( ancestryModule.ancestry ) :
             self.__leptons.add( particle )
         elif( isinstance( particle, baryonModule.particle ) ) :
             self.__baryons.add( particle )
-        elif( isinstance( particle, ( chemicalElementModule.suite, isotopeModule.suite, nuclearLevelModule.particle ) ) ) :
+        elif( isinstance( particle, ( chemicalElementModule.chemicalElement, isotopeModule.isotope, nuclideModule.particle ) ) ) :
             self.__chemicalElements.add( particle )
         elif( isinstance( particle, unorthodoxModule.particle ) ) :
             self.__unorthodoxes.add( particle )
         elif( isinstance( particle, aliasModule.alias ) ) :
             if( particle.id not in self.__aliases ) :      # Do not allow an alias id to overwrite a particle id.
-                if( id in self ) : raise ValueError( 'particle with id = "%s" already in database' % particle.id )
+                if( particle.id in self ) : raise ValueError( 'particle with id = "%s" already in database' % particle.id )
             self.__aliases.add( particle )
         else :
             raise TypeError( 'Unsupported particle family = "%s"' % particle.moniker )
@@ -274,6 +283,7 @@ class database( ancestryModule.ancestry ) :
 
     def convertUnits( self, unitMap ) :
 
+        self.styles.convertUnits( unitMap )
         self.__gaugeBosons.convertUnits( unitMap )
         self.__leptons.convertUnits( unitMap )
         self.__baryons.convertUnits( unitMap )
@@ -283,6 +293,8 @@ class database( ancestryModule.ancestry ) :
     def copy( self ) :
 
         _database = database( self.name, self.version, documentation = self.documentation )
+        for item in self.__styles : _database.styles.add( item.copy( ) )
+# FIXME, missing documentation.
         for item in self.__gaugeBosons : _database.add( item.copy( ) )
         for item in self.__leptons : _database.add( item.copy( ) )
         for item in self.__baryons : _database.add( item.copy( ) )
@@ -296,9 +308,13 @@ class database( ancestryModule.ancestry ) :
 
         return( id in self.__aliases )
 
-    def saveToFile( self, fileName ) :
+    def saveToFile( self, fileName, **kwargs ) :
 
+        dirname = os.path.dirname( fileName )
+        if( dirname != '' ) :
+            if( not( os.path.exists( dirname ) ) ) : os.makedirs( dirname )
         fOut = open( fileName, 'w' )
+        fOut.write( '<?xml version="1.0"?>\n' )
         fOut.write( self.toXML( ) )
         fOut.write( '\n' )
         fOut.close( )
@@ -312,8 +328,10 @@ class database( ancestryModule.ancestry ) :
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlString = [ '%s<%s name="%s" version="%s" format="%s">' % ( indent, self.moniker, self.name, self.version, self.format ) ]
+        xmlString += self.styles.toXMLList( indent2, **kwargs )
         if( self.documentation != '' ) :
             xmlString.append( '%s<documentations>\n%s<documentation name="endfDoc"><![CDATA[\n%s]]></documentation></documentations>' % ( indent2, indent2+indent2, self.documentation ) )
+
         xmlString += self.__aliases.toXMLList( indent2, **kwargs )
         xmlString += self.__gaugeBosons.toXMLList( indent2, **kwargs )
         xmlString += self.__leptons.toXMLList( indent2, **kwargs )
@@ -328,13 +346,18 @@ class database( ancestryModule.ancestry ) :
         xPath.append( element.tag )
 
         children = {}
-        for child in ( gaugeBosonModule, leptonModule, baryonModule, isotopeModule, chemicalElementsModule, 
-                    unorthodoxModule, aliasModule ) :
+        for child in ( gaugeBosonModule, leptonModule, baryonModule, unorthodoxModule, aliasModule ) :
             children[child.suite.moniker] = child.suite
+
+        children[chemicalElementsModule.chemicalElements.moniker] = chemicalElementsModule.chemicalElements
 
         for child in element :
             if( child.tag in children ) :
                 children[child.tag].parseXMLNode( getattr( self, child.tag ), child, xPath, linkData )
+            elif( child.tag == stylesModule.styles.moniker ) :
+                self.styles.parseXMLNode( child, xPath, linkData )
+            elif( child.tag == 'documentations' ) :
+                self.documentation = child.find('documentation').text[1:]
             else :
                 raise ValueError( 'sub-element = "%s" not allowed' % child.tag )
 
@@ -344,31 +367,35 @@ class database( ancestryModule.ancestry ) :
     @classmethod
     def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
 
-        for attributeName in element.attrib :
-            if( attributeName == 'name' ) :
-                name = element.attrib[attributeName]
-            elif( attributeName == 'version' ) :
-                version = element.attrib[attributeName]
-            elif( attributeName == 'format' ) :
-                _format = element.attrib[attributeName]
-            else :
-                raise ValueError( 'Unknown attribute = "%s"' % attributeName )
-
+        _format = element.attrib['format']
         if( format != _format ) : ValueError( 'Unsupported format = "%s"' % _format )
-        return( cls( name, version ).parseXMLNode( element, xPath, linkData ) )
+
+        self = cls( element.attrib['name'], element.attrib['version'] )
+        self.parseXMLNode( element, xPath, linkData )
+        return( self )
 
     @classmethod
     def parseXMLStringAsClass( cls, string ) :
 
         from xml.etree import cElementTree
 
-        element = cElementTree.fromstring( string )
-        return( cls.parseXMLNodeAsClass( element, [], {} ) )
+        xPath = []
+        try :
+            element = cElementTree.fromstring( string )
+            return( cls.parseXMLNodeAsClass( element, xPath, {} ) )
+        except Exception :
+            print( "Error encountered at xpath = /%s" % '/'.join( xPath ) )
+            raise
 
     @staticmethod
     def readFile( fileName ) :
 
         from xml.etree import cElementTree
-        
-        element = cElementTree.parse( fileName ).getroot( )
-        return( database.parseXMLNodeAsClass( element, [], {} ) )
+
+        xPath = []
+        try :
+            element = cElementTree.parse( fileName ).getroot( )
+            return( database.parseXMLNodeAsClass( element, xPath, {} ) )
+        except :
+            print( "Error encountered at xpath = /%s" % '/'.join( xPath ) )
+            raise

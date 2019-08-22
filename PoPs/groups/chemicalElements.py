@@ -67,91 +67,90 @@ This module contains the class for the suite chemicalElements.
 
 from .. import suite as suiteModule
 
-from ..families import nuclearLevel as nuclearLevelModule
-from ..families import nucleus as nucleusModule
+from ..groups import misc as chemicalElementMiscModule
 
 from . import isotope as isotopeModule
 from . import chemicalElement as chemicalElementModule
 
-class suite( suiteModule.sortedSuite ) :
+from ..families import nuclide as nuclideModule
+from ..families import nucleus as nucleusModule
+
+class chemicalElements( suiteModule.sortedSuite ) :
     """
-    This is the suite class used by a chemicalElement instance for storing 
-    its list of istopes for a chemical element (e.g., list of istopes for 'O').
+    This class stores a list of chemicalElement instances.
     """
 
     moniker = 'chemicalElements'
 
     def __init__( self ) :
 
-        suiteModule.sortedSuite.__init__( self, [ chemicalElementModule.suite ], key = 'id', replace = True )
+        suiteModule.sortedSuite.__init__( self, [ chemicalElementModule.chemicalElement ], replace = True )
 
     def __contains__( self, key ) :
 
-        if( suiteModule.sortedSuite.__contains__( self, key ) ) : return( True )
-        for chemicalElement in self :
-            if( key in chemicalElement ) : return( True )
+        baseID, chemicalElementSymbol, A, levelID, isNucleus, anti, qualifier = chemicalElementMiscModule.chemicalElementALevelIDsAndAnti( key )
+        if( chemicalElementSymbol is None ) : return( False )
+        if( suiteModule.sortedSuite.__contains__( self, chemicalElementSymbol ) ) :
+            return( key in suiteModule.sortedSuite.__getitem__( self, chemicalElementSymbol ) )
         return( False )
 
     def __getitem__( self, key ) :
+        """
+        :param key: string or integer
+        :return: chemicalElement, nuclide or nucleus
+        """
+        try:
+            baseID, chemicalElementSymbol, A, levelID, isNucleus, anti, qualifier = chemicalElementMiscModule.chemicalElementALevelIDsAndAnti( key )
+        except:
+            chemicalElementSymbol = None
 
-        def getitem( key ) :
+        if( chemicalElementSymbol is not None ) :
+            chemicalElement = suiteModule.sortedSuite.__getitem__( self, chemicalElementSymbol )
+            if( baseID == chemicalElementSymbol ) : return( chemicalElement )
+            return( chemicalElement[key] )
 
-            for item in self :
-                if( getattr( item, self.__key ) == key ) : return( item )
-            return( None )
-
-        if( isinstance( key, int ) ) : return( self.__items[key] )
-        if( not( isinstance( key, str ) ) ) : raise TypeError( 'key must be a string' )
-
-        item = getitem( key )
-        if( item is not None ) : return( item )
-
-        chemicalElementID = None
-        try :
-            isNucleus, chemicalElementID, A, levelIDs, anti, qualifier = \
-                    nucleusModule.chemicalElementAAndLevelIDsFromNuclearLevelID( key, qualifierAllowed = True )
-        except :
-            try :
-                chemicalElementID, A, anti, qualifier = \
-                        isotopeModule.chemicalElementAndAIDsFromIsotopeID( key, qualifierAllowed = True )
-            except :
-                pass
-        if( chemicalElementID is not None ) :
-            item = getitem( chemicalElementID )
-            if( item is not None ) : return( item[key] )
-        raise KeyError( 'key "%s" not found' % key )
+        return suiteModule.sortedSuite.__getitem__( self, key )
 
     def add( self, item ) :
 
-        if( isinstance( item, chemicalElementModule.suite ) ) :
+        if( isinstance( item, chemicalElementModule.chemicalElement ) ) :
             suiteModule.sortedSuite.add( self, item )
-        elif( isinstance( item, isotopeModule.suite ) ) :
-            if( item.chemicalElement not in self ) :
-                suiteModule.sortedSuite.add( self, chemicalElementModule.suite( 
-                        item.chemicalElement, item.Z, chemicalElementModule.nameFromZ[item.Z] ) )
-            chemicalElement = self[item.chemicalElement].add( item )
-        elif( isinstance( item, nuclearLevelModule.particle ) ) :
-            chemicalElementID = item.chemicalElement
-            if( chemicalElementID not in self ) :
-                name = chemicalElementModule.nameFromSymbol[chemicalElementID]
-                suiteModule.sortedSuite.add( self, chemicalElementModule.suite( chemicalElementID, item.Z, name ) )
-            self[chemicalElementID].add( item )
+        elif( isinstance( item, ( isotopeModule.isotope, nuclideModule.particle, nucleusModule.particle ) ) ) :
+            chemicalElementSymbol = item.chemicalElementSymbol
+            if( self.hasSymbol( chemicalElementSymbol ) ) :
+                suiteModule.sortedSuite.__getitem__( self, chemicalElementSymbol ).add( item )
+            else :
+                chemicalElement = chemicalElementModule.chemicalElement( chemicalElementSymbol, item.Z, chemicalElementMiscModule.nameFromZ[item.Z] )
+                suiteModule.sortedSuite.add( self, chemicalElement )
+                chemicalElement.add( item )
         else :
-            raise TypeError( "Particle not a nuclearLevel object." )
+            raise TypeError( "Particle not a nuclide or nucleus object." )
+
+    def convertUnits( self, unitMap ) :
+
+        for chemicalElement in self : chemicalElement.convertUnits( unitMap )
+
+    def getSymbol( self, key ) :
+
+        return( suiteModule.sortedSuite.__getitem__( self, key ) )
+
+    def hasSymbol( self, key ) :
+
+        return( suiteModule.sortedSuite.__contains__( self, key ) )
 
     def parseXMLNode( self, element, xPath, linkData ) :
 
+        xPath.append( element.tag )
         for child in element :
-            chemicalElement = chemicalElementModule.suite( child.attrib['id'], int( child.attrib['Z'] ), child.attrib['name'] )
-            self.add( chemicalElement.parseXMLNode( child,  xPath, linkData ) )
+            self.add( chemicalElementModule.chemicalElement.parseXMLNodeAsClass( child, xPath, linkData ) )
+        xPath.pop()
 
     @classmethod
     def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
 
         xPath.append( element.tag )
-
         self = cls( )
+        xPath.pop()
         self.parseXMLNode( element, xPath, linkData )
 
-        xPath.pop( )
         return( self )

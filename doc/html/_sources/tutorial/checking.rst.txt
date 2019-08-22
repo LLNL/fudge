@@ -1,4 +1,4 @@
-Checking ENDF or GND files
+Checking ENDF or GNDS files
 ==========================
 
 Let's face it.  ENDF evaluations often have mistakes and bugs.  Fortunately `fudge` comes 
@@ -16,7 +16,7 @@ Using the ``myEval`` and ``myCov`` instances from the previous tutorial, we find
     >>> myEval.check()
     n + H1
     H2 + photon
-    <fudge.gnd.warning.context object at 0x101cb6190>
+    <fudge.gnds.warning.context object at 0x101cb6190>
     
 Hmm... This doesn't look so helpful.  This is because ``fudge`` understand the hierarchy 
 and categorizes the errors and warnings accordingly.  Try this:
@@ -106,7 +106,7 @@ Setting up a checker script
 ---------------------------
 
 We will set up a script to use ``fudge`` to check ENDF files.  I'll leave to you to figure out how
-to do the same with GND files (if you do, remember to load both the evaluation and the covariance!).
+to do the same with GNDS files (if you do, remember to load both the evaluation and the covariance!).
 
 This is what I came up with (download it :download:`here <checkendf.py>`):
 
@@ -114,7 +114,7 @@ This is what I came up with (download it :download:`here <checkendf.py>`):
 
     #! /usr/bin/env python
     import argparse
-    from fudge.legacy.converting.endfFileToGND import endfFileToGND
+    from fudge.legacy.converting.endfFileToGNDS import endfFileToGNDS
     
     # Process command line options
     parser = argparse.ArgumentParser(description='Check an ENDF file')
@@ -122,7 +122,7 @@ This is what I came up with (download it :download:`here <checkendf.py>`):
     args = parser.parse_args()
     
     # Now translate
-    results = endfFileToGND( args.inFile, toStdOut=True, skipBadData=True )
+    results = endfFileToGNDS( args.inFile, toStdOut=True, skipBadData=True )
     myEval = results['reactionSuite']
     myCov = results['covarianceSuite']
     print '\n\n'

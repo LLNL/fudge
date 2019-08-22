@@ -62,23 +62,24 @@
 # <<END-copyright>>
 
 """
-This module adds the method toACE to the classes in the fudge.gnd.productData.distributions.energyAngular module.
+This module adds the method toACE to the classes in the fudge.gnds.productData.distributions.energyAngularMC module.
 """
 
 from fudge.core.utilities import brb
 
 from xData import standards as standardsModule
 
-from fudge.gnd.productData.distributions import energyAngular as energyAngularModule
+from fudge.gnds.productData.distributions import energyAngularMC as energyAngularMCModule
 
 def toACE( self, label, offset, weight, **kwargs ) :
 
     header = [ 0, 61, offset + len( weight ) + 4 ] + weight
-    e_inFactor = self.domainUnitConversionFactor( 'MeV' )
-    e_outFactor = self[0].domainUnitConversionFactor( 'MeV' )
+
+    energyData = self.energy.data
+    energyAngularData = self.energyAngular.data
 
     INTE = -1
-    interpolation = self.interpolation
+    interpolation = energyData.interpolation
     if( interpolation == standardsModule.interpolation.flatToken ) :
         INTE = 1
     elif( interpolation == standardsModule.interpolation.linlinToken ) :
@@ -86,60 +87,34 @@ def toACE( self, label, offset, weight, **kwargs ) :
     if( INTE == -1 ) : raise Exception( 'Interpolation "%s" not supported for incident energy' % interpolation )
 
     INTT = -1
-    interpolation = self[0].interpolation
+    interpolation = energyData[0].interpolation
     if( interpolation == standardsModule.interpolation.flatToken ) :
         INTT = 1
     elif( interpolation == standardsModule.interpolation.linlinToken ) :
         INTT = 2
     if( INTT == -1 ) : raise Exception( 'Interpolation "%s" not supported for outgoing energy' % interpolation )
 
-    NE, e_ins, Ls, epData = len( self ), [], [], []
+    NE = len( energyData )
+    e_ins = []
+    Ls = []
+    EpData = []
     offset += len( header ) + 3 + 1 + 2 * NE + 1        # header length plus NR, NE, Es, Ls, (1-based).
-    for w_xys in self :
-        e_ins.append( w_xys.value * e_inFactor )
-        Ls.append( offset + len( epData ) )
-        EOuts, pdfOfEOuts, cdfOfEOuts, LCs, muPData = [], [], [], [], []
-        NP = len( w_xys )
-        offset_LC = Ls[-1] + 1 + 4 * NP
-        for i1, _xys in enumerate( w_xys ) :
-            x2 = _xys.value * e_outFactor
-            EOuts.append( x2 )
+    for i1, _EpData in enumerate( energyData ) :
+        e_ins.append( _EpData.value  )
+        Ls.append( offset + len( EpData ) )
 
-            norm = _xys.integrate( )
-            y2 = norm / e_outFactor
-            pdfOfEOuts.append( y2 )
-
-            if( i1 == 0 ) :
-                runningIntegral = 0
-            else :
-                if( INTT == 1 ) :
-                    runningIntegral += y1 * ( x2 - x1 )
-                else :
-                    runningIntegral += 0.5 * ( y1 + y2 ) * ( x2 - x1 )
-            cdfOfEOuts.append( runningIntegral )
-            x1, y1 = x2, y2
-
+        LCs = []
+        muPData = []
+        NP = len( _EpData )
+        offset_LC = Ls[-1] + 1 + 4 * NP + 1
+        for i2, _muData in enumerate( energyAngularData[i1] ) :
             LCs.append( offset_LC )
-            if( norm == 0 ) :
-                muData = [ 1, 2, -1.0, 1.0, 0.5, 0.5, 0.0, 1.0 ]
-            else :
-                if( not( isinstance( _xys, energyAngularModule.XYs1d ) ) ) :
-                    _xys = _xys.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-6 )
-                xys = _xys.normalize( )
-                cdfOfMus = xys.runningIntegral( )
-                mus, pdfOfMus = [], []
-                for mu1, pdf1 in xys :
-                    mus.append( mu1 )
-                    pdfOfMus.append( pdf1 )
-                cdfOfMus[-1] = 1.
-                muData = [ 1, len( mus ) ] + mus + pdfOfMus + cdfOfMus
+            mus = _muData.xs.values.values
+            muData = [ 1, len( mus ) ] + mus + _muData.pdf.values.values + _muData.cdf.values.values
             offset_LC += len( muData )
             muPData += muData
-        for i1 in range( NP ) :
-            pdfOfEOuts[i1] /= cdfOfEOuts[-1]
-            cdfOfEOuts[i1] /= cdfOfEOuts[-1]
-        epData += [ INTT, NP ] + EOuts + pdfOfEOuts + cdfOfEOuts + LCs + muPData
+        EpData += [ INTT, NP ] + _EpData.xs.values.values + _EpData.pdf.values.values + _EpData.cdf.values.values + LCs + muPData
 
-    return( header + [ 1, NE, INTE, NE ] + e_ins + Ls + epData )
+    return( header + [ 1, NE, INTE, NE ] + e_ins + Ls + EpData )
 
-energyAngularModule.XYs3d.toACE = toACE
+energyAngularMCModule.form.toACE = toACE

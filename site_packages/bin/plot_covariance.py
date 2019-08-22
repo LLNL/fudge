@@ -66,7 +66,7 @@
 try:                import argparse
 except ImportError: from fudge.core.utilities import argparse
 
-from BNL import data_io as io
+from site_packages.BNL.plot_evaluation import plotio as io
 
 # Process command line options
 parser = argparse.ArgumentParser(description='Plot the covariance data in an ENDF file')
@@ -102,7 +102,7 @@ if args.list:
         print c, row, col
     exit()
 
-evaluation.reconstructResonances( styleName='reconstructed', accuracy=0.001 )
+#evaluation.reconstructResonances( styleName='reconstructed', accuracy=0.001 )
 made_a_plot=False
 for c in covariances.sections: 
     if hasattr(c,'rowData') and c.rowData.attributes['ENDF_MFMT'] == '%i,%i' % (args.MF, args.MT): 
@@ -113,7 +113,7 @@ for c in covariances.sections:
             if args.crossMT != None: otherMT=args.crossMT
             elif c.columnData == None: otherMT=args.MT
             else: otherMT = int( c.columnData.attributes['ENDF_MFMT'].split(',')[-1] )
-            c2 = c.getNativeData().toCovarianceMatrix()
+            c2 = c.toCovarianceMatrix()
             c2.setAncestor( c )
             if args.abs:
                 c2.toAbsolute().plot(title='(%i,%i) x (%i,%i)'  % (args.MF, args.MT, args.MF, otherMT))
@@ -122,7 +122,7 @@ for c in covariances.sections:
             elif args.corr:
                 c2.toAbsolute().toCorrelationMatrix().plot(title='(%i,%i) x (%i,%i)' % (args.MF, args.MT, args.MF, otherMT))
             else:
-                c.getNativeData().plot(title='(%i,%i) x (%i,%i)'   % (args.MF, args.MT, args.MF, otherMT))
+                c.plot(title='(%i,%i) x (%i,%i)'   % (args.MF, args.MT, args.MF, otherMT))
             made_a_plot=True
 
 if not made_a_plot: 

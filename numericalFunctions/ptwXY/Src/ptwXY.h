@@ -168,6 +168,7 @@ ptwXYPoints *ptwXY_createFrom_Xs_Ys( statusMessageReporting *smr, ptwXY_interpol
 nfu_status ptwXY_copy( statusMessageReporting *smr, ptwXYPoints *dest, ptwXYPoints *src );
 nfu_status ptwXY_copyDataOnly( statusMessageReporting *smr, ptwXYPoints *dest, ptwXYPoints *src );
 ptwXYPoints *ptwXY_clone( statusMessageReporting *smr, ptwXYPoints *ptwXY );
+ptwXYPoints *ptwXY_clone2( statusMessageReporting *smr, ptwXYPoints const *ptwXY );
 ptwXYPoints *ptwXY_cloneToInterpolation( statusMessageReporting *smr, ptwXYPoints *ptwXY, ptwXY_interpolation interpolationTo );
 ptwXYPoints *ptwXY_slice( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t index1, int64_t index2, int64_t secondarySize );
 ptwXYPoints *ptwXY_domainSlice( statusMessageReporting *smr, ptwXYPoints *ptwXY, double domainMin, double domainMax, 
@@ -203,7 +204,7 @@ nfu_status ptwXY_setXYDataFromXsAndYs( statusMessageReporting *smr, ptwXYPoints 
 nfu_status ptwXY_deletePoints( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t i1, int64_t i2 );
 nfu_status ptwXY_getLowerIndexBoundingX( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x, int64_t *index );
 ptwXYPoint *ptwXY_getPointAtIndex( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t index );
-ptwXYPoint *ptwXY_getPointAtIndex_Unsafely( ptwXYPoints *ptwXY, int64_t index );
+ptwXYPoint *ptwXY_getPointAtIndex_Unsafely( ptwXYPoints const *ptwXY, int64_t index );
 nfu_status ptwXY_getXYPairAtIndex( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t index, double *x, double *y );
 ptwXY_lessEqualGreaterX ptwXY_getPointsAroundX( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x, 
         ptwXYOverflowPoint *lessThanEqualXPoint, ptwXYOverflowPoint *greaterThanXPoint );
@@ -244,6 +245,7 @@ ptwXYPoints *ptwXY_union( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwX
 
 nfu_status ptwXY_scaleOffsetXAndY( statusMessageReporting *smr, ptwXYPoints *ptwXY, double xScale, double xOffset, 
         double yScale, double yOffset );
+
 /*
 * Functions in ptwXY_unitaryOperators.c
 */
@@ -296,6 +298,7 @@ ptwXYPoints *ptwXY_fromUnitbase( statusMessageReporting *smr, ptwXYPoints *ptwXY
 * Functions in ptwXY_convenient.c 
 */
 ptwXPoints *ptwXY_getXArray( statusMessageReporting *smr, ptwXYPoints *ptwXY );
+ptwXPoints *ptwXY_ysMappedToXs( statusMessageReporting *smr, ptwXYPoints *ptwXY, ptwXPoints *Xs, int64_t *offset );
 nfu_status ptwXY_dullEdges( statusMessageReporting *smr, ptwXYPoints *ptwXY, double lowerEps, double upperEps, int positiveXOnly );
 nfu_status ptwXY_mergeClosePoints( statusMessageReporting *smr, ptwXYPoints *ptwXY, double epsilon );
 ptwXYPoints *ptwXY_intersectionWith_ptwX( statusMessageReporting *smr, ptwXYPoints *ptwXY, ptwXPoints *ptwX );

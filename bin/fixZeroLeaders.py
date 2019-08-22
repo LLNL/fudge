@@ -67,7 +67,7 @@ import sys, os
 binDir = os.path.dirname( os.path.abspath( __file__ ) )
 sys.path.insert(0, os.path.dirname( binDir ) )
 import site_packages.legacy.toENDF6.endfFormats as endfFormatsModule
-from fudge.legacy.converting.ENDFToGND import endfFileToGNDMisc
+from fudge.legacy.converting.ENDFToGNDS import endfFileToGNDSMisc
 
 f = open( sys.argv[1] )
 ls = f.readlines( )
@@ -88,7 +88,7 @@ for i, l in enumerate( ls ) :
                 nl = ''
                 for i6 in r6 :
                     datum = l[:11]
-                    if( datum[:n] == s ) : datum = endfFormatsModule.floatToFunky( endfFileToGNDMisc.funkyFloatStringToFloat( 0, datum ) )
+                    if( datum[:n] == s ) : datum = endfFormatsModule.floatToFunky( endfFileToGNDSMisc.funkyFloatStringToFloat( 0, datum ) )
                     nl += datum
                     l = l[11:]
                 l = nl + l

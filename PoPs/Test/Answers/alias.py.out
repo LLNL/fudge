@@ -38,7 +38,7 @@ Now add gamma and x-ray
         mass 5.4857990907e-4 amu: spin 0.5 hbar: parity -1.: charge 1. e: halflife stable: isAnti True
 
 ========== meta stables ==========
-has Am True
+has Am False
 has Am242 True
 has Am242_e0 True
 has Am242_e1 True

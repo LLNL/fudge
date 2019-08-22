@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.core.math.fudgemath &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.core.math.fudgemath &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,7 +25,7 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +35,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -56,42 +53,58 @@
 <span class="sd">This module contains useful fudge math routines that do not fit into any other module.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">pqu</span> <span class="k">import</span> <span class="n">PQU</span>
-<span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="k">import</span> <span class="n">brb</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
 <span class="k">try</span> <span class="p">:</span>
     <span class="kn">import</span> <span class="nn">numpy</span>
     <span class="n">numpyFloat64</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span> <span class="mf">1.</span> <span class="p">)</span>
 <span class="k">except</span> <span class="p">:</span>
     <span class="n">numpyFloat64</span> <span class="o">=</span> <span class="mf">1.</span>
 
+<span class="kn">from</span> <span class="nn">pqu</span> <span class="k">import</span> <span class="n">PQU</span> <span class="k">as</span> <span class="n">PQUModule</span>
+<span class="kn">import</span> <span class="nn">xData.standards</span> <span class="k">as</span> <span class="nn">standardsModule</span>
+
+<span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="k">import</span> <span class="n">brb</span>
+
 <span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
 
-<div class="viewcode-block" id="thickenXYList"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.fudgemath.thickenXYList">[docs]</a><span class="k">def</span> <span class="nf">thickenXYList</span><span class="p">(</span> <span class="nb">list</span><span class="p">,</span> <span class="n">tester</span><span class="p">,</span> <span class="n">biSectionMax</span> <span class="o">=</span> <span class="mi">6</span> <span class="p">)</span> <span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;This functions takes a list of (x,y) points and a function, tester.evaluateAtX, and bi-sectionally adds points to </span>
+<div class="viewcode-block" id="thickenXYList"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.fudgemath.thickenXYList">[docs]</a><span class="k">def</span> <span class="nf">thickenXYList</span><span class="p">(</span> <span class="nb">list</span><span class="p">,</span> <span class="n">tester</span><span class="p">,</span> <span class="n">biSectionMax</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span> <span class="n">interpolation</span> <span class="o">=</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">interpolation</span><span class="o">.</span><span class="n">linlinToken</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This functions takes a list of (x,y) points and a function, tester.evaluateAtX, and bi-sectionally adds points to </span>
 <span class="sd">    obtain linear-linear tolerance of the returned list and tester.evaluateAtX to tester.relativeTolerance. At most </span>
 <span class="sd">    biSectionMax bi-sections are performed between each consecutive pair of inputted points. It is assumed that the </span>
 <span class="sd">    initial list of points and the function tester.evaluateAtX agree to tolerance tester.relativeTolerance. The instance</span>
 <span class="sd">    tester must contain the members relativeTolerance and absoluteTolerance as well as the method evaluateAtX. The</span>
-<span class="sd">    method evaluateAtX takes an x-value and returns its y-value.&quot;&quot;&quot;</span>
+<span class="sd">    method evaluateAtX takes an x-value and returns its y-value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">thickenXYList2</span><span class="p">(</span> <span class="n">xl</span><span class="p">,</span> <span class="n">yl</span><span class="p">,</span> <span class="n">xu</span><span class="p">,</span> <span class="n">yu</span><span class="p">,</span> <span class="n">newList</span><span class="p">,</span> <span class="n">tester</span><span class="p">,</span> <span class="n">level</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">def</span> <span class="nf">thickenXYList2</span><span class="p">(</span> <span class="n">interpolation</span><span class="p">,</span> <span class="n">xl</span><span class="p">,</span> <span class="n">yl</span><span class="p">,</span> <span class="n">xu</span><span class="p">,</span> <span class="n">yu</span><span class="p">,</span> <span class="n">newList</span><span class="p">,</span> <span class="n">tester</span><span class="p">,</span> <span class="n">level</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="n">level</span> <span class="o">==</span> <span class="n">biSectionMax</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span>
         <span class="n">level</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="n">xMid</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="o">*</span> <span class="p">(</span> <span class="n">xl</span> <span class="o">+</span> <span class="n">xu</span> <span class="p">)</span>
-        <span class="n">yMid</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="o">*</span> <span class="p">(</span> <span class="n">yl</span> <span class="o">+</span> <span class="n">yu</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">interpolation</span> <span class="o">==</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">interpolation</span><span class="o">.</span><span class="n">linlinToken</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="n">interpolation</span> <span class="o">==</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">interpolation</span><span class="o">.</span><span class="n">loglinToken</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">xMid</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="o">*</span> <span class="p">(</span> <span class="n">xl</span> <span class="o">+</span> <span class="n">xu</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">xMid</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">xl</span> <span class="o">*</span> <span class="n">xu</span> <span class="p">);</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">interpolation</span> <span class="o">==</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">interpolation</span><span class="o">.</span><span class="n">linlinToken</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="n">interpolation</span> <span class="o">==</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">interpolation</span><span class="o">.</span><span class="n">linlogToken</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">yMid</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="o">*</span> <span class="p">(</span> <span class="n">yl</span> <span class="o">+</span> <span class="n">yu</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">yMid</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">yl</span> <span class="o">*</span> <span class="n">yu</span> <span class="p">)</span>
+
         <span class="n">y</span> <span class="o">=</span> <span class="n">tester</span><span class="o">.</span><span class="n">evaluateAtX</span><span class="p">(</span> <span class="n">xMid</span> <span class="p">)</span>
+
         <span class="n">dy</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span> <span class="n">y</span> <span class="o">-</span> <span class="n">yMid</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">dy</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">(</span> <span class="n">y</span> <span class="o">*</span> <span class="n">tester</span><span class="o">.</span><span class="n">relativeTolerance</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">dy</span> <span class="o">&gt;</span> <span class="n">tester</span><span class="o">.</span><span class="n">absoluteTolerance</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
             <span class="n">newList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">xMid</span><span class="p">,</span> <span class="n">y</span> <span class="p">]</span> <span class="p">)</span>
-            <span class="n">thickenXYList2</span><span class="p">(</span> <span class="n">xl</span><span class="p">,</span> <span class="n">yl</span><span class="p">,</span> <span class="n">xMid</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">newList</span><span class="p">,</span> <span class="n">tester</span><span class="p">,</span> <span class="n">level</span> <span class="p">)</span>
-            <span class="n">thickenXYList2</span><span class="p">(</span> <span class="n">xMid</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">xu</span><span class="p">,</span> <span class="n">yu</span><span class="p">,</span> <span class="n">newList</span><span class="p">,</span> <span class="n">tester</span><span class="p">,</span> <span class="n">level</span> <span class="p">)</span>
+            <span class="n">thickenXYList2</span><span class="p">(</span> <span class="n">interpolation</span><span class="p">,</span> <span class="n">xl</span><span class="p">,</span> <span class="n">yl</span><span class="p">,</span> <span class="n">xMid</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">newList</span><span class="p">,</span> <span class="n">tester</span><span class="p">,</span> <span class="n">level</span> <span class="p">)</span>
+            <span class="n">thickenXYList2</span><span class="p">(</span> <span class="n">interpolation</span><span class="p">,</span> <span class="n">xMid</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">xu</span><span class="p">,</span> <span class="n">yu</span><span class="p">,</span> <span class="n">newList</span><span class="p">,</span> <span class="n">tester</span><span class="p">,</span> <span class="n">level</span> <span class="p">)</span>
 
     <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="nb">list</span> <span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s2">&quot;len( list ) = </span><span class="si">%d</span><span class="s2"> &lt; 2&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span> <span class="nb">list</span> <span class="p">)</span> <span class="p">)</span>
     <span class="n">newList</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">xy</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="nb">list</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">xy</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="nb">list</span> <span class="p">)</span> <span class="p">:</span>
         <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">xy</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">thickenXYList2</span><span class="p">(</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">newList</span><span class="p">,</span> <span class="n">tester</span><span class="p">,</span> <span class="mi">0</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">i1</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">thickenXYList2</span><span class="p">(</span> <span class="n">interpolation</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">newList</span><span class="p">,</span> <span class="n">tester</span><span class="p">,</span> <span class="mi">0</span> <span class="p">)</span>
         <span class="n">newList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="p">]</span> <span class="p">)</span>
         <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span>
     <span class="n">newList</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span> <span class="p">)</span>
@@ -137,7 +150,7 @@
 <div class="viewcode-block" id="getValue"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.fudgemath.getValue">[docs]</a><span class="k">def</span> <span class="nf">getValue</span><span class="p">(</span> <span class="n">n</span> <span class="p">)</span> <span class="p">:</span>
 
     <span class="k">if</span><span class="p">(</span> <span class="n">isNumber</span><span class="p">(</span> <span class="n">n</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">n</span> <span class="p">)</span>
-    <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">n</span><span class="p">,</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">n</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">n</span><span class="p">,</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">n</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Invalue number object = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">brb</span><span class="o">.</span><span class="n">getType</span><span class="p">(</span> <span class="n">n</span> <span class="p">)</span> <span class="p">)</span></div>
 </pre></div>
 
@@ -172,13 +185,13 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

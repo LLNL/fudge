@@ -65,6 +65,8 @@ from pqu import PQU as PQUModule
 
 import ancestry as ancestryModule
 
+from .uncertainty.physicalQuantity import uncertainty as uncertaintyModule
+
 class physicalQuantity( ancestryModule.ancestry ) :
 
     moniker = 'physicalQuantity'
@@ -77,6 +79,8 @@ class physicalQuantity( ancestryModule.ancestry ) :
         if( label is not None ) :
             if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must be a str instance.' )
         self.__label = label
+
+        self.__uncertainty = None
 
     def __str__( self ) :
 
@@ -150,6 +154,20 @@ class physicalQuantity( ancestryModule.ancestry ) :
 
         return( self.__PQ.unit )
 
+    @property
+    def uncertainty( self ) :
+
+        return( self.__uncertainty )
+
+    @uncertainty.setter
+    def uncertainty( self, _uncertainty ) :
+
+        if( _uncertainty is not None ) :
+            if( not( isinstance( _uncertainty, uncertaintyModule.uncertainty ) ) ) : raise TypeError( 'Invalid uncertainty instance.' )
+
+        self.__uncertainty = _uncertainty
+        if( self.__uncertainty is not None ) : self.__uncertainty.setAncestor( self )
+
     def convertToUnit( self, unit ) :
 
         self.__PQ.convertToUnit( unit )
@@ -158,10 +176,13 @@ class physicalQuantity( ancestryModule.ancestry ) :
 
         unit, factor = PQUModule.convertUnits( self.unit, unitMap )
         self.__PQ.convertToUnit( unit )
+        if( self.__uncertainty is not None ) : self.__uncertainty.parentConvertingUnits( [ factor ] )
 
     def copy( self ) :
 
-        return( self.__class__( self.value, self.unit, self.label ) )
+        cls = self.__class__( self.value, self.unit, self.label )
+        if( self.__uncertainty is not None ) : cls.uncertainty = self.__uncertainty.copy( )
+        return( cls )
 
     __copy__ = copy
     __deepcopy__ = __copy__
@@ -186,11 +207,23 @@ class physicalQuantity( ancestryModule.ancestry ) :
 
     def toXMLList( self, indent = '', **kwargs ) :
 
-        incrementalIndent = kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         label = ''
         if( self.label is not None ) : label = ' label="%s"' % self.label
-        return( [ '%s<%s%s value="%s" unit="%s"/>' % ( indent, self.moniker, label, self.value, self.unit ) ] )
+
+        unit = ''
+        if( not( self.unit.isDimensionless( ) ) ) : unit = ' unit="%s"' % self.unit
+
+        ending = '>'
+        if( self.__uncertainty is None ) : ending = '/>'
+        XMLStringList = [ '%s<%s%s value="%s"%s%s' % ( indent, self.moniker, label, self.value, unit, ending ) ]
+
+        if( ending == '>' ) :
+            if( self.__uncertainty is not None ) : XMLStringList += self.__uncertainty.toXMLList( indent = indent2, **kwargs )
+            XMLStringList[-1] += '</%s>' % self.moniker
+
+        return( XMLStringList )
 
     @classmethod
     def parseXMLNode( cls, element, xPath, linkData ) :
@@ -201,6 +234,12 @@ class physicalQuantity( ancestryModule.ancestry ) :
         unit = element.get( 'unit' )
         label = element.get( 'label', None )
         _cls = cls( value, unit, label )
+
+        for child in element :
+            if( child.tag == uncertaintyModule.uncertainty.moniker ) :
+                _cls.uncertainty = uncertaintyModule.uncertainty.parseXMLNodeAsClass( child, xPath, linkData )
+            else :
+                raise ValueError( 'child element with tag "%s" not allowed' % child.tag )
 
         xPath.pop( ) 
         return( _cls )

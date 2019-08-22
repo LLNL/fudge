@@ -81,12 +81,13 @@ parser.add_argument( "-v", "--verbose", action = "count", default = 0,      help
 
 args = parser.parse_args( )
 
+files = None
 if args.glob : files = sorted( glob.glob( args.glob ) )
 if args.files : files = args.files.split()
 if args.verbose > 1 : 
-    print '\ncode : %s' % args.code 
-    print '\noptions : %s' % args.options
-    print '\nfile list : ',files,'\n'
+    print( '\ncode : %s' % args.code )
+    print( '\noptions : %s' % args.options )
+    print( '\nfile list : ',files,'\n' )
 
 def f( filename ) :
 
@@ -98,7 +99,7 @@ def f( filename ) :
     sys.exit( status )
 
 k = 0
-def addProcess( process ) :
+def addProcess( processes ) :
 
     global k
     process = multiprocessing.Process( target = f, args = ( files[k], ) )
@@ -107,7 +108,7 @@ def addProcess( process ) :
     k += 1
 
 n1, processes = len( files ), []
-for i in xrange( 0, min( n1, args.NumProcesses ) ) : addProcess( processes )
+for i in range( 0, min( n1, args.NumProcesses ) ) : addProcess( processes )
 
 ik, done = 0, {}
 while( ik < n1 ) :
@@ -121,7 +122,7 @@ while( ik < n1 ) :
             done[j] = s
             if( k < n1 ) : addProcess( nextProcesses )
     while( ik in done ) :       # Print results ordered.
-        if args.verbose > 0: print done[ik]
+        if args.verbose > 0: print( done[ik] )
         del done[ik]
         ik += 1
     time.sleep( 0.1 )

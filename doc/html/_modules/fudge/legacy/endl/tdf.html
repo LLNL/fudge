@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.legacy.endl.tdf &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.legacy.endl.tdf &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,7 +25,7 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +35,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
       </ul>
@@ -116,7 +113,7 @@
 
 
 <span class="c1">#default_C_list = ( 11, 40, 41, 42, 12, 44, 45, 39) # try to get Li6__H2_H1__H3__He4 too!</span>
-<span class="n">default_C_list</span> <span class="o">=</span> <span class="p">(</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">39</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">42</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">44</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">47</span><span class="p">,</span> <span class="mi">48</span>  <span class="p">)</span> <span class="c1">### new complete list for P. Bedrossian</span>
+<span class="n">default_C_list</span> <span class="o">=</span> <span class="p">(</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">37</span><span class="p">,</span> <span class="mi">39</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">42</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">44</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">47</span><span class="p">,</span> <span class="mi">48</span>  <span class="p">)</span> <span class="c1">### new complete list for P. Bedrossian (34 is pnaa and tdfgen cannot handle 4-body final state kinematics)</span>
 
 <span class="n">default_lib_path</span> <span class="o">=</span> <span class="s2">&quot;/usr/gapps/data/nuclear/endl_official/&quot;</span>
 
@@ -136,13 +133,13 @@
         <span class="n">os</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span> <span class="s1">&#39;command failed: </span><span class="si">%s</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">command</span> <span class="p">)</span></div>
                 
 <div class="viewcode-block" id="processTDF_Reaction"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.tdf.processTDF_Reaction">[docs]</a><span class="k">def</span> <span class="nf">processTDF_Reaction</span><span class="p">(</span> <span class="n">target</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">S</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">X1</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">X2</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">X3</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">X4</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">Q</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">outputDir</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
-        <span class="n">workDir</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">movePoints</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">movePointsEps</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="n">addPoints</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">libraryName</span> <span class="o">=</span> <span class="s2">&quot;ENDL2008&quot;</span><span class="p">,</span> <span class="n">libraryVersion</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">overWrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dryrun</span><span class="o">=</span><span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">workDir</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">movePoints</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">movePointsEps</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="n">addPoints</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">libraryName</span> <span class="o">=</span> <span class="s2">&quot;ENDL2008&quot;</span><span class="p">,</span> <span class="n">libraryVersion</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">overWrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dryrun</span><span class="o">=</span><span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
 
     <span class="n">endl_bdfls</span> <span class="o">=</span> <span class="n">bdfls</span><span class="o">.</span><span class="n">getDefaultBdfls</span><span class="p">(</span> <span class="p">)</span>
     <span class="n">AMUToMeV</span> <span class="o">=</span> <span class="n">endl_bdfls</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span> <span class="mi">4</span> <span class="p">)</span>
     <span class="n">dataList</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">findDatas</span><span class="p">(</span> <span class="n">C</span> <span class="o">=</span> <span class="n">C</span><span class="p">,</span> <span class="n">I</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">S</span> <span class="o">=</span> <span class="n">S</span><span class="p">,</span> <span class="n">X1</span> <span class="o">=</span> <span class="n">X1</span><span class="p">,</span> <span class="n">X2</span> <span class="o">=</span> <span class="n">X2</span><span class="p">,</span> <span class="n">X3</span> <span class="o">=</span> <span class="n">X3</span><span class="p">,</span> <span class="n">X4</span> <span class="o">=</span> <span class="n">X4</span><span class="p">,</span> <span class="n">Q</span> <span class="o">=</span> <span class="n">Q</span> <span class="p">)</span>
     <span class="k">for</span> <span class="n">xsec</span> <span class="ow">in</span> <span class="n">dataList</span><span class="p">:</span>
-        <span class="n">xsec</span><span class="o">.</span><span class="n">set</span><span class="p">(</span> <span class="n">xsec</span><span class="o">.</span><span class="n">thin</span><span class="p">(</span> <span class="n">interpolationAccuracy</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">xsec</span><span class="o">.</span><span class="n">set</span><span class="p">(</span> <span class="n">xsec</span><span class="o">.</span><span class="n">thin</span><span class="p">(</span> <span class="n">interpolationAccuracy</span> <span class="o">=</span> <span class="mf">1e-4</span> <span class="p">)</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">movePoints</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
             <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">xsec</span><span class="o">.</span><span class="n">data</span> <span class="p">:</span>
                 <span class="k">for</span> <span class="n">x_</span><span class="p">,</span> <span class="n">y_</span> <span class="ow">in</span> <span class="n">movePoints</span> <span class="p">:</span>
@@ -187,12 +184,12 @@
         <span class="n">ZA</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">ZA</span>
         <span class="n">ZAZ</span><span class="p">,</span> <span class="n">ZAA</span> <span class="o">=</span> <span class="n">endl2</span><span class="o">.</span><span class="n">ZandAFromZA</span><span class="p">(</span> <span class="n">ZA</span> <span class="p">)</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="n">projectileMass</span> <span class="o">&gt;</span> <span class="n">targetMass</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="n">reaction</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">+</span><span class="si">%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">endl_Z</span><span class="o">.</span><span class="n">endl_ZSymbol</span><span class="p">(</span> <span class="n">yiZ</span> <span class="p">),</span> <span class="n">yiA</span><span class="p">,</span> <span class="n">endl_Z</span><span class="o">.</span><span class="n">endl_ZSymbol</span><span class="p">(</span> <span class="n">ZAZ</span> <span class="p">),</span> <span class="n">ZAA</span> <span class="p">)</span>
-            <span class="c1">#print &quot;Skipping reaction &quot;+reaction+&quot;, it is in inverse kinematics&quot;</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">projectileMass</span> <span class="o">&gt;</span> <span class="n">targetMass</span> <span class="p">)</span> <span class="ow">and</span> <span class="n">ZAA</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">reaction</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">+</span><span class="si">%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">localZsymbol</span><span class="p">(</span> <span class="n">yiZ</span> <span class="p">),</span> <span class="n">yiA</span><span class="p">,</span> <span class="n">localZsymbol</span><span class="p">(</span> <span class="n">ZAZ</span> <span class="p">),</span> <span class="n">ZAA</span> <span class="p">)</span>
+            <span class="nb">print</span> <span class="s2">&quot;Skipping reaction &quot;</span><span class="o">+</span><span class="n">reaction</span><span class="o">+</span><span class="s2">&quot;, it is in inverse kinematics&quot;</span>
             <span class="k">return</span>
         <span class="k">else</span> <span class="p">:</span>
-            <span class="n">reaction</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">+</span><span class="si">%s%d</span><span class="s1">=&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">endl_Z</span><span class="o">.</span><span class="n">endl_ZSymbol</span><span class="p">(</span> <span class="n">ZAZ</span> <span class="p">),</span> <span class="n">ZAA</span><span class="p">,</span> <span class="n">endl_Z</span><span class="o">.</span><span class="n">endl_ZSymbol</span><span class="p">(</span> <span class="n">yiZ</span> <span class="p">),</span> <span class="n">yiA</span> <span class="p">)</span>
+            <span class="n">reaction</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">+</span><span class="si">%s%d</span><span class="s1">=&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">localZsymbol</span><span class="p">(</span> <span class="n">ZAZ</span> <span class="p">),</span> <span class="n">ZAA</span><span class="p">,</span> <span class="n">localZsymbol</span><span class="p">(</span> <span class="n">yiZ</span> <span class="p">),</span> <span class="n">yiA</span> <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">Q</span><span class="o">&lt;</span><span class="mf">0.0</span> <span class="p">:</span> 
             <span class="nb">print</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is an endothermic reaction&quot;</span><span class="o">%</span><span class="n">reaction</span>
@@ -218,7 +215,7 @@
         <span class="n">outGoing</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span> <span class="p">)</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="k">for</span> <span class="n">mass</span><span class="p">,</span> <span class="n">iZA</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span> <span class="ow">in</span> <span class="n">outGoing</span> <span class="p">:</span>
-            <span class="n">reaction</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%s%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">endl_Z</span><span class="o">.</span><span class="n">endl_ZSymbol</span><span class="p">(</span> <span class="n">Z</span> <span class="p">),</span> <span class="n">A</span> <span class="p">)</span>
+            <span class="n">reaction</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%s%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">localZsymbol</span><span class="p">(</span> <span class="n">Z</span> <span class="p">),</span> <span class="n">A</span> <span class="p">)</span>
             <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span>
         
         <span class="k">if</span> <span class="n">xsec</span><span class="o">.</span><span class="n">S</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
@@ -365,7 +362,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">reactionname</span> <span class="o">=</span> <span class="n">processTDF_Reaction</span><span class="p">(</span> <span class="n">target</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">workDir</span> <span class="o">=</span> <span class="n">workDir</span><span class="p">,</span> <span class="n">outputDir</span> <span class="o">=</span> <span class="n">outputDir</span><span class="p">,</span> <span class="n">libraryName</span> <span class="o">=</span> <span class="n">libraryName</span><span class="p">,</span> <span class="n">libraryVersion</span> <span class="o">=</span> <span class="n">libraryVersion</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">dryrun</span> <span class="o">=</span> <span class="n">dryrun</span> <span class="p">)</span>
             <span class="n">reactionnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reactionname</span><span class="p">)</span>
-            <span class="nb">print</span> <span class="s1">&#39;adding to tdf list :&#39;</span><span class="p">,</span><span class="n">reactionname</span>
+            <span class="k">if</span> <span class="n">verbose</span> <span class="p">:</span> <span class="nb">print</span> <span class="s1">&#39;adding to tdf list :&#39;</span><span class="p">,</span><span class="n">reactionname</span>
         <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
             <span class="nb">print</span> <span class="n">err</span>
             <span class="nb">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">.... continuing</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -422,6 +419,12 @@
     <span class="nb">print</span> <span class="s2">&quot;         --workdir       sets fudge&#39;s working directory&quot;</span>
     <span class="nb">print</span> <span class="s2">&quot;         --all           process all reactions in all evaluations for all projectiles in library&quot;</span>
     <span class="nb">print</span> <span class="s2">&quot;         --dryrun        runs through data lookup and name munging, but does write out any files&quot;</span></div>
+
+<div class="viewcode-block" id="localZsymbol"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.tdf.localZsymbol">[docs]</a><span class="k">def</span> <span class="nf">localZsymbol</span><span class="p">(</span><span class="n">Z</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">Z</span><span class="o">==</span><span class="mi">0</span> <span class="p">:</span> 
+        <span class="k">return</span> <span class="s1">&#39;n&#39;</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="n">endl_Z</span><span class="o">.</span><span class="n">endl_ZSymbol</span><span class="p">(</span> <span class="n">Z</span> <span class="p">)</span></div>
 
 <span class="c1"># ------------- version -----------------</span>
 <div class="viewcode-block" id="version"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.tdf.version">[docs]</a><span class="k">def</span> <span class="nf">version</span><span class="p">():</span>
@@ -520,7 +523,7 @@
         
 
 <span class="c1"># ------------------------------</span>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">(</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="p">)</span>
     
 </pre></div>
@@ -556,14 +559,14 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

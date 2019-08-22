@@ -6,10 +6,12 @@ import scipy.special as sp
 from site_packages.BNL.plot_evaluation import getEXFORSets, generatePlot, getXdXYdYDataSets
 from fudge.processing.resonances.reconstructResonances import URRPDFTable
 from fudge.core.utilities.brb import banner
-from fudge.gnd.reactionData.crossSection import component, XYs1d, upperEps
+from fudge.gnds.reactionData.crossSection import component, XYs1d, upperEps
 from xData import XYs, standards
 import xData.axes as axesModule
 from pqu import PQU
+
+from fudge.legacy.endl import misc as miscENDLModule
 
 # If numba available, use it to get some speedups
 try:
@@ -25,7 +27,7 @@ defaultXSmax=None # if None, take from data
 defaultNXS=20
 defaultNE=100
 exforRxnMap={1:'N,TOT', 2:'N,EL', 102:'N,G', 18:'N,F'}
-gndRxnMap={1:'total',2:'elastic',102:'capture',18:'fission'}
+gndsRxnMap={1:'total',2:'elastic',102:'capture',18:'fission'}
 
 
 @jit
@@ -57,7 +59,7 @@ def normal_dist_cdf(x,x0,dx):
 def getPDFFromData(MT, _x4Sets, _eBins, _xsBins, skipEXFOREntries=[]):
     # The results histogram
     _binnedPDF = URRPDFTable(eBins=_eBins,xsBins=_xsBins)
-    _binnedPDF[gndRxnMap[MT]]=np.zeros((_binnedPDF.NE,_binnedPDF.NXS))
+    _binnedPDF[gndsRxnMap[MT]]=np.zeros((_binnedPDF.NE,_binnedPDF.NXS))
 
     # Create the binned PDF
     skipIt = False
@@ -83,7 +85,7 @@ def getPDFFromData(MT, _x4Sets, _eBins, _xsBins, skipEXFOREntries=[]):
             if args.ignoreUncertainty:
                 iXS = np.digitize(x4Set.y[i], _binnedPDF.xsBins) - 1
                 binWeight = 1. #/ ptsInEBin[iE]
-                _binnedPDF[gndRxnMap[MT]][iE, iXS] += binWeight
+                _binnedPDF[gndsRxnMap[MT]][iE, iXS] += binWeight
             # This is more complex as we are including the experimental uncertainty in the
             # PDF generation.  As before we histogram the PDF P(xs|E), but because of the
             # experimental uncertainty, we don't know what cross section bin to add a point.
@@ -93,7 +95,7 @@ def getPDFFromData(MT, _x4Sets, _eBins, _xsBins, skipEXFOREntries=[]):
                 for iXS in range(_binnedPDF.NXS):
                     binWeight = normal_dist_cdf(_binnedPDF.xsBins[iXS + 1], x4Set.y[i], x4Set.yerr[i]) - \
                                 normal_dist_cdf(_binnedPDF.xsBins[iXS], x4Set.y[i], x4Set.yerr[i])
-                    _binnedPDF[gndRxnMap[MT]][iE, iXS] += binWeight
+                    _binnedPDF[gndsRxnMap[MT]][iE, iXS] += binWeight
     _binnedPDF.normalize()
     return _binnedPDF
 
@@ -104,8 +106,8 @@ def getPDFFromEvaluation(MT, _endfXS, _eBins, _xsBins, thicken=0):
 
     # The results histogram
     _binnedPDF = URRPDFTable(eBins=_eBins, xsBins=_xsBins)
-    _binnedPDF[gndRxnMap[MT]]=np.zeros((_binnedPDF.NE,_binnedPDF.NXS))
-#    if args.verbose: print('binnedPDF before loading:', _binnedPDF[gndRxnMap[MT]])
+    _binnedPDF[gndsRxnMap[MT]]=np.zeros((_binnedPDF.NE,_binnedPDF.NXS))
+#    if args.verbose: print('binnedPDF before loading:', _binnedPDF[gndsRxnMap[MT]])
 
     # Build the indicator functions.  These functions work this way:
     # at a given energy, if the cross section value is within cross section
@@ -130,7 +132,7 @@ def getPDFFromEvaluation(MT, _endfXS, _eBins, _xsBins, thicken=0):
     for iXS,eta in enumerate(indicatorFuncs):
         geta=eta.group([E*1e6 for E in _eBins],norm='dx')
         for iE, p in enumerate(geta):
-            _binnedPDF[gndRxnMap[MT]][iE, iXS] += p
+            _binnedPDF[gndsRxnMap[MT]][iE, iXS] += p
 
     _binnedPDF.normalize()
     return _binnedPDF
@@ -520,10 +522,9 @@ if __name__ == "__main__":
     if args.endf is not None:
         print(banner('Reading ENDF file '+args.endf))
         from site_packages.BNL.plot_evaluation.plotio import readEvaluation
-        from fudge.particles.nuclear import elementAFromName
         endfEval=readEvaluation(args.endf, skipBadData=args.skipBadData, continuumSpectraFix=args.continuumSpectraFix)[0]
         targ=str(endfEval.target)
-        sym, A, m = elementAFromName( targ )
+        sym, A, m = miscENDLModule.elementAFromName( targ )
         args.sym=sym
         args.A=A
         if m is not None: args.A+=str(m)
@@ -701,7 +702,7 @@ if __name__ == "__main__":
         for iE in range(binnedPDF.NE):
             norm = 0.0
             for iXS in range(binnedPDF.NXS):
-                norm += binnedPDF[gndRxnMap[args.MT]][iE,iXS] * binnedPDF.xsBinWidths[iXS]
+                norm += binnedPDF[gndsRxnMap[args.MT]][iE,iXS] * binnedPDF.xsBinWidths[iXS]
             print(iE, binnedPDF.eBinCenters[iE], binnedPDF.eBinWidths[iE], norm)
 
     # Compute the average cross section
@@ -709,7 +710,7 @@ if __name__ == "__main__":
     if args.getAveXS or args.getXSCorr:
         if args.aveXSMode=='pdf':
             # Using the PDF
-            EdEXSdXS=avexs_from_xspdf(gndRxnMap[args.MT], binnedPDF, DEBUG=args.check)
+            EdEXSdXS=avexs_from_xspdf(gndsRxnMap[args.MT], binnedPDF, DEBUG=args.check)
             #aveXS = grouped_values_to_XYs(EdEXSdXS, popt) # FIXME
         elif args.aveXSMode=='endf':
             aveXS=endfXS
@@ -896,7 +897,7 @@ if __name__ == "__main__":
             import matplotlib.pyplot as plt
             title='$^{'+args.A+'}$'+args.sym+'('+exforRxnMap[args.MT].lower()+') cross section PDF'
             if args.ignoreUncertainty: title+=', ignoring experimental uncertainty'
-            plot_matrix( binnedPDF[gndRxnMap[args.MT]].T, energyBoundariesX=eBins, energyBoundariesY=xsBins,
+            plot_matrix( binnedPDF[gndsRxnMap[args.MT]].T, energyBoundariesX=eBins, energyBoundariesY=xsBins,
                          title=title,
                          xyTitle=('energy (MeV)', 'cross section (b)'),
                          switchY=False )
@@ -904,13 +905,13 @@ if __name__ == "__main__":
 
         # Plot a slice of the PDF of the cross section
         if args.plotXSPDFSlice is not None:
-            E = binnedPDF.eBinCenters[args.plotPDFSlice]
-            binnedPDF.pdf_at_energy(gndRxnMap[args.MT], E).plot()
+            E = binnedPDF.eBinCenters[args.plotXSPDFSlice]
+            binnedPDF.pdf_at_energy(gndsRxnMap[args.MT], E).plot()
 
         # Plot a slice of the PDF of the cross section
         if args.printXSPDFSlice is not None:
-            E = binnedPDF.eBinCenters[args.printPDFSlice]
-            print('\n'.join(binnedPDF.pdf_at_energy(gndRxnMap[args.MT], E).toXMLList()))
+            E = binnedPDF.eBinCenters[args.printXSPDFSlice]
+            print('\n'.join(binnedPDF.pdf_at_energy(gndsRxnMap[args.MT], E).toXMLList()))
 
     # Output the average
     if args.getAveXS:
@@ -963,12 +964,16 @@ if __name__ == "__main__":
                         lineWidth     = 4,
                         lineStyle     = "-",
                         color         = 'blue' ) )
+            whatToPlot=endfSet+theAve
+            if not args.ignoreData: whatToPlot+=x4Sets
             generatePlot(
                 'crossSection',
-                x4Sets+endfSet+theAve,
+                whatToPlot,
                 plotStyle={
                     'plotStyles':{'crossSection':{
                         'xAxis':{'min':args.Emin*1e3, 'max':args.Emax*1e3, 'unit':'keV'},
                         'yAxis':{'min':args.XSmin,'max':args.XSmax, 'unit':'b'}}}},
                 suggestTitle=title,
-                figsize=(15,6), suggestYLog=args.MT==102)
+                figsize=(15,6),
+                suggestYLog=args.MT in (1,2,18,102),
+                suggestXLog=args.MT in (1,2,18,102))

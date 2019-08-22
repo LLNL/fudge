@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.core.utilities package &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.core.utilities package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -30,7 +27,7 @@
     <link rel="next" title="fudge.core.utilities.test package" href="fudge.core.utilities.test.html" />
     <link rel="prev" title="fudge.core.math.xData.test package" href="fudge.core.math.xData.test.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -46,7 +43,7 @@
         <li class="right" >
           <a href="fudge.core.math.xData.test.html" title="fudge.core.math.xData.test package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="fudge.core.html" accesskey="U">fudge.core package</a> &#187;</li> 
       </ul>
@@ -120,375 +117,8 @@ uncert   : uncertainties in abundance in %</div></blockquote>
 
 </div>
 </div>
-<div class="section" id="module-fudge.core.utilities.argparse">
-<span id="fudge-core-utilities-argparse-module"></span><h2>fudge.core.utilities.argparse module<a class="headerlink" href="#module-fudge.core.utilities.argparse" title="Permalink to this headline">¶</a></h2>
-<p>Command-line parsing library</p>
-<p>This module is an optparse-inspired command-line parsing library that:</p>
-<blockquote>
-<div><ul class="simple">
-<li>handles both optional and positional arguments</li>
-<li>produces highly informative usage messages</li>
-<li>supports parsers that dispatch to sub-parsers</li>
-</ul>
-</div></blockquote>
-<p>The following is a simple usage example that sums integers from the
-command-line and writes the result to a file:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
-    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;sum the integers at the command line&#39;</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-    <span class="s1">&#39;integers&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-    <span class="n">help</span><span class="o">=</span><span class="s1">&#39;an integer to be summed&#39;</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-    <span class="s1">&#39;--log&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">FileType</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">),</span>
-    <span class="n">help</span><span class="o">=</span><span class="s1">&#39;the file where the sum should be written&#39;</span><span class="p">)</span>
-<span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-<span class="n">args</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">sum</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">integers</span><span class="p">))</span>
-<span class="n">args</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>The module contains the following public classes:</p>
-<blockquote>
-<div><ul class="simple">
-<li><dl class="first docutils">
-<dt>ArgumentParser &#8211; The main entry point for command-line parsing. As the</dt>
-<dd>example above shows, the add_argument() method is used to populate
-the parser with actions for optional and positional arguments. Then
-the parse_args() method is invoked to convert the args at the
-command-line into an object with attributes.</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>ArgumentError &#8211; The exception raised by ArgumentParser objects when</dt>
-<dd>there are errors with the parser&#8217;s actions. Errors raised while
-parsing the command-line are caught by ArgumentParser and emitted
-as command-line messages.</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>FileType &#8211; A factory for defining types of files to be created. As the</dt>
-<dd>example above shows, instances of FileType are typically passed as
-the type= argument of add_argument() calls.</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>Action &#8211; The base class for parser actions. Typically actions are</dt>
-<dd>selected by passing strings like &#8216;store_true&#8217; or &#8216;append_const&#8217; to
-the action= argument of add_argument(). However, for greater
-customization of ArgumentParser actions, subclasses of Action may
-be defined and passed as the action= argument.</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>HelpFormatter, RawDescriptionHelpFormatter, RawTextHelpFormatter,</dt>
-<dd>ArgumentDefaultsHelpFormatter &#8211; Formatter classes which
-may be passed as the formatter_class= argument to the
-ArgumentParser constructor. HelpFormatter is the default,
-RawDescriptionHelpFormatter and RawTextHelpFormatter tell the parser
-not to change the formatting for help text, and
-ArgumentDefaultsHelpFormatter adds information about argument defaults
-to the help.</dd>
-</dl>
-</li>
-</ul>
-</div></blockquote>
-<p>All other classes in this module are considered implementation details.
-(Also note that HelpFormatter and RawDescriptionHelpFormatter are only
-considered public as object names &#8211; the API of the formatter objects is
-still considered an implementation detail.)</p>
-<dl class="class">
-<dt id="fudge.core.utilities.argparse.ArgumentParser">
-<em class="property">class </em><code class="descclassname">fudge.core.utilities.argparse.</code><code class="descname">ArgumentParser</code><span class="sig-paren">(</span><em>prog=None</em>, <em>usage=None</em>, <em>description=None</em>, <em>epilog=None</em>, <em>version=None</em>, <em>parents=[]</em>, <em>formatter_class=&lt;class 'fudge.core.utilities.argparse.HelpFormatter'&gt;</em>, <em>prefix_chars='-'</em>, <em>fromfile_prefix_chars=None</em>, <em>argument_default=None</em>, <em>conflict_handler='error'</em>, <em>add_help=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#ArgumentParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.ArgumentParser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">fudge.core.utilities.argparse._AttributeHolder</span></code>, <code class="xref py py-class docutils literal"><span class="pre">fudge.core.utilities.argparse._ActionsContainer</span></code></p>
-<p>Object for parsing command line strings into Python objects.</p>
-<dl class="docutils">
-<dt>Keyword Arguments:</dt>
-<dd><ul class="first last simple">
-<li>prog &#8211; The name of the program (default: sys.argv[0])</li>
-<li>usage &#8211; A usage message (default: auto-generated from arguments)</li>
-<li>description &#8211; A description of what the program does</li>
-<li>epilog &#8211; Text following the argument descriptions</li>
-<li>parents &#8211; Parsers whose arguments should be copied into this one</li>
-<li>formatter_class &#8211; HelpFormatter class for printing help messages</li>
-<li>prefix_chars &#8211; Characters that prefix optional arguments</li>
-<li><dl class="first docutils">
-<dt>fromfile_prefix_chars &#8211; Characters that prefix files containing</dt>
-<dd>additional arguments</dd>
-</dl>
-</li>
-<li>argument_default &#8211; The default value for all arguments</li>
-<li>conflict_handler &#8211; String indicating how to handle conflicts</li>
-<li>add_help &#8211; Add a -h/-help option</li>
-</ul>
-</dd>
-</dl>
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.ArgumentParser.add_subparsers">
-<code class="descname">add_subparsers</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#ArgumentParser.add_subparsers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.ArgumentParser.add_subparsers" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.ArgumentParser.convert_arg_line_to_args">
-<code class="descname">convert_arg_line_to_args</code><span class="sig-paren">(</span><em>arg_line</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#ArgumentParser.convert_arg_line_to_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.ArgumentParser.convert_arg_line_to_args" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.ArgumentParser.error">
-<code class="descname">error</code><span class="sig-paren">(</span><em>message: string</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#ArgumentParser.error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.ArgumentParser.error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints a usage message incorporating the message to stderr and
-exits.</p>
-<p>If you override this in a subclass, it should not return &#8211; it
-should either exit or raise an exception.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.ArgumentParser.exit">
-<code class="descname">exit</code><span class="sig-paren">(</span><em>status=0</em>, <em>message=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#ArgumentParser.exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.ArgumentParser.exit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.ArgumentParser.format_help">
-<code class="descname">format_help</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#ArgumentParser.format_help"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.ArgumentParser.format_help" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.ArgumentParser.format_usage">
-<code class="descname">format_usage</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#ArgumentParser.format_usage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.ArgumentParser.format_usage" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.ArgumentParser.format_version">
-<code class="descname">format_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#ArgumentParser.format_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.ArgumentParser.format_version" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.ArgumentParser.parse_args">
-<code class="descname">parse_args</code><span class="sig-paren">(</span><em>args=None</em>, <em>namespace=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#ArgumentParser.parse_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.ArgumentParser.parse_args" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.ArgumentParser.parse_known_args">
-<code class="descname">parse_known_args</code><span class="sig-paren">(</span><em>args=None</em>, <em>namespace=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#ArgumentParser.parse_known_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.ArgumentParser.parse_known_args" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.ArgumentParser.print_help">
-<code class="descname">print_help</code><span class="sig-paren">(</span><em>file=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#ArgumentParser.print_help"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.ArgumentParser.print_help" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.ArgumentParser.print_usage">
-<code class="descname">print_usage</code><span class="sig-paren">(</span><em>file=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#ArgumentParser.print_usage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.ArgumentParser.print_usage" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.ArgumentParser.print_version">
-<code class="descname">print_version</code><span class="sig-paren">(</span><em>file=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#ArgumentParser.print_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.ArgumentParser.print_version" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="exception">
-<dt id="fudge.core.utilities.argparse.ArgumentError">
-<em class="property">exception </em><code class="descclassname">fudge.core.utilities.argparse.</code><code class="descname">ArgumentError</code><span class="sig-paren">(</span><em>argument</em>, <em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#ArgumentError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.ArgumentError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
-<p>An error from creating or using an argument (optional or positional).</p>
-<p>The string value of this exception is the message, augmented with
-information about the argument that caused it.</p>
-</dd></dl>
-
-<dl class="exception">
-<dt id="fudge.core.utilities.argparse.ArgumentTypeError">
-<em class="property">exception </em><code class="descclassname">fudge.core.utilities.argparse.</code><code class="descname">ArgumentTypeError</code><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#ArgumentTypeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.ArgumentTypeError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
-<p>An error from trying to convert a command line string to a type.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="fudge.core.utilities.argparse.FileType">
-<em class="property">class </em><code class="descclassname">fudge.core.utilities.argparse.</code><code class="descname">FileType</code><span class="sig-paren">(</span><em>mode='r'</em>, <em>bufsize=-1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#FileType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.FileType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Factory for creating file object types</p>
-<p>Instances of FileType are typically passed as type= arguments to the
-ArgumentParser add_argument() method.</p>
-<dl class="docutils">
-<dt>Keyword Arguments:</dt>
-<dd><ul class="first last simple">
-<li><dl class="first docutils">
-<dt>mode &#8211; A string indicating how the file is to be opened. Accepts the</dt>
-<dd>same values as the builtin open() function.</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>bufsize &#8211; The file&#8217;s desired buffer size. Accepts the same values as</dt>
-<dd>the builtin open() function.</dd>
-</dl>
-</li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="class">
-<dt id="fudge.core.utilities.argparse.HelpFormatter">
-<em class="property">class </em><code class="descclassname">fudge.core.utilities.argparse.</code><code class="descname">HelpFormatter</code><span class="sig-paren">(</span><em>prog</em>, <em>indent_increment=2</em>, <em>max_help_position=24</em>, <em>width=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#HelpFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.HelpFormatter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Formatter for generating usage messages and argument help strings.</p>
-<p>Only the name of this class is considered a public API. All the methods
-provided by the class are considered an implementation detail.</p>
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.HelpFormatter.add_argument">
-<code class="descname">add_argument</code><span class="sig-paren">(</span><em>action</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#HelpFormatter.add_argument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.HelpFormatter.add_argument" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.HelpFormatter.add_arguments">
-<code class="descname">add_arguments</code><span class="sig-paren">(</span><em>actions</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#HelpFormatter.add_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.HelpFormatter.add_arguments" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.HelpFormatter.add_text">
-<code class="descname">add_text</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#HelpFormatter.add_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.HelpFormatter.add_text" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.HelpFormatter.add_usage">
-<code class="descname">add_usage</code><span class="sig-paren">(</span><em>usage</em>, <em>actions</em>, <em>groups</em>, <em>prefix=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#HelpFormatter.add_usage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.HelpFormatter.add_usage" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.HelpFormatter.end_section">
-<code class="descname">end_section</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#HelpFormatter.end_section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.HelpFormatter.end_section" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.HelpFormatter.format_help">
-<code class="descname">format_help</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#HelpFormatter.format_help"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.HelpFormatter.format_help" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.utilities.argparse.HelpFormatter.start_section">
-<code class="descname">start_section</code><span class="sig-paren">(</span><em>heading</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#HelpFormatter.start_section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.HelpFormatter.start_section" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="fudge.core.utilities.argparse.ArgumentDefaultsHelpFormatter">
-<em class="property">class </em><code class="descclassname">fudge.core.utilities.argparse.</code><code class="descname">ArgumentDefaultsHelpFormatter</code><span class="sig-paren">(</span><em>prog</em>, <em>indent_increment=2</em>, <em>max_help_position=24</em>, <em>width=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#ArgumentDefaultsHelpFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.ArgumentDefaultsHelpFormatter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.core.utilities.argparse.HelpFormatter" title="fudge.core.utilities.argparse.HelpFormatter"><code class="xref py py-class docutils literal"><span class="pre">fudge.core.utilities.argparse.HelpFormatter</span></code></a></p>
-<p>Help message formatter which adds default values to argument help.</p>
-<p>Only the name of this class is considered a public API. All the methods
-provided by the class are considered an implementation detail.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="fudge.core.utilities.argparse.RawDescriptionHelpFormatter">
-<em class="property">class </em><code class="descclassname">fudge.core.utilities.argparse.</code><code class="descname">RawDescriptionHelpFormatter</code><span class="sig-paren">(</span><em>prog</em>, <em>indent_increment=2</em>, <em>max_help_position=24</em>, <em>width=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#RawDescriptionHelpFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.RawDescriptionHelpFormatter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.core.utilities.argparse.HelpFormatter" title="fudge.core.utilities.argparse.HelpFormatter"><code class="xref py py-class docutils literal"><span class="pre">fudge.core.utilities.argparse.HelpFormatter</span></code></a></p>
-<p>Help message formatter which retains any formatting in descriptions.</p>
-<p>Only the name of this class is considered a public API. All the methods
-provided by the class are considered an implementation detail.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="fudge.core.utilities.argparse.RawTextHelpFormatter">
-<em class="property">class </em><code class="descclassname">fudge.core.utilities.argparse.</code><code class="descname">RawTextHelpFormatter</code><span class="sig-paren">(</span><em>prog</em>, <em>indent_increment=2</em>, <em>max_help_position=24</em>, <em>width=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#RawTextHelpFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.RawTextHelpFormatter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.core.utilities.argparse.RawDescriptionHelpFormatter" title="fudge.core.utilities.argparse.RawDescriptionHelpFormatter"><code class="xref py py-class docutils literal"><span class="pre">fudge.core.utilities.argparse.RawDescriptionHelpFormatter</span></code></a></p>
-<p>Help message formatter which retains formatting of all help text.</p>
-<p>Only the name of this class is considered a public API. All the methods
-provided by the class are considered an implementation detail.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="fudge.core.utilities.argparse.Namespace">
-<em class="property">class </em><code class="descclassname">fudge.core.utilities.argparse.</code><code class="descname">Namespace</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#Namespace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.Namespace" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">fudge.core.utilities.argparse._AttributeHolder</span></code></p>
-<p>Simple object for storing attributes.</p>
-<p>Implements equality by attribute names and values, and provides a simple
-string representation.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="fudge.core.utilities.argparse.Action">
-<em class="property">class </em><code class="descclassname">fudge.core.utilities.argparse.</code><code class="descname">Action</code><span class="sig-paren">(</span><em>option_strings</em>, <em>dest</em>, <em>nargs=None</em>, <em>const=None</em>, <em>default=None</em>, <em>type=None</em>, <em>choices=None</em>, <em>required=False</em>, <em>help=None</em>, <em>metavar=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/argparse.html#Action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.argparse.Action" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">fudge.core.utilities.argparse._AttributeHolder</span></code></p>
-<p>Information about how to convert command line strings to Python objects.</p>
-<p>Action objects are used by an ArgumentParser to represent the information
-needed to parse a single argument from one or more strings from the
-command line. The keyword arguments to the Action constructor are also
-all attributes of Action instances.</p>
-<p>Keyword Arguments:</p>
-<blockquote>
-<div><ul>
-<li><dl class="first docutils">
-<dt>option_strings &#8211; A list of command-line option strings which</dt>
-<dd><p class="first last">should be associated with this action.</p>
-</dd>
-</dl>
-</li>
-<li><p class="first">dest &#8211; The name of the attribute to hold the created object(s)</p>
-</li>
-<li><dl class="first docutils">
-<dt>nargs &#8211; The number of command-line arguments that should be</dt>
-<dd><p class="first">consumed. By default, one argument will be consumed and a single
-value will be produced.  Other values include:</p>
-<blockquote>
-<div><ul class="simple">
-<li>N (an integer) consumes N arguments (and produces a list)</li>
-<li>&#8216;?&#8217; consumes zero or one arguments</li>
-<li>&#8216;*&#8217; consumes zero or more arguments (and produces a list)</li>
-<li>&#8216;+&#8217; consumes one or more arguments (and produces a list)</li>
-</ul>
-</div></blockquote>
-<p class="last">Note that the difference between the default and nargs=1 is that
-with the default, a single value will be produced, while with
-nargs=1, a list containing a single value will be produced.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>const &#8211; The value to be produced if the option is specified and the</dt>
-<dd><p class="first last">option uses an action that takes no values.</p>
-</dd>
-</dl>
-</li>
-<li><p class="first">default &#8211; The value to be produced if the option is not specified.</p>
-</li>
-<li><dl class="first docutils">
-<dt>type &#8211; The type which the command-line arguments should be converted</dt>
-<dd><p class="first last">to, should be one of &#8216;string&#8217;, &#8216;int&#8217;, &#8216;float&#8217;, &#8216;complex&#8217; or a
-callable object that accepts a single string argument. If None,
-&#8216;string&#8217; is assumed.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>choices &#8211; A container of values that should be allowed. If not None,</dt>
-<dd><p class="first last">after a command-line argument has been converted to the appropriate
-type, an exception will be raised if it is not a member of this
-collection.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>required &#8211; True if the action must always be specified at the</dt>
-<dd><p class="first last">command line. This is only meaningful for optional command-line
-arguments.</p>
-</dd>
-</dl>
-</li>
-<li><p class="first">help &#8211; The help string describing the argument.</p>
-</li>
-<li><dl class="first docutils">
-<dt>metavar &#8211; The name to be used for the option&#8217;s argument with the</dt>
-<dd><p class="first last">help string. If None, the &#8216;dest&#8217; value will be used as the name.</p>
-</dd>
-</dl>
-</li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
+<div class="section" id="fudge-core-utilities-argparse-module">
+<h2>fudge.core.utilities.argparse module<a class="headerlink" href="#fudge-core-utilities-argparse-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-fudge.core.utilities.brb">
 <span id="fudge-core-utilities-brb-module"></span><h2>fudge.core.utilities.brb module<a class="headerlink" href="#module-fudge.core.utilities.brb" title="Permalink to this headline">¶</a></h2>
@@ -514,7 +144,7 @@ arguments.</p>
 <dl class="function">
 <dt id="fudge.core.utilities.brb.doc">
 <code class="descclassname">fudge.core.utilities.brb.</code><code class="descname">doc</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/brb.html#doc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.brb.doc" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function simply executes &#8220;print a.__doc__&#8221; where &#8220;a&#8221; is the argument.</p>
+<dd><p>This function simply executes “print a.__doc__” where “a” is the argument.</p>
 </dd></dl>
 
 <dl class="function">
@@ -565,7 +195,7 @@ of the first argument. It will recursively traverse each object found down to le
 <dl class="function">
 <dt id="fudge.core.utilities.brb.objectvalues">
 <code class="descclassname">fudge.core.utilities.brb.</code><code class="descname">objectvalues</code><span class="sig-paren">(</span><em>o</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/brb.html#objectvalues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.brb.objectvalues" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints a list of all objects return by dir( o ) and their data (or object type) where &#8220;o&#8221; 
+<dd><p>Prints a list of all objects return by dir( o ) and their data (or object type) where “o” 
 is the first argument.</p>
 </dd></dl>
 
@@ -584,12 +214,12 @@ is the first argument.</p>
 <dl class="function">
 <dt id="fudge.core.utilities.brb.tdir">
 <code class="descclassname">fudge.core.utilities.brb.</code><code class="descname">tdir</code><span class="sig-paren">(</span><em>a=None</em>, <em>w=5</em>, <em>pattern=None</em>, <em>wpattern=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/brb.html#tdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.brb.tdir" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function is an attempt at improving the output of python&#8217;s dir function. It uses
+<dd><p>This function is an attempt at improving the output of python’s dir function. It uses
 tlist to print the output in a more readable format. The argument w is passed to tlist.
 The argument pattern, if not None, is used to restrict the items displayed to those that match it.
 Pattern can be any pattern understood by the re module (e.g., to display all items
-containing the two consecutive letters &#8220;2d&#8221; set pattern to &#8221;.*2d.*&#8221;). If pattern is None
-and wpattern is NOT None then pattern is set to &#8221;.*&#8221; + wpattern + &#8221;.*&#8221;.</p>
+containing the two consecutive letters “2d” set pattern to “.*2d.*”). If pattern is None
+and wpattern is NOT None then pattern is set to “.*” + wpattern + “.*”.</p>
 </dd></dl>
 
 <dl class="function">
@@ -703,7 +333,7 @@ for the file (e.g., write). Currently, reading from the temporary file is not su
 <dl class="method">
 <dt id="fudge.core.utilities.fudgeFileMisc.fudgeTempFile.close">
 <code class="descname">close</code><span class="sig-paren">(</span><em>raiseIfClosed=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/fudgeFileMisc.html#fudgeTempFile.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.fudgeFileMisc.fudgeTempFile.close" title="Permalink to this definition">¶</a></dt>
-<dd><p>Closes the file if still opened. If raiseIfClosed is &#8216;True&#8217; and file is already
+<dd><p>Closes the file if still opened. If raiseIfClosed is ‘True’ and file is already
 closed, a raise is executed.</p>
 </dd></dl>
 
@@ -717,25 +347,25 @@ been deleted, a raise is executed.</p>
 <dl class="method">
 <dt id="fudge.core.utilities.fudgeFileMisc.fudgeTempFile.getFileDescriptor">
 <code class="descname">getFileDescriptor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/fudgeFileMisc.html#fudgeTempFile.getFileDescriptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.fudgeFileMisc.fudgeTempFile.getFileDescriptor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self&#8217;s file descriptor.</p>
+<dd><p>Returns self’s file descriptor.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.core.utilities.fudgeFileMisc.fudgeTempFile.getName">
 <code class="descname">getName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/fudgeFileMisc.html#fudgeTempFile.getName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.fudgeFileMisc.fudgeTempFile.getName" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self&#8217;s name which is the full path name of the temporary file.</p>
+<dd><p>Returns self’s name which is the full path name of the temporary file.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.core.utilities.fudgeFileMisc.fudgeTempFile.isDeleted">
 <code class="descname">isDeleted</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/fudgeFileMisc.html#fudgeTempFile.isDeleted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.fudgeFileMisc.fudgeTempFile.isDeleted" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns &#8216;True&#8217; if the file has been deleted.</p>
+<dd><p>Returns ‘True’ if the file has been deleted.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.core.utilities.fudgeFileMisc.fudgeTempFile.isOpened">
 <code class="descname">isOpened</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/fudgeFileMisc.html#fudgeTempFile.isOpened"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.fudgeFileMisc.fudgeTempFile.isOpened" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns &#8216;True&#8217; if the file is still opened.</p>
+<dd><p>Returns ‘True’ if the file is still opened.</p>
 </dd></dl>
 
 <dl class="method">
@@ -755,38 +385,38 @@ cmattoon, March 2011</p>
 <dl class="function">
 <dt id="fudge.core.utilities.fudgeZA.LabelToZ">
 <code class="descclassname">fudge.core.utilities.fudgeZA.</code><code class="descname">LabelToZ</code><span class="sig-paren">(</span><em>label</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/fudgeZA.html#LabelToZ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.fudgeZA.LabelToZ" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the Z for the specified label or &#8216;None&#8217; if no match for label.</p>
+<dd><p>Returns the Z for the specified label or ‘None’ if no match for label.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fudge.core.utilities.fudgeZA.SymbolToZ">
 <code class="descclassname">fudge.core.utilities.fudgeZA.</code><code class="descname">SymbolToZ</code><span class="sig-paren">(</span><em>symbol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/fudgeZA.html#SymbolToZ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.fudgeZA.SymbolToZ" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the Z for the specified symbol or &#8216;None&#8217; if no match for symbol.</p>
+<dd><p>Returns the Z for the specified symbol or ‘None’ if no match for symbol.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="fudge.core.utilities.fudgeZA.ZAToGNDName">
-<code class="descclassname">fudge.core.utilities.fudgeZA.</code><code class="descname">ZAToGNDName</code><span class="sig-paren">(</span><em>ZA</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/fudgeZA.html#ZAToGNDName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.fudgeZA.ZAToGNDName" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts an ENDL ZA or &#8216;zaZZZAAA_suffix&#8217; into a GND name. For example ENDL 94239 or &#8216;za094239&#8217;, is converted to &#8216;Pu239&#8217;.</p>
+<dt id="fudge.core.utilities.fudgeZA.ZAToGNDSName">
+<code class="descclassname">fudge.core.utilities.fudgeZA.</code><code class="descname">ZAToGNDSName</code><span class="sig-paren">(</span><em>ZA</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/fudgeZA.html#ZAToGNDSName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.fudgeZA.ZAToGNDSName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts an ENDL ZA or ‘zaZZZAAA_suffix’ into a GNDS name. For example ENDL 94239 or ‘za094239’, is converted to ‘Pu239’.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fudge.core.utilities.fudgeZA.ZToLabel">
 <code class="descclassname">fudge.core.utilities.fudgeZA.</code><code class="descname">ZToLabel</code><span class="sig-paren">(</span><em>Z</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/fudgeZA.html#ZToLabel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.fudgeZA.ZToLabel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the label (i.e., name) for the specified Z or &#8216;None&#8217; if Z is out-of-bounds.</p>
+<dd><p>Returns the label (i.e., name) for the specified Z or ‘None’ if Z is out-of-bounds.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fudge.core.utilities.fudgeZA.ZToSymbol">
 <code class="descclassname">fudge.core.utilities.fudgeZA.</code><code class="descname">ZToSymbol</code><span class="sig-paren">(</span><em>Z</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/fudgeZA.html#ZToSymbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.fudgeZA.ZToSymbol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the symbol for the specified Z or &#8216;None&#8217; if Z is out-of-bounds.</p>
+<dd><p>Returns the symbol for the specified Z or ‘None’ if Z is out-of-bounds.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="fudge.core.utilities.fudgeZA.gndNameToZ_A_Suffix">
-<code class="descclassname">fudge.core.utilities.fudgeZA.</code><code class="descname">gndNameToZ_A_Suffix</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/fudgeZA.html#gndNameToZ_A_Suffix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.fudgeZA.gndNameToZ_A_Suffix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the tuple (Z, A, suffix, ZA) for an gnd isotope name (e.g., gnd name = &#8216;Am242_m1&#8217; 
-returns ( 95, 242, &#8216;m1&#8217;, 95242 ).</p>
+<dt id="fudge.core.utilities.fudgeZA.gndsNameToZ_A_Suffix">
+<code class="descclassname">fudge.core.utilities.fudgeZA.</code><code class="descname">gndsNameToZ_A_Suffix</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/fudgeZA.html#gndsNameToZ_A_Suffix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.fudgeZA.gndsNameToZ_A_Suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the tuple (Z, A, suffix, ZA) for an gnds isotope name (e.g., gnds name = ‘Am242_m1’
+returns ( 95, 242, ‘m1’, 95242 ).</p>
 </dd></dl>
 
 </div>
@@ -795,9 +425,9 @@ returns ( 95, 242, &#8216;m1&#8217;, 95242 ).</p>
 <p>pyparsing module - Classes and methods to define and execute parsing grammars</p>
 <p>The pyparsing module is an alternative approach to creating and executing simple grammars,
 vs. the traditional lex/yacc approach, or the use of regular expressions.  With pyparsing, you
-don&#8217;t need to learn a new syntax for defining grammars or matching expressions - the parsing module
+don’t need to learn a new syntax for defining grammars or matching expressions - the parsing module
 provides a library of classes that you use to construct the grammar directly in Python.</p>
-<p>Here is a program to parse &#8220;Hello, World!&#8221; (or any greeting of the form C{&#8220;&lt;salutation&gt;, &lt;addressee&gt;!&#8221;}):</p>
+<p>Here is a program to parse “Hello, World!” (or any greeting of the form C{“&lt;salutation&gt;, &lt;addressee&gt;!”}):</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyparsing</span> <span class="k">import</span> <span class="n">Word</span><span class="p">,</span> <span class="n">alphas</span>
 
 <span class="c1"># define grammar of a greeting</span>
@@ -812,13 +442,13 @@ provides a library of classes that you use to construct the grammar directly in 
 </pre></div>
 </div>
 <p>The Python representation of the grammar is quite readable, owing to the self-explanatory
-class names, and the use of &#8216;+&#8217;, &#8216;|&#8217; and &#8216;^&#8217; operators.</p>
+class names, and the use of ‘+’, ‘|’ and ‘^’ operators.</p>
 <p>The parsed results returned from C{parseString()} can be accessed as a nested list, a dictionary, or an
 object with named attributes.</p>
 <dl class="docutils">
 <dt>The pyparsing module handles some of the problems that are typically vexing when writing text parsers:</dt>
 <dd><ul class="first last simple">
-<li>extra or missing whitespace (the above program will also handle &#8220;Hello,World!&#8221;, &#8220;Hello  ,  World  !&#8221;, etc.)</li>
+<li>extra or missing whitespace (the above program will also handle “Hello,World!”, “Hello  ,  World  !”, etc.)</li>
 <li>quoted strings</li>
 <li>embedded comments</li>
 </ul>
@@ -830,7 +460,7 @@ object with named attributes.</p>
 <dd><p>Bases: <a class="reference internal" href="#fudge.core.utilities.pyparsing.ParseExpression" title="fudge.core.utilities.pyparsing.ParseExpression"><code class="xref py py-class docutils literal"><span class="pre">fudge.core.utilities.pyparsing.ParseExpression</span></code></a></p>
 <p>Requires all given C{ParseExpressions} to be found in the given order.
 Expressions may be separated by whitespace.
-May be constructed using the &#8216;+&#8217; operator.</p>
+May be constructed using the ‘+’ operator.</p>
 <dl class="method">
 <dt id="fudge.core.utilities.pyparsing.And.checkRecursion">
 <code class="descname">checkRecursion</code><span class="sig-paren">(</span><em>parseElementList</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#And.checkRecursion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.And.checkRecursion" title="Permalink to this definition">¶</a></dt>
@@ -890,7 +520,7 @@ are 0, meaning no maximum or exact length restriction.</p>
 <dd><p>Bases: <a class="reference internal" href="#fudge.core.utilities.pyparsing.TokenConverter" title="fudge.core.utilities.pyparsing.TokenConverter"><code class="xref py py-class docutils literal"><span class="pre">fudge.core.utilities.pyparsing.TokenConverter</span></code></a></p>
 <p>Converter to concatenate all matching tokens to a single string.
 By default, the matching patterns must also be contiguous in the input string;
-this can be disabled by specifying C{&#8216;adjacent=False&#8217;} in the constructor.</p>
+this can be disabled by specifying C{‘adjacent=False’} in the constructor.</p>
 <dl class="method">
 <dt id="fudge.core.utilities.pyparsing.Combine.ignore">
 <code class="descname">ignore</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#Combine.ignore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.Combine.ignore" title="Permalink to this definition">¶</a></dt>
@@ -923,7 +553,7 @@ Useful for tabular report scraping when the first column can be used as a item k
 <dd><p>Bases: <a class="reference internal" href="#fudge.core.utilities.pyparsing.ParseExpression" title="fudge.core.utilities.pyparsing.ParseExpression"><code class="xref py py-class docutils literal"><span class="pre">fudge.core.utilities.pyparsing.ParseExpression</span></code></a></p>
 <p>Requires all given C{ParseExpressions} to be found, but in any order.
 Expressions may be separated by whitespace.
-May be constructed using the &#8216;&amp;&#8217; operator.</p>
+May be constructed using the ‘&amp;’ operator.</p>
 <dl class="method">
 <dt id="fudge.core.utilities.pyparsing.Each.checkRecursion">
 <code class="descname">checkRecursion</code><span class="sig-paren">(</span><em>parseElementList</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#Each.checkRecursion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.Each.checkRecursion" title="Permalink to this definition">¶</a></dt>
@@ -964,9 +594,9 @@ position.  C{FollowedBy} always returns a null token list.</p>
 <dd><p>Bases: <a class="reference internal" href="#fudge.core.utilities.pyparsing.ParseElementEnhance" title="fudge.core.utilities.pyparsing.ParseElementEnhance"><code class="xref py py-class docutils literal"><span class="pre">fudge.core.utilities.pyparsing.ParseElementEnhance</span></code></a></p>
 <p>Forward declaration of an expression to be defined later -
 used for recursive grammars, such as algebraic infix notation.
-When the expression is known, it is assigned to the C{Forward} variable using the &#8216;&lt;&lt;&#8217; operator.</p>
+When the expression is known, it is assigned to the C{Forward} variable using the ‘&lt;&lt;’ operator.</p>
 <p>Note: take care when assigning to C{Forward} not to overlook precedence of operators.
-Specifically, &#8216;|&#8217; has a lower precedence than &#8216;&lt;&lt;&#8217;, so that:</p>
+Specifically, ‘|’ has a lower precedence than ‘&lt;&lt;’, so that:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">fwdExpr</span> <span class="o">&lt;&lt;</span> <span class="n">a</span> <span class="o">|</span> <span class="n">b</span> <span class="o">|</span> <span class="n">c</span>
 </pre></div>
 </div>
@@ -1042,7 +672,7 @@ immediately followed by a non-keyword character.  Compare with C{Literal}:</p>
 </div>
 <p>Accepts two optional constructor arguments in addition to the keyword string:
 C{identChars} is a string of characters that would be valid identifier characters,
-defaulting to all alphanumerics + &#8220;_&#8221; and &#8220;$&#8221;; C{caseless} allows case-insensitive
+defaulting to all alphanumerics + “_” and “$”; C{caseless} allows case-insensitive
 matching, default is False.</p>
 <dl class="attribute">
 <dt id="fudge.core.utilities.pyparsing.Keyword.DEFAULT_KEYWORD_CHARS">
@@ -1114,7 +744,7 @@ matching, default is False.</p>
 <dd><p>Bases: <a class="reference internal" href="#fudge.core.utilities.pyparsing.ParseExpression" title="fudge.core.utilities.pyparsing.ParseExpression"><code class="xref py py-class docutils literal"><span class="pre">fudge.core.utilities.pyparsing.ParseExpression</span></code></a></p>
 <p>Requires that at least one C{ParseExpression} is found.
 If two expressions match, the first one listed is the one that will match.
-May be constructed using the &#8216;|&#8217; operator.</p>
+May be constructed using the ‘|’ operator.</p>
 <dl class="method">
 <dt id="fudge.core.utilities.pyparsing.MatchFirst.checkRecursion">
 <code class="descname">checkRecursion</code><span class="sig-paren">(</span><em>parseElementList</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#MatchFirst.checkRecursion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.MatchFirst.checkRecursion" title="Permalink to this definition">¶</a></dt>
@@ -1147,7 +777,7 @@ May be constructed using the &#8216;|&#8217; operator.</p>
 does <em>not</em> advance the parsing position within the input string, it only
 verifies that the specified parse expression does <em>not</em> match at the current
 position.  Also, C{NotAny} does <em>not</em> skip over leading whitespace. C{NotAny}
-always returns a null token list.  May be constructed using the &#8216;~&#8217; operator.</p>
+always returns a null token list.  May be constructed using the ‘~’ operator.</p>
 <dl class="method">
 <dt id="fudge.core.utilities.pyparsing.NotAny.parseImpl">
 <code class="descname">parseImpl</code><span class="sig-paren">(</span><em>instring</em>, <em>loc</em>, <em>doActions=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#NotAny.parseImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.NotAny.parseImpl" title="Permalink to this definition">¶</a></dt>
@@ -1204,7 +834,7 @@ is not found.</p>
 <dd><p>Bases: <a class="reference internal" href="#fudge.core.utilities.pyparsing.ParseExpression" title="fudge.core.utilities.pyparsing.ParseExpression"><code class="xref py py-class docutils literal"><span class="pre">fudge.core.utilities.pyparsing.ParseExpression</span></code></a></p>
 <p>Requires that at least one C{ParseExpression} is found.
 If two expressions match, the expression that matches the longest string will be used.
-May be constructed using the &#8216;^&#8217; operator.</p>
+May be constructed using the ‘^’ operator.</p>
 <dl class="method">
 <dt id="fudge.core.utilities.pyparsing.Or.checkRecursion">
 <code class="descname">checkRecursion</code><span class="sig-paren">(</span><em>parseElementList</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#Or.checkRecursion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.Or.checkRecursion" title="Permalink to this definition">¶</a></dt>
@@ -1272,7 +902,7 @@ the location of the exception with a special symbol.</p>
 <dt id="fudge.core.utilities.pyparsing.ParseException">
 <em class="property">exception </em><code class="descclassname">fudge.core.utilities.pyparsing.</code><code class="descname">ParseException</code><span class="sig-paren">(</span><em>pstr</em>, <em>loc=0</em>, <em>msg=None</em>, <em>elem=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#ParseException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.ParseException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#fudge.core.utilities.pyparsing.ParseBaseException" title="fudge.core.utilities.pyparsing.ParseBaseException"><code class="xref py py-class docutils literal"><span class="pre">fudge.core.utilities.pyparsing.ParseBaseException</span></code></a></p>
-<p>Exception thrown when parse expressions don&#8217;t match class;
+<p>Exception thrown when parse expressions don’t match class;
 supported attributes by name are:</p>
 <blockquote>
 <div><ul class="simple">
@@ -1422,7 +1052,7 @@ Will work with either numeric indices or dict-key indicies.</p>
 <em class="property">exception </em><code class="descclassname">fudge.core.utilities.pyparsing.</code><code class="descname">ParseSyntaxException</code><span class="sig-paren">(</span><em>pe</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#ParseSyntaxException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.ParseSyntaxException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#fudge.core.utilities.pyparsing.ParseFatalException" title="fudge.core.utilities.pyparsing.ParseFatalException"><code class="xref py py-class docutils literal"><span class="pre">fudge.core.utilities.pyparsing.ParseFatalException</span></code></a></p>
 <p>Just like C{ParseFatalException}, but thrown internally when an
-C{ErrorStop} (&#8216;-&#8216; operator) indicates that parsing is to stop immediately because
+C{ErrorStop} (‘-‘ operator) indicates that parsing is to stop immediately because
 an unbacktrackable syntax error has been found</p>
 </dd></dl>
 
@@ -1439,7 +1069,7 @@ an unbacktrackable syntax error has been found</p>
 <dl class="method">
 <dt id="fudge.core.utilities.pyparsing.ParserElement.addParseAction">
 <code class="descname">addParseAction</code><span class="sig-paren">(</span><em>*fns</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#ParserElement.addParseAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.ParserElement.addParseAction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add parse action to expression&#8217;s list of parse actions. See L{I{setParseAction}&lt;setParseAction&gt;}.</p>
+<dd><p>Add parse action to expression’s list of parse actions. See L{I{setParseAction}&lt;setParseAction&gt;}.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1457,7 +1087,7 @@ for the same parsing pattern, using copies of the original parse element.</p>
 <dl class="staticmethod">
 <dt id="fudge.core.utilities.pyparsing.ParserElement.enablePackrat">
 <em class="property">static </em><code class="descname">enablePackrat</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#ParserElement.enablePackrat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.ParserElement.enablePackrat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Enables &#8220;packrat&#8221; parsing, which adds memoizing to the parsing logic.
+<dd><p>Enables “packrat” parsing, which adds memoizing to the parsing logic.
 Repeated parse attempts at the same string location (which happens
 often in many complex grammars) can immediately return a cached value,
 instead of re-executing parsing/validating code.  Memoizing is done of
@@ -1466,7 +1096,7 @@ both valid results and parsing exceptions.</p>
 have side-effects.  For this reason, packrat parsing is disabled when
 you first import pyparsing.  To activate the packrat feature, your
 program must call the class method C{ParserElement.enablePackrat()}.  If
-your program uses C{psyco} to &#8220;compile as you go&#8221;, you must call
+your program uses C{psyco} to “compile as you go”, you must call
 C{enablePackrat} before calling C{psyco.full()}.  If you do not do this,
 Python will crash.  For best results, call C{enablePackrat()} immediately
 after importing pyparsing.</p>
@@ -1489,7 +1119,7 @@ ignorable patterns.</p>
 <dt id="fudge.core.utilities.pyparsing.ParserElement.leaveWhitespace">
 <code class="descname">leaveWhitespace</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#ParserElement.leaveWhitespace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.ParserElement.leaveWhitespace" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disables the skipping of whitespace before matching the characters in the
-C{ParserElement}&#8217;s defined pattern.  This is normally only used internally by
+C{ParserElement}’s defined pattern.  This is normally only used internally by
 the pyparsing module, but may be needed in some whitespace-sensitive grammars.</p>
 </dd></dl>
 
@@ -1526,7 +1156,7 @@ string by:</p>
 <li>calling C{parseWithTabs} on your grammar before calling C{parseString}
 (see L{I{parseWithTabs}&lt;parseWithTabs&gt;})</li>
 <li>define your parse action using the full C{(s,loc,toks)} signature, and
-reference the input string using the parse action&#8217;s C{s} argument</li>
+reference the input string using the parse action’s C{s} argument</li>
 <li>explictly expand the tabs in your input string before calling
 C{parseString}</li>
 </ul>
@@ -1561,7 +1191,7 @@ match &lt;TAB&gt; characters.</p>
 <code class="descname">scanString</code><span class="sig-paren">(</span><em>instring</em>, <em>maxMatches=9223372036854775807</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#ParserElement.scanString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.ParserElement.scanString" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scan the input string for expression matches.  Each match will return the
 matching tokens, start location, and end location.  May be called with optional
-C{maxMatches} argument, to clip scanning after &#8216;n&#8217; matches are found.</p>
+C{maxMatches} argument, to clip scanning after ‘n’ matches are found.</p>
 <p>Note that the start and end locations are reported relative to the string
 being parsed.  See L{I{parseString}&lt;parseString&gt;} for more information on parsing
 strings with embedded tabs.</p>
@@ -1572,7 +1202,7 @@ strings with embedded tabs.</p>
 <code class="descname">searchString</code><span class="sig-paren">(</span><em>instring</em>, <em>maxMatches=9223372036854775807</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#ParserElement.searchString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.ParserElement.searchString" title="Permalink to this definition">¶</a></dt>
 <dd><p>Another extension to C{scanString}, simplifying the access to the tokens found
 to match the given parse expression.  May be called with optional
-C{maxMatches} argument, to clip searching after &#8216;n&#8217; matches are found.</p>
+C{maxMatches} argument, to clip searching after ‘n’ matches are found.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1658,7 +1288,7 @@ NOTE: this returns a <em>copy</em> of the original C{ParserElement} object;
 this is so that the client can define a basic element, such as an
 integer, and reference it in multiple places with different names.</p>
 <p>You can also set results names using the abbreviated syntax,
-C{expr(&#8220;name&#8221;)} in place of C{expr.setResultsName(&#8220;name&#8221;)} - 
+C{expr(“name”)} in place of C{expr.setResultsName(“name”)} - 
 see L{I{__call__}&lt;__call__&gt;}.</p>
 </dd></dl>
 
@@ -1842,7 +1472,7 @@ might contain false matches.</p>
 <p>Special matching class for matching whitespace.  Normally, whitespace is ignored
 by pyparsing grammars.  This class is included when some whitespace structures
 are significant.  Define with a string containing the whitespace characters to be
-matched; default is C{&#8221; trn&#8221;}.  Also takes optional C{min}, C{max}, and C{exact} arguments,
+matched; default is C{” trn”}.  Also takes optional C{min}, C{max}, and C{exact} arguments,
 as defined for the C{Word} class.</p>
 <dl class="method">
 <dt id="fudge.core.utilities.pyparsing.White.parseImpl">
@@ -1950,7 +1580,7 @@ The matched tokens returns the array of expr tokens as a list - the leading coun
 <dl class="function">
 <dt id="fudge.core.utilities.pyparsing.delimitedList">
 <code class="descclassname">fudge.core.utilities.pyparsing.</code><code class="descname">delimitedList</code><span class="sig-paren">(</span><em>expr</em>, <em>delim='</em>, <em>'</em>, <em>combine=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#delimitedList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.delimitedList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper to define a delimited list of expressions - the delimiter defaults to &#8216;,&#8217;.
+<dd><p>Helper to define a delimited list of expressions - the delimiter defaults to ‘,’.
 By default, the list elements and delimiters can have intervening whitespace, and
 comments, but this can be overridden by passing C{combine=True} in the constructor.
 If C{combine} is set to True, the matching tokens are returned as a single token
@@ -2032,16 +1662,16 @@ column in the input text.</p>
 <code class="descclassname">fudge.core.utilities.pyparsing.</code><code class="descname">matchPreviousExpr</code><span class="sig-paren">(</span><em>expr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#matchPreviousExpr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.matchPreviousExpr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper to define an expression that is indirectly defined from
 the tokens matched in a previous expression, that is, it looks
-for a &#8216;repeat&#8217; of a previous expression.  For example:</p>
+for a ‘repeat’ of a previous expression.  For example:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">first</span> <span class="o">=</span> <span class="n">Word</span><span class="p">(</span><span class="n">nums</span><span class="p">)</span>
 <span class="n">second</span> <span class="o">=</span> <span class="n">matchPreviousExpr</span><span class="p">(</span><span class="n">first</span><span class="p">)</span>
 <span class="n">matchExpr</span> <span class="o">=</span> <span class="n">first</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="n">second</span>
 </pre></div>
 </div>
-<p>will match C{&#8220;1:1&#8221;}, but not C{&#8220;1:2&#8221;}.  Because this matches by
-expressions, will <em>not</em> match the leading C{&#8220;1:1&#8221;} in C{&#8220;1:10&#8221;};
+<p>will match C{“1:1”}, but not C{“1:2”}.  Because this matches by
+expressions, will <em>not</em> match the leading C{“1:1”} in C{“1:10”};
 the expressions are evaluated first, and then compared, so
-C{&#8220;1&#8221;} is compared with C{&#8220;10&#8221;}.
+C{“1”} is compared with C{“10”}.
 Do <em>not</em> use with packrat parsing enabled.</p>
 </dd></dl>
 
@@ -2050,14 +1680,14 @@ Do <em>not</em> use with packrat parsing enabled.</p>
 <code class="descclassname">fudge.core.utilities.pyparsing.</code><code class="descname">matchPreviousLiteral</code><span class="sig-paren">(</span><em>expr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#matchPreviousLiteral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.matchPreviousLiteral" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper to define an expression that is indirectly defined from
 the tokens matched in a previous expression, that is, it looks
-for a &#8216;repeat&#8217; of a previous expression.  For example:</p>
+for a ‘repeat’ of a previous expression.  For example:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">first</span> <span class="o">=</span> <span class="n">Word</span><span class="p">(</span><span class="n">nums</span><span class="p">)</span>
 <span class="n">second</span> <span class="o">=</span> <span class="n">matchPreviousLiteral</span><span class="p">(</span><span class="n">first</span><span class="p">)</span>
 <span class="n">matchExpr</span> <span class="o">=</span> <span class="n">first</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="n">second</span>
 </pre></div>
 </div>
-<p>will match C{&#8220;1:1&#8221;}, but not C{&#8220;1:2&#8221;}.  Because this matches a
-previous literal, will also match the leading C{&#8220;1:1&#8221;} in C{&#8220;1:10&#8221;}.
+<p>will match C{“1:1”}, but not C{“1:2”}.  Because this matches a
+previous literal, will also match the leading C{“1:1”} in C{“1:10”}.
 If this is not desired, use C{matchPreviousExpr}.
 Do <em>not</em> use with packrat parsing enabled.</p>
 </dd></dl>
@@ -2066,12 +1696,12 @@ Do <em>not</em> use with packrat parsing enabled.</p>
 <dt id="fudge.core.utilities.pyparsing.nestedExpr">
 <code class="descclassname">fudge.core.utilities.pyparsing.</code><code class="descname">nestedExpr</code><span class="sig-paren">(</span><em>opener='('</em>, <em>closer=')'</em>, <em>content=None</em>, <em>ignoreExpr=quotedString using single or double quotes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#nestedExpr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.nestedExpr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper method for defining nested lists enclosed in opening and closing
-delimiters (&#8220;(&#8221; and &#8221;)&#8221; are the default).</p>
+delimiters (“(” and “)” are the default).</p>
 <dl class="docutils">
 <dt>Parameters:</dt>
 <dd><ul class="first last simple">
-<li>opener - opening character for a nested list (default=&#8221;(&#8221;); can also be a pyparsing expression</li>
-<li>closer - closing character for a nested list (default=&#8221;)&#8221;); can also be a pyparsing expression</li>
+<li>opener - opening character for a nested list (default=”(“); can also be a pyparsing expression</li>
+<li>closer - closing character for a nested list (default=”)”); can also be a pyparsing expression</li>
 <li>content - expression for items within the nested lists (default=None)</li>
 <li>ignoreExpr - expression for ignoring opening and closing delimiters (default=quotedString)</li>
 </ul>
@@ -2091,7 +1721,7 @@ then pass None for this argument.</p>
 <dl class="function">
 <dt id="fudge.core.utilities.pyparsing.nullDebugAction">
 <code class="descclassname">fudge.core.utilities.pyparsing.</code><code class="descname">nullDebugAction</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#nullDebugAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.nullDebugAction" title="Permalink to this definition">¶</a></dt>
-<dd><p>&#8216;Do-nothing&#8217; debug action, to suppress debugging output during parsing.</p>
+<dd><p>‘Do-nothing’ debug action, to suppress debugging output during parsing.</p>
 </dd></dl>
 
 <dl class="function">
@@ -2188,15 +1818,15 @@ useful when used with C{transformString()}.</p>
 <dt id="fudge.core.utilities.pyparsing.srange">
 <code class="descclassname">fudge.core.utilities.pyparsing.</code><code class="descname">srange</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/pyparsing.html#srange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.pyparsing.srange" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper to easily define string ranges for use in Word construction.  Borrows
-syntax from regexp &#8216;[]&#8217; string range definitions:</p>
+syntax from regexp ‘[]’ string range definitions:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">srange</span><span class="p">(</span><span class="s2">&quot;[0-9]&quot;</span><span class="p">)</span>   <span class="o">-&gt;</span> <span class="s2">&quot;0123456789&quot;</span>
 <span class="n">srange</span><span class="p">(</span><span class="s2">&quot;[a-z]&quot;</span><span class="p">)</span>   <span class="o">-&gt;</span> <span class="s2">&quot;abcdefghijklmnopqrstuvwxyz&quot;</span>
 <span class="n">srange</span><span class="p">(</span><span class="s2">&quot;[a-z$_]&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;abcdefghijklmnopqrstuvwxyz$_&quot;</span>
 </pre></div>
 </div>
-<p>The input string must be enclosed in []&#8217;s, and the returned string is the expanded
+<p>The input string must be enclosed in []’s, and the returned string is the expanded
 character set joined into a single string.
-The values enclosed in the []&#8217;s may be:</p>
+The values enclosed in the []’s may be:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="n">single</span> <span class="n">character</span>
 <span class="n">an</span> <span class="n">escaped</span> <span class="n">character</span> <span class="k">with</span> <span class="n">a</span> <span class="n">leading</span> <span class="n">backslash</span> <span class="p">(</span><span class="n">such</span> <span class="k">as</span> \<span class="o">-</span> <span class="ow">or</span> \<span class="p">])</span>
 <span class="n">an</span> <span class="n">escaped</span> <span class="nb">hex</span> <span class="n">character</span> <span class="k">with</span> <span class="n">a</span> <span class="n">leading</span> <span class="s1">&#39;</span><span class="se">\0</span><span class="s1">x&#39;</span> <span class="p">(</span>\<span class="mh">0x21</span><span class="p">,</span> <span class="n">which</span> <span class="ow">is</span> <span class="n">a</span> <span class="s1">&#39;!&#39;</span> <span class="n">character</span><span class="p">)</span>
@@ -2230,8 +1860,8 @@ with a required attribute value, to avoid false matches on common tags such as
 of filter attributes names and values as:</p>
 <blockquote>
 <div><ul class="simple">
-<li>keyword arguments, as in (class=&#8221;Customer&#8221;,align=&#8221;right&#8221;), or</li>
-<li>a list of name-value tuples, as in ( (&#8220;ns1:class&#8221;, &#8220;Customer&#8221;), (&#8220;ns2:align&#8221;,&#8221;right&#8221;) )</li>
+<li>keyword arguments, as in (class=”Customer”,align=”right”), or</li>
+<li>a list of name-value tuples, as in ( (“ns1:class”, “Customer”), (“ns2:align”,”right”) )</li>
 </ul>
 </div></blockquote>
 <p>For attribute names with a namespace prefix, you must use the second form.  Attribute
@@ -2293,7 +1923,7 @@ results name values.</p>
 <span id="fudge-core-utilities-reactionstrings-module"></span><h2>fudge.core.utilities.reactionStrings module<a class="headerlink" href="#module-fudge.core.utilities.reactionStrings" title="Permalink to this headline">¶</a></h2>
 <p>Containers for a particle and a reaction, plus utility to parse in string
 representations to containers:
-&gt;&gt;&gt; parseReaction(&#8220;n + Fe56 -&gt; n[multiplicity:&#8216;2&#8217;] + (Fe55_s -&gt; gamma)&#8221;)</p>
+&gt;&gt;&gt; parseReaction(“n + Fe56 -&gt; n[multiplicity:‘2’] + (Fe55_s -&gt; gamma)”)</p>
 <dl class="function">
 <dt id="fudge.core.utilities.reactionStrings.parseReaction">
 <code class="descclassname">fudge.core.utilities.reactionStrings.</code><code class="descname">parseReaction</code><span class="sig-paren">(</span><em>str</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/reactionStrings.html#parseReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.reactionStrings.parseReaction" title="Permalink to this definition">¶</a></dt>
@@ -2302,7 +1932,7 @@ representations to containers:
 <dl class="function">
 <dt id="fudge.core.utilities.reactionStrings.particleParser">
 <code class="descclassname">fudge.core.utilities.reactionStrings.</code><code class="descname">particleParser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/reactionStrings.html#particleParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.reactionStrings.particleParser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse string of form &#8220;Pu239_e2[option1:&#8217;value&#8217;, option2:&#8217;value&#8217; ... ]&#8221; into particle class.</p>
+<dd><p>Parse string of form “Pu239_e2[option1:’value’, option2:’value’ … ]” into particle class.</p>
 </dd></dl>
 
 <dl class="class">
@@ -2324,7 +1954,7 @@ representations to containers:
 <dl class="function">
 <dt id="fudge.core.utilities.reactionStrings.reactionParser">
 <code class="descclassname">fudge.core.utilities.reactionStrings.</code><code class="descname">reactionParser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/utilities/reactionStrings.html#reactionParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.utilities.reactionStrings.reactionParser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse reaction of form &#8220;n + Fe56 -&gt; n[options...] + (Fe55_u -&gt; gamma)&#8221; into reaction class.</p>
+<dd><p>Parse reaction of form “n + Fe56 -&gt; n[options…] + (Fe55_u -&gt; gamma)” into reaction class.</p>
 </dd></dl>
 
 <dl class="class">
@@ -2387,7 +2017,7 @@ representations to containers:
 </div>
 <div class="section" id="module-fudge.core.utilities.xmlNode">
 <span id="fudge-core-utilities-xmlnode-module"></span><h2>fudge.core.utilities.xmlNode module<a class="headerlink" href="#module-fudge.core.utilities.xmlNode" title="Permalink to this headline">¶</a></h2>
-<p>Wrapper for xml parsers (Etree, DOM, etc), in case we need to support multiple parsers. For now only supporting python&#8217;s xml.etree.
+<p>Wrapper for xml parsers (Etree, DOM, etc), in case we need to support multiple parsers. For now only supporting python’s xml.etree.
 This is only for reading (not writing) xml; creating new elements should happen within fudge</p>
 <dl class="class">
 <dt id="fudge.core.utilities.xmlNode.xmlNode">
@@ -2478,7 +2108,7 @@ This is only for reading (not writing) xml; creating new elements should happen 
 <li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-fudge.core.utilities.argparse">fudge.core.utilities.argparse module</a></li>
+<li><a class="reference internal" href="#fudge-core-utilities-argparse-module">fudge.core.utilities.argparse module</a></li>
 <li><a class="reference internal" href="#module-fudge.core.utilities.brb">fudge.core.utilities.brb module</a></li>
 <li><a class="reference internal" href="#module-fudge.core.utilities.fudgeExceptions">fudge.core.utilities.fudgeExceptions module</a></li>
 <li><a class="reference internal" href="#module-fudge.core.utilities.fudgeFileMisc">fudge.core.utilities.fudgeFileMisc module</a></li>
@@ -2535,14 +2165,14 @@ This is only for reading (not writing) xml; creating new elements should happen 
         <li class="right" >
           <a href="fudge.core.math.xData.test.html" title="fudge.core.math.xData.test package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="fudge.core.html" >fudge.core package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

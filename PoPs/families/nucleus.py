@@ -65,10 +65,9 @@
 This module contains the nucleus classes.
 """
 
-continuumID = 1000000
-sumID = continuumID + 1
-
 from .. import misc as miscModule
+
+from ..groups import misc as chemicalElementMiscModule
 
 from ..quantities import nuclearEnergyLevel as nuclearEnergyLevelModule
 
@@ -79,9 +78,9 @@ class alias( particleModule.alias ) :
     moniker = 'nucleusAlias'
 
     @property
-    def chemicalElement( self ) :
+    def chemicalElementSymbol( self ) :
 
-        return( self.__particle.chemicalElement )
+        return( self.__particle.chemicalElementSymbol )
 
     @property
     def Z( self ) :
@@ -99,11 +98,6 @@ class alias( particleModule.alias ) :
         return( self.__particle.index )
 
     @property
-    def intIndex( self ) :
-
-        return( self.__particle.intIndex )
-
-    @property
     def energy( self ) :
 
         return( self.__particle.energy )
@@ -115,38 +109,24 @@ class particle( particleModule.particle ) :
 
     def __init__( self, id, index ) :
 
-        from ..groups import chemicalElement as chemicalElementModule
-        from ..groups import isotope as isotopeModule
-
         particleModule.particle.__init__( self, id )
 
-        isNucleus, chemicalElement, A, _index, anti, qualifier = chemicalElementAAndLevelIDsFromNuclearLevelID( id )
+        baseID, chemicalElementSymbol, A, levelID, isNucleus, anti, qualifier = chemicalElementMiscModule.chemicalElementALevelIDsAndAnti( id )
         if( not( isNucleus ) ) : raise ValueError( 'Invalid nucleus id = "%s"' % id )
 
-        if( isinstance( index, int ) ) : index = str( index )
-        intIndex = checkIndex( index )
-        if( index != _index ) : raise ValueError( 'id = "%s" does not agree with index = "%s"' % 
+        index = int( index )
+        if( index != levelID ) : raise ValueError( 'id = "%s" does not agree with index = "%s"' % 
                 ( miscModule.toLimitedString( id ), miscModule.toLimitedString( index ) ) )
 
-        self.__chemicalElement = chemicalElement
-        self.__Z = chemicalElementModule.ZFromSymbol[chemicalElement]
-        self.__A = A
-        self.__intA = isotopeModule.checkA( A )
-        self.__index = index
-        self.__intIndex = intIndex
+        self.__chemicalElementSymbol = chemicalElementSymbol
+        self.__Z = chemicalElementMiscModule.ZFromSymbol[chemicalElementSymbol]
+        self.__A = chemicalElementMiscModule.checkA( A )
+        self.__index = chemicalElementMiscModule.checkIndex( index )
         self.__energy = self.addSuite( nuclearEnergyLevelModule )
 
     def __eq__( self, other ) :
 
-        from ..groups import isotope as isotopeModule
-
-        if(   isinstance( other, particle ) ) :
-            return( self.id == other.id )
-        elif( isinstance( other, isotopeModule.suite ) ) :
-            _particle = other.particle
-            return( self.id == _particle.id )
-        else :
-            return( False )
+        return( self.id == other.id )
 
     @property
     def A( self ) :
@@ -154,14 +134,9 @@ class particle( particleModule.particle ) :
         return( self.__A )
 
     @property
-    def intA( self ) :
+    def chemicalElementSymbol( self ) :
 
-        return( self.__intA )
-
-    @property
-    def chemicalElement( self ) :
-
-        return( self.__chemicalElement )
+        return( self.__chemicalElementSymbol )
 
     @property
     def index( self ) :
@@ -169,14 +144,14 @@ class particle( particleModule.particle ) :
         return( self.__index )
 
     @property
-    def intIndex( self ) :
-
-        return( self.__intIndex )
-
-    @property
     def energy( self ) :
 
         return( self.__energy )
+
+    @property
+    def nuclide( self ) :
+
+        return( self.ancestor )
 
     @property
     def Z( self ) :
@@ -194,6 +169,17 @@ class particle( particleModule.particle ) :
         self.__copyStandardQuantities( _particle )
         for item in self.__energy : _particle.energy.add( item.copy( ) )
         return( _particle )
+
+    def getMass( self, unit ) :
+
+# Still need to correct for electron masses and binding energy.
+        if( len( self.mass ) > 0 ) : return( self.mass[0].float( unit ) )
+        return( self.nuclide.getMass( unit ) )
+
+    def replicate( self, other ) :
+
+        particleModule.particle.replicate( self, other )
+        self.__energy.replicate( other.energy )
 
     def extraXMLAttributes( self ) :
 
@@ -214,54 +200,4 @@ class particle( particleModule.particle ) :
     def sortCompare( self, other ) :
 
         if( not( isinstance( other, particle ) ) ) : raise TypeError( 'Invalid other.' )
-        return( self.intIndex - other.intIndex )
-
-def nucleusNameFromNucleusNameAndIndex( isotopeName, index ) :
-
-    nucleusName = isotopeName[0].lower( ) + isotopeName[1:]
-    _index = checkIndex( index )
-    if( isinstance( _index, int ) ) : return( "%s_e%s" % ( nucleusName, index ) )
-    return( "%s_%s" % ( nucleusName, index ) )
-
-def levelNameFromIsotopeNameAndIndex( isotopeName, index ) :
-
-    _index = checkIndex( index )
-    if( isinstance( _index, int ) ) : return( "%s_e%s" % ( isotopeName, index ) )
-    return( "%s_%s" % ( isotopeName, index ) )
-
-def chemicalElementAAndLevelIDsFromNuclearLevelID( id, qualifierAllowed = False ) :
-
-    from ..groups import isotope as isotopeModule
-
-    baseID, anti, qualifier = miscModule.baseAntiQualifierFromID( id, qualifierAllowed = qualifierAllowed )
-
-    isotopeID, sep, levelID = baseID.rpartition( '_' )
-    if( sep == '' ) : raise ValueError( 'Missing level id separator: %s' % miscModule.toLimitedString( id ) )
-    if( levelID == '' ) : raise ValueError( 'Missing level id: %s' % miscModule.toLimitedString( id ) )
-    if( levelID[0] == 'e' ) :
-        checkIndex( levelID[1:] )
-        levelID = levelID[1:]
-    elif( not( checkIndex( levelID ) ) ) :
-        raise ValueError( 'Invalid level id: %s' % miscModule.toLimitedString( id ) )
-
-    if( len( isotopeID ) < 2 ) : raise ValueError( 'Invalid isotope id = "%s"' % isotopeID )
-    isotopeIDUpper = isotopeID[0].upper( ) + isotopeID[1:]
-    chemicalElementID, A, dummy, dummy = isotopeModule.chemicalElementAndAIDsFromIsotopeID( isotopeIDUpper )
-
-    isNucleus = isotopeID != isotopeIDUpper
-    return( isNucleus, chemicalElementID, A, levelID, anti, qualifier )
-
-def checkIndex( index ) :
-
-    if( not( isinstance( index, str ) ) ) : raise TypeError( 'index attribute not str object.' )
-    if( index == 'c' ) :
-        _index = continuumID
-    elif( index == 's' ) :
-        _index = sumID
-    else :
-        try :
-            _index = int( index )
-            if( _index < 0 ) : ValueError( 'Negative level index id = %s' % index )
-        except :
-            raise ValueError( 'index attribute not str of positive integer, "c" or "s": %s' % miscModule.toLimitedString( index ) )
-    return( _index )
+        return( self.index - other.index )

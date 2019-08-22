@@ -1,20 +1,20 @@
-Generalized Nuclear Data (GND)
+Generalized Nuclear Data (GNDS)
 ==============================
 
-GND version 1.0
+GNDS version 1.0
 
-You can find out more about GND from `C. Mattoon, et al., 
+You can find out more about GNDS from `C. Mattoon, et al.,
 Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145--3171 
 <http://dx.doi.org/10.1016/j.nds.2012.11.008/>`_.
 
-GND-XML
+GNDS-XML
 -------
 
-*Download:* :download:`XML Schema for GND <../../fudge/gnd/gnd.xsd>`
+*Download:* :download:`XML Schema for GNDS <../../fudge/gnds/gnds.xsd>`
 
-*Download:* :download:`XML Schema for xlink <../../fudge/gnd/xlink.xsd>`
+*Download:* :download:`XML Schema for xlink <../../fudge/gnds/xlink.xsd>`
 
-*Download:* :download:`Stylesheet transformation for simple viewing of GND files <../../examples/gnd.xsl>`
+*Download:* :download:`Stylesheet transformation for simple viewing of GNDS files <../../examples/gnds.xsl>`
 
-GND-HDF5
+GNDS-HDF5
 --------

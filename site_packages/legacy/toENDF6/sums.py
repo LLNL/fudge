@@ -63,8 +63,7 @@
 
 from pqu import PQU as PQUModule
 
-from fudge.gnd import sums as sumsModule
-from fudge.gnd.reactionData import crossSection as crossSectionModule
+from fudge.gnds import sums as sumsModule
 
 __metaclass__ = type
 
@@ -73,8 +72,9 @@ __metaclass__ = type
 #
 def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
 
-    if self.ENDF_MT in xrange(851,871) : return   # for lumped-sum covariance, only write MF 33
-    if flags['verbosity'] >= 10 : print '%ssummed reaction: %s' % (verbosityIndent, self.label)
+    if self.ENDF_MT in range(851,871) : return   # for lumped-sum covariance, only write MF 33
+    if 'omit' in targetInfo['ENDFconversionFlags'].get(self,""): return
+    if flags['verbosity'] >= 10 : print( '%ssummed reaction: %s' % (verbosityIndent, self.label) )
     Q = self.Q[targetInfo['style']]
     Q = PQUModule.PQU( Q.constant, Q.axes[0].unit ).getValueAs( 'eV' )
     targetInfo['Q'] = Q                     # FIXME may need to account for ground state
@@ -90,7 +90,7 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
 sumsModule.crossSectionSum.toENDF6 = toENDF6
 
 #
-# summed multiplicities are written back in gndToENDF6.gammasToENDF6_MF12_13. Just implement do-nothing routine here:
+# summed multiplicities are written back in gndsToENDF6.gammasToENDF6_MF12_13. Just implement do-nothing routine here:
 #
 def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
     pass

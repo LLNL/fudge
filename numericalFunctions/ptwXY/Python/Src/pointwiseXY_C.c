@@ -264,6 +264,7 @@ static PyObject *pointwiseXY_C_rangeMin( pointwiseXY_CPy *self );
 static PyObject *pointwiseXY_C_rangeMax( pointwiseXY_CPy *self );
 static int pointwiseXY_C_domainMinMax( pointwiseXY_CPy *self, double *domainMin, double *domainMax );
 static int pointwiseXY_C_rangeMinMax( pointwiseXY_CPy *self, double *rangeMin, double *rangeMax );
+static PyObject *pointwiseXY_C_ysMappedToXs( pointwiseXY_CPy *self, PyObject *args );
 
 static PyObject *pointwiseXY_C_emptyXYs( void );
 static PyObject *pointwiseXY_C_createFromFunction( pointwiseXY_CPy *self, PyObject *args, PyObject *keywords );
@@ -2925,6 +2926,35 @@ static int pointwiseXY_C_rangeMinMax( pointwiseXY_CPy *self, double *rangeMin, d
 /*
 ************************************************************
 */
+static PyObject *pointwiseXY_C_ysMappedToXs( pointwiseXY_CPy *self, PyObject *args ) {
+
+    int64_t offset;
+    ptwXPoints *ptwX, *Xs = NULL;
+    PyObject *nPy, *Xs_Py;
+    statusMessageReporting *smr = &(self->smr);
+
+    if( pointwiseXY_C_checkStatus( self ) != 0 ) return( NULL );
+
+    if( !PyArg_ParseTuple( args, "O", &Xs_Py ) ) return( NULL );
+
+    if( ( Xs = pointwiseXY_C_PyFloatList_to_ptwXPoints( Xs_Py ) ) == NULL ) return( NULL );
+
+    ptwX = ptwXY_ysMappedToXs( smr, self->ptwXY, Xs, &offset );
+    ptwX_free( Xs );
+
+    if( ptwX == NULL ) {
+        pointwiseXY_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
+    }
+
+    nPy = pointwiseXY_C_ptwXPoints_to_PyFloatList( ptwX );
+    ptwX_free( ptwX );
+
+    return( Py_BuildValue( "(l,O)", (long) offset, nPy ) );
+}
+/*
+************************************************************
+*/
 static PyObject *pointwiseXY_C_defaultAccuracy( pointwiseXY_CPy *self, PyObject *args ) {
 
     return( Py_BuildValue( "d", _defaultAccuracy ) );
@@ -3823,6 +3853,9 @@ static PyMethodDef pointwiseXY_CPyMethods[] = {
     { "range",    (PyCFunction)    pointwiseXY_C_range, METH_NOARGS, "Returns the minimum and maximum y-values in self or 0 if self is empty." },
     { "rangeMin", (PyCFunction) pointwiseXY_C_rangeMin, METH_NOARGS, "Returns the minimum y-value in self or 0 if self is empty." },
     { "rangeMax", (PyCFunction) pointwiseXY_C_rangeMax, METH_NOARGS, "Returns the maximum y-value in self or 0 if self is empty." },
+    { "ysMappedToXs", (PyCFunction) pointwiseXY_C_ysMappedToXs, METH_VARARGS, "Returns the tuple (offset, y-values) where y-values is self's y-values mapped to Xs.\n" \
+        "\nArguments are: ([o] implies optional argument)\n" \
+        "   Xs  [o] List of x-values to map self to." },
     { NULL, NULL, 0, NULL }        /* Sentinel (i.e., the end of the list) */
 };
 /*

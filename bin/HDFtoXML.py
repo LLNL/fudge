@@ -64,7 +64,7 @@
 # <<END-copyright>>
 
 """
-Translate GND/HDF5 to GND/XML
+Translate GNDS/HDF5 to GNDS/XML
 """
 import sys
 import os

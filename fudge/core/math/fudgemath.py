@@ -65,42 +65,58 @@
 This module contains useful fudge math routines that do not fit into any other module.
 """
 
-from pqu import PQU
-from fudge.core.utilities import brb
+import math
+
 try :
     import numpy
     numpyFloat64 = numpy.float64( 1. )
 except :
     numpyFloat64 = 1.
 
+from pqu import PQU as PQUModule
+import xData.standards as standardsModule
+
+from fudge.core.utilities import brb
+
 __metaclass__ = type
 
-def thickenXYList( list, tester, biSectionMax = 6 ) :
-    """This functions takes a list of (x,y) points and a function, tester.evaluateAtX, and bi-sectionally adds points to 
+def thickenXYList( list, tester, biSectionMax = 6, interpolation = standardsModule.interpolation.linlinToken ) :
+    """
+    This functions takes a list of (x,y) points and a function, tester.evaluateAtX, and bi-sectionally adds points to 
     obtain linear-linear tolerance of the returned list and tester.evaluateAtX to tester.relativeTolerance. At most 
     biSectionMax bi-sections are performed between each consecutive pair of inputted points. It is assumed that the 
     initial list of points and the function tester.evaluateAtX agree to tolerance tester.relativeTolerance. The instance
     tester must contain the members relativeTolerance and absoluteTolerance as well as the method evaluateAtX. The
-    method evaluateAtX takes an x-value and returns its y-value."""
+    method evaluateAtX takes an x-value and returns its y-value.
+    """
 
-    def thickenXYList2( xl, yl, xu, yu, newList, tester, level ) :
+    def thickenXYList2( interpolation, xl, yl, xu, yu, newList, tester, level ) :
 
         if( level == biSectionMax ) : return
         level += 1
-        xMid = 0.5  * ( xl + xu )
-        yMid = 0.5  * ( yl + yu )
+        if( ( interpolation == standardsModule.interpolation.linlinToken ) or ( interpolation == standardsModule.interpolation.loglinToken ) ) :
+            xMid = 0.5  * ( xl + xu )
+        else :
+            xMid = math.sqrt( xl * xu );
+
+        if( ( interpolation == standardsModule.interpolation.linlinToken ) or ( interpolation == standardsModule.interpolation.linlogToken ) ) :
+            yMid = 0.5  * ( yl + yu )
+        else :
+            yMid = math.sqrt( yl * yu )
+
         y = tester.evaluateAtX( xMid )
+
         dy = abs( y - yMid )
         if( ( dy > abs( y * tester.relativeTolerance ) ) and ( dy > tester.absoluteTolerance ) ) :
             newList.append( [ xMid, y ] )
-            thickenXYList2( xl, yl, xMid, y, newList, tester, level )
-            thickenXYList2( xMid, y, xu, yu, newList, tester, level )
+            thickenXYList2( interpolation, xl, yl, xMid, y, newList, tester, level )
+            thickenXYList2( interpolation, xMid, y, xu, yu, newList, tester, level )
 
     if( len( list ) < 2 ) : raise Exception( "len( list ) = %d < 2" % len( list ) )
     newList = []
-    for i, xy in enumerate( list ) :
+    for i1, xy in enumerate( list ) :
         x2, y2 = xy
-        if( i > 0 ) : thickenXYList2( x1, y1, x2, y2, newList, tester, 0 )
+        if( i1 > 0 ) : thickenXYList2( interpolation, x1, y1, x2, y2, newList, tester, 0 )
         newList.append( [ x2, y2 ] )
         x1, y1 = x2, y2
     newList.sort( )
@@ -146,5 +162,5 @@ def checkNumber( v, str = "", printErrors = True, indentation = "", messages = N
 def getValue( n ) :
 
     if( isNumber( n ) ) : return( n )
-    if( isinstance( n, PQU.PQU ) ) : return( n.getValue( ) )
+    if( isinstance( n, PQUModule.PQU ) ) : return( n.getValue( ) )
     raise Exception( 'Invalue number object = %s' % brb.getType( n ) )

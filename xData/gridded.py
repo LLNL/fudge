@@ -63,8 +63,6 @@
 
 __metaclass__ = type
 
-import abc
-
 import standards as standardsModule
 import base as baseModule
 import axes as axesModule
@@ -106,7 +104,7 @@ class gridded( baseModule.xDataFunctional ) :
     def getGrid( self, index ) :
 
         if( 0 < index <= len( self ) ) : return( self.axes[index].grid )
-        raise IndexError( 'index = %d out of range [1,%s]' % len( self ) )
+        raise IndexError( 'index = %d out of range [1,%s]' % (index, len( self ) ) )
 
     def getGridUnit( self, index ) :
 

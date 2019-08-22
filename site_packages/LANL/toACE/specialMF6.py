@@ -68,13 +68,13 @@ This module handles a few special case for MF 6 data that are not easily convert
 from xData import standards as standardsModule
 from xData import axes as axesModule
 
-from fudge.gnd.productData.distributions import angular as angularModule
-from fudge.gnd.productData.distributions import energy as energyModule
-from fudge.gnd.productData.distributions import energyAngular as energyAngularModule
+from fudge.gnds.productData.distributions import angular as angularModule
+from fudge.gnds.productData.distributions import energy as energyModule
+from fudge.gnds.productData.distributions import energyAngular as energyAngularModule
 
 class multipleNeutronDistributions :
     """
-    This class simulates gnd class productData.distributions.energy.weightedFunctionals for MF 6 distributions.
+    This class simulates gnds class productData.distributions.energy.weightedFunctionals for MF 6 distributions.
     """
 
     def __init__( self ) :
@@ -97,110 +97,31 @@ class multipleNeutronDistributions :
 
         DLWs = []
         for i1, functional in enumerate( self ) :
-            domainScale = functional.domainUnitConversionFactor( 'MeV' )
             domainMin, domainMax = functional.domainMin, functional.domainMax
-            weight = [ 2 ] + [ domainScale * domainMin, domainScale * domainMax, 1., 1. ]
+            weight = [ 0, 2, domainMin, domainMax, 1.0, 1.0 ]
             DLW = functional.toACE( label, offset, weight, **kwargs )
             offset += len( DLW )
             if( functional is not self[-1] ) : DLW[0] = offset + 1
             DLWs += DLW
         return( DLWs )
 
-class energyToEnergyAngular :
-
-    def __init__( self, energyData ) :
-
-        self.energyData = energyData
-
-    @property
-    def domainMin( self ) :
-
-        return( self.energyData.domainMin )
-
-    @property
-    def domainMax( self ) :
-
-        return( self.energyData.domainMax )
-
-    def toACE( self, label, offset, weight, **kwargs  ) :
-
-        energyData = self.energyData
-        header = [ 0, 61, len( weight ) + 4 ] + weight
-        e_inFactor = energyData.axes[2].unitConversionFactor( 'MeV' )
-        e_outFactor =  energyData.axes[1].unitConversionFactor( 'MeV' )
-
-        INTE = -1
-        interpolation = energyData.interpolation
-        if( interpolation == standardsModule.interpolation.flatToken ) :
-            INTE = 1
-        elif( interpolation == standardsModule.interpolation.linlinToken ) :
-            INTE = 2
-        if( INTE == -1 ) : raise Exception( 'Interpolation "%s" not supported for incident energy' % interpolation )
-
-        INTT = -1
-        interpolation = energyData[0].interpolation
-        if( interpolation == standardsModule.interpolation.flatToken ) :
-            INTT = 1
-        elif( interpolation == standardsModule.interpolation.linlinToken ) :
-            INTT = 2
-        if( INTT == -1 ) : raise Exception( 'Interpolation "%s" not supported for outgoing energy' % ( interpolation ) )
-
-        NE, e_ins, Ls, epData = len( energyData ), [], [], []
-        offset += len( header ) + 3 + 1 + 2 * NE + 1        # header length plus NR, NE, Es, Ls, (1-based).
-
-        for xys in energyData :
-            e_ins.append( xys.value * e_inFactor )
-            Ls.append( offset + len( epData ) )
-            EOuts, pdfOfEOuts, cdfOfEOuts, LCs, muPData = [], [], [], [], []
-            NP = len( xys )
-            offset_LC = Ls[-1] + 1 + 4 * NP
-            x1 = None
-            for Ep2, P2, in xys :
-                x2 = Ep2 * e_outFactor
-                EOuts.append( x2 )
-
-                y2 = P2 / e_outFactor
-                pdfOfEOuts.append( y2 )
-
-                if( x1 is None ) :
-                    runningIntegral = 0
-                else :
-                    if( INTT == 1 ) :
-                        runningIntegral += y1 * ( x2 - x1 )
-                    else :
-                        runningIntegral += 0.5 * ( y1 + y2 ) * ( x2 - x1 )
-                cdfOfEOuts.append( runningIntegral )
-                x1, y1 = x2, y2
-
-                LCs.append( offset_LC )
-                muData = [ 1, 2, -1.0, 1.0, 0.5, 0.5, 0.0, 1.0 ]
-                offset_LC += len( muData )
-                muPData += muData
-            for i1 in range( NP ) :
-                pdfOfEOuts[i1] /= cdfOfEOuts[-1]
-                cdfOfEOuts[i1] /= cdfOfEOuts[-1]
-            epData += [ INTT, NP ] + EOuts + pdfOfEOuts + cdfOfEOuts + LCs + muPData
-
-        return( header + [ 1, NE, INTE, NE ] + e_ins + Ls + epData )
-
 def neutrons( neutronDatas ) :
 
-    LAW61 = multipleNeutronDistributions( )
+    weightedFunctionals = multipleNeutronDistributions( )
     frame = neutronDatas[0]['frame']
     for neutronData in neutronDatas :
         if( neutronData['multiplicity'] != 1 ) : raise Exception( 'multiplicity = %s != 1 is not currently supported' % neutronData['multiplicity'] )
         angularData = neutronData['angularData']
         if( neutronData['frame'] != frame ) : raise Exception( 'All neutrons must have the same frame' )
         energyData = neutronData['energyData']
-        if( isinstance( energyData, energyAngularModule.XYs3d ) ) :
-            LAW61.append( energyData )
-        elif( isinstance( energyData, energyModule.XYs2d ) ) :
-            if( not( isinstance( angularData, angularModule.isotropic ) ) ) :
-                raise Exception( 'Only isotropic angular data is currently supported' )
+        if( hasattr( energyData, 'toACE' ) ) :
+            weightedFunctionals.append( energyData )
+            if( angularData is not None ) :
+                if( not( isinstance( angularData, angularModule.isotropic ) ) ) :
+                    raise Exception( 'Only isotropic angular data is currently supported' )
             angularData = None
-            LAW61.append( energyToEnergyAngular( energyData ) )
         else :
             raise Exception( "Unsupported energyData %s" % repr( energyData ) )
         if( angularData is not None ) : raise Exception( 'angularData must be None, not %s' % neutronData['angularData'] )
 
-    return( len( LAW61 ), None, LAW61 )
+    return( len( weightedFunctionals ), None, weightedFunctionals )

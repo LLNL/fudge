@@ -64,12 +64,18 @@
 */
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <math.h>
 #include <ctype.h>
 
 #include "nf_utilities.h"
 
 #define numberOfStaticInt32s ( 100 * 1000 )
+
+#ifndef INT32_MIN
+#define INT32_MIN -2147483648
+#define INT32_MAX 2147483647
+#endif
 
 static int32_t *nfu_stringToListOfInt32s_2( statusMessageReporting *smr, char const *str, char sep, int64_t *numberConverted, 
         char **endCharacter );

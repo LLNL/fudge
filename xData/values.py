@@ -191,6 +191,7 @@ class values( baseModule.xDataCoreMembers )  :
         valuesPerLine = kwargs.get( 'valuesPerLine', 100 )
         valueFormatter = kwargs.get( 'valueFormatter', floatToShortestString )
         significantDigits = kwargs.get( 'significantDigits', 15 )
+        writeLength = kwargs.get( 'writeLengthAttribute', False )
         sep = kwargs.get( 'sep', None )
         outline = kwargs.get( 'outline', False )
         if( len( self ) < 14 ) : outline = False
@@ -200,6 +201,7 @@ class values( baseModule.xDataCoreMembers )  :
         strList, line = [], None
         attributeStr = ''
 
+        if( writeLength ) : attributeStr += ' length="%d"' % len( self.__values )
         if( self.start != 0 ) : attributeStr += ' start="%d"' % self.start
         if( self.end != self.size ) : attributeStr += ' size="%d"' % self.size
 
@@ -211,7 +213,7 @@ class values( baseModule.xDataCoreMembers )  :
         if( self.valueType != standardsModule.types.float64Token ) : attributeStr += ' valueType="%s"' % self.valueType
         if( self.valueType == standardsModule.types.integer32Token ) : valueFormatter = intValueFormatter
         attributeStr += baseModule.xDataCoreMembers.attributesToXMLAttributeStr( self )
-        XMLList = [ '%s<%s length="%d"%s>' % ( indent, self.moniker, len( self.__values ), attributeStr ) ]
+        XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributeStr ) ]
         if( outline ) :                     # Logic above guarantees more than 14 elements in self.
             line = []
             for i1 in range( 6 ) : line.append( valueFormatter( self[i1], significantDigits = significantDigits ) )

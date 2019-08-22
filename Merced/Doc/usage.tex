@@ -22,12 +22,8 @@ energies be given in MeV.
 
 \section{Output file}
 The default name of the output file is \texttt{utfil}.  
-It may be changed on the command line with\\
+It may only be changed on the command line,  and the option to do so is\\
   \Input{-output}{OutputFile}\\
-It may also be changed with the
-line\\
-  \Input{output:}{OutputFile}\\
-  in the input file.
 
 \section{Form of the input file}
 The first line of the input file must be\\
@@ -47,8 +43,9 @@ Comments may be included in the input file in either if two forms.\\
 \subsection{Parallel computing}
 The \gettransfer\ code may be compiled to run in parallel if
 \textsf{OpenMP} is available on your computer.  In fact, the
-default \textsf{Makefile} uses \textsf{OpenMP}.  Compile with
-\textsf{Makefile\_serial} to obtain serial code.  
+\textsf{Makefile} uses \textsf{OpenMP} as a default.  To obtain 
+serial code, compile using the command\\
+   \Input{make VERSION=SERIAL}{}
 
 For the parallel code, the number of threads is set to $n$ by the
 line\\

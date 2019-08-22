@@ -64,12 +64,10 @@
 SMR_PATH = ../../../../../statusMessageReporting
 NUMERICALFUNCTIONS_PATH = ../../../..
 
-CC = gcc
-CDEBUGFLAGS = -g -O0 -Wall
 ptwXYCFLAGS = -I$(NUMERICALFUNCTIONS_PATH)/include -L$(NUMERICALFUNCTIONS_PATH)/lib -lnumericalfunctions \
               -I$(SMR_PATH)/include -L$(SMR_PATH)/lib -lstatusMessageReporting \
               -lptwXY_utilities -lnfut_utilities
-localCFLAGS = $(CDEBUGFLAGS) $(CFLAGS) $(ptwXYCFLAGS) -lm
+localCFLAGS = $(CFLAGS) $(ptwXYCFLAGS)
 
 TARGETS = flatToLinear flatToLinear2 flatToLinear3
 
@@ -78,13 +76,13 @@ TARGETS = flatToLinear flatToLinear2 flatToLinear3
 default: $(TARGETS)
 
 flatToLinear: flatToLinear.c
-	$(CC) -o flatToLinear flatToLinear.c $(localCFLAGS)
+	$(CC) -o flatToLinear flatToLinear.c $(localCFLAGS) -lm
 
 flatToLinear2: flatToLinear2.c
-	$(CC) -o flatToLinear2 flatToLinear2.c $(localCFLAGS)
+	$(CC) -o flatToLinear2 flatToLinear2.c $(localCFLAGS) -lm
 
 flatToLinear3: flatToLinear3.c
-	$(CC) -o flatToLinear3 flatToLinear3.c $(localCFLAGS)
+	$(CC) -o flatToLinear3 flatToLinear3.c $(localCFLAGS) -lm
 
 check: default
 	for f in $(TARGETS); do ./$$f -v $(CHECKOPTIONS) > v; python check.py $$f; done

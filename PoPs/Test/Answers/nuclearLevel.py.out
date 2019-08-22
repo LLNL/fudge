@@ -1,4 +1,4 @@
-<nuclearLevel id="O16_e3">
+<nuclide id="O16_e3">
   <mass>
     <double label="base" value="15.9949146196" unit="amu"/></mass>
   <spin>
@@ -11,7 +11,7 @@
     <double label="base" value="1e+100" unit="s"/></halflife>
   <nucleus id="o16_e3" index="3">
     <energy>
-      <double label="base" value="6917100.0" unit="eV"/></energy></nucleus></nuclearLevel>
+      <double label="base" value="6917100.0" unit="eV"/></energy></nucleus></nuclide>
 15.99491461956 amu
 15.99491461956 amu
 14899.16852086884 MeV/c**2

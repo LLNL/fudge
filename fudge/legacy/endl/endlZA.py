@@ -87,7 +87,7 @@ import endl_I
 import endl_Z
 import endlReactionParameters
 try :
-    from fudge.structure import xensl
+    from .structure import xensl
 except :
     endlmisc.printWarning( 'Could not import xensl.py' )
 
@@ -106,11 +106,11 @@ class endlZA :
         self.Z, self.A = endl2.ZandAFromZA( self.ZA )
         self.suffix = suffix_
         self.targetName   = endl2.nameForYoOrZA(   self.sZA, NameASeperator = "", ZAOnly = 1, AddNatural = 1, m_to_m1 = True, suffixSeperator = '_' )
-        self.targetSymbol = endl2.endlToGNDName( self.sZA )
+        self.targetSymbol = endl2.endlToGNDSName( self.sZA )
         self.name = self.targetSymbol
         self.yiTags = endlmisc.incidentParticleTags( yi )
         self.yi = self.yiTags[0]
-        self.projectileName = endl2.endlToGNDName( self.yi )
+        self.projectileName = endl2.endlToGNDSName( self.yi )
         self.readOnly = readOnly or fudgeParameters.ReadOnly
         gappsDir = os.path.realpath( '/usr/gapps/data/nuclear' )
         self.documentation = None
@@ -1196,10 +1196,10 @@ can be used to get a reference to the neutron in-elastic cross section,
                 if( datum.I == 9 ) : addFile( datum.toZAsFrame( newProjectileMass, newTargetMass, halflife, self.bdflsFile )[0], halflife )
         return( newTarget )
 
-    def toGND( self, evaluationLibrary, evaluationVersion, excludeAverageProductData = True, testing = False, verbose = 0 ) :
+    def toGNDS( self, evaluationLibrary, evaluationVersion, excludeAverageProductData = True, testing = False, verbose = 0 ) :
 
-        import fudge.legacy.converting.endlToGND as endlToGND
-        return( endlToGND.toGND( self, evaluationLibrary, evaluationVersion, excludeAverageProductData = excludeAverageProductData, verbose = verbose ) )
+        import fudge.legacy.converting.endlToGNDS as endlToGNDS
+        return(endlToGNDS.toGNDS( self, evaluationLibrary, evaluationVersion, excludeAverageProductData = excludeAverageProductData, verbose = verbose))
 
     def adjustcs( self, C = 10, S = None, X1 = None, X2 = None, X3 = None, X4 = None, Q = None, f = 5.e-5, csRelChangeNotice = .1 ) :
         """Adjust the cross section given by C, S, X1, X2, X3, X4 and Q  so that the total cross section remains fixed.  

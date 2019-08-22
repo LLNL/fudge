@@ -65,12 +65,13 @@ import math
 
 from pqu import PQU as PQUModule
 
-from PoPs import misc as miscPoPsModule
+from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from xData import regions as regionsModule
 
-import fudge.gnd.resonances as resonancesModule
+import fudge.gnds.resonances as resonancesModule
 
 from . import endfFormats as endfFormatsModule
-from . import gndToENDF6 as gndToENDF6Module
+from . import gndsToENDF6 as gndsToENDF6Module
 
 #
 # resonances
@@ -81,7 +82,10 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
     NIS, ABN = 1, 1.0; ZAI=ZAM  # assuming only one isotope per file
 
     # get target spin from the particle list:
-    target = targetInfo['reactionSuite'].PoPs[targetInfo['reactionSuite'].target]
+    reactionSuite = targetInfo['reactionSuite']
+    targetID = reactionSuite.target
+    if( targetID in reactionSuite.PoPs.aliases ) : targetID = reactionSuite.PoPs[targetID].pid
+    target = reactionSuite.PoPs[targetID]
     if hasattr(target, 'nucleus'):
         targetInfo['spin'] = target.nucleus.spin[0].value
     else:
@@ -90,7 +94,10 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
     endf = [endfFormatsModule.endfHeadLine( ZAM, AWT, 0, 0, NIS, 0)]
     resolvedCount, unresolvedCount = 0, 0
     # resolved may have multiple energy regions:
-    if self.resolved is not None: resolvedCount = max(1,len(self.resolved.regions))
+    if self.resolved is not None:
+        resolvedCount = 1
+        if isinstance(self.resolved.evaluated, resonancesModule.energyIntervals):
+            resolvedCount = len(self.resolved.evaluated)
     if self.unresolved is not None: unresolvedCount = 1
 
     # resonances may only contain a scattering radius:
@@ -109,22 +116,28 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
     # LFW is a pain: only applies to unresolved, but must be written at the start of MF2
     LRFurr, LFW = 0,0
     if unresolvedCount != 0:
-        LRF_LFW = self.unresolved.evaluated.ENDFconversionFlag
-        LRFurr, LFW = map(int, LRF_LFW.split('=')[-1].split(',') )
+        LRF_LFW = targetInfo['ENDFconversionFlags'].get(self.unresolved.evaluated)
+        if LRF_LFW is not None:
+            LRFurr, LFW = LRF_LFW.split(',')
+            LRFurr = int(LRFurr.replace('LRF',''))
+            LFW = int(LFW.replace('LFW',''))
     NER = resolvedCount + unresolvedCount
     endf.append( endfFormatsModule.endfHeadLine( ZAI, ABN, 0, LFW, NER, 0 ) )
     for idx in range(resolvedCount):
         if resolvedCount==1: region = self.resolved
-        else: region = self.resolved.regions[idx]
+        else: region = self.resolved.evaluated[idx]
         LRU = 1 #resolved
-        LRF = { resonancesModule.SLBW.moniker:1,
-                resonancesModule.MLBW.moniker:2,
-                resonancesModule.RMatrix.moniker:7
-              }[region.evaluated.moniker]
+        if isinstance(region.evaluated, resonancesModule.BreitWigner):
+            LRF = {
+                resonancesModule.BreitWigner.singleLevel: 1,
+                resonancesModule.BreitWigner.multiLevel: 2
+            }[ region.evaluated.approximation ]
+        elif isinstance(region.evaluated, resonancesModule.RMatrix):
+            LRF = 7
         EL, EH = region.domainMin, region.domainMax
         if LRF==7:
             NRO = 0
-            if region.evaluated.ENDFconversionFlag and 'LRF3' in region.evaluated.ENDFconversionFlag:
+            if 'LRF3' in targetInfo['ENDFconversionFlags'].get(region.evaluated,''):
                 LRF = 3
         else: NRO = region.evaluated.scatteringRadius.isEnergyDependent()
         NAPS = not( region.evaluated.calculateChannelRadius )
@@ -140,7 +153,7 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
         # pass LFW/LRF so we don't have to calculate twice:
         targetInfo['unresolved_LFW'] = LFW
         targetInfo['unresolved_LRF'] = LRFurr
-        targetInfo['LSSF'] = not self.unresolved.reconstructCrossSection
+        targetInfo['LSSF'] = self.unresolved.evaluated.useForSelfShieldingOnly
         targetInfo['regionEnergyBounds'] = (region.domainMin, region.domainMax)
         endf += region.evaluated.toENDF6( flags, targetInfo, verbosityIndent )
     endf.append( endfFormatsModule.endfSENDLineNumber() )
@@ -160,7 +173,7 @@ def toENDF6( self, flags, targetInfo, verbosityIndent='' ):
         NR, NP = 1, len(scatRadius)
         endf.append( endfFormatsModule.endfHeadLine( 0,0,0,0, NR,NP ) )
         endf += endfFormatsModule.endfInterpolationList( (NP,
-            gndToENDF6Module.gndToENDFInterpolationFlag( scatRadius.interpolation ) ) )
+            gndsToENDF6Module.gndsToENDFInterpolationFlag( scatRadius.interpolation ) ) )
         endf += endfFormatsModule.endfNdDataList( scatRadius.convertAxisToUnit( 0, '10*fm' ) )
         AP = 0
     else :
@@ -195,7 +208,7 @@ def toENDF6( self, flags, targetInfo, verbosityIndent='' ):
             endf.append( endfFormatsModule.endfDataLine( row ) )
     return endf
 
-resonancesModule.resonanceFormalismBaseClass.toENDF6 = toENDF6
+resonancesModule.BreitWigner.toENDF6 = toENDF6
 
 #
 # helper functions for RMatrix
@@ -229,12 +242,12 @@ def writeRMatrixParticlePairs( RMatrixLimited, targetInfo ):
         mass = particle.getMass( 'amu' ) / nMass
 
         if hasattr(particle, 'nucleus'): particle = particle.nucleus
-        Z = miscPoPsModule.ZAInfo( particle )[0]
+        Z = chemicalElementMiscPoPsModule.ZAInfo( particle )[0]
         try:
             parity = particle.parity[0].value
             spin = particle.spin.float('hbar')
             I, P = getENDFtuple( spin, parity )
-        except IndexError, err:
+        except IndexError as err:
             if ignoreMissingJpi:
                 I,P = (0,0) # ENDF omits spin/parity for compound nucleus from capture
             else:
@@ -253,7 +266,7 @@ def writeRMatrixParticlePairs( RMatrixLimited, targetInfo ):
         PNT = RMatrixLimited.calculatePenetrability
         SHF = pp.computeShiftFactor
         if MT in (19,102): PNT = 0  # special case
-        if pp.Q is not None: Q = pp.Q.getValueAs('eV')
+        if pp.Q is not None: Q = pp.Q.getConstantAs('eV')
         else:
             Q = reaction.getQ('eV')
             # getQ doesn't account for residual left in excited state:
@@ -269,8 +282,7 @@ def writeRMatrixParticlePairs( RMatrixLimited, targetInfo ):
 def writeRMatrixSpinGroupHeader( RMatrixLimited, spingrp ):
     endf = []
     AJ, PJ = getENDFtuple(float(spingrp.spin), int(spingrp.parity))
-    KBK = spingrp.background
-    KPS = spingrp.applyPhaseShift
+    KBK, KPS = 0, 0 # AFAIK neither option is used in any library
     NCH = len(spingrp.resonanceParameters.table.columns) - 1  # skip the 'energy' column
     try:
         endf.append(endfFormatsModule.endfHeadLine(AJ, PJ, KBK, KPS, 6 * NCH, NCH))
@@ -303,7 +315,7 @@ def writeRMatrixSpinGroupHeader( RMatrixLimited, spingrp ):
 #
 def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
 
-    if self.ENDFconversionFlag and "LRF3" in self.ENDFconversionFlag:
+    if "LRF3" in targetInfo["ENDFconversionFlags"].get(self,""):
         return writeAsLRF3( self, flags, targetInfo, verbosityIndent = verbosityIndent )
 
     KRM = {'SLBW':1, 'MLBW':2, 'Reich_Moore':3, 'Full R-Matrix':4} [self.approximation]
@@ -349,7 +361,7 @@ def writeAsLRF3( RMatrix, flags, targetInfo, verbosityIndent = '' ):
         NR, NP = 1, len(scatRadius)
         endf.append( endfFormatsModule.endfHeadLine( 0,0,0,0, NR,NP ) )
         endf += endfFormatsModule.endfInterpolationList( (NP,
-            gndToENDF6Module.gndToENDFInterpolationFlag( scatRadius.interpolation ) ) )
+            gndsToENDF6Module.gndsToENDFInterpolationFlag( scatRadius.interpolation ) ) )
         endf += endfFormatsModule.endfNdDataList( scatRadius.convertAxisToUnit( 0, '10*fm' ) )
         AP = 0
     else :
@@ -363,7 +375,8 @@ def writeAsLRF3( RMatrix, flags, targetInfo, verbosityIndent = '' ):
             APL = elasticChan.scatteringRadius.getValueAs( '10*fm' )
             if APL != AP: APLs[elasticChan.L] = APL
         J = float(sg.spin)
-        if J!=0 and elasticChan.channelSpin < targetInfo['spin']: J *= -1
+        if 'ignoreChannelSpin' not in targetInfo["ENDFconversionFlags"].get(RMatrix,""):
+            if J!=0 and elasticChan.channelSpin < targetInfo['spin']: J *= -1
 
         energies = sg.resonanceParameters.table.getColumn('energy',unit='eV')
         NE = len(energies)
@@ -382,11 +395,15 @@ def writeAsLRF3( RMatrix, flags, targetInfo, verbosityIndent = '' ):
     NLS = len(L_list)
     if APLs and 0 not in APLs:
         APLs[0] = AP
-    LAD = int(RMatrix.reconstructAngular)
+    LAD = int(RMatrix.supportsAngularReconstruction)
     NLSC = 0
-    if 'LvaluesNeededForConvergence' in RMatrix.ENDFconversionFlag:
-        NLSC = int( RMatrix.ENDFconversionFlag.split('LvaluesNeededForConvergence=')[1].split(',')[0] )
-    endf += [endfFormatsModule.endfHeadLine(targetInfo['spin'], AP, LAD, 0, NLS, NLSC)]
+    conversionFlags = targetInfo['ENDFconversionFlags'].get(RMatrix,"")
+    if 'LvaluesNeededForConvergence' in conversionFlags:
+        NLSC = int( conversionFlags.split('LvaluesNeededForConvergence=')[1].split(',')[0] )
+    APtmp = AP
+    if 'AP=0' in conversionFlags:
+        APtmp = 0
+    endf += [endfFormatsModule.endfHeadLine(targetInfo['spin'], APtmp, LAD, 0, NLS, NLSC)]
 
     sortedTable = sorted(zip(*(
         table['Ls'],table['energies'],table['Js'],table['elastic'],table['capture'],
@@ -394,7 +411,7 @@ def writeAsLRF3( RMatrix, flags, targetInfo, verbosityIndent = '' ):
     )))
 
     defaultAP = 0
-    if 'explicitAPL' in RMatrix.ENDFconversionFlag: defaultAP = AP
+    if 'explicitAPL' in conversionFlags: defaultAP = AP
     for L in L_list:
         APL = APLs.get(L,defaultAP)
         resonances = [sortedTable[i][1:] for i in range(len(sortedTable)) if sortedTable[i][0] == L]
@@ -424,86 +441,116 @@ def toENDF6( self, flags, targetInfo, verbosityIndent = ''):
         NR, NP = 1, len(scatRadius)
         endf.append( endfFormatsModule.endfHeadLine( 0,0,0,0, NR,NP ) )
         endf += endfFormatsModule.endfInterpolationList( (NP,
-            gndToENDF6Module.gndToENDFInterpolationFlag( scatRadius.interpolation ) ) )
+            gndsToENDF6Module.gndsToENDFInterpolationFlag( scatRadius.interpolation ) ) )
         endf += endfFormatsModule.endfNdDataList( scatRadius.convertAxisToUnit( 0, '10*fm' ) )
         AP = 0
     else :
         AP = AP.getValueAs( '10*fm' )
 
-    NLS = len(self.L_values)
-    LFW = targetInfo['unresolved_LFW']; LRF = targetInfo['unresolved_LRF']
+    NLS = len(self.Ls)
+    LFW = False
+    reactionLabels = {'competitive':'competitive','fission':'fission'}
+    for reaction in self.resonanceReactions:
+        MT = reaction.reactionLink.link.ENDF_MT
+        if MT==2:
+            reactionLabels['elastic'] = reaction.label
+        elif MT==102:
+            reactionLabels['capture'] = reaction.label
+        elif MT==18:
+            reactionLabels['fission'] = reaction.label
+            LFW = True
+        else:
+            raise NotImplementedError("Unsupported reaction '%s' in unresolved resonanceReactions!" % reaction.label)
 
-    def v(val): # get value back from PhysicalQuantityWithUncertainty
-        if type(val)==type(None): return
-        return val.getValueAs('eV')
+    LRF = targetInfo['unresolved_LRF']
 
     if LFW==0 and LRF==1:   # 'Case A' from ENDF 2010 manual pg 70
         endf.append( endfFormatsModule.endfHeadLine( targetInfo['spin'], AP,
             targetInfo['LSSF'],0,NLS,0) )
-        for Lval in self.L_values:
-            NJS = len(Lval.J_values)
+        for Lval in self.Ls:
+            NJS = len(Lval.Js)
             endf.append(endfFormatsModule.endfHeadLine( targetInfo['mass'], 0, Lval.L, 0, 6*NJS, NJS ))
-            for Jval in Lval.J_values:
+            for Jval in Lval.Js:
                 # here we only have one width per J:
-                ave = Jval.constantWidths
-                endf.append( endfFormatsModule.endfDataLine([v(ave.levelSpacing),Jval.J,
-                    Jval.neutronDOF,v(ave.neutronWidth),v(ave.captureWidth),0]) )
+                D = Jval.levelSpacing.data[0][1]
+                widths = {}
+                DOFs = {}
+                for label in reactionLabels:
+                    if reactionLabels[label] in Jval.widths:
+                        width = Jval.widths[reactionLabels[label]]
+                        widths[label] = width.data[0][1]
+                        DOFs[label] = width.degreesOfFreedom
+                endf.append( endfFormatsModule.endfDataLine(
+                    [D,Jval.J,DOFs['elastic'],widths['elastic'],widths['capture'],0] ) )
 
-    elif LFW==1 and LRF==1: # 'Case B'
-        energies = self.L_values[0].J_values[0].energyDependentWidths.getColumn('energy',unit='eV')
+    elif LFW==1 and LRF==1: # 'Case B', all widths are constant except fission
+        energies = self.Ls[0].Js[0].widths[reactionLabels['fission']].data.domainGrid
         NE = len(energies)
         endf.append( endfFormatsModule.endfHeadLine( targetInfo['spin'], AP,
             targetInfo['LSSF'], 0, NE, NLS ) )
         nlines = int(math.ceil(NE/6.0))
         for line in range(nlines):
             endf.append( endfFormatsModule.endfDataLine( energies[line*6:line*6+6] ) )
-        for Lval in self.L_values:
-            NJS = len(Lval.J_values)
+        for Lval in self.Ls:
+            NJS = len(Lval.Js)
             endf.append( endfFormatsModule.endfHeadLine( targetInfo['mass'], 0, Lval.L, 0, NJS, 0 ) )
-            for Jval in Lval.J_values:
-                cw = Jval.constantWidths
-                endf.append( endfFormatsModule.endfHeadLine(0,0,Lval.L,Jval.fissionDOF,NE+6,0) )
-                endf.append( endfFormatsModule.endfDataLine([v(cw.levelSpacing),Jval.J,Jval.neutronDOF,
-                    v(cw.neutronWidth),v(cw.captureWidth),0]) )
-                fissWidths = Jval.energyDependentWidths.getColumn('fissionWidthA',unit='eV')
+            for Jval in Lval.Js:
+                D = Jval.levelSpacing.data[0][1]
+                elastic = Jval.widths[reactionLabels['elastic']]
+                fission = Jval.widths[reactionLabels['fission']]
+                MUF = fission.degreesOfFreedom
+                AMUN = elastic.degreesOfFreedom
+                GNO = elastic.data[0][1]
+                GG = Jval.widths[reactionLabels['capture']].data[0][1]
+
+                endf.append( endfFormatsModule.endfHeadLine(0,0,Lval.L,MUF,NE+6,0) )
+                endf.append( endfFormatsModule.endfDataLine([D,Jval.J,AMUN,GNO,GG,0]) )
+                fissWidths = [xy[1] for xy in fission.data]
                 for line in range(nlines):
                     endf.append( endfFormatsModule.endfDataLine( fissWidths[line*6:line*6+6] ) )
 
     elif LRF==2:            # 'Case C', most common in ENDF
         endf.append( endfFormatsModule.endfHeadLine( targetInfo['spin'], AP,
             targetInfo['LSSF'],0,NLS,0) )
-        INT = gndToENDF6Module.gndToENDFInterpolationFlag( self.interpolation )
-        for Lval in self.L_values:
-            NJS = len(Lval.J_values)
+        for Lval in self.Ls:
+            NJS = len(Lval.Js)
             endf.append( endfFormatsModule.endfHeadLine( targetInfo['mass'], 0, Lval.L, 0, NJS, 0 ))
-            for Jval in Lval.J_values:
-                NE = len( Jval.energyDependentWidths )
-                useConstant = not NE
-                if useConstant: NE = 2
+            for Jval in Lval.Js:
+                INT = gndsToENDF6Module.gndsToENDFInterpolationFlag(Jval.levelSpacing.data.interpolation)
+                unionGrid = set(Jval.levelSpacing.data.domainGrid)
+                for width in Jval.widths:
+                    unionGrid.update( width.data.domainGrid )
+                unionGrid = sorted(unionGrid)
+                NE = len( unionGrid )
                 endf.append( endfFormatsModule.endfHeadLine( Jval.J, 0, INT, 0, 6*NE+6, NE ) )
-                endf.append( endfFormatsModule.endfDataLine([0,0,Jval.competitiveDOF,
-                    Jval.neutronDOF,Jval.gammaDOF,Jval.fissionDOF]) )
-                cws = Jval.constantWidths
-                if useConstant:
-                    # widths are all stored in 'constantWidths' instead. get energies from parent class
-                    NE = 2; useConstant=True
-                    eLow,eHigh = targetInfo['regionEnergyBounds']
-                    for e in (eLow,eHigh):
-                        endf.append(endfFormatsModule.endfDataLine([v(e),v(cws.levelSpacing),
-                            v(cws.competitiveWidth),v(cws.neutronWidth),v(cws.captureWidth),
-                            v(cws.fissionWidthA)]) )
 
-                else:
-                    table = [ Jval.energyDependentWidths.getColumn('energy',unit='eV') ]
-                    for attr in ('levelSpacing','competitiveWidth','neutronWidth','captureWidth',
-                            'fissionWidthA'):
-                        # find each attribute, in energy-dependent or constant width section
-                        column = ( Jval.energyDependentWidths.getColumn( attr, unit='eV' ) or
-                                [v(getattr( cws, attr ))]*NE )
-                        if not any(column): column = [0]*NE
-                        table.append( column )
-                    for row in zip(*table):
-                        endf.append( endfFormatsModule.endfDataLine( row ) )
+                levelSpacing = [Jval.levelSpacing.data.evaluate(x) for x in unionGrid]
+
+                widths = {}
+                DOF = {}
+                for label in reactionLabels:
+                    if reactionLabels[label] in Jval.widths:
+                        width = Jval.widths[reactionLabels[label]]
+                        DOF[label] = width.degreesOfFreedom
+                        if isinstance(width.data, regionsModule.regions1d):
+                            widths[label] = []
+                            for x in unionGrid:
+                                for region in width.data:
+                                    if x <= region.domainMax:
+                                        widths[label].append( region.evaluate(x))
+                                        break
+                        else:
+                            widths[label] = [width.data.evaluate(x) for x in unionGrid]
+                    else:
+                        DOF[label] = 0
+                        widths[label] = [0] * len(unionGrid)
+
+                endf.append( endfFormatsModule.endfDataLine([0,0,
+                        DOF['competitive'],DOF['elastic'],DOF['capture'],DOF['fission']]) )
+                table = [ unionGrid, levelSpacing, widths['competitive'], widths['elastic'],
+                          widths['capture'], widths['fission'] ]
+                for row in zip(*table):
+                    endf.append( endfFormatsModule.endfDataLine( row ) )
     return endf
 
 resonancesModule.unresolvedTabulatedWidths.toENDF6 = toENDF6

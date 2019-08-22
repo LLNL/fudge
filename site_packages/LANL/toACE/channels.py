@@ -65,10 +65,10 @@
 This module adds the method toACE to the reaction class.
 """
 
-from fudge.gnd import channels as channelsModule
+from fudge.gnds import channels as channelsModule
 
-def toACE( self, MTData, MT, verbose ) :
+def toACE( self, cdf_style, MTData, MT, verbose ) :
 
-    for product in self : product.toACE( MTData, MT, verbose )
+    for product in self : product.toACE( cdf_style, MTData, MT, verbose )
 
 channelsModule.channel.toACE = toACE

@@ -64,13 +64,10 @@
 SMR_PATH = ../../../../../statusMessageReporting
 NUMERICALFUNCTIONS_PATH = ../../../..
 
-CC = gcc
-CDEBUGFLAGS = -g -O0 -Wall
 ptwXYCFLAGS = -lnfut_utilities -lptwXY_utilities \
 			  -I$(NUMERICALFUNCTIONS_PATH)/include -L$(NUMERICALFUNCTIONS_PATH)/lib -lnumericalfunctions \
               -I$(SMR_PATH)/include -L$(SMR_PATH)/lib -lstatusMessageReporting
-
-localCFLAGS = $(CDEBUGFLAGS) $(CFLAGS) $(ptwXYCFLAGS) -lm
+localCFLAGS = $(CFLAGS) $(ptwXYCFLAGS)
 
 TARGETS = groupTestAll1 integration integrationXY integrationWithWeight_x integrationWithWeight_sqrt_x integration2 runningIntegration \
 	groupTwoFunction groupTwoFunction2 equalProbableBins

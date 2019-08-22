@@ -42,7 +42,7 @@ Subpackages
 .. toctree::
 
     Core library <fudge.core>
-    GND hierarchy <fudge.gnd>
+    GNDS hierarchy <fudge.gnds>
     Legacy data support <fudge.legacy>
     Particle properties <fudge.particles>
     Processing support <fudge.processing>

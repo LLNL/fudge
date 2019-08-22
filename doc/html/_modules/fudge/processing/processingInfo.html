@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.processing.processingInfo &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.processing.processingInfo &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,7 +25,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +35,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -60,8 +57,8 @@ conserveParticleAndEnergy = &#39;conserveParticleAndEnergy&#39;
 
 from PoPs import IDs as IDsPoPsModule
 
-from fudge.gnd import styles as stylesModule
-from fudge.gnd import reactionSuite as reactionSuiteModule
+from fudge.gnds import styles as stylesModule
+from fudge.gnds import reactionSuite as reactionSuiteModule
 
 <div class="viewcode-block" id="tempInfo"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.tempInfo">[docs]</a>class tempInfo :
 
@@ -198,11 +195,11 @@ from fudge.gnd import reactionSuite as reactionSuiteModule
 
 <div class="viewcode-block" id="processInfo.getProjectileName"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.getProjectileName">[docs]</a>    def getProjectileName( self ) :
 
-        return( self.target.projectile.name )</div>
+        return( self.target.projectile.pid )</div>
 
 <div class="viewcode-block" id="processInfo.getTargetName"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.getTargetName">[docs]</a>    def getTargetName( self ) :
 
-        return( self.target.target.name )</div>
+        return( self.target.target.pid )</div>
 
 <div class="viewcode-block" id="processInfo.isProcessParticle"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.processingInfo.processInfo.isProcessParticle">[docs]</a>    def isProcessParticle( self, name ) :
 
@@ -225,14 +222,14 @@ from fudge.gnd import reactionSuite as reactionSuiteModule
 
     def __init__( self, name, groups, lMax, conservationFlag = conserveParticle ) :
 
-        self.name = name
+        self.pid = name
         self.groups = groups
         self.lMax = lMax
         self.conservationFlag = conservationFlag
 
     def __repr__( self ) :
 
-        s = &#39;\n%s %s %s\n&#39; % ( self.name, self.lMax, self.conservationFlag )
+        s = &#39;\n%s %s %s\n&#39; % ( self.pid, self.lMax, self.conservationFlag )
         s += `self.groups`
         return( s )</div>
 
@@ -243,7 +240,7 @@ from fudge.gnd import reactionSuite as reactionSuiteModule
         particles = {}
         for particle in groups :
             lMax_ = 0
-            if( particle == target.projectile.name ) : lMax_ = lMax
+            if( particle == target.projectile.pid ) : lMax_ = lMax
             conservationFlag = conserveParticleAndEnergy
             if( particle == &#39;n&#39; ) : conservationFlag = conserveParticle
             if( particle == IDsPoPsModule.photon ) : conservationFlag = conserveEnergy
@@ -286,13 +283,13 @@ from fudge.gnd import reactionSuite as reactionSuiteModule
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

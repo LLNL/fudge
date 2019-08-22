@@ -68,7 +68,7 @@ from pqu import PQU as PQUModule
 from xData import XYs as XYsModule
 from xData import regions as regionsModule
 
-from . import gndToENDF6 as gndToENDF6Module
+from . import gndsToENDF6 as gndsToENDF6Module
 
 useRedsFloatFormat = False
 
@@ -95,11 +95,15 @@ def floatToFunky2( value ) :
     floatStr = '%13.6e' % value
     floatStr_Orig = floatStr
     valueStr = str( value )
+    valueStrLength = len( valueStr )
     eNotInStrValue = 'e' not in valueStr
     if( useRedsFloatFormat and eNotInStrValue ) : valueStr = valueStr[:10]
     length = 10
     if( value < 0.0 ) : length = 11                             # Allow for '-' sign.
-    if( ( len( valueStr ) <= length ) and eNotInStrValue ) :
+    if( ( valueStrLength == length+1 ) and valueStr[:2] == '0.' ) :
+        valueStr = valueStr[1:]     # some ENDF-VIII evaluations store numbers like '.700842459'
+        valueStrLength -= 1
+    if( ( valueStrLength <= length ) and eNotInStrValue ) :
         floatStr = valueStr.rjust( 11 )
         floatStr_Orig = floatStr
     elif( floatStr[11] == '0' ) :
@@ -112,12 +116,12 @@ def floatToFunky2( value ) :
 
 
 def endfContLine( C1, C2, L1, L2, N1, N2 ) :
-    "This is the basic 'control' line in ENDF."
+    """This is the basic 'control' line in ENDF."""
 
     return( '%11s%11s%11d%11d%11d%11d' % ( floatToFunky( C1 ), floatToFunky( C2 ), L1, L2, N1, N2 ) )
 
 def endfContLine2( C1, C2, L1, L2, N1, N2, MAT, MF, MT, NS = None ) :
-    "This is the basic 'control' line in ENDF."
+    """This is the basic 'control' line in ENDF."""
 
     line = '%11s%11s%11d%11d%11d%11d%4d%2d%3d' % ( floatToFunky( C1 ), floatToFunky( C2 ),
                                                    L1, L2, N1, N2, MAT, MF, MT )
@@ -126,50 +130,50 @@ def endfContLine2( C1, C2, L1, L2, N1, N2, MAT, MF, MT, NS = None ) :
     return line
 
 def endfHeadLine( ZA, AWR, L1, L2, N1, N2 ) :
-    "Indicates the start of an ENDF data section."
+    """Indicates the start of an ENDF data section."""
 
     return( endfContLine( ZA, AWR, L1, L2, N1, N2 ) )
 
 def endfSENDLineNumber( ) :
-    "Indicates the end of an ENDF data section for one (MF, MT) pair."
+    """Indicates the end of an ENDF data section for one (MF, MT) pair."""
 
     return( 99999 )
 
 def endfSENDLine( MAT, MF, lineNumbers = True ) :
-    "Indicates the end of an ENDF data section for one (MF, MT) pair."
+    """Indicates the end of an ENDF data section for one (MF, MT) pair."""
 
     lineNum = None
     if lineNumbers: lineNum = endfSENDLineNumber()
     return( endfContLine2( 0, 0, 0, 0, 0, 0, MAT, MF, 0, lineNum ) )
 
 def endfFENDLine( MAT, lineNumbers = True ) :
-    "Indicates the end of an ENDF data block for one MF."
+    """Indicates the end of an ENDF data block for one MF."""
 
     lineNum = None
     if lineNumbers: lineNum = 0
     return( endfContLine2( 0, 0, 0, 0, 0, 0, MAT, 0, 0, lineNum ) )
 
 def endfMENDLine( lineNumbers = True ) :
-    "Indicates the end of ENDF data for one material."
+    """Indicates the end of ENDF data for one material."""
 
     lineNum = None
     if lineNumbers: lineNum = 0
     return endfContLine2( 0, 0, 0, 0, 0, 0,  0, 0, 0, lineNum )
 
 def endfTENDLine( lineNumbers = True ) :
-    "Indicates the end of ENDF data."
+    """Indicates the end of ENDF data."""
 
     lineNum = None
     if lineNumbers: lineNum = 0
     return endfContLine2( 0, 0, 0, 0, 0, 0, -1, 0, 0, lineNum )
 
 def endfComment( text, MAT, MF, MT, NS ) :
-    "Used for writing the introductory comments."
+    """Used for writing the introductory comments."""
 
     return( '%66s%4d%2d%3d%5d' % ( text, MAT, MF, MT, NS ) )
 
 def endfDataLine( data ) :
-    "Makes one ENDF data line."
+    """Makes one ENDF data line."""
 
     dData = dataListToSupportDimensionlessPQ( data )
     s = ''
@@ -177,11 +181,11 @@ def endfDataLine( data ) :
     return ( "%-66s" % ( s ) )
 
 def endfDataList( data ) :
-    "Writes the data in ENDF format."
+    """Writes the data in ENDF format."""
 
     dData = dataListToSupportDimensionlessPQ( data )
     dataOut = []
-    for i1 in xrange( 0, len( dData ), 6 ): dataOut.append( endfDataLine( dData[i1:i1+6] ) )
+    for i1 in range( 0, len( dData ), 6 ): dataOut.append( endfDataLine( dData[i1:i1+6] ) )
     return( dataOut )
 
 def endfNdDataList( nDdata, xUnit = 'eV', yUnit = '' ) :
@@ -205,8 +209,7 @@ def toTAB1( self, xUnitTo, yUnitTo, C1 = 0, C2 = 0, L1  = 0, L2 = 0 ) :
 
     if( isinstance( self, XYsModule.XYs1d ) ) :
         ENDFDataList = [ endfContLine( C1, C2, 0, 0, 1, len( self ) ) ] + \
-            endfInterpolationList( [ len( self ), \
-            gndToENDF6Module.gndToENDFInterpolationFlag( self.interpolation ) ] )
+            endfInterpolationList( [ len( self ), gndsToENDF6Module.gndsToENDFInterpolationFlag( self.interpolation ) ] )
         ENDFDataList += endfNdDataList( self, xUnit = xUnitTo, yUnit = yUnitTo )
     elif( isinstance( self, regionsModule.regions1d ) ) :
         interpolations, data = [], []
@@ -215,7 +218,7 @@ def toTAB1( self, xUnitTo, yUnitTo, C1 = 0, C2 = 0, L1  = 0, L2 = 0 ) :
             if( len( data ) > 0 ) :
                 if( subData[0] == data[-1] ) : subData.pop( 0 )
             data += subData
-            interpolations += [ len( data ), gndToENDF6Module.gndToENDFInterpolationFlag( region.interpolation ) ]
+            interpolations += [ len( data ), gndsToENDF6Module.gndsToENDFInterpolationFlag( region.interpolation ) ]
         NR = len( interpolations ) / 2
         ENDFDataList = [ endfContLine( C1, C2, 0, 0, NR, len( data ) ) ]
         ENDFDataList += endfInterpolationList( interpolations )
@@ -225,18 +228,18 @@ def toTAB1( self, xUnitTo, yUnitTo, C1 = 0, C2 = 0, L1  = 0, L2 = 0 ) :
     return( ENDFDataList )
 
 def endfInterpolationLine( interpolation ) :
-    "Makes one ENDF interpolation line."
+    """Makes one ENDF interpolation line."""
 
     s = ''
     for d in interpolation : s += "%11d" % d
-    for i1 in xrange( len( interpolation ), 6 ) : s += "%11d" % 0
+    for i1 in range( len( interpolation ), 6 ) : s += "%11d" % 0
     return( s )
 
 def endfInterpolationList( interpolation ) :
-    "Writes the interpolation in ENDF format."
+    """Writes the interpolation in ENDF format."""
 
     interpolationOut = []
-    for i1 in xrange( 0, len( interpolation ), 6 ):
+    for i1 in range( 0, len( interpolation ), 6 ):
         interpolationOut.append( endfInterpolationLine( interpolation[i1:i1+6] ) )
     return( interpolationOut )
 

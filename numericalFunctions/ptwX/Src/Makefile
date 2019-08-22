@@ -64,8 +64,7 @@
 PTWC_PATH = ../../ptwC
 PTWC_INCLUDE_PATH = $(PTWC_PATH)/include
 
-CFLAGS = -g -O0 -Wall
-localCFLAGS = $(CFLAGS) $(ptwCFLAGS) $(ptwXCFLAGS) -I$(PTWC_INCLUDE_PATH) -I$(SMR_PATH)/include
+localCFLAGS = $(CFLAGS) $(ptwXCFLAGS) -I$(PTWC_INCLUDE_PATH) -I$(SMR_PATH)/include
 objects = ptwX_core.o ptwX_misc.o
 
 .PHONY: default check clean realclean

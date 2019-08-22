@@ -153,8 +153,8 @@ def parse_arguments():
     parser.add_argument('--transmissionCoeff', default=False, action='store_true', help="Transmision coefficient per channel in both the RRR and URR, computed by Moldauer's sum rule")
 
     # Average cross section over a window (esentially grouping it)
-    parser.add_argument('--windowCenter', default=None, type=float, help="Energy in keV that, if given along with windowWidth, compute the average of the specified reactions over that window")
-    parser.add_argument('--windowWidth', default=None, type=float, help="Energy in keV that, if given along with windowWidth, compute the average of the specified reactions over that window")
+    parser.add_argument('--windowCenter', default=None, type=float, help="Window's Center: Energy in keV that, if given along with windowWidth, compute the average of the specified reactions over that window")
+    parser.add_argument('--windowWidth', default=None, type=float, help="Window's Total width: Energy in keV that, if given along with windowCenter, compute the average of the specified reactions over that window")
 
     # Average over a user-defined spectrum
     parser.add_argument('--userDefinedSpecAve', default=None, type=str, help="Compute spectrum average using the spectrum defined in this file/key")

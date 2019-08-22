@@ -63,10 +63,7 @@
 
 from PoPs import IDs as IDsPoPsModule
 
-from fudge.gnd.reactions import production as productionModule
-
-from fudge.gnd.reactionData import crossSection as crossSectionModule
-from fudge.gnd.productData.distributions import base as distributionBaseModule
+from fudge.gnds.reactions import production as productionModule
 
 #
 # production
@@ -74,7 +71,7 @@ from fudge.gnd.productData.distributions import base as distributionBaseModule
 def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
 
 
-    if( flags['verbosity'] >= 10 ) : print '%sproduction: %s' % ( verbosityIndent, self.outputChannel.toString( simpleString = True ) )
+    if( flags['verbosity'] >= 10 ) : print( '%sproduction: %s' % ( verbosityIndent, self.outputChannel.toString( simpleString = True ) ) )
     MT = self.ENDF_MT
 # BRB, why is this?
     MF = None
@@ -82,7 +79,7 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
         if( product.id == IDsPoPsModule.photon ) :
             if( product.distribution.hasData( ) ) :
                 productMF = 12
-                if( product.getAttribute( 'ENDFconversionFlag' ) == 'MF13' ) : productMF = 13
+                if( 'MF13' in targetInfo['ENDFconversionFlags'].get(product,"") ) : productMF = 13
                 if( MF == None ) : MF = productMF
                 if( MF != productMF ) : raise Exception( 'MF = %s mixed with MF = %s' % ( MF, productMF ) )
     if( MF is not None ) :

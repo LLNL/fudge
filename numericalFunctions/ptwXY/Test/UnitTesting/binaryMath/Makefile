@@ -64,12 +64,10 @@
 SMR_PATH = ../../../../../statusMessageReporting
 NUMERICALFUNCTIONS_PATH = ../../../..
 
-CC = gcc
-CDEBUGFLAGS = -g -O0 -Wall
 ptwXYCFLAGS = -lnfut_utilities -lptwXY_utilities \
 			  -I$(NUMERICALFUNCTIONS_PATH)/include -L$(NUMERICALFUNCTIONS_PATH)/lib -lnumericalfunctions \
               -I$(SMR_PATH)/include -L$(SMR_PATH)/lib -lstatusMessageReporting
-localCFLAGS = $(CDEBUGFLAGS) $(CFLAGS) $(ptwXYCFLAGS) -lm
+localCFLAGS = $(CFLAGS) $(ptwXYCFLAGS)
 
 TARGETS = add divide divide2
 
@@ -78,13 +76,13 @@ TARGETS = add divide divide2
 default: $(TARGETS)
 
 add: add.c
-	$(CC) -o add add.c $(localCFLAGS)
+	$(CC) -o add add.c $(localCFLAGS) -lm
 
 divide: divide.c
-	$(CC) -o divide divide.c $(localCFLAGS)
+	$(CC) -o divide divide.c $(localCFLAGS) -lm
 
 divide2: divide2.c
-	$(CC) -o divide2 divide2.c $(localCFLAGS)
+	$(CC) -o divide2 divide2.c $(localCFLAGS) -lm
 
 check: default
 	for f in $(TARGETS); do ./$$f $(CHECKOPTIONS); done

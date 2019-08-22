@@ -8,7 +8,7 @@ Subpackages
 
     fudge.core
     fudge.evaluationBuilder
-    fudge.gnd
+    fudge.gnds
     fudge.legacy
     fudge.particles
     fudge.processing

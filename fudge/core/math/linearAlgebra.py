@@ -1050,9 +1050,9 @@ def get_test_matrix( endfFile = None, MT = None, MF = None ):
 
 def get_covariances_from_endf( endfFile, MT, MF = 33 ):
 
-    from fudge.legacy.converting import endfFileToGND
+    from fudge.legacy.converting import endfFileToGNDS
 
-    rce = endfFileToGND.endfFileToGND( endfFile, toStdOut = False )
+    rce = endfFileToGNDS.endfFileToGNDS( endfFile, toStdOut = False )
     xFileOne, cFileOne = rce['reactionSuite'], rce['covarianceSuite']
     MFMTListOne = [ section.rowData.attributes[ 'ENDF_MFMT' ] for section in cFileOne ]
     if not str(MF)+","+str(MT) in MFMTListOne:  raise ValueError( "Requested MF,MT (" +str(MF)+","+str(MT)+ ") not in first file, pick from " +str( MFMTListOne ) )

@@ -296,9 +296,9 @@ class endlI10( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         """Constructor for the endlI10 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure."""
 
-        from fudge import gnd
+        from fudge import gnds
 
-        self.name = gnd.productData.energyDeposition.component.moniker
+        self.name = gnds.productData.energyDeposition.component.moniker
         endlNd.endlNd.__init__( self, f, 10, yo, C, I, S, h, points, bdflsFile = bdflsFile )
         self.variablesUnits = 'energy_in[MeV];energy_deposition[MeV]'
 
@@ -343,9 +343,9 @@ class endlI11( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         """Constructor for the endlI11 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure."""
 
-        from fudge import gnd
+        from fudge import gnds
 
-        self.name = gnd.productData.energyDeposition.component.moniker
+        self.name = gnds.productData.energyDeposition.component.moniker
         endlNd.endlNd.__init__( self, f, 11, yo, C, I, S, h, points, bdflsFile = bdflsFile )
         self.variablesUnits = 'energy_in[MeV];energy_deposition[MeV]'
 
@@ -435,9 +435,9 @@ class endlI13( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         """Constructor for the endlI13 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure."""
 
-        from fudge import gnd
+        from fudge import gnds
 
-        self.name = gnd.productData.momentumDeposition.component.moniker
+        self.name = gnds.productData.momentumDeposition.component.moniker
         endlNd.endlNd.__init__( self, f, 13, yo, C, I, S, h, points, bdflsFile = bdflsFile )
         self.variablesUnits = 'energy_in[MeV];momentum_deposition[MeV/c]'
 
@@ -602,7 +602,7 @@ class endlI941( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         """Constructor for the endlI941 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure."""
 
-        from fudge import gnd
+        from fudge import gnds
 
         self.name = 'pointwise'
         endlNd.endlNd.__init__( self, f, 941, yo, C, I, S, h, points, bdflsFile = bdflsFile )
@@ -641,7 +641,7 @@ class endlI942( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         """Constructor for the endlI942 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure."""
 
-        from fudge import gnd
+        from fudge import gnds
 
         self.name = 'pointwise'
         endlNd.endlNd.__init__( self, f, 942, yo, C, I, S, h, points, bdflsFile = bdflsFile )
@@ -704,7 +704,7 @@ class endlI1( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
         """Constructor for the endlI1 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl3dmath class data structure."""
 
-        from fudge import gnd
+        from fudge import gnds
 
         self.name = 'pointwise'
         endlNd.endlNd.__init__( self, f, 1, yo, C, I, S, h, points, i2 = 2, bdflsFile = bdflsFile )
@@ -866,7 +866,7 @@ class endlI21( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
         """Constructor for the endlI21 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl3dmath class data structure."""
 
-        from fudge import gnd
+        from fudge import gnds
 
         self.name = ''
         self.form = 'pointwise'
@@ -1032,7 +1032,7 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
         """Constructor for the endlI3 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl4dmath class data structure."""
 
-        from fudge import gnd
+        from fudge import gnds
 
         self.name = 'pointwise'
         endlNd.endlNd.__init__( self, f, 3, yo, C, I, S, h, points, i2 = 2, i3 = 3, bdflsFile = bdflsFile )
@@ -1414,7 +1414,7 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
         """Constructor for the endlI4 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl4dmath class data structure."""
 
-        from fudge import gnd
+        from fudge import gnds
 
         self.name = 'pointwise'
         endlNd.endlNd.__init__( self, f, 4, yo, C, I, S, h, points, i0 = 2, i1 = 0, i2 = 1, i3 = 3, bdflsFile = bdflsFile )

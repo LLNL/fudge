@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.processing.miscellaneous &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.processing.miscellaneous &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,7 +25,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +35,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -52,7 +49,7 @@
 <span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
 <span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
 
-<span class="n">accuracy</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span>
+<span class="n">accuracy</span> <span class="o">=</span> <span class="mf">1e-6</span>
 
 <span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">link</span> <span class="k">as</span> <span class="n">linkModule</span>
 <span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">standards</span> <span class="k">as</span> <span class="n">standardsModule</span>
@@ -67,9 +64,9 @@
     <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">func</span><span class="p">,</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">func</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">==</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">interpolation</span><span class="o">.</span><span class="n">linlinToken</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">func</span> <span class="p">)</span>
         <span class="n">func</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="n">func</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">8</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">func</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-8</span> <span class="p">)</span> <span class="p">)</span>
     <span class="k">elif</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">func</span><span class="p">,</span> <span class="n">regionsModule</span><span class="o">.</span><span class="n">regions1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="k">return</span><span class="p">(</span> <span class="n">func</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">8</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">func</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-8</span> <span class="p">)</span> <span class="p">)</span>
     <span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="k">import</span> <span class="n">brb</span>
     <span class="n">brb</span><span class="o">.</span><span class="n">objectoutline</span><span class="p">(</span> <span class="n">func</span> <span class="p">)</span>
     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;FIX ME&#39;</span> <span class="p">)</span>
@@ -100,9 +97,9 @@
         <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">f3</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">f3</span> <span class="o">=</span> <span class="n">f3</span><span class="o">.</span><span class="n">domainSlice</span><span class="p">(</span> <span class="n">domainMin</span> <span class="o">=</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span> <span class="o">=</span> <span class="n">domainMax</span> <span class="p">)</span>
     <span class="k">return</span><span class="p">(</span> <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span> <span class="p">)</span>
 
-<div class="viewcode-block" id="groupOneFunctionAndFlux"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.miscellaneous.groupOneFunctionAndFlux">[docs]</a><span class="k">def</span> <span class="nf">groupOneFunctionAndFlux</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">f1</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="groupOneFunctionAndFlux"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.miscellaneous.groupOneFunctionAndFlux">[docs]</a><span class="k">def</span> <span class="nf">groupOneFunctionAndFlux</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">styleFilter</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
 
-    <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">f1</span><span class="p">,</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">link</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">f1</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">findFormMatchingDerivedStyle</span><span class="p">(</span> <span class="n">f1</span><span class="o">.</span><span class="n">link</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">f1</span><span class="p">,</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">link</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">f1</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">findFormMatchingDerivedStyle</span><span class="p">(</span> <span class="n">f1</span><span class="o">.</span><span class="n">link</span><span class="p">,</span> <span class="n">styleFilter</span> <span class="o">=</span> <span class="n">styleFilter</span> <span class="p">)</span>
     <span class="n">f1</span> <span class="o">=</span> <span class="n">_toLinear</span><span class="p">(</span> <span class="n">f1</span> <span class="p">)</span>
     <span class="n">groupBoundaries</span><span class="p">,</span> <span class="n">flux</span> <span class="o">=</span> <span class="n">_groupFunctionsAndFluxInit</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">f1</span> <span class="p">)</span>
     <span class="k">return</span><span class="p">(</span> <span class="n">f1</span><span class="o">.</span><span class="n">groupTwoFunctions</span><span class="p">(</span> <span class="n">groupBoundaries</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;groupedFlux&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span></div>
@@ -115,7 +112,7 @@
     <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">flux</span> <span class="o">=</span> <span class="n">_mutualifyGrouping3Data</span><span class="p">(</span> <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">printMutualDomainWarning</span> <span class="o">=</span> <span class="n">printMutualDomainWarning</span> <span class="p">)</span>
     <span class="k">return</span><span class="p">(</span> <span class="n">f1</span><span class="o">.</span><span class="n">groupThreeFunctions</span><span class="p">(</span> <span class="n">groupBoundaries</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="n">norm</span> <span class="p">)</span> <span class="p">)</span></div>
 
-<div class="viewcode-block" id="groupFunctionCrossSectionAndFlux"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.miscellaneous.groupFunctionCrossSectionAndFlux">[docs]</a><span class="k">def</span> <span class="nf">groupFunctionCrossSectionAndFlux</span><span class="p">(</span> <span class="n">cls</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">printMutualDomainWarning</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="groupFunctionCrossSectionAndFlux"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.miscellaneous.groupFunctionCrossSectionAndFlux">[docs]</a><span class="k">def</span> <span class="nf">groupFunctionCrossSectionAndFlux</span><span class="p">(</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">printMutualDomainWarning</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
 
     <span class="n">crossSection</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;crossSection&#39;</span><span class="p">]</span>
     <span class="n">norm</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;groupedFlux&#39;</span><span class="p">]</span>
@@ -126,7 +123,7 @@
     <span class="n">axis</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> * </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">f1</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">crossSection</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">label</span> <span class="p">),</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span>
     <span class="n">axes</span> <span class="o">=</span> <span class="n">f1</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
     <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axis</span>
-    <span class="k">return</span><span class="p">(</span> <span class="n">groupModule</span><span class="o">.</span><span class="n">toMultiGroup1d</span><span class="p">(</span> <span class="n">cls</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">grouped</span> <span class="p">)</span> <span class="p">)</span></div>
+    <span class="k">return</span><span class="p">(</span> <span class="n">groupModule</span><span class="o">.</span><span class="n">toMultiGroup1d</span><span class="p">(</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">grouped</span> <span class="p">)</span> <span class="p">)</span></div>
 </pre></div>
 
           </div>
@@ -160,13 +157,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

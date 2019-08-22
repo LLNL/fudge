@@ -64,7 +64,7 @@
 from xData import array as arrayModule
 from xData import axes as axesModule
 
-from fudge.gnd.covariances.base import covarianceMatrix as covarianceMatrixModule
+from fudge.gnds.covariances.base import covarianceMatrix as covarianceMatrixModule
 from fudge.core.math import linearAlgebra as linearAlgebraModule
 
 from .. import endfFormats as endfFormatsModule
@@ -72,6 +72,7 @@ from .. import endfFormats as endfFormatsModule
 def toENDF6(self, flags, targetInfo, inCovarianceGroup=False):
 
     endf = []
+    conversionFlags = targetInfo['ENDFconversionFlags'].get(self,"")
     rowdat, coldat = targetInfo['dataPointer']
     MF,MT1 = map(int, rowdat['ENDF_MFMT'].split(','))
     if not inCovarianceGroup:
@@ -87,8 +88,8 @@ def toENDF6(self, flags, targetInfo, inCovarianceGroup=False):
     if isinstance( self.matrix.array, arrayModule.diagonal ):
         LS = 0; LB = 1; NP = len(self.matrix.axes[2].values); NT = 2*NP
         if self.type=='absolute': LB = 0
-        if self.ENDFconversionFlag:
-            LB = int( self.ENDFconversionFlag.split('=')[1] )
+        if 'LB' in conversionFlags:
+            LB = int( conversionFlags.split('=')[1] )
         matrixData = zip( self.matrix.axes[2].values, list(self.matrix.array.values) + [0] )
         matrixData = [val for sublist in matrixData for val in sublist] # flatten
     elif isinstance( self.matrix.array, arrayModule.full ):
@@ -108,8 +109,7 @@ def toENDF6(self, flags, targetInfo, inCovarianceGroup=False):
     else:
         raise NotImplemented
     if MF==35:  # header for fission spectra is different:
-        E1,E2 = [a.getValueAs('eV') for a in (rowdat.attributes['incidentEnergyLowerBound'],
-                                              rowdat.attributes['incidentEnergyUpperBound'])]
+        E1,E2 = (rowdat.attributes['domainMin'], rowdat.attributes['domainMax'])
         if LS: LB = 7
         else:
             raise Exception ("Unknown spectrum (MF35) covariance format")

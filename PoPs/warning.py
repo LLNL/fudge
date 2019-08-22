@@ -77,7 +77,7 @@ Or, for easier searching you may wish to flatten the list (to get warnings alone
     >>> flat = warnings.flatten()
 """
 
-# FIXME context class and base warning class are both identical to stuff in fudge.gnd.warning. Move to external utility?
+# FIXME context class and base warning class are both identical to stuff in fudge.gnds.warning. Move to external utility?
 __metaclass__ = type
 
 

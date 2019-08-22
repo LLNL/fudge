@@ -1,0 +1,520 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>fudge.gnds.channels &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '4.2.3 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.gnds.channels</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">In GNDS, a channel class contains all outgoing products from either a reaction (also called an interaction),</span>
+<span class="sd">from a decay or from a collection of interactions. Since products may subsequently decay, a decay channel may </span>
+<span class="sd">be nested within a product of another channel. Channels have the following genre:</span>
+
+<span class="sd">    :output:        The output channel resulting from an interaction. All products, except gammas,</span>
+<span class="sd">                    must be present. The ZA of the output channel must match the input channel&#39;s ZA.</span>
+
+<span class="sd">    :decay:         The output channel resulting from the decay of a particle. All decay products, except gammas,</span>
+<span class="sd">                    must be present. The ZA of the output channel must match the parent&#39;s ZA.</span>
+
+<span class="sd">    :fission:     A pseudo output channel resulting from fission. Only prompt neutrons must be present.</span>
+
+<span class="sd">    :sumOfRemainingOutputChannels: A pseudo output channel giving product data for all output channels not explicitly given.</span>
+
+<span class="sd">    :production:  A pseudo output channel representing a product not fully covered in other output channels.</span>
+
+<span class="sd">For example, consider the following nuclear interaction:</span>
+
+<span class="sd">        n + O16 --&gt; n + ( O16_e6 -&gt; He4 + C12 )</span>
+
+<span class="sd">This interaction represents a neutron hitting an Oxygen-16 target producing a n and Oxygen-16 in the 6th excited. The</span>
+<span class="sd">excited Oxygen-16 subsequently decays into He4 and C12. The output channel for this interaction is &quot;n + O16_e6&quot; and</span>
+<span class="sd">the &quot;O16_e6&quot; contains the decay channel &quot;He4 + C12&quot;.</span>
+
+<span class="sd">Output and decay channels can be further divided into twoBody or NBody channels.</span>
+
+<span class="sd">    :twoBody:       The channel initially has two products whose angular and energy correlates are known. Only the </span>
+<span class="sd">                    center-of-mass angular data for one of the products is needed. The products&#39; outgoing energies can </span>
+<span class="sd">                    be calculated from their center-of-mass angular information and other data like the masses of the </span>
+<span class="sd">                    products involved in a reaction or decay.</span>
+
+<span class="sd">    :NBody:         The channel has two or more products whose angular and energy correlates are not known. The full double</span>
+<span class="sd">                    differential data for each product must be given.</span>
+
+<span class="sd">This module contains the following channel classes::</span>
+
+<span class="sd">    channel     : the base class for all other classes.</span>
+<span class="sd">        outputChannel                   : the base class for the following outout channels,</span>
+<span class="sd">            twoBodyOutputChannel            : twoBody output channel.</span>
+<span class="sd">            NBodyOutputChannel              : NBody output channel.</span>
+<span class="sd">        fissionChannel                  :</span>
+<span class="sd">        sumOfRemainingOutputChannels    :</span>
+<span class="sd">        productionChannel               :</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<span class="n">twoBodyGenre</span> <span class="o">=</span> <span class="s1">&#39;twoBody&#39;</span>
+<span class="n">NBodyGenre</span> <span class="o">=</span> <span class="s1">&#39;NBody&#39;</span>
+<span class="n">productionGenre</span> <span class="o">=</span> <span class="s1">&#39;production&#39;</span>
+<span class="n">sumOfRemainingOutputChannelsGenre</span> <span class="o">=</span> <span class="s1">&#39;sumOfRemainingOutputChannels&#39;</span>
+
+<span class="n">outputChannelToken</span> <span class="o">=</span> <span class="s2">&quot;outputChannel&quot;</span>
+
+<span class="n">fissionGenreTotal</span> <span class="o">=</span> <span class="s1">&#39;total&#39;</span>
+<span class="n">fissionGenreFirstChance</span> <span class="o">=</span> <span class="s1">&#39;firstChance&#39;</span>
+<span class="n">fissionGenreSecondChance</span> <span class="o">=</span> <span class="s1">&#39;secondChance&#39;</span>
+<span class="n">fissionGenreThirdChance</span> <span class="o">=</span> <span class="s1">&#39;thirdChance&#39;</span>
+<span class="n">fissionGenreFourthChance</span> <span class="o">=</span> <span class="s1">&#39;fourthChance&#39;</span>
+
+<span class="n">manyToken</span> <span class="o">=</span> <span class="s1">&#39;many&#39;</span>
+
+<div class="viewcode-block" id="processes"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.processes">[docs]</a><span class="k">class</span> <span class="nc">processes</span> <span class="p">:</span>
+
+    <span class="n">continuum</span> <span class="o">=</span> <span class="s1">&#39;continuum&#39;</span></div>
+
+<span class="kn">from</span> <span class="nn">PoPs</span> <span class="k">import</span> <span class="n">IDs</span> <span class="k">as</span> <span class="n">IDsPoPsModule</span>
+
+<span class="kn">import</span> <span class="nn">xData.ancestry</span> <span class="k">as</span> <span class="nn">ancestryModule</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">tokens</span> <span class="k">as</span> <span class="n">tokensModule</span>
+
+<span class="kn">from</span> <span class="nn">.channelData</span> <span class="k">import</span> <span class="n">Q</span> <span class="k">as</span> <span class="n">QModule</span>
+
+<div class="viewcode-block" id="channel"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel">[docs]</a><span class="k">class</span> <span class="nc">channel</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This is the class for a gnds channel which is a list of products (i.e., product class objects).&quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="n">outputChannelToken</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;Q&#39;</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">genre</span><span class="p">,</span> <span class="n">numberOfAllowedParticles</span> <span class="o">=</span> <span class="n">manyToken</span><span class="p">,</span> <span class="n">fissionGenre</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">process</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Creates a new channel object.&quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">product</span> <span class="k">as</span> <span class="n">productModule</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">genre</span> <span class="o">=</span> <span class="n">genre</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numberOfAllowedParticles</span> <span class="o">=</span> <span class="n">numberOfAllowedParticles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fissionGenre</span> <span class="o">=</span> <span class="n">fissionGenre</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">process</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span> <span class="o">=</span> <span class="n">QModule</span><span class="o">.</span><span class="n">component</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">products</span> <span class="o">=</span> <span class="n">productModule</span><span class="o">.</span><span class="n">products</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__cmp__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Compares self to other.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">other</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span>
+        <span class="n">n1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="n">n2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span> <span class="n">n1</span><span class="p">,</span> <span class="n">n2</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">n</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">other</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">other</span><span class="p">[</span><span class="n">i1</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span>  <span class="mi">1</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">n1</span> <span class="o">&lt;</span> <span class="n">n2</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">n1</span> <span class="o">&gt;</span> <span class="n">n2</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span>  <span class="mi">1</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">i</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the i^th product in the channel.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the number of products for this channel.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">def</span>  <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Converts channel object to a string representation.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">simpleString</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="channel.removeProductAtIndex"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.removeProductAtIndex">[docs]</a>    <span class="k">def</span> <span class="nf">removeProductAtIndex</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">index</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="channel.convertUnits"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s2">&quot;See documentation for reactionSuite.convertUnits.&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="channel.checkProductFrame"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.checkProductFrame">[docs]</a>    <span class="k">def</span> <span class="nf">checkProductFrame</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Calls checkProductFrame for self&#39;s products.&quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">product</span><span class="o">.</span><span class="n">checkProductFrame</span><span class="p">(</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="channel.getFinalProductList"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.getFinalProductList">[docs]</a>    <span class="k">def</span> <span class="nf">getFinalProductList</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of [ multiplicity, name ] in order for the final products of this channel.&quot;&quot;&quot;</span>
+
+        <span class="n">mP</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">outputChannel</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">try</span> <span class="p">:</span>
+                    <span class="n">multiplicity</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">getConstant</span><span class="p">(</span> <span class="p">)</span>
+                <span class="k">except</span> <span class="p">:</span>
+                    <span class="n">multiplicity</span> <span class="o">=</span> <span class="s2">&quot;(?)&quot;</span>                        <span class="c1"># ????? This needs work.</span>
+                <span class="n">mP</span> <span class="o">+=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">multiplicity</span><span class="p">,</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span> <span class="p">]</span> <span class="p">]</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">mP</span> <span class="o">+=</span> <span class="n">product</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">getFinalProductList</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">mP</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="channel.getProductsWithName"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.getProductsWithName">[docs]</a>    <span class="k">def</span> <span class="nf">getProductsWithName</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of all the channel&#39;s products with given name (&#39;gamma&#39;,&#39;n&#39;, etc).&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="p">[</span> <span class="n">prod</span> <span class="k">for</span> <span class="n">prod</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">prod</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">name</span> <span class="p">]</span></div>
+
+<div class="viewcode-block" id="channel.getProductWithName"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.getProductWithName">[docs]</a>    <span class="k">def</span> <span class="nf">getProductWithName</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the product with given name. If no such product is found, or if more than one are found,</span>
+<span class="sd">        raise an Exception.&quot;&quot;&quot;</span>
+
+        <span class="n">prods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getProductsWithName</span><span class="p">(</span> <span class="n">name</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prods</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span> <span class="k">return</span> <span class="n">prods</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unique product named &#39;</span><span class="si">%s</span><span class="s2">&#39; not found in </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="channel.getFissionGenre"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.getFissionGenre">[docs]</a>    <span class="k">def</span> <span class="nf">getFissionGenre</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the channel&#39;s fission genre.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionGenre</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="channel.getGenre"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.getGenre">[docs]</a>    <span class="k">def</span> <span class="nf">getGenre</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the genre for this channel.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">genre</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="channel.cullStyles"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.cullStyles">[docs]</a>    <span class="k">def</span> <span class="nf">cullStyles</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">styleList</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">cullStyles</span><span class="p">(</span> <span class="n">styleList</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="channel.thresholdQAs"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.thresholdQAs">[docs]</a>    <span class="k">def</span> <span class="nf">thresholdQAs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">thresholdQAs</span><span class="p">(</span> <span class="n">unit</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># calculate from particle masses</span>
+            <span class="n">massUnit</span> <span class="o">=</span> <span class="n">unit</span> <span class="o">+</span> <span class="s1">&#39;/c**2&#39;</span>
+            <span class="n">reactionSuite</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getRootAncestor</span><span class="p">(</span> <span class="p">)</span>
+            <span class="n">projectile</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">reactionSuite</span><span class="o">.</span><span class="n">projectile</span><span class="p">]</span>
+            <span class="n">targetID</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">target</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">targetID</span> <span class="ow">in</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">aliases</span> <span class="p">)</span> <span class="p">:</span> <span class="n">targetID</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">targetID</span><span class="p">]</span><span class="o">.</span><span class="n">pid</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="n">targetID</span><span class="p">]</span>
+            <span class="n">Q</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span> <span class="n">massUnit</span> <span class="p">)</span> <span class="o">+</span> <span class="n">projectile</span><span class="o">.</span><span class="n">mass</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(</span> <span class="n">massUnit</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span> <span class="n">Q</span> <span class="o">-=</span> <span class="n">product</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span><span class="n">massUnit</span><span class="p">)</span> <span class="o">*</span> <span class="n">product</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Non-constant Q-value must be explicitly listed in GNDS!&quot;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">final</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span> <span class="p">:</span> <span class="n">Q</span> <span class="o">+=</span> <span class="n">product</span><span class="o">.</span><span class="n">thresholdQAs</span><span class="p">(</span> <span class="n">unit</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="n">final</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">Q</span> <span class="p">)</span>  </div>
+
+<div class="viewcode-block" id="channel.isFission"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.isFission">[docs]</a>    <span class="k">def</span> <span class="nf">isFission</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionGenre</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="channel.calculateAverageProductData"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate average product data.</span>
+
+<span class="sd">        :param style: The style to use.</span>
+<span class="sd">        :param indent: string; The amount to indent and verbose output.</span>
+<span class="sd">        :param kwargs: string; All other parameters.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;outputChannel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
+
+        <span class="k">for</span> <span class="n">productIndex</span><span class="p">,</span> <span class="n">product</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;productIndex&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="n">productIndex</span> <span class="p">)</span>
+            <span class="n">product</span><span class="o">.</span><span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="channel.processMC_cdf"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.processMC_cdf">[docs]</a>    <span class="k">def</span> <span class="nf">processMC_cdf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">productIndex</span><span class="p">,</span> <span class="n">product</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;productIndex&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="n">productIndex</span> <span class="p">)</span>
+            <span class="n">product</span><span class="o">.</span><span class="n">processMC_cdf</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent2</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="channel.processMultiGroup"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span>
+
+<span class="c1"># BRBBRB</span>
+        <span class="k">for</span> <span class="n">productIndex</span><span class="p">,</span> <span class="n">product</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;productIndex&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="n">productIndex</span> <span class="p">)</span>
+            <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;productName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span>
+            <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;productLabel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">label</span>
+            <span class="n">product</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent2</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="channel.QToPointwiseLinear"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.QToPointwiseLinear">[docs]</a>    <span class="k">def</span> <span class="nf">QToPointwiseLinear</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">linearQ</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">final</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">outputChannel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">linearQ</span> <span class="o">+=</span> <span class="n">product</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">final</span> <span class="o">=</span> <span class="n">final</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">linearQ</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="channel.toXMLList"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">qualifiers</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">qualifiers</span> <span class="o">+=</span> <span class="s1">&#39; process=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="p">)</span>
+        <span class="n">xmlStringList</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> genre=&quot;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">genre</span><span class="p">,</span> <span class="n">qualifiers</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="n">xmlStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlStringList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">xmlStringList</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="channel.setFissionGenre"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.setFissionGenre">[docs]</a>    <span class="k">def</span> <span class="nf">setFissionGenre</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">fissionGenre</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Sets the channel&#39;s fission genre.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fissionGenre</span> <span class="o">=</span> <span class="n">fissionGenre</span></div>
+
+<div class="viewcode-block" id="channel.channelParticlesToString"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.channelParticlesToString">[docs]</a>    <span class="k">def</span> <span class="nf">channelParticlesToString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">specialChannelsReturnGenre</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">specialChannelsReturnGenre</span> <span class="ow">and</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">genre</span> <span class="ow">in</span> <span class="p">[</span> <span class="n">sumOfRemainingOutputChannelsGenre</span> <span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">genre</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">prefix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">simpleString</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="o">+</span> <span class="n">suffix</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="channel.toStandardString"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.toStandardString">[docs]</a>    <span class="k">def</span> <span class="nf">toStandardString</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a more standard nuclear, but less informative, string representation for the channel.</span>
+<span class="sd">        For output channel it is &quot;list of products)Residual&quot; (e.g., &quot;2n)Pu_238&quot;).&quot;&quot;&quot;</span>
+
+        <span class="n">mP</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFinalProductList</span><span class="p">(</span> <span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">mP</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">m</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">sp</span> <span class="o">=</span> <span class="n">p</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">sm</span> <span class="o">=</span> <span class="n">m</span>
+                <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">m</span> <span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">sm</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span> <span class="n">m</span> <span class="p">)</span>
+                <span class="n">sp</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">sm</span><span class="p">,</span> <span class="n">p</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">s</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">sp</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="s1">&#39; + </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sp</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="channel.toString"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.toString">[docs]</a>    <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">simpleString</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">exposeGammaMultiplicity</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a string representation of self. If simpleString is True, the string contains only the initial</span>
+<span class="sd">        products, and not any decay products.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">genre</span> <span class="ow">in</span> <span class="p">[</span> <span class="n">sumOfRemainingOutputChannelsGenre</span> <span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">genre</span> <span class="p">)</span>
+        <span class="n">s</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">gammaString</span><span class="p">,</span> <span class="n">delayNeutrons</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span> <span class="p">:</span>
+            <span class="n">addParticle</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isFission</span><span class="p">(</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">neutron</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+<span class="c1"># BRB6 &#39;emissionMode&#39;?</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">getAttribute</span><span class="p">(</span> <span class="s1">&#39;emissionMode&#39;</span> <span class="p">)</span> <span class="o">==</span> <span class="n">tokensModule</span><span class="o">.</span><span class="n">delayedToken</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">addParticle</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">delayNeutrons</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">addParticle</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">gammaStringP</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">simpleString</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">exposeGammaMultiplicity</span> <span class="o">=</span> <span class="n">exposeGammaMultiplicity</span> <span class="p">)</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">gammaString</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">gammaString</span> <span class="o">=</span> <span class="n">gammaStringP</span>
+<span class="c1"># BRB6 &#39;energyDependent&#39;?</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="s1">&#39;energyDependent&#39;</span> <span class="ow">in</span> <span class="n">gammaStringP</span> <span class="p">)</span> <span class="p">:</span> <span class="n">gammaString</span> <span class="o">=</span> <span class="n">gammaStringP</span>
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="n">s</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">p</span><span class="p">,</span> <span class="n">product</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">simpleString</span> <span class="o">=</span> <span class="n">simpleString</span><span class="p">,</span> <span class="n">exposeGammaMultiplicity</span> <span class="o">=</span> <span class="n">exposeGammaMultiplicity</span> <span class="p">)</span> <span class="p">)</span>
+                    <span class="n">p</span> <span class="o">=</span> <span class="s1">&#39; + &#39;</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">delayNeutrons</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+<span class="c1"># BRB6 &#39;n[emissionMode:&#39;%s delayed&#39;]&#39;?</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">p</span><span class="p">,</span> <span class="s2">&quot;n[emissionMode:&#39;</span><span class="si">%s</span><span class="s2"> delayed&#39;]&quot;</span> <span class="o">%</span> <span class="n">delayNeutrons</span> <span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="s1">&#39; + &#39;</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">gammaString</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">s</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">p</span><span class="p">,</span> <span class="n">gammaString</span> <span class="p">)</span>
+        <span class="n">process</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isFission</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+<span class="c1"># BRB6 &#39;%s fission&#39;?</span>
+            <span class="n">process</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> fission&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">fissionGenre</span> <span class="p">)</span>
+        <span class="k">elif</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">process</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">process</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot; [</span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="s2">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">process</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="channel.parseXMLNode"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.channel.parseXMLNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">product</span> <span class="k">as</span> <span class="n">productModule</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;process&#39;</span> <span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;process&#39;</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">QModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">Q</span> <span class="o">=</span> <span class="n">QModule</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+                <span class="k">for</span> <span class="n">QForm</span> <span class="ow">in</span> <span class="n">Q</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">QForm</span> <span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">productModule</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Parsing </span><span class="si">%s</span><span class="s2"> not yet supported&quot;</span> <span class="o">%</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="outputChannel"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.outputChannel">[docs]</a><span class="k">class</span> <span class="nc">outputChannel</span><span class="p">(</span> <span class="n">channel</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">genre</span><span class="p">,</span> <span class="n">numberOfAllowedParticles</span> <span class="o">=</span> <span class="n">manyToken</span><span class="p">,</span> <span class="n">process</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">channel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">genre</span><span class="p">,</span> <span class="n">numberOfAllowedParticles</span> <span class="o">=</span> <span class="n">numberOfAllowedParticles</span><span class="p">,</span> <span class="n">process</span> <span class="o">=</span> <span class="n">process</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="twoBodyOutputChannel"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.twoBodyOutputChannel">[docs]</a><span class="k">class</span> <span class="nc">twoBodyOutputChannel</span><span class="p">(</span> <span class="n">outputChannel</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This is a two-body class version of channel. In particular, two-body is an output channel where only the</span>
+<span class="sd">    angular information is needed to calculate the outgoing angle/energy for the two-bodies. Either of the bodies may </span>
+<span class="sd">    subsequently decay/breakup.&quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="n">outputChannelToken</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">process</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;This is the constructor for the twoBodyOutputChannel class. See class channel for more information.&quot;&quot;&quot;</span>
+
+        <span class="n">outputChannel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">twoBodyGenre</span><span class="p">,</span> <span class="n">numberOfAllowedParticles</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">process</span> <span class="o">=</span> <span class="n">process</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="NBodyOutputChannel"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.NBodyOutputChannel">[docs]</a><span class="k">class</span> <span class="nc">NBodyOutputChannel</span><span class="p">(</span> <span class="n">outputChannel</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This is a N-body class version of channel. It is for all output channels that do not fit under the </span>
+<span class="sd">    twoBodyOutputChannel class. In particular, the going energy/angular information for each particle is </span>
+<span class="sd">    not correlated with the other products. Any of the bodies may decay/breakup.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">process</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;This is the constructor for the NBodyOutputChannel class. See this class&#39;s documentation and</span>
+<span class="sd">        the class channel for more information.&quot;&quot;&quot;</span>
+
+        <span class="n">outputChannel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">NBodyGenre</span><span class="p">,</span> <span class="n">process</span> <span class="o">=</span> <span class="n">process</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="fissionChannel"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.fissionChannel">[docs]</a><span class="k">class</span> <span class="nc">fissionChannel</span><span class="p">(</span> <span class="n">channel</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">fissionGenre</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">channel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">NBodyGenre</span><span class="p">,</span> <span class="n">numberOfAllowedParticles</span> <span class="o">=</span> <span class="n">manyToken</span><span class="p">,</span> <span class="n">fissionGenre</span> <span class="o">=</span> <span class="n">fissionGenre</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="sumOfRemainingOutputChannels"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.sumOfRemainingOutputChannels">[docs]</a><span class="k">class</span> <span class="nc">sumOfRemainingOutputChannels</span><span class="p">(</span> <span class="n">channel</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This channel is a catchall for all output channels not described for a given input channel.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;This is the constructor for the sumOfRemainingOutputChannels class. See this class&#39;s documentation and</span>
+<span class="sd">        the class channel for more information.&quot;&quot;&quot;</span>
+
+        <span class="n">channel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">sumOfRemainingOutputChannelsGenre</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="productionChannel"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.productionChannel">[docs]</a><span class="k">class</span> <span class="nc">productionChannel</span><span class="p">(</span> <span class="n">channel</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a production channel version of the channel class. A production channel is one that contains</span>
+<span class="sd">    information about the production of outgoing products for various outgoing channels (that is, independent </span>
+<span class="sd">    of the actual outgoing channel).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is the constructor for the productionChannel class. See this class&#39;s documentation and</span>
+<span class="sd">        the class channel for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">channel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">productionGenre</span><span class="p">,</span> <span class="n">numberOfAllowedParticles</span> <span class="o">=</span> <span class="n">manyToken</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="parseXMLNode"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.channels.parseXMLNode">[docs]</a><span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">channelElement</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Translate &#39;&lt;outputChannel&gt;&#39; from xml.&quot;&quot;&quot;</span>
+
+    <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">channelElement</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+    <span class="n">outputChannelClass</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">twoBodyGenre</span>                        <span class="p">:</span> <span class="n">twoBodyOutputChannel</span><span class="p">,</span> 
+            <span class="n">NBodyGenre</span>                          <span class="p">:</span> <span class="n">NBodyOutputChannel</span><span class="p">,</span>
+            <span class="n">sumOfRemainingOutputChannelsGenre</span>   <span class="p">:</span> <span class="n">sumOfRemainingOutputChannels</span><span class="p">,</span>
+            <span class="n">productionGenre</span>                     <span class="p">:</span> <span class="n">productionChannel</span> <span class="p">}[</span><span class="n">channelElement</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;genre&#39;</span> <span class="p">)]</span>
+    <span class="n">outputChannel</span> <span class="o">=</span> <span class="n">outputChannelClass</span><span class="p">(</span> <span class="p">)</span>
+
+    <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+    <span class="n">outputChannel</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">channelElement</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+
+    <span class="k">return</span><span class="p">(</span> <span class="n">outputChannel</span> <span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

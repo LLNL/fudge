@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>4.1. Cross sections &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>4.1. Cross sections &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -30,7 +27,7 @@
     <link rel="next" title="4.2. Resonances" href="resonances.html" />
     <link rel="prev" title="4. Digging deeper in Fudge" href="diggingDeeper.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -46,7 +43,7 @@
         <li class="right" >
           <a href="diggingDeeper.html" title="4. Digging deeper in Fudge"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="diggingDeeper.html" accesskey="U">4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a> &#187;</li> 
       </ul>
@@ -61,21 +58,21 @@
 <h1>4.1. Cross sections<a class="headerlink" href="#cross-sections" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="types-of-cross-section-data">
 <h2>4.1.1. Types of cross section data<a class="headerlink" href="#types-of-cross-section-data" title="Permalink to this headline">¶</a></h2>
-<p>Cross section data can be stored in several forms in GND. The simplest forms are <em>pointwise</em> and <em>linear</em>,
+<p>Cross section data can be stored in several forms in GNDS. The simplest forms are <em>pointwise</em> and <em>linear</em>,
 which contain a single region that uses the same interpolation rule throughout.
-A &#8216;pointwise&#8217; cross section may use any supported interpolation rule, whereas a &#8216;linear&#8217; cross section
+A ‘pointwise’ cross section may use any supported interpolation rule, whereas a ‘linear’ cross section
 must use linear interpolation on both axes.</p>
 <p>Discontinuities are not permitted inside a pointwise region. Instead, they must be implemented at the boundary
 between two different regions of a <em>piecewise</em> cross section. In this case, each region has its own interpolation and list of X-Y points.</p>
 <p>For low-energy incident neutrons, the cross section can be represented best using resonance parameters
 (see the next section for more detail). In this case, the full cross section includes the sum of the values
-computed from resonance with the tabulated &#8216;background&#8217; cross section. This type of data is stored in GND as <em>resonancesWithBackground</em>.</p>
+computed from resonance with the tabulated ‘background’ cross section. This type of data is stored in GNDS as <em>resonancesWithBackground</em>.</p>
 </div>
 <div class="section" id="plotting">
 <h2>4.1.2. Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h2>
 <p>The plotting tools included with <code class="docutils literal"><span class="pre">Fudge</span></code> require that the cross section first be converted to a single, lin-lin interpolated region.
-This can be achieved using the &#8216;toPointwise_withLinearXYs()&#8217; function. Thus, if you have a
-gnd.reactionData.crossSection instance, you can plot it like this (assuming you have installed Gnuplot.py):</p>
+This can be achieved using the ‘toPointwise_withLinearXYs()’ function. Thus, if you have a
+gnds.reactionData.crossSection instance, you can plot it like this (assuming you have installed Gnuplot.py):</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">crossSection</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -153,14 +150,14 @@ gnd.reactionData.crossSection instance, you can plot it like this (assuming you 
         <li class="right" >
           <a href="diggingDeeper.html" title="4. Digging deeper in Fudge"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="diggingDeeper.html" >4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

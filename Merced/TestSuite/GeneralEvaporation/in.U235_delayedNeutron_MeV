@@ -79263,7 +79263,7 @@ Product Frame: lab
 
 # Start data
 weight: n = 2
-Interpolation: lin-lin
+Interpolation: flat
   1.000000000000e-11  1.000000000000e+00
   2.000000000000e+01  1.000000000000e+00
 

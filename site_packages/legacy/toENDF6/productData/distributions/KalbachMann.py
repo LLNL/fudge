@@ -65,10 +65,10 @@ from pqu import PQU as PQUModule
 
 from xData import XYs as XYsModule
 
-from fudge.gnd.productData.distributions import KalbachMann as KalbachMannModule
+from fudge.gnds.productData.distributions import KalbachMann as KalbachMannModule
 
 from ... import endfFormats as endfFormatsModule
-from ... import gndToENDF6 as gndToENDF6Module
+from ... import gndsToENDF6 as gndsToENDF6Module
 
 #
 # KalbachMann
@@ -108,6 +108,6 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
         length = len( coefficients )
         ENDFDataList += [ endfFormatsModule.endfContLine( 0, value, 0, 1, length, length / 3 ) ]
         ENDFDataList += endfFormatsModule.endfDataList( coefficients )
-    gndToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, 1, self.productFrame, ENDFDataList )
+    gndsToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, 1, self.productFrame, ENDFDataList )
 
 KalbachMannModule.form.toENDF6 = toENDF6

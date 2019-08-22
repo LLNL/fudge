@@ -67,45 +67,21 @@ This module contains the alias classes.
 
 import abc
 
-from xData import ancestry as ancestryModule
-
 from . import misc as miscModule
 from . import suite as suiteModule
 
-from .groups import chemicalElement as chemicalElementModule
-from .groups import isotope as isotopeModule
-from .families import particle as particleModule
-from .families import nucleus as nucleusModule
+from .groups import misc as chemicalElementMiscModule
 
-class alias( ancestryModule.ancestry ) :
+class alias( miscModule.classWithIDKey ) :
 
     __metaclass__ = abc.ABCMeta
 
     def __init__( self, id, pid ) :
 
-        ancestryModule.ancestry.__init__( self )
-
-        if( not( isinstance( id, str ) ) ) : raise TypeError( 'id not str' )
-        self.__id = id
+        miscModule.classWithIDKey.__init__( self, id )
 
         if( not( isinstance( pid, str ) ) ) : raise TypeError( 'pid not str' )
         self.__pid = pid
-
-    @property
-    def id( self ) :
-
-        return( self.__id )
-
-    @property
-    def key( self ) :
-
-        return( self.__id )
-
-    @key.setter
-    def key( self, value ) :
-
-        if( not( isinstance( value, str ) ) ) : raise TypeError( 'id must be a string instance.' )
-        self.__id = value
 
     @property
     def pid( self ) :
@@ -135,6 +111,16 @@ class particle( alias ) :
 
     moniker = 'particle'
 
+    @classmethod
+    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+
+        xPath.append( element.tag )
+
+        self = cls( element.attrib['id'], element.attrib['pid'] )
+
+        xPath.pop( )
+        return( self )
+
 class metaStable( alias ) :
 
     moniker = 'metaStable'
@@ -160,16 +146,27 @@ class metaStable( alias ) :
 
         return( self.__class__( self.id, self.pid, self.metaStableIndex ) )
 
+    @classmethod
+    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+
+        xPath.append( element.tag )
+
+        self = cls( element.attrib['id'], element.attrib['pid'], int( element.attrib['metaStableIndex'] ) )
+
+        xPath.pop( )
+        return( self )
+
     @staticmethod
-    def metaStableNameFromNuclearLevelNameAndMetaStableIndex( nuclearLevelName, metaStableIndex ) :
+    def metaStableNameFromNuclearLevelNameAndMetaStableIndex( nuclideName, metaStableIndex ) :
 
         if( not( isinstance( metaStableIndex, int ) ) ) :
             TypeError( 'metaStableIndex must be an int: %s' % miscModule.toLimitedString( metaStableIndex ) )
+        if( metaStableIndex < 1 ) : raise ValueError( 'metaStableIndex must be greater than 0 got "%s".' % metaStableIndex )
 
-        isNucleus, chemicalElementID, A, levelID, anti, qualifier = nucleusModule.chemicalElementAAndLevelIDsFromNuclearLevelID( nuclearLevelName )
+        baseID, chemicalElementID, A, levelID, isNucleus, anti, qualifier = chemicalElementMiscModule.chemicalElementALevelIDsAndAnti( nuclideName )
 
         if( isNucleus ) : chemicalElementID = chemicalElementID[0].lower( ) + chemicalElementID[1:]
-        return( "%s_m%d" % ( isotopeModule.isotopeIDFromElementIDAndA( chemicalElementID, A ), metaStableIndex ) )
+        return( "%s_m%d" % ( chemicalElementMiscModule.isotopeSymbolFromChemicalElementIDAndA( chemicalElementID, A ), metaStableIndex ) )
 
 class suite( suiteModule.suite ) :
 
@@ -177,18 +174,15 @@ class suite( suiteModule.suite ) :
 
     def __init__( self ) :
 
-        suiteModule.suite.__init__( self, ( alias, ), key = 'id' )
+        suiteModule.suite.__init__( self, ( alias, ) )
 
     def parseXMLNode( self, element, xPath, linkData ) :
 
-        children = {}
-        for child in ( particle, metaStable ) : children[child.moniker] = child
-
         for child in element :
             if( child.tag == metaStable.moniker ) :
-                self.add( children[child.tag]( child.attrib['id'], child.attrib['pid'], int( child.attrib['metaStableIndex'] ) ) )
+                self.add( metaStable.parseXMLNodeAsClass( child, xPath, linkData ) )
             else :
-                self.add( children[child.tag]( child.attrib['id'], child.attrib['pid'] ) )
+                self.add( particle.parseXMLNodeAsClass( child, xPath, linkData ) )
 
     @classmethod
     def parseXMLNodeAsClass( cls, element, xPath, linkData ) :

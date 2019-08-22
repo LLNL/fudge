@@ -66,7 +66,7 @@ __metaclass__ = type
 from xData import ancestry as ancestryModule
 from xData import axes as axesModule
 
-from fudge.gnd import suites as suitesModule
+from fudge.gnds import suites as suitesModule
 
 from . import group as groupModule
 

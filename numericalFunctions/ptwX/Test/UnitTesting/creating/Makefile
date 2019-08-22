@@ -67,11 +67,10 @@ NUMERICALFUNCTIONS_PATH = ../../../..
 NUMERICALFUNCTIONS_INCLUDE_PATH = $(NUMERICALFUNCTIONS_PATH)/include
 NUMERICALFUNCTIONS_LIB_PATH = $(NUMERICALFUNCTIONS_PATH)/lib
 
-CDEBUGFLAGS = -g -O0 -Wall
 ptwXCFLAGS =  -I$(NUMERICALFUNCTIONS_INCLUDE_PATH) -L$(NUMERICALFUNCTIONS_LIB_PATH) -lnumericalfunctions    \
               -lnfut_utilities                                                                              \
               -I$(SMR_PATH)/include -L$(SMR_PATH)/lib -lstatusMessageReporting
-localCFLAGS = $(CDEBUGFLAGS) $(CFLAGS) $(ptwXCFLAGS)
+localCFLAGS = $(CFLAGS) $(ptwXCFLAGS)
 
 default: testCreate
 

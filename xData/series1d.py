@@ -61,6 +61,8 @@
 # 
 # <<END-copyright>>
 
+from __future__ import print_function
+
 __metaclass__ = type
 
 import abc
@@ -213,7 +215,7 @@ class series( baseModule.xDataFunctional ) :
         unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
         """
 
-        if( self.axes is None ) : print self.toXLink( )
+        if( self.axes is None ) : print(self.toXLink())
         factors = self.axes.convertUnits( unitMap )
         if( factors[:2] !=[ 1., 1. ] ) :
             self.__domainMin *= factors[1]
@@ -226,7 +228,7 @@ class series( baseModule.xDataFunctional ) :
                 factor *= 1 / factors[1]
         self.fixValuePerUnitChange( factors )
 
-        if( self.uncertainties ) : self.uncertainties.convertUnits( unitMap )
+        if( self.uncertainty ) : self.uncertainty.convertUnits( unitMap )
 
     def copy( self ) :
         """
@@ -286,7 +288,7 @@ class series( baseModule.xDataFunctional ) :
         """
 
         series_ = self.copy( )
-        for l in xrange( 1, len( series_ ), 2 ) : series_.coefficients[l] *= -1
+        for l in range( 1, len( series_ ), 2 ) : series_.coefficients[l] *= -1
         return( series_ )
 
     def setData( self, data ) :
@@ -334,12 +336,8 @@ class series( baseModule.xDataFunctional ) :
         if( self.isPrimaryXData( ) and ( self.axes is not None ) ) :
             XMLList += self.axes.toXMLList( indent2, **kwargs )
             XMLList += coefs.toXMLList( indent2, **kwargs )
-            if self.uncertainties:
-                XMLList.append( "%s<uncertainties>" % indent2 )
-                indent3 = indent2 + kwargs.get( 'incrementalIndent', '  ' )
-                for uncertainty in self.uncertainties:
-                    XMLList += uncertainty.toXMLList( indent3, **kwargs )
-                XMLList[-1] += "</uncertainties>"
+            if self.uncertainty:
+                XMLList += self.uncertainty.toXMLList( indent2, **kwargs )
             XMLList[-1] += '</%s>' % self.moniker
             return XMLList
         else:
@@ -374,9 +372,9 @@ class series( baseModule.xDataFunctional ) :
         if( attrs['domainMax'] == None ) : raise ValueError( 'missing attribute "domainMax"' )
         coefficients = map( float, xDataElement.find('values').text.split() )
         series = cls( coefficients = coefficients, axes = axes, **attrs )
-        uncertElement = xDataElement.find(uncertaintiesModule.uncertainties.moniker)
+        uncertElement = xDataElement.find(uncertaintiesModule.uncertainty.moniker)
         if uncertElement is not None:
-            series.uncertainties = uncertaintiesModule.uncertainties.parseXMLNode(uncertElement, xPath, linkData)
+            series.uncertainty = uncertaintiesModule.uncertainty.parseXMLNode(uncertElement, xPath, linkData)
         xPath.pop( )
         return( series )
 
@@ -472,7 +470,7 @@ class LegendreSeries( series ) :
             P = L.toPointwiseLinear( accuracy, biSectionMax = biSectionMax, checkForRoots = True )
         except :
             P, n = [], 400
-            for i in xrange( n ) :
+            for i in range( n ) :
                 mu = -1. + ( 2. * i ) / n
                 P.append( [ mu, self.evaluate( mu ) ] )
             P.append( [ 1., self.evaluate( 1. ) ] )
@@ -481,7 +479,7 @@ class LegendreSeries( series ) :
         axes[0] = axesModule.axis( 'P(mu)', 0, unit )
         axes[1] = axesModule.axis( 'mu', 1, '' )
         Pclass = self.toLinearXYsClass()
-        P = Pclass( P, axes = axes )
+        P = Pclass( P, axes = axes, value = self.value )
         return( P.thin( accuracy = accuracy ) )
 
     @staticmethod
@@ -530,7 +528,7 @@ class polynomial1d( series ) :
         if( accuracy > 0.1 ) : accuracy = 0.1
 
         P, n = [], 1000
-        for i in xrange( n + 1 ) :
+        for i in range( n + 1 ) :
             x = ( ( n - i ) * self.domainMin + self.domainMax * i ) / n
             P.append( [ x, self.evaluate( x ) ] )
         axes = axesModule.axes( )
@@ -539,7 +537,7 @@ class polynomial1d( series ) :
         axes[0] = axesModule.axis( 'y(x)', 0, yUnit )       # FIXME
         axes[1] = axesModule.axis( 'x', 1, xUnit )          # FIXME
         Pclass = self.toLinearXYsClass()
-        P = Pclass( P, axes = axes )
+        P = Pclass( P, axes = axes, value = self.value )
         return( P.thin( accuracy = accuracy ) )
 
 class linearSpline1d( series ) :

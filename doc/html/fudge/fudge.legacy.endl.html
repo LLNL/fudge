@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.legacy.endl package &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.legacy.endl package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,9 +25,9 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="fudge.legacy.endl.test package" href="fudge.legacy.endl.test.html" />
-    <link rel="prev" title="fudge.legacy.converting.ENDFToGND package" href="fudge.legacy.converting.ENDFToGND.html" /> 
+    <link rel="prev" title="fudge.legacy.converting package" href="fudge.legacy.converting.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -44,9 +41,9 @@
           <a href="fudge.legacy.endl.test.html" title="fudge.legacy.endl.test package"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="fudge.legacy.converting.ENDFToGND.html" title="fudge.legacy.converting.ENDFToGND package"
+          <a href="fudge.legacy.converting.html" title="fudge.legacy.converting package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="fudge.legacy.html" accesskey="U">fudge.legacy package</a> &#187;</li> 
       </ul>
@@ -85,18 +82,18 @@
 <dl class="method">
 <dt id="fudge.legacy.endl.bdfls.bdfls.addFlux">
 <code class="descname">addFlux</code><span class="sig-paren">(</span><em>EF_ls</em>, <em>id</em>, <em>label=''</em>, <em>overwrite=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/bdfls.html#bdfls.addFlux"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.bdfls.bdfls.addFlux" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the flux with id to self&#8217;s list of fluxes. EF_ls is a python list
+<dd><p>Adds the flux with id to self’s list of fluxes. EF_ls is a python list
 with the following structure:</p>
 <blockquote>
 <div><dl class="docutils">
 <dt>[</dt>
-<dd>[ [E0, f0], [E1, f1], ... ], # for l = 0 
-[ [E0, f0], [E1, f1], ... ], # for l = 1 
-...</dd>
+<dd>[ [E0, f0], [E1, f1], … ], # for l = 0 
+[ [E0, f0], [E1, f1], … ], # for l = 1 
+…</dd>
 </dl>
 <p>]</p>
 </div></blockquote>
-<p>and label is the flux&#8217;s label (see class bdfls_flux). If overwrite
+<p>and label is the flux’s label (see class bdfls_flux). If overwrite
 is false, a raise is triggered if self already contains group with id, else
 the old one is overwritten.</p>
 </dd></dl>
@@ -104,7 +101,7 @@ the old one is overwritten.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.bdfls.bdfls.addGroup">
 <code class="descname">addGroup</code><span class="sig-paren">(</span><em>ebs</em>, <em>id</em>, <em>label=''</em>, <em>overwrite=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/bdfls.html#bdfls.addGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.bdfls.bdfls.addGroup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the group with id to self&#8217;s list of groups. ebs is a python list
+<dd><p>Adds the group with id to self’s list of groups. ebs is a python list
 of numbers and label is the groups label (see class bdfls_group). If overwrite
 is false, a raise is triggered if self already contains group with id, else
 the old one is overwritten.</p>
@@ -119,21 +116,21 @@ the old one is overwritten.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.bdfls.bdfls.addZAHalflife">
 <code class="descname">addZAHalflife</code><span class="sig-paren">(</span><em>za</em>, <em>halflife</em>, <em>warning=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/bdfls.html#bdfls.addZAHalflife"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.bdfls.bdfls.addZAHalflife" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds or changes the halflife for ZA. If warning is true and ZA is already in self&#8217;s halflife list,
+<dd><p>Adds or changes the halflife for ZA. If warning is true and ZA is already in self’s halflife list,
 then a warning message is printed.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.bdfls.bdfls.addZAMass">
 <code class="descname">addZAMass</code><span class="sig-paren">(</span><em>za</em>, <em>mass</em>, <em>warning=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/bdfls.html#bdfls.addZAMass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.bdfls.bdfls.addZAMass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds or changes the mass for ZA. If warning is true and ZA is already in self&#8217;s mass list,
+<dd><p>Adds or changes the mass for ZA. If warning is true and ZA is already in self’s mass list,
 then a warning message is printed.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.bdfls.bdfls.constant">
 <code class="descname">constant</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/bdfls.html#bdfls.constant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.bdfls.bdfls.constant" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the (i+1)^th constant from self&#8217;s constant list.</p>
+<dd><p>Returns the (i+1)^th constant from self’s constant list.</p>
 </dd></dl>
 
 <dl class="method">
@@ -187,13 +184,13 @@ then a warning message is printed.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.bdfls.bdfls.setZAHalflife">
 <code class="descname">setZAHalflife</code><span class="sig-paren">(</span><em>za</em>, <em>halflife</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/bdfls.html#bdfls.setZAHalflife"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.bdfls.bdfls.setZAHalflife" title="Permalink to this definition">¶</a></dt>
-<dd><p>Changes the halflife for ZA. A raise is triggered is za in not in self&#8217;s halflife list.</p>
+<dd><p>Changes the halflife for ZA. A raise is triggered is za in not in self’s halflife list.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.bdfls.bdfls.setZAMass">
 <code class="descname">setZAMass</code><span class="sig-paren">(</span><em>za</em>, <em>mass</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/bdfls.html#bdfls.setZAMass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.bdfls.bdfls.setZAMass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Changes the mass for ZA. A raise is triggered is za in not in self&#8217;s mass list.</p>
+<dd><p>Changes the mass for ZA. A raise is triggered is za in not in self’s mass list.</p>
 </dd></dl>
 
 <dl class="method">
@@ -223,7 +220,7 @@ then a warning message is printed.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.bdfls.bdfls_constant.read">
 <code class="descname">read</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/bdfls.html#bdfls_constant.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.bdfls.bdfls_constant.read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads in the next constand datum from the bdfls file. Sets self&#8217;s value to None if at end of constant data.</p>
+<dd><p>Reads in the next constand datum from the bdfls file. Sets self’s value to None if at end of constant data.</p>
 </dd></dl>
 
 </dd></dl>
@@ -252,7 +249,7 @@ then a warning message is printed.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.bdfls.bdfls_flux.read">
 <code class="descname">read</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/bdfls.html#bdfls_flux.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.bdfls.bdfls_flux.read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads in the next flux from a bdfls file. Sets self&#8217;s id to None if no more fluxes to read in.</p>
+<dd><p>Reads in the next flux from a bdfls file. Sets self’s id to None if no more fluxes to read in.</p>
 </dd></dl>
 
 </dd></dl>
@@ -281,7 +278,7 @@ then a warning message is printed.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.bdfls.bdfls_group.read">
 <code class="descname">read</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/bdfls.html#bdfls_group.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.bdfls.bdfls_group.read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads in the next group from a bdfls file. Sets self&#8217;s id to None if not more groups to read in.</p>
+<dd><p>Reads in the next group from a bdfls file. Sets self’s id to None if not more groups to read in.</p>
 </dd></dl>
 
 </dd></dl>
@@ -329,7 +326,7 @@ to None if at end of halflife data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.bdfls.bdfls_subshell.read">
 <code class="descname">read</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/bdfls.html#bdfls_subshell.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.bdfls.bdfls_subshell.read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads in the subshell data from the bdfls file. Set self&#8217;s line
+<dd><p>Reads in the subshell data from the bdfls file. Set self’s line
 to None if at end of subshell data.</p>
 </dd></dl>
 
@@ -342,7 +339,7 @@ to None if at end of subshell data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.bdfls.bdfls_temperature.read">
 <code class="descname">read</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/bdfls.html#bdfls_temperature.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.bdfls.bdfls_temperature.read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads in the next temperature datum from the bdfls file. Set self&#8217;s id
+<dd><p>Reads in the next temperature datum from the bdfls file. Set self’s id
 to None if at end of temerature data.</p>
 </dd></dl>
 
@@ -361,7 +358,7 @@ to None if at end of temerature data.</p>
 <dl class="function">
 <dt id="fudge.legacy.endl.bdfls.targetToZA">
 <code class="descclassname">fudge.legacy.endl.bdfls.</code><code class="descname">targetToZA</code><span class="sig-paren">(</span><em>za</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/bdfls.html#targetToZA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.bdfls.targetToZA" title="Permalink to this definition">¶</a></dt>
-<dd><p>This routine converts an integer or string into a ZA (e.g., &#8220;FissionProductENDL99120&#8221; to 99120).</p>
+<dd><p>This routine converts an integer or string into a ZA (e.g., “FissionProductENDL99120” to 99120).</p>
 </dd></dl>
 
 </div>
@@ -372,7 +369,7 @@ to None if at end of temerature data.</p>
 <dt id="fudge.legacy.endl.endl1dmathClasses.endl1dmath">
 <em class="property">class </em><code class="descclassname">fudge.legacy.endl.endl1dmathClasses.</code><code class="descname">endl1dmath</code><span class="sig-paren">(</span><em>data=None</em>, <em>checkDataType=False</em>, <em>yLabel=None</em>, <em>label='unknown'</em>, <em>toFloat=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl1dmathClasses.html#endl1dmath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl1dmathClasses.endl1dmath" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>This class is designed to support operations on a list of numbers (e.g., [ number, number, ..., number ]) that may be useful to scientists.
+<p>This class is designed to support operations on a list of numbers (e.g., [ number, number, …, number ]) that may be useful to scientists.
 A number is an integer or a float.</p>
 <p>Members</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">data</span>        <span class="o">|</span> <span class="n">A</span> <span class="n">python</span> <span class="nb">list</span> <span class="n">of</span> <span class="n">numbers</span><span class="o">.</span>
@@ -401,7 +398,7 @@ A number is an integer or a float.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endl1dmathClasses.endl1dmath.check">
 <code class="descname">check</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl1dmathClasses.html#endl1dmath.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl1dmathClasses.endl1dmath.check" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check that self&#8217;s data is a list of numbers.</p>
+<dd><p>Check that self’s data is a list of numbers.</p>
 </dd></dl>
 
 <dl class="method">
@@ -419,8 +416,8 @@ A number is an integer or a float.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endl1dmathClasses.endl1dmath.mapFunction">
 <code class="descname">mapFunction</code><span class="sig-paren">(</span><em>function</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl1dmathClasses.html#endl1dmath.mapFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl1dmathClasses.endl1dmath.mapFunction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Maps &#8216;function&#8217; onto every point of self&#8217;s data. &#8216;Function&#8217; must be a string of the form &#8216;f(x)&#8217; where
-f(x) evaluates to a number (e.g. &#8216;math.sin(x)&#8217;). That is, self.data[i] = f( self.data[i] ).  For example, to
+<dd><p>Maps ‘function’ onto every point of self’s data. ‘Function’ must be a string of the form ‘f(x)’ where
+f(x) evaluates to a number (e.g. ‘math.sin(x)’). That is, self.data[i] = f( self.data[i] ).  For example, to
 exponentiate the points of instance my1d enter</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">my1d</span><span class="o">.</span><span class="n">mapFunction</span><span class="p">(</span> <span class="s1">&#39;exp(x)&#39;</span> <span class="p">)</span>
 </pre></div>
@@ -492,8 +489,8 @@ exponentiate the points of instance my1d enter</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endl1dmathClasses.endl1dmath.set">
 <code class="descname">set</code><span class="sig-paren">(</span><em>other</em>, <em>duplicate=0</em>, <em>checkDataType=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl1dmathClasses.html#endl1dmath.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl1dmathClasses.endl1dmath.set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self.data = other.data. If duplicate is true (i.e., not 0) than a copy of other&#8217;s data 
-is made so that other&#8217;s and self&#8217;s data can be modified independently.</p>
+<dd><p>Sets self.data = other.data. If duplicate is true (i.e., not 0) than a copy of other’s data 
+is made so that other’s and self’s data can be modified independently.</p>
 </dd></dl>
 
 <dl class="method">
@@ -505,7 +502,7 @@ is made so that other&#8217;s and self&#8217;s data can be modified independentl
 <dl class="method">
 <dt id="fudge.legacy.endl.endl1dmathClasses.endl1dmath.toString">
 <code class="descname">toString</code><span class="sig-paren">(</span><em>format=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl1dmathClasses.html#endl1dmath.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl1dmathClasses.endl1dmath.toString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the string returned by the endl1dmath&#8217;s __repr__ function.</p>
+<dd><p>Returns the string returned by the endl1dmath’s __repr__ function.</p>
 </dd></dl>
 
 <dl class="method">
@@ -520,7 +517,7 @@ is made so that other&#8217;s and self&#8217;s data can be modified independentl
 <div class="section" id="module-fudge.legacy.endl.endl1dmathmisc">
 <span id="fudge-legacy-endl-endl1dmathmisc-module"></span><h2>fudge.legacy.endl.endl1dmathmisc module<a class="headerlink" href="#module-fudge.legacy.endl.endl1dmathmisc" title="Permalink to this headline">¶</a></h2>
 <p>This module contains miscellaneous routines for supporting the endl1dmath class from module endl1dmathClasses.</p>
-<p>Module&#8217;s global variables:</p>
+<p>Module’s global variables:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">endl1d_repr_xFormat</span> <span class="p">:</span> <span class="n">Default</span> <span class="nb">format</span> <span class="n">string</span> <span class="n">used</span> <span class="k">for</span> <span class="n">converting</span> <span class="n">an</span> <span class="n">element</span> <span class="n">of</span> <span class="n">the</span> <span class="n">data</span> <span class="n">of</span>
                       <span class="n">an</span> <span class="n">endl1dmath</span> <span class="nb">object</span> <span class="n">to</span> <span class="n">a</span> <span class="n">string</span><span class="o">.</span>
 </pre></div>
@@ -593,8 +590,8 @@ ZA = 1001 could be yo = 2 or 12.  The smaller yo values is returned.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="fudge.legacy.endl.endl2.endlToGNDName">
-<code class="descclassname">fudge.legacy.endl.endl2.</code><code class="descname">endlToGNDName</code><span class="sig-paren">(</span><em>yoOrZA</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2.html#endlToGNDName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2.endlToGNDName" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.legacy.endl.endl2.endlToGNDSName">
+<code class="descclassname">fudge.legacy.endl.endl2.</code><code class="descname">endlToGNDSName</code><span class="sig-paren">(</span><em>yoOrZA</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2.html#endlToGNDSName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2.endlToGNDSName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -604,9 +601,9 @@ ZA = 1001 could be yo = 2 or 12.  The smaller yo values is returned.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="fudge.legacy.endl.endl2.gndNameToEndlZ_A_Suffix">
-<code class="descclassname">fudge.legacy.endl.endl2.</code><code class="descname">gndNameToEndlZ_A_Suffix</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2.html#gndNameToEndlZ_A_Suffix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2.gndNameToEndlZ_A_Suffix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the tuple (Z, A, suffix, ZA) for a gnd isotope name (e.g., gnd name = &#8216;Am242_m1&#8217; returns ( 95, 242, &#8216;m1&#8217;, 95242 ).</p>
+<dt id="fudge.legacy.endl.endl2.gndsNameToEndlZ_A_Suffix">
+<code class="descclassname">fudge.legacy.endl.endl2.</code><code class="descname">gndsNameToEndlZ_A_Suffix</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2.html#gndsNameToEndlZ_A_Suffix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2.gndsNameToEndlZ_A_Suffix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the tuple (Z, A, suffix, ZA) for a gnds isotope name (e.g., gnds name = ‘Am242_m1’ returns ( 95, 242, ‘m1’, 95242 ).</p>
 </dd></dl>
 
 <dl class="function">
@@ -614,9 +611,9 @@ ZA = 1001 could be yo = 2 or 12.  The smaller yo values is returned.</p>
 <code class="descclassname">fudge.legacy.endl.endl2.</code><code class="descname">nameForYoOrZA</code><span class="sig-paren">(</span><em>yoOrZA</em>, <em>NameASeperator=''</em>, <em>ZAOnly=0</em>, <em>AddNatural=1</em>, <em>m_to_m1=False</em>, <em>suffixSeperator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2.html#nameForYoOrZA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2.nameForYoOrZA" title="Permalink to this definition">¶</a></dt>
 <dd><p>If ZAOnly == 0 and yoOrZA is a yo type particle then the name for its yo is returned;
 otherwise, the name for ZA is returned. If AddNatural is true, then natural ZAs (i.e.,
-those with A = 000 like 12000) have the string &#8216;natural&#8217; append to the name for the Z, 
-otherwise, natural targets only contain the name. If m_to_m1 is True then when Suffix = &#8216;m&#8217;
-it is changed to &#8216;m1&#8217;.</p>
+those with A = 000 like 12000) have the string ‘natural’ append to the name for the Z, 
+otherwise, natural targets only contain the name. If m_to_m1 is True then when Suffix = ‘m’
+it is changed to ‘m1’.</p>
 </dd></dl>
 
 <dl class="function">
@@ -624,7 +621,7 @@ it is changed to &#8216;m1&#8217;.</p>
 <code class="descclassname">fudge.legacy.endl.endl2.</code><code class="descname">possibleReactions</code><span class="sig-paren">(</span><em>projectile</em>, <em>target</em>, <em>energy_MeV</em>, <em>maxProducts=4</em>, <em>bdflsFile=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2.html#possibleReactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2.possibleReactions" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function returns a list of all reactions for the projectile with kinetic energy energy_MeV 
 hitting the stationary target that are allowed by the amount of energy_MeV available in the 
-center-of-mass and a reaction&#8217;s Q.  Reactions considered will only contain products of n_1, 
+center-of-mass and a reaction’s Q.  Reactions considered will only contain products of n_1, 
 H_1, H_2, H_3, He_3, He_4 and a residual. The reactions considered are also limited to the 
 number of outgoing products, not including the residual, being no greater than maxProducts.</p>
 </dd></dl>
@@ -633,11 +630,11 @@ number of outgoing products, not including the residual, being no greater than m
 <dt id="fudge.legacy.endl.endl2.reactionEquations">
 <code class="descclassname">fudge.legacy.endl.endl2.</code><code class="descname">reactionEquations</code><span class="sig-paren">(</span><em>yi_</em>, <em>ZA_</em>, <em>C</em>, <em>level=None</em>, <em>specialCases=1</em>, <em>printQWarning=True</em>, <em>NameASeperator=''</em>, <em>bdflsFile=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2.html#reactionEquations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2.reactionEquations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given the incident particle yi, target ZA and reaction type C,
-this routine returns a list of three string for the reaction&#8217;s equation.  The first string
-is of the form &#8216;yi + ZA -&gt; products + residual + Q&#8217; and the second is of the form
+this routine returns a list of three string for the reaction’s equation.  The first string
+is of the form ‘yi + ZA -&gt; products + residual + Q’ and the second is of the form
 ZA(yi,products)residual.  The third string is of the form (yi,products).  For example, 
 reactionEquations( 1, 94239, 13 ) returns the list 
-[ &#8216;n + Pu239n -&gt; 3n + Pu237 + -12.64503 MeV&#8217;, &#8216;Pu239(n,3n)Pu237&#8217;, &#8216;(n,3n)&#8217; ].
+[ ‘n + Pu239n -&gt; 3n + Pu237 + -12.64503 MeV’, ‘Pu239(n,3n)Pu237’, ‘(n,3n)’ ].
 If level is not None,</p>
 </dd></dl>
 
@@ -645,7 +642,7 @@ If level is not None,</p>
 <dt id="fudge.legacy.endl.endl2.reactionInfo">
 <code class="descclassname">fudge.legacy.endl.endl2.</code><code class="descname">reactionInfo</code><span class="sig-paren">(</span><em>yi</em>, <em>ZA</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>bdflsFile=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2.html#reactionInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2.reactionInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a string of 5 lines. The first 3 lines are the item return by reactionEquations.
-The fourth is &#8220;Elastic&#8221; if C = 10 else it is a blank line, and the last is &#8220;total cross section&#8221;
+The fourth is “Elastic” if C = 10 else it is a blank line, and the last is “total cross section”
 if I == 0 and C == 0, else it is the string return by endl_I.endl_ILabel.</p>
 </dd></dl>
 
@@ -662,8 +659,8 @@ the target is taken to be in its ground state.</p>
 <dd><p>Returns the Q in MeV for the reaction, that is, the (sum of incoming masses) - (sum of outgoing mass) in MeV.
 Returns None if at least one of the masses is unknown. This routine only works for isotopes in the ground state as it
 converts each name to it ZA and calls reactionQByZAs (see reactionQByZAs for more details). Example,
-incomingNames = [ &#8216;n&#8217;, &#8216;W186&#8217; ]
-outgoingNames = [ &#8216;H3&#8217;, &#8216;He4&#8217;, &#8216;Tm176&#8217; ]
+incomingNames = [ ‘n’, ‘W186’ ]
+outgoingNames = [ ‘H3’, ‘He4’, ‘Tm176’ ]
 Q = reactionQByIsotopeNames( incomingNames, outgoingNames )</p>
 </dd></dl>
 
@@ -684,10 +681,10 @@ and residualELevel is the excited state of the residual.</p>
 <dl class="function">
 <dt id="fudge.legacy.endl.endl2.residualZA_yos_Q">
 <code class="descclassname">fudge.legacy.endl.endl2.</code><code class="descname">residualZA_yos_Q</code><span class="sig-paren">(</span><em>yi_</em>, <em>ZA_</em>, <em>C</em>, <em>targetELevel=0.0</em>, <em>X4=0</em>, <em>specialCases=1</em>, <em>printQWarning=True</em>, <em>bdflsFile=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2.html#residualZA_yos_Q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2.residualZA_yos_Q" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a tuple containing the residual ZA&#8217;, yos and Q for reaction of type 
+<dd><p>Returns a tuple containing the residual ZA’, yos and Q for reaction of type 
 C involving incident particle yi and target ZA.  yos is a list.  For example,
-the reation, ZA + yi -&gt; ZA&#8217; + yo_1 + yo_2 + ... + yo_n + Q,
-would return ( ZA&#8217;, [ yo_1, yo_2, ..., yo_n ], Q ).</p>
+the reation, ZA + yi -&gt; ZA’ + yo_1 + yo_2 + … + yo_n + Q,
+would return ( ZA’, [ yo_1, yo_2, …, yo_n ], Q ).</p>
 </dd></dl>
 
 <dl class="function">
@@ -701,10 +698,10 @@ would return ( ZA&#8217;, [ yo_1, yo_2, ..., yo_n ], Q ).</p>
 <code class="descclassname">fudge.legacy.endl.endl2.</code><code class="descname">symbolForYoOrZA</code><span class="sig-paren">(</span><em>yoOrZA</em>, <em>NameASeperator=''</em>, <em>ZAOnly=0</em>, <em>AddNatural=1</em>, <em>m_to_m1=False</em>, <em>suffixSeperator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2.html#symbolForYoOrZA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2.symbolForYoOrZA" title="Permalink to this definition">¶</a></dt>
 <dd><p>If ZAOnly == 0 and yoOrZA is a yo type particle then the symbol for its yo is returned;
 otherwise, the symbol for ZA is returned.  If AddNatural is true, then natural ZAs (i.e.,
-those with A = 000 like 12000) have the string &#8216;natural&#8217; append to the symbol for the Z, 
-otherwise, natural targets only contain the symbol. If m_to_m1 is True then when Suffix = &#8216;m&#8217;</p>
+those with A = 000 like 12000) have the string ‘natural’ append to the symbol for the Z, 
+otherwise, natural targets only contain the symbol. If m_to_m1 is True then when Suffix = ‘m’</p>
 <blockquote>
-<div>it is changed to &#8216;m1&#8217;.</div></blockquote>
+<div>it is changed to ‘m1’.</div></blockquote>
 </dd></dl>
 
 <dl class="function">
@@ -781,7 +778,7 @@ I is the starting index.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endl2dmathClasses.endl2dmath.clip">
 <code class="descname">clip</code><span class="sig-paren">(</span><em>yMin</em>, <em>yMax</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathClasses.html#endl2dmath.clip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathClasses.endl2dmath.clip" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath object whose y values are self&#8217;s y values clipped to be between yMin and yMax.</p>
+<dd><p>Returns an endl2dmath object whose y values are self’s y values clipped to be between yMin and yMax.</p>
 </dd></dl>
 
 <dl class="method">
@@ -794,7 +791,7 @@ I is the starting index.</p>
 <dt id="fudge.legacy.endl.endl2dmathClasses.endl2dmath.convolution">
 <code class="descname">convolution</code><span class="sig-paren">(</span><em>other</em>, <em>dxMax=None</em>, <em>convolutionMethod=None</em>, <em>interpolationAccuracy=0.01</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathClasses.html#endl2dmath.convolution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathClasses.endl2dmath.convolution" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an endl2dmath instance that is a convolution of self and other. convolutionMethod
-can be None or &#8216;pythonCodingV1&#8217;. If None and module fudgeConvolutions exist then function
+can be None or ‘pythonCodingV1’. If None and module fudgeConvolutions exist then function
 fudgeConvolutions.convolution will be used; otherwise, the slow, original python code will be 
 used. If interpolationAccuracy is not None then the endl2dmath.thin method is called with
 interpolationAccuracy = interpolationAccuracy.</p>
@@ -842,15 +839,15 @@ interpolationAccuracy = interpolationAccuracy.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endl2dmathClasses.endl2dmath.getValue">
 <code class="descname">getValue</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathClasses.html#endl2dmath.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathClasses.endl2dmath.getValue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self&#8217;s y value evaluated at x.  If x is outside the range
-of self&#8217;s x domain then 0. is returned. Also see getValueInDomain.</p>
+<dd><p>Returns self’s y value evaluated at x.  If x is outside the range
+of self’s x domain then 0. is returned. Also see getValueInDomain.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endl2dmathClasses.endl2dmath.getValueInDomain">
 <code class="descname">getValueInDomain</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathClasses.html#endl2dmath.getValueInDomain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathClasses.endl2dmath.getValueInDomain" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self&#8217;s y value evaluated at x.  If x is outside the range
-of self&#8217;s x domain then None is returned. Also see getValue.</p>
+<dd><p>Returns self’s y value evaluated at x.  If x is outside the range
+of self’s x domain then None is returned. Also see getValue.</p>
 </dd></dl>
 
 <dl class="method">
@@ -884,7 +881,7 @@ equal to None, weigth must be an endl2dmath object, and the integral is of self 
 <dl class="method">
 <dt id="fudge.legacy.endl.endl2dmathClasses.endl2dmath.label">
 <code class="descname">label</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathClasses.html#endl2dmath.label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathClasses.endl2dmath.label" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self&#8217;s label.</p>
+<dd><p>Returns self’s label.</p>
 </dd></dl>
 
 <dl class="method">
@@ -902,7 +899,7 @@ equal to None, weigth must be an endl2dmath object, and the integral is of self 
 <dl class="method">
 <dt id="fudge.legacy.endl.endl2dmathClasses.endl2dmath.map">
 <code class="descname">map</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathClasses.html#endl2dmath.map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathClasses.endl2dmath.map" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s y values to other evaluated at self&#8217;s x values.</p>
+<dd><p>Sets self’s y values to other evaluated at self’s x values.</p>
 </dd></dl>
 
 <dl class="method">
@@ -928,7 +925,7 @@ the integral of dx y(x) is 1.</p>
 <dt id="fudge.legacy.endl.endl2dmathClasses.endl2dmath.overstrike">
 <code class="descname">overstrike</code><span class="sig-paren">(</span><em>other</em>, <em>leftFill=1</em>, <em>rightFill=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathClasses.html#endl2dmath.overstrike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathClasses.endl2dmath.overstrike" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an endl2dmath instance that is the same as self, except that the data from
-other.xMin to other.xMax is replaced by other&#8217;s data.  Other must be an endl2dmath object.
+other.xMin to other.xMax is replaced by other’s data.  Other must be an endl2dmath object.
 If leftFill is true then a point at other.xMin * ( 1. - endlParameters.endlEpsx ) is inserted 
 with y value of self at that x value.  If rightFill is true then a point at other.xMax * 
 ( 1. + endlParameters.endlEpsx ) is inserted  with y value of self at that x value.</p>
@@ -968,7 +965,7 @@ qplot is faster while plot is more flexible.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endl2dmathClasses.endl2dmath.relativediff">
 <code class="descname">relativediff</code><span class="sig-paren">(</span><em>other</em>, <em>i1</em>, <em>i2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathClasses.html#endl2dmath.relativediff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathClasses.endl2dmath.relativediff" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compares self&#8217;s y value at i1 to other&#8217;s y value at i2.  Mainly for internal use.</p>
+<dd><p>Compares self’s y value at i1 to other’s y value at i2.  Mainly for internal use.</p>
 </dd></dl>
 
 <dl class="method">
@@ -996,21 +993,21 @@ and adds near by points on either side. See __div__ for more information.</p>
 <dt id="fudge.legacy.endl.endl2dmathClasses.endl2dmath.scalex">
 <code class="descname">scalex</code><span class="sig-paren">(</span><em>f</em>, <em>xLabel=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathClasses.html#endl2dmath.scalex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathClasses.endl2dmath.scalex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an endl2dmath instance whose x data is set to f(x) where the x in f(x)
-is self&#8217;s x data and f(x) is a string representing a function. The y data is not altered.
-Two examples of f(x) are &#8216;exp(x)&#8217; and &#8216;sqrt( pow( x, 2 ) - 1 ) / x&#8217;. 
+is self’s x data and f(x) is a string representing a function. The y data is not altered.
+Two examples of f(x) are ‘exp(x)’ and ‘sqrt( pow( x, 2 ) - 1 ) / x’. 
 Sets the returned objects xLabel to xLabel if is it not None.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endl2dmathClasses.endl2dmath.set">
 <code class="descname">set</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathClasses.html#endl2dmath.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathClasses.endl2dmath.set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s data to other&#8217;s data.</p>
+<dd><p>Sets self’s data to other’s data.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endl2dmathClasses.endl2dmath.setValue">
 <code class="descname">setValue</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathClasses.html#endl2dmath.setValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathClasses.endl2dmath.setValue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s y value evaluated at x to y.  If there is no point at x 
+<dd><p>Sets self’s y value evaluated at x to y.  If there is no point at x 
 then one is added. x and y must be numbers.</p>
 </dd></dl>
 
@@ -1064,9 +1061,9 @@ Log != 0. The actual x spacing may be smaller than dx but not larger.</p>
 <code class="descname">thin</code><span class="sig-paren">(</span><em>interpolationAccuracy=0.01</em>, <em>thinningMethod=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathClasses.html#endl2dmath.thin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathClasses.endl2dmath.thin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an endl2dmath instance that is the same as self except the points are
 thinned while keeping linear interpolation accurate to interpolationAccuracy. interpolationAccuracy
-is forced into the range 1e-1 to 1e-8.  thinningMethod can be None, &#8216;c_CodingV1&#8217; or &#8216;pythonCodingV1&#8217;.
-If thinningMethod is None or &#8216;c_CodingV1&#8217; then thin tries to use the thinning function in fudge2dThin.
-If this fails or thinningMethod is &#8216;pythonCodingV1&#8217;, a slower python code is used.</p>
+is forced into the range 1e-1 to 1e-8.  thinningMethod can be None, ‘c_CodingV1’ or ‘pythonCodingV1’.
+If thinningMethod is None or ‘c_CodingV1’ then thin tries to use the thinning function in fudge2dThin.
+If this fails or thinningMethod is ‘pythonCodingV1’, a slower python code is used.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1085,7 +1082,7 @@ compatible with legacy fudge as the returned instance is of type XYs and not of 
 <dl class="method">
 <dt id="fudge.legacy.endl.endl2dmathClasses.endl2dmath.toString">
 <code class="descname">toString</code><span class="sig-paren">(</span><em>format=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathClasses.html#endl2dmath.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathClasses.endl2dmath.toString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the string returned by the endl2dmath&#8217;s __repr__ function. This can be useful when endl2dmath is used as a base class.</p>
+<dd><p>Returns the string returned by the endl2dmath’s __repr__ function. This can be useful when endl2dmath is used as a base class.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1103,23 +1100,23 @@ compatible with legacy fudge as the returned instance is of type XYs and not of 
 <dl class="method">
 <dt id="fudge.legacy.endl.endl2dmathClasses.endl2dmath.union">
 <code class="descname">union</code><span class="sig-paren">(</span><em>other</em>, <em>xDomainUnionOnly=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathClasses.html#endl2dmath.union"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathClasses.endl2dmath.union" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance with its x values being a union of self&#8217;s
-and other&#8217;s x values.  The y values are self&#8217;s y values mapped onto
-the union&#8217;s x values. If xDomainUnionOnly is True then only the x domain
+<dd><p>Returns an endl2dmath instance with its x values being a union of self’s
+and other’s x values.  The y values are self’s y values mapped onto
+the union’s x values. If xDomainUnionOnly is True then only the x domain
 common to self and other is returned.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endl2dmathClasses.endl2dmath.vectorScale">
 <code class="descname">vectorScale</code><span class="sig-paren">(</span><em>vector</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathClasses.html#endl2dmath.vectorScale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathClasses.endl2dmath.vectorScale" title="Permalink to this definition">¶</a></dt>
-<dd><p>Scales the y value of self at x by vector evaluated at x.  Only self&#8217;s data within the x range of vector are modified.</p>
+<dd><p>Scales the y value of self at x by vector evaluated at x.  Only self’s data within the x range of vector are modified.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endl2dmathClasses.endl2dmath.vectorScaleAdd">
 <code class="descname">vectorScaleAdd</code><span class="sig-paren">(</span><em>vector</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathClasses.html#endl2dmath.vectorScaleAdd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathClasses.endl2dmath.vectorScaleAdd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scales the y value of self at x by vector evaluated at x.
-Only self&#8217;s data within the x range of vector are modified.</p>
+Only self’s data within the x range of vector are modified.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1164,7 +1161,7 @@ Only self&#8217;s data within the x range of vector are modified.</p>
 <div class="section" id="module-fudge.legacy.endl.endl2dmathmisc">
 <span id="fudge-legacy-endl-endl2dmathmisc-module"></span><h2>fudge.legacy.endl.endl2dmathmisc module<a class="headerlink" href="#module-fudge.legacy.endl.endl2dmathmisc" title="Permalink to this headline">¶</a></h2>
 <p>This module contains miscellaneous routines for supporting the endl2dmath class from module endl2dmathClasses.</p>
-<p>Module&#8217;s global variables:</p>
+<p>Module’s global variables:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">endl2d_repr_xFormat</span> <span class="p">:</span> <span class="n">Default</span> <span class="nb">format</span> <span class="n">string</span> <span class="n">used</span> <span class="k">for</span> <span class="n">converting</span> <span class="n">an</span> <span class="n">x</span><span class="o">-</span><span class="n">element</span> <span class="n">of</span> <span class="n">the</span> <span class="n">data</span> <span class="n">of</span> <span class="n">an</span> <span class="n">endl2dmath</span> <span class="nb">object</span> <span class="n">to</span> <span class="n">a</span> <span class="n">string</span><span class="o">.</span>
 <span class="n">endl2d_repr_yFormat</span> <span class="p">:</span> <span class="n">Default</span> <span class="nb">format</span> <span class="n">string</span> <span class="n">used</span> <span class="k">for</span> <span class="n">converting</span> <span class="n">an</span> <span class="n">y</span><span class="o">-</span><span class="n">element</span> <span class="n">of</span> <span class="n">the</span> <span class="n">data</span> <span class="n">of</span> <span class="n">an</span> <span class="n">endl2dmath</span> <span class="nb">object</span> <span class="n">to</span> <span class="n">a</span> <span class="n">string</span><span class="o">.</span>
 </pre></div>
@@ -1184,8 +1181,8 @@ is None, the it is set to endlParameters.endlEpsx * pow( 0.1, formatCode - 14 ) 
 If on input formatCode is 12 then it is set to 14.
 This function returns an integer and an array. The integer is the number of negative
 y values and the array is a list of all indices with close x-values. If printWarning
-is &#8216;True&#8217; than warnings are printed (warning will not execute a raise). If printErrors 
-is &#8216;True&#8217; then errors are printed, and if at least one error exist, a raise will be 
+is ‘True’ than warnings are printed (warning will not execute a raise). If printErrors 
+is ‘True’ then errors are printed, and if at least one error exist, a raise will be 
 executed after all data has been checked.</p>
 </dd></dl>
 
@@ -1243,7 +1240,7 @@ the specified absolute accuracy on the interval xMin to xMax.</p>
 <code class="descclassname">fudge.legacy.endl.endl2dmathmisc.</code><code class="descname">gauss2d</code><span class="sig-paren">(</span><em>xc</em>, <em>xw</em>, <em>f=0.001</em>, <em>xsigmax=4</em>, <em>xMin=None</em>, <em>xMax=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2dmathmisc.html#gauss2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2dmathmisc.gauss2d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an endl2dmath instance the has a Gaussian shape centered at xc with
 width xw (i.e., Exp( -( (x - xc) / xw )^2 / 2 ).  The points are generated 
-such that linear interpolation is accurate to f.  The x value&#8217;s range is limited 
+such that linear interpolation is accurate to f.  The x value’s range is limited 
 by xMin, xMax and abs(x - xc) / xw &lt;= xsigmax.</p>
 </dd></dl>
 
@@ -1357,7 +1354,7 @@ The data is to be stored as a python list of [ x, yz-data-for-x ], where yz-data
 <dl class="method">
 <dt id="fudge.legacy.endl.endl3dmathClasses.endl3dmath.copyDataToGridWsAndXsAndYs">
 <code class="descname">copyDataToGridWsAndXsAndYs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl3dmathClasses.html#endl3dmath.copyDataToGridWsAndXsAndYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl3dmathClasses.endl3dmath.copyDataToGridWsAndXsAndYs" title="Permalink to this definition">¶</a></dt>
-<dd><p>A method to be like the W_XYs&#8217; method of the same name. Used in the vis.matplotlib.plot2d module.</p>
+<dd><p>A method to be like the W_XYs’ method of the same name. Used in the vis.matplotlib.plot2d module.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1374,7 +1371,7 @@ The data is to be stored as a python list of [ x, yz-data-for-x ], where yz-data
 <dl class="method">
 <dt id="fudge.legacy.endl.endl3dmathClasses.endl3dmath.getAtX">
 <code class="descname">getAtX</code><span class="sig-paren">(</span><em>x</em>, <em>unitBase=False</em>, <em>extrapolation='noExtrapolation'</em>, <em>endl2dmathObject=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl3dmathClasses.html#endl3dmath.getAtX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl3dmathClasses.endl3dmath.getAtX" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calls endl3dmathmisc.interpolate3d to get self&#8217;s yz data at x.</p>
+<dd><p>Calls endl3dmathmisc.interpolate3d to get self’s yz data at x.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1387,7 +1384,7 @@ The data is to be stored as a python list of [ x, yz-data-for-x ], where yz-data
 <dt id="fudge.legacy.endl.endl3dmathClasses.endl3dmath.getValue">
 <code class="descname">getValue</code><span class="sig-paren">(</span><em>x</em>, <em>y=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl3dmathClasses.html#endl3dmath.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl3dmathClasses.endl3dmath.getValue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an endl2dmath instance of self evaluated at x if y is None. Otherwise, returns, as a float, the value of self at x, y.
-If x (y) is outside the range of self&#8217;s x (y) domain then 0. is returned.</p>
+If x (y) is outside the range of self’s x (y) domain then 0. is returned.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1412,13 +1409,13 @@ If x (y) is outside the range of self&#8217;s x (y) domain then 0. is returned.<
 <dl class="method">
 <dt id="fudge.legacy.endl.endl3dmathClasses.endl3dmath.setAtX">
 <code class="descname">setAtX</code><span class="sig-paren">(</span><em>x</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl3dmathClasses.html#endl3dmath.setAtX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl3dmathClasses.endl3dmath.setAtX" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s yz data at x to data. Data can be a endl2dmath object.</p>
+<dd><p>Sets self’s yz data at x to data. Data can be a endl2dmath object.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endl3dmathClasses.endl3dmath.toString">
 <code class="descname">toString</code><span class="sig-paren">(</span><em>format=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl3dmathClasses.html#endl3dmath.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl3dmathClasses.endl3dmath.toString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the string returned by the endl3dmath&#8217;s __repr__ function. This can be useful when endl3dmath is used as a base class.</p>
+<dd><p>Returns the string returned by the endl3dmath’s __repr__ function. This can be useful when endl3dmath is used as a base class.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1452,7 +1449,7 @@ See __repr__ to change the output format.</p>
 <div class="section" id="module-fudge.legacy.endl.endl3dmathmisc">
 <span id="fudge-legacy-endl-endl3dmathmisc-module"></span><h2>fudge.legacy.endl.endl3dmathmisc module<a class="headerlink" href="#module-fudge.legacy.endl.endl3dmathmisc" title="Permalink to this headline">¶</a></h2>
 <p>This module contains miscellaneous routines for supporting the endl3dmath class from module endl3dmathClasses.</p>
-<p>Module&#8217;s global variables:</p>
+<p>Module’s global variables:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">endl3d_repr_xFormat</span> <span class="p">:</span> <span class="n">Default</span> <span class="nb">format</span> <span class="n">string</span> <span class="n">used</span> <span class="k">for</span> <span class="n">converting</span> <span class="n">an</span> <span class="n">x</span><span class="o">-</span><span class="n">element</span> <span class="n">of</span> <span class="n">the</span> <span class="n">data</span> <span class="n">of</span> <span class="n">an</span> <span class="n">endl3dmath</span> <span class="nb">object</span> <span class="n">to</span> <span class="n">a</span> <span class="n">string</span><span class="o">.</span>
 <span class="n">endl3d_repr_yFormat</span> <span class="p">:</span> <span class="n">Default</span> <span class="nb">format</span> <span class="n">string</span> <span class="n">used</span> <span class="k">for</span> <span class="n">converting</span> <span class="n">an</span> <span class="n">y</span><span class="o">-</span><span class="n">element</span> <span class="n">of</span> <span class="n">the</span> <span class="n">data</span> <span class="n">of</span> <span class="n">an</span> <span class="n">endl3dmath</span> <span class="nb">object</span> <span class="n">to</span> <span class="n">a</span> <span class="n">string</span><span class="o">.</span>
 <span class="n">endl3d_repr_zFormat</span> <span class="p">:</span> <span class="n">Default</span> <span class="nb">format</span> <span class="n">string</span> <span class="n">used</span> <span class="k">for</span> <span class="n">converting</span> <span class="n">an</span> <span class="n">z</span><span class="o">-</span><span class="n">element</span> <span class="n">of</span> <span class="n">the</span> <span class="n">data</span> <span class="n">of</span> <span class="n">an</span> <span class="n">endl3dmath</span> <span class="nb">object</span> <span class="n">to</span> <span class="n">a</span> <span class="n">string</span><span class="o">.</span>
@@ -1464,9 +1461,9 @@ See __repr__ to change the output format.</p>
 <dd><p>Checks that data is a valid structure for endl3dmath data. Triggers a raise if it is not.  Data may be
 an instance that is a subclass of endl3dmath or a python list as required by endl3dmath. If allowZeroX is 
 False, a zero first x value will generate a raise. If allowNegativeX is true than the x data can have negative 
-values (ENDL 3d-data has projectile energy as the x-data which must always be &gt; 0. ). See endl2dmathmisc.check2dData&#8217;s 
+values (ENDL 3d-data has projectile energy as the x-data which must always be &gt; 0. ). See endl2dmathmisc.check2dData’s 
 allowSameX, allowZeroX, positiveY and xCloseEps argument for meaning of allowSameY, allowZeroY, positiveZ and 
-xCloseEps respectively.  If printErrors is &#8216;True&#8217; then errors are printed, and if at least one error exist, a 
+xCloseEps respectively.  If printErrors is ‘True’ then errors are printed, and if at least one error exist, a 
 raise will be executed.  printWarning is just passed on to endl2dmathmisc.check2dData.</p>
 </dd></dl>
 
@@ -1652,7 +1649,7 @@ zLabel      | Labelled used as the z-Label when plotting.</dd>
 <dl class="method">
 <dt id="fudge.legacy.endl.endl4dmathClasses.endl4dmath.toString">
 <code class="descname">toString</code><span class="sig-paren">(</span><em>format=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl4dmathClasses.html#endl4dmath.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl4dmathClasses.endl4dmath.toString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the string returned by the endl4dmath&#8217;s __repr__ function. This can be useful when endl4dmath is used as a base class.</p>
+<dd><p>Returns the string returned by the endl4dmath’s __repr__ function. This can be useful when endl4dmath is used as a base class.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1668,7 +1665,7 @@ See __repr__ to change the output format.</p>
 <div class="section" id="module-fudge.legacy.endl.endl4dmathmisc">
 <span id="fudge-legacy-endl-endl4dmathmisc-module"></span><h2>fudge.legacy.endl.endl4dmathmisc module<a class="headerlink" href="#module-fudge.legacy.endl.endl4dmathmisc" title="Permalink to this headline">¶</a></h2>
 <p>This module contains miscellaneous routines for supporting the endl4dmath class from module endl4dmathClasses.</p>
-<p>Module&#8217;s global variables:</p>
+<p>Module’s global variables:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">endl4d_repr_tFormat</span> <span class="p">:</span> <span class="n">Default</span> <span class="nb">format</span> <span class="n">string</span> <span class="n">used</span> <span class="k">for</span> <span class="n">converting</span> <span class="n">an</span> <span class="n">t</span><span class="o">-</span><span class="n">element</span> <span class="n">of</span> <span class="n">the</span> <span class="n">data</span> <span class="n">of</span> <span class="n">an</span> <span class="n">endl4dmath</span> <span class="nb">object</span> <span class="n">to</span> <span class="n">a</span> <span class="n">string</span><span class="o">.</span>
 <span class="n">endl4d_repr_xFormat</span> <span class="p">:</span> <span class="n">Default</span> <span class="nb">format</span> <span class="n">string</span> <span class="n">used</span> <span class="k">for</span> <span class="n">converting</span> <span class="n">an</span> <span class="n">x</span><span class="o">-</span><span class="n">element</span> <span class="n">of</span> <span class="n">the</span> <span class="n">data</span> <span class="n">of</span> <span class="n">an</span> <span class="n">endl4dmath</span> <span class="nb">object</span> <span class="n">to</span> <span class="n">a</span> <span class="n">string</span><span class="o">.</span>
 <span class="n">endl4d_repr_yFormat</span> <span class="p">:</span> <span class="n">Default</span> <span class="nb">format</span> <span class="n">string</span> <span class="n">used</span> <span class="k">for</span> <span class="n">converting</span> <span class="n">an</span> <span class="n">y</span><span class="o">-</span><span class="n">element</span> <span class="n">of</span> <span class="n">the</span> <span class="n">data</span> <span class="n">of</span> <span class="n">an</span> <span class="n">endl4dmath</span> <span class="nb">object</span> <span class="n">to</span> <span class="n">a</span> <span class="n">string</span><span class="o">.</span>
@@ -1683,7 +1680,7 @@ an instance that is a subclass of endl4dmath or a python list as required by end
 a zero first t value will generate a raise.If allowNegativeT is true than the t data can have negative values 
 (many ENDL 4d-data have projectile energy as the t-data which must always be positive). For meanings of 
 allowNegativeX, allowZeroX, allowSameY, allowNegativeY, allowZeroY, positiveZ and xCloseEps see endl3dmathmisc.check3dData.
-If printErrors is &#8216;True&#8217; then errors are printed, and if at least one error exist, a raise will be executed.  
+If printErrors is ‘True’ then errors are printed, and if at least one error exist, a raise will be executed.  
 printWarning is just passed on to endl3dmathmisc.check3dData.</p>
 </dd></dl>
 
@@ -1724,13 +1721,13 @@ An ENDL data file can contains one or more related data sets, each specified by 
 yo, C, I and S values.</p>
 <p>As example, for the cross section, I = 0, for inelastic scattering 
 of a neutron, C = 11, the target may be left in different excited states. In ENDL ths cross sections to specific excited state, S = 1, are stored in a file
-named &#8220;yo00c11i000s001&#8221;, and the data for different excited states are distinguished by different excitation levels, X1-value, for the
+named “yo00c11i000s001”, and the data for different excited states are distinguished by different excitation levels, X1-value, for the
 target. When the read method for this class gets the data from this file it creates a new endlI0 object for each data set and addes it
 to the levels member of this class. The number of data sets (i.e., length of levels) is return by the len method for the endlFile object.</p>
 <p>No data is read in when the object is instantiated; instead, the read method must be explicitly called.</p>
 <dl class="docutils">
 <dt>Useful Members::</dt>
-<dd>name        The file&#8217;s name.
+<dd>name        The file’s name.
 path        The full path, include name, of this file.
 ZA          The ENDL ZA-value for this file. ZA = 1000 * Z + A.
 yi          The ENDL yi-value for this file. That is, the projectile for this file.
@@ -1756,7 +1753,7 @@ the same for C, I and S. For example self has yo = 7 and C = 3 then self.IsyoCIS
 <dl class="method">
 <dt id="fudge.legacy.endl.endlFile.endlFile.addEndlData">
 <code class="descname">addEndlData</code><span class="sig-paren">(</span><em>endlData</em>, <em>overWrite=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlFile.html#endlFile.addEndlData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlFile.endlFile.addEndlData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds the data in the endl object endlData to self. enldData must be of an endlI* class that must match self&#8217;s
+<dd><p>Adds the data in the endl object endlData to self. enldData must be of an endlI* class that must match self’s
 I class. For example, if self is I = 11 data then endlData be must an endlI11 object. Currently, overWrite is not
 implemented.</p>
 </dd></dl>
@@ -1764,14 +1761,14 @@ implemented.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlFile.endlFile.check">
 <code class="descname">check</code><span class="sig-paren">(</span><em>targetParameters</em>, <em>dQ_MeV=0.01</em>, <em>dThreshold_MeV=0.01</em>, <em>allowZeroE=False</em>, <em>xCloseEps=None</em>, <em>normTolerance=1e-05</em>, <em>maxAbsFloatValue=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlFile.html#endlFile.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlFile.endlFile.check" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks self&#8217;s data if it as been read in. This is, it goes through the list levels, calling the
+<dd><p>Checks self’s data if it as been read in. This is, it goes through the list levels, calling the
 appropriate routines to check data.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlFile.endlFile.columns">
 <code class="descname">columns</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlFile.html#endlFile.columns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlFile.endlFile.columns" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the number of data columns for self&#8217;s data. For example, for 3d data a 3 is returned.</p>
+<dd><p>Returns the number of data columns for self’s data. For example, for 3d data a 3 is returned.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1789,7 +1786,7 @@ appropriate routines to check data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlFile.endlFile.read">
 <code class="descname">read</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlFile.html#endlFile.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlFile.endlFile.read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads in the data from self&#8217;s file.</p>
+<dd><p>Reads in the data from self’s file.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1801,15 +1798,15 @@ appropriate routines to check data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlFile.endlFile.setYiZAYoCISs">
 <code class="descname">setYiZAYoCISs</code><span class="sig-paren">(</span><em>yi=None</em>, <em>ZA=None</em>, <em>yo=None</em>, <em>C=None</em>, <em>I=None</em>, <em>S=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlFile.html#endlFile.setYiZAYoCISs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlFile.endlFile.setYiZAYoCISs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fixes the headers in all of file&#8217;s levels to match yo, C, I and S. For input
-parameters that are None, self&#8217;s values are used. Also sets self&#8217;s yi and ZA
+<dd><p>Fixes the headers in all of file’s levels to match yo, C, I and S. For input
+parameters that are None, self’s values are used. Also sets self’s yi and ZA
 to inputted values if they are other than None.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlFile.endlFile.unreadData">
 <code class="descname">unreadData</code><span class="sig-paren">(</span><em>X1=None</em>, <em>X2=None</em>, <em>X3=None</em>, <em>X4=None</em>, <em>Q=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlFile.html#endlFile.unreadData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlFile.endlFile.unreadData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes self&#8217;s reference to data matching X1, X2, X3, X4 and Q. Note, the data may still be in the work directory if
+<dd><p>Removes self’s reference to data matching X1, X2, X3, X4 and Q. Note, the data may still be in the work directory if
 the file is not saved.</p>
 </dd></dl>
 
@@ -1853,7 +1850,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI0.getEMin_EMinNext">
 <code class="descname">getEMin_EMinNext</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI0.getEMin_EMinNext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI0.getEMin_EMinNext" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the first two Energy values from self&#8217;s data. None is return for any absent value.</p>
+<dd><p>Gets the first two Energy values from self’s data. None is return for any absent value.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1865,7 +1862,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI0.heat">
 <code class="descname">heat</code><span class="sig-paren">(</span><em>T</em>, <em>lowerlimit=None</em>, <em>upperlimit=None</em>, <em>interpolationAccuracy=0.002</em>, <em>heatAllPoints=False</em>, <em>doNotThin=True</em>, <em>EMin=1e-11</em>, <em>heatBelowThreshold=True</em>, <em>removeClosePoints=True</em>, <em>heatAllEDomain=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI0.heat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI0.heat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calls crossSectionAdjustForHeatedTarget with self&#8217;s data. Returns an endl2dmath
+<dd><p>Calls crossSectionAdjustForHeatedTarget with self’s data. Returns an endl2dmath
 instance. See module crossSectionAdjustForHeatedTarget for more details.</p>
 </dd></dl>
 
@@ -1918,7 +1915,7 @@ then linear interpolation is performed.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI1.getEMin_EMinNext">
 <code class="descname">getEMin_EMinNext</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI1.getEMin_EMinNext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI1.getEMin_EMinNext" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the first two Energy values from self&#8217;s data. None is return for any absent value.</p>
+<dd><p>Gets the first two Energy values from self’s data. None is return for any absent value.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1978,7 +1975,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI10.getEMin_EMinNext">
 <code class="descname">getEMin_EMinNext</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI10.getEMin_EMinNext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI10.getEMin_EMinNext" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the first two Energy values from self&#8217;s data. None is return for any absent value.</p>
+<dd><p>Gets the first two Energy values from self’s data. None is return for any absent value.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2015,7 +2012,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI11.getEMin_EMinNext">
 <code class="descname">getEMin_EMinNext</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI11.getEMin_EMinNext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI11.getEMin_EMinNext" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the first two Energy values from self&#8217;s data. None is return for any absent value.</p>
+<dd><p>Gets the first two Energy values from self’s data. None is return for any absent value.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2052,7 +2049,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI12.getEMin_EMinNext">
 <code class="descname">getEMin_EMinNext</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI12.getEMin_EMinNext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI12.getEMin_EMinNext" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the first two Energy values from self&#8217;s data. None is return for any absent value.</p>
+<dd><p>Gets the first two Energy values from self’s data. None is return for any absent value.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2089,7 +2086,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI13.getEMin_EMinNext">
 <code class="descname">getEMin_EMinNext</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI13.getEMin_EMinNext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI13.getEMin_EMinNext" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the first two Energy values from self&#8217;s data. None is return for any absent value.</p>
+<dd><p>Gets the first two Energy values from self’s data. None is return for any absent value.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2129,7 +2126,7 @@ See endl4dmathmisc.check4dData for meaning of printWarning and printErrors.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI20.normalize">
 <code class="descname">normalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI20.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI20.normalize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Normalizes the data so that the cdf&#8217;s are 1.</p>
+<dd><p>Normalizes the data so that the cdf’s are 1.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2167,7 +2164,7 @@ See endl3dmathmisc.check3dData for meaning of printWarning and printErrors.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI21.getEMin_EMinNext">
 <code class="descname">getEMin_EMinNext</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI21.getEMin_EMinNext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI21.getEMin_EMinNext" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the first two Energy values from self&#8217;s data. None is return for any absent value.</p>
+<dd><p>Gets the first two Energy values from self’s data. None is return for any absent value.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2199,7 +2196,7 @@ See endl3dmathmisc.check3dData for meaning of printWarning and printErrors.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI22.getEMin_EMinNext">
 <code class="descname">getEMin_EMinNext</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI22.getEMin_EMinNext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI22.getEMin_EMinNext" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the first two Energy values from self&#8217;s data. None is return for any absent value.</p>
+<dd><p>Gets the first two Energy values from self’s data. None is return for any absent value.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2223,7 +2220,7 @@ See endl3dmathmisc.check3dData for meaning of printWarning and printErrors.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI3.EIndexMu">
 <code class="descname">EIndexMu</code><span class="sig-paren">(</span><em>iE</em>, <em>mu</em>, <em>unitBase=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI3.EIndexMu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI3.EIndexMu" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath object that is the interpolation of self&#8217;s data at mu for energy index iE.</p>
+<dd><p>Returns an endl2dmath object that is the interpolation of self’s data at mu for energy index iE.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2249,7 +2246,7 @@ See endl4dmathmisc.check4dData for meaning of printWarning and printErrors.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI3.convertToI4">
 <code class="descname">convertToI4</code><span class="sig-paren">(</span><em>i1=None</em>, <em>lmax=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI3.convertToI4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI3.convertToI4" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts the self and the I=1 data given as an argument to an endlI4 instance where the new object has Legendre orders 0, 1, ..., lmax</p>
+<dd><p>Converts the self and the I=1 data given as an argument to an endlI4 instance where the new object has Legendre orders 0, 1, …, lmax</p>
 </dd></dl>
 
 <dl class="method">
@@ -2267,13 +2264,13 @@ See endl4dmathmisc.check4dData for meaning of printWarning and printErrors.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI3.getEMin_EMinNext">
 <code class="descname">getEMin_EMinNext</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI3.getEMin_EMinNext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI3.getEMin_EMinNext" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the first two Energy values from self&#8217;s data. None is return for any absent value.</p>
+<dd><p>Gets the first two Energy values from self’s data. None is return for any absent value.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI3.getMuEpPAtE">
 <code class="descname">getMuEpPAtE</code><span class="sig-paren">(</span><em>E</em>, <em>extrapolation='noExtrapolation'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI3.getMuEpPAtE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI3.getMuEpPAtE" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl3dmath object of P&#8217;( mu, E&#8217; ) = P( E, mu, E&#8217; ).
+<dd><p>Returns an endl3dmath object of P’( mu, E’ ) = P( E, mu, E’ ).
 E is compare to the incident energies in self and is considered to be a match if the
 difference is less than relEps. Also see muEpP.</p>
 </dd></dl>
@@ -2287,15 +2284,15 @@ difference is less than relEps. Also see muEpP.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI3.mapMuEpPToGrid">
 <code class="descname">mapMuEpPToGrid</code><span class="sig-paren">(</span><em>E</em>, <em>relEps=1e-05</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI3.mapMuEpPToGrid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI3.mapMuEpPToGrid" title="Permalink to this definition">¶</a></dt>
-<dd><p>P( E = E, mu, E&#8217; ) with mu, and E&#8217; mapped to a grid determine from
-the mu and E&#8217; points.  Returns a endl3dmath object of list[ u, list[ E&#8217;, P( u, E&#8217; ) ] ].
+<dd><p>P( E = E, mu, E’ ) with mu, and E’ mapped to a grid determine from
+the mu and E’ points.  Returns a endl3dmath object of list[ u, list[ E’, P( u, E’ ) ] ].
 See muEpP( ) for meaning of relEps.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI3.muEpP">
 <code class="descname">muEpP</code><span class="sig-paren">(</span><em>E</em>, <em>relEps=1e-05</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI3.muEpP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI3.muEpP" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl3dmath object of P&#8217;( mu, E&#8217; ) = P( E, mu, E&#8217; ).
+<dd><p>Returns an endl3dmath object of P’( mu, E’ ) = P( E, mu, E’ ).
 E is compare to the incident energies in self and is considered to be a match if the
 difference is less than relEps. Also see getMuEpPAtE.</p>
 </dd></dl>
@@ -2303,7 +2300,7 @@ difference is less than relEps. Also see getMuEpPAtE.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI3.normalize">
 <code class="descname">normalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI3.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI3.normalize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Normalizes the data so that the integral P(E, mu, E&#8217;) dE&#8217; = 1.</p>
+<dd><p>Normalizes the data so that the integral P(E, mu, E’) dE’ = 1.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2330,19 +2327,19 @@ difference is less than relEps. Also see getMuEpPAtE.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI3.reduceToEEpP">
 <code class="descname">reduceToEEpP</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI3.reduceToEEpP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI3.reduceToEEpP" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integrates the mu dimension, returning an endl3dmath object of list[ E, list[ E&#8217;, P( E, E&#8217; ) ] ].</p>
+<dd><p>Integrates the mu dimension, returning an endl3dmath object of list[ E, list[ E’, P( E, E’ ) ] ].</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI3.reduceToEMuP">
 <code class="descname">reduceToEMuP</code><span class="sig-paren">(</span><em>normalize=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI3.reduceToEMuP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI3.reduceToEMuP" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integrates the E&#8217; dimension, returning an unnormalized (normalize = False) or normalized (normalize = True) endlI1 object.</p>
+<dd><p>Integrates the E’ dimension, returning an unnormalized (normalize = False) or normalized (normalize = True) endlI1 object.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI3.runningEpSum">
 <code class="descname">runningEpSum</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI3.runningEpSum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI3.runningEpSum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Does a running sum of the E&#8217; data, returning an endl4dmath object of the results.</p>
+<dd><p>Does a running sum of the E’ data, returning an endl4dmath object of the results.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2390,7 +2387,7 @@ This method calls convertToUI3. The returned value is the tuple (I1, I3).</p>
 <dd><p>This methods converts the I = 4 data into unnormalized I = 3 data using nMu equally spaced mu 
 values.  Note that the data is not normalized; hence, the normalized method should be called on the
 returned object. This method will only convert up to Legendre order l = min( lMax, series1d.maxLegendreOrder ) 
-of self&#8217;s data.</p>
+of self’s data.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2408,7 +2405,7 @@ of self&#8217;s data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI4.getEMin_EMinNext">
 <code class="descname">getEMin_EMinNext</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI4.getEMin_EMinNext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI4.getEMin_EMinNext" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the first two Energy values from self&#8217;s data. None is return for any absent value.</p>
+<dd><p>Gets the first two Energy values from self’s data. None is return for any absent value.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2440,7 +2437,7 @@ is performed. If unitBase is true, the Ep, P(l,E,Ep) data are unit based linear 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI4.normalize">
 <code class="descname">normalize</code><span class="sig-paren">(</span><em>doL_0_Only=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI4.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI4.normalize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Normalizes the l = 0 data so that the integral P(l = 0, E, E&#8217;) dE&#8217; = 1. If doL_0_Only is true, then only the
+<dd><p>Normalizes the l = 0 data so that the integral P(l = 0, E, E’) dE’ = 1. If doL_0_Only is true, then only the
 l = 0 component is normalizes. Otherwise, the l = 0 sum is used to normalize all orders. The return value the tuple
 (n0, nm) where n0 (nm) is the number of sum that are zero (negative).</p>
 </dd></dl>
@@ -2469,8 +2466,8 @@ l = 0 component is normalizes. Otherwise, the l = 0 sum is used to normalize all
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI4.reduceToEEpP">
 <code class="descname">reduceToEEpP</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI4.reduceToEEpP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI4.reduceToEEpP" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the l = 0 term as an endl3dmath object of list[ E, list[ E&#8217;, P( E, E&#8217; ) ] ].
-Note, the l = 0 term is P( E, E&#8217; ).</p>
+<dd><p>Returns the l = 0 term as an endl3dmath object of list[ E, list[ E’, P( E, E’ ) ] ].
+Note, the l = 0 term is P( E, E’ ).</p>
 </dd></dl>
 
 <dl class="method">
@@ -2495,7 +2492,7 @@ The l-value must be an existing l-value or one greater than the current maximum 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI4.toString">
 <code class="descname">toString</code><span class="sig-paren">(</span><em>format=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI4.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI4.toString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a string with the data in the order (E, E&#8217;, l, P) as required by ENDL.</p>
+<dd><p>Returns a string with the data in the order (E, E’, l, P) as required by ENDL.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2526,7 +2523,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI7.getEMin_EMinNext">
 <code class="descname">getEMin_EMinNext</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI7.getEMin_EMinNext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI7.getEMin_EMinNext" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the first two Energy values from self&#8217;s data. None is return for any absent value.</p>
+<dd><p>Gets the first two Energy values from self’s data. None is return for any absent value.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2641,7 +2638,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI9.getEMin_EMinNext">
 <code class="descname">getEMin_EMinNext</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI9.getEMin_EMinNext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI9.getEMin_EMinNext" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets the first two Energy values from self&#8217;s data. None is return for any absent value.</p>
+<dd><p>Gets the first two Energy values from self’s data. None is return for any absent value.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2876,7 +2873,7 @@ are the same and 0 otherwise. The X1 values can differ by as much as epsX1.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.compareQXs">
 <code class="descname">compareQXs</code><span class="sig-paren">(</span><em>Q</em>, <em>X1</em>, <em>X2</em>, <em>X3</em>, <em>X4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.compareQXs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.compareQXs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return -1 if self&#8217;s values &lt; (Q, X1, X2, X3, X4), 0 if equal and 1 otherwise.</p>
+<dd><p>Return -1 if self’s values &lt; (Q, X1, X2, X3, X4), 0 if equal and 1 otherwise.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2887,37 +2884,37 @@ are the same and 0 otherwise. The X1 values can differ by as much as epsX1.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.getDate">
 <code class="descname">getDate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.getDate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.getDate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the target&#8217;s date.</p>
+<dd><p>Returns the target’s date.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.getELevel">
 <code class="descname">getELevel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.getELevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.getELevel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the target&#8217;s excitation level.</p>
+<dd><p>Returns the target’s excitation level.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.getENDLInterpolation">
 <code class="descname">getENDLInterpolation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.getENDLInterpolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.getENDLInterpolation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the target&#8217;s ENDL interpolation flag. 0 or 2 is lin-lin, 3 is log-lin, 4 is lin-log and 5 is log-log. Also see getInterpolation.</p>
+<dd><p>Returns the target’s ENDL interpolation flag. 0 or 2 is lin-lin, 3 is log-lin, 4 is lin-log and 5 is log-log. Also see getInterpolation.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.getFormat">
 <code class="descname">getFormat</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.getFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.getFormat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the target&#8217;s format specifier.</p>
+<dd><p>Returns the target’s format specifier.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.getHalflife">
 <code class="descname">getHalflife</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.getHalflife"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.getHalflife" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the target&#8217;s halflife.</p>
+<dd><p>Returns the target’s halflife.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.getInterpolation">
 <code class="descname">getInterpolation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.getInterpolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.getInterpolation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the target&#8217;s fudge interpolation flag. 0 is lin-lin, 1 is log-lin, 2 is lin-log and 3 is log-log. Also see getENDLInterpolation.</p>
+<dd><p>Returns the target’s fudge interpolation flag. 0 is lin-lin, 1 is log-lin, 2 is lin-log and 3 is log-log. Also see getENDLInterpolation.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2929,19 +2926,19 @@ are the same and 0 otherwise. The X1 values can differ by as much as epsX1.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.getMass">
 <code class="descname">getMass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.getMass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.getMass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the target&#8217;s mass.</p>
+<dd><p>Returns the target’s mass.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.getQ">
 <code class="descname">getQ</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.getQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.getQ" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the Q value for self&#8217;s reaction.</p>
+<dd><p>Returns the Q value for self’s reaction.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.getTemperature">
 <code class="descname">getTemperature</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.getTemperature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.getTemperature" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the taget&#8217;s temperature.</p>
+<dd><p>Returns the taget’s temperature.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2971,13 +2968,13 @@ are the same and 0 otherwise. The X1 values can differ by as much as epsX1.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.getYi">
 <code class="descname">getYi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.getYi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.getYi" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns projectile&#8217;s identifier, yi value.</p>
+<dd><p>Returns projectile’s identifier, yi value.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.getYo">
 <code class="descname">getYo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.getYo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.getYo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the outgoing particle&#8217;s identifier, yo value.</p>
+<dd><p>Returns the outgoing particle’s identifier, yo value.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2989,7 +2986,7 @@ are the same and 0 otherwise. The X1 values can differ by as much as epsX1.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.info">
 <code class="descname">info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints information about self&#8217;s data.</p>
+<dd><p>Prints information about self’s data.</p>
 </dd></dl>
 
 <dl class="method">
@@ -3002,37 +2999,37 @@ If f is None then writes data to sys.stdout.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setC">
 <code class="descname">setC</code><span class="sig-paren">(</span><em>C</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setC" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s C value and self&#8217;s header C value to C.</p>
+<dd><p>Sets self’s C value and self’s header C value to C.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setDate">
 <code class="descname">setDate</code><span class="sig-paren">(</span><em>date=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setDate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setDate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s data and self&#8217;s header date value to data. If date is None then today&#8217;s date is used.</p>
+<dd><p>Sets self’s data and self’s header date value to data. If date is None then today’s date is used.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setELevel">
 <code class="descname">setELevel</code><span class="sig-paren">(</span><em>ELevel</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setELevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setELevel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s ELevel value and self&#8217;s header ELevel value to ELevel.</p>
+<dd><p>Sets self’s ELevel value and self’s header ELevel value to ELevel.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setFormat">
 <code class="descname">setFormat</code><span class="sig-paren">(</span><em>width</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setFormat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s format specifier and self&#8217;s header format specifier value to width.</p>
+<dd><p>Sets self’s format specifier and self’s header format specifier value to width.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setHalflife">
 <code class="descname">setHalflife</code><span class="sig-paren">(</span><em>Halflife</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setHalflife"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setHalflife" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s Halflife value and self&#8217;s header Halflife value to Halflife.</p>
+<dd><p>Sets self’s Halflife value and self’s header Halflife value to Halflife.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setI">
 <code class="descname">setI</code><span class="sig-paren">(</span><em>I</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setI" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s I value and self&#8217;s header I value to I.</p>
+<dd><p>Sets self’s I value and self’s header I value to I.</p>
 </dd></dl>
 
 <dl class="method">
@@ -3044,13 +3041,13 @@ If f is None then writes data to sys.stdout.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setMass">
 <code class="descname">setMass</code><span class="sig-paren">(</span><em>Mass</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setMass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setMass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s Mass value and self&#8217;s header Mass value to Mass.</p>
+<dd><p>Sets self’s Mass value and self’s header Mass value to Mass.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setQ">
 <code class="descname">setQ</code><span class="sig-paren">(</span><em>Q</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setQ" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s Q value and self&#8217;s header Q value to Q.</p>
+<dd><p>Sets self’s Q value and self’s header Q value to Q.</p>
 </dd></dl>
 
 <dl class="method">
@@ -3061,63 +3058,63 @@ If f is None then writes data to sys.stdout.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setS">
 <code class="descname">setS</code><span class="sig-paren">(</span><em>S</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s S value and self&#8217;s header S value to S.</p>
+<dd><p>Sets self’s S value and self’s header S value to S.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setTemperature">
 <code class="descname">setTemperature</code><span class="sig-paren">(</span><em>T</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setTemperature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setTemperature" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s Temperature value and self&#8217;s header Temperature value to T.</p>
+<dd><p>Sets self’s Temperature value and self’s header Temperature value to T.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setX1">
 <code class="descname">setX1</code><span class="sig-paren">(</span><em>X1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setX1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setX1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s X1 value and self&#8217;s header X1 value to X1.</p>
+<dd><p>Sets self’s X1 value and self’s header X1 value to X1.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setX2">
 <code class="descname">setX2</code><span class="sig-paren">(</span><em>X2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setX2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setX2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s X2 value and self&#8217;s header X2 value to X2.</p>
+<dd><p>Sets self’s X2 value and self’s header X2 value to X2.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setX3">
 <code class="descname">setX3</code><span class="sig-paren">(</span><em>X3</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setX3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setX3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s X3 value and self&#8217;s header X3 value to X3.</p>
+<dd><p>Sets self’s X3 value and self’s header X3 value to X3.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setX4">
 <code class="descname">setX4</code><span class="sig-paren">(</span><em>X4</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setX4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setX4" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s X4 value and self&#8217;s header X4 value to X4.</p>
+<dd><p>Sets self’s X4 value and self’s header X4 value to X4.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setYi">
 <code class="descname">setYi</code><span class="sig-paren">(</span><em>yi</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setYi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setYi" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s yi value and self&#8217;s header yi value to yi.  yi must be an integer
+<dd><p>Sets self’s yi value and self’s header yi value to yi.  yi must be an integer
 or a string convertible to an integer.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setYiZAYoCIS">
 <code class="descname">setYiZAYoCIS</code><span class="sig-paren">(</span><em>yi=None</em>, <em>ZA=None</em>, <em>yo=None</em>, <em>C=None</em>, <em>I=None</em>, <em>S=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setYiZAYoCIS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setYiZAYoCIS" title="Permalink to this definition">¶</a></dt>
-<dd><p>For input parameters that are not None, sets self&#8217;s value to input parameter.</p>
+<dd><p>For input parameters that are not None, sets self’s value to input parameter.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setYo">
 <code class="descname">setYo</code><span class="sig-paren">(</span><em>yo</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setYo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setYo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s yo value and self&#8217;s header yo value to yo.  yo must be an integer
+<dd><p>Sets self’s yo value and self’s header yo value to yo.  yo must be an integer
 or a string convertible to an integer.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.setZA">
 <code class="descname">setZA</code><span class="sig-paren">(</span><em>ZA</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd.setZA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd.setZA" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s ZA value and self&#8217;s header ZA value to ZA.  ZA must be an integer
+<dd><p>Sets self’s ZA value and self’s header ZA value to ZA.  ZA must be an integer
 or a string convertible to an integer.</p>
 </dd></dl>
 
@@ -3141,10 +3138,10 @@ or a string convertible to an integer.</p>
 <dt>To resolve the location of the bdfls file, endlProject does the following,</dt>
 <dd><ol class="first last arabic simple">
 <li>Uses the bdflsFileName argument if it is None; else,</li>
-<li>Uses &#8221;./bdfls&#8221; if it exists; else,</li>
-<li>Uses the bdfls in the database (at the same level as the &#8220;ascii&#8221; file) if it exists; else,</li>
+<li>Uses “./bdfls” if it exists; else,</li>
+<li>Uses the bdfls in the database (at the same level as the “ascii” file) if it exists; else,</li>
 <li>Uses the bdfls pointed to by the environmental variable BDFLSPATH if it exists; else,</li>
-<li>Uses &#8220;/usr/gapps/data/nuclear/bdfls&#8221;.</li>
+<li>Uses “/usr/gapps/data/nuclear/bdfls”.</li>
 </ol>
 </dd>
 </dl>
@@ -3161,7 +3158,7 @@ and its return value to used for matching ZAs. If ZA has not been instantiated t
 <dl class="method">
 <dt id="fudge.legacy.endl.endlProject.endlProject.ZAList">
 <code class="descname">ZAList</code><span class="sig-paren">(</span><em>Z=None</em>, <em>A=None</em>, <em>suffix=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlProject.html#endlProject.ZAList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlProject.endlProject.ZAList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list of ZA sub-directories in self&#8217;s database matching Z and A.</p>
+<dd><p>Returns a list of ZA sub-directories in self’s database matching Z and A.</p>
 </dd></dl>
 
 <dl class="method">
@@ -3191,7 +3188,7 @@ and its return value to used for matching ZAs. If ZA has not been instantiated t
 <dl class="method">
 <dt id="fudge.legacy.endl.endlProject.endlProject.ll">
 <code class="descname">ll</code><span class="sig-paren">(</span><em>Z=None</em>, <em>A=None</em>, <em>suffix=''</em>, <em>w=5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlProject.html#endlProject.ll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlProject.endlProject.ll" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints a table of all ZA directories in self&#8217;s default source database that match Z and A.  The table is printed with w columns.</p>
+<dd><p>Prints a table of all ZA directories in self’s default source database that match Z and A.  The table is printed with w columns.</p>
 </dd></dl>
 
 <dl class="method">
@@ -3208,8 +3205,8 @@ create newfile.  Active ZAs are ones that have been read-in-to (readZA)
 or added-to (addZA) self.  Uses bdfls pointed to by bdflsFile if not None; otherwise,
 used search in the standard algorithm. The options argument sets internal flags (see below).
 The defines argument must contain a list of ksh environmental assignments (e.g.,
-defines = ( &#8216;greeting=&#8221;Hello world&#8221;&#8217;, &#8216;NDFGENINPUTSPATH=./ndf.inputs&#8217; ), note that
-since &#8220;Hello world&#8221; is 2 words, it is quoted).</p>
+defines = ( ‘greeting=”Hello world”’, ‘NDFGENINPUTSPATH=./ndf.inputs’ ), note that
+since “Hello world” is 2 words, it is quoted).</p>
 <dl class="docutils">
 <dt>Valid options are::</dt>
 <dd><table class="first last docutils option-list" frame="void" rules="none">
@@ -3218,7 +3215,7 @@ since &#8220;Hello world&#8221; is 2 words, it is quoted).</p>
 <tbody valign="top">
 <tr><td class="option-group">
 <kbd><span class="option">-i</span></kbd></td>
-<td>Creates a &#8221;.index&#8221; file (this should generally be included),</td></tr>
+<td>Creates a “.index” file (this should generally be included),</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">-u</span></kbd></td>
 <td>Update: newfile is oldfile amended by the active ZAs, 
@@ -3234,7 +3231,7 @@ intermediate files are kept,</td></tr>
 </table>
 </dd>
 </dl>
-<p>All options can be negated by prepending with &#8216;<a href="#id1"><span class="problematic" id="id2">no_</span></a>&#8216; (e.g., -no_u&#8217;).</p>
+<p>All options can be negated by prepending with ‘<a href="#id1"><span class="problematic" id="id2">no_</span></a>’ (e.g., -no_u’).</p>
 </dd></dl>
 
 <dl class="method">
@@ -3251,14 +3248,14 @@ intermediate files are kept,</td></tr>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlProject.endlProject.remove">
 <code class="descname">remove</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlProject.html#endlProject.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlProject.endlProject.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes self&#8217;s reference to target and deletes target&#8217;s directory from self&#8217;s work 
+<dd><p>Removes self’s reference to target and deletes target’s directory from self’s work 
 directory (i.e., if process( ) is called this target will not be processed).  Also see unread.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlProject.endlProject.removeZA">
 <code class="descname">removeZA</code><span class="sig-paren">(</span><em>ZA</em>, <em>suffix=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlProject.html#endlProject.removeZA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlProject.endlProject.removeZA" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes self&#8217;s reference to ZA and deletes ZA&#8217;s directory from self&#8217;s work 
+<dd><p>Removes self’s reference to ZA and deletes ZA’s directory from self’s work 
 directory (i.e., if process( ) is called this ZA will not be processed).  Also see unreadZA.</p>
 </dd></dl>
 
@@ -3277,20 +3274,20 @@ directory (i.e., if process( ) is called this ZA will not be processed).  Also s
 <dl class="method">
 <dt id="fudge.legacy.endl.endlProject.endlProject.targetList">
 <code class="descname">targetList</code><span class="sig-paren">(</span><em>Symbol=None</em>, <em>A=None</em>, <em>suffix=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlProject.html#endlProject.targetList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlProject.endlProject.targetList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list of target sub-directories in self&#8217;s database matching Symbol, A and suffix.</p>
+<dd><p>Returns a list of target sub-directories in self’s database matching Symbol, A and suffix.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlProject.endlProject.unread">
 <code class="descname">unread</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlProject.html#endlProject.unread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlProject.endlProject.unread" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes self&#8217;s reference to target, but does not delete target&#8217;s directory from self&#8217;s work 
+<dd><p>Removes self’s reference to target, but does not delete target’s directory from self’s work 
 directory (i.e., if process( ) is called this target will be processed). Also see remove.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlProject.endlProject.unreadZA">
 <code class="descname">unreadZA</code><span class="sig-paren">(</span><em>ZA</em>, <em>suffix=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlProject.html#endlProject.unreadZA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlProject.endlProject.unreadZA" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes self&#8217;s reference to ZA, but does not delete ZA&#8217;s directory from self&#8217;s work 
+<dd><p>Removes self’s reference to ZA, but does not delete ZA’s directory from self’s work 
 directory (i.e., if process( ) is called this ZA will be processed). Also see removeZA.</p>
 </dd></dl>
 
@@ -3317,7 +3314,7 @@ directory (i.e., if process( ) is called this ZA will be processed). Also see re
 <dl class="function">
 <dt id="fudge.legacy.endl.endlProject.removeProject">
 <code class="descclassname">fudge.legacy.endl.endlProject.</code><code class="descname">removeProject</code><span class="sig-paren">(</span><em>p</em>, <em>delWorkDirWhenDone=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlProject.html#removeProject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlProject.removeProject" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes endlProject p from Fudge&#8217;s internal list and returns None.</p>
+<dd><p>Removes endlProject p from Fudge’s internal list and returns None.</p>
 </dd></dl>
 
 </div>
@@ -3342,8 +3339,8 @@ directory (i.e., if process( ) is called this ZA will be processed). Also see re
 <dt id="fudge.legacy.endl.endlSplit.endlSplit">
 <code class="descclassname">fudge.legacy.endl.endlSplit.</code><code class="descname">endlSplit</code><span class="sig-paren">(</span><em>file</em>, <em>outDir</em>, <em>endlretHeaders=True</em>, <em>verbose=0</em>, <em>format=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlSplit.html#endlSplit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlSplit.endlSplit" title="Permalink to this definition">¶</a></dt>
 <dd><p>The function undoes what endlret does. That is, it takes an ascii file with a collect of
-isotopes in ENDL ascii format, and splits the isotopes up into separate &#8216;za&#8217; directories
-with the appropriate &#8216;yo&#8217; files. The za directories are placed in outDir.</p>
+isotopes in ENDL ascii format, and splits the isotopes up into separate ‘za’ directories
+with the appropriate ‘yo’ files. The za directories are placed in outDir.</p>
 </dd></dl>
 
 </div>
@@ -3409,7 +3406,7 @@ cross section by 16.7% of the different. Relative total cross section less than 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlZA.endlZA.changeFileYoCIS">
 <code class="descname">changeFileYoCIS</code><span class="sig-paren">(</span><em>file</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>deleteOldFile=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlZA.html#endlZA.changeFileYoCIS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlZA.endlZA.changeFileYoCIS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Changes endlFile object file&#8217;s yo-, C-, I- and S-values to yo, C, I and S.
+<dd><p>Changes endlFile object file’s yo-, C-, I- and S-values to yo, C, I and S.
 If deleteOldFile is true, the old file is deleted (a new file is not created unless method save is called).</p>
 </dd></dl>
 
@@ -3528,9 +3525,9 @@ by more than threshold_MeV_shiftWarning, a warning is printed.</p>
 <dt id="fudge.legacy.endl.endlZA.endlZA.fixupReactions">
 <code class="descname">fixupReactions</code><span class="sig-paren">(</span><em>fixReactions=None</em>, <em>fixReactionsEps=0.001</em>, <em>fixReactionsQuery=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlZA.html#endlZA.fixupReactions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlZA.endlZA.fixupReactions" title="Permalink to this definition">¶</a></dt>
 <dd><p>If the parameter fixReactions is one (or a list containing one or more) of the following 
-&#8216;Q&#8217;, &#8216;X1, &#8216;X2, &#8216;X3&#8217; or &#8216;X4&#8217;, this method will try to find data sets which are not considered 
+‘Q’, ‘X1, ‘X2, ‘X3’ or ‘X4’, this method will try to find data sets which are not considered 
 to be for the same reaction due to slightly different value(s) in the members as given by 
-fixReactions, but are within fixReactionsEps (e.g., fixReactions = [&#8216;Q&#8217;, &#8216;X1&#8217;]). If 
+fixReactions, but are within fixReactionsEps (e.g., fixReactions = [‘Q’, ‘X1’]). If 
 fixReactionsQuery is true, you will be asked for your option on reaction parameters that 
 this method deems the same.</p>
 </dd></dl>
@@ -3613,7 +3610,7 @@ list of [ C, S, X1, X2, X3, X4, Q ] for a reaction.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlZA.endlZA.removeFile">
 <code class="descname">removeFile</code><span class="sig-paren">(</span><em>yo=None</em>, <em>C=None</em>, <em>I=None</em>, <em>S=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlZA.html#endlZA.removeFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlZA.endlZA.removeFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes self&#8217;s reference to all files matching yo, C, I and S and deletes them from the working directory.  Also see unreadFile.</p>
+<dd><p>Removes self’s reference to all files matching yo, C, I and S and deletes them from the working directory.  Also see unreadFile.</p>
 </dd></dl>
 
 <dl class="method">
@@ -3631,7 +3628,7 @@ list of [ C, S, X1, X2, X3, X4, Q ] for a reaction.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlZA.endlZA.setDocumentation">
 <code class="descname">setDocumentation</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlZA.html#endlZA.setDocumentation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlZA.endlZA.setDocumentation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s documentation text to text.</p>
+<dd><p>Sets self’s documentation text to text.</p>
 </dd></dl>
 
 <dl class="method">
@@ -3653,8 +3650,8 @@ If isomerMinimumHalflife is given then sets this variable in the Levels class be
 </dd></dl>
 
 <dl class="method">
-<dt id="fudge.legacy.endl.endlZA.endlZA.toGND">
-<code class="descname">toGND</code><span class="sig-paren">(</span><em>evaluationLibrary</em>, <em>evaluationVersion</em>, <em>excludeAverageProductData=True</em>, <em>testing=False</em>, <em>verbose=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlZA.html#endlZA.toGND"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlZA.endlZA.toGND" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.legacy.endl.endlZA.endlZA.toGNDS">
+<code class="descname">toGNDS</code><span class="sig-paren">(</span><em>evaluationLibrary</em>, <em>evaluationVersion</em>, <em>excludeAverageProductData=True</em>, <em>testing=False</em>, <em>verbose=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlZA.html#endlZA.toGNDS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlZA.endlZA.toGNDS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -3666,7 +3663,7 @@ If isomerMinimumHalflife is given then sets this variable in the Levels class be
 <dl class="method">
 <dt id="fudge.legacy.endl.endlZA.endlZA.unreadFile">
 <code class="descname">unreadFile</code><span class="sig-paren">(</span><em>yo=None</em>, <em>C=None</em>, <em>I=None</em>, <em>S=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlZA.html#endlZA.unreadFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlZA.endlZA.unreadFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes self&#8217;s reference to all files matching yo, C, I and S.  Also see removeFile.</p>
+<dd><p>Removes self’s reference to all files matching yo, C, I and S.  Also see removeFile.</p>
 </dd></dl>
 
 </dd></dl>
@@ -3699,7 +3696,7 @@ or reaction type for the specified C-value. If C-value is not defined then None 
 <dt id="fudge.legacy.endl.endl_C.endl_C_yoInfo">
 <code class="descclassname">fudge.legacy.endl.endl_C.</code><code class="descname">endl_C_yoInfo</code><span class="sig-paren">(</span><em>C</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl_C.html#endl_C_yoInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl_C.endl_C_yoInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a tuple of integers describing the outgoing particles - called yos in ENDL -
-for the specified C-value, or a negative number (see &#8220;Special cases ...&#8221; below) if outgoing particle
+for the specified C-value, or a negative number (see “Special cases …” below) if outgoing particle
 types/numbers are not defined. Each particle is defined by its ZA = 1000 * Z + A value, with the
 exceptions of gammas, positrons and electrons whose integer designations are 7, 8 and 9 respectively. For
 example, neutron, Helium-3 and Pu-239 are designated as 1, 2003 and 94239 respectively.
@@ -3753,13 +3750,13 @@ scattering.</p>
 <dl class="function">
 <dt id="fudge.legacy.endl.endl_I.endl_IColumns">
 <code class="descclassname">fudge.legacy.endl.endl_I.</code><code class="descname">endl_IColumns</code><span class="sig-paren">(</span><em>I</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl_I.html#endl_IColumns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl_I.endl_IColumns" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the number of columns of data for the specified I-value. If I-value is not defined than &#8216;None&#8217; is returned.</p>
+<dd><p>Returns the number of columns of data for the specified I-value. If I-value is not defined than ‘None’ is returned.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fudge.legacy.endl.endl_I.endl_ILabel">
 <code class="descclassname">fudge.legacy.endl.endl_I.</code><code class="descname">endl_ILabel</code><span class="sig-paren">(</span><em>I</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl_I.html#endl_ILabel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl_I.endl_ILabel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a mnemonic string for the specified I-value. If I-value is not defined than &#8216;None&#8217; is returned.</p>
+<dd><p>Returns a mnemonic string for the specified I-value. If I-value is not defined than ‘None’ is returned.</p>
 </dd></dl>
 
 <dl class="function">
@@ -3775,25 +3772,25 @@ scattering.</p>
 <dl class="function">
 <dt id="fudge.legacy.endl.endl_Z.endl_ZLabel">
 <code class="descclassname">fudge.legacy.endl.endl_Z.</code><code class="descname">endl_ZLabel</code><span class="sig-paren">(</span><em>Z</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl_Z.html#endl_ZLabel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl_Z.endl_ZLabel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the label (i.e., name) for the specified Z or &#8216;None&#8217; if Z is out-of-bounds.</p>
+<dd><p>Returns the label (i.e., name) for the specified Z or ‘None’ if Z is out-of-bounds.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fudge.legacy.endl.endl_Z.endl_ZLabelToZ">
 <code class="descclassname">fudge.legacy.endl.endl_Z.</code><code class="descname">endl_ZLabelToZ</code><span class="sig-paren">(</span><em>label</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl_Z.html#endl_ZLabelToZ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl_Z.endl_ZLabelToZ" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the Z for the specified label or &#8216;None&#8217; if no match for label.</p>
+<dd><p>Returns the Z for the specified label or ‘None’ if no match for label.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fudge.legacy.endl.endl_Z.endl_ZSymbol">
 <code class="descclassname">fudge.legacy.endl.endl_Z.</code><code class="descname">endl_ZSymbol</code><span class="sig-paren">(</span><em>Z</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl_Z.html#endl_ZSymbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl_Z.endl_ZSymbol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the symbol for the specified Z or &#8216;None&#8217; if Z is out-of-bounds.</p>
+<dd><p>Returns the symbol for the specified Z or ‘None’ if Z is out-of-bounds.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fudge.legacy.endl.endl_Z.endl_ZSymbolToZ">
 <code class="descclassname">fudge.legacy.endl.endl_Z.</code><code class="descname">endl_ZSymbolToZ</code><span class="sig-paren">(</span><em>symbol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl_Z.html#endl_ZSymbolToZ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl_Z.endl_ZSymbolToZ" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the Z for the specified symbol or &#8216;None&#8217; if no match for symbol.</p>
+<dd><p>Returns the Z for the specified symbol or ‘None’ if no match for symbol.</p>
 </dd></dl>
 
 <dl class="function">
@@ -3811,7 +3808,7 @@ incident, yi, or outgoing, yo, particle designator.</p>
 <dl class="function">
 <dt id="fudge.legacy.endl.endl_y.endl_yLabel">
 <code class="descclassname">fudge.legacy.endl.endl_y.</code><code class="descname">endl_yLabel</code><span class="sig-paren">(</span><em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl_y.html#endl_yLabel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl_y.endl_yLabel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the symbol for the specified y or &#8216;None&#8217; if y is out-of-bounds.</p>
+<dd><p>Returns the symbol for the specified y or ‘None’ if y is out-of-bounds.</p>
 </dd></dl>
 
 <dl class="function">
@@ -3823,7 +3820,7 @@ incident, yi, or outgoing, yo, particle designator.</p>
 <dl class="function">
 <dt id="fudge.legacy.endl.endl_y.endl_yLongLabel">
 <code class="descclassname">fudge.legacy.endl.endl_y.</code><code class="descname">endl_yLongLabel</code><span class="sig-paren">(</span><em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endl_y.html#endl_yLongLabel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl_y.endl_yLongLabel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the label (i.e., name) for the specified y or &#8216;None&#8217; if y is out-of-bounds.</p>
+<dd><p>Returns the label (i.e., name) for the specified y or ‘None’ if y is out-of-bounds.</p>
 </dd></dl>
 
 <dl class="function">
@@ -3863,7 +3860,7 @@ for f in f2d : fs.appendAddend( f )
 s = fs.returnSum( )</p>
 <p>is, in general, much more efficient (i.e., runs a lot faster) and it should never be less efficient.</p>
 <p>While this class was designed for endl2dmath and fudge2dmath objects, it should work for any object
-for which the &#8216;+&#8217; operation is defined.</p>
+for which the ‘+’ operation is defined.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlmath.fastSumOfManyAddends.appendAddend">
 <code class="descname">appendAddend</code><span class="sig-paren">(</span><em>addend</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlmath.html#fastSumOfManyAddends.appendAddend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlmath.fastSumOfManyAddends.appendAddend" title="Permalink to this definition">¶</a></dt>
@@ -3992,7 +3989,7 @@ is itself a link.</p>
 <dd><p>Checks if self has a getFormat method. If it does not, then None is returned. If it does then: 
 1) if getFormat returns a string or None then it is returned else getFormat must return an 
 integer, n1. If n1 is 12 (default for legacy ENDL) then None is returned else returns string 
-&#8216;%n1.n2e&#8217; where n2 = n1 - 7.</p>
+‘%n1.n2e’ where n2 = n1 - 7.</p>
 </dd></dl>
 
 <dl class="function">
@@ -4030,15 +4027,15 @@ integer, n1. If n1 is 12 (default for legacy ENDL) then None is returned else re
 <code class="descclassname">fudge.legacy.endl.endlmisc.</code><code class="descname">incidentParticleTags</code><span class="sig-paren">(</span><em>yi</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlmisc.html#incidentParticleTags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlmisc.incidentParticleTags" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a list of [ iYi, strYi, symbol, name ] for projectile yi where yi 
 can be any of iYi, strYi, label or name. iYi is the projectile integer id, strYi
-is a string of the form &#8220;yi##&#8221; where ## is iYi converted to a two digit string,
+is a string of the form “yi##” where ## is iYi converted to a two digit string,
 and the last two (symbol and name) are the projectiles symbol and name. For
-example, incidentParticleTags( &#8220;yi02&#8221; ) would return [ 2, &#8220;yi02&#8221;, &#8220;p&#8221;, &#8220;proton&#8221; ].</p>
+example, incidentParticleTags( “yi02” ) would return [ 2, “yi02”, “p”, “proton” ].</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fudge.legacy.endl.endlmisc.intYoCIS">
 <code class="descclassname">fudge.legacy.endl.endlmisc.</code><code class="descname">intYoCIS</code><span class="sig-paren">(</span><em>fileName</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlmisc.html#intYoCIS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlmisc.intYoCIS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the list of integers ( yo, C, I, S ) from fileName where fileName must be of the from &#8216;yo##c##i###s###&#8217;.</p>
+<dd><p>Returns the list of integers ( yo, C, I, S ) from fileName where fileName must be of the from ‘yo##c##i###s###’.</p>
 </dd></dl>
 
 <dl class="function">
@@ -4050,10 +4047,10 @@ example, incidentParticleTags( &#8220;yi02&#8221; ) would return [ 2, &#8220;yi0
 <dl class="function">
 <dt id="fudge.legacy.endl.endlmisc.intZASuffix">
 <code class="descclassname">fudge.legacy.endl.endlmisc.</code><code class="descname">intZASuffix</code><span class="sig-paren">(</span><em>ZA_ii</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlmisc.html#intZASuffix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlmisc.intZASuffix" title="Permalink to this definition">¶</a></dt>
-<dd><p>ZA_ii can be an integer (e.g., 92235) or a string of the from &#8220;zaZZZAAA_suffix&#8221; 
-(e.g., &#8220;za095242m&#8221;). Returns the tuple integer ZA and _suffix from ZA_i. For 
-examples, ZA_i = 92235 would return ( 92235, &#8220;&#8221; ) and ZA_i = &#8220;za095242m&#8221; would
-return ( 95242, &#8220;m&#8221; ).</p>
+<dd><p>ZA_ii can be an integer (e.g., 92235) or a string of the from “zaZZZAAA_suffix” 
+(e.g., “za095242m”). Returns the tuple integer ZA and _suffix from ZA_i. For 
+examples, ZA_i = 92235 would return ( 92235, “” ) and ZA_i = “za095242m” would
+return ( 95242, “m” ).</p>
 </dd></dl>
 
 <dl class="function">
@@ -4122,7 +4119,7 @@ translate4dStringData with the data.  Returns the results of translate4dStringDa
 <dl class="function">
 <dt id="fudge.legacy.endl.endlmisc.strZASuffix">
 <code class="descclassname">fudge.legacy.endl.endlmisc.</code><code class="descname">strZASuffix</code><span class="sig-paren">(</span><em>ZA</em>, <em>suffix=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/endlmisc.html#strZASuffix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlmisc.strZASuffix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts ZA and suffix into &#8216;za%6.6d%s&#8217; % ( ZA, suffix ). If ZA is already of the form &#8216;za%6.6d%s&#8217;, it is returned
+<dd><p>Converts ZA and suffix into ‘za%6.6d%s’ % ( ZA, suffix ). If ZA is already of the form ‘za%6.6d%s’, it is returned
 without any change.</p>
 </dd></dl>
 
@@ -4254,7 +4251,7 @@ is column i1, the z-component is column i2 and the zz-component is column i3
 <dl class="method">
 <dt id="fudge.legacy.endl.fudgeDocumentationFile.fudgeDocumentationFile.getXML_ParserFriendlyText">
 <code class="descname">getXML_ParserFriendlyText</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/fudgeDocumentationFile.html#fudgeDocumentationFile.getXML_ParserFriendlyText"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.fudgeDocumentationFile.fudgeDocumentationFile.getXML_ParserFriendlyText" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts &amp;, &lt; and &gt; in the self.text to &#8216;&amp;amp;&#8217;, &#8216;&amp;lt;&#8217; and &#8216;&amp;gt;&#8217;, respectively and stores it in self.XML_ParserFriendlyText</p>
+<dd><p>Converts &amp;, &lt; and &gt; in the self.text to ‘&amp;amp;’, ‘&amp;lt;’ and ‘&amp;gt;’, respectively and stores it in self.XML_ParserFriendlyText</p>
 </dd></dl>
 
 <dl class="method">
@@ -4308,6 +4305,11 @@ This allows a user to have their own directory containing databases.</p>
 <span id="fudge-legacy-endl-tdf-module"></span><h2>fudge.legacy.endl.tdf module<a class="headerlink" href="#module-fudge.legacy.endl.tdf" title="Permalink to this headline">¶</a></h2>
 <p>This module contains the methods to run tdfgen, producing tdf files for light ion thermonuclear reactions. Methods include
 prepping the endlZA input and running the code (processTDF_Reaction), and various wrappers to provide running options.</p>
+<dl class="function">
+<dt id="fudge.legacy.endl.tdf.localZsymbol">
+<code class="descclassname">fudge.legacy.endl.tdf.</code><code class="descname">localZsymbol</code><span class="sig-paren">(</span><em>Z</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/tdf.html#localZsymbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.tdf.localZsymbol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="function">
 <dt id="fudge.legacy.endl.tdf.main">
 <code class="descclassname">fudge.legacy.endl.tdf.</code><code class="descname">main</code><span class="sig-paren">(</span><em>arglist</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl/tdf.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.tdf.main" title="Permalink to this definition">¶</a></dt>
@@ -4371,14 +4373,14 @@ I = 0 is cross section data.</p>
 <dl class="function">
 <dt id="fudge.legacy.endl.readOnly">
 <code class="descclassname">fudge.legacy.endl.</code><code class="descname">readOnly</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl.html#readOnly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.readOnly" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets Fudge&#8217;s internal readonly flag which causes fudge to not create working directories
+<dd><p>Sets Fudge’s internal readonly flag which causes fudge to not create working directories
 for the isotopes read in. Note, you cannot unset this flag once readOnly has been called.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fudge.legacy.endl.verbose">
 <code class="descclassname">fudge.legacy.endl.</code><code class="descname">verbose</code><span class="sig-paren">(</span><em>mode=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/legacy/endl.html#verbose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.verbose" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets Fudge&#8217;s internal verbose flag to mode. Mode = 0 suppress all informational messages.</p>
+<dd><p>Sets Fudge’s internal verbose flag to mode. Mode = 0 suppress all informational messages.</p>
 </dd></dl>
 
 </div>
@@ -4434,8 +4436,8 @@ for the isotopes read in. Note, you cannot unset this flag once readOnly has bee
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="fudge.legacy.converting.ENDFToGND.html"
-                        title="previous chapter">fudge.legacy.converting.ENDFToGND package</a></p>
+  <p class="topless"><a href="fudge.legacy.converting.html"
+                        title="previous chapter">fudge.legacy.converting package</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="fudge.legacy.endl.test.html"
                         title="next chapter">fudge.legacy.endl.test package</a></p>
@@ -4473,16 +4475,16 @@ for the isotopes read in. Note, you cannot unset this flag once readOnly has bee
           <a href="fudge.legacy.endl.test.html" title="fudge.legacy.endl.test package"
              >next</a> |</li>
         <li class="right" >
-          <a href="fudge.legacy.converting.ENDFToGND.html" title="fudge.legacy.converting.ENDFToGND package"
+          <a href="fudge.legacy.converting.html" title="fudge.legacy.converting package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="fudge.legacy.html" >fudge.legacy package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

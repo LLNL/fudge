@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.core.utilities.pyparsing &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.core.utilities.pyparsing &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,7 +25,7 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +35,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -74,7 +71,7 @@
 <span class="c1">#</span>
 <span class="c1">#from __future__ import generators</span>
 
-<span class="n">__doc__</span> <span class="o">=</span> \
+<span class="vm">__doc__</span> <span class="o">=</span> \
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">pyparsing module - Classes and methods to define and execute parsing grammars</span>
 
@@ -285,7 +282,7 @@
 <span class="sd">       C{ErrorStop} (&#39;-&#39; operator) indicates that parsing is to stop immediately because</span>
 <span class="sd">       an unbacktrackable syntax error has been found&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pe</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ParseSyntaxException</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ParseSyntaxException</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
                                     <span class="n">pe</span><span class="o">.</span><span class="n">pstr</span><span class="p">,</span> <span class="n">pe</span><span class="o">.</span><span class="n">loc</span><span class="p">,</span> <span class="n">pe</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span> <span class="n">pe</span><span class="o">.</span><span class="n">parserElement</span><span class="p">)</span></div>
 
 <span class="c1">#~ class ReparseException(ParseBaseException):</span>
@@ -326,10 +323,10 @@
 <span class="sd">       - by attribute (C{results.&lt;resultsName&gt;})</span>
 <span class="sd">       &quot;&quot;&quot;</span>
     <span class="c1">#~ __slots__ = ( &quot;__toklist&quot;, &quot;__tokdict&quot;, &quot;__doinit&quot;, &quot;__name&quot;, &quot;__parent&quot;, &quot;__accumNames&quot;, &quot;__weakref__&quot; )</span>
-    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">toklist</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asList</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">modal</span><span class="o">=</span><span class="kc">True</span> <span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">toklist</span><span class="p">,</span> <span class="n">cls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">toklist</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">asList</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">modal</span><span class="o">=</span><span class="kc">True</span> <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">toklist</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">toklist</span>
-        <span class="n">retobj</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
+        <span class="n">retobj</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
         <span class="n">retobj</span><span class="o">.</span><span class="n">__doinit</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">retobj</span>
 
@@ -417,7 +414,7 @@
 
     <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span> <span class="k">return</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__toklist</span> <span class="p">)</span>
     <span class="k">def</span> <span class="nf">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__toklist</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
-    <span class="n">__nonzero__</span> <span class="o">=</span> <span class="n">__bool__</span>
+    <span class="n">__nonzero__</span> <span class="o">=</span> <span class="fm">__bool__</span>
     <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span> <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__toklist</span> <span class="p">)</span>
     <span class="k">def</span> <span class="nf">__reversed__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span> <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__toklist</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
 <div class="viewcode-block" id="ParseResults.keys"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.ParseResults.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
@@ -817,7 +814,7 @@
 	            <span class="n">restore</span> <span class="o">=</span> <span class="kc">None</span>
 	            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="nb">type</span><span class="p">):</span>
 	                <span class="n">restore</span> <span class="o">=</span> <span class="n">f</span>
-	                <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">__init__</span>
+	                <span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="fm">__init__</span>
 	            <span class="k">if</span> <span class="ow">not</span> <span class="n">_PY3K</span><span class="p">:</span>
 	                <span class="n">codeObj</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">func_code</span>
 	            <span class="k">else</span><span class="p">:</span>
@@ -836,9 +833,9 @@
 	        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
 	            <span class="k">try</span><span class="p">:</span>
 	                <span class="k">if</span> <span class="ow">not</span> <span class="n">_PY3K</span><span class="p">:</span>
-	                    <span class="n">call_im_func_code</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">__call__</span><span class="o">.</span><span class="n">im_func</span><span class="o">.</span><span class="n">func_code</span>
+	                    <span class="n">call_im_func_code</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="fm">__call__</span><span class="o">.</span><span class="n">im_func</span><span class="o">.</span><span class="n">func_code</span>
 	                <span class="k">else</span><span class="p">:</span>
-	                    <span class="n">call_im_func_code</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">__code__</span>
+	                    <span class="n">call_im_func_code</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="vm">__code__</span>
 	
 	                <span class="c1"># not a function, must be a callable object, get info from the</span>
 	                <span class="c1"># im_func binding of its bound __call__ method</span>
@@ -846,25 +843,25 @@
 	                    <span class="k">return</span> <span class="n">f</span>
 	                <span class="n">numargs</span> <span class="o">=</span> <span class="n">call_im_func_code</span><span class="o">.</span><span class="n">co_argcount</span>
 	                <span class="k">if</span> <span class="ow">not</span> <span class="n">_PY3K</span><span class="p">:</span>
-	                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">__call__</span><span class="p">,</span><span class="s2">&quot;im_self&quot;</span><span class="p">):</span>
+	                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="fm">__call__</span><span class="p">,</span><span class="s2">&quot;im_self&quot;</span><span class="p">):</span>
 	                        <span class="n">numargs</span> <span class="o">-=</span> <span class="mi">1</span>
 	                <span class="k">else</span><span class="p">:</span>
-	                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">__call__</span><span class="p">,</span><span class="s2">&quot;__self__&quot;</span><span class="p">):</span>
+	                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="fm">__call__</span><span class="p">,</span><span class="s2">&quot;__self__&quot;</span><span class="p">):</span>
 	                        <span class="n">numargs</span> <span class="o">-=</span> <span class="mi">0</span>
 	            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
 	                <span class="k">if</span> <span class="ow">not</span> <span class="n">_PY3K</span><span class="p">:</span>
-	                    <span class="n">call_func_code</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">__call__</span><span class="o">.</span><span class="n">func_code</span>
+	                    <span class="n">call_func_code</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="fm">__call__</span><span class="o">.</span><span class="n">func_code</span>
 	                <span class="k">else</span><span class="p">:</span>
-	                    <span class="n">call_func_code</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">__call__</span><span class="o">.</span><span class="n">__code__</span>
+	                    <span class="n">call_func_code</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="fm">__call__</span><span class="o">.</span><span class="vm">__code__</span>
 	                <span class="c1"># not a bound method, get info directly from __call__ method</span>
 	                <span class="k">if</span> <span class="n">call_func_code</span><span class="o">.</span><span class="n">co_flags</span> <span class="o">&amp;</span> <span class="n">STAR_ARGS</span><span class="p">:</span>
 	                    <span class="k">return</span> <span class="n">f</span>
 	                <span class="n">numargs</span> <span class="o">=</span> <span class="n">call_func_code</span><span class="o">.</span><span class="n">co_argcount</span>
 	                <span class="k">if</span> <span class="ow">not</span> <span class="n">_PY3K</span><span class="p">:</span>
-	                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">__call__</span><span class="p">,</span><span class="s2">&quot;im_self&quot;</span><span class="p">):</span>
+	                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="fm">__call__</span><span class="p">,</span><span class="s2">&quot;im_self&quot;</span><span class="p">):</span>
 	                        <span class="n">numargs</span> <span class="o">-=</span> <span class="mi">1</span>
 	                <span class="k">else</span><span class="p">:</span>
-	                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">__call__</span><span class="p">,</span><span class="s2">&quot;__self__&quot;</span><span class="p">):</span>
+	                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="fm">__call__</span><span class="p">,</span><span class="s2">&quot;__self__&quot;</span><span class="p">):</span>
 	                        <span class="n">numargs</span> <span class="o">-=</span> <span class="mi">1</span>
 
 
@@ -874,7 +871,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">numargs</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
                 <span class="k">def</span> <span class="nf">tmp</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">t</span><span class="p">):</span>
-                    <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">__call__</span><span class="o">.</span><span class="n">__self__</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">t</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="fm">__call__</span><span class="o">.</span><span class="vm">__self__</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">t</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">numargs</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="k">def</span> <span class="nf">tmp</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">t</span><span class="p">):</span>
                     <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">t</span><span class="p">)</span>
@@ -885,17 +882,17 @@
                 <span class="k">def</span> <span class="nf">tmp</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">t</span><span class="p">):</span>
                     <span class="k">return</span> <span class="n">f</span><span class="p">()</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">tmp</span><span class="o">.</span><span class="n">__name__</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">__name__</span>
+                <span class="n">tmp</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="vm">__name__</span>
             <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span><span class="ne">TypeError</span><span class="p">):</span>
                 <span class="c1"># no need for special handling if attribute doesnt exist</span>
                 <span class="k">pass</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">tmp</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">__doc__</span>
+                <span class="n">tmp</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="vm">__doc__</span>
             <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span><span class="ne">TypeError</span><span class="p">):</span>
                 <span class="c1"># no need for special handling if attribute doesnt exist</span>
                 <span class="k">pass</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">tmp</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">__dict__</span><span class="p">)</span>
+                <span class="n">tmp</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
             <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span><span class="ne">TypeError</span><span class="p">):</span>
                 <span class="c1"># no need for special handling if attribute doesnt exist</span>
                 <span class="k">pass</span>
@@ -1352,7 +1349,7 @@
         <span class="k">return</span> <span class="n">ret</span>
 
     <span class="k">def</span> <span class="nf">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__mul__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Implementation of | operator - returns C{MatchFirst}&quot;&quot;&quot;</span>
@@ -1532,7 +1529,7 @@
 
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ParserElement</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">self</span> <span class="ow">is</span> <span class="n">other</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">__dict__</span>
+            <span class="k">return</span> <span class="bp">self</span> <span class="ow">is</span> <span class="n">other</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="vm">__dict__</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">parseString</span><span class="p">(</span><span class="n">_ustr</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="n">parseAll</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1558,7 +1555,7 @@
 <div class="viewcode-block" id="Token"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.Token">[docs]</a><span class="k">class</span> <span class="nc">Token</span><span class="p">(</span><span class="n">ParserElement</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Abstract C{ParserElement} subclass, for defining atomic matching patterns.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Token</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="n">savelist</span><span class="o">=</span><span class="kc">False</span> <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Token</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="n">savelist</span><span class="o">=</span><span class="kc">False</span> <span class="p">)</span>
         <span class="c1">#self.myException = ParseException(&quot;&quot;,0,&quot;&quot;,self)</span>
 
 <div class="viewcode-block" id="Token.setName"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.Token.setName">[docs]</a>    <span class="k">def</span> <span class="nf">setName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
@@ -1571,7 +1568,7 @@
 <div class="viewcode-block" id="Empty"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.Empty">[docs]</a><span class="k">class</span> <span class="nc">Empty</span><span class="p">(</span><span class="n">Token</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;An empty token, will always match.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Empty</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Empty</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Empty&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mayReturnEmpty</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mayIndexError</span> <span class="o">=</span> <span class="kc">False</span></div>
@@ -1580,7 +1577,7 @@
 <div class="viewcode-block" id="NoMatch"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.NoMatch">[docs]</a><span class="k">class</span> <span class="nc">NoMatch</span><span class="p">(</span><span class="n">Token</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A token that will never match.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">NoMatch</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NoMatch</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;NoMatch&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mayReturnEmpty</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mayIndexError</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1597,7 +1594,7 @@
 <div class="viewcode-block" id="Literal"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.Literal">[docs]</a><span class="k">class</span> <span class="nc">Literal</span><span class="p">(</span><span class="n">Token</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Token to exactly match a specified string.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">matchString</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Literal</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Literal</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">match</span> <span class="o">=</span> <span class="n">matchString</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">matchLen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">matchString</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1605,7 +1602,7 @@
         <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;null string passed to Literal; use Empty() instead&quot;</span><span class="p">,</span>
                             <span class="ne">SyntaxWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span> <span class="o">=</span> <span class="n">Empty</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">=</span> <span class="n">Empty</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">_ustr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">errmsg</span> <span class="o">=</span> <span class="s2">&quot;Expected &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mayReturnEmpty</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1640,7 +1637,7 @@
     <span class="n">DEFAULT_KEYWORD_CHARS</span> <span class="o">=</span> <span class="n">alphanums</span><span class="o">+</span><span class="s2">&quot;_$&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">matchString</span><span class="p">,</span> <span class="n">identChars</span><span class="o">=</span><span class="n">DEFAULT_KEYWORD_CHARS</span><span class="p">,</span> <span class="n">caseless</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Keyword</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Keyword</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">match</span> <span class="o">=</span> <span class="n">matchString</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">matchLen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">matchString</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1694,7 +1691,7 @@
 <span class="sd">       match string, NOT the case of the input text.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">matchString</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CaselessLiteral</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="n">matchString</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CaselessLiteral</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="n">matchString</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="p">)</span>
         <span class="c1"># Preserve the defining literal.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">returnString</span> <span class="o">=</span> <span class="n">matchString</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">returnString</span>
@@ -1712,7 +1709,7 @@
 
 <div class="viewcode-block" id="CaselessKeyword"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.CaselessKeyword">[docs]</a><span class="k">class</span> <span class="nc">CaselessKeyword</span><span class="p">(</span><span class="n">Keyword</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">matchString</span><span class="p">,</span> <span class="n">identChars</span><span class="o">=</span><span class="n">Keyword</span><span class="o">.</span><span class="n">DEFAULT_KEYWORD_CHARS</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CaselessKeyword</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="n">matchString</span><span class="p">,</span> <span class="n">identChars</span><span class="p">,</span> <span class="n">caseless</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CaselessKeyword</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="n">matchString</span><span class="p">,</span> <span class="n">identChars</span><span class="p">,</span> <span class="n">caseless</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="CaselessKeyword.parseImpl"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.CaselessKeyword.parseImpl">[docs]</a>    <span class="k">def</span> <span class="nf">parseImpl</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">instring</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">doActions</span><span class="o">=</span><span class="kc">True</span> <span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="n">instring</span><span class="p">[</span> <span class="n">loc</span><span class="p">:</span><span class="n">loc</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">matchLen</span> <span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">caselessmatch</span><span class="p">)</span> <span class="ow">and</span>
@@ -1734,7 +1731,7 @@
 <span class="sd">       are 0, meaning no maximum or exact length restriction.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">initChars</span><span class="p">,</span> <span class="n">bodyChars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">asKeyword</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Word</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Word</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initCharsOrig</span> <span class="o">=</span> <span class="n">initChars</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initChars</span> <span class="o">=</span> <span class="n">_str2dict</span><span class="p">(</span><span class="n">initChars</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">bodyChars</span> <span class="p">:</span>
@@ -1778,7 +1775,7 @@
                                       <span class="p">(</span><span class="n">_escapeRegexRangeChars</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initCharsOrig</span><span class="p">),</span>
                                       <span class="n">_escapeRegexRangeChars</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bodyCharsOrig</span><span class="p">),)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">asKeyword</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">reString</span> <span class="o">=</span> <span class="s2">r&quot;\b&quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">reString</span><span class="o">+</span><span class="s2">r&quot;\b&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reString</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;\b&quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">reString</span><span class="o">+</span><span class="sa">r</span><span class="s2">&quot;\b&quot;</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">reString</span> <span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
@@ -1831,7 +1828,7 @@
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Word</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Word</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 
@@ -1859,7 +1856,7 @@
     <span class="n">compiledREtype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;[A-Z]&quot;</span><span class="p">))</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;The parameters pattern and flags are passed to the re.compile() function as-is. See the Python re module for an explanation of the acceptable patterns and flags.&quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Regex</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Regex</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
 	        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -1910,7 +1907,7 @@
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Regex</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Regex</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 
@@ -1933,7 +1930,7 @@
 <span class="sd">            - unquoteResults - boolean indicating whether the matched text should be unquoted (default=True)</span>
 <span class="sd">            - endQuoteChar - string of one or more characters defining the end of the quote delimited string (default=None =&gt; same as quoteChar)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">QuotedString</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">QuotedString</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="c1"># remove white space from quote chars - wont work anyway</span>
         <span class="n">quoteChar</span> <span class="o">=</span> <span class="n">quoteChar</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -1960,13 +1957,13 @@
 
         <span class="k">if</span> <span class="n">multiline</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">flags</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">=</span> <span class="s1">r&#39;</span><span class="si">%s</span><span class="s1">(?:[^</span><span class="si">%s%s</span><span class="s1">]&#39;</span> <span class="o">%</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(?:[^</span><span class="si">%s%s</span><span class="s1">]&#39;</span> <span class="o">%</span> \
                 <span class="p">(</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quoteChar</span><span class="p">),</span>
                   <span class="n">_escapeRegexRangeChars</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endQuoteChar</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
                   <span class="p">(</span><span class="n">escChar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_escapeRegexRangeChars</span><span class="p">(</span><span class="n">escChar</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">flags</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">=</span> <span class="s1">r&#39;</span><span class="si">%s</span><span class="s1">(?:[^</span><span class="si">%s</span><span class="s1">\n\r</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(?:[^</span><span class="si">%s</span><span class="s1">\n\r</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> \
                 <span class="p">(</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quoteChar</span><span class="p">),</span>
                   <span class="n">_escapeRegexRangeChars</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endQuoteChar</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
                   <span class="p">(</span><span class="n">escChar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_escapeRegexRangeChars</span><span class="p">(</span><span class="n">escChar</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">)</span>
@@ -1977,11 +1974,11 @@
                                     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endQuoteChar</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)])</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
                 <span class="p">)</span>
         <span class="k">if</span> <span class="n">escQuote</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">r&#39;|(?:</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">escQuote</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">+=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;|(?:</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">escQuote</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">escChar</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">r&#39;|(?:</span><span class="si">%s</span><span class="s1">.)&#39;</span> <span class="o">%</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">escChar</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">+=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;|(?:</span><span class="si">%s</span><span class="s1">.)&#39;</span> <span class="o">%</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">escChar</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">escCharReplacePattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">escChar</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;(.)&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">r&#39;)*</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endQuoteChar</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">+=</span> <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;)*</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endQuoteChar</span><span class="p">))</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pattern</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">flags</span><span class="p">)</span>
@@ -2026,7 +2023,7 @@
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">QuotedString</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">QuotedString</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 
@@ -2044,7 +2041,7 @@
 <span class="sd">       are 0, meaning no maximum or exact length restriction.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">notChars</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="mi">0</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CharsNotIn</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CharsNotIn</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">skipWhitespace</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">notChars</span> <span class="o">=</span> <span class="n">notChars</span>
 
@@ -2095,7 +2092,7 @@
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CharsNotIn</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CharsNotIn</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 
@@ -2121,7 +2118,7 @@
         <span class="s2">&quot;</span><span class="se">\f</span><span class="s2">&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;FF&gt;&quot;</span><span class="p">,</span>
         <span class="p">}</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ws</span><span class="o">=</span><span class="s2">&quot; </span><span class="se">\t\r\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">White</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">White</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">matchWhite</span> <span class="o">=</span> <span class="n">ws</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setWhitespaceChars</span><span class="p">(</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">whiteChars</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">matchWhite</span><span class="p">])</span> <span class="p">)</span>
         <span class="c1">#~ self.leaveWhitespace()</span>
@@ -2167,15 +2164,15 @@
 
 <span class="k">class</span> <span class="nc">_PositionToken</span><span class="p">(</span><span class="n">Token</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">_PositionToken</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">_PositionToken</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mayReturnEmpty</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mayIndexError</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="GoToColumn"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.GoToColumn">[docs]</a><span class="k">class</span> <span class="nc">GoToColumn</span><span class="p">(</span><span class="n">_PositionToken</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Token to advance to a specific column of input text; useful for tabular report scraping.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">colno</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">GoToColumn</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GoToColumn</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">col</span> <span class="o">=</span> <span class="n">colno</span>
 
 <div class="viewcode-block" id="GoToColumn.preParse"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.GoToColumn.preParse">[docs]</a>    <span class="k">def</span> <span class="nf">preParse</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">instring</span><span class="p">,</span> <span class="n">loc</span> <span class="p">):</span>
@@ -2198,7 +2195,7 @@
 <div class="viewcode-block" id="LineStart"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.LineStart">[docs]</a><span class="k">class</span> <span class="nc">LineStart</span><span class="p">(</span><span class="n">_PositionToken</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Matches if current position is at the beginning of a line within the parse string&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">LineStart</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LineStart</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setWhitespaceChars</span><span class="p">(</span> <span class="n">ParserElement</span><span class="o">.</span><span class="n">DEFAULT_WHITE_CHARS</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">errmsg</span> <span class="o">=</span> <span class="s2">&quot;Expected start of line&quot;</span>
         <span class="c1">#self.myException.msg = self.errmsg</span>
@@ -2223,7 +2220,7 @@
 <div class="viewcode-block" id="LineEnd"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.LineEnd">[docs]</a><span class="k">class</span> <span class="nc">LineEnd</span><span class="p">(</span><span class="n">_PositionToken</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Matches if current position is at the end of a line within the parse string&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">LineEnd</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LineEnd</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setWhitespaceChars</span><span class="p">(</span> <span class="n">ParserElement</span><span class="o">.</span><span class="n">DEFAULT_WHITE_CHARS</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">errmsg</span> <span class="o">=</span> <span class="s2">&quot;Expected end of line&quot;</span>
         <span class="c1">#self.myException.msg = self.errmsg</span>
@@ -2249,7 +2246,7 @@
 <div class="viewcode-block" id="StringStart"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.StringStart">[docs]</a><span class="k">class</span> <span class="nc">StringStart</span><span class="p">(</span><span class="n">_PositionToken</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Matches if current position is at the beginning of the parse string&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">StringStart</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">StringStart</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">errmsg</span> <span class="o">=</span> <span class="s2">&quot;Expected start of text&quot;</span>
         <span class="c1">#self.myException.msg = self.errmsg</span>
 
@@ -2267,7 +2264,7 @@
 <div class="viewcode-block" id="StringEnd"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.StringEnd">[docs]</a><span class="k">class</span> <span class="nc">StringEnd</span><span class="p">(</span><span class="n">_PositionToken</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Matches if current position is at the end of the parse string&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">StringEnd</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">StringEnd</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">errmsg</span> <span class="o">=</span> <span class="s2">&quot;Expected end of text&quot;</span>
         <span class="c1">#self.myException.msg = self.errmsg</span>
 
@@ -2296,7 +2293,7 @@
 <span class="sd">       the string being parsed, or at the beginning of a line.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wordChars</span> <span class="o">=</span> <span class="n">printables</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">WordStart</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">WordStart</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wordChars</span> <span class="o">=</span> <span class="n">_str2dict</span><span class="p">(</span><span class="n">wordChars</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">errmsg</span> <span class="o">=</span> <span class="s2">&quot;Not at the start of a word&quot;</span>
 
@@ -2318,7 +2315,7 @@
 <span class="sd">       the string being parsed, or at the end of a line.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wordChars</span> <span class="o">=</span> <span class="n">printables</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">WordEnd</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">WordEnd</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wordChars</span> <span class="o">=</span> <span class="n">_str2dict</span><span class="p">(</span><span class="n">wordChars</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">skipWhitespace</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">errmsg</span> <span class="o">=</span> <span class="s2">&quot;Not at the end of a word&quot;</span>
@@ -2339,7 +2336,7 @@
 <div class="viewcode-block" id="ParseExpression"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.ParseExpression">[docs]</a><span class="k">class</span> <span class="nc">ParseExpression</span><span class="p">(</span><span class="n">ParserElement</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Abstract subclass of ParserElement, for combining and post-processing parsed tokens.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">exprs</span><span class="p">,</span> <span class="n">savelist</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ParseExpression</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">savelist</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ParseExpression</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">savelist</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">exprs</span><span class="p">,</span> <span class="nb">list</span> <span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">exprs</span> <span class="o">=</span> <span class="n">exprs</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">exprs</span><span class="p">,</span> <span class="n">basestring</span> <span class="p">):</span>
@@ -2382,12 +2379,12 @@
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ParseExpression</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ParseExpression</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strRepr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">strRepr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">_ustr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exprs</span><span class="p">)</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">strRepr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">_ustr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exprs</span><span class="p">)</span> <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">strRepr</span>
 
 <div class="viewcode-block" id="ParseExpression.streamline"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.ParseExpression.streamline">[docs]</a>    <span class="k">def</span> <span class="nf">streamline</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
@@ -2401,7 +2398,7 @@
         <span class="c1"># (likewise for Or&#39;s and MatchFirst&#39;s)</span>
         <span class="k">if</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exprs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="p">):</span>
             <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exprs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">if</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span> <span class="p">)</span> <span class="ow">and</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="p">)</span> <span class="ow">and</span>
                   <span class="ow">not</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">parseAction</span><span class="p">)</span> <span class="ow">and</span>
                   <span class="n">other</span><span class="o">.</span><span class="n">resultsName</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span>
                   <span class="ow">not</span> <span class="n">other</span><span class="o">.</span><span class="n">debug</span> <span class="p">):</span>
@@ -2411,7 +2408,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">mayIndexError</span>  <span class="o">|=</span> <span class="n">other</span><span class="o">.</span><span class="n">mayIndexError</span>
 
             <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exprs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">if</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span> <span class="p">)</span> <span class="ow">and</span>
+            <span class="k">if</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="p">)</span> <span class="ow">and</span>
                   <span class="ow">not</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">parseAction</span><span class="p">)</span> <span class="ow">and</span>
                   <span class="n">other</span><span class="o">.</span><span class="n">resultsName</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span>
                   <span class="ow">not</span> <span class="n">other</span><span class="o">.</span><span class="n">debug</span> <span class="p">):</span>
@@ -2440,11 +2437,11 @@
 
     <span class="k">class</span> <span class="nc">_ErrorStop</span><span class="p">(</span><span class="n">Empty</span><span class="p">):</span>
         <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="nb">super</span><span class="p">(</span><span class="n">Empty</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">Empty</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">leaveWhitespace</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">exprs</span><span class="p">,</span> <span class="n">savelist</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">And</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">exprs</span><span class="p">,</span> <span class="n">savelist</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">And</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">exprs</span><span class="p">,</span> <span class="n">savelist</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mayReturnEmpty</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exprs</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">e</span><span class="o">.</span><span class="n">mayReturnEmpty</span><span class="p">:</span>
@@ -2507,7 +2504,7 @@
 <span class="sd">       May be constructed using the &#39;^&#39; operator.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">exprs</span><span class="p">,</span> <span class="n">savelist</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Or</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">exprs</span><span class="p">,</span> <span class="n">savelist</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Or</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">exprs</span><span class="p">,</span> <span class="n">savelist</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mayReturnEmpty</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exprs</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">mayReturnEmpty</span><span class="p">:</span>
@@ -2569,7 +2566,7 @@
 <span class="sd">       May be constructed using the &#39;|&#39; operator.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">exprs</span><span class="p">,</span> <span class="n">savelist</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">MatchFirst</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">exprs</span><span class="p">,</span> <span class="n">savelist</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MatchFirst</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">exprs</span><span class="p">,</span> <span class="n">savelist</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">exprs</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mayReturnEmpty</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exprs</span><span class="p">:</span>
@@ -2628,7 +2625,7 @@
 <span class="sd">       May be constructed using the &#39;&amp;&#39; operator.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">exprs</span><span class="p">,</span> <span class="n">savelist</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Each</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">exprs</span><span class="p">,</span> <span class="n">savelist</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Each</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">exprs</span><span class="p">,</span> <span class="n">savelist</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mayReturnEmpty</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exprs</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">e</span><span class="o">.</span><span class="n">mayReturnEmpty</span><span class="p">:</span>
@@ -2713,7 +2710,7 @@
 <div class="viewcode-block" id="ParseElementEnhance"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.ParseElementEnhance">[docs]</a><span class="k">class</span> <span class="nc">ParseElementEnhance</span><span class="p">(</span><span class="n">ParserElement</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Abstract subclass of C{ParserElement}, for combining and post-processing parsed tokens.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">,</span> <span class="n">savelist</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ParseElementEnhance</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">savelist</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ParseElementEnhance</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">savelist</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">expr</span><span class="p">,</span> <span class="n">basestring</span> <span class="p">):</span>
             <span class="n">expr</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">expr</span> <span class="o">=</span> <span class="n">expr</span>
@@ -2773,12 +2770,12 @@
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ParseElementEnhance</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ParseElementEnhance</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strRepr</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">strRepr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">_ustr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expr</span><span class="p">)</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">strRepr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">_ustr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expr</span><span class="p">)</span> <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">strRepr</span></div>
 
 
@@ -2788,7 +2785,7 @@
 <span class="sd">    verifies that the specified parse expression matches at the current</span>
 <span class="sd">    position.  C{FollowedBy} always returns a null token list.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">expr</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">FollowedBy</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FollowedBy</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mayReturnEmpty</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="FollowedBy.parseImpl"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.FollowedBy.parseImpl">[docs]</a>    <span class="k">def</span> <span class="nf">parseImpl</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">instring</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">doActions</span><span class="o">=</span><span class="kc">True</span> <span class="p">):</span>
@@ -2803,7 +2800,7 @@
 <span class="sd">    position.  Also, C{NotAny} does *not* skip over leading whitespace. C{NotAny}</span>
 <span class="sd">    always returns a null token list.  May be constructed using the &#39;~&#39; operator.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">expr</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">NotAny</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NotAny</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
         <span class="c1">#~ self.leaveWhitespace()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">skipWhitespace</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># do NOT use self.leaveWhitespace(), don&#39;t want to propagate to exprs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mayReturnEmpty</span> <span class="o">=</span> <span class="kc">True</span>
@@ -2836,7 +2833,7 @@
 <div class="viewcode-block" id="ZeroOrMore"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.ZeroOrMore">[docs]</a><span class="k">class</span> <span class="nc">ZeroOrMore</span><span class="p">(</span><span class="n">ParseElementEnhance</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Optional repetition of zero or more of the given expression.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">expr</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ZeroOrMore</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ZeroOrMore</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mayReturnEmpty</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="ZeroOrMore.parseImpl"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.ZeroOrMore.parseImpl">[docs]</a>    <span class="k">def</span> <span class="nf">parseImpl</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">instring</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">doActions</span><span class="o">=</span><span class="kc">True</span> <span class="p">):</span>
@@ -2909,7 +2906,7 @@
 <span class="k">class</span> <span class="nc">_NullToken</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
-    <span class="n">__nonzero__</span> <span class="o">=</span> <span class="n">__bool__</span>
+    <span class="n">__nonzero__</span> <span class="o">=</span> <span class="fm">__bool__</span>
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;&quot;</span>
 
@@ -2920,7 +2917,7 @@
 <span class="sd">       is not found.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">exprs</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">_optionalNotMatched</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Optional</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="n">exprs</span><span class="p">,</span> <span class="n">savelist</span><span class="o">=</span><span class="kc">False</span> <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Optional</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="n">exprs</span><span class="p">,</span> <span class="n">savelist</span><span class="o">=</span><span class="kc">False</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">defaultValue</span> <span class="o">=</span> <span class="n">default</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mayReturnEmpty</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -2956,7 +2953,7 @@
 <span class="sd">       might contain false matches.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ignore</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">failOn</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span> <span class="n">SkipTo</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span> <span class="n">SkipTo</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ignoreExpr</span> <span class="o">=</span> <span class="n">ignore</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mayReturnEmpty</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mayIndexError</span> <span class="o">=</span> <span class="kc">False</span>
@@ -3029,7 +3026,7 @@
 <span class="sd">          fwdExpr &lt;&lt; (a | b | c)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Forward</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">savelist</span><span class="o">=</span><span class="kc">False</span> <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Forward</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">savelist</span><span class="o">=</span><span class="kc">False</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__lshift__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">basestring</span> <span class="p">):</span>
@@ -3067,16 +3064,16 @@
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s2">&quot;name&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_revertClass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span> <span class="o">=</span> <span class="n">_ForwardNoRecurse</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_revertClass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">=</span> <span class="n">_ForwardNoRecurse</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">retString</span> <span class="o">=</span> <span class="n">_ustr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expr</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">retString</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_revertClass</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="n">retString</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_revertClass</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="n">retString</span>
 
 <div class="viewcode-block" id="Forward.copy"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.Forward.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">expr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -3093,13 +3090,13 @@
 <div class="viewcode-block" id="TokenConverter"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.TokenConverter">[docs]</a><span class="k">class</span> <span class="nc">TokenConverter</span><span class="p">(</span><span class="n">ParseElementEnhance</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Abstract subclass of ParseExpression, for converting parsed results.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">,</span> <span class="n">savelist</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TokenConverter</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="n">expr</span> <span class="p">)</span><span class="c1">#, savelist )</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TokenConverter</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="n">expr</span> <span class="p">)</span><span class="c1">#, savelist )</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">saveAsList</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="Upcase"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.Upcase">[docs]</a><span class="k">class</span> <span class="nc">Upcase</span><span class="p">(</span><span class="n">TokenConverter</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Converter to upper case all matching tokens.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Upcase</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Upcase</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Upcase class is deprecated, use upcaseTokens parse action instead&quot;</span><span class="p">,</span>
                        <span class="ne">DeprecationWarning</span><span class="p">,</span><span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
@@ -3113,7 +3110,7 @@
 <span class="sd">       this can be disabled by specifying C{&#39;adjacent=False&#39;} in the constructor.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">,</span> <span class="n">joinString</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">adjacent</span><span class="o">=</span><span class="kc">True</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Combine</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="n">expr</span> <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Combine</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="n">expr</span> <span class="p">)</span>
         <span class="c1"># suppress whitespace-stripping in contained parse expressions, but re-enable it on the Combine itself</span>
         <span class="k">if</span> <span class="n">adjacent</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">leaveWhitespace</span><span class="p">()</span>
@@ -3142,7 +3139,7 @@
 <div class="viewcode-block" id="Group"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.Group">[docs]</a><span class="k">class</span> <span class="nc">Group</span><span class="p">(</span><span class="n">TokenConverter</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Converter to return the matched tokens as a list - useful for returning tokens of ZeroOrMore and OneOrMore expressions.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">expr</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Group</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="n">expr</span> <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Group</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="n">expr</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">saveAsList</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="Group.postParse"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.Group.postParse">[docs]</a>    <span class="k">def</span> <span class="nf">postParse</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">instring</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">tokenlist</span> <span class="p">):</span>
@@ -3154,7 +3151,7 @@
 <span class="sd">       Useful for tabular report scraping when the first column can be used as a item key.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">exprs</span> <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Dict</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="n">exprs</span> <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Dict</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="n">exprs</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">saveAsList</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="Dict.postParse"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.Dict.postParse">[docs]</a>    <span class="k">def</span> <span class="nf">postParse</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">instring</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">tokenlist</span> <span class="p">):</span>
@@ -3212,7 +3209,7 @@
         <span class="n">thisFunc</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">func_name</span>
         <span class="n">s</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">t</span> <span class="o">=</span> <span class="n">paArgs</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">paArgs</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">3</span><span class="p">:</span>
-            <span class="n">thisFunc</span> <span class="o">=</span> <span class="n">paArgs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">thisFunc</span>
+            <span class="n">thisFunc</span> <span class="o">=</span> <span class="n">paArgs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">thisFunc</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s2">&quot;&gt;&gt;entering </span><span class="si">%s</span><span class="s2">(line: &#39;</span><span class="si">%s</span><span class="s2">&#39;, </span><span class="si">%d</span><span class="s2">, </span><span class="si">%s</span><span class="s2">)</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">thisFunc</span><span class="p">,</span><span class="n">line</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">s</span><span class="p">),</span><span class="n">l</span><span class="p">,</span><span class="n">t</span><span class="p">)</span> <span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">ret</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">paArgs</span><span class="p">)</span>
@@ -3223,7 +3220,7 @@
         <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s2">&quot;&lt;&lt;leaving </span><span class="si">%s</span><span class="s2"> (ret: </span><span class="si">%s</span><span class="s2">)</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">thisFunc</span><span class="p">,</span><span class="n">ret</span><span class="p">)</span> <span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">z</span><span class="o">.</span><span class="n">__name__</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">__name__</span>
+        <span class="n">z</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="vm">__name__</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
         <span class="k">pass</span>
     <span class="k">return</span> <span class="n">z</span></div>
@@ -3318,10 +3315,10 @@
 
 <span class="k">def</span> <span class="nf">_escapeRegexRangeChars</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="c1">#~  escape these chars: ^-]</span>
-    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="s2">r&quot;\^-]&quot;</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="sa">r</span><span class="s2">&quot;\^-]&quot;</span><span class="p">:</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">_bslash</span><span class="o">+</span><span class="n">c</span><span class="p">)</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">r&quot;\n&quot;</span><span class="p">)</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">r&quot;\t&quot;</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span><span class="sa">r</span><span class="s2">&quot;\n&quot;</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span><span class="sa">r</span><span class="s2">&quot;\t&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_ustr</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
 <div class="viewcode-block" id="oneOf"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.oneOf">[docs]</a><span class="k">def</span> <span class="nf">oneOf</span><span class="p">(</span> <span class="n">strs</span><span class="p">,</span> <span class="n">caseless</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">useRegex</span><span class="o">=</span><span class="kc">True</span> <span class="p">):</span>
@@ -3429,8 +3426,8 @@
 <span class="n">stringStart</span> <span class="o">=</span> <span class="n">StringStart</span><span class="p">()</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;stringStart&quot;</span><span class="p">)</span>
 <span class="n">stringEnd</span>   <span class="o">=</span> <span class="n">StringEnd</span><span class="p">()</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;stringEnd&quot;</span><span class="p">)</span>
 
-<span class="n">_escapedPunc</span> <span class="o">=</span> <span class="n">Word</span><span class="p">(</span> <span class="n">_bslash</span><span class="p">,</span> <span class="s2">r&quot;\[]-*.$+^?()~ &quot;</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="mi">2</span> <span class="p">)</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">t</span><span class="p">:</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
-<span class="n">_printables_less_backslash</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">printables</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span>  <span class="s2">r&quot;\]&quot;</span> <span class="p">])</span>
+<span class="n">_escapedPunc</span> <span class="o">=</span> <span class="n">Word</span><span class="p">(</span> <span class="n">_bslash</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\[]-*.$+^?()~ &quot;</span><span class="p">,</span> <span class="n">exact</span><span class="o">=</span><span class="mi">2</span> <span class="p">)</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">t</span><span class="p">:</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">_printables_less_backslash</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">printables</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span>  <span class="sa">r</span><span class="s2">&quot;\]&quot;</span> <span class="p">])</span>
 <span class="n">_escapedHexChar</span> <span class="o">=</span> <span class="n">Combine</span><span class="p">(</span> <span class="n">Suppress</span><span class="p">(</span><span class="n">_bslash</span> <span class="o">+</span> <span class="s2">&quot;0x&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">Word</span><span class="p">(</span><span class="n">hexnums</span><span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">t</span><span class="p">:</span><span class="n">unichr</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">16</span><span class="p">)))</span>
 <span class="n">_escapedOctChar</span> <span class="o">=</span> <span class="n">Combine</span><span class="p">(</span> <span class="n">Suppress</span><span class="p">(</span><span class="n">_bslash</span><span class="p">)</span> <span class="o">+</span> <span class="n">Word</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">,</span><span class="s2">&quot;01234567&quot;</span><span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">t</span><span class="p">:</span><span class="n">unichr</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">8</span><span class="p">)))</span>
 <span class="n">_singleChar</span> <span class="o">=</span> <span class="n">_escapedPunc</span> <span class="o">|</span> <span class="n">_escapedHexChar</span> <span class="o">|</span> <span class="n">_escapedOctChar</span> <span class="o">|</span> <span class="n">Word</span><span class="p">(</span><span class="n">_printables_less_backslash</span><span class="p">,</span><span class="n">exact</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -3440,7 +3437,7 @@
 <span class="n">_expanded</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">ParseResults</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="n">unichr</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="nb">ord</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="p">])</span> <span class="ow">or</span> <span class="n">p</span><span class="p">)</span>
 
 <div class="viewcode-block" id="srange"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.srange">[docs]</a><span class="k">def</span> <span class="nf">srange</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Helper to easily define string ranges for use in Word construction.  Borrows</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Helper to easily define string ranges for use in Word construction.  Borrows</span>
 <span class="sd">       syntax from regexp &#39;[]&#39; string range definitions::</span>
 <span class="sd">          srange(&quot;[0-9]&quot;)   -&gt; &quot;0123456789&quot;</span>
 <span class="sd">          srange(&quot;[a-z]&quot;)   -&gt; &quot;abcdefghijklmnopqrstuvwxyz&quot;</span>
@@ -3663,9 +3660,9 @@
     <span class="n">ret</span> <span class="o">&lt;&lt;</span> <span class="n">lastExpr</span>
     <span class="k">return</span> <span class="n">ret</span></div>
 
-<span class="n">dblQuotedString</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="s1">r&#39;&quot;(?:[^&quot;\n\r</span><span class="se">\\</span><span class="s1">]|(?:&quot;&quot;)|(?:</span><span class="se">\\</span><span class="s1">x[0-9a-fA-F]+)|(?:</span><span class="se">\\</span><span class="s1">.))*&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;string enclosed in double quotes&quot;</span><span class="p">)</span>
-<span class="n">sglQuotedString</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="s2">r&quot;&#39;(?:[^&#39;\n\r</span><span class="se">\\</span><span class="s2">]|(?:&#39;&#39;)|(?:</span><span class="se">\\</span><span class="s2">x[0-9a-fA-F]+)|(?:</span><span class="se">\\</span><span class="s2">.))*&#39;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;string enclosed in single quotes&quot;</span><span class="p">)</span>
-<span class="n">quotedString</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="s1">r&#39;&#39;&#39;(?:&quot;(?:[^&quot;\n\r\\]|(?:&quot;&quot;)|(?:\\x[0-9a-fA-F]+)|(?:\\.))*&quot;)|(?:&#39;(?:[^&#39;\n\r\\]|(?:&#39;&#39;)|(?:\\x[0-9a-fA-F]+)|(?:\\.))*&#39;)&#39;&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;quotedString using single or double quotes&quot;</span><span class="p">)</span>
+<span class="n">dblQuotedString</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;&quot;(?:[^&quot;\n\r</span><span class="se">\\</span><span class="s1">]|(?:&quot;&quot;)|(?:</span><span class="se">\\</span><span class="s1">x[0-9a-fA-F]+)|(?:</span><span class="se">\\</span><span class="s1">.))*&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;string enclosed in double quotes&quot;</span><span class="p">)</span>
+<span class="n">sglQuotedString</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&#39;(?:[^&#39;\n\r</span><span class="se">\\</span><span class="s2">]|(?:&#39;&#39;)|(?:</span><span class="se">\\</span><span class="s2">x[0-9a-fA-F]+)|(?:</span><span class="se">\\</span><span class="s2">.))*&#39;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;string enclosed in single quotes&quot;</span><span class="p">)</span>
+<span class="n">quotedString</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;&#39;&#39;(?:&quot;(?:[^&quot;\n\r\\]|(?:&quot;&quot;)|(?:\\x[0-9a-fA-F]+)|(?:\\.))*&quot;)|(?:&#39;(?:[^&#39;\n\r\\]|(?:&#39;&#39;)|(?:\\x[0-9a-fA-F]+)|(?:\\.))*&#39;)&#39;&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;quotedString using single or double quotes&quot;</span><span class="p">)</span>
 <span class="n">unicodeString</span> <span class="o">=</span> <span class="n">Combine</span><span class="p">(</span><span class="n">_L</span><span class="p">(</span><span class="s1">&#39;u&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">quotedString</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 
 <div class="viewcode-block" id="nestedExpr"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.pyparsing.nestedExpr">[docs]</a><span class="k">def</span> <span class="nf">nestedExpr</span><span class="p">(</span><span class="n">opener</span><span class="o">=</span><span class="s2">&quot;(&quot;</span><span class="p">,</span> <span class="n">closer</span><span class="o">=</span><span class="s2">&quot;)&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ignoreExpr</span><span class="o">=</span><span class="n">quotedString</span><span class="o">.</span><span class="n">copy</span><span class="p">()):</span>
@@ -3772,8 +3769,8 @@
     <span class="n">blockStatementExpr</span><span class="o">.</span><span class="n">ignore</span><span class="p">(</span><span class="n">_bslash</span> <span class="o">+</span> <span class="n">LineEnd</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">smExpr</span></div>
 
-<span class="n">alphas8bit</span> <span class="o">=</span> <span class="n">srange</span><span class="p">(</span><span class="s2">r&quot;[\0xc0-\0xd6\0xd8-\0xf6\0xf8-\0xff]&quot;</span><span class="p">)</span>
-<span class="n">punc8bit</span> <span class="o">=</span> <span class="n">srange</span><span class="p">(</span><span class="s2">r&quot;[\0xa1-\0xbf\0xd7\0xf7]&quot;</span><span class="p">)</span>
+<span class="n">alphas8bit</span> <span class="o">=</span> <span class="n">srange</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\0xc0-\0xd6\0xd8-\0xf6\0xf8-\0xff]&quot;</span><span class="p">)</span>
+<span class="n">punc8bit</span> <span class="o">=</span> <span class="n">srange</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\0xa1-\0xbf\0xd7\0xf7]&quot;</span><span class="p">)</span>
 
 <span class="n">anyOpenTag</span><span class="p">,</span><span class="n">anyCloseTag</span> <span class="o">=</span> <span class="n">makeHTMLTags</span><span class="p">(</span><span class="n">Word</span><span class="p">(</span><span class="n">alphas</span><span class="p">,</span><span class="n">alphanums</span><span class="o">+</span><span class="s2">&quot;_:&quot;</span><span class="p">))</span>
 <span class="n">commonHTMLEntity</span> <span class="o">=</span> <span class="n">Combine</span><span class="p">(</span><span class="n">_L</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">oneOf</span><span class="p">(</span><span class="s2">&quot;gt lt amp nbsp quot&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setResultsName</span><span class="p">(</span><span class="s2">&quot;entity&quot;</span><span class="p">)</span> <span class="o">+</span><span class="s2">&quot;;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">streamline</span><span class="p">()</span>
@@ -3781,15 +3778,15 @@
 <span class="n">replaceHTMLEntity</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span> <span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">entity</span> <span class="ow">in</span> <span class="n">_htmlEntityMap</span> <span class="ow">and</span> <span class="n">_htmlEntityMap</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">entity</span><span class="p">]</span> <span class="ow">or</span> <span class="kc">None</span>
 
 <span class="c1"># it&#39;s easy to get these comment structures wrong - they&#39;re very common, so may as well make them available</span>
-<span class="n">cStyleComment</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="s2">r&quot;/\*(?:[^*]*\*+)+?/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;C style comment&quot;</span><span class="p">)</span>
+<span class="n">cStyleComment</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/\*(?:[^*]*\*+)+?/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;C style comment&quot;</span><span class="p">)</span>
 
-<span class="n">htmlComment</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="s2">r&quot;&lt;!--[\s\S]*?--&gt;&quot;</span><span class="p">)</span>
-<span class="n">restOfLine</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="s2">r&quot;.*&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">leaveWhitespace</span><span class="p">()</span>
-<span class="n">dblSlashComment</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="s2">r&quot;\/\/(</span><span class="se">\\</span><span class="s2">\n|.)*&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;// comment&quot;</span><span class="p">)</span>
-<span class="n">cppStyleComment</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="s2">r&quot;/(?:\*(?:[^*]*\*+)+?/|/[^\n]*(?:\n[^\n]*)*?(?:(?&lt;!</span><span class="se">\\</span><span class="s2">)|\Z))&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;C++ style comment&quot;</span><span class="p">)</span>
+<span class="n">htmlComment</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;&lt;!--[\s\S]*?--&gt;&quot;</span><span class="p">)</span>
+<span class="n">restOfLine</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;.*&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">leaveWhitespace</span><span class="p">()</span>
+<span class="n">dblSlashComment</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\/\/(</span><span class="se">\\</span><span class="s2">\n|.)*&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;// comment&quot;</span><span class="p">)</span>
+<span class="n">cppStyleComment</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/(?:\*(?:[^*]*\*+)+?/|/[^\n]*(?:\n[^\n]*)*?(?:(?&lt;!</span><span class="se">\\</span><span class="s2">)|\Z))&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;C++ style comment&quot;</span><span class="p">)</span>
 
 <span class="n">javaStyleComment</span> <span class="o">=</span> <span class="n">cppStyleComment</span>
-<span class="n">pythonStyleComment</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="s2">r&quot;#.*&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;Python style comment&quot;</span><span class="p">)</span>
+<span class="n">pythonStyleComment</span> <span class="o">=</span> <span class="n">Regex</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;#.*&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;Python style comment&quot;</span><span class="p">)</span>
 <span class="n">_noncomma</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="p">[</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">printables</span> <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="s2">&quot;,&quot;</span> <span class="p">]</span> <span class="p">)</span>
 <span class="n">_commasepitem</span> <span class="o">=</span> <span class="n">Combine</span><span class="p">(</span><span class="n">OneOrMore</span><span class="p">(</span><span class="n">Word</span><span class="p">(</span><span class="n">_noncomma</span><span class="p">)</span> <span class="o">+</span>
                                   <span class="n">Optional</span><span class="p">(</span> <span class="n">Word</span><span class="p">(</span><span class="s2">&quot; </span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">+</span>
@@ -3797,7 +3794,7 @@
 <span class="n">commaSeparatedList</span> <span class="o">=</span> <span class="n">delimitedList</span><span class="p">(</span> <span class="n">Optional</span><span class="p">(</span> <span class="n">quotedString</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="o">|</span> <span class="n">_commasepitem</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s2">&quot;commaSeparatedList&quot;</span><span class="p">)</span>
 
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
 
     <span class="k">def</span> <span class="nf">test</span><span class="p">(</span> <span class="n">teststring</span> <span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
@@ -3873,13 +3870,13 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

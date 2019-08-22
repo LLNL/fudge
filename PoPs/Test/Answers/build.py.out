@@ -1,4 +1,4 @@
-<PoPs name="test" version="1.2.3" format="PoPs 0.1">
+<PoPs name="test" version="1.2.3" format="0.1">
   <aliases>
     <particle id="electron" pid="e-"/>
     <particle id="e+" pid="e-_anti"/>
@@ -61,23 +61,25 @@
       <halflife>
         <string label="default" value="stable" unit="s"/></halflife></baryon></baryons>
   <chemicalElements>
-    <chemicalElement id="O" Z="8" name="Oxygen">
-      <isotope id="O16" A="16">
-        <nuclearLevel id="O16_e0">
-          <mass>
-            <double label="default" value="15.994913988" unit="amu"/></mass>
-          <charge>
-            <integer label="default" value="0" unit="e"/></charge>
-          <nucleus id="o16_e0" index="0">
-            <charge>
-              <integer label="default" value="8" unit="e"/></charge>
-            <energy>
-              <double label="default" value="0.0" unit="eV"/></energy></nucleus></nuclearLevel>
-        <nuclearLevel id="O16_e3">
-          <charge>
-            <integer label="default" value="0" unit="e"/></charge>
-          <nucleus id="o16_e3" index="3">
-            <charge>
-              <integer label="default" value="8" unit="e"/></charge>
-            <energy>
-              <double label="default" value="6917100.0" unit="eV"/></energy></nucleus></nuclearLevel></isotope></chemicalElement></chemicalElements></PoPs>
+    <chemicalElement symbol="O" Z="8" name="Oxygen">
+      <isotopes>
+        <isotope symbol="O16" A="16">
+          <nuclides>
+            <nuclide id="O16">
+              <mass>
+                <double label="default" value="15.994913988" unit="amu"/></mass>
+              <charge>
+                <integer label="default" value="0" unit="e"/></charge>
+              <nucleus id="o16" index="0">
+                <charge>
+                  <integer label="default" value="8" unit="e"/></charge>
+                <energy>
+                  <double label="default" value="0.0" unit="eV"/></energy></nucleus></nuclide>
+            <nuclide id="O16_e3">
+              <charge>
+                <integer label="default" value="0" unit="e"/></charge>
+              <nucleus id="o16_e3" index="3">
+                <charge>
+                  <integer label="default" value="8" unit="e"/></charge>
+                <energy>
+                  <double label="default" value="6917100.0" unit="eV"/></energy></nucleus></nuclide></nuclides></isotope></isotopes></chemicalElement></chemicalElements></PoPs>

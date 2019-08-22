@@ -68,7 +68,7 @@ from __future__ import division, nested_scopes
 
 FUDGE_MAJORVERSION = 4
 FUDGE_MINORVERSION = 2
-FUDGE_PATCHLEVEL = 1
+FUDGE_PATCHLEVEL = 3
 __version__ = '%s.%s.%s' % ( FUDGE_MAJORVERSION, FUDGE_MINORVERSION, FUDGE_PATCHLEVEL )
 
 __docformat__ = 'epytext en'
@@ -83,8 +83,7 @@ import fudgeDefaults
 import fudgeParameters
 from core import *
 import vis
-import gnd
-import particles
+import gnds
 
 # if we want to export a smaller set of files with 'from fudge import *':
-#__all__ = ['core','gnd',...]
+#__all__ = ['core','gnds',...]

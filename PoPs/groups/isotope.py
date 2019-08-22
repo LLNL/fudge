@@ -62,76 +62,78 @@
 # <<END-copyright>>
 
 """
-This module contains the class for the suite isotope.
+This module contains the isotope classes.
 """
-
-naturalAID = 1000000
-MaxA = 400
 
 from .. import suite as suiteModule
 from .. import misc as miscModule
 
-from ..families import nuclearLevel as nuclearLevelModule
+from ..groups import misc as chemicalElementMiscModule
+
+from ..families import nuclide as nuclideModule
 from ..families import nucleus as nucleusModule
 
-class suite( suiteModule.sortedSuite ) :
+class isotope( miscModule.classWithSymbolKey ) :
     """
-    The class is and isotope that contains a list if nuclear levels. The ids for this class are SA[_anti]
-    where S is the istopes's chemical element symbol, A is the isotope's nucleon number.
+    An isotope that contains a list of nuclides. The symbol is of the form  *SA[_anti]*
+    where *S* is the istopes's chemical element symbol and *A* is the isotope's nucleon number.
     """
 
     moniker = 'isotope'
 
-    def __init__( self, id, A ) :
+    def __init__( self, symbol, A ) :
 
-        from . import chemicalElement as chemicalElementModule
+        miscModule.classWithSymbolKey.__init__( self, symbol )
 
-        chemicalElement, _A, anti, qualifier = chemicalElementAndAIDsFromIsotopeID( id )
+        baseID, chemicalElementSymbol, _A, levelID, isNucleus, anti, qualifier = chemicalElementMiscModule.chemicalElementALevelIDsAndAnti( symbol )
+        isotopeSymbol = chemicalElementMiscModule.isotopeSymbolFromChemicalElementIDAndA( chemicalElementSymbol, A )
+        if( symbol != isotopeSymbol ) : ValueError( 'invalid isotope symbol = "%s"' % symbol )
 
-        if( A != _A ) : raise ValueError( 'id = "%s" does not agree with A = "%s"' % 
-                ( miscModule.toLimitedString( id ), miscModule.toLimitedString( A ) ) )
+        if( A != _A ) : raise ValueError( 'symbol = "%s" does not agree with A = "%s"' % 
+                ( miscModule.toLimitedString( symbol ), miscModule.toLimitedString( A ) ) )
 
-        suiteModule.sortedSuite.__init__( self, [ nuclearLevelModule.particle ], key = 'id', replace = True )
-
-        self.__id = id
-
-        self.__anti = anti == miscModule.antiSuffix
-
-        self.__chemicalElement = chemicalElement
+        self.__chemicalElementSymbol = chemicalElementSymbol
         self.__A = A
-        self.__intA = checkA( A )
 
-        self.__Z = chemicalElementModule.ZFromSymbol[chemicalElement]
+        self.__Z = chemicalElementMiscModule.ZFromSymbol[chemicalElementSymbol]
+
+        self.__atomicData = None
+
+        self.__nuclides = nuclideModule.suite( )
+        self.__nuclides.setAncestor( self )
+
+    def __len__( self ) :
+
+        return( len( self.__nuclides ) )
 
     def __contains__( self, key ) :
 
-        if( suiteModule.sortedSuite.__contains__( self, key ) ) : return( True )
-        if( isinstance( key, str ) ) :
-            keyUpper = key[:1].upper( ) + key[1:]
-            if( suiteModule.sortedSuite.__contains__( self, keyUpper ) ) : return( True )   # all nuclearLevels must have a nucleus.
+        baseID, chemicalElementSymbol, A, levelID, isNucleus, anti, qualifier = chemicalElementMiscModule.chemicalElementALevelIDsAndAnti( key )
+        if( None in [ chemicalElementSymbol, A, levelID ] ) : return( False )
+        isotopeSymbol = chemicalElementMiscModule.isotopeSymbolFromChemicalElementIDAndA( chemicalElementSymbol, A )
+        nuclideID = chemicalElementMiscModule.nuclideIDFromIsotopeSymbolAndIndex( isotopeSymbol, levelID )
+        if( nuclideID in self.__nuclides ) :
+            if( not( isNucleus ) ) : return( True )
+            nuclide = self.__nuclides[nuclideID]
+            return( nuclide.nucleus is not None )
         return( False )
 
     def __getitem__( self, key ) :
 
-        if( isinstance( key, int ) ) : return( suiteModule.sortedSuite.__getitem__( self, key ) )
-        try :
-            return( suiteModule.sortedSuite.__getitem__( self, key ) )
-        except :
-            keyUpper = key[:1].upper( ) + key[1:]
-            if( suiteModule.sortedSuite.__contains__( self, keyUpper ) ) : return( suiteModule.sortedSuite.__getitem__( self, keyUpper ).nucleus )
+        if( isinstance( key, int ) ) : return( self.__nuclides[0] )
+        baseID, chemicalElementSymbol, A, levelID, isNucleus, anti, qualifier = chemicalElementMiscModule.chemicalElementALevelIDsAndAnti( key )
+        if( None in [ chemicalElementSymbol, A, levelID ] ) : raise KeyError( 'key "%s" not found' % key )
+        isotopeSymbol = chemicalElementMiscModule.isotopeSymbolFromChemicalElementIDAndA( chemicalElementSymbol, A )
+        nuclideID = chemicalElementMiscModule.nuclideIDFromIsotopeSymbolAndIndex( isotopeSymbol, levelID )
+        if( nuclideID in self.__nuclides ) :
+            nuclide = self.__nuclides[nuclideID]
+            if( not( isNucleus ) ) : return( nuclide )
+            if( nuclide.nucleus is not None ) : return( nuclide.nucleus )
         raise KeyError( 'key "%s" not found' % key )
 
-    def __eq__( self, other ) :
+    def __iter__( self ) :
 
-        from ..families import nuclearLevel as nuclearLevelModule
-
-        if(   isinstance( other, suite ) ) :
-            return( self.id == other.id )
-        elif( isinstance( other, nuclearLevelModule.particle ) ) :
-            _particle = self.particle
-            return( _particle.id == other.id )
-        else :
-            return( False )
+        for nuclide in self.__nuclides : yield nuclide
 
     @property
     def A( self ) :
@@ -139,90 +141,23 @@ class suite( suiteModule.sortedSuite ) :
         return( self.__A )
 
     @property
-    def intA( self ) :
-
-        return( self.__intA )
-
-    @property
     def Z( self ) :
 
         return( self.__Z )
 
     @property
-    def chemicalElement( self ) :
+    def chemicalElementSymbol( self ) :
 
-        return( self.__chemicalElement )
-
-    @property
-    def groundState( self ) :
-
-        if( len( self ) > 0 ) :
-            groundState = self[0]
-            if( groundState.intIndex == 0 ) : return( groundState )
-        raise Exception( 'No ground state present for isotope id = "%s".' % self.id )
+        return( self.__chemicalElementSymbol )
 
     @property
-    def id( self ) :
+    def nuclides( self ) :
 
-        return( self.__id )
-
-    @property
-    def isAnti( self ) :
-
-        return( self.__anti )
-
-    @property
-    def key( self ) :
-
-        return( self.__id )
-
-    @key.setter
-    def key( self, value ) :
-
-        if( not( isinstance( value, str ) ) ) : raise TypeError( 'id must be a string instance.' )
-        self.__id = value
-
-    @property
-    def mass( self ) :
-
-        return( self.groundState.mass )
-
-    @property
-    def spin( self ) :
-
-        return( self.groundState.spin )
-
-    @property
-    def parity( self ) :
-
-        return( self.groundState.parity )
-
-    @property
-    def charge( self ) :
-
-        return( self.groundState.charge )
-
-    @property
-    def halflife( self ) :
-
-        return( self.groundState.halflife )
-
-    @property
-    def energy( self ) :
-
-        return( self.groundState.energy )
-
-    @property
-    def nucleus( self ) :
-
-        return( self.groundState.nucleus )
+        return( self.__nuclides )
 
     def add( self, particle ) :
 
-        if( not( isinstance( particle, nuclearLevelModule.particle ) ) ) :
-            raise TypeError( "Particle not a nuclearLevel object." )
-
-        suiteModule.sortedSuite.add( self, particle )
+        self.__nuclides.add( particle )
 
     def check( self, info ):
 
@@ -230,34 +165,34 @@ class suite( suiteModule.sortedSuite ) :
         warnings = []
 
         emax = -1
-        for level in self:
-            levelWarnings = level.check(info)
-            if levelWarnings:
-                warnings.append(warningModule.context('Level %s' % level.index, levelWarnings))
+        for nuclide in self:
+            nuclideWarnings = nuclide.check(info)
+            if nuclideWarnings:
+                warnings.append(warningModule.context('nuclide %s' % nuclide.id, nuclideWarnings))
 
-            if not level.index.isdigit(): continue  # 'c' and 'u' levels may be out of order
-            enow = level.energy.float('eV')
+            enow = nuclide.nucleus.energy.float('eV')
             if enow <= emax:
-                warnings.append(warningModule.discreteLevelsOutOfOrder(level.index, level))
+                warnings.append(warningModule.discreteLevelsOutOfOrder(nuclide.nucleus.index, nuclide))
             else:
                 emax = enow
 
         return warnings
 
+    def convertUnits( self, unitMap ) :
+
+        if( self.__atomicData is not None ) : self.__atomicData.convertUnits( unitMap )
+        self.__nuclides.convertUnits( unitMap )
+
     def copy( self ) :
 
-        isotope = suite( self.id, self.A )
-        for item in self : isotope.add( item.copy( ) )
-        return( isotope )
-
-    def getMass( self, unit ) :
-
-        return( self[0].getMass( unit ) )
+        _isotope = isotope( self.symbol, self.A )
+        for nuclide in self.__nuclides : _isotope.add( nuclide.copy( ) )
+        return( _isotope )
 
     def sortCompare( self, other ) :
 
-        if( not( isinstance( other, suite ) ) ) : raise TypeError( 'Invalid other.' )
-        return( self.intA - other.intA )
+        if( not( isinstance( other, isotope ) ) ) : raise TypeError( 'Invalid other.' )
+        return( self.A - other.A )
 
     def toXML( self, indent = '', **kwargs ) :
 
@@ -267,19 +202,34 @@ class suite( suiteModule.sortedSuite ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        XMLStringList = [ '%s<%s id="%s" A="%s">' % ( indent, self.moniker, self.id, self.A ) ]
-        for level in self : XMLStringList += level.toXMLList( indent2, **kwargs )
+        XMLStringList = [ '%s<%s symbol="%s" A="%s">' % ( indent, self.moniker, self.symbol, self.A ) ]
+        if( self.__atomicData is not None ) : XMLStringList += self.__atomicData.toXMLList( indent = indent2, **kwargs )
+        XMLStringList += self.__nuclides.toXMLList( indent = indent2, **kwargs )
         XMLStringList[-1] += '</%s>' % self.moniker
         return( XMLStringList )
 
     def parseXMLNode( self, element, xPath, linkData ) :
 
-        xPath.append( element.tag )
+        xPath.append( '%s[@symbol="%s"]' % ( element.tag, element.get( 'symbol' ) ) )
     
         for child in element :
-            self.add( nuclearLevelModule.particle.parseXMLNodeAsClass( child,  xPath, linkData ) ) 
+            if( child.tag == nuclideModule.suite.moniker ) :
+                self.nuclides.parseXMLNode( child,  xPath, linkData )
+            else :
+                raise Exception( 'Fix me: tag = %s' % child.tag )
     
         xPath.pop( )
+        return( self )
+
+    @classmethod
+    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+
+        xPath.append( '%s[@symbol="%s"]' % ( element.tag, element.get( 'symbol' ) ) )
+
+        self = cls( element.get( 'symbol' ), int( element.get( 'A' ) ) )
+        xPath.pop()
+        self.parseXMLNode( element, xPath, linkData )
+
         return( self )
 
     @classmethod
@@ -288,66 +238,54 @@ class suite( suiteModule.sortedSuite ) :
         from xml.etree import cElementTree
 
         element = cElementTree.fromstring( string )
+        self = cls.parseXMLNodeAsClass( element, [], [] )
 
-        attributes = {}
-        for attributeName in element.attrib :
-            if( attributeName == 'id' ) :
-                id = element.attrib[attributeName]
-            elif( attributeName == 'A' ) :
-                A = element.attrib[attributeName]
-            else :
-                raise ValueError( 'Unknown attribute = "%s"' % attributeName )
+        return( self )
 
-        return( cls( id, A ).parseXMLNode( element, [], [] ) )
+class isotopes( suiteModule.sortedSuite ) :
 
-def isotopeIDFromElementIDAndA( elementID, A ) :
+    moniker = 'isotopes'
 
-    checkA( A )
-    return( "%s%s" % ( elementID, A ) )
+    def __init__( self, replace = True ) :
 
-def chemicalElementAndAIDsFromIsotopeID( id, qualifierAllowed = False ) :
-    """
-    Returns the chemicalElement id and A from an isotope's id.
-    """
+        suiteModule.sortedSuite.__init__( self, allowedClasses = ( isotope, ), replace = replace )
 
-    from . import chemicalElement as chemicalElementModule
+    def __contains__( self, key ) :
 
-    baseID, anti, qualifier = miscModule.baseAntiQualifierFromID( id, qualifierAllowed = qualifierAllowed )
+        baseID, chemicalElementSymbol, A, levelID, isNucleus, anti, qualifier = chemicalElementMiscModule.chemicalElementALevelIDsAndAnti( key )
+        if( None in [ chemicalElementSymbol, A ] ) : return( False )
+        isotopeSymbol = chemicalElementMiscModule.isotopeSymbolFromChemicalElementIDAndA( chemicalElementSymbol, A )
+        if( suiteModule.sortedSuite.__contains__( self, isotopeSymbol ) ) :
+            return( key in suiteModule.sortedSuite.__getitem__( self, isotopeSymbol ) )
+        return( False )
 
-    chemicalElementID, sep, A = baseID.rpartition( '_' )
-    if( sep == '' ) :
-        if(   baseID[1:].isdigit( ) ) :
-            chemicalElementID, A = baseID[0], baseID[1:]
-        elif( baseID[2:].isdigit( ) ) :
-            chemicalElementID, A = baseID[:2], baseID[2:]
-        elif( baseID[3:].isdigit( ) ) :
-            chemicalElementID, A = baseID[:3], baseID[3:]
+    def __getitem__( self, key ) :
+
+        if( isinstance( key, int ) ) : return( suiteModule.sortedSuite.__getitem__( self, key ) )
+        baseID, chemicalElementSymbol, A, levelID, isNucleus, anti, qualifier = chemicalElementMiscModule.chemicalElementALevelIDsAndAnti( key )
+        if( None in [ chemicalElementSymbol, A ] ) : raise KeyError( 'key "%s" not found' % key )
+        isotopeSymbol = chemicalElementMiscModule.isotopeSymbolFromChemicalElementIDAndA( chemicalElementSymbol, A )
+        return( suiteModule.sortedSuite.__getitem__( self, isotopeSymbol )[key] )
+
+    def add( self, item ) :
+
+        if( isinstance( item, isotope ) ) :
+            suiteModule.sortedSuite.add( self, item )
+        elif( isinstance( item, ( nuclideModule.particle, nucleusModule.particle ) ) ) :
+            isotopeSymbol = chemicalElementMiscModule.isotopeSymbolFromChemicalElementIDAndA( item.chemicalElementSymbol, item.A )
+            if( not( suiteModule.sortedSuite.__contains__( self, isotopeSymbol ) ) ) : suiteModule.sortedSuite.add( self, isotope( isotopeSymbol, item.A ) )
+            suiteModule.sortedSuite.__getitem__( self, isotopeSymbol ).add( item )
         else :
-            raise ValueError( 'Invalid isotope id.' )
-        try :
-            Z = chemicalElementModule.ZFromSymbol[chemicalElementID]
-        except :
-            raise ValueError( 'Invalid chemical symbol "%s".' % chemicalElementID )
-        intA = int( A )
-        if( intA  != 0 ) :                  # Elementmental isotope.
-            if( intA < Z ) : raise ValueError( 'A = %s must be greater than or equal to Z = %s: id = "%s"' % ( A, Z, id ) )
-    else :                              # id is chemicalElement + '_natural'.
-        if( A == '' ) : raise ValueError( 'Missing A in isotope id.' )
-        if( A not in [ 'natural' ] ) : raise ValueError( 'Invalid A = "%s": id = "%s"' ( A, id ) )
+            raise TypeError( "Object not an isotope, nuclide or nucleus particle." )
 
-    chemicalElementModule.checkSymbol( chemicalElementID )
+    def convertUnits( self, unitMap ) :
 
-    return( chemicalElementID, A, anti, qualifier )
+        for isotope in self : isotope.convertUnits( unitMap )
 
-def checkA( A ) :
+    def getSymbol( self, key ) :
 
-    if( not( isinstance( A, str ) ) ) : raise TypeError( 'A attribute not str' )
-    if( A not in ( '_natural', ) ) :
-        try :
-            intA = int( A )             # In the next line 300 is arbitary.
-            if( not( 0 <= intA < MaxA ) ) : raise ValueError( 'integer A out of range: A = %s' % A )
-            return( intA )
-        except :
-            raise ValueError( 'A attribute not str of an integer or "_natural"' )
+        return( suiteModule.sortedSuite.__getitem__( self, key ) )
 
-    return( naturalAID )
+    def hasSymbol( self, key ) :
+
+        return( suiteModule.sortedSuite.__contains__( self, key ) )

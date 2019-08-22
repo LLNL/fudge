@@ -61,18 +61,18 @@
 # 
 # <<END-copyright>>
 
-from fudge.gnd.productData.distributions import Legendre as LLNLLegendreModule
+from fudge.gnds.productData.distributions import Legendre as LLNLLegendreModule
 
-from ... import gndToENDF6 as gndToENDF6Module
+from ... import gndsToENDF6 as gndsToENDF6Module
 from ... import endfFormats as endfFormatsModule
 
 #
 # form
 #
-def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
+def toENDF6( self, MT, endfMFList, flags, targetInfo ) :    # FIXME appears to be broken code
 
     LAW, LEP = 1, 2
-    EInInterpolation = gndToENDF6Module.axisToEndfInterpolationFlag( self.axes[1] )
+    EInInterpolation = gndsToENDF6Module.axisToEndfInterpolationFlag( self.axes[1] )
     E_ins = [ [ EpCl.value, {} ] for EpCl in self[0].EpP ]
     for l_EEpCl in self :
         for indexE, EpCl in enumerate( l_EEpCl ) :
@@ -93,6 +93,6 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
             data += [ key ] + LegendreSeries
         ENDFDataList.append( endfFormatsModule.endfContLine( 0, Es[0], 0, NA - 1, len( data ), len( data ) / ( NA + 1 ) ) )
         ENDFDataList += endfFormatsModule.endfDataList( data )
-    gndToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, self.productFrame, ENDFDataList )
+    gndsToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, self.productFrame, ENDFDataList )
 
 LLNLLegendreModule.form.toENDF6 = toENDF6

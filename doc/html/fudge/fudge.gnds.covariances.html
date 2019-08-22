@@ -1,0 +1,1395 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>fudge.gnds.covariances package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '4.2.3 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fudge.gnds.productData package" href="fudge.gnds.productData.html" />
+    <link rel="prev" title="fudge.gnds.channelData package" href="fudge.gnds.channelData.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fudge.gnds.productData.html" title="fudge.gnds.productData package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fudge.gnds.channelData.html" title="fudge.gnds.channelData package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="fudge.gnds.html" accesskey="U">fudge.gnds package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="fudge-gnds-covariances-package">
+<h1>fudge.gnds.covariances package<a class="headerlink" href="#fudge-gnds-covariances-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="fudge-gnds-covariances-base-module">
+<h2>fudge.gnds.covariances.base module<a class="headerlink" href="#fudge-gnds-covariances-base-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-fudge.gnds.covariances.base"></span><p>Base classes for covariances: matrix, axes.</p>
+<dl class="class">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.base.</code><code class="descname">covarianceMatrix</code><span class="sig-paren">(</span><em>label</em>, <em>type='absolute'</em>, <em>matrix=None</em>, <em>productFrame=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">xData.ancestry.ancestry</span></code></p>
+<p>Base class for all covariances. covarianceMatrix contains a label, a covariance ‘type’ which might be ‘absolute’,
+‘relative’ or ‘correlation’, and an optional ‘productFrame’ for outgoing distribution covariances.
+Matrix data is stored in an <code class="xref py py-class docutils literal"><span class="pre">xData.gridded.gridded2d</span></code> class. May be diagonal, symmetric, sparse, etc</p>
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.check">
+<code class="descname">check</code><span class="sig-paren">(</span><em>info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if uncertainty in the bounds passed into the checker.  
+Requires specification of the data (“theData”) if the covariance is not relative.
+I was not creative when I coded this, so it will fail when theData.getValue( x )
+doesn’t exist or is a function of more than one value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.convertAxesToUnits">
+<code class="descname">convertAxesToUnits</code><span class="sig-paren">(</span><em>units</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.convertAxesToUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.convertAxesToUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts all the axes’ units.
+The parameter <code class="docutils literal"><span class="pre">units</span></code> should be a list of units with the same length as self.axes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.convertUnits">
+<code class="descname">convertUnits</code><span class="sig-paren">(</span><em>unitMap</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.fix">
+<code class="descname">fix</code><span class="sig-paren">(</span><em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.fix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fix uncertainty using the bounds passed into the fixer.
+Requires specification of the data (“theData”) if the covariance is not relative.
+I was not creative when I coded this, so it will fail when theData.getValue( x )
+doesn’t exist or is a function of more than one value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.getColumnBounds">
+<code class="descname">getColumnBounds</code><span class="sig-paren">(</span><em>unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.getColumnBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.getColumnBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the bounds of the column.  If unit is specified, return the bounds in that unit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.getCorrelationMatrix">
+<code class="descname">getCorrelationMatrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.getCorrelationMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.getCorrelationMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the correlation matrix generated from self’s covariance matrix.  This is
+essentially a copy of self, but renormalized by the uncertainty:</p>
+<blockquote>
+<div>correlation[i,j] = covariance[i,j]/sqrt(covariance[i,i])/sqrt(covariance[j,j])</div></blockquote>
+<p>We reuse the covariance matrix class so that we can do plotting, etc.  If you have
+a correlation matrix, you can safely recover it provided you have the uncertainty
+vector.</p>
+<p>Currently only works for a square covariance matrix and not a off-diagonal part of
+another covariance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.getRowBounds">
+<code class="descname">getRowBounds</code><span class="sig-paren">(</span><em>unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.getRowBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.getRowBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the bounds of the row.  If unit is specified, return the bounds in that unit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.getUncertaintyVector">
+<code class="descname">getUncertaintyVector</code><span class="sig-paren">(</span><em>theData=None</em>, <em>relative=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.getUncertaintyVector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.getUncertaintyVector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an XYs1d object containing uncertainty for this matrix.
+Convert relative/absolute if requested (if so, must also pass central values as theData)</p>
+<p>Examples:</p>
+<blockquote>
+<div><ul>
+<li><p class="first">if the covariance matrix is relative and we want relative uncertainty vector, just do:</p>
+<blockquote>
+<div><p>&gt; matrix.getUncertaintyVector()</p>
+</div></blockquote>
+</li>
+<li><p class="first">if we want the absolute matrix instead:</p>
+<blockquote>
+<div><p>&gt; matrix.getUncertaintyVector( theData=&lt;XYs1d instance&gt;, relative=False )</p>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.getValue">
+<code class="descname">getValue</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.getValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.group">
+<code class="descname">group</code><span class="sig-paren">(</span><em>groupBoundaries=(None</em>, <em>None)</em>, <em>groupUnit=(None</em>, <em>None)</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Group the matrix in self</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>groupBoundaries</strong> – a 2 element list containing the group boundaries for the rows 
+and columns (respectively) of the covariance to be regrouped
+rows go in the first element, columns in the second</li>
+<li><strong>groupUnit</strong> – a 2 element list containing the units in which group boundaries are 
+specified for the rows and columns (respectively) of the covariance 
+to be regrouped</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the regrouped matrix (an xData.array.full as the array in a gridded2d.matrix)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We still need to do flux weighting</p>
+</div>
+<p class="rubric">Regrouping Theory</p>
+<p>Given a function <img class="math" src="../_images/math/3e47ae30d72acd8ef948490fc2d3ecd726742ca6.png" alt="f(E)"/>, we write the grouped data using fudge’s <code class="docutils literal"><span class="pre">flat</span></code> interpolation 
+scheme.  We note that we could write this scheme as an expansion over basis functions:</p>
+<div class="math">
+<p><img src="../_images/math/63d6a56b2596863ee81234136993483579bd7343.png" alt="f(E) = \sum_{i=0}^{N+1} w_i(E) * f_i"/></p>
+</div><p>where the weight functions <img class="math" src="../_images/math/1e3902a2c01250b5fd25666843d67129c60feaa0.png" alt="w_i(E)"/> are</p>
+<div class="math">
+<p><img src="../_images/math/9eb2469e736a96ed17f89c5c26c13df3599ce9ec.png" alt="w_i(E) = 1  \;\text{for}\; E_i &lt;= E &lt;= E_{i+1}; \;\; 0 \;\textrm{otherwise}"/></p>
+</div><p>These weights are an orthogonal (bot not orthonormal) basis, with</p>
+<div class="math">
+<p><img src="../_images/math/04ed76cbbe5623cd28ecd5077fc092d8e7911fd8.png" alt="(E_{i+1}-E_i) \delta_{ij} = \int dE w_i(E) * w_j(E)"/></p>
+</div><p>So, to transform from basis <img class="math" src="../_images/math/1e3902a2c01250b5fd25666843d67129c60feaa0.png" alt="w_i(E)"/> to <img class="math" src="../_images/math/395dad5d1ea0866b0c3c9ce0c2ccdfed1a4a56a9.png" alt="v_i(E)"/> (which has group boundaries 
+<img class="math" src="../_images/math/5edef0b432c8a218a6f8b9b83038f49b200514f1.png" alt="[ E'_0, ... ]"/>), do:</p>
+<div class="math">
+<p><img src="../_images/math/b4016d14ba7ca608bd119c93d312ca56cda214a4.png" alt="f'_j = \sum_i m_{ji} f_i"/></p>
+</div><p>where <img class="math" src="../_images/math/a036a203f0ec9156ccdc34d60e52c88818ca0bb9.png" alt="f'"/> is the regrouped function coefficients and <img class="math" src="../_images/math/9b7c25a79fe0ce2b2fce37db0bc296b1389b467b.png" alt="m_{ji}"/> is the matrix</p>
+<div class="math">
+<p><img src="../_images/math/af54e88bcbf0879916ac1b95e572cdb237132ce7.png" alt="m_{ij} = (E'_{i+1}-E'_i)^{-1} \int dE v_i(E) w_j(E)"/></p>
+</div><p class="rubric">Applying regrouping theory to covariance matrices   </p>
+<p>When we are given a covariance matrix <img class="math" src="../_images/math/5b081855e65302dfb2148cb29a7d769330d607af.png" alt="c_{ij}"/> in ENDF, it is meant to be interpreted
+as a grouped covariance in both the direction of the matrix rows and the matrix 
+columns.  Therefore, we must regroup in both the row direction and the column 
+direction.  The ENDF format gives both the group boundaries for the rows and columns.
+In other words, ENDF gives us the following rule for evaluating the continuous row-
+column covariance:</p>
+<div class="math">
+<p><img src="../_images/math/c8bf4d1ac3e6406b5323ce86b626664cb510995d.png" alt="c( E1, E2 ) = \sum_{ij} w_i(E1) w_j(E2) c_{ij}"/></p>
+</div><p>Computing <img class="math" src="../_images/math/6ee379186003495fd567daa9cf5c0dfec6503fed.png" alt="m_{ij}"/> as before,</p>
+<div class="math">
+<p><img src="../_images/math/b6147e4d73f9aa2e57966bc5b56e8b10ebdfecbf.png" alt="cc_{ij} = \sum_{i',j'} m_{ii'} c_{i'j'} m_{j'j}"/></p>
+</div><p>It is straightforward to generalize to the case where the row and column bases are 
+different.</p>
+<p>In the routine below, we abuse <code class="xref py py-class docutils literal"><span class="pre">xData.XYs1d</span></code> to specify the functions 
+<img class="math" src="../_images/math/1e3902a2c01250b5fd25666843d67129c60feaa0.png" alt="w_i(E)"/> and use the <code class="xref py py-func docutils literal"><span class="pre">XYs1d.groupOneFunction()</span></code> method to perform the integrals to get
+the regrouping matrix.  We do this separately for the rows and the columns.
+The matrix multiplication that converts a covariance from one pair of bases (group 
+structures) to another is accomplished using numpy.</p>
+<p class="rubric">An explanation of fudge’s ‘flat’ interpolation</p>
+<p>Suppose we have a function <img class="math" src="../_images/math/3e47ae30d72acd8ef948490fc2d3ecd726742ca6.png" alt="f(E)"/> specified using fudge’s <cite>‘flat’</cite> interpolation.  
+Then we have <img class="math" src="../_images/math/f4170ed8938b79490d8923857962695514a8e4cb.png" alt="N"/> entries <img class="math" src="../_images/math/a64756d6bea8d12d5b9b32d3edb43d933ef3be2a.png" alt="[f_0, f_1, ..., f_{N-1}]"/> and a set of group 
+boundaries <img class="math" src="../_images/math/accb039fd8b4fcbf8a88c890e6dbc457a231721d.png" alt="[E_0, E_1, ..., E_N]"/> and the following rule for interpolation:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Below <img class="math" src="../_images/math/10c4bd0c5cfb7a116bde63541919dfbbf3282298.png" alt="E_0"/>, <img class="math" src="../_images/math/3e47ae30d72acd8ef948490fc2d3ecd726742ca6.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/720482fdb5d7a6334d0563fa0829338f187fe763.png" alt="0.0"/></li>
+<li>From <img class="math" src="../_images/math/85ae397a08a0891f4d46b57495c45dd4d3073940.png" alt="E_0 \rightarrow E_1"/>, <img class="math" src="../_images/math/3e47ae30d72acd8ef948490fc2d3ecd726742ca6.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/52912b9344b448d9c381dc4c5b6d0adc3b268b50.png" alt="f_0"/></li>
+<li>From <img class="math" src="../_images/math/63c57841652420ccc3cedbe9a67456d222d13faf.png" alt="E_1 \rightarrow E_2"/>, <img class="math" src="../_images/math/3e47ae30d72acd8ef948490fc2d3ecd726742ca6.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/09968cb620b9b121ddcc33bb90eab038355375ab.png" alt="f_1"/></li>
+<li>…</li>
+<li>From <img class="math" src="../_images/math/6584941ea449ddc1abe7d54f867d4299cd72c15d.png" alt="E_{i} \rightarrow E_{i+1}"/>, <img class="math" src="../_images/math/3e47ae30d72acd8ef948490fc2d3ecd726742ca6.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/32c776976a60205210b12dc2566b5f2b2a81f7bf.png" alt="f_i"/></li>
+<li>…</li>
+<li>From <img class="math" src="../_images/math/30dc6e894442aa5aa987eb5b97a8c4d8ee1d7182.png" alt="E_{N-1} \rightarrow E_N"/>, <img class="math" src="../_images/math/3e47ae30d72acd8ef948490fc2d3ecd726742ca6.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/42e0c3807b89cb807f619a1e5386f5bd167c16f8.png" alt="f_{N-1}"/></li>
+<li>Above <img class="math" src="../_images/math/9a2550e7fe51f7ac5f324143e5003e18c877c393.png" alt="E_N"/>, <img class="math" src="../_images/math/3e47ae30d72acd8ef948490fc2d3ecd726742ca6.png" alt="f(E)"/> evaluates to <img class="math" src="../_images/math/720482fdb5d7a6334d0563fa0829338f187fe763.png" alt="0.0"/></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.isSymmetric">
+<code class="descname">isSymmetric</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.isSymmetric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.isSymmetric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple test to determin if an underlying matrix is symmetric
+:return:</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.label">
+<code class="descname">label</code><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.matrix">
+<code class="descname">matrix</code><em class="property"> = None</em><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>a <code class="xref py py-class docutils literal"><span class="pre">xData.gridded.gridded2d</span></code> instance containing the matrix</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.moniker">
+<code class="descname">moniker</code><em class="property"> = 'covarianceMatrix'</em><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.parseXMLNode">
+<em class="property">static </em><code class="descname">parseXMLNode</code><span class="sig-paren">(</span><em>element</em>, <em>xPath</em>, <em>linkData</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate &lt;covarianceMatrix&gt; element from xml into python class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>title=None</em>, <em>scalelabel=None</em>, <em>xlim=None</em>, <em>ylim=None</em>, <em>xlog=False</em>, <em>ylog=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.plot" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>title</strong> – </li>
+<li><strong>scalelabel</strong> – </li>
+<li><strong>xlim</strong> – </li>
+<li><strong>ylim</strong> – </li>
+<li><strong>xlog</strong> – </li>
+<li><strong>ylog</strong> – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.removeExtraZeros">
+<code class="descname">removeExtraZeros</code><span class="sig-paren">(</span><em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.removeExtraZeros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.removeExtraZeros" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all extra zeros from the underlying matrix
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.toAbsolute">
+<code class="descname">toAbsolute</code><span class="sig-paren">(</span><em>rowData=None</em>, <em>colData=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.toAbsolute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.toAbsolute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rescales self (if it is a relative covariance) using XYs1d rowData and colData
+to convert self into an absolute covariance matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>rowData</strong> (<a class="reference internal" href="fudge.gnds.reactionData.html#fudge.gnds.reactionData.crossSection.backgroundTerm.XYs1d" title="fudge.gnds.reactionData.crossSection.backgroundTerm.XYs1d"><em>XYs1d</em></a>) – an XYs1d instance containing data to rescale covariance in the “row direction”
+if it isn’t given, we’ll compute it from the corresponding data in the reactionSuite</li>
+<li><strong>colData</strong> (<a class="reference internal" href="fudge.gnds.reactionData.html#fudge.gnds.reactionData.crossSection.backgroundTerm.XYs1d" title="fudge.gnds.reactionData.crossSection.backgroundTerm.XYs1d"><em>XYs1d</em></a>) – an XYs1d instance containing data to rescale covariance in the “col direction”
+if it isn’t given, we’ll compute it from the corresponding data in the reactionSuite</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a copy of self, but rescaled and with the type set to absoluteToken</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.toCovarianceMatrix">
+<code class="descname">toCovarianceMatrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.toCovarianceMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.toCovarianceMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return self, converted to a <cite>base</cite> instance.  Since it already is one, we just return a copy.
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.toRelative">
+<code class="descname">toRelative</code><span class="sig-paren">(</span><em>rowData=None</em>, <em>colData=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.toRelative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.toRelative" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rescales self (if it is a absolute covariance) using XYs1d rowData and colData
+to convert self into a relative covariance matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>rowData</strong> (<a class="reference internal" href="fudge.gnds.reactionData.html#fudge.gnds.reactionData.crossSection.backgroundTerm.XYs1d" title="fudge.gnds.reactionData.crossSection.backgroundTerm.XYs1d"><em>XYs1d</em></a>) – an XYs1d instance containing data to rescale covariance in the “row direction”
+if it isn’t given, we’ll compute it from the corresponding data in the reactionSuite</li>
+<li><strong>colData</strong> (<a class="reference internal" href="fudge.gnds.reactionData.html#fudge.gnds.reactionData.crossSection.backgroundTerm.XYs1d" title="fudge.gnds.reactionData.crossSection.backgroundTerm.XYs1d"><em>XYs1d</em></a>) – an XYs1d instance containing data to rescale covariance in the “col direction”
+if it isn’t given, we’ll compute it from the corresponding data in the reactionSuite</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If the column axis is a link, only rowData is needed.
+If neither rowData nor colData are specified, you’d better hope that the covariance is already 
+relative because this will throw an error.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a copy of self, but rescaled and with the type set to relativeToken</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.toXMLList">
+<code class="descname">toXMLList</code><span class="sig-paren">(</span><em>indent=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/base.html#covarianceMatrix.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>indent</strong> – </li>
+<li><strong>kwargs</strong> – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.base.covarianceMatrix.type">
+<code class="descname">type</code><em class="property"> = None</em><a class="headerlink" href="#fudge.gnds.covariances.base.covarianceMatrix.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>‘relative’ or ‘absolute’</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="fudge-gnds-covariances-covariancesuite-module">
+<h2>fudge.gnds.covariances.covarianceSuite module<a class="headerlink" href="#fudge-gnds-covariances-covariancesuite-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-fudge.gnds.covariances.covarianceSuite"></span><p>Module with containers for covariances in several different forms</p>
+<dl class="class">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSections">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.covarianceSuite.</code><code class="descname">covarianceSections</code><a class="reference internal" href="../_modules/fudge/gnds/covariances/covarianceSuite.html#covarianceSections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">fudge.gnds.suites.suite</span></code></p>
+<p>Most covariances are stored in ‘sections’, each representing either the internal covariance
+for a single quantity (i.e. cross section) or the cross-term between two quantities</p>
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSections.moniker">
+<code class="descname">moniker</code><em class="property"> = 'covarianceSections'</em><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSections.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSuite">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.covarianceSuite.</code><code class="descname">covarianceSuite</code><span class="sig-paren">(</span><em>projectile</em>, <em>target</em>, <em>evaluation</em>, <em>GNDS_version='1.9'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/covarianceSuite.html#covarianceSuite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">xData.ancestry.ancestry</span></code></p>
+<p>All covariances for a target/projectile combination are stored in a <a class="reference internal" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite" title="fudge.gnds.covariances.covarianceSuite.covarianceSuite"><code class="xref py py-class docutils literal"><span class="pre">covarianceSuite</span></code></a> in gnds.
+The <a class="reference internal" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite" title="fudge.gnds.covariances.covarianceSuite.covarianceSuite"><code class="xref py py-class docutils literal"><span class="pre">covarianceSuite</span></code></a> is stored in a separate file from the reactionSuite.</p>
+<p>Within the <a class="reference internal" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite" title="fudge.gnds.covariances.covarianceSuite.covarianceSuite"><code class="xref py py-class docutils literal"><span class="pre">covarianceSuite</span></code></a>, data is sorted into <code class="xref py py-class docutils literal"><span class="pre">sections</span></code> (see the section module), each
+of which contains one section of the full covariance matrix.</p>
+<dl class="method">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSuite.check">
+<code class="descname">check</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/covarianceSuite.html#covarianceSuite.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check all covariance sections, returning a list of warnings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>checkUncLimits</strong> (<em>bool</em>) – Should we check the uncertainty limits? (default: True)</li>
+<li><strong>minRelUnc</strong> (<em>float</em>) – Minimum allowable relative uncertainty (default: 0.0)</li>
+<li><strong>maxRelUnc</strong> (<em>float</em>) – Maximum allowable relative uncertainty (default: 10.0)</li>
+<li><strong>theData</strong> – A reference to the data for this covariance.  This is useful for converting between relative and absolute covariance (default: None)</li>
+<li><strong>negativeEigenTolerance</strong> (<em>float</em>) – Ignore negative eigenvalues smaller than this (default: -1e-6)</li>
+<li><strong>eigenvalueRatioTolerance</strong> (<em>float</em>) – Warn if smallest eigenvalue &lt; this value * biggest (default: 1e-8)</li>
+<li><strong>eigenvalueAbsoluteTolerance</strong> (<em>float</em>) – Warn if smallest eigenvalue &lt; this value (default: 1e-14)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="fudge.gnds.html#fudge.gnds.warning.context" title="fudge.gnds.warning.context">warning.context</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSuite.convertUnits">
+<code class="descname">convertUnits</code><span class="sig-paren">(</span><em>unitMap</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/covarianceSuite.html#covarianceSuite.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd><p>unitMap is a dictionary with old/new unit pairs where the old unit is the key (e.g., { ‘eV’ : ‘MeV’, ‘b’ : ‘mb’ }).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSuite.covarianceSections">
+<code class="descname">covarianceSections</code><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite.covarianceSections" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSuite.externalFiles">
+<code class="descname">externalFiles</code><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite.externalFiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSuite.fix">
+<code class="descname">fix</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/covarianceSuite.html#covarianceSuite.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite.fix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply basic fixes to a covariance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>removeNegativeEVs</strong> (<em>bool</em>) – Should we remove eigenspaces corresponding to negative eigenvalues? (Default: True)</li>
+<li><strong>removeSmallEVs</strong> (<em>bool</em>) – Should we remove eigenspaces corresponding to small eigenvalues? (Default: False)</li>
+<li><strong>fixUncLimits</strong> (<em>bool</em>) – Should we fix the uncertainties to lie within bounds imposed by minRelUnc and maxRelUnc? (Default: False)</li>
+<li><strong>minRelUnc</strong> (<em>float</em><em> or </em><em>None</em>) – Minimum allowable uncertainty for this covariance</li>
+<li><strong>maxRelUnc</strong> (<em>float</em><em> or </em><em>None</em>) – Maximum allowable uncertainty for this covariance</li>
+<li><strong>theData</strong> (<em>instance</em><em> or </em><em>None</em>) – Reference to the data that accompanies this covariance so that we may convert between absolute and relative covariance as needed.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSuite.moniker">
+<code class="descname">moniker</code><em class="property"> = 'covarianceSuite'</em><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSuite.parameterCovariances">
+<code class="descname">parameterCovariances</code><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite.parameterCovariances" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSuite.parseXMLNode">
+<em class="property">static </em><code class="descname">parseXMLNode</code><span class="sig-paren">(</span><em>element</em>, <em>xPath</em>, <em>linkData</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/covarianceSuite.html#covarianceSuite.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSuite.projectile">
+<code class="descname">projectile</code><em class="property"> = None</em><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite.projectile" title="Permalink to this definition">¶</a></dt>
+<dd><p>The projectile</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSuite.removeExtraZeros">
+<code class="descname">removeExtraZeros</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/covarianceSuite.html#covarianceSuite.removeExtraZeros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite.removeExtraZeros" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks all covariance matrices for rows/columns of all zero, removes them if found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSuite.saveToFile">
+<code class="descname">saveToFile</code><span class="sig-paren">(</span><em>fileName</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/covarianceSuite.html#covarianceSuite.saveToFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite.saveToFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSuite.saveToOpenedFile">
+<code class="descname">saveToOpenedFile</code><span class="sig-paren">(</span><em>fOut</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/covarianceSuite.html#covarianceSuite.saveToOpenedFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite.saveToOpenedFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSuite.styles">
+<code class="descname">styles</code><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite.styles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSuite.target">
+<code class="descname">target</code><em class="property"> = None</em><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite.target" title="Permalink to this definition">¶</a></dt>
+<dd><p>The target</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.covarianceSuite.covarianceSuite.toXMLList">
+<code class="descname">toXMLList</code><span class="sig-paren">(</span><em>indent=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/covarianceSuite.html#covarianceSuite.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.covarianceSuite.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write self out to GNDS-XML</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnds.covariances.covarianceSuite.parameterCovariances">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.covarianceSuite.</code><code class="descname">parameterCovariances</code><a class="reference internal" href="../_modules/fudge/gnds/covariances/covarianceSuite.html#parameterCovariances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.parameterCovariances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">fudge.gnds.suites.suite</span></code></p>
+<p>Resolved and unresolved resonance parameters are stored inside the parameterCovariances</p>
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.covarianceSuite.parameterCovariances.moniker">
+<code class="descname">moniker</code><em class="property"> = 'parameterCovariances'</em><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.parameterCovariances.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="fudge.gnds.covariances.covarianceSuite.readXML">
+<code class="descclassname">fudge.gnds.covariances.covarianceSuite.</code><code class="descname">readXML</code><span class="sig-paren">(</span><em>gndsCovariancesFile</em>, <em>reactionSuite=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/covarianceSuite.html#readXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.covarianceSuite.readXML" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="fudge-gnds-covariances-distributions-module">
+<h2>fudge.gnds.covariances.distributions module<a class="headerlink" href="#fudge-gnds-covariances-distributions-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-fudge.gnds.covariances.distributions"></span><dl class="class">
+<dt id="fudge.gnds.covariances.distributions.LegendreLValue">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.distributions.</code><code class="descname">LegendreLValue</code><span class="sig-paren">(</span><em>L1</em>, <em>L2</em>, <em>frame</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/distributions.html#LegendreLValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreLValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">fudge.gnds.suites.suite</span></code></p>
+<p>Represents one subsection of the Legendre coefficient covariance matrix:
+covariance between coefficients for two Legendre orders at various energies</p>
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.distributions.LegendreLValue.L1">
+<code class="descname">L1</code><em class="property"> = None</em><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreLValue.L1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.distributions.LegendreLValue.L2">
+<code class="descname">L2</code><em class="property"> = None</em><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreLValue.L2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.distributions.LegendreLValue.check">
+<code class="descname">check</code><span class="sig-paren">(</span><em>info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/distributions.html#LegendreLValue.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreLValue.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.distributions.LegendreLValue.fix">
+<code class="descname">fix</code><span class="sig-paren">(</span><em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/distributions.html#LegendreLValue.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreLValue.fix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.distributions.LegendreLValue.frame">
+<code class="descname">frame</code><em class="property"> = None</em><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreLValue.frame" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.distributions.LegendreLValue.moniker">
+<code class="descname">moniker</code><em class="property"> = 'LegendreLValue'</em><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreLValue.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="fudge.gnds.covariances.distributions.LegendreLValue.parseXMLNode">
+<em class="property">classmethod </em><code class="descname">parseXMLNode</code><span class="sig-paren">(</span><em>element</em>, <em>xPath</em>, <em>linkData</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/distributions.html#LegendreLValue.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreLValue.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.distributions.LegendreLValue.toXMLList">
+<code class="descname">toXMLList</code><span class="sig-paren">(</span><em>indent=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/distributions.html#LegendreLValue.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreLValue.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.distributions.</code><code class="descname">LegendreOrderCovarianceForm</code><span class="sig-paren">(</span><em>label=None</em>, <em>lvalues=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/distributions.html#LegendreOrderCovarianceForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">xData.ancestry.ancestry</span></code></p>
+<p>Stores covariance between energy-dependent Legendre coefficients for a reaction.
+This class contains one or more LegendreLValue sections, each section containing the matrix
+between a pair of L-values</p>
+<dl class="method">
+<dt id="fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.addLegendreOrder">
+<code class="descname">addLegendreOrder</code><span class="sig-paren">(</span><em>LValue</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/distributions.html#LegendreOrderCovarianceForm.addLegendreOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.addLegendreOrder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.check">
+<code class="descname">check</code><span class="sig-paren">(</span><em>info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/distributions.html#LegendreOrderCovarianceForm.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.convertUnits">
+<code class="descname">convertUnits</code><span class="sig-paren">(</span><em>unitMap</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/distributions.html#LegendreOrderCovarianceForm.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.fix">
+<code class="descname">fix</code><span class="sig-paren">(</span><em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/distributions.html#LegendreOrderCovarianceForm.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.fix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.label">
+<code class="descname">label</code><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.lvalues">
+<code class="descname">lvalues</code><em class="property"> = None</em><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.lvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>the l values of course</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.moniker">
+<code class="descname">moniker</code><em class="property"> = 'LegendreOrderCovariance'</em><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.parseXMLNode">
+<em class="property">classmethod </em><code class="descname">parseXMLNode</code><span class="sig-paren">(</span><em>element</em>, <em>xPath</em>, <em>linkData</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/distributions.html#LegendreOrderCovarianceForm.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.toXMLList">
+<code class="descname">toXMLList</code><span class="sig-paren">(</span><em>indent=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/distributions.html#LegendreOrderCovarianceForm.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="fudge-gnds-covariances-mixed-module">
+<h2>fudge.gnds.covariances.mixed module<a class="headerlink" href="#fudge-gnds-covariances-mixed-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-fudge.gnds.covariances.mixed"></span><dl class="class">
+<dt id="fudge.gnds.covariances.mixed.mixedForm">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.mixed.</code><code class="descname">mixedForm</code><span class="sig-paren">(</span><em>label=None</em>, <em>components=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">xData.ancestry.ancestry</span></code></p>
+<p>Covariance for a single quantity, stored as several separate matrices that must be summed together.
+In general, the energy bounds for these matrices can overlap (unlike regions1d cross section data).</p>
+<dl class="method">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.addComponent">
+<code class="descname">addComponent</code><span class="sig-paren">(</span><em>covariance</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm.addComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.addComponent" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>covariance</strong> – an instance of covariance (or inherited class)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.check">
+<code class="descname">check</code><span class="sig-paren">(</span><em>info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.components">
+<code class="descname">components</code><em class="property"> = None</em><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.components" title="Permalink to this definition">¶</a></dt>
+<dd><p>a Python list containing instances of <code class="docutils literal"><span class="pre">mixedForm</span></code>, <code class="docutils literal"><span class="pre">summedCovariance</span></code>, and <code class="docutils literal"><span class="pre">covarianceMatrix</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.convertUnits">
+<code class="descname">convertUnits</code><span class="sig-paren">(</span><em>unitMap</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.fix">
+<code class="descname">fix</code><span class="sig-paren">(</span><em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.fix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.getColumnBounds">
+<code class="descname">getColumnBounds</code><span class="sig-paren">(</span><em>unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm.getColumnBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.getColumnBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the bounds of the column.  If unit is specified, return the bounds in that unit.
+Otherwise, take unit from the first sub-matrix.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.getCorrelationMatrix">
+<code class="descname">getCorrelationMatrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm.getCorrelationMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.getCorrelationMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.getMatchingComponent">
+<code class="descname">getMatchingComponent</code><span class="sig-paren">(</span><em>rowBounds=None</em>, <em>columnBounds=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm.getMatchingComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.getMatchingComponent" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rowBounds</strong> – </li>
+<li><strong>columnBounds</strong> – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.getRowBounds">
+<code class="descname">getRowBounds</code><span class="sig-paren">(</span><em>unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm.getRowBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.getRowBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the bounds of the row. If unit is specified, return the bounds in that unit.
+Otherwise, take unit from first sub-matrix.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.getUncertaintyVector">
+<code class="descname">getUncertaintyVector</code><span class="sig-paren">(</span><em>theData=None</em>, <em>relative=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm.getUncertaintyVector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.getUncertaintyVector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combines all subsections into single uncertainty vector, converting to relative if requested.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">an XYs1d instance</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.label">
+<code class="descname">label</code><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.makeSafeBounds">
+<code class="descname">makeSafeBounds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm.makeSafeBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.makeSafeBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Go through all the components and make sure the bounds don’t overlap.  If they do, it is likely a bug.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.moniker">
+<code class="descname">moniker</code><em class="property"> = 'mixed'</em><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.parseXMLNode">
+<em class="property">classmethod </em><code class="descname">parseXMLNode</code><span class="sig-paren">(</span><em>element</em>, <em>xPath</em>, <em>linkData</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate &lt;mixed&gt; element from xml.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>title=None</em>, <em>scalelabel=None</em>, <em>xlim=None</em>, <em>ylim=None</em>, <em>xlog=False</em>, <em>ylog=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.toAbsolute">
+<code class="descname">toAbsolute</code><span class="sig-paren">(</span><em>rowData=None</em>, <em>colData=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm.toAbsolute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.toAbsolute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rescales self (if it is a relative covariance) using XYs1d rowData and colData
+to convert self into an absolute covariance matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>rowData</strong> – an XYs1d instance containing data to rescale covariance in the “row direction”</li>
+<li><strong>colData</strong> – an XYs1d instance containing data to rescale covariance in the “col direction”</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If the column axis is set to ‘mirrorOtherAxis’, only rowData is needed.  
+If neither rowData nor colData are specified, you’d better hope that the covariance is already 
+absolute because this will throw an error.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a copy of self, but rescaled and with the type set to absoluteToken</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.toCovarianceMatrix">
+<code class="descname">toCovarianceMatrix</code><span class="sig-paren">(</span><em>label='composed'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm.toCovarianceMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.toCovarianceMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sum all parts together to build a single matrix.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.toRelative">
+<code class="descname">toRelative</code><span class="sig-paren">(</span><em>label='composed'</em>, <em>rowData=None</em>, <em>colData=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm.toRelative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.toRelative" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rescales self (if it is a absolute covariance) using XYs1d rowData and colData
+to convert self into a relative covariance matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>rowData</strong> – an XYs1d instance containing data to rescale covariance in the “row direction”</li>
+<li><strong>colData</strong> – an XYs1d instance containing data to rescale covariance in the “col direction”</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If the column axis is set to ‘mirrorOtherAxis’, only rowData is needed.  
+If neither rowData nor colData are specified, you’d better hope that the covariance is already 
+relative because this will throw an error.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a copy of self, but rescaled and with the type set to relativeToken</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.mixed.mixedForm.toXMLList">
+<code class="descname">toXMLList</code><span class="sig-paren">(</span><em>indent=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/mixed.html#mixedForm.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.mixed.mixedForm.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="fudge-gnds-covariances-modelparameters-module">
+<h2>fudge.gnds.covariances.modelParameters module<a class="headerlink" href="#fudge-gnds-covariances-modelparameters-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-fudge.gnds.covariances.modelParameters"></span><dl class="class">
+<dt id="fudge.gnds.covariances.modelParameters.averageParameterCovariance">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.modelParameters.</code><code class="descname">averageParameterCovariance</code><span class="sig-paren">(</span><em>label</em>, <em>rowData=None</em>, <em>columnData=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/modelParameters.html#averageParameterCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.averageParameterCovariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#fudge.gnds.covariances.section.section" title="fudge.gnds.covariances.section.section"><code class="xref py py-class docutils literal"><span class="pre">fudge.gnds.covariances.section.section</span></code></a></p>
+<p>For storing unresolved resonance parameter covariances. Very similar to covariances for cross section, nubar, etc.:
+they require an energy grid + matrix.</p>
+<p>Each average parameter (e.g. elastic width, capture width, etc.) has its own averageParameterCovariance section.</p>
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.modelParameters.averageParameterCovariance.moniker">
+<code class="descname">moniker</code><em class="property"> = 'averageParameterCovariance'</em><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.averageParameterCovariance.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnds.covariances.modelParameters.parameterCovariance">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.modelParameters.</code><code class="descname">parameterCovariance</code><span class="sig-paren">(</span><em>label</em>, <em>rowData=None</em>, <em>columnData=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/modelParameters.html#parameterCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameterCovariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">fudge.gnds.suites.suite</span></code></p>
+<p>For storing unresolved resonance parameter covariances. Very similar to covariances for cross section, nubar, etc.:
+they require an energy grid + matrix.</p>
+<p>Each average parameter (e.g. elastic width, capture width, etc.) has its own averageParameterCovariance section.</p>
+<dl class="method">
+<dt id="fudge.gnds.covariances.modelParameters.parameterCovariance.check">
+<code class="descname">check</code><span class="sig-paren">(</span><em>info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/modelParameters.html#parameterCovariance.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameterCovariance.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>check each section</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.modelParameters.parameterCovariance.crossTerm">
+<code class="descname">crossTerm</code><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameterCovariance.crossTerm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.modelParameters.parameterCovariance.moniker">
+<code class="descname">moniker</code><em class="property"> = 'parameterCovariance'</em><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameterCovariance.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="fudge.gnds.covariances.modelParameters.parameterCovariance.parseXMLNode">
+<em class="property">classmethod </em><code class="descname">parseXMLNode</code><span class="sig-paren">(</span><em>element</em>, <em>xPath</em>, <em>linkData</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/modelParameters.html#parameterCovariance.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameterCovariance.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate &lt;section&gt; element from xml.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.modelParameters.parameterCovariance.toXMLList">
+<code class="descname">toXMLList</code><span class="sig-paren">(</span><em>indent=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/modelParameters.html#parameterCovariance.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameterCovariance.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnds.covariances.modelParameters.parameterCovarianceMatrix">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.modelParameters.</code><code class="descname">parameterCovarianceMatrix</code><span class="sig-paren">(</span><em>label</em>, <em>matrix</em>, <em>parameters_=None</em>, <em>type='relativeCovariance'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/modelParameters.html#parameterCovarianceMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameterCovarianceMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">fudge.gnds.abstractClasses.form</span></code></p>
+<p>Store covariances (or correlations, depending on ‘type’) between model parameters</p>
+<dl class="method">
+<dt id="fudge.gnds.covariances.modelParameters.parameterCovarianceMatrix.check">
+<code class="descname">check</code><span class="sig-paren">(</span><em>info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/modelParameters.html#parameterCovarianceMatrix.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameterCovarianceMatrix.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.modelParameters.parameterCovarianceMatrix.convertUnits">
+<code class="descname">convertUnits</code><span class="sig-paren">(</span><em>unitMap</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/modelParameters.html#parameterCovarianceMatrix.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameterCovarianceMatrix.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.modelParameters.parameterCovarianceMatrix.fix">
+<code class="descname">fix</code><span class="sig-paren">(</span><em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/modelParameters.html#parameterCovarianceMatrix.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameterCovarianceMatrix.fix" title="Permalink to this definition">¶</a></dt>
+<dd><p>assemble some useful info, to be handed down to children’s fix() functions</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.modelParameters.parameterCovarianceMatrix.moniker">
+<code class="descname">moniker</code><em class="property"> = 'parameterCovarianceMatrix'</em><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameterCovarianceMatrix.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="fudge.gnds.covariances.modelParameters.parameterCovarianceMatrix.parseXMLNode">
+<em class="property">classmethod </em><code class="descname">parseXMLNode</code><span class="sig-paren">(</span><em>element</em>, <em>xPath</em>, <em>linkData</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/modelParameters.html#parameterCovarianceMatrix.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameterCovarianceMatrix.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.modelParameters.parameterCovarianceMatrix.toXMLList">
+<code class="descname">toXMLList</code><span class="sig-paren">(</span><em>indent=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/modelParameters.html#parameterCovarianceMatrix.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameterCovarianceMatrix.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnds.covariances.modelParameters.parameterLink">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.modelParameters.</code><code class="descname">parameterLink</code><span class="sig-paren">(</span><em>label</em>, <em>link</em>, <em>nParameters=1</em>, <em>matrixStartIndex=0</em>, <em>parameterStartIndex=0</em>, <em>parameterStride=1</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/modelParameters.html#parameterLink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameterLink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">xData.link.link</span></code></p>
+<p>Establishes a link between one or more rows of a parameterCovariance and corresponding parameter(s).
+Supports linking to specific parameters inside a table or list.</p>
+<dl class="docutils">
+<dt>For example, if we have a 2x4 table</dt>
+<dd><a href="#id1"><span class="problematic" id="id2">|A B C D|</span></a>
+<a href="#id3"><span class="problematic" id="id4">|E F G H|</span></a></dd>
+</dl>
+<p>and wish to give a 4x4 covariance matrix for elements in the 2nd and 4th column of the table, we can create
+a parameterLink pointing to the table, with
+‘matrixStartIndex=0’,  ‘nParameters=4’,  ‘parameterStartIndex=1’,  ‘parameterStride=2’.</p>
+<p>The corresponding covariance matrix rows would then correspond to ‘B, D, F, H’.</p>
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.modelParameters.parameterLink.moniker">
+<code class="descname">moniker</code><em class="property"> = 'parameterLink'</em><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameterLink.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.modelParameters.parameterLink.toXMLList">
+<code class="descname">toXMLList</code><span class="sig-paren">(</span><em>indent=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/modelParameters.html#parameterLink.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameterLink.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnds.covariances.modelParameters.parameters">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.modelParameters.</code><code class="descname">parameters</code><a class="reference internal" href="../_modules/fudge/gnds/covariances/modelParameters.html#parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">fudge.gnds.suites.suite</span></code></p>
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.modelParameters.parameters.moniker">
+<code class="descname">moniker</code><em class="property"> = 'parameters'</em><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameters.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.modelParameters.parameters.nParameters">
+<code class="descname">nParameters</code><a class="headerlink" href="#fudge.gnds.covariances.modelParameters.parameters.nParameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="fudge-gnds-covariances-section-module">
+<h2>fudge.gnds.covariances.section module<a class="headerlink" href="#fudge-gnds-covariances-section-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-fudge.gnds.covariances.section"></span><p>A covarianceSuite is organized into sections, where each section contains either
+- a covariance matrix for a single reaction quantity (cross section, multiplicity, etc), or
+- a covariance matrix between two different quantities (off-diagonal block)</p>
+<dl class="class">
+<dt id="fudge.gnds.covariances.section.columnData">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.section.</code><code class="descname">columnData</code><span class="sig-paren">(</span><em>link=None</em>, <em>root=None</em>, <em>path=None</em>, <em>label=None</em>, <em>relative=False</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/section.html#columnData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.section.columnData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">xData.link.link</span></code></p>
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.section.columnData.moniker">
+<code class="descname">moniker</code><em class="property"> = 'columnData'</em><a class="headerlink" href="#fudge.gnds.covariances.section.columnData.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnds.covariances.section.rowData">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.section.</code><code class="descname">rowData</code><span class="sig-paren">(</span><em>link=None</em>, <em>root=None</em>, <em>path=None</em>, <em>label=None</em>, <em>relative=False</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/section.html#rowData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.section.rowData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">xData.link.link</span></code></p>
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.section.rowData.moniker">
+<code class="descname">moniker</code><em class="property"> = 'rowData'</em><a class="headerlink" href="#fudge.gnds.covariances.section.rowData.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnds.covariances.section.section">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.section.</code><code class="descname">section</code><span class="sig-paren">(</span><em>label</em>, <em>rowData=None</em>, <em>columnData=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/section.html#section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.section.section" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">fudge.gnds.suites.suite</span></code></p>
+<p>A covarianceSuite contains sections, where each section represents either a self-covariance for one quantity,
+or a cross-covariance between two quantities</p>
+<p>More generally, the covarianceSuite can be thought of as a single covariance matrix with all covariance data
+for a target/projectile. It is broken into sections, where each section holds a chunk of the full matrix.</p>
+<p>Within each section, covariance data can take multiple forms: <code class="xref py py-class docutils literal"><span class="pre">covarianceMatrix</span></code> is the most common,
+but ‘summed’, ‘mixed’ are also possible.</p>
+<dl class="docutils">
+<dt>Valid values in the <code class="xref py py-attr docutils literal"><span class="pre">forms</span></code> dictionary are:</dt>
+<dd><ul class="first last simple">
+<li>mixedForm</li>
+<li>summedCovariance</li>
+<li>covarianceMatrix</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="fudge.gnds.covariances.section.section.check">
+<code class="descname">check</code><span class="sig-paren">(</span><em>info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/section.html#section.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.section.section.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>check each section</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.section.section.columnData">
+<code class="descname">columnData</code><em class="property"> = None</em><a class="headerlink" href="#fudge.gnds.covariances.section.section.columnData" title="Permalink to this definition">¶</a></dt>
+<dd><p>xData.link.link pointing to the corresponding data for the covariance column</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.section.section.crossTerm">
+<code class="descname">crossTerm</code><a class="headerlink" href="#fudge.gnds.covariances.section.section.crossTerm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.section.section.fix">
+<code class="descname">fix</code><span class="sig-paren">(</span><em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/section.html#section.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.section.section.fix" title="Permalink to this definition">¶</a></dt>
+<dd><p>assemble some useful info, to be handed down to children’s check() functions</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.section.section.label">
+<code class="descname">label</code><em class="property"> = None</em><a class="headerlink" href="#fudge.gnds.covariances.section.section.label" title="Permalink to this definition">¶</a></dt>
+<dd><p>a str label that gets used on plots, etc.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.section.section.moniker">
+<code class="descname">moniker</code><em class="property"> = 'section'</em><a class="headerlink" href="#fudge.gnds.covariances.section.section.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="fudge.gnds.covariances.section.section.parseXMLNode">
+<em class="property">classmethod </em><code class="descname">parseXMLNode</code><span class="sig-paren">(</span><em>element</em>, <em>xPath</em>, <em>linkData</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/section.html#section.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.section.section.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate &lt;section&gt; element from xml.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.section.section.rowData">
+<code class="descname">rowData</code><em class="property"> = None</em><a class="headerlink" href="#fudge.gnds.covariances.section.section.rowData" title="Permalink to this definition">¶</a></dt>
+<dd><p>xData.link.link pointing to the corresponding data for the covariance row</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.section.section.toXMLList">
+<code class="descname">toXMLList</code><span class="sig-paren">(</span><em>indent=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/section.html#section.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.section.section.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="fudge-gnds-covariances-summed-module">
+<h2>fudge.gnds.covariances.summed module<a class="headerlink" href="#fudge-gnds-covariances-summed-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-fudge.gnds.covariances.summed"></span><dl class="class">
+<dt id="fudge.gnds.covariances.summed.summand">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.summed.</code><code class="descname">summand</code><span class="sig-paren">(</span><em>link=None</em>, <em>root=None</em>, <em>path=None</em>, <em>label=None</em>, <em>relative=False</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/summed.html#summand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.summed.summand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">xData.link.link</span></code></p>
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.summed.summand.moniker">
+<code class="descname">moniker</code><em class="property"> = 'summand'</em><a class="headerlink" href="#fudge.gnds.covariances.summed.summand.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="fudge.gnds.covariances.summed.summedCovariance">
+<em class="property">class </em><code class="descclassname">fudge.gnds.covariances.summed.</code><code class="descname">summedCovariance</code><span class="sig-paren">(</span><em>label</em>, <em>domainMin</em>, <em>domainMax</em>, <em>domainUnit='eV'</em>, <em>pointerList=None</em>, <em>coefficients=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/summed.html#summedCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">xData.ancestry.ancestry</span></code></p>
+<p>Covariance matrix stored as sum/difference of other matrices.</p>
+<dl class="method">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.check">
+<code class="descname">check</code><span class="sig-paren">(</span><em>info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/summed.html#summedCovariance.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.convertUnits">
+<code class="descname">convertUnits</code><span class="sig-paren">(</span><em>unitMap</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/summed.html#summedCovariance.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.convertUnits" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.domainMax">
+<code class="descname">domainMax</code><em class="property"> = None</em><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.domainMax" title="Permalink to this definition">¶</a></dt>
+<dd><p>upper bound of row/column direction.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.domainMin">
+<code class="descname">domainMin</code><em class="property"> = None</em><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.domainMin" title="Permalink to this definition">¶</a></dt>
+<dd><p>lower bound of row/column direction.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.fix">
+<code class="descname">fix</code><span class="sig-paren">(</span><em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/summed.html#summedCovariance.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.fix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.getColumnBounds">
+<code class="descname">getColumnBounds</code><span class="sig-paren">(</span><em>unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/summed.html#summedCovariance.getColumnBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.getColumnBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the bounds of the column.  If unit is specified, return the bounds in that unit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.getReferredCovariance">
+<code class="descname">getReferredCovariance</code><span class="sig-paren">(</span><em>pointer</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/summed.html#summedCovariance.getReferredCovariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.getReferredCovariance" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pointer</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.getRowBounds">
+<code class="descname">getRowBounds</code><span class="sig-paren">(</span><em>unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/summed.html#summedCovariance.getRowBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.getRowBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the bounds of the row.  If unit is specified, return the bounds in that unit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.getUncertaintyVector">
+<code class="descname">getUncertaintyVector</code><span class="sig-paren">(</span><em>theData=None</em>, <em>relative=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/summed.html#summedCovariance.getUncertaintyVector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.getUncertaintyVector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine all subsections into single uncertainty vector, converting to relative if requested.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">an XYs1d instance</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.label">
+<code class="descname">label</code><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.moniker">
+<code class="descname">moniker</code><em class="property"> = 'sum'</em><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.moniker" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.parseXMLNode">
+<em class="property">static </em><code class="descname">parseXMLNode</code><span class="sig-paren">(</span><em>element</em>, <em>xPath</em>, <em>linkData</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/summed.html#summedCovariance.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>title=None</em>, <em>scalelabel=None</em>, <em>xlim=None</em>, <em>ylim=None</em>, <em>xlog=False</em>, <em>ylog=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/summed.html#summedCovariance.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.toAbsolute">
+<code class="descname">toAbsolute</code><span class="sig-paren">(</span><em>rowData=None</em>, <em>colData=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/summed.html#summedCovariance.toAbsolute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.toAbsolute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rescales self (if it is a relative covariance) using XYs1d rowData and colData
+to convert self into an absolute covariance matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>rowData</strong> – an XYs1d instance containing data to rescale covariance in the “row direction”</li>
+<li><strong>colData</strong> – an XYs1d instance containing data to rescale covariance in the “col direction”</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If the column axis is set to ‘mirrorOtherAxis’, only rowData is needed.
+If neither rowData nor colData are specified, you’d better hope that the covariance is already
+absolute because this will throw an error.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a copy of self, but rescaled and with the type set to absoluteToken</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.toCorrelationMatrix">
+<code class="descname">toCorrelationMatrix</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/summed.html#summedCovariance.toCorrelationMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.toCorrelationMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.toCovarianceMatrix">
+<code class="descname">toCovarianceMatrix</code><span class="sig-paren">(</span><em>label='composed'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/summed.html#summedCovariance.toCovarianceMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.toCovarianceMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sum the parts to construct the covariance matrix.
+Note, each part must be converted to an absolute covariance before summing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.toRelative">
+<code class="descname">toRelative</code><span class="sig-paren">(</span><em>rowData=None</em>, <em>colData=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/summed.html#summedCovariance.toRelative"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.toRelative" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rescales self (if it is a absolute covariance) using XYs1d rowData and colData
+to convert self into a relative covariance matrix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>rowData</strong> – an XYs1d instance containing data to rescale covariance in the “row direction”</li>
+<li><strong>colData</strong> – an XYs1d instance containing data to rescale covariance in the “col direction”</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If the column axis is set to ‘mirrorOtherAxis’, only rowData is needed.
+If neither rowData nor colData are specified, you’d better hope that the covariance is already
+relative because this will throw an error.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a copy of self, but rescaled and with the type set to relativeToken</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.gnds.covariances.summed.summedCovariance.toXMLList">
+<code class="descname">toXMLList</code><span class="sig-paren">(</span><em>indent=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/gnds/covariances/summed.html#summedCovariance.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.gnds.covariances.summed.summedCovariance.toXMLList" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>indent</strong> – </li>
+<li><strong>kwargs</strong> – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="fudge-gnds-covariances-tokens-module">
+<h2>fudge.gnds.covariances.tokens module<a class="headerlink" href="#fudge-gnds-covariances-tokens-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-fudge.gnds.covariances.tokens"></span><p>Define tokens to identify covariance elements in GNDS</p>
+</div>
+<div class="section" id="module-fudge.gnds.covariances">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fudge.gnds.covariances" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">fudge.gnds.covariances package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#fudge-gnds-covariances-base-module">fudge.gnds.covariances.base module</a></li>
+<li><a class="reference internal" href="#fudge-gnds-covariances-covariancesuite-module">fudge.gnds.covariances.covarianceSuite module</a></li>
+<li><a class="reference internal" href="#fudge-gnds-covariances-distributions-module">fudge.gnds.covariances.distributions module</a></li>
+<li><a class="reference internal" href="#fudge-gnds-covariances-mixed-module">fudge.gnds.covariances.mixed module</a></li>
+<li><a class="reference internal" href="#fudge-gnds-covariances-modelparameters-module">fudge.gnds.covariances.modelParameters module</a></li>
+<li><a class="reference internal" href="#fudge-gnds-covariances-section-module">fudge.gnds.covariances.section module</a></li>
+<li><a class="reference internal" href="#fudge-gnds-covariances-summed-module">fudge.gnds.covariances.summed module</a></li>
+<li><a class="reference internal" href="#fudge-gnds-covariances-tokens-module">fudge.gnds.covariances.tokens module</a></li>
+<li><a class="reference internal" href="#module-fudge.gnds.covariances">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fudge.gnds.channelData.html"
+                        title="previous chapter">fudge.gnds.channelData package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fudge.gnds.productData.html"
+                        title="next chapter">fudge.gnds.productData package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/fudge/fudge.gnds.covariances.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fudge.gnds.productData.html" title="fudge.gnds.productData package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fudge.gnds.channelData.html" title="fudge.gnds.channelData package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="fudge.gnds.html" >fudge.gnds package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

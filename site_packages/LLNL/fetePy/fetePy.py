@@ -71,32 +71,34 @@ from pqu import PQU as PQUModule
 from xData import standards as standardsModule
 from xData import XYs as XYsModule
 
-from PoPs import misc as miscPoPsModule
-from PoPs.families import nuclearLevel as nuclearLevelModule
+from PoPs import IDs as IDsPoPsModule
+from PoPs import alias as aliasPoPsModule
+from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs.families import nuclide as nuclideModule
 
 from fudge import fudgeParameters as fudgeParametersModule
 fudgeParametersModule.VerboseMode = 0
 
-from fudge.legacy.converting import endfFileToGND as endfFileToGNDModule
+from fudge.legacy.converting import endfFileToGNDS as endfFileToGNDSModule
 from fudge.legacy.converting import endf_endl as endf_endlModule
 from fudge.legacy.endl import endlmisc as endlmiscModule
 from fudge.legacy.endl import endlZA as endlZAClass
 from fudge.legacy.endl import bdfls as bdflsModule
 
-from fudge.gnd import channels as channelsModule
-from fudge.gnd import sums as sumsModule
-from fudge.gnd.reactions import production as productionModule
-from fudge.gnd.productData import multiplicity as multiplicityModule
-from fudge.gnd.productData.distributions import angular as angularModule
-from fudge.gnd.productData.distributions import energy as energyModule
-from fudge.gnd.productData.distributions import uncorrelated as uncorrelatedModule
-from fudge.gnd.productData.distributions import unspecified as unspecifiedModule
+from fudge.gnds import channels as channelsModule
+from fudge.gnds import sums as sumsModule
+from fudge.gnds.reactions import production as productionModule
+from fudge.gnds.productData import multiplicity as multiplicityModule
+from fudge.gnds.productData.distributions import angular as angularModule
+from fudge.gnds.productData.distributions import energy as energyModule
+from fudge.gnds.productData.distributions import uncorrelated as uncorrelatedModule
+from fudge.gnds.productData.distributions import unspecified as unspecifiedModule
 
 outputDefault = 'ascii'
 EMaxDefault = 20
 temperatureDefault = 2.58522e-08
 
-energyEps = 1e-6
+energyEps = 2e-7
 fractionDefault = 1e-6
 style = 'eval'
 
@@ -116,16 +118,16 @@ parser.add_argument( '-d', '--date', default = None, action = 'store', type = in
         help = '''The date to use for the ENDL date. Must be of the format yymmdd. If not present, today's date is used.''' )
 parser.add_argument( '-e', '--ENDF', default = False, action = 'store_true',
         help = '''Write the original ENDF file to the target's directory.''' )
-parser.add_argument( '-g', '--GND', default = False, action = 'store_true',
-        help = '''Write an GND/XML file representing the ENDF file to the target's directory.''' )
+parser.add_argument( '-g', '--GNDS', default = False, action = 'store_true',
+        help = '''Write an GNDS/XML file representing the ENDF file to the target's directory.''' )
 parser.add_argument( '-o', '--output', type = str, default = outputDefault, action = 'store',
         help = '''Write the target's files (i.e., (yi0?/za??????/*) to the specified directory. Default = "%s".''' % outputDefault )
 parser.add_argument( '-s', '--skipBadData', default = False, action = 'store_true',
-        help = 'Skips format errors if possible when translating the ENDF file to GND.' )
+        help = 'Skips format errors if possible when translating the ENDF file to GNDS.' )
 parser.add_argument( '--MT2Skip', type = int, action = 'append',
-        help = 'When translating from ENDF to GND, add MT to list of MTs to skip.' )
+        help = 'When translating from ENDF to GNDS, add MT to list of MTs to skip.' )
 parser.add_argument( '-c', '--continuumSpectraFix', action = 'store_true',
-        help = 'When translating from ENDF to GND, set the "continuumSpectraFix" flag to True.' )
+        help = 'When translating from ENDF to GNDS, set the "continuumSpectraFix" flag to True.' )
 parser.add_argument( '-b', '--bdfls', action = 'store', default = None,
         help = 'The next argument specifies the bdfls file to use.' )
 parser.add_argument( '-t', '--temperature', action = 'store', type = float, default = temperatureDefault,
@@ -149,21 +151,24 @@ if( bdflsFile is None ) :
     if( not( os.path.exists( bdflsFile ) ) ) : bdflsFile = None
 if( bdflsFile is not None ) : bdflsFile = bdflsModule.bdfls( template = bdflsFile )
 
-rce = endfFileToGNDModule.endfFileToGND( args.inputFile, singleMTOnly = args.MT, MTs2Skip = args.MT2Skip, 
+rce = endfFileToGNDSModule.endfFileToGNDS( args.inputFile, singleMTOnly = args.MT, MTs2Skip = args.MT2Skip,
         toStdOut = args.verbose > 2, skipBadData = args.skipBadData, doCovariances = False, verbose = 0,
-        printBadNK14 = False, continuumSpectraFix = args.continuumSpectraFix )
+        printBadNK14 = False, continuumSpectraFix = args.continuumSpectraFix, acceptBadMF10FissionZAP = True )
 reactionSuite = rce['reactionSuite']
 reactionSuite.convertUnits( { 'eV' : 'MeV' } )
 
-target = reactionSuite.PoPs[reactionSuite.target]
-ZA = miscPoPsModule.ZA( target )
+yi = endlmiscModule.incidentParticleTags( str( reactionSuite.projectile ) )[1]
+
 suffix = ''
 ELevel = 0
-if( isinstance( target, nuclearLevelModule.particle ) ) : ELevel = target.nucleus.energy[0].float( 'MeV' )
-if( ELevel > 0 ) :
-    metaStableName = reactionSuite.aliases.getAliasesFor( reactionSuite.target )[0]
-    suffix = 'm%s' % int( reactionSuite.aliases[metaStableName].attributes['nuclearMetaStable'] )
-yi = endlmiscModule.incidentParticleTags( str( reactionSuite.projectile ) )[1]
+if( reactionSuite.target in reactionSuite.PoPs.aliases ) :
+    target = reactionSuite.PoPs.aliases[reactionSuite.target]
+    suffix = 'm%s' % target.metaStableIndex
+    target = reactionSuite.PoPs[target.pid]
+else :
+    target = reactionSuite.PoPs[reactionSuite.target]
+ZA = chemicalElementMiscPoPsModule.ZA( target )
+if( isinstance( target, nuclideModule.particle ) ) : ELevel = target.nucleus.energy[0].float( 'MeV' )
 
 endlZA = endlZAClass( ZA, yi, suffix = suffix, workDir = args.output, bdflsFile = bdflsFile )
 if( args.verbose > 0 ) : print 'Using bdfls files %s' % endlZA.bdflsFile.template
@@ -172,7 +177,7 @@ workDir = endlZA.workDir
 os.system( 'rm -rf %s/*' % endlZA.workDir )
 
 if( args.ENDF ) : os.system( 'cp %s %s' % ( args.inputFile, workDir ) )
-if( args.GND ) : reactionSuite.saveToFile( os.path.join( workDir, 'gnd.xml' ) )
+if( args.GNDS ) : reactionSuite.saveToFile( os.path.join( workDir, 'gnds.xml' ) )
 
 def getMultiplicityForDistributionSum( self, energy, energies, numberOfGammas, zeroTotal ) :
 
@@ -199,11 +204,13 @@ def gammaDeltaDistribution( energy ) :
 
 def finalDistributionCheck( fullDistribution ) :
 
-    for Ein, PofEout in fullDistribution :
+    for i1, ( Ein, PofEout ) in enumerate( fullDistribution  ) :
         for i2, PEout2 in enumerate( PofEout ) :
             if( i2 > 0 ) :
-                if( PEout2[0] - PEout1[0] < 0.1 * energyEps * PEout2[0] ) : PEout2[0] = ( 1 + 0.1 * energyEps ) * PEout1[0]
+                if( ( PEout2[0] - PEout1[0] ) < 0.1 * energyEps * PEout2[0] ) : PEout2[0] = ( 1 + 0.1 * energyEps ) * PEout1[0]
             PEout1 = PEout2
+        PEout = XYsModule.XYs1d( fullDistribution[0][1] )
+        if( abs( PEout.integrate( ) - 1 ) > 1e-5 ) : fullDistribution[i1][1] = PEout.normalize( ).copyDataToXYs( )
 
 class primaryGamma :
 
@@ -296,7 +303,6 @@ class continuumGammaIsotropic :
             energyForm = XYsModule.XYs1d( energyForm )
             multiplicity = getMultiplicityForDistributionSum( self, energy, energies, numberOfGammas, zeroTotal )
             distribution = multiplicity * energyForm
-
             return( distribution )
         else :
             return( None )
@@ -356,7 +362,7 @@ def processGamma( gamma, gammas, crossSection ) :
         angularForm = distribution.angularSubform.data
         energyForm = distribution.energySubform.data
         if( isinstance( angularForm, angularModule.XYs2d ) ) :
-            if( not( angularForm.isIsotropic( ) ) ) : print 'WARNING: treating angular XYs2d as isotropic'
+            if( not( angularForm.isIsotropic( ) ) ) : print '    WARNING: treating angular XYs2d as isotropic'
             isIsotropic = True
         else :
             isIsotropic = angularForm.isIsotropic( )
@@ -394,7 +400,7 @@ def processChannel( channel, gammas, branchingGammas, crossSection = None ) :
                     energy = ": discrete energy = %s" % ( energyForm.value )
             if( args.verbose > 1 ) : print '        %-40s: %-12s%s' % ( product, product.label, energy )
             if( isinstance( channel, channelsModule.twoBodyOutputChannel ) ) :
-                print 'WARNING: skipping two body gamma'
+                print '    WARNING: skipping two body gamma'
             else :
                 processGamma( product, gammas, crossSection )
                 numberOfGammasProcessed += 1
@@ -450,21 +456,22 @@ def sumDistributions( multiplicity, gammaList ) :
         fullDistribution.append( [ energy, norm.copyDataToXYs( ) ] )
     return( fullDistribution )
 
-def getGammaEmission( gammas, priorProbability, nuclearLevel, PoPs ) :
+def getGammaEmission( gammas, priorProbability, nuclide, PoPs ) :
 
-    energy2 = nuclearLevel.energy[0]
-    for decay in nuclearLevel.nucleus.decays :
-        probability = decay.probability[0].value * priorProbability
-        products = [ product.pid for product in decay.products ]
-        if( len( products ) == 2 ) :
-            if( 'photon' in products ) :
-                products.remove( 'photon' )
-                productID = products[0]
-                product = PoPs[productID]
-                energy1 = product.energy[0]
-                gammaEnergy = energy2.value - energy1.value
-                gammas.append( [ product, probability, gammaEnergy ] )
-                getGammaEmission( gammas, probability, product, PoPs )
+    energy2 = nuclide.energy[0]
+    for decayMode in nuclide.nucleus.decayData.decayModes :
+        probability = decayMode.probability[0].value * priorProbability
+        for decayPath in decayMode.decayPath :
+            products = [ product.pid for product in decayPath.products ]
+            if( len( products ) == 2 ) :
+                if( IDsPoPsModule.photon in products ) :
+                    products.remove( IDsPoPsModule.photon )
+                    product = PoPs[products[0]]
+                    energy1 = product.energy[0]
+                    gammaEnergy = energy2.value - energy1.value
+                    gammas.append( [ product, probability, gammaEnergy ] )
+                    getGammaEmission( gammas, probability, product, PoPs )
+
     return( gammas )
 
 def writeGammas( ENDLFiles, C, S, Q, X1, multiplicity, fullDistribution ) :
@@ -494,8 +501,8 @@ def writeGammas( ENDLFiles, C, S, Q, X1, multiplicity, fullDistribution ) :
 branchingGammas = {}
 for chemicalElement in reactionSuite.PoPs.chemicalElements :
     for isotope in chemicalElement :
-        for nuclearLevel in isotope :
-            gammas = getGammaEmission( [], 1, nuclearLevel, reactionSuite.PoPs )
+        for nuclide in isotope :
+            gammas = getGammaEmission( [], 1, nuclide, reactionSuite.PoPs )
             multiplicity = 0
             spectra = None
             for product, probability, gammaEnergy in gammas :
@@ -509,7 +516,7 @@ for chemicalElement in reactionSuite.PoPs.chemicalElements :
                     spectra = spectra + spectrum
             if( spectra is not None ) :
                 spectra = spectra.normalize( )
-                branchingGammas[nuclearLevel.id] = ( multiplicity, spectra )
+                branchingGammas[nuclide.id] = ( multiplicity, spectra )
 
 if( args.verbose ) : print '%s ->' % reactionSuite.inputParticlesToReactionString( )
 
@@ -518,23 +525,20 @@ for _sum in reactionSuite.sums.multiplicities :
     multiplicity = _sum.multiplicity.toPointwise_withLinearXYs( lowerEps = energyEps, upperEps = energyEps )
     multiplicitySums[_sum.ENDF_MT] = multiplicity.domainSlice( domainMax = args.EMax )
 ENDLFiles = {}
-productionReactions = []
 for reaction in reactionSuite.reactions :
     MT = reaction.ENDF_MT
-    if( isinstance( reaction, productionModule.production ) ) :
-        productionReactions.append( reaction )
-        continue
-    if( MT in ( 5, 25 ) ) :
-        print 'INFO: skipping MT=%d' % ( MT )
-        continue
     C, S = endf_endlModule.getCSFromMT( MT )
-    if( C == 10 ) : continue                    # There are not gammas for elastic scattering, but logic below may produce gammas for 
+    if( C < 0 ) :
+        crossSection = reaction.crossSection.toPointwise_withLinearXYs( lowerEps = energyEps, upperEps = energyEps )
+        print '    WARNING: skipping MT=%s as it has no ENDL C equivalent. Domain range is %s to %s.' % ( MT, crossSection.domainMin, crossSection.domainMax )
+        continue
+    if( C == 10 ) : continue                    # There are no gammas for elastic scattering, but logic below may produce gammas for 
                                                 # meta-stables with branching data so let's skip it now.
     Q = reaction.getQ( unit = 'MeV' )           # BRB, this is the wrong Q.
     X1 = 0.
     if( len( reaction.outputChannel ) == 2 ) :
         particle = reaction.outputChannel[1].particle
-        if( isinstance( particle, nuclearLevelModule.particle ) ) :
+        if( isinstance( particle, nuclideModule.particle ) ) :
             X1 = particle.energy[0].value
     Q += X1                                     # BRB, is this the right Q?
     if( C not in CSQList ) : CSQList[C] = {}
@@ -576,7 +580,7 @@ for reaction in reactionSuite.reactions :
 gammas = { 'continuum' : [], 'discretes' : [], 'primaries' : [] }
 
 productionMT = None
-for production in productionReactions :
+for production in reactionSuite.orphanProducts :
     MT = production.ENDF_MT
     if( args.verbose ) : print '    %-40s: MT = %3s C = 55' % ( production, MT )
     if( productionMT is None ) : MT = productionMT

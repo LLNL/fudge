@@ -66,90 +66,73 @@ This module contains the class for the suite chemicalElement.
 """
 
 from .. import misc as miscModule
-from .. import suite as suiteModule
 
-from ..families import nuclearLevel as nuclearLevelModule
-from ..families import nucleus as nucleusModule
+from ..atomic import atomic as atomicDataModule
 
+from . import misc as chemicalElementMiscModule
 from . import isotope as isotopeModule
 
-class suite( suiteModule.sortedSuite ) :
+class chemicalElement( miscModule.classWithSymbolKey ) :
     """
     This class represents a chemical element (i.e., Oyxgen, Iron, Uranium). A chemical element
     stores all isotopes that contain the same number of protons (i.e., O16, O17, and O18). 
     The members of a chemicalElement are::
 
-        +-------------------+-----------------------------------------------------------+
-        | member            | type      | description                                   |
-        +===================|===========+===============================================|
-        | id                | string    | This is the symbol for the chemical element   |
-        |                   |           | (e.g., 'O' for oxygen).                       |
-        +-------------------+-----------------------------------------------------------+
-        | Z                 | int       | Number of protons for this chemical element.  |
-        |                   |           | (e.g., 8 for 'O').                            |
-        +-------------------+-----------------------------------------------------------+
-        | name              | string    | The name of the chemical element              |
-        |                   |           | (i.e., 'Oxygen')                              |
-        +-------------------+-----------------------------------------------------------+
-        | list of isotopes  | suite     | The list of isotopes                          |
-        +-------------------+-----------------------------------------------------------+
+        +-------------------+---------------------------------------------------------------+
+        | member            | type          | description                                   |
+        +===================|===========+===================================================|
+        | symbol            | string        | This is the symbol for the chemical element   |
+        |                   |               | (e.g., 'O' for oxygen).                       |
+        +-------------------+---------------------------------------------------------------+
+        | Z                 | int           | Number of protons for this chemical element.  |
+        |                   |               | (e.g., 8 for 'O').                            |
+        +-------------------+---------------------------------------------------------------+
+        | name              | string        | The name of the chemical element              |
+        |                   |               | (i.e., 'Oxygen')                              |
+        +-------------------+---------------------------------------------------------------+
+        | atomicData        | atomicData    | Container for atomicData                      |
+        +-------------------+---------------------------------------------------------------+
+        | isotopes          | suite         | The list of isotopes                          |
+        +-------------------+---------------------------------------------------------------+
     """
 
     moniker = 'chemicalElement'
 
-    def __init__( self, id, Z, name ) :
+    def __init__( self, symbol, Z, name ) :
 
-        suiteModule.sortedSuite.__init__( self, [ isotopeModule.suite ], key = 'id', replace = True )
+        miscModule.classWithSymbolKey.__init__( self, symbol )
 
-        base, anti = miscModule.baseAntiFromID( id )
-
-        self.__id = id
+        base, anti = miscModule.baseAntiFromID( symbol )
 
         self.__anti = anti == miscModule.antiSuffix
 
-        checkZ( Z )
+        chemicalElementMiscModule.checkZ( Z )
         self.__Z = Z
-        if( symbolFromZ[Z] != base ) : raise ValueError( 'Z = %s and chemical element id = "%s" are not consistent' %
-                ( Z, miscModule.toLimitedString( id ) ) )
+        if( chemicalElementMiscModule.symbolFromZ[Z] != base ) : raise ValueError( 'Z = %s and chemical element symbol = "%s" are not consistent' %
+                ( Z, miscModule.toLimitedString( symbol ) ) )
 
-# FIXME - What is the name if element is an '_anti'?
         if( not( isinstance( name, str ) ) ) : TypeError( 'name must be a string' )
-        if( nameFromZ[Z] != name ) : 
+        if( chemicalElementMiscModule.nameFromZ[Z] != name ) : 
             raise ValueError( 'Z = "%s" and chemical element name = "%s" are not consistent, should be "%s".' %
-                    ( Z, miscModule.toLimitedString( name ), nameFromZ[Z] ) )
+                    ( Z, miscModule.toLimitedString( name ), chemicalElementMiscModule.nameFromZ[Z] ) )
         self.__name = name
+
+        self.__atomicData = None
+
+        self.__isotopes = isotopeModule.isotopes( )
+        self.__isotopes.setAncestor( self ) 
 
     def __contains__( self, key ) : 
 
-        if( suiteModule.sortedSuite.__contains__( self, key ) ) : return( True )
-        for chemicalElement in self :
-            if( key in chemicalElement ) : return( True )
-        return( False )
+        return( key in self.__isotopes )
 
     def __getitem__( self, key ) :
 
-        def getitem( key ) :
+        return( self.__isotopes[key] )
 
-            for item in self :
-                if( getattr( item, self.__key ) == key ) : return( item )
-            return( None )
+    def __iter__( self ) :
 
-        if( isinstance( key, int ) ) : return( self.__items[key] )
-        if( not( isinstance( key, str ) ) ) : raise TypeError( 'key must be a string' )
-
-        item = getitem( key )
-        if( item is not None ) : return( item )
-
-        chemicalElementID = None
-        try :
-            isNucleus, chemicalElementID, A, levelIDs, anti, qualifier = nucleusModule.chemicalElementAAndLevelIDsFromNuclearLevelID( key )
-        except :
-            pass
-        if( chemicalElementID is not None ) :
-            isotopeID = isotopeModule.isotopeIDFromElementIDAndA( chemicalElementID, A )
-            item = getitem( isotopeID )
-            if( item is not None ) : return( item[key] )
-        raise KeyError( 'key "%s" not found' % key )
+        for isotope in self.__isotopes : yield isotope
 
     @property
     def Z( self ) :
@@ -157,52 +140,64 @@ class suite( suiteModule.sortedSuite ) :
         return( self.__Z )
 
     @property
-    def id( self ) :
-
-        return( self.__id )
-
-    @property
     def isAnti( self ) :
 
         return( self.__anti )
-
-    @property
-    def key( self ) :
-
-        return( self.__id )
-
-    @key.setter
-    def key( self, value ) :
-
-        if( not( isinstance( value, str ) ) ) : raise TypeError( 'id must be a string instance.' )
-        self.__id = value
 
     @property
     def name( self ) :
 
         return( self.__name )
 
+    @property
+    def atomicData( self ) :
+
+        return( self.__atomicData )
+
+    @atomicData.setter
+    def atomicData( self, value ) :
+
+        if( not( isinstance( value, atomicDataModule.atomic ) ) ) : raise TypeError( 'value must be an instance of atomicData.' )
+        self.__atomicData = value
+        self.__atomicData.setAncestor( self )
+
+    @property
+    def isotopes( self ) :
+
+        return( self.__isotopes )
+
     def add( self, item ) :
 
-        if( isinstance( item, isotopeModule.suite ) ) :
-            suiteModule.sortedSuite.add( self, item )
-        elif( isinstance( item, nuclearLevelModule.particle ) ) :
-            isotopeID = isotopeModule.isotopeIDFromElementIDAndA( item.chemicalElement, item.A )
-            if( isotopeID not in self ) : suiteModule.sortedSuite.add( self, isotopeModule.suite( isotopeID, item.A ) )
-            self[isotopeID].add( item )
-        else :
-            raise TypeError( "Object not an isotope or sub-isotope particle." )
+        self.__isotopes.add( item )
+
+    def convertUnits( self, unitMap ) :
+
+        if( self.__atomicData is not None ) : self.__atomicData.convertUnits( unitMap )
+        self.__isotopes.convertUnits( unitMap )
 
     def copy( self ) :
 
-        chemicalElement = suite( self.id, self.Z, self.name )
-        for item in self : chemicalElement.add( item.copy( ) )
-        return( chemicalElement )
+        _chemicalElement = chemicalElement( self.symbol, self.Z, self.name )
+        if( self.__atomicData is not None ) : _chemicalElement.atomicData = self.__atomicData.copy( )
+        for item in self.__isotopes : _chemicalElement.add( item.copy( ) )
+        return( _chemicalElement )
 
     def sortCompare( self, other ) :
 
-        if( not( isinstance( other, suite ) ) ) : raise TypeError( 'Invalid other.' )
+        if( not( isinstance( other, chemicalElement ) ) ) : raise TypeError( 'Invalid other.' )
         return( self.Z - other.Z )
+
+    def check(self, info):
+
+        from .. import warning as warningModule
+        warnings = []
+
+        for isotope in self:
+            isotopeWarnings = isotope.check(info)
+            if isotopeWarnings:
+                warnings.append(warningModule.context('Isotope %s' % isotope.symbol, isotopeWarnings))
+
+        return warnings
 
     def toXML( self, indent = '', **kwargs ) :
 
@@ -212,20 +207,37 @@ class suite( suiteModule.sortedSuite ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        XMLStringList = [ '%s<%s id="%s" Z="%s" name="%s">' % ( indent, self.moniker, self.id, self.Z, self.name ) ]
-        for isotope in self : XMLStringList += isotope.toXMLList( indent2, **kwargs )
+        XMLStringList = [ '%s<%s symbol="%s" Z="%s" name="%s">' % ( indent, self.moniker, self.symbol, self.Z, self.name ) ]
+        if( self.__atomicData is not None ) : XMLStringList += self.__atomicData.toXMLList( indent2, **kwargs )
+        XMLStringList += self.__isotopes.toXMLList( indent2, **kwargs )
         XMLStringList[-1] += '</%s>' % self.moniker
         return( XMLStringList )
 
     def parseXMLNode( self, element, xPath, linkData ) :
 
-        xPath.append( element.tag )
+        xPath.append( '%s[@symbol="%s"]' % ( element.tag, element.get( 'symbol' ) ) )
 
         for child in element :
-            isotope = isotopeModule.suite( child.attrib['id'], child.attrib['A'] )
-            self.add( isotope.parseXMLNode( child,  xPath, linkData ) ) 
+            if( child.tag == isotopeModule.isotopes.moniker ) :
+                self.__isotopes.parseXMLNode( child, xPath, linkData )
+            elif( child.tag == atomicDataModule.atomic.moniker ) :
+                self.atomicData = atomicDataModule.atomic.parseXMLNodeAsClass( child, xPath, linkData )
+            else :
+                raise ValueError( 'Invalid child = "%s" for %s' % ( child.tag, self.moniker ) )
 
         xPath.pop( )
+        return( self )
+
+    @classmethod
+    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+
+        xPath.append( '%s[@symbol="%s"]' % ( element.tag, element.get( 'symbol' ) ) )
+
+        self = cls( element.attrib['symbol'], int( element.attrib['Z'] ), element.attrib['name'] )
+        xPath.pop( )
+
+        self.parseXMLNode( element, xPath, linkData )
+
         return( self )
 
     @classmethod
@@ -237,8 +249,8 @@ class suite( suiteModule.sortedSuite ) :
 
         attributes = {}
         for attributeName in element.attrib :
-            if( attributeName == 'id' ) :
-                id = element.attrib[attributeName]
+            if( attributeName == 'symbol' ) :
+                symbol = element.attrib[attributeName]
             elif( attributeName == 'Z' ) :
                 Z = int( element.attrib[attributeName] )
             elif( attributeName == 'name' ) :
@@ -246,75 +258,4 @@ class suite( suiteModule.sortedSuite ) :
             else :
                 raise ValueError( 'Unknown attribute = "%s"' % attributeName )
 
-        return( cls( id, Z, name ).parseXMLNode( element, [], [] ) )
-
-elementsZSymbolName = (
-    (   1, "H",  "Hydrogen" ),      (   2, "He", "Helium" ),        (   3, "Li", "Lithium" ),
-    (   4, "Be", "Beryllium" ),     (   5, "B",  "Boron" ),         (   6, "C",  "Carbon" ),
-    (   7, "N",  "Nitrogen" ),      (   8, "O",  "Oxygen" ),        (   9, "F",  "Fluorine" ),
-    (  10, "Ne", "Neon" ),          (  11, "Na", "Sodium" ),        (  12, "Mg", "Magnesium" ),
-    (  13, "Al", "Aluminium" ),     (  14, "Si", "Silicon" ),       (  15, "P",  "Phosphorus" ),
-    (  16, "S",  "Sulphur" ),       (  17, "Cl", "Chlorine" ),      (  18, "Ar", "Argon" ),
-    (  19, "K",  "Potassium" ),     (  20, "Ca", "Calcium" ),       (  21, "Sc", "Scandium" ),
-    (  22, "Ti", "Titanium" ),      (  23, "V",  "Vanadium" ),      (  24, "Cr", "Chromium" ),
-    (  25, "Mn", "Manganese" ),     (  26, "Fe", "Iron" ),          (  27, "Co", "Cobalt" ),
-    (  28, "Ni", "Nickel" ),        (  29, "Cu", "Copper" ),        (  30, "Zn", "Zinc" ),
-    (  31, "Ga", "Gallium" ),       (  32, "Ge", "Germanium" ),     (  33, "As", "Arsenic" ),
-    (  34, "Se", "Selenium" ),      (  35, "Br", "Bromine" ),       (  36, "Kr", "Krypton" ),
-    (  37, "Rb", "Rubidium" ),      (  38, "Sr", "Strontium" ),     (  39, "Y",  "Yttrium" ),
-    (  40, "Zr", "Zirconium" ),     (  41, "Nb", "Niobium" ),       (  42, "Mo", "Molybdenum" ),
-    (  43, "Tc", "Technetium" ),    (  44, "Ru", "Ruthenium" ),     (  45, "Rh", "Rhodium" ),
-    (  46, "Pd", "Palladium" ),     (  47, "Ag", "Silver" ),        (  48, "Cd", "Cadmium" ),
-    (  49, "In", "Indium" ),        (  50, "Sn", "Tin" ),           (  51, "Sb", "Antimony" ),
-    (  52, "Te", "Tellurium" ),     (  53, "I",  "Iodine" ),        (  54, "Xe", "Xenon" ),
-    (  55, "Cs", "Cesium" ),        (  56, "Ba", "Barium" ),        (  57, "La", "Lanthanum" ),
-    (  58, "Ce", "Cerium" ),        (  59, "Pr", "Praseodymium" ),  (  60, "Nd", "Neodymium" ),
-    (  61, "Pm", "Promethium" ),    (  62, "Sm", "Samarium" ),      (  63, "Eu", "Europium" ),
-    (  64, "Gd", "Gadolinium" ),    (  65, "Tb", "Terbium" ),       (  66, "Dy", "Dysprosium" ),
-    (  67, "Ho", "Holmium" ),       (  68, "Er", "Erbium" ),        (  69, "Tm", "Thulium" ),
-    (  70, "Yb", "Ytterbium" ),     (  71, "Lu", "Lutetium" ),      (  72, "Hf", "Hafnium" ),
-    (  73, "Ta", "Tantalum" ),      (  74, "W",  "Tungsten" ),      (  75, "Re", "Rhenium" ),
-    (  76, "Os", "Osmium" ),        (  77, "Ir", "Iridium" ),       (  78, "Pt", "Platinum" ),
-    (  79, "Au", "Gold" ),          (  80, "Hg", "Mercury" ),       (  81, "Tl", "Thallium" ),
-    (  82, "Pb", "Lead" ),          (  83, "Bi", "Bismuth" ),       (  84, "Po", "Polonium" ),
-    (  85, "At", "Astatine" ),      (  86, "Rn", "Radon" ),         (  87, "Fr", "Francium" ),
-    (  88, "Ra", "Radium" ),        (  89, "Ac", "Actinium" ),      (  90, "Th", "Thorium" ),
-    (  91, "Pa", "Protactinium" ),  (  92, "U",  "Uranium" ),       (  93, "Np", "Neptunium" ),
-    (  94, "Pu", "Plutonium" ),     (  95, "Am", "Americium" ),     (  96, "Cm", "Curium" ),
-    (  97, "Bk", "Berkelium" ),     (  98, "Cf", "Californium" ),   (  99, "Es", "Einsteinium" ),
-    ( 100, "Fm", "Fermium" ),       ( 101, "Md", "Mendelevium" ),   ( 102, "No", "Nobelium" ),
-    ( 103, "Lr", "Lawrencium" ),    ( 104, "Rf", "Rutherfordium" ), ( 105, "Db", "Dubnium" ),
-    ( 106, "Sg", "Seaborgium" ),    ( 107, "Bh", "Bohrium" ),       ( 108, "Hs", "Hassium" ),
-    ( 109, "Mt", "Meitnerium" ),    ( 110, "Ds", "Darmstadtium" ),  ( 111, "Rg", "Roentgenium" ),
-    ( 112, "Cn", "Copernicium" ),   ( 113, "Uut", "Ununtrium" ),    ( 114, "Fl", "Flerovium" ),
-    ( 115, "Uup", "Ununpentium" ),  ( 116, "Lv", "Livermorium" ),   ( 117, "Uus", "Ununseptium" ),
-    ( 118, "Uuo", "Ununoctium" ) )
-
-symbolFromZ = {}
-for Z, symbol, name in elementsZSymbolName : symbolFromZ[Z] = symbol
-
-nameFromZ = {}
-for Z, symbol, name in elementsZSymbolName : nameFromZ[Z] = name
-
-ZFromSymbol = {}
-for Z, symbol, name in elementsZSymbolName : ZFromSymbol[symbol] = Z
-
-nameFromSymbol = {}
-for Z, symbol, name in elementsZSymbolName : nameFromSymbol[symbol] = name
-
-ZFromName = {}
-for Z, symbol, name in elementsZSymbolName : ZFromName[name] = Z
-
-symbolFromName = {}
-for Z, symbol, name in elementsZSymbolName : symbolFromName[name] = symbol
-
-def checkZ( Z ) :
-
-    if( not( isinstance( Z, int ) ) ) : raise TypeError( 'Z not an int object.' )
-    if( 0 < Z <= elementsZSymbolName[-1][0] ) : return( Z )
-    raise ValueError( 'Z = "%s" out of range.' % Z )
-
-def checkSymbol( symbol ) :
-
-    if( not( isinstance( symbol, str ) ) ) : raise TypeError( 'symbol not a str object.' )
-    if( symbol not in ZFromSymbol ) : raise ValueError( 'Invalid symbol: %s.' % miscModule.toLimitedString( symbol ) )
+        return( cls( symbol, Z, name ).parseXMLNode( element, [], [] ) )

@@ -340,7 +340,7 @@ All options can be negated by prepending with 'no_' (e.g., -no_u').
         if( target[:18] == 'FissionProductENDL' ) :
             ZAs = target[18:]
         else :
-            Z, A, suffix, ZA = endl2.gndNameToEndlZ_A_Suffix( target )
+            Z, A, suffix, ZA = endl2.gndsNameToEndlZ_A_Suffix( target )
             ZAs = endlmisc.strZASuffix( 1000 * Z + A, suffix )
         return( self.readZA( ZAs, database = database ) )
 
@@ -399,7 +399,7 @@ All options can be negated by prepending with 'no_' (e.g., -no_u').
                 if( suffix != [ None ] ) : s_ = target[8:]
                 if( ( S_ in Symbol ) and ( A_ in A ) and ( s_ in suffix ) ) :
                     d = os.path.join( self.database, target )
-                    if ( os.path.exists( d ) ) : targetList.append( endl2.endlToGNDName( target ) )
+                    if ( os.path.exists( d ) ) : targetList.append( endl2.endlToGNDSName( target ) )
         return targetList
 
     def unread( self, target ) :

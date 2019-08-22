@@ -61,10 +61,9 @@
 # 
 # <<END-copyright>>
 
-SHELL = /bin/ksh
+SHELL = /bin/sh
 
-STATUSMESSAGEREPORTING_CXXFLAGS = -g -O0
-local_CXXFLAGS = $(CXXFLAGS) -I../Src $(STATUSMESSAGEREPORTING_CXXFLAGS)
+localCFLAGS = $(CFLAGS) -I../include
 
 .PHONY: all check clean realclean
 
@@ -78,14 +77,14 @@ check: check1 check2 check3
 	python check3.py
 	diff check3.out Data/check3.out > /dev/null; if [ $$? != 0 ]; then echo "FAILED: check3"; fi
 
-check1: check1.c ../Src/statusMessageReporting.o
-	$(CXX) $(local_CXXFLAGS) -o check1 check1.c ../Src/statusMessageReporting.o
+check1: check1.c
+	$(CC) $(localCFLAGS) -o check1 check1.c -L../lib -lstatusMessageReporting
 
-check2: check2.c ../Src/statusMessageReporting.o
-	$(CXX) $(local_CXXFLAGS) -o check2 check2.c ../Src/statusMessageReporting.o
+check2: check2.c
+	$(CC) $(localCFLAGS) -o check2 check2.c -L../lib -lstatusMessageReporting
 
-check3: check3.c ../Src/statusMessageReporting.o
-	$(CXX) $(local_CXXFLAGS) -o check3 check3.c ../Src/statusMessageReporting.o
+check3: check3.c
+	$(CC) $(localCFLAGS) -o check3 check3.c -L../lib -lstatusMessageReporting
 
 clean:
 	rm -f check1 check2 check2.out check3 check3.out

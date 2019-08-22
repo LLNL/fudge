@@ -68,7 +68,6 @@ import string
 from pqu import PQU as PQUModule
 
 from . import ancestry as ancestryModule
-from . import base as baseModule
 from . import link as linkModule
 from . import values as valuesModule
 
@@ -112,6 +111,16 @@ class axis( ancestryModule.ancestry ) :
     def __ne__( self, other ) :
 
         return( not( self.__eq__( other ) ) )
+
+    @property
+    def keyName( self ) :
+
+        return( 'index' )
+
+    @property
+    def keyValue( self ) :
+
+        return( self.index )
 
     def convertUnits( self, unitMap ) :
 
@@ -232,6 +241,30 @@ class grid( axis ) :
 
         return( self.__values )
 
+    @property
+    def domainMin( self ) :
+
+        return( self.values[0] )
+
+    @property
+    def domainMax( self ) :
+
+        return( self.values[-1] )
+
+    @property
+    def domainUnit( self ) :
+
+        return( self.unit )
+
+    def domainUnitConversionFactor( self, unitTo ) :
+
+        return( self.unitConversionFactor( unitTo ) )
+
+    @property
+    def domainGrid( self ) :
+
+        return( [ value for value in self.values ] )
+
     def convertToUnit( self, unit ) :
 
         factor = self.unitConversionFactor( unit )
@@ -292,6 +325,13 @@ class grid( axis ) :
 
         xPath.append( '%s[@index="%s"]' % ( grid.moniker, element.get( 'index' ) ) )
 
+        moniker = None
+        href = None
+        for key in element.keys( ) :
+            if( 'href' == key[-4:] ) :
+                xPath.pop( )
+                return( linkModule.link2.parseXMLNode( element, xPath, linkData ) )
+
         style = element.get( 'style' )
         gridClass = {
             'link': linkModule.link,
@@ -303,9 +343,9 @@ class grid( axis ) :
 
         gridData = gridClass.parseXMLNode( element[0], xPath, linkData )
         _grid = grid( element.get( 'label' ), element.get( 'index' ), element.get( 'unit' ), style, gridData,
-                interpolation = element.get('interpolation') )
+                interpolation = element.get( 'interpolation' ) )
 
-        xPath.pop()
+        xPath.pop( )
         return( _grid )
 
 class axes( ancestryModule.ancestry ) :
@@ -331,7 +371,7 @@ class axes( ancestryModule.ancestry ) :
 
         self.axes = []
         abcsOffset = string.ascii_lowercase.index( 'y' )
-        for index in xrange( rank ) :
+        for index in range( rank ) :
             label, unit = string.ascii_lowercase[abcsOffset-index], ''
             if( index in labelsUnits ) : label, unit = labelsUnits[index]
             self.axes.append( axis( label, index, unit ) )
@@ -360,7 +400,7 @@ class axes( ancestryModule.ancestry ) :
 
     def __setitem__( self, index, axisOrGrid ) :
 
-        if( not( isinstance( axisOrGrid, ( axis, grid ) ) ) ) : raise TypeError( 'axisOrGrid is not an instance of axis or grid' )
+        if( not( isinstance( axisOrGrid, ( axis, grid, linkModule.link2 ) ) ) ) : raise TypeError( 'axisOrGrid is not an instance of axis or grid' )
         rank = len( self )
         index = int( index )
         if( index < 0 ) : index += rank 
@@ -385,7 +425,9 @@ class axes( ancestryModule.ancestry ) :
         """
 
         factors = []
-        for axis in self : factors.append( axis.convertUnits( unitMap ) )
+        for axis in self :
+            if( isinstance( axis, linkModule.link2 ) ) : continue
+            factors.append( axis.convertUnits( unitMap ) )
         return( factors )
 
     def copy( self ) :
@@ -422,7 +464,7 @@ class axes( ancestryModule.ancestry ) :
         if( axesElement.tag == axes.moniker ) :
             _axes = axes( rank = len( axesElement ) )
             for child in axesElement :
-                childClass = {axis.moniker: axis, grid.moniker: grid}.get(child.tag)
+                childClass = { axis.moniker : axis, grid.moniker : grid }.get( child.tag )
                 if childClass is None:
                     raise TypeError("Unexpected child element '%s' encountered in axes" % child.tag)
                 index = child.get( "index" )

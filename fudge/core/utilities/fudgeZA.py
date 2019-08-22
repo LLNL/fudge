@@ -190,12 +190,12 @@ ZLabels = (
     ( 110, "Ds", "Darmstadtium" ),
     ( 111, "Rg", "Roentgenium" ),
     ( 112, "Cn", "Copernicium" ),
-    ( 113, "Uut", "Ununtrium" ),
-    ( 114, "Fl",  "Flerovium" ),
-    ( 115, "Uup", "Ununpentium" ),
-    ( 116, "Lv",  "Livermorium" ),
-    ( 117, "Uus", "Ununseptium" ),
-    ( 118, "Uuo", "Ununoctium" ) )
+    ( 113, "Nh", "Nihonium" ),
+    ( 114, "Fl", "Flerovium" ),
+    ( 115, "Mc", "Moscovium" ),
+    ( 116, "Lv", "Livermorium" ),
+    ( 117, "Ts", "Tennessine" ),
+    ( 118, "Og", "Oganesson" ) )
 
 def ZToSymbol( Z ) :
     """Returns the symbol for the specified Z or 'None' if Z is out-of-bounds."""
@@ -225,8 +225,8 @@ def LabelToZ( label ) :
         if( i[2] == label ) : return i[0]
     return None
 
-def gndNameToZ_A_Suffix( name ):
-    """Returns the tuple (Z, A, suffix, ZA) for an gnd isotope name (e.g., gnd name = 'Am242_m1' 
+def gndsNameToZ_A_Suffix( name ):
+    """Returns the tuple (Z, A, suffix, ZA) for an gnds isotope name (e.g., gnds name = 'Am242_m1'
     returns ( 95, 242, 'm1', 95242 )."""
 
     if( name == 'n' ) : return( 0, 1, '', 1 )
@@ -267,8 +267,8 @@ def gndNameToZ_A_Suffix( name ):
     ZA = 1000 * Z + A
     return( Z, A, suffix, ZA )
 
-def ZAToGNDName( ZA ):
-    """Converts an ENDL ZA or 'zaZZZAAA_suffix' into a GND name. For example ENDL 94239 or 'za094239', is converted to 'Pu239'."""
+def ZAToGNDSName( ZA ):
+    """Converts an ENDL ZA or 'zaZZZAAA_suffix' into a GNDS name. For example ENDL 94239 or 'za094239', is converted to 'Pu239'."""
 
     if( ZA == 1 ) : return( 'n' )
     if type(ZA) in (int,float):

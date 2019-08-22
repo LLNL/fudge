@@ -61,7 +61,7 @@
 # 
 # <<END-copyright>>
 
-SUB_DIRS = quantities groups families decays Test
+SUB_DIRS = quantities groups families decays atomic Test
 
 .PHONY: clean realclean doTarget
 

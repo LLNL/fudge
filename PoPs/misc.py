@@ -61,6 +61,8 @@
 # 
 # <<END-copyright>>
 
+from xData import ancestry as ancestryModule
+
 maxLength = 32
 antiSuffix = '_anti'
 
@@ -75,7 +77,7 @@ def toLimitedString( object, maxLength = maxLength ) :
 
 def baseAntiQualifierFromID( id, qualifierAllowed = False ) :
 
-    if( not( isinstance( id, str ) ) ) : raise TypeError( 'id is not a str' )
+    if( not( isinstance( id, str ) ) ) : raise TypeError( 'id is not a str: %s' % type( id ) )
     anti, qualifier = '', ''
     base = id.split( '{' )
     if( len( base ) > 1 ) :
@@ -99,58 +101,6 @@ def baseAntiFromID( id ) :
 
     return( base, anti )
 
-def ZAInfo( particle ) :
-
-    from . import IDs as IDsModule
-    from .groups import isotope as isotopeModule
-    from .families import nuclearLevel as nuclearLevelModule
-    from .families import nucleus as nucleusModule
-    from .families import baryon as baryonModule
-
-    level = 0
-    Z = 0
-    A = 0
-    if( isinstance( particle, ( isotopeModule.suite, ) ) ) :
-        Z = particle.Z
-        A = particle.intA
-    elif( isinstance( particle, ( nuclearLevelModule.particle, ) ) ) :
-        Z = particle.Z
-        A = particle.intA
-        level = particle.intIndex
-    elif( isinstance( particle, ( nucleusModule.particle, ) ) ) :
-        Z = particle.Z
-        A = particle.intA
-        level = particle.intIndex
-    elif( isinstance( particle, ( baryonModule.particle, ) ) ) :
-        if( particle.id == IDsModule.neutron ) :
-            A = 1
-        if( particle.id == IDsModule.proton ) :
-            Z = 1
-            A = 1
-    if( A == isotopeModule.naturalAID ) : A = 0
-
-    try :
-        return( Z, A, 1000 * Z + A, level )
-    except :
-        print particle.id, Z, A, level, type( Z ), type( A ), type( level )
-        raise
-
-def ZA( particle ) :
-
-    return( ZAInfo( particle )[2] )
-
-def idFromZAndA( Z, A ) :
-
-    from .groups import isotope as isotopeModule
-    from .groups import chemicalElement as chemicalElementModule
-
-    return( isotopeModule.isotopeIDFromElementIDAndA( chemicalElementModule.symbolFromZ[Z], str( A ) ) )
-
-def nucleusIDFromZAndA( Z, A ) :
-
-    nucleusID = idFromZAndA( Z, A )
-    return( nucleusID[0].lower( ) + nucleusID[1:] )
-
 def buildParticleFromRawData( cls, ID, mass = None, spin = None, parity = None, charge = None, halflife = None,
         nucleus = None, index = None, energy = None, generation = None, label = 'default' ) :
 
@@ -159,8 +109,8 @@ def buildParticleFromRawData( cls, ID, mass = None, spin = None, parity = None, 
     from .quantities import nuclearEnergyLevel as nuclearEnergyLevelModule
     from .families import particle as particleModule
     from .families import lepton as leptonModule
-    from .families import nuclearLevel as nuclearLevelModule
     from .families import nucleus as nucleusModule
+    from .families import nuclide as nuclideModule
 
     def getUnit( unit ) :
 
@@ -171,14 +121,16 @@ def buildParticleFromRawData( cls, ID, mass = None, spin = None, parity = None, 
         particle = cls( ID, generation = generation )
     elif( issubclass( cls, nucleusModule.particle ) ) :
         ID = ID[0].lower( ) + ID[1:]
-        if( index is None ) : raise ValueError( 'index must be defined for nuclearLevel to be built' )
+        if( index is None ) : raise ValueError( 'index must be defined for nuclide to be built' )
         particle = cls( ID, index )
         if( energy is not None ) : particle.energy.add( nuclearEnergyLevelModule.double( label, energy[0], getUnit( energy[1] ) ) )
-    elif( issubclass( cls, nuclearLevelModule.particle ) ) :
-        particle = cls( ID, nucleus = nucleus )
+    elif( issubclass( cls, nuclideModule.particle ) ) :
+        particle = cls( ID )
+        if( nucleus is not None ) : particle.nucleus.replicate( nucleus )
         if( charge is None ) : charge = ( 0, chargeModule.baseUnit )
         if( len( particle.nucleus.charge ) == 0 ) :
             particle.nucleus.charge.add( chargeModule.integer( label, particle.Z, chargeModule.baseUnit ) )
+        if( energy is not None ) : particle.nucleus.energy.add( nuclearEnergyLevelModule.double( label, energy[0], getUnit( energy[1] ) ) )
     elif( issubclass( cls, particleModule.particle ) ) :
         particle = cls( ID )
     else :
@@ -188,16 +140,6 @@ def buildParticleFromRawData( cls, ID, mass = None, spin = None, parity = None, 
 
     return( particle )
 
-def hasNucleas( particle, nucleusReturnsTrue = False ) :
-
-    from .groups import isotope as isotopeModule
-    from .families import nuclearLevel as nuclearLevelModule
-    from .families import nucleus as nucleusModule
-
-    if( isinstance( particle, ( isotopeModule.suite, nuclearLevelModule.particle ) ) ) : return( True )
-    if( nucleusReturnsTrue and isinstance( particle, nucleusModule.particle ) ) : return( True )
-    return( False )
-
 def returnAntiParticleIDFromId( particleID ) :
 
     n1 = len( antiSuffix )
@@ -206,4 +148,164 @@ def returnAntiParticleIDFromId( particleID ) :
 
 def returnAntiParticleID( particle ) :
 
-    return( returnAntiParticleIDFromID( particle.ID ) )
+    return( returnAntiParticleIDFromId( particle.ID ) )
+
+class classWithIDKey( ancestryModule.ancestry ) :
+
+    __keyName = 'id'
+
+    def __init__( self, id ) :
+
+        ancestryModule.ancestry.__init__( self  )
+
+        if( not( isinstance( id, str ) ) ) : raise TypeError( 'id not str' )
+        self.__id = id
+
+    @property
+    def id( self ) :
+
+        return( self.__id )
+
+    @property
+    def key( self ) :
+
+        return( self.__id )
+
+    @key.setter
+    def key( self, value ) :
+
+        if( not( isinstance( value, str ) ) ) : raise TypeError( 'id must be a string instance.' )
+        self.__id = value
+
+    @property
+    def keyName( self ) :
+
+        return( self.__keyName )
+
+class classWithSymbolKey( ancestryModule.ancestry ) :
+
+    __keyName = 'symbol'
+
+    def __init__( self, symbol ) :
+
+        ancestryModule.ancestry.__init__( self  )
+
+        if( not( isinstance( symbol, str ) ) ) : raise TypeError( 'symbol not str' )
+        self.__symbol = symbol
+
+    @property
+    def symbol( self ) :
+
+        return( self.__symbol )
+
+    @property
+    def key( self ) :
+
+        return( self.__symbol )
+
+    @key.setter
+    def key( self, value ) :
+
+        if( not( isinstance( value, str ) ) ) : raise TypeError( 'symbol must be a string instance.' )
+        self.__symbol = value
+
+    @property
+    def keyName( self ) :
+
+        return( self.__keyName )
+
+class classWithLabelKey( ancestryModule.ancestry ) :
+
+    __keyName = 'label'
+
+    def __init__( self, label ) :
+
+        ancestryModule.ancestry.__init__( self  )
+
+        if( not( isinstance( label, str ) ) ) : raise TypeError( 'label not str' )
+        self.__label = label
+
+    @property
+    def label( self ) :
+    
+        return( self.__label )
+
+    @property
+    def key( self ) :
+    
+        return( self.__label )
+        
+    @key.setter
+    def key( self, value ) :
+
+        if( not( isinstance( value, str ) ) ) : raise TypeError( 'label must be a string instance.' )
+        self.__label = value
+
+    @property
+    def keyName( self ) :
+
+        return( self.__keyName )
+
+class classWithIndexKey( ancestryModule.ancestry ) :
+
+    __keyName = 'index'
+
+    def __init__( self, index ) :
+
+        ancestryModule.ancestry.__init__( self  )
+
+        if( not( isinstance( index, str ) ) ) : raise TypeError( 'index not str' )
+        self.key = index
+
+    @property
+    def index( self ) :
+
+        return( self.__index )
+
+    @property
+    def key( self ) :
+
+        return( self.__index )
+
+    @key.setter
+    def key( self, value ) :
+
+        if( not( isinstance( value, str ) ) ) : raise TypeError( 'indexmust be a string instance.' )
+        self.__index = value
+
+    @property
+    def keyName( self ) :
+
+        return( self.__keyName )
+
+class classWithSubshellKey( ancestryModule.ancestry ) :
+
+    __keyName = 'subshell'
+
+    def __init__( self, subshell ) :
+
+        ancestryModule.ancestry.__init__( self  )
+
+        if( not( isinstance( subshell, str ) ) ) : raise TypeError( 'subshell not str' )
+        self.__subshell = subshell
+
+    @property
+    def subshell( self ) :
+
+        return( self.__subshell )
+
+    @property
+    def key( self ) :
+
+        return( self.__subshell )
+
+    @key.setter
+    def key( self, value ) :
+
+        if( not( isinstance( value, str ) ) ) : raise TypeError( 'subshell must be a string instance.' )
+        self.__subshell = value
+
+    @property
+    def keyName( self ) :
+
+        return( self.__keyName )

@@ -125,6 +125,10 @@ checkePython:
 collectSources:
 	cd _Src; $(MAKE) collectSources
 
+utilities:
+	cd ptwC/Test/Utilities; $(MAKE)
+	cd ptwXY/Test/Utilities; $(MAKE)
+
 clean:
 	rm -rf build
 	$(MAKE) doTarget MODE=clean

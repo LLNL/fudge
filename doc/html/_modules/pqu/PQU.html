@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pqu.PQU &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>pqu.PQU &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,7 +25,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +35,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -734,6 +731,8 @@
 <span class="sd">    :rtype: `str`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">==</span><span class="nb">str</span><span class="p">:</span> <span class="k">return</span> <span class="n">value</span>
+
     <span class="k">def</span> <span class="nf">isfinite</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns True if value is neither infinite nor not-a-number (NaN) and False otherwise.&quot;&quot;&quot;</span>
 
@@ -808,7 +807,7 @@
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">( &quot;</span><span class="si">%s</span><span class="s1">&quot; )&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">( &quot;</span><span class="si">%s</span><span class="s1">&quot; )&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -852,7 +851,7 @@
 
     <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PQU</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">__radd__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PQU</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="fm">__radd__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isPercent</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Addition of per cent is not allowed (defined)&#39;</span> <span class="p">)</span>
         <span class="n">significantOrder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">significantDigits</span>
         <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">pqu_float</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
@@ -866,7 +865,7 @@
         <span class="n">pqu_f</span><span class="o">.</span><span class="n">setSignificantDigits</span><span class="p">(</span> <span class="n">significantOrder</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">pqu_f</span> <span class="p">)</span>
 
-    <span class="n">__radd__</span> <span class="o">=</span> <span class="n">__add__</span>
+    <span class="fm">__radd__</span> <span class="o">=</span> <span class="fm">__add__</span>
 
     <span class="k">def</span> <span class="nf">__iadd__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -875,12 +874,12 @@
 
     <span class="k">def</span> <span class="nf">__sub__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PQU</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">__rsub__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PQU</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="fm">__rsub__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">pqu_float</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
             <span class="n">other_</span> <span class="o">=</span> <span class="o">-</span><span class="n">other</span>
         <span class="k">else</span> <span class="p">:</span>
             <span class="n">other_</span> <span class="o">=</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__add__</span><span class="p">(</span> <span class="n">other_</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span> <span class="n">other_</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__rsub__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -893,7 +892,7 @@
 
     <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PQU</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">__rmul__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PQU</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="fm">__rmul__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
         <span class="n">significantDigits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">significantDigits</span>
         <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">pqu_float</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
             <span class="n">value</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">significantDigits</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">significantDigits</span> <span class="p">)</span>
@@ -901,7 +900,7 @@
             <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">pqu_float</span><span class="p">(</span> <span class="n">value</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">significantDigits</span><span class="p">,</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">)</span>
 
-    <span class="n">__rmul__</span> <span class="o">=</span> <span class="n">__mul__</span>
+    <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
 
     <span class="k">def</span> <span class="nf">__imul__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -941,11 +940,11 @@
 
         <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="mf">0.</span> <span class="p">)</span>
 
-    <span class="n">__nonzero__</span> <span class="o">=</span> <span class="n">__bool__</span>      <span class="c1"># for python 2.x</span>
+    <span class="n">__nonzero__</span> <span class="o">=</span> <span class="fm">__bool__</span>      <span class="c1"># for python 2.x</span>
 
     <span class="k">def</span> <span class="nf">__deepcopy__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span> <span class="n">pqu_float</span> <span class="p">)</span>
+        <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span> <span class="n">pqu_float</span> <span class="p">)</span>
         <span class="n">other</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">order</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">significantDigits</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">_isPercent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">significantDigits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isPercent</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
 
@@ -1068,8 +1067,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%%</span><span class="s2">.</span><span class="si">%d</span><span class="s2">e&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">significantDigits</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setSignificantDigits</span><span class="p">(</span> <span class="n">significantDigits</span> <span class="p">)</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="pqu_float.calculateOrder"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.pqu_float.calculateOrder">[docs]</a>    <span class="k">def</span> <span class="nf">calculateOrder</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="pqu_float.calculateOrder"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.pqu_float.calculateOrder">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">calculateOrder</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the order of value. Value must be convertible to a float. A float&#39;s order is the exponent in the</span>
 <span class="sd">        representation &#39;m * 10**o&#39; where &#39;m&#39; is the mantissa and &#39;o&#39; is the exponent. For example, 1.234e43 has order 43.</span>
@@ -1083,8 +1082,8 @@
         <span class="n">s1</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%.17e</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">value</span>
         <span class="k">return</span><span class="p">(</span> <span class="nb">int</span><span class="p">(</span> <span class="n">s1</span><span class="o">.</span><span class="n">split</span><span class="p">(</span> <span class="s1">&#39;e&#39;</span> <span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="pqu_float.fixFloatsOrder"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.pqu_float.fixFloatsOrder">[docs]</a>    <span class="k">def</span> <span class="nf">fixFloatsOrder</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="pqu_float.fixFloatsOrder"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.pqu_float.fixFloatsOrder">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fixFloatsOrder</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Many numbers are not represented in IEEE floating point by there true value. For example, &#39;1e-12&#39; is </span>
 <span class="sd">        stored as the float 9.9999999999999998e-13. The order of the true value is -12 while the order of the floating </span>
@@ -1110,8 +1109,8 @@
             <span class="n">order1</span> <span class="o">=</span> <span class="n">order2</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="n">order1</span> <span class="p">)</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="pqu_float.surmiseSignificantDigits"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.pqu_float.surmiseSignificantDigits">[docs]</a>    <span class="k">def</span> <span class="nf">surmiseSignificantDigits</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="pqu_float.surmiseSignificantDigits"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.pqu_float.surmiseSignificantDigits">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">surmiseSignificantDigits</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This factory function returns a pqu_float instance given a float value and set its significantDigits to</span>
 <span class="sd">        something &quot;reasonable&quot;. The significantDigits are determined by using PQU.floatToShortestString with trimZeros = True.</span>
@@ -1161,7 +1160,7 @@
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">( &quot;</span><span class="si">%s</span><span class="s1">&quot; )&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">( &quot;</span><span class="si">%s</span><span class="s1">&quot; )&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -1177,7 +1176,7 @@
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="nb">float</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Other type = &quot;</span><span class="si">%s</span><span class="s1">&quot; not supported&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">pqu_uncertainty</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">significantDigits</span><span class="p">,</span> <span class="n">isPercent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isPercent</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
 
-    <span class="n">__rmul__</span> <span class="o">=</span> <span class="n">__mul__</span>
+    <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
 
     <span class="k">def</span> <span class="nf">__float__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -1185,7 +1184,7 @@
 
     <span class="k">def</span> <span class="nf">__deepcopy__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span> <span class="n">pqu_uncertainty</span> <span class="p">)</span>
+        <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span> <span class="n">pqu_uncertainty</span> <span class="p">)</span>
         <span class="n">other</span><span class="o">.</span><span class="n">style</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">__deepcopy__</span><span class="p">(</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
 
@@ -1270,7 +1269,7 @@
             <span class="n">favorEFormBy</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">order</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">getSignificantDigits</span><span class="p">(</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">favorEFormBy</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">+/- </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">prefix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">trimZeros</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">favorEFormBy</span> <span class="o">=</span> <span class="n">favorEFormBy</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="n">significantDigits</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;(</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span> <span class="mf">10.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">getSignificantDigits</span><span class="p">(</span> <span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">getOrder</span><span class="p">(</span> <span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">12</span> <span class="p">)</span> <span class="p">)</span></div>
+        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;(</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span> <span class="nb">pow</span><span class="p">(</span> <span class="mf">10.</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">getSignificantDigits</span><span class="p">(</span> <span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">getOrder</span><span class="p">(</span> <span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="p">)</span> <span class="o">+</span> <span class="mf">1e-12</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="pqu_uncertainty.truncate"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.pqu_uncertainty.truncate">[docs]</a>    <span class="k">def</span> <span class="nf">truncate</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1422,7 +1421,7 @@
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">( &quot;</span><span class="si">%s</span><span class="s1">&quot; )&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">( &quot;</span><span class="si">%s</span><span class="s1">&quot; )&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -1430,11 +1429,11 @@
 
     <span class="k">def</span> <span class="nf">__abs__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span> <span class="nb">abs</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="nb">abs</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__neg__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -1450,7 +1449,7 @@
         <span class="n">uncertainty</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">setSignificantDigits</span><span class="p">(</span> <span class="n">uncertainty</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">order</span> <span class="o">-</span> <span class="n">leastSignificantOrder</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">PQU</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="p">)</span> <span class="p">)</span>
 
-    <span class="n">__radd__</span> <span class="o">=</span> <span class="n">__add__</span>
+    <span class="fm">__radd__</span> <span class="o">=</span> <span class="fm">__add__</span>
 
     <span class="k">def</span> <span class="nf">__iadd__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -1489,7 +1488,7 @@
 
         <span class="k">return</span><span class="p">(</span> <span class="n">PQU</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">*</span> <span class="n">other</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="o">=</span> <span class="n">uncertainty</span> <span class="p">)</span> <span class="p">)</span>
 
-    <span class="n">__rmul__</span> <span class="o">=</span> <span class="n">__mul__</span>
+    <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
 
     <span class="k">def</span> <span class="nf">__imul__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -1539,7 +1538,7 @@
 
         <span class="k">return</span><span class="p">(</span> <span class="nb">bool</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="p">)</span> <span class="p">)</span>
 
-    <span class="n">__nonzero__</span> <span class="o">=</span> <span class="n">__bool__</span>      <span class="c1"># for python 2.x</span>
+    <span class="n">__nonzero__</span> <span class="o">=</span> <span class="fm">__bool__</span>      <span class="c1"># for python 2.x</span>
 
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -1567,7 +1566,7 @@
 
     <span class="k">def</span> <span class="nf">__deepcopy__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span> <span class="n">PQU</span> <span class="p">)</span>
+        <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span> <span class="n">PQU</span> <span class="p">)</span>
         <span class="n">other</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">__deepcopy__</span><span class="p">(</span> <span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">__deepcopy__</span><span class="p">(</span> <span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span><span class="o">.</span><span class="n">__deepcopy__</span><span class="p">(</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
 
@@ -1715,7 +1714,7 @@
         <span class="n">units</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="nb">map</span><span class="p">(</span> <span class="n">_findUnit</span><span class="p">,</span> <span class="n">units</span> <span class="p">)</span> <span class="p">)</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">units</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="n">elf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="p">)</span>
+            <span class="n">elf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="p">)</span>
             <span class="n">elf</span><span class="o">.</span><span class="n">convertToUnit</span><span class="p">(</span> <span class="n">units</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
             <span class="k">return</span><span class="p">(</span> <span class="n">elf</span> <span class="p">)</span>
         <span class="k">else</span> <span class="p">:</span>
@@ -1727,9 +1726,9 @@
             <span class="k">for</span> <span class="n">subunit</span> <span class="ow">in</span> <span class="n">units</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">:</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="n">base</span> <span class="o">*</span> <span class="n">baseUnit</span><span class="o">.</span><span class="n">conversionFactorTo</span><span class="p">(</span> <span class="n">subunit</span> <span class="p">)</span>
                 <span class="n">rounded</span> <span class="o">=</span> <span class="n">_round</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span>
-                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span> <span class="n">rounded</span><span class="p">,</span> <span class="n">subunit</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="n">rounded</span><span class="p">,</span> <span class="n">subunit</span> <span class="p">)</span> <span class="p">)</span>
                 <span class="n">base</span> <span class="o">=</span> <span class="n">base</span> <span class="o">-</span> <span class="n">rounded</span> <span class="o">*</span> <span class="n">subunit</span><span class="o">.</span><span class="n">conversionFactorTo</span><span class="p">(</span> <span class="n">baseUnit</span> <span class="p">)</span>
-            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span> <span class="n">base</span><span class="p">,</span> <span class="n">units</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="n">base</span><span class="p">,</span> <span class="n">units</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
 
             <span class="k">return</span><span class="p">(</span> <span class="nb">tuple</span><span class="p">(</span> <span class="n">result</span> <span class="p">)</span> <span class="p">)</span></div>
 
@@ -1811,7 +1810,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">num</span> <span class="o">=</span> <span class="n">num</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="n">num</span> <span class="o">+</span> <span class="n">denom</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="p">)</span> <span class="p">)</span></div>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="n">num</span> <span class="o">+</span> <span class="n">denom</span><span class="p">,</span> <span class="n">uncertainty</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="PQU.info"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="mi">17</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns a detailed string of self. Mainly for debugging.</span>
@@ -2050,8 +2049,8 @@
         <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">other</span><span class="p">,</span> <span class="n">PQU</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">PQU</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">)</span>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="PQU.isPhysicalUnitOf"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isPhysicalUnitOf">[docs]</a>    <span class="k">def</span> <span class="nf">isPhysicalUnitOf</span><span class="p">(</span> <span class="n">elf</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="PQU.isPhysicalUnitOf"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.PQU.isPhysicalUnitOf">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">isPhysicalUnitOf</span><span class="p">(</span> <span class="n">elf</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns True if elf has the same unit as the argument unit and False otherwise. Elf and unit can be an instance of string,</span>
 <span class="sd">        PhysicalUnit or PQU.</span>
@@ -2074,7 +2073,7 @@
 <span class="sd">    .. rubric:: Regular Expression Matching</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_spaces</span> <span class="o">=</span> <span class="s1">r&#39;[ \t]*&#39;</span>
+    <span class="n">_spaces</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;[ \t]*&#39;</span>
     <span class="n">_anything_RE</span> <span class="o">=</span> <span class="s1">&#39;(.*)&#39;</span>
     <span class="n">_sign</span> <span class="o">=</span> <span class="s1">&#39;[+-]?&#39;</span>                                     <span class="c1"># Optional sign regular expression.</span>
     <span class="n">_unsignedInteger</span> <span class="o">=</span> <span class="s1">&#39;\d+&#39;</span>
@@ -2088,17 +2087,17 @@
     <span class="n">_floatingPoint_andAnythingElse_RE</span> <span class="o">=</span> <span class="s1">&#39;^&#39;</span> <span class="o">+</span> <span class="n">_floatingPoint_RE</span> <span class="o">+</span> <span class="n">_anything_RE</span>
     <span class="n">_floatingPoint_andAnythingElse_PO</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span> <span class="n">_floatingPoint_andAnythingElse_RE</span> <span class="p">)</span>
 
-    <span class="n">_uncertaintyPlusMinus_andAnythingElse_RE</span> <span class="o">=</span> <span class="s1">&#39;^&#39;</span> <span class="o">+</span> <span class="n">_spaces</span> <span class="o">+</span> <span class="s1">r&#39;\+/-&#39;</span> <span class="o">+</span> <span class="n">_spaces</span> <span class="o">+</span> <span class="n">_floatingPoint_RE</span> <span class="o">+</span> <span class="n">_anything_RE</span>
+    <span class="n">_uncertaintyPlusMinus_andAnythingElse_RE</span> <span class="o">=</span> <span class="s1">&#39;^&#39;</span> <span class="o">+</span> <span class="n">_spaces</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;\+/-&#39;</span> <span class="o">+</span> <span class="n">_spaces</span> <span class="o">+</span> <span class="n">_floatingPoint_RE</span> <span class="o">+</span> <span class="n">_anything_RE</span>
     <span class="n">_uncertaintyPlusMinus_andAnythingElse_PO</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span> <span class="n">_uncertaintyPlusMinus_andAnythingElse_RE</span> <span class="p">)</span>
 
-    <span class="n">_uncertaintyParenthesis_andAnythingElse_RE</span> <span class="o">=</span> <span class="s1">r&#39;^[(](\d\d?)[)]&#39;</span> <span class="o">+</span> <span class="n">_anything_RE</span>
+    <span class="n">_uncertaintyParenthesis_andAnythingElse_RE</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^[(](\d\d?)[)]&#39;</span> <span class="o">+</span> <span class="n">_anything_RE</span>
     <span class="n">_uncertaintyParenthesis_andAnythingElse_PO</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span> <span class="n">_uncertaintyParenthesis_andAnythingElse_RE</span> <span class="p">)</span>
 
     <span class="n">_unitCharacters_RE</span> <span class="o">=</span> <span class="s1">&#39;([ a-zA-Z*/()]*)&#39;</span>           <span class="c1"># This does not match a valid unit, it only match the part of a</span>
                                                     <span class="c1"># string that contains characters that can be present in a unit string.</span>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="parsers.parseFloat"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.parsers.parseFloat">[docs]</a>    <span class="k">def</span> <span class="nf">parseFloat</span><span class="p">(</span> <span class="n">str1</span><span class="p">,</span> <span class="n">fullStr</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="parsers.parseFloat"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.parsers.parseFloat">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseFloat</span><span class="p">(</span> <span class="n">str1</span><span class="p">,</span> <span class="n">fullStr</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method parses the beginning of str1 for a valid float. An arbitrary number of white spaces can exists before the </span>
 <span class="sd">        float characters. This method returns a tuple of length 3. The first item of the tuple is the float </span>
@@ -2140,8 +2139,8 @@
         <span class="n">value</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">significantDigits</span><span class="p">,</span> <span class="n">significantDigitsForZero</span> <span class="o">=</span> <span class="n">parsers</span><span class="o">.</span><span class="n">_parseFloatGroups</span><span class="p">(</span> <span class="n">groups</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">pqu_float</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="n">significantDigits</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">checkOrder</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">),</span> <span class="n">significantDigitsForZero</span><span class="p">,</span> <span class="n">groups</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="p">)</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="parsers.parsePlusMinusUncertainty"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.parsers.parsePlusMinusUncertainty">[docs]</a>    <span class="k">def</span> <span class="nf">parsePlusMinusUncertainty</span><span class="p">(</span> <span class="n">str1</span><span class="p">,</span> <span class="n">fullStr</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="parsers.parsePlusMinusUncertainty"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.parsers.parsePlusMinusUncertainty">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parsePlusMinusUncertainty</span><span class="p">(</span> <span class="n">str1</span><span class="p">,</span> <span class="n">fullStr</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method parses the beginning of str1 for the sub-string &#39;+/-&#39; followed by a float string. An arbitrary number of </span>
 <span class="sd">        white spaces can exists before the &#39;+/-&#39; sub-string and between it and the float string. This method</span>
@@ -2164,8 +2163,8 @@
         <span class="n">uncertainty</span> <span class="o">=</span> <span class="n">pqu_uncertainty</span><span class="p">(</span> <span class="n">pqu_uncertainty</span><span class="o">.</span><span class="n">pqu_uncertaintyStylePlusMinus</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">significantDigits</span><span class="p">,</span> <span class="n">checkOrder</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">uncertainty</span><span class="p">,</span> <span class="n">groups</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="p">)</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="parsers.parseParenthesisUncertainty"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.parsers.parseParenthesisUncertainty">[docs]</a>    <span class="k">def</span> <span class="nf">parseParenthesisUncertainty</span><span class="p">(</span> <span class="n">str1</span><span class="p">,</span> <span class="n">fullStr</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="parsers.parseParenthesisUncertainty"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.parsers.parseParenthesisUncertainty">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseParenthesisUncertainty</span><span class="p">(</span> <span class="n">str1</span><span class="p">,</span> <span class="n">fullStr</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method parses the beginning of str1 for the sub-string &#39;(#)&#39; where &#39;#&#39; is a 1 or 2 digit</span>
 <span class="sd">        number.  This method returns a tuple of length 2. The first item of the tuple is the number returned as </span>
@@ -2210,8 +2209,8 @@
         <span class="n">value</span><span class="p">,</span> <span class="n">order</span> <span class="o">=</span> <span class="n">pqu_float</span><span class="o">.</span><span class="n">fixFloatsOrder</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span> <span class="n">groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">significantDigits</span><span class="p">,</span> <span class="n">significantDigitsForZero</span> <span class="p">)</span>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="parsers.parsePQUString"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.parsers.parsePQUString">[docs]</a>    <span class="k">def</span> <span class="nf">parsePQUString</span><span class="p">(</span> <span class="n">str1</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="parsers.parsePQUString"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.parsers.parsePQUString">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parsePQUString</span><span class="p">(</span> <span class="n">str1</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parses the string str1 and returns the tuple ( value, unit, uncertainty ) where value is an instance of pqu_float, </span>
 <span class="sd">        unit is an instance of PhysicalUnit and uncertainty is an instance of pqu_uncertainty.</span>
@@ -2334,7 +2333,7 @@
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span> <span class="o">+</span> <span class="s2">&quot;(&#39;&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">(</span> <span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39;)&quot;</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;(&#39;&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">(</span> <span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;&#39;)&quot;</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__hash__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -2343,17 +2342,17 @@
     <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Incompatible units&#39;</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="o">.</span><span class="n">__lt__</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="o">.</span><span class="fm">__lt__</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Incompatible units&#39;</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="o">.</span><span class="n">__eq__</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Incompatible units&#39;</span> <span class="p">)</span>
-        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="o">.</span><span class="n">__ne__</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="o">.</span><span class="fm">__ne__</span><span class="p">(</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span> <span class="p">)</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__mul__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -2365,7 +2364,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span><span class="p">(</span> <span class="n">PhysicalUnit</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">+</span> <span class="p">{</span> <span class="nb">str</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span> <span class="mi">1</span> <span class="p">},</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="p">)</span> <span class="p">)</span>
 
-    <span class="n">__rmul__</span> <span class="o">=</span> <span class="n">__mul__</span>
+    <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
 
     <span class="k">def</span> <span class="nf">__truediv__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -2387,8 +2386,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span><span class="p">(</span> <span class="n">PhysicalUnit</span><span class="p">(</span> <span class="n">NumberDict</span><span class="p">(</span> <span class="p">{</span> <span class="nb">str</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span> <span class="mi">1</span> <span class="p">}</span> <span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="p">,</span> <span class="n">other</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="p">[</span> <span class="o">-</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span> <span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
 
-    <span class="n">__div__</span> <span class="o">=</span> <span class="n">__truediv__</span>   <span class="c1"># for python 2.x</span>
-    <span class="n">__rdiv__</span> <span class="o">=</span> <span class="n">__rtruediv__</span>
+    <span class="n">__div__</span> <span class="o">=</span> <span class="fm">__truediv__</span>   <span class="c1"># for python 2.x</span>
+    <span class="n">__rdiv__</span> <span class="o">=</span> <span class="fm">__rtruediv__</span>
 
     <span class="k">def</span> <span class="nf">__pow__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -2429,7 +2428,7 @@
 
     <span class="k">def</span> <span class="nf">__deepcopy__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span> <span class="n">PhysicalUnit</span> <span class="p">)</span>
+        <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span> <span class="n">PhysicalUnit</span> <span class="p">)</span>
         <span class="n">other</span><span class="o">.</span><span class="n">symbols</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">powers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="o">.</span><span class="n">__deepcopy__</span><span class="p">(</span> <span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">powers</span><span class="p">[:]</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">other</span> <span class="p">)</span>
 
@@ -2684,7 +2683,7 @@
                 <span class="n">name0</span><span class="p">,</span> <span class="n">unit0</span><span class="p">,</span> <span class="n">symbol0</span> <span class="o">=</span> <span class="n">entry</span>
                 <span class="n">i</span> <span class="o">=</span> <span class="n">_help</span><span class="o">.</span><span class="n">index</span><span class="p">(</span> <span class="n">entry</span> <span class="p">)</span>
                 <span class="k">if</span> <span class="n">unit</span> <span class="o">==</span> <span class="n">symbol0</span><span class="p">:</span>
-                    <span class="n">_help</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span> <span class="n">name0</span><span class="p">,</span> <span class="n">unit0</span><span class="p">,</span> <span class="n">symbol0</span><span class="p">,</span> <span class="n">_prefixed_symbols</span> <span class="p">)</span> <span class="p">)</span>
+                    <span class="n">_help</span><span class="o">.</span><span class="fm">__setitem__</span><span class="p">(</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span> <span class="n">name0</span><span class="p">,</span> <span class="n">unit0</span><span class="p">,</span> <span class="n">symbol0</span><span class="p">,</span> <span class="n">_prefixed_symbols</span> <span class="p">)</span> <span class="p">)</span>
 
 <span class="c1"># SI derived units; these automatically get prefixes</span>
 <span class="n">_help</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;----------------------------------------------------</span><span class="se">\n</span><span class="s1">Defined prefixes and units</span><span class="se">\n</span><span class="s1">----------------------------------------------------&#39;</span> <span class="p">)</span>
@@ -2902,7 +2901,7 @@
     <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span></div>
 
 <span class="c1"># add the description of the units to the module&#39;s doc string:</span>
-<span class="n">__doc__</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">description</span><span class="p">(</span> <span class="p">)</span>
+<span class="vm">__doc__</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">description</span><span class="p">(</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="printPredefinedUnits"><a class="viewcode-back" href="../../pqu/pqu.html#pqu.PQU.printPredefinedUnits">[docs]</a><span class="k">def</span> <span class="nf">printPredefinedUnits</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -2963,13 +2962,13 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

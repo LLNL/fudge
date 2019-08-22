@@ -63,15 +63,12 @@
 
 .PHONY: check clean realclean
 
-CC = gcc
-CFLAGS = -g -O0 -Wall
 ARFLAGS = rc
 
 NUMERICALFUNCTIONS_PATH = ../../..
 NUMERICALFUNCTIONS_INCLUDE_PATH = $(NUMERICALFUNCTIONS_PATH)/include
 
-localCFLAGS = -I$(NUMERICALFUNCTIONS_INCLUDE_PATH) \
-              -I$(SMR_PATH)/include
+localCFLAGS = $(CFLAGS) -I$(NUMERICALFUNCTIONS_INCLUDE_PATH) -I$(SMR_PATH)/include
 
 default: libnfut_utilities.a 
 	cp nfut_utilities.h ../../../include
@@ -82,7 +79,7 @@ libnfut_utilities.a: nfut_utilities.o
 	ranlib $@
 
 nfut_utilities.o: nfut_utilities.c nfut_utilities.h
-	$(CC) $(CFLAGS) -c -o nfut_utilities.o nfut_utilities.c $(localCFLAGS)
+	$(CC) -c -o nfut_utilities.o nfut_utilities.c $(localCFLAGS)
 
 check: default
 

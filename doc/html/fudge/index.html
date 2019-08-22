@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge Package &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge Package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,9 +25,9 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="fudge.core package" href="fudge.core.html" />
-    <link rel="prev" title="Fudge and GND" href="../index.html" /> 
+    <link rel="prev" title="Fudge and GNDS" href="../index.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -44,9 +41,9 @@
           <a href="fudge.core.html" title="fudge.core package"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="../index.html" title="Fudge and GND"
+          <a href="../index.html" title="Fudge and GNDS"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -63,14 +60,14 @@
 </div>
 <div class="section" id="id1">
 <h2><a class="reference internal" href="fudge.html#module-fudge" title="fudge"><code class="xref py py-mod docutils literal"><span class="pre">fudge</span></code></a> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-fudge.__init__"></span><p>Fudge is a python package which allows one to view, plot and modify LLNL&#8217;s evaluated nuclear data, and use LLNL&#8217;s processing codes
+<span class="target" id="module-fudge.__init__"></span><p>Fudge is a python package which allows one to view, plot and modify LLNL’s evaluated nuclear data, and use LLNL’s processing codes
 that convert the evaluated data into processed data. Processed data is evaluatated nuclear transport data that has been converted into a format 
 used by the deterministic (libndf.a) and and Monte Carlo (MCAPM) transport libraries. The deterministic library reads data
 from the ndf files (ndf1, ndf2, etc.) and the Monte Carlo library reads data from the mcf files (mcf1.pdb, mcf2.pdb, etc.).</p>
 <div class="section" id="getting-at-fudge-s-python-scripts">
-<h3>Getting at fudge&#8217;s python scripts.<a class="headerlink" href="#getting-at-fudge-s-python-scripts" title="Permalink to this headline">¶</a></h3>
+<h3>Getting at fudge’s python scripts.<a class="headerlink" href="#getting-at-fudge-s-python-scripts" title="Permalink to this headline">¶</a></h3>
 <p>To use fudge, one must add the location of the fudge scripts to the environment variable PYTHONPATH. (PYTHONPATH is the environment variable
-used by python when searching for imported python modules (files). On LLNL&#8217;s computing system (LC) this would look something like,</p>
+used by python when searching for imported python modules (files). On LLNL’s computing system (LC) this would look something like,</p>
 <p>export PYTHONPATH=$PYTHONPATH:/usr/apps/fudge/current/Src</p>
 <p>for the bash shell.</p>
 <p>Alternatively, one can add the following lines near the top of a python script (or type them at the prompt)</p>
@@ -103,7 +100,7 @@ for the fudgeDefaults module.</p>
 </div>
 </div>
 <div class="section" id="reading-fudge-s-documentation">
-<h3>Reading fudge&#8217;s documentation.<a class="headerlink" href="#reading-fudge-s-documentation" title="Permalink to this headline">¶</a></h3>
+<h3>Reading fudge’s documentation.<a class="headerlink" href="#reading-fudge-s-documentation" title="Permalink to this headline">¶</a></h3>
 <p>In general, one should first instantiate an endlProject class object and work from it. For example the beginning of a fudge session may look like,</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge</span> <span class="k">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">project</span> <span class="o">=</span> <span class="n">endlProject</span><span class="p">(</span> <span class="n">database</span> <span class="o">=</span> <span class="s2">&quot;endl99&quot;</span><span class="p">,</span> <span class="n">workDir</span> <span class="o">=</span> <span class="s2">&quot;tmp&quot;</span> <span class="p">)</span>
@@ -116,14 +113,14 @@ and where it searches to find platform dependent files (e.g., executable files).
 </div>
 <div class="section" id="module-fudge.__doc__">
 <span id="doc-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">__doc__</span></code> Module<a class="headerlink" href="#module-fudge.__doc__" title="Permalink to this headline">¶</a></h2>
-<p>Fudge is a python package which allows one to view, plot and modify LLNL&#8217;s evaluated nuclear data, and use LLNL&#8217;s processing codes
+<p>Fudge is a python package which allows one to view, plot and modify LLNL’s evaluated nuclear data, and use LLNL’s processing codes
 that convert the evaluated data into processed data. Processed data is evaluatated nuclear transport data that has been converted into a format 
 used by the deterministic (libndf.a) and and Monte Carlo (MCAPM) transport libraries. The deterministic library reads data
 from the ndf files (ndf1, ndf2, etc.) and the Monte Carlo library reads data from the mcf files (mcf1.pdb, mcf2.pdb, etc.).</p>
 <div class="section" id="id2">
-<h3>Getting at fudge&#8217;s python scripts.<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<h3>Getting at fudge’s python scripts.<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <p>To use fudge, one must add the location of the fudge scripts to the environment variable PYTHONPATH. (PYTHONPATH is the environment variable
-used by python when searching for imported python modules (files). On LLNL&#8217;s computing system (LC) this would look something like,</p>
+used by python when searching for imported python modules (files). On LLNL’s computing system (LC) this would look something like,</p>
 <p>export PYTHONPATH=$PYTHONPATH:/usr/apps/fudge/current/Src</p>
 <p>for the bash shell.</p>
 <p>Alternatively, one can add the following lines near the top of a python script (or type them at the prompt)</p>
@@ -156,7 +153,7 @@ for the fudgeDefaults module.</p>
 </div>
 </div>
 <div class="section" id="id4">
-<h3>Reading fudge&#8217;s documentation.<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<h3>Reading fudge’s documentation.<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>In general, one should first instantiate an endlProject class object and work from it. For example the beginning of a fudge session may look like,</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge</span> <span class="k">import</span> <span class="o">*</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">project</span> <span class="o">=</span> <span class="n">endlProject</span><span class="p">(</span> <span class="n">database</span> <span class="o">=</span> <span class="s2">&quot;endl99&quot;</span><span class="p">,</span> <span class="n">workDir</span> <span class="o">=</span> <span class="s2">&quot;tmp&quot;</span> <span class="p">)</span>
@@ -242,7 +239,7 @@ The module fudge.py describes the proper procedure to follow to override these p
 <li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#fudge-core-math-fudge2dgrouping-module">fudge.core.math.fudge2dGrouping module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.fudgemath">fudge.core.math.fudgemath module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.linearAlgebra">fudge.core.math.linearAlgebra module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.matrix">fudge.core.math.matrix module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#fudge-core-math-matrix-module">fudge.core.math.matrix module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.miscellaneous">fudge.core.math.miscellaneous module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#fudge-core-math-pointwisexy-module">fudge.core.math.pointwiseXY module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.core.math.html#fudge-core-math-table-module">fudge.core.math.table module</a></li>
@@ -266,7 +263,7 @@ The module fudge.py describes the proper procedure to follow to override these p
 <li class="toctree-l5"><a class="reference internal" href="fudge.core.utilities.html#references">References</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.argparse">fudge.core.utilities.argparse module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.html#fudge-core-utilities-argparse-module">fudge.core.utilities.argparse module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.brb">fudge.core.utilities.brb module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.fudgeExceptions">fudge.core.utilities.fudgeExceptions module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.fudgeFileMisc">fudge.core.utilities.fudgeFileMisc module</a></li>
@@ -287,143 +284,132 @@ The module fudge.py describes the proper procedure to follow to override these p
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.html#module-fudge.core">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="fudge.gnd.html">GND hierarchy</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="fudge.gnd.channelData.html">fudge.gnd.channelData package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.channelData.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.channelData.html#module-fudge.gnd.channelData.Q">fudge.gnd.channelData.Q module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.channelData.html#module-fudge.gnd.channelData.base">fudge.gnd.channelData.base module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.channelData.html#module-fudge.gnd.channelData.fissionEnergyReleased">fudge.gnd.channelData.fissionEnergyReleased module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.channelData.html#module-fudge.gnd.channelData">Module contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fudge.gnds.html">GNDS hierarchy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fudge.gnds.channelData.html">fudge.gnds.channelData package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.channelData.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.channelData.html#fudge-gnds-channeldata-q-module">fudge.gnds.channelData.Q module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.channelData.html#fudge-gnds-channeldata-base-module">fudge.gnds.channelData.base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.channelData.html#fudge-gnds-channeldata-fissionenergyreleased-module">fudge.gnds.channelData.fissionEnergyReleased module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.channelData.html#module-fudge.gnds.channelData">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="fudge.gnd.covariances.html">fudge.gnd.covariances package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.covariances.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.covariances.html#module-fudge.gnd.covariances.base">fudge.gnd.covariances.base module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.covariances.html#module-fudge.gnd.covariances.covarianceSuite">fudge.gnd.covariances.covarianceSuite module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.covariances.html#module-fudge.gnd.covariances.distributions">fudge.gnd.covariances.distributions module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.covariances.html#module-fudge.gnd.covariances.mixed">fudge.gnd.covariances.mixed module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.covariances.html#module-fudge.gnd.covariances.modelParameters">fudge.gnd.covariances.modelParameters module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.covariances.html#module-fudge.gnd.covariances.section">fudge.gnd.covariances.section module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.covariances.html#module-fudge.gnd.covariances.summed">fudge.gnd.covariances.summed module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.covariances.html#module-fudge.gnd.covariances.tokens">fudge.gnd.covariances.tokens module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.covariances.html#module-fudge.gnd.covariances">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fudge.gnds.covariances.html">fudge.gnds.covariances package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.covariances.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.covariances.html#fudge-gnds-covariances-base-module">fudge.gnds.covariances.base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.covariances.html#fudge-gnds-covariances-covariancesuite-module">fudge.gnds.covariances.covarianceSuite module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.covariances.html#fudge-gnds-covariances-distributions-module">fudge.gnds.covariances.distributions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.covariances.html#fudge-gnds-covariances-mixed-module">fudge.gnds.covariances.mixed module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.covariances.html#fudge-gnds-covariances-modelparameters-module">fudge.gnds.covariances.modelParameters module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.covariances.html#fudge-gnds-covariances-section-module">fudge.gnds.covariances.section module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.covariances.html#fudge-gnds-covariances-summed-module">fudge.gnds.covariances.summed module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.covariances.html#fudge-gnds-covariances-tokens-module">fudge.gnds.covariances.tokens module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.covariances.html#module-fudge.gnds.covariances">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="fudge.gnd.productData.html">fudge.gnd.productData package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.productData.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="fudge.gnd.productData.distributions.html">fudge.gnd.productData.distributions package</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l7"><a class="reference internal" href="fudge.gnd.productData.distributions.test.html">fudge.gnd.productData.distributions.test package</a><ul>
-<li class="toctree-l8"><a class="reference internal" href="fudge.gnd.productData.distributions.test.html#module-fudge.gnd.productData.distributions.test">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#submodules">Submodules</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.Legendre">fudge.gnd.productData.distributions.Legendre module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.angular">fudge.gnd.productData.distributions.angular module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.angularEnergy">fudge.gnd.productData.distributions.angularEnergy module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.base">fudge.gnd.productData.distributions.base module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.energy">fudge.gnd.productData.distributions.energy module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.energyAngular">fudge.gnd.productData.distributions.energyAngular module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.miscellaneous">fudge.gnd.productData.distributions.miscellaneous module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.photonScattering">fudge.gnd.productData.distributions.photonScattering module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions.uncorrelated">fudge.gnd.productData.distributions.uncorrelated module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.productData.distributions.html#module-fudge.gnd.productData.distributions">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fudge.gnds.productData.html">fudge.gnds.productData package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.productData.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fudge.gnds.productData.distributions.html">fudge.gnds.productData.distributions package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnds.productData.distributions.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="fudge.gnds.productData.distributions.test.html">fudge.gnds.productData.distributions.test package</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="fudge.gnds.productData.distributions.test.html#module-fudge.gnds.productData.distributions.test">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.productData.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.productData.html#fudge-gnd-productdata-base-module">fudge.gnd.productData.base module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.productData.html#module-fudge.gnd.productData.energyDeposition">fudge.gnd.productData.energyDeposition module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.productData.html#module-fudge.gnd.productData.momentumDeposition">fudge.gnd.productData.momentumDeposition module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.productData.html#module-fudge.gnd.productData.multiplicity">fudge.gnd.productData.multiplicity module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.productData.html#module-fudge.gnd.productData">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="fudge.gnd.reactionData.html">fudge.gnd.reactionData package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactionData.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="fudge.gnd.reactionData.test.html">fudge.gnd.reactionData.test package</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.reactionData.test.html#submodules">Submodules</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.reactionData.test.html#module-fudge.gnd.reactionData.test.test_crossSection">fudge.gnd.reactionData.test.test_crossSection module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.gnd.reactionData.test.html#module-fudge.gnd.reactionData.test">Module contents</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnds.productData.distributions.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnds.productData.distributions.html#fudge-gnds-productdata-distributions-legendre-module">fudge.gnds.productData.distributions.Legendre module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnds.productData.distributions.html#fudge-gnds-productdata-distributions-angular-module">fudge.gnds.productData.distributions.angular module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnds.productData.distributions.html#fudge-gnds-productdata-distributions-angularenergy-module">fudge.gnds.productData.distributions.angularEnergy module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnds.productData.distributions.html#fudge-gnds-productdata-distributions-base-module">fudge.gnds.productData.distributions.base module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnds.productData.distributions.html#fudge-gnds-productdata-distributions-energy-module">fudge.gnds.productData.distributions.energy module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnds.productData.distributions.html#fudge-gnds-productdata-distributions-energyangular-module">fudge.gnds.productData.distributions.energyAngular module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnds.productData.distributions.html#fudge-gnds-productdata-distributions-miscellaneous-module">fudge.gnds.productData.distributions.miscellaneous module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnds.productData.distributions.html#fudge-gnds-productdata-distributions-photonscattering-module">fudge.gnds.productData.distributions.photonScattering module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnds.productData.distributions.html#fudge-gnds-productdata-distributions-uncorrelated-module">fudge.gnds.productData.distributions.uncorrelated module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnds.productData.distributions.html#module-fudge.gnds.productData.distributions">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactionData.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactionData.html#module-fudge.gnd.reactionData.availableEnergy">fudge.gnd.reactionData.availableEnergy module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactionData.html#module-fudge.gnd.reactionData.availableMomentum">fudge.gnd.reactionData.availableMomentum module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactionData.html#module-fudge.gnd.reactionData.base">fudge.gnd.reactionData.base module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactionData.html#module-fudge.gnd.reactionData.crossSection">fudge.gnd.reactionData.crossSection module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactionData.html#module-fudge.gnd.reactionData">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.productData.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.productData.html#fudge-gnds-productdata-base-module">fudge.gnds.productData.base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.productData.html#fudge-gnds-productdata-energydeposition-module">fudge.gnds.productData.energyDeposition module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.productData.html#fudge-gnds-productdata-momentumdeposition-module">fudge.gnds.productData.momentumDeposition module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.productData.html#fudge-gnds-productdata-multiplicity-module">fudge.gnds.productData.multiplicity module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.productData.html#module-fudge.gnds.productData">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="fudge.gnd.reactions.html">fudge.gnd.reactions package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactions.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactions.html#module-fudge.gnd.reactions.base">fudge.gnd.reactions.base module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactions.html#module-fudge.gnd.reactions.fissionComponent">fudge.gnd.reactions.fissionComponent module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactions.html#module-fudge.gnd.reactions.production">fudge.gnd.reactions.production module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactions.html#module-fudge.gnd.reactions.reaction">fudge.gnd.reactions.reaction module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactions.html#fudge-gnd-reactions-summedreaction-module">fudge.gnd.reactions.summedReaction module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.reactions.html#module-fudge.gnd.reactions">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="fudge.gnd.test.html">fudge.gnd.test package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.test.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.test.html#fudge-gnd-test-testcovariances-module">fudge.gnd.test.testCovariances module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.gnd.test.html#module-fudge.gnd.test">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fudge.gnds.reactionData.html">fudge.gnds.reactionData package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.reactionData.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fudge.gnds.reactionData.test.html">fudge.gnds.reactionData.test package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnds.reactionData.test.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnds.reactionData.test.html#fudge-gnds-reactiondata-test-test-crosssection-module">fudge.gnds.reactionData.test.test_crossSection module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fudge.gnds.reactionData.test.html#module-fudge.gnds.reactionData.test">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.alias">fudge.gnd.alias module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#fudge-gnd-baseclasses-module">fudge.gnd.baseClasses module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.channels">fudge.gnd.channels module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.documentation">fudge.gnd.documentation module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#fudge-gnd-link-module">fudge.gnd.link module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.miscellaneous">fudge.gnd.miscellaneous module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.product">fudge.gnd.product module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.reactionSuite">fudge.gnd.reactionSuite module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#fudge-gnd-referreddata-module">fudge.gnd.referredData module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.resonances">fudge.gnd.resonances module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.thermalScattering">fudge.gnd.thermalScattering module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.tokens">fudge.gnd.tokens module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.version">fudge.gnd.version module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.warning">fudge.gnd.warning module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.xParticle">fudge.gnd.xParticle module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd.xParticleList">fudge.gnd.xParticleList module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.gnd.html#module-fudge.gnd">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.reactionData.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.reactionData.html#fudge-gnds-reactiondata-availableenergy-module">fudge.gnds.reactionData.availableEnergy module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.reactionData.html#fudge-gnds-reactiondata-availablemomentum-module">fudge.gnds.reactionData.availableMomentum module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.reactionData.html#fudge-gnds-reactiondata-base-module">fudge.gnds.reactionData.base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.reactionData.html#fudge-gnds-reactiondata-crosssection-module">fudge.gnds.reactionData.crossSection module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.reactionData.html#module-fudge.gnds.reactionData">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fudge.gnds.reactions.html">fudge.gnds.reactions package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.reactions.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.reactions.html#fudge-gnds-reactions-base-module">fudge.gnds.reactions.base module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.reactions.html#fudge-gnds-reactions-fissioncomponent-module">fudge.gnds.reactions.fissionComponent module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.reactions.html#fudge-gnds-reactions-production-module">fudge.gnds.reactions.production module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.reactions.html#fudge-gnds-reactions-reaction-module">fudge.gnds.reactions.reaction module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.reactions.html#fudge-gnds-reactions-summedreaction-module">fudge.gnds.reactions.summedReaction module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.reactions.html#module-fudge.gnds.reactions">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fudge.gnds.test.html">fudge.gnds.test package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.test.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.test.html#fudge-gnds-test-testcovariances-module">fudge.gnds.test.testCovariances module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.gnds.test.html#module-fudge.gnds.test">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#fudge-gnds-alias-module">fudge.gnds.alias module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#fudge-gnds-baseclasses-module">fudge.gnds.baseClasses module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#fudge-gnds-channels-module">fudge.gnds.channels module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#fudge-gnds-documentation-module">fudge.gnds.documentation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#fudge-gnds-link-module">fudge.gnds.link module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#fudge-gnds-miscellaneous-module">fudge.gnds.miscellaneous module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#fudge-gnds-product-module">fudge.gnds.product module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#fudge-gnds-reactionsuite-module">fudge.gnds.reactionSuite module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#fudge-gnds-referreddata-module">fudge.gnds.referredData module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#fudge-gnds-resonances-module">fudge.gnds.resonances module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#fudge-gnds-thermalscattering-module">fudge.gnds.thermalScattering module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#fudge-gnds-tokens-module">fudge.gnds.tokens module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#fudge-gnds-version-module">fudge.gnds.version module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#fudge-gnds-warning-module">fudge.gnds.warning module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#fudge-gnds-xparticle-module">fudge.gnds.xParticle module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#fudge-gnds-xparticlelist-module">fudge.gnds.xParticleList module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.gnds.html#module-fudge.gnds">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="fudge.legacy.html">Legacy data support</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="fudge.legacy.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="fudge.legacy.converting.html">fudge.legacy.converting package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="fudge.legacy.converting.ENDFToGND.html">fudge.legacy.converting.ENDFToGND package</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="fudge.legacy.converting.ENDFToGND.html#submodules">Submodules</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.legacy.converting.ENDFToGND.html#module-fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_0">fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_0 module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.legacy.converting.ENDFToGND.html#module-fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_0_Misc">fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_0_Misc module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.legacy.converting.ENDFToGND.html#module-fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_3">fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_3 module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.legacy.converting.ENDFToGND.html#module-fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_3_6_Misc">fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_3_6_Misc module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.legacy.converting.ENDFToGND.html#module-fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_6">fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_6 module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.legacy.converting.ENDFToGND.html#module-fudge.legacy.converting.ENDFToGND.endfFileToGNDMisc">fudge.legacy.converting.ENDFToGND.endfFileToGNDMisc module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="fudge.legacy.converting.ENDFToGND.html#module-fudge.legacy.converting.ENDFToGND">Module contents</a></li>
-</ul>
-</li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#subpackages">Subpackages</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#module-fudge.legacy.converting.endfFileToGND">fudge.legacy.converting.endfFileToGND module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#fudge-legacy-converting-endffiletognds-module">fudge.legacy.converting.endfFileToGNDS module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#fudge-legacy-converting-endfformats-module">fudge.legacy.converting.endfFormats module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#fudge-legacy-converting-endfthermscatttognd-module">fudge.legacy.converting.endfThermScattToGND module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#fudge-legacy-converting-endfthermscatttognds-module">fudge.legacy.converting.endfThermScattToGNDS module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#module-fudge.legacy.converting.endf_endl">fudge.legacy.converting.endf_endl module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#module-fudge.legacy.converting.endlToGND">fudge.legacy.converting.endlToGND module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#fudge-legacy-converting-gndtoendf6-module">fudge.legacy.converting.gndToENDF6 module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#module-fudge.legacy.converting.toGNDMisc">fudge.legacy.converting.toGNDMisc module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#fudge-legacy-converting-endltognds-module">fudge.legacy.converting.endlToGNDS module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#fudge-legacy-converting-gndstoendf6-module">fudge.legacy.converting.gndsToENDF6 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#fudge-legacy-converting-togndsmisc-module">fudge.legacy.converting.toGNDSMisc module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.legacy.converting.html#module-fudge.legacy.converting">Module contents</a></li>
 </ul>
 </li>
@@ -478,8 +464,8 @@ The module fudge.py describes the proper procedure to follow to override these p
 </li>
 <li class="toctree-l1"><a class="reference internal" href="fudge.particles.html">Particle properties</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="fudge.particles.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.particles.html#module-fudge.particles.nuclear">fudge.particles.nuclear module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.particles.html#module-fudge.particles">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.particles.html#fudge-particles-nuclear-module">fudge.particles.nuclear module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.particles.html#module-contents">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="fudge.processing.html">Processing support</a><ul>
@@ -510,11 +496,7 @@ The module fudge.py describes the proper procedure to follow to override these p
 <li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances.getCoulombWavefunctions">fudge.processing.resonances.getCoulombWavefunctions module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances.getScatteringMatrices">fudge.processing.resonances.getScatteringMatrices module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances.reconstructResonances">fudge.processing.resonances.reconstructResonances module</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="fudge.processing.resonances.html#basic-usage">Basic usage:</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fudge.processing.resonances.html#alternate-uses">Alternate uses:</a></li>
-</ul>
-</li>
+<li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances.reconstructResonances">fudge.processing.resonances.reconstructResonances module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.html#fudge-processing-resonances-setup-module">fudge.processing.resonances.setup module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fudge.processing.resonances.html#module-fudge.processing.resonances">Module contents</a></li>
 </ul>
@@ -529,11 +511,11 @@ The module fudge.py describes the proper procedure to follow to override these p
 </li>
 <li class="toctree-l1"><a class="reference internal" href="fudge.structure.html">Structure data</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="fudge.structure.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.structure.html#module-fudge.structure.ElementTree">fudge.structure.ElementTree module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.structure.html#module-fudge.structure.masses">fudge.structure.masses module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.structure.html#module-fudge.structure.xensl">fudge.structure.xensl module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.structure.html#module-fudge.structure.xml2py">fudge.structure.xml2py module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.structure.html#module-fudge.structure">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.structure.html#fudge-structure-elementtree-module">fudge.structure.ElementTree module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.structure.html#fudge-structure-masses-module">fudge.structure.masses module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.structure.html#fudge-structure-xensl-module">fudge.structure.xensl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.structure.html#fudge-structure-xml2py-module">fudge.structure.xml2py module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.structure.html#module-contents">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="fudge.vis.html">Visualization</a><ul>
@@ -589,15 +571,15 @@ The module fudge.py describes the proper procedure to follow to override these p
   <ul>
 <li><a class="reference internal" href="#">fudge Package</a><ul>
 <li><a class="reference internal" href="#id1"><code class="docutils literal"><span class="pre">fudge</span></code> Package</a><ul>
-<li><a class="reference internal" href="#getting-at-fudge-s-python-scripts">Getting at fudge&#8217;s python scripts.</a></li>
+<li><a class="reference internal" href="#getting-at-fudge-s-python-scripts">Getting at fudge’s python scripts.</a></li>
 <li><a class="reference internal" href="#other-environment-variables">Other environment variables.</a></li>
-<li><a class="reference internal" href="#reading-fudge-s-documentation">Reading fudge&#8217;s documentation.</a></li>
+<li><a class="reference internal" href="#reading-fudge-s-documentation">Reading fudge’s documentation.</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-fudge.__doc__"><code class="docutils literal"><span class="pre">__doc__</span></code> Module</a><ul>
-<li><a class="reference internal" href="#id2">Getting at fudge&#8217;s python scripts.</a></li>
+<li><a class="reference internal" href="#id2">Getting at fudge’s python scripts.</a></li>
 <li><a class="reference internal" href="#id3">Other environment variables.</a></li>
-<li><a class="reference internal" href="#id4">Reading fudge&#8217;s documentation.</a></li>
+<li><a class="reference internal" href="#id4">Reading fudge’s documentation.</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-fudge.fudgeDefaults"><code class="docutils literal"><span class="pre">fudgeDefaults</span></code> Module</a></li>
@@ -609,7 +591,7 @@ The module fudge.py describes the proper procedure to follow to override these p
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="../index.html"
-                        title="previous chapter">Fudge and GND</a></p>
+                        title="previous chapter">Fudge and GNDS</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="fudge.core.html"
                         title="next chapter">fudge.core package</a></p>
@@ -647,14 +629,14 @@ The module fudge.py describes the proper procedure to follow to override these p
           <a href="fudge.core.html" title="fudge.core package"
              >next</a> |</li>
         <li class="right" >
-          <a href="../index.html" title="Fudge and GND"
+          <a href="../index.html" title="Fudge and GNDS"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

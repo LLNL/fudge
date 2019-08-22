@@ -62,71 +62,65 @@
 # <<END-copyright>>
 
 """
-This module adds the method toACE to the classes in the fudge.gnd.product module.
+This module adds the method toACE to the classes in the fudge.gnds.product module.
 """
 
-from fudge.core.utilities import brb
+from PoPs import IDs as IDsPoPsModule
 
 from xData import standards as standardsModule
 
-from fudge.gnd import product as productModule
+from fudge.core.utilities import brb
 
-from fudge.gnd.productData.distributions import unspecified as unspecifiedModule
-from fudge.gnd.productData.distributions import unknown as unknownModule
-from fudge.gnd.productData.distributions import angular as angularModule
-from fudge.gnd.productData.distributions import uncorrelated as uncorrelatedModule
-from fudge.gnd.productData.distributions import angularEnergy as angularEnergyModule
-from fudge.gnd.productData.distributions import energyAngular as energyAngularModule
-from fudge.gnd.productData.distributions import KalbachMann as KalbachMannModule
+from fudge.gnds import product as productModule
+
+from fudge.gnds.productData.distributions import unspecified as unspecifiedModule
+from fudge.gnds.productData.distributions import angular as angularModule
+from fudge.gnds.productData.distributions import uncorrelated as uncorrelatedModule
+from fudge.gnds.productData.distributions import angularEnergyMC as angularEnergyMCModule
+from fudge.gnds.productData.distributions import energyAngularMC as energyAngularMCModule
+from fudge.gnds.productData.distributions import KalbachMann as KalbachMannModule
 
 from . import angularEnergy
 
-def toACE( self, MTData, MT, verbose ) :
+def toACE( self, cdf_style, MTData, MT, verbose ) :
 
-    if( verbose > 2 ) : print '        %s: label = %s' % ( self.name, self.label )
-    if( self.name in [ 'n', 'gamma' ] ) :
+    if( verbose > 2 ) : print '        %s: label = %s' % ( self.id, self.label )
+    if( self.id in [ IDsPoPsModule.neutron, IDsPoPsModule.photon ] ) :
         if( self.multiplicity.isConstant( ) ) :
             multiplicity = self.multiplicity.evaluate( 0 )
         else :
             multiplicity = self.multiplicity.evaluated
 
-    if( self.name == 'n' ) :
-        angularForm, energyData = None, None
+    if( self.id == IDsPoPsModule.neutron ) :
+        angularData = None
+        energyData = None
         evaluated = self.distribution.evaluated
-        if( ( MT == 18 ) and isinstance( evaluated, ( unspecifiedModule.form, unknownModule.form ) ) ) :
-            pass
+
+        if( ( MT == 18 ) and isinstance( evaluated, unspecifiedModule.form ) ) :
+            distribution = evaluated
         else :
-            if( isinstance( evaluated, angularModule.twoBodyForm ) ) :
-                angularForm = evaluated.angularSubform
-            elif( isinstance( evaluated, uncorrelatedModule.form ) ) :
-                angularForm = evaluated.angularSubform.data
-                energyData = evaluated.energySubform.data
-            elif( isinstance( evaluated, energyAngularModule.form ) ) :
-                energyData = evaluated.energyAngularSubform
-            elif( isinstance( evaluated, KalbachMannModule.form ) ) :
-                energyData = evaluated
-            elif( isinstance( evaluated, angularEnergyModule.form ) ) :
-                angularForm = angularEnergy.angularFor_angularEnergy( evaluated )
-                energyData = evaluated
+            try :
+                distribution = self.distribution[cdf_style.label]
+            except :
+                distribution = evaluated
+
+            if( isinstance( distribution, angularModule.twoBodyForm ) ) :
+                angularData = distribution.angularSubform
+            elif( isinstance( distribution, uncorrelatedModule.form ) ) :
+                angularData = distribution.angularSubform.data
+                energyData = distribution.energySubform.data
+            elif( isinstance( distribution, energyAngularMCModule.form ) ) :
+                energyData = distribution
+            elif( isinstance( distribution, angularEnergyMCModule.form ) ) :
+                angularData = distribution.angular.data
+                energyData = distribution.angularEnergy.data
+            elif( isinstance( distribution, KalbachMannModule.form ) ) :
+                energyData = distribution
             else :
-                raise Exception( 'Unsupported distribution form = %s' % evaluated.moniker )
+                raise Exception( 'Unsupported distribution form = %s' % distribution.moniker )
 
-        if( angularForm is None ) :
-            angularData = angularForm
-        elif( isinstance( angularForm, angularEnergyModule.XYs3d ) ) :
-            angularData = angularForm
-        elif( isinstance( angularForm, angularModule.isotropic ) ) :
-            angularData = angularForm
-        elif( isinstance( angularForm, angularEnergy.angularFor_angularEnergy ) ) :
-            angularData = angularForm
-        elif( isinstance( angularForm, angularModule.subform ) ) :
-            angularData = angularForm.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-6 )
-        else :
-            brb.objectoutline( angularForm )
-            raise Exception( "angular form '%s' not supported" % angularForm.moniker )
-
-        frame = evaluated.productFrame
-        MTData['n'].append( { 'product' : self, 'frame' : frame, 'multiplicity' : multiplicity, 
+        frame = distribution.productFrame
+        MTData[IDsPoPsModule.neutron].append( { 'product' : self, 'frame' : frame, 'multiplicity' : multiplicity, 
             'angularData' : angularData, 'energyData' : energyData } )
 
         if( 'decayRate' in self.attributes ) : MTData['n_fissionDelayed'].append( self )

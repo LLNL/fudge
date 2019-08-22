@@ -61,7 +61,7 @@
 # 
 # <<END-copyright>>
 
-from fudge.gnd.covariances.summed import summedCovariance
+from fudge.gnds.covariances.summed import summedCovariance
 
 from .. import endfFormats as endfFormatsModule
 

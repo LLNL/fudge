@@ -152,13 +152,13 @@ def toMultiGroup1d( cls, style, tempInfo, _axes, data, addLabel = True ) :
     if( addLabel ) : label = style.label
     return( cls( label = label, axes = axes, array = flattened ) )
 
-def TMs2Form( style, tempInfo, TM_1, TM_E ) :
+def TMs2Form( style, tempInfo, TM_1, TM_E, productName = None ) :
 
     from fudge.processing import transportables as transportablesModule
-    from fudge.gnd.productData.distributions import multiGroup as multiGroupModule
+    from fudge.gnds.productData.distributions import multiGroup as multiGroupModule
 
     reactionSuite = tempInfo['reactionSuite']
-    productName = tempInfo['productName']
+    if( productName is None ) : productName = tempInfo['productName']
     transportable = style.transportables[productName]
     conserve = transportable.conserve
     energyUnit = tempInfo['incidentEnergyUnit']

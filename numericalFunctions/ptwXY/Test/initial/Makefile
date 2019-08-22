@@ -64,12 +64,10 @@
 SMR_PATH = ../../../../statusMessageReporting
 NUMERICALFUNCTIONS_PATH = ../../..
 
-CC = gcc
-CDEBUGFLAGS = -g -O0 -Wall
 ptwXYCFLAGS = -I$(NUMERICALFUNCTIONS_PATH)/include -L$(NUMERICALFUNCTIONS_PATH)/lib -lnumericalfunctions \
               -I$(SMR_PATH)/include -L$(SMR_PATH)/lib -lstatusMessageReporting \
               -lptwXY_utilities -lnfut_utilities
-localCFLAGS = $(CDEBUGFLAGS) $(CFLAGS) $(ptwXYCFLAGS) -lm
+localCFLAGS = $(CFLAGS) $(ptwXYCFLAGS)
 
 TARGETS = testBinaryUnion testOverwrite testAddRandomPoints testAddRandomPoints2 testInterpolation_1 \
           testMultiPly2_1 testDivide2_1 testExp_1
@@ -83,28 +81,28 @@ check: default
 	for f in $(TARGETS); do python check.py $$f; done
 
 testBinaryUnion: testBinaryUnion.c
-	$(CC) -o testBinaryUnion testBinaryUnion.c $(localCFLAGS)
+	$(CC) -o testBinaryUnion testBinaryUnion.c $(localCFLAGS) -lm
 
 testOverwrite: testOverwrite.c
-	$(CC) -o testOverwrite testOverwrite.c $(localCFLAGS)
+	$(CC) -o testOverwrite testOverwrite.c $(localCFLAGS) -lm
 
 testAddRandomPoints2: testAddRandomPoints2.c
-	$(CC) -o testAddRandomPoints2 testAddRandomPoints2.c $(localCFLAGS)
+	$(CC) -o testAddRandomPoints2 testAddRandomPoints2.c $(localCFLAGS) -lm
 
 testAddRandomPoints: testAddRandomPoints.c
-	$(CC) -o testAddRandomPoints testAddRandomPoints.c $(localCFLAGS)
+	$(CC) -o testAddRandomPoints testAddRandomPoints.c $(localCFLAGS) -lm
 
 testInterpolation_1: testInterpolation_1.c
-	$(CC) -o testInterpolation_1 testInterpolation_1.c $(localCFLAGS)
+	$(CC) -o testInterpolation_1 testInterpolation_1.c $(localCFLAGS) -lm
 
 testMultiPly2_1: testMultiPly2_1.c
-	$(CC) -o testMultiPly2_1 testMultiPly2_1.c $(localCFLAGS)
+	$(CC) -o testMultiPly2_1 testMultiPly2_1.c $(localCFLAGS) -lm
 
 testDivide2_1: testDivide2_1.c
-	$(CC) -L. -o testDivide2_1 testDivide2_1.c $(localCFLAGS)
+	$(CC) -L. -o testDivide2_1 testDivide2_1.c $(localCFLAGS) -lm
 
 testExp_1: testExp_1.c
-	$(CC) -L. -o testExp_1 testExp_1.c $(localCFLAGS)
+	$(CC) -L. -o testExp_1 testExp_1.c $(localCFLAGS) -lm
 
 clean:
 	rm -f *.dat t_*

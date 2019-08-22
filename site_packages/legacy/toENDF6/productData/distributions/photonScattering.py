@@ -61,72 +61,18 @@
 # 
 # <<END-copyright>>
 
-from fudge.gnd.productData.distributions import photonScattering as photonScatteringModule
-
-from ... import endfFormats as endfFormatsModule
-from ... import gndToENDF6 as gndToENDF6Module
+from fudge.gnds.productData.distributions import photonScattering as photonScatteringModule
 
 #
-# scatteringFactorXYs1d.
+# coherent
 #
 def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
-    if( MT == 502 ) : MT = self.ancestor.ENDFMT
-    Z = targetInfo['ZA'] / 1000
+    pass
 
-    endfInterpolation = gndToENDF6Module.gndToENDFInterpolationFlag( self.interpolation )
-    data = []
-    for xy in self.copyDataToXYs( ) : data += xy
-    endfMFList[27][MT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'],  0, 0, 0, 0 ),
-                           endfFormatsModule.endfContLine( 0, Z,  0, 0, 1, len( data ) / 2 ) ] + \
-                           endfFormatsModule.endfInterpolationList( ( len( data ) / 2, endfInterpolation ) ) + \
-                           endfFormatsModule.endfDataList( data ) + [ endfFormatsModule.endfSENDLineNumber( ) ]
-
-photonScatteringModule.scatteringFactor.XYs1d.toENDF6 = toENDF6
-#
-# scatteringFactor.regions1d
-#
-def toENDF6( self, MT, endfMFList, flags, targetInfo, energyUnit = 'eV' ) :
-
-    if( MT == 502 ) : MT = self.ancestor.ENDFMT
-    Z = targetInfo['ZA'] / 1000
-
-    endfInterpolation, data = [], []
-    counter, lastX, lastY = 0, None, None
-    for region in self :
-        ENDFInterpolation = gndToENDF6Module.gndToENDFInterpolationFlag( region.interpolation )
-        regionData = region.copyDataToXYs( )
-        if( lastX is not None ) :
-            if( lastY == regionData[0][1] ) : del regionData[0]
-        counter += len( regionData )
-        endfInterpolation.append( counter )
-        endfInterpolation.append( ENDFInterpolation )
-        for xy in regionData : data += xy
-        lastX, lastY = regionData[-1]
-
-    endfMFList[27][MT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'],  0, 0, 0, 0 ),
-                           endfFormatsModule.endfContLine( 0, Z,  0, 0, len( endfInterpolation ) / 2, len( data ) / 2 ) ] + \
-                           endfFormatsModule.endfInterpolationList( endfInterpolation ) + \
-                           endfFormatsModule.endfDataList( data ) + [ endfFormatsModule.endfSENDLineNumber( ) ]
-
-photonScatteringModule.scatteringFactor.regions1d.toENDF6 = toENDF6
+photonScatteringModule.coherentPhotonScattering.form.toENDF6 = toENDF6
 
 #
-# coherent.form
+# incoherent
 #
-def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
-
-    if( self.formFactor is not None ) : self.formFactor.data.toENDF6( MT, endfMFList, flags, targetInfo, energyUnit = '1/Ang' )
-    if( self.anomalousScatteringFactor_realPart is not None ) : self.anomalousScatteringFactor_realPart.data.toENDF6( MT, endfMFList, flags, targetInfo )
-    if( self.anomalousScatteringFactor_imaginaryPart is not None ) : self.anomalousScatteringFactor_imaginaryPart.data.toENDF6( MT, endfMFList, flags, targetInfo )
-
-photonScatteringModule.coherent.form.toENDF6 = toENDF6
-
-#
-# incoherent.form
-#
-def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
-
-    self.scatteringFunction.toENDF6( MT, endfMFList, flags, targetInfo, energyUnit = '1/Ang' )
-
-photonScatteringModule.incoherent.form.toENDF6 = toENDF6
+photonScatteringModule.incoherentPhotonScattering.form.toENDF6 = toENDF6

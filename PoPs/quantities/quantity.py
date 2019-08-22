@@ -67,21 +67,21 @@ Contains the quantity class. This class is used to represent a (physical) quanti
 
 import sys
 import abc
-import inspect
 import fractions
 
 from pqu import PQU as PQUModule
-from xData import ancestry as ancestryModule
 
+from .. import misc as miscModule
 from .. import suite as suiteModule
+
+from xData.uncertainty.physicalQuantity import uncertainty as uncertaintyModule
 
 __metaclass__ = type
 
-class quantity( ancestryModule.ancestry ) :
+class quantity( miscModule.classWithLabelKey ) :
     """
     This class is used to represent a (physical) quantity (e.g., mass, spin or halflife).
-    A quantity has members label, value and can also have members unit, documentation, for
-    and uncertainty. Uncertainty is an instance of the suite class.
+    A quantity has members label, value and can also have members unit, documentation, and uncertainty.
     """
 
     __metaclass__ = abc.ABCMeta
@@ -92,10 +92,7 @@ class quantity( ancestryModule.ancestry ) :
 
     def __init__( self, label, value, unit, documentation = '' ) :
 
-        ancestryModule.ancestry.__init__( self )
-
-        if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must be a string' )
-        self.__label = label
+        miscModule.classWithLabelKey.__init__( self, label )
 
         self.value = value
 
@@ -104,28 +101,11 @@ class quantity( ancestryModule.ancestry ) :
         if( not( isinstance( documentation, str ) ) ) : raise TypeError( 'documentation must be a string' )
         self.__documentation = documentation
 
-#        self.uncertainty = suiteModule.suite( )
-        self.uncertainty = []                       # Only needed for temp kludge for toXMLList until uncertainty is implemented.
+        self.uncertainty = None
 
     def __str__( self ) :
 
         return( "%s %s" % ( self.value, self.unit ) )
-
-    @property
-    def key( self ) :
-
-        return( self.__label )
-
-    @key.setter
-    def key( self, value ) :
-
-        if( not( isinstance( value, str ) ) ) : raise TypeError( 'label must be a string instance.' )
-        self.__label = value
-
-    @property
-    def label( self ) :
-
-        return( self.__label )
 
     @property
     def value( self ) :
@@ -158,6 +138,20 @@ class quantity( ancestryModule.ancestry ) :
         self.__unit = unit
 
     @property
+    def uncertainty( self ) :
+
+        return( self.__uncertainty )
+
+    @uncertainty.setter
+    def uncertainty( self, _uncertainty ) :
+
+        if( _uncertainty is not None ) :
+            if( not( isinstance( _uncertainty, uncertaintyModule.uncertainty ) ) ) : raise TypeError( 'Invalid uncertainty instance.' )
+
+        self.__uncertainty = _uncertainty
+        if( self.__uncertainty is not None ) : self.__uncertainty.setAncestor( self )
+
+    @property
     def documentation( self ) :
 
         return( self.__documentation )
@@ -172,6 +166,7 @@ class quantity( ancestryModule.ancestry ) :
     def copy( self ) :
 
         _quantity = self.__class__( self.label, self.value, self.unit, self.documentation )
+        if( self.__uncertainty is not None ) : _quantity.uncertainty = self.__uncertainty.copy( )
         return( _quantity )
 
     def toXML( self, indent = '', **kwargs ) :
@@ -187,7 +182,7 @@ class quantity( ancestryModule.ancestry ) :
         if( not( self.unit.isDimensionless( ) ) ) : attributes += ' unit="%s"' % self.unit
 
         ending = '>'
-        if( ( self.documentation == '' ) and ( len( self.uncertainty ) == 0 ) ) : ending = '/>'
+        if( ( self.documentation == '' ) and ( self.uncertainty is None ) ) : ending = '/>'
         XMLStringList = [ '%s<%s label="%s" value="%s"%s%s' % 
                 ( indent, self.moniker, self.label, self.value, attributes, ending ) ]
 
@@ -195,44 +190,55 @@ class quantity( ancestryModule.ancestry ) :
             if( self.documentation != '' ) :
                 XMLStringList.append( '%s<documentation>' % indent2 )
                 XMLStringList.append( '%s%s</documentation>' % ( indent3, self.documentation ) )
-            XMLStringList += self.uncertainty.toXMLList( indent = indent2, **kwargs )
+            if( self.uncertainty is not None ) : XMLStringList += self.uncertainty.toXMLList( indent = indent2, **kwargs )
             XMLStringList[-1] += '</%s>' % self.moniker
         return( XMLStringList )
 
-    @classmethod
-    def toValueType( cls, value ) :
+    def parseXMLNode( self, element, xPath, linkData ) :
 
-        return( cls.__valueType( value ) )
+        xPath.append( element.tag )
+
+        documentation = ''
+        for child in element :
+            if( child.tag == 'uncertainty' ) :
+                self.uncertainty = uncertaintyModule.uncertainty.parseXMLNodeAsClass( child, xPath, linkData )
+#            elif( child.tag 'documentation' ) :
+#                if( child.tag == 'documentation' ) : documentation = child.findtext( )
+            else :
+                raise ValueError( 'child element with tag "%s" not allowed' % child.tag )
+
+        xPath.pop( )
+        return( self )
 
     @classmethod
     def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
 
-        xPath.append( element.tag )
+        xPath.append( '%s[@label="%s"]' % ( element.tag, element.get( 'label' ) ) )
 
-        attributes = { 'label' : None, 'value' : None, 'unit' : '' }
+        attributes = ( 'label', 'value', 'unit' )
         for attributeName in element.attrib :
-            if( attributeName not in attributes ) :
-                raise ValueError( 'attribute = "%s" not allowed' % attributeName )
-            attributes[attributeName] = element.attrib[attributeName]
+            if( attributeName not in attributes ) : raise ValueError( 'attribute = "%s" not allowed' % attributeName )
 
-        documentation = ''
-        for child in element :
-            if( child.tag not in [ 'documentation', 'uncertainty' ] ) :
-                raise ValueError( 'child element with tag "%s" not allowed' % child.tag )
-            if( child.tag == 'documentation' ) : documentation = child.findtext( )
+        value = cls.toValueType( element.attrib['value'] )
+        unit = stringToPhysicalUnit( element.get( 'unit', '' ) )
 
-        attributes['value'] = cls.toValueType( attributes['value'] )
-        attributes['unit'] = stringToPhysicalUnit( attributes['unit'] )
-        instance = cls( attributes['label'], attributes['value'], attributes['unit'], documentation = documentation )
+        self = cls( element.attrib['label'], value, unit )
+        xPath.pop()
 
-        xPath.pop( )
-        return( instance )
+        self.parseXMLNode( element, xPath, linkData )
+
+        return( self )
 
     @classmethod
     def parseXMLStringAsClass( cls, string ) :
 
         from xml.etree import cElementTree
         return( cls.parseXMLNodeAsClass( cElementTree.fromstring( string ), [], [] ) )
+
+    @classmethod
+    def toValueType( cls, value ) :
+
+        return( cls.__valueType( value ) )
 
 class string( quantity ) :
     """

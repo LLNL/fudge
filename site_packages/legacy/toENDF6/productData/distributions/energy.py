@@ -66,9 +66,9 @@ from pqu import PQU as PQUModule
 from xData import standards as standardsModule
 from xData import regions as regionsModule
 
-from fudge.gnd.productData.distributions import energy as energyModule
+from fudge.gnds.productData.distributions import energy as energyModule
 
-from ... import gndToENDF6 as gndToENDF6Module
+from ... import gndsToENDF6 as gndsToENDF6Module
 from ... import endfFormats as endfFormatsModule
 
 __metaclass__ = type
@@ -97,7 +97,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
             endfMFList[5][MT]  = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], 0, 0, NK, 0 ) ] + \
                     MF5 + [ endfFormatsModule.endfSENDLineNumber( ) ]
     else :
-        print 'WARNING: energy subform "%s" does not have method toENDF6' % energySubform.moniker 
+        print( 'WARNING: energy subform "%s" does not have method toENDF6' % energySubform.moniker )
 
 energyModule.form.toENDF6 = toENDF6
 
@@ -110,7 +110,7 @@ def toENDF6( self, flags, targetInfo, weight = None, MT = None ) :
     EInFactor = PQUModule.PQU(1, self.axes[-1].unit ).getValueAs('eV')
     if( weight is None ) : weight = [ [ self[0].value * EInFactor, 1.0 ],
                                       [ self[-1].value * EInFactor, 1.0 ] ]
-    EInInterpolation = gndToENDF6Module.gndToENDF2PlusDInterpolationFlag( self.interpolation, self.interpolationQualifier )
+    EInInterpolation = gndsToENDF6Module.gndsToENDF2PlusDInterpolationFlag( self.interpolation, self.interpolationQualifier )
     C1, C2, LAW, LANG = 0, 0, 0, 0
     if( MT == 527 ) : C1, C2, LAW, LANG = 11, 5.438675e-4, 1, 2
     ENDFDataList = [ endfFormatsModule.endfContLine( C1, C2, 0, 1, 1, len( weight ) ) ] + \
@@ -130,13 +130,13 @@ def toENDF6( self, flags, targetInfo, weight = None, MT = None ) :
                         if( data[-1] == regionData[0] ) : regionData.pop( 0 )
                     data += regionData
                     interpolations.append( len( data ) )
-                    interpolations.append( gndToENDF6Module.gndToENDFInterpolationFlag( region.interpolation ) )
+                    interpolations.append( gndsToENDF6Module.gndsToENDFInterpolationFlag( region.interpolation ) )
                 NR, NE = len( interpolations ) / 2, interpolations[-2]
                 ENDFDataList.append( endfFormatsModule.endfContLine( 0, energy.value * EInFactor, 0, 0, NR, NE ) )
                 ENDFDataList += endfFormatsModule.endfInterpolationList( interpolations )
                 ENDFDataList += endfFormatsModule.endfNdDataList( data )
             else :
-                interpolation = gndToENDF6Module.gndToENDFInterpolationFlag( energy.interpolation )
+                interpolation = gndsToENDF6Module.gndsToENDFInterpolationFlag( energy.interpolation )
                 ENDFDataList.append( endfFormatsModule.endfContLine( 0, energy.value * EInFactor, 0, 0, 1, len( energy ) ) )
                 ENDFDataList += endfFormatsModule.endfInterpolationList( [ len( energy ), interpolation ] )
                 ENDFDataList += endfFormatsModule.endfNdDataList( energy, xUnit = 'eV', yUnit = '1/eV' )
@@ -152,9 +152,9 @@ def toENDF6_oneRegion( self, EInFactor, startingIndex = 0 ) :
     for index, energy_in in enumerate( self[startingIndex:] ) :
         ENDFDataList += [ endfFormatsModule.endfContLine( 0., energy_in.value * EInFactor, 0, 0, 1, len( energy_in ) ) ]
         ENDFDataList += endfFormatsModule.endfInterpolationList(
-                [ len( energy_in ), gndToENDF6Module.gndToENDFInterpolationFlag( energy_in.interpolation ) ] )
+                [ len( energy_in ), gndsToENDF6Module.gndsToENDFInterpolationFlag( energy_in.interpolation ) ] )
         ENDFDataList += endfFormatsModule.endfNdDataList( energy_in, xUnit = 'eV', yUnit = '1/eV' )
-    EInInterpolation = gndToENDF6Module.gndToENDF2PlusDInterpolationFlag( self.interpolation, self.interpolationQualifier )
+    EInInterpolation = gndsToENDF6Module.gndsToENDF2PlusDInterpolationFlag( self.interpolation, self.interpolationQualifier )
     return( len( self[startingIndex:] ), EInInterpolation, ENDFDataList )
 
 def toENDF6( self, flags, targetInfo, weight = None ) :
@@ -195,7 +195,7 @@ def toENDF6( self, flags, targetInfo, weight = None ) :
         weight = [ [ energyFactor * parameter1[0][0], 1.0 ], [ energyFactor * parameter1[-1][0], 1.0 ] ]
         interpolation = 2
     elif( hasattr( weight, 'axes' ) ):
-        interpolation = gndToENDF6Module.gndToENDFInterpolationFlag( weight.interpolation )
+        interpolation = gndsToENDF6Module.gndsToENDFInterpolationFlag( weight.interpolation )
     else:
         interpolation = 2
     ENDFDataList = [ endfFormatsModule.endfContLine( U, 0, 0, self.LF, 1, len( weight ) ) ] + \
@@ -217,7 +217,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
     mass = self.numberOfProductsMasses.getValueAs( 'amu' ) / targetInfo['massTracker'].neutronMass
     ENDFDataList = [ endfFormatsModule.endfContLine( mass, 0, 0, 0, 0, self.numberOfProducts ) ]
-    gndToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, 6, standardsModule.frames.centerOfMassToken, ENDFDataList )
+    gndsToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, 6, standardsModule.frames.centerOfMassToken, ENDFDataList )
 
 energyModule.NBodyPhaseSpace.toENDF6 = toENDF6
 

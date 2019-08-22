@@ -1,0 +1,1048 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>fudge.gnds.productData.distributions.angular &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <link rel="stylesheet" href="../../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '4.2.3 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.gnds.productData.distributions.angular</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Angular distribution classes with forms :py:class:`form`, :py:class:`twoBodyForm` and :py:class:`CoulombElasticForm`.</span>
+
+<span class="sd">This details most of the stuff in :py:mod:`angular.py`, and it also applies to :py:mod:`energy.py`,</span>
+<span class="sd">:py:mod:`energyAngular.py` and :py:mod:`angularEnergy.py`. Here we only describe some of the old classes.</span>
+<span class="sd">Namely,</span>
+
+<span class="sd">    * ``pdfOfMu.pointwise``</span>
+
+<span class="sd">        - Stores a :math:`P(\mu)` as a list of :math:`\mu_i`, :math:`P_i`</span>
+
+<span class="sd">    * ``pdfOfMu.Legendre``</span>
+
+<span class="sd">        - Stores a :math:`P(\mu)`  as a Legendre series</span>
+
+<span class="sd">    * ``pointwise``</span>
+
+<span class="sd">        - Stores the :math:`P(\mu|E)` as a list of :math:`P(\mu)` which can be either</span>
+<span class="sd">          pdfOfMu.pointwise of pdfOfMu.Legendre</span>
+
+<span class="sd">    * ``piecewise``</span>
+
+<span class="sd">        - Stores :math:`P(\mu|E)` as a contigous list of ``pointwise`` instances.</span>
+
+<span class="sd">and their new equivalent classes</span>
+
+<span class="sd">    * :py:class:`XYs1d`</span>
+
+<span class="sd">        - Same as ``pdfOfMu.pointwise``</span>
+
+<span class="sd">    * :py:class:`Legendre`</span>
+
+<span class="sd">        - Same as ``pdfOfMu.Legendre``</span>
+
+<span class="sd">    * :py:class:`XYs2d`</span>
+
+<span class="sd">        - Same as ``pointwise``</span>
+
+<span class="sd">    * :py:class:`regions2d`</span>
+
+<span class="sd">        - Same as ``piecewise``</span>
+
+
+<span class="sd">Note, there was no ``pdfOfMu.piecewise`` and its new equivalent :py:class:`regions1d`, as</span>
+<span class="sd">they are not currently needed. There are other classes in :py:mod:`angular.py`</span>
+<span class="sd">(e.g., :py:class:`isotropic2d`, :py:class:`forward`, :py:class:`recoil`) but we can ignore them for now.</span>
+
+<span class="sd">So what are the classes in :py:mod:`angular.py` for? They are to represent the</span>
+<span class="sd">physics function :math:`P(\mu|E)` where :math:`\mu` is the outgoing :math:`\cos( \theta )` and :math:`E` is</span>
+<span class="sd">the projectile&#39;s energy. Currently, we only store these as list of :math:`P(\mu)`</span>
+<span class="sd">or :math:`C_l`&#39;s (or regions of these).</span>
+
+<span class="sd">For the simple case with only :math:`P(\mu`&#39;s (no :math:`C_l`&#39;s), and no change of</span>
+<span class="sd">interpolation or step in function, a :math:`P(\mu|E)` looks like::</span>
+
+<span class="sd">    E_1, P_1(mu)</span>
+<span class="sd">    E_2, P_2(mu)</span>
+<span class="sd">    ...</span>
+<span class="sd">    E_n-1, P_n-1(mu)</span>
+<span class="sd">    E_1, P_1(mu)</span>
+
+<span class="sd">In the old code each :math:`P_i(\mu)` was stored as an instance of a</span>
+<span class="sd">``pdfOfMu.pointwise`` and the P(mu|E) was an instance of ``pointwise``. In the new</span>
+<span class="sd">code each :math:&#39;P_i(\mu)` is stored as an instance of :py:class:`XYs1d`, and :math:`P(\mu|E)` is an</span>
+<span class="sd">instance of :py:class:`XYs2d`. There are several nice things about the new structure.</span>
+<span class="sd">For example, the names here match the names in ``xData``. Also, the internal</span>
+<span class="sd">functions do not need to be nested as, for example, ``pdfOfMu.pointwise`` was.</span>
+<span class="sd">This latter point is a result of adding the dimension to the name of each</span>
+<span class="sd">class (e.g., :py:class:`XYs1d` vs. :py:class:`XYs2d`) so there is no name clashing.</span>
+
+
+<span class="sd">As a further note, in MF=4, the LTT = 1, 2 and 3 are stored using</span>
+
+<span class="sd">LTT=1</span>
+<span class="sd">    XYs1d for :math:`P(\mu)` and :py:class:`XYs2d` for the list of :math:`{E_i,P(\mu)}`.</span>
+
+<span class="sd">LTT=2</span>
+<span class="sd">    Legendre for :math:`P(\mu)` and :py:class:`XYs2d` for the list of :math:`{E_i,P(\mu)}`.</span>
+
+<span class="sd">LTT=3</span>
+<span class="sd">    :py:class:`regions2d` that stores the LTT=1 in the first region and LTT=2 in the second region.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">miscellaneous</span>
+<span class="kn">import</span> <span class="nn">fudge</span>
+<span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="k">import</span> <span class="n">brb</span>
+<span class="kn">from</span> <span class="nn">fudge.core.math</span> <span class="k">import</span> <span class="n">fudgemath</span>
+
+<span class="kn">from</span> <span class="nn">pqu</span> <span class="k">import</span> <span class="n">PQU</span> <span class="k">as</span> <span class="n">PQUModule</span>
+
+<span class="kn">from</span> <span class="nn">PoPs</span> <span class="k">import</span> <span class="n">IDs</span> <span class="k">as</span> <span class="n">IDsPoPsModule</span>
+
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">standards</span> <span class="k">as</span> <span class="n">standardsModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">base</span> <span class="k">as</span> <span class="n">xDataBaseModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">axes</span> <span class="k">as</span> <span class="n">axesModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">XYs</span> <span class="k">as</span> <span class="n">XYsModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">series1d</span> <span class="k">as</span> <span class="n">series1dModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">multiD_XYs</span> <span class="k">as</span> <span class="n">multiD_XYsModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">regions</span> <span class="k">as</span> <span class="n">regionsModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">link</span> <span class="k">as</span> <span class="n">linkModule</span>
+
+<span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">abstractClasses</span> <span class="k">as</span> <span class="n">abstractClassesModule</span>
+
+<span class="kn">from</span> <span class="nn">fudge.gnds.productData</span> <span class="k">import</span> <span class="n">energyDeposition</span> <span class="k">as</span> <span class="n">energyDepositionModule</span>
+<span class="kn">from</span> <span class="nn">fudge.gnds.productData</span> <span class="k">import</span> <span class="n">momentumDeposition</span> <span class="k">as</span> <span class="n">momentumDepositionModule</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">base</span> <span class="k">as</span> <span class="n">baseModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">reference</span> <span class="k">as</span> <span class="n">referenceModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">xs_pdf_cdf</span> <span class="k">as</span> <span class="n">xs_pdf_cdfModule</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<div class="viewcode-block" id="defaultAxes"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.defaultAxes">[docs]</a><span class="k">def</span> <span class="nf">defaultAxes</span><span class="p">(</span> <span class="n">energyUnit</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">axes</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axes</span><span class="p">(</span> <span class="n">rank</span> <span class="o">=</span> <span class="mi">3</span> <span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span> <span class="s1">&#39;P(mu|energy_in)&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span> <span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span> <span class="s1">&#39;energy_in&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">energyUnit</span> <span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">axes</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs1d"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.XYs1d">[docs]</a><span class="k">class</span> <span class="nc">XYs1d</span><span class="p">(</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="XYs1d.averageMu"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.XYs1d.averageMu">[docs]</a>    <span class="k">def</span> <span class="nf">averageMu</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">allowedInterpolations</span> <span class="o">=</span> <span class="p">[</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">interpolation</span><span class="o">.</span><span class="n">linlinToken</span><span class="p">,</span>
+                                  <span class="n">standardsModule</span><span class="o">.</span><span class="n">interpolation</span><span class="o">.</span><span class="n">flatToken</span> <span class="p">]</span>
+        <span class="n">xys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">changeInterpolationIfNeeded</span><span class="p">(</span> <span class="n">allowedInterpolations</span><span class="p">,</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">defaultAccuracy</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">xys</span><span class="o">.</span><span class="n">integrateWithWeight_x</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs1d.invert"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.XYs1d.invert">[docs]</a>    <span class="k">def</span> <span class="nf">invert</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">reflected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span>
+        <span class="n">pdf</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="o">-</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="p">]</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">]</span>
+        <span class="n">pdf</span><span class="o">.</span><span class="n">reverse</span><span class="p">(</span> <span class="p">)</span>
+        <span class="n">reflected</span><span class="o">.</span><span class="n">setData</span><span class="p">(</span> <span class="n">pdf</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">reflected</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs1d.isIsotropic"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.XYs1d.isIsotropic">[docs]</a>    <span class="k">def</span> <span class="nf">isIsotropic</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">rangeMin</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">rangeMax</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs1d.toLinearXYsClass"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.XYs1d.toLinearXYsClass">[docs]</a>    <span class="k">def</span> <span class="nf">toLinearXYsClass</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">XYs1d</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs1d.to_xs_pdf_cdf1d"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.XYs1d.to_xs_pdf_cdf1d">[docs]</a>    <span class="k">def</span> <span class="nf">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">xs_pdf_cdf1d</span><span class="o">.</span><span class="n">fromXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Legendre"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.Legendre">[docs]</a><span class="k">class</span> <span class="nc">Legendre</span><span class="p">(</span> <span class="n">series1dModule</span><span class="o">.</span><span class="n">LegendreSeries</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="Legendre.averageMu"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.Legendre.averageMu">[docs]</a>    <span class="k">def</span> <span class="nf">averageMu</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCoefficientSafely</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Legendre.toLinearXYsClass"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.Legendre.toLinearXYsClass">[docs]</a>    <span class="k">def</span> <span class="nf">toLinearXYsClass</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">XYs1d</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Legendre.to_xs_pdf_cdf1d"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.Legendre.to_xs_pdf_cdf1d">[docs]</a>    <span class="k">def</span> <span class="nf">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">linear</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">defaultAccuracy</span><span class="p">,</span> <span class="n">lowerEps</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-8</span> <span class="p">)</span>
+        <span class="n">linear</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">linear</span><span class="o">.</span><span class="n">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="xs_pdf_cdf1d"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.xs_pdf_cdf1d">[docs]</a><span class="k">class</span> <span class="nc">xs_pdf_cdf1d</span><span class="p">(</span> <span class="n">xs_pdf_cdfModule</span><span class="o">.</span><span class="n">xs_pdf_cdf1d</span> <span class="p">)</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="xs_pdf_cdf1d.isIsotropic"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.xs_pdf_cdf1d.isIsotropic">[docs]</a>    <span class="k">def</span> <span class="nf">isIsotropic</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="nb">min</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdf</span><span class="o">.</span><span class="n">values</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdf</span><span class="o">.</span><span class="n">values</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="isotropic1d"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.isotropic1d">[docs]</a><span class="k">class</span> <span class="nc">isotropic1d</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;isotropic1d&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="isotropic1d.evaluate"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.isotropic1d.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">mu</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="mf">0.5</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="isotropic1d.isIsotropic"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.isotropic1d.isIsotropic">[docs]</a>    <span class="k">def</span> <span class="nf">isIsotropic</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="subform"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.subform">[docs]</a><span class="k">class</span> <span class="nc">subform</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">subform</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Abstract base class for angular subforms.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="subform.to_xs_pdf_cdf1d"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.subform.to_xs_pdf_cdf1d">[docs]</a>    <span class="k">def</span> <span class="nf">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="kc">None</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="isotropic2d"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.isotropic2d">[docs]</a><span class="k">class</span> <span class="nc">isotropic2d</span><span class="p">(</span> <span class="n">subform</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;isotropic2d&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">subform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="isotropic2d.convertUnits"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.isotropic2d.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s2">&quot;See documentation for reactionSuite.convertUnits.&quot;</span>
+
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="isotropic2d.copy"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.isotropic2d.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">isotropic2d</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
+
+    <span class="n">__copy__</span> <span class="o">=</span> <span class="n">__deepcopy__</span> <span class="o">=</span> <span class="n">copy</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">product</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">product</span> <span class="p">)</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">product</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">product</span> <span class="p">)</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">product</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">product</span> <span class="p">)</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="isotropic2d.evaluate"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.isotropic2d.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">energy</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">_isotropic1d</span> <span class="o">=</span> <span class="n">isotropic1d</span><span class="p">(</span> <span class="p">)</span>
+        <span class="n">_isotropic1d</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">_isotropic1d</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="isotropic2d.getEnergyArray"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.isotropic2d.getEnergyArray">[docs]</a>    <span class="k">def</span> <span class="nf">getEnergyArray</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">EMin</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">EMax</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span> <span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="isotropic2d.invert"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.isotropic2d.invert">[docs]</a>    <span class="k">def</span> <span class="nf">invert</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="isotropic2d.isIsotropic"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.isotropic2d.isIsotropic">[docs]</a>    <span class="k">def</span> <span class="nf">isIsotropic</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="isotropic2d.averageMu"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.isotropic2d.averageMu">[docs]</a>    <span class="k">def</span> <span class="nf">averageMu</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="mf">0.</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="isotropic2d.check"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.isotropic2d.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="isotropic2d.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.isotropic2d.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">ptw</span> <span class="o">=</span> <span class="n">XYs2d</span><span class="p">(</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">defaultAxes</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">ptw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">XYs1d</span><span class="p">(</span> <span class="p">[</span> <span class="p">[</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span> <span class="p">],</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span> <span class="p">]</span> <span class="p">],</span> <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">ptw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">XYs1d</span><span class="p">(</span> <span class="p">[</span> <span class="p">[</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span> <span class="p">],</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span> <span class="p">]</span> <span class="p">],</span> <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">ptw</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="isotropic2d.toXMLList"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.isotropic2d.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">XMLStartTagString</span><span class="p">(</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="n">emptyTag</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="isotropic2d.parseXMLNode"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.isotropic2d.parseXMLNode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">isotropic2d</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="forward"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.forward">[docs]</a><span class="k">class</span> <span class="nc">forward</span><span class="p">(</span> <span class="n">subform</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;forward&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">subform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="forward.convertUnits"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.forward.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s2">&quot;See documentation for reactionSuite.convertUnits.&quot;</span>
+
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="forward.copy"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.forward.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">forward</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
+
+    <span class="n">__copy__</span> <span class="o">=</span> <span class="n">__deepcopy__</span> <span class="o">=</span> <span class="n">copy</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">product</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">product</span> <span class="p">)</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">product</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">product</span> <span class="p">)</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">product</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">product</span> <span class="p">)</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="forward.getEnergyArray"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.forward.getEnergyArray">[docs]</a>    <span class="k">def</span> <span class="nf">getEnergyArray</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">EMin</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">EMax</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span> <span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="forward.invert"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.forward.invert">[docs]</a>    <span class="k">def</span> <span class="nf">invert</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="p">)</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="forward.isIsotropic"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.forward.isIsotropic">[docs]</a>    <span class="k">def</span> <span class="nf">isIsotropic</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="forward.averageMu"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.forward.averageMu">[docs]</a>    <span class="k">def</span> <span class="nf">averageMu</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="mf">1.</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="forward.check"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.forward.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="forward.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.forward.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">accuracy</span> <span class="o">=</span> <span class="n">xDataBaseModule</span><span class="o">.</span><span class="n">getArguments</span><span class="p">(</span> <span class="n">kwargs</span><span class="p">,</span> <span class="p">{</span> <span class="s1">&#39;accuracy&#39;</span> <span class="p">:</span> <span class="mf">1e-6</span> <span class="p">}</span> <span class="p">)[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">]</span>
+
+        <span class="n">ptw</span> <span class="o">=</span> <span class="n">XYs2d</span><span class="p">(</span> <span class="n">defaultAxes</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">ptw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="p">[</span> <span class="p">[</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">accuracy</span><span class="p">,</span> <span class="mf">0.</span> <span class="p">],</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">accuracy</span> <span class="p">]</span> <span class="p">],</span> <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">ptw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="p">[</span> <span class="p">[</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">accuracy</span><span class="p">,</span> <span class="mf">0.</span> <span class="p">],</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">accuracy</span> <span class="p">]</span> <span class="p">],</span> <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">ptw</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="forward.toXMLList"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.forward.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">XMLStartTagString</span><span class="p">(</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="n">emptyTag</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="forward.parseXMLNode"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.forward.parseXMLNode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span> <span class="n">forward</span><span class="p">()</span></div></div>
+
+<div class="viewcode-block" id="recoil"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.recoil">[docs]</a><span class="k">class</span> <span class="nc">recoil</span><span class="p">(</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">link</span><span class="p">,</span> <span class="n">subform</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;recoil&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">link</span><span class="p">,</span> <span class="n">root</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">relative</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Distributions for this particle can be computed from its recoil partner using kinematics.</span>
+<span class="sd">        Only meant for angular 2-body reactions.</span>
+<span class="sd">        The &#39;root&#39; and &#39;path&#39; usually do not need to be specified: they will be computed from the link.</span>
+
+<span class="sd">        :param link: distribution form for recoil partner</span>
+<span class="sd">        :type link: distribution.base.form</span>
+<span class="sd">        :param root: filename where recoil partner is defined (usually None)</span>
+<span class="sd">        :param path: xpath to recoil partner (usually will be computed from the link)</span>
+<span class="sd">        :param relative: whether to write xpath as relative or absolute</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">linkModule</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">link</span><span class="o">=</span><span class="n">link</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="n">relative</span> <span class="p">)</span>
+        <span class="n">subform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">partner</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">link</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s2">&quot;Encountered unresolved link!&quot;</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">link</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="recoil.convertUnits"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.recoil.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s2">&quot;See documentation for reactionSuite.convertUnits.&quot;</span>
+
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="recoil.copy"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.recoil.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">recoil</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">partner</span> <span class="p">)</span> <span class="p">)</span></div>
+
+    <span class="n">__copy__</span> <span class="o">=</span> <span class="n">__deepcopy__</span> <span class="o">=</span> <span class="n">copy</span>
+
+<div class="viewcode-block" id="recoil.getNumericalDistribution"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.recoil.getNumericalDistribution">[docs]</a>    <span class="k">def</span> <span class="nf">getNumericalDistribution</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">partnerForm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">partner</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mf">1e-8</span> <span class="p">)</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">partnerForm</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="recoil.getEnergyArray"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.recoil.getEnergyArray">[docs]</a>    <span class="k">def</span> <span class="nf">getEnergyArray</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">EMin</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">EMax</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">partner</span><span class="o">.</span><span class="n">getEnergyArray</span><span class="p">(</span> <span class="n">EMin</span> <span class="o">=</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span> <span class="o">=</span> <span class="n">EMax</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="recoil.isIsotropic"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.recoil.isIsotropic">[docs]</a>    <span class="k">def</span> <span class="nf">isIsotropic</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">partner</span><span class="o">.</span><span class="n">isIsotropic</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="recoil.averageMu"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.recoil.averageMu">[docs]</a>    <span class="k">def</span> <span class="nf">averageMu</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">partner</span><span class="o">.</span><span class="n">averageMu</span><span class="p">(</span> <span class="n">E</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="recoil.check"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.recoil.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">warning</span>
+
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">partner</span><span class="p">,</span> <span class="p">(</span> <span class="n">twoBodyForm</span><span class="p">,</span> <span class="n">referenceModule</span><span class="o">.</span><span class="n">CoulombPlusNuclearElastic</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">missingRecoilDistribution</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="recoil.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.recoil.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">partner</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span> <span class="p">)</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="XYs2d"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.XYs2d">[docs]</a><span class="k">class</span> <span class="nc">XYs2d</span><span class="p">(</span> <span class="n">subform</span><span class="p">,</span> <span class="n">multiD_XYsModule</span><span class="o">.</span><span class="n">XYs2d</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">multiD_XYsModule</span><span class="o">.</span><span class="n">XYs2d</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">subform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="XYs2d.getAtEnergy"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.XYs2d.getAtEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">getAtEnergy</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">energy</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolateAtValue</span><span class="p">(</span> <span class="n">energy</span><span class="p">,</span> <span class="n">extrapolation</span> <span class="o">=</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">flatExtrapolationToken</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs2d.invert"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.XYs2d.invert">[docs]</a>    <span class="k">def</span> <span class="nf">invert</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">ptw</span> <span class="o">=</span> <span class="n">XYs2d</span><span class="p">(</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">POfMu</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">ptw</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">POfMu</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">ptw</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs2d.isIsotropic"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.XYs2d.isIsotropic">[docs]</a>    <span class="k">def</span> <span class="nf">isIsotropic</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">energy_in</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">energy_in</span><span class="o">.</span><span class="n">isIsotropic</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs2d.averageMu"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.XYs2d.averageMu">[docs]</a>    <span class="k">def</span> <span class="nf">averageMu</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">mode</span><span class="p">,</span> <span class="n">function1</span><span class="p">,</span> <span class="n">function2</span><span class="p">,</span> <span class="n">frac</span><span class="p">,</span> <span class="n">interpolation</span><span class="p">,</span> <span class="n">interpolationQualifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getBoundingSubFunctions</span><span class="p">(</span> <span class="n">E</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">mode</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;angular has no data&#39;</span> <span class="p">)</span>
+        <span class="n">mu1</span> <span class="o">=</span> <span class="n">function1</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span> <span class="p">)</span><span class="o">.</span><span class="n">averageMu</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">mu2</span> <span class="o">=</span> <span class="n">function2</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span> <span class="p">)</span><span class="o">.</span><span class="n">averageMu</span><span class="p">(</span> <span class="p">)</span>
+            <span class="n">mu1</span> <span class="o">=</span> <span class="p">(</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">frac</span> <span class="p">)</span> <span class="o">*</span> <span class="n">mu1</span> <span class="o">+</span> <span class="n">frac</span> <span class="o">*</span> <span class="n">mu2</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">interpolationQualifier</span> <span class="o">==</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">interpolation</span><span class="o">.</span><span class="n">unitBaseToken</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Unsupported interpolation qualifier &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">interpolationQualifier</span> <span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">interpolationQualifier</span> <span class="o">!=</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">interpolation</span><span class="o">.</span><span class="n">noneQualifierToken</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Unsupported interpolation qualifier &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">interpolationQualifier</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">mu1</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs2d.getEnergyArray"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.XYs2d.getEnergyArray">[docs]</a>    <span class="k">def</span> <span class="nf">getEnergyArray</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">EMin</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">EMax</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">Es</span> <span class="o">=</span> <span class="p">[</span> <span class="n">data</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">EMin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">EMin</span> <span class="o">&lt;</span> <span class="n">Es</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">Es</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="n">EMin</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">EMax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">EMax</span> <span class="o">&gt;</span> <span class="n">Es</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">Es</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">EMax</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">Es</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs2d.check"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.XYs2d.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">warning</span>
+
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span><span class="n">function</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="n">xys</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;normTolerance&#39;</span><span class="p">],</span> <span class="n">lowerEps</span> <span class="o">=</span> <span class="mf">1e-6</span> <span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">Legendre</span><span class="p">):</span>
+                <span class="n">integral</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="n">coefficients</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">XYs1d</span><span class="p">):</span>
+                <span class="n">integral</span> <span class="o">=</span> <span class="n">xys</span><span class="o">.</span><span class="n">integrate</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;checking function of type </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">function</span><span class="p">))</span>  <span class="c1"># FIXME support xs_pdf_cdf1d</span>
+
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">integral</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;normTolerance&#39;</span><span class="p">]:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">unnormalizedDistribution</span><span class="p">(</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">function</span><span class="o">.</span><span class="n">value</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">),</span> <span class="n">idx</span><span class="p">,</span>
+                    <span class="n">integral</span><span class="p">,</span> <span class="n">function</span> <span class="p">)</span> <span class="p">)</span>
+
+            <span class="k">if</span><span class="p">(</span> <span class="n">xys</span><span class="o">.</span><span class="n">rangeMin</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">negativeProbability</span><span class="p">(</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span><span class="n">function</span><span class="o">.</span><span class="n">value</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">),</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">xys</span><span class="o">.</span><span class="n">rangeMin</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="n">function</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="XYs2d.to_xs_pdf_cdf1d"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.XYs2d.to_xs_pdf_cdf1d">[docs]</a>    <span class="k">def</span> <span class="nf">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">subform</span> <span class="o">=</span> <span class="n">XYs2d</span><span class="p">(</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="p">),</span> <span class="n">interpolation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolation</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">xys</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">subform</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">xys</span><span class="o">.</span><span class="n">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">subform</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs2d.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.XYs2d.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">multiD_XYsModule</span><span class="o">.</span><span class="n">XYs2d</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span> <span class="o">=</span> <span class="n">XYs2d</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs2d.allowedSubElements"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.XYs2d.allowedSubElements">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">allowedSubElements</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="n">XYs1d</span><span class="p">,</span> <span class="n">Legendre</span><span class="p">,</span> <span class="n">xs_pdf_cdf1d</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="regions2d"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.regions2d">[docs]</a><span class="k">class</span> <span class="nc">regions2d</span><span class="p">(</span> <span class="n">subform</span><span class="p">,</span> <span class="n">regionsModule</span><span class="o">.</span><span class="n">regions2d</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">regionsModule</span><span class="o">.</span><span class="n">regions2d</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">subform</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="regions2d.check"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.regions2d.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">warning</span>
+
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span><span class="n">region</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="n">regionWarnings</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">regionWarnings</span><span class="p">:</span> <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s1">&#39;region index </span><span class="si">%i</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">region</span><span class="o">.</span><span class="n">moniker</span><span class="p">),</span> <span class="n">regionWarnings</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="regions2d.calculateAverageProductData"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.regions2d.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">EMax</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;EMax&#39;</span><span class="p">]</span>
+        <span class="n">aveEnergies</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">aveMomenta</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;EMax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">domainMax</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">i1</span> <span class="o">==</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;EMax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">EMax</span>
+            <span class="n">aveEnergy</span><span class="p">,</span> <span class="n">aveMomentum</span> <span class="o">=</span> <span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="n">region</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> 
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;EMin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;EMax&#39;</span><span class="p">]</span>
+            <span class="n">aveEnergies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">aveEnergy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">aveMomenta</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">aveMomentum</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">aveEnergies</span><span class="p">,</span> <span class="n">aveMomenta</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="regions2d.isIsotropic"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.regions2d.isIsotropic">[docs]</a>    <span class="k">def</span> <span class="nf">isIsotropic</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="n">region</span><span class="o">.</span><span class="n">isIsotropic</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">False</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="regions2d.getEnergyArray"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.regions2d.getEnergyArray">[docs]</a>    <span class="k">def</span> <span class="nf">getEnergyArray</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">EMin</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">EMax</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">Es</span> <span class="o">=</span> <span class="p">[</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span> <span class="n">Es</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span> <span class="p">[</span> <span class="n">data</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">region</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">EMin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">EMin</span> <span class="o">&lt;</span> <span class="n">Es</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">Es</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="n">EMin</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">EMax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">EMax</span> <span class="o">&gt;</span> <span class="n">Es</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">Es</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">EMax</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">Es</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="regions2d.averageMu"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.regions2d.averageMu">[docs]</a>    <span class="k">def</span> <span class="nf">averageMu</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="c1"># FIXME what if E lies on boundary between regions?</span>
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">region</span><span class="o">.</span><span class="n">domainMax</span> <span class="o">&gt;</span> <span class="n">E</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">return</span> <span class="n">region</span><span class="o">.</span><span class="n">averageMu</span><span class="p">(</span> <span class="n">E</span><span class="p">,</span> <span class="n">accuracy</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">averageMu</span><span class="p">(</span> <span class="n">E</span><span class="p">,</span> <span class="n">accuracy</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="regions2d.to_xs_pdf_cdf1d"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.regions2d.to_xs_pdf_cdf1d">[docs]</a>    <span class="k">def</span> <span class="nf">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">_regions2d</span> <span class="o">=</span> <span class="n">regions2d</span><span class="p">(</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">_regions2d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">region</span><span class="o">.</span><span class="n">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">_regions2d</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="regions2d.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.regions2d.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">arguments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getArguments</span><span class="p">(</span> <span class="n">kwargs</span><span class="p">,</span> <span class="p">{</span> <span class="s1">&#39;lowerEps&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;upperEps&#39;</span> <span class="p">:</span> <span class="mi">0</span> <span class="p">}</span> <span class="p">)</span>
+        <span class="n">lowerEps</span> <span class="o">=</span> <span class="n">arguments</span><span class="p">[</span><span class="s1">&#39;lowerEps&#39;</span><span class="p">]</span>
+        <span class="n">upperEps</span> <span class="o">=</span> <span class="n">arguments</span><span class="p">[</span><span class="s1">&#39;upperEps&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">region</span><span class="o">.</span><span class="n">interpolation</span> <span class="o">!=</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">interpolation</span><span class="o">.</span><span class="n">linlinToken</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="nb">print</span> <span class="p">(</span> <span class="s1">&#39;    WARNING: ignoring interpolation &quot;</span><span class="si">%s</span><span class="s1">&quot; for toPointwise_withLinearXYs&#39;</span> <span class="o">%</span> <span class="n">region</span><span class="o">.</span><span class="n">interpolation</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">lowerEps</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="n">upperEps</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;lowerEps = </span><span class="si">%s</span><span class="s1"> and upperEps = </span><span class="si">%s</span><span class="s1"> must be &gt;= 0.&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">lowerEps</span><span class="p">,</span> <span class="n">upperEps</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">lowerEps</span> <span class="o">==</span> <span class="n">upperEps</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;lowerEps and upperEps cannot both be 0.&#39;</span> <span class="p">)</span>
+
+        <span class="n">minEps</span> <span class="o">=</span> <span class="mf">5e-16</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">lowerEps</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">lowerEps</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="n">minEps</span><span class="p">,</span> <span class="n">lowerEps</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">upperEps</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="n">minEps</span><span class="p">,</span> <span class="n">upperEps</span> <span class="p">)</span>
+
+        <span class="n">linear</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toLinearXYsClass</span><span class="p">(</span> <span class="p">)(</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="p">)</span>
+        <span class="n">n1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">_region</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">i1</span> <span class="o">&lt;</span> <span class="n">n1</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">lowerEps</span> <span class="o">&gt;</span> <span class="mi">0</span>  <span class="p">)</span> <span class="p">:</span> <span class="n">_region</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">_region</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="p">(</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">lowerEps</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">i1</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">upperEps</span> <span class="o">&gt;</span> <span class="mi">0</span>  <span class="p">)</span> <span class="p">:</span> <span class="n">_region</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">_region</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="p">(</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">upperEps</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">xys</span> <span class="ow">in</span> <span class="n">_region</span> <span class="p">:</span> <span class="n">linear</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">xys</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">linear</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="regions2d.toLinearXYsClass"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.regions2d.toLinearXYsClass">[docs]</a>    <span class="k">def</span> <span class="nf">toLinearXYsClass</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">XYs2d</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="regions2d.allowedSubElements"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.regions2d.allowedSubElements">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">allowedSubElements</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="n">XYs2d</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd"># BRB need to implement</span>
+<span class="sd">    def getAtEnergy( self, energy ) :</span>
+<span class="sd">    def invert( self ) :</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="form"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.form">[docs]</a><span class="k">class</span> <span class="nc">form</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">form</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class only seems to be used in site_packages/legacy/toENDF6/productData/distributions/uncorrelated.py</span>
+<span class="sd">    to write GNDS structure to ENDF6. This class should be deprecated.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;angular&#39;</span>
+    <span class="n">subformAttributes</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;angularSubform&#39;</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="n">subformAttributes</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">angularSubform</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">angularSubform</span><span class="p">,</span> <span class="n">subform</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;instance is not an angular subform&#39;</span> <span class="p">)</span>
+        <span class="n">baseModule</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="p">(</span> <span class="n">angularSubform</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="form.convertUnits"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.form.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s2">&quot;See documentation for reactionSuite.convertUnits.&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="form.calculateAverageProductData"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.form.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">raise</span> <span class="s1">&#39;FIXME, when am I called&#39;</span>
+
+        <span class="n">energyUnit</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;incidentEnergyUnit&#39;</span><span class="p">]</span>
+        <span class="n">momentumDepositionUnit</span> <span class="o">=</span> <span class="n">energyUnit</span> <span class="o">+</span> <span class="s1">&#39;/c&#39;</span>
+        <span class="n">massUnit</span> <span class="o">=</span> <span class="n">energyUnit</span> <span class="o">+</span> <span class="s1">&#39;/c**2&#39;</span>
+        <span class="n">energyAccuracy</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;energyAccuracy&#39;</span><span class="p">]</span>
+        <span class="n">momentumAccuracy</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;momentumAccuracy&#39;</span><span class="p">]</span>
+        <span class="n">product</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;product&#39;</span><span class="p">]</span>
+        <span class="n">reactionSuite</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;For form </span><span class="si">%s</span><span class="s1">, calculateAverageProductData is only for gammas, not </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">depData</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">angularSubform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span>
+
+        <span class="n">Es</span> <span class="o">=</span> <span class="n">angularSubform</span><span class="o">.</span><span class="n">getEnergyArray</span><span class="p">(</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;EMin&#39;</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;EMax&#39;</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="s1">&#39;discrete&#39;</span> <span class="ow">in</span> <span class="n">product</span><span class="o">.</span><span class="n">attributes</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="s1">&#39;primary&#39;</span> <span class="ow">in</span> <span class="n">product</span><span class="o">.</span><span class="n">attributes</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">massRatio</span> <span class="o">=</span> <span class="mf">0.</span>
+            <span class="k">if</span><span class="p">(</span> <span class="s1">&#39;discrete&#39;</span> <span class="ow">in</span> <span class="n">product</span><span class="o">.</span><span class="n">attributes</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">Eg</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;discrete&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span> <span class="n">energyUnit</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">Eg</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;primary&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span> <span class="n">energyUnit</span> <span class="p">)</span>
+                <span class="n">mass1</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;projectileMass&#39;</span><span class="p">]</span>
+                <span class="n">mass2</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;targetMass&#39;</span><span class="p">]</span>
+                <span class="n">massRatio</span> <span class="o">=</span> <span class="n">mass2</span> <span class="o">/</span> <span class="p">(</span> <span class="n">mass1</span> <span class="o">+</span> <span class="n">mass2</span> <span class="p">)</span>
+            <span class="n">depEnergy</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">E</span><span class="p">,</span> <span class="n">Eg</span> <span class="o">+</span> <span class="n">massRatio</span> <span class="o">*</span> <span class="n">E</span> <span class="p">]</span> <span class="k">for</span> <span class="n">E</span> <span class="ow">in</span> <span class="n">Es</span> <span class="p">]</span>
+            <span class="n">depMomentum</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">E</span><span class="p">,</span> <span class="p">(</span> <span class="n">Eg</span> <span class="o">+</span> <span class="n">massRatio</span> <span class="o">*</span> <span class="n">E</span> <span class="p">)</span> <span class="o">*</span> <span class="n">angularSubform</span><span class="o">.</span><span class="n">averageMu</span><span class="p">(</span> <span class="n">E</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">momentumAccuracy</span> <span class="p">)</span> <span class="p">]</span> <span class="k">for</span> <span class="n">E</span> <span class="ow">in</span> <span class="n">Es</span> <span class="p">]</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;Unsupported gamma; gamma must be &quot;discrete&quot; or &quot;primary&quot;&#39;</span> <span class="p">)</span>
+
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">energyDepositionModule</span><span class="o">.</span><span class="n">defaultAxes</span><span class="p">(</span> <span class="n">energyUnit</span> <span class="o">=</span> <span class="n">energyUnit</span> <span class="p">)</span>
+        <span class="n">depData</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">energyDepositionModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="n">depEnergy</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">momentumDepositionModule</span><span class="o">.</span><span class="n">defaultAxes</span><span class="p">(</span> <span class="n">energyUnit</span> <span class="o">=</span> <span class="n">energyUnit</span><span class="p">,</span> <span class="n">momentumDepositionUnit</span> <span class="o">=</span> <span class="n">momentumDepositionUnit</span> <span class="p">)</span>
+        <span class="n">depData</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">momentumDepositionModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="n">depMomentum</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">depData</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="form.processMultiGroup"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.form.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span> <span class="s1">&#39;need to implement&#39;</span> <span class="p">)</span>
+
+<span class="c1">#    def process( self, processInfo, tempInfo, verbosityIndent ) :</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">miscellaneous</span> <span class="k">as</span> <span class="n">miscellaneousModule</span>
+        <span class="kn">from</span> <span class="nn">fudge.processing.deterministic</span> <span class="k">import</span> <span class="n">transferMatrices</span> <span class="k">as</span> <span class="n">transferMatricesModule</span>
+
+        <span class="n">product</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;product&#39;</span><span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;For form </span><span class="si">%s</span><span class="s1">, process is only for gammas, not </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">newForms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">angularSubform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span>
+        <span class="n">crossSection</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;crossSection&#39;</span><span class="p">]</span>
+        <span class="n">energyUnit</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;incidentEnergyUnit&#39;</span><span class="p">]</span>
+        <span class="n">massUnit</span> <span class="o">=</span> <span class="n">energyUnit</span> <span class="o">+</span> <span class="s1">&#39;/c**2&#39;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="s1">&#39;LLNL_Pn&#39;</span> <span class="ow">in</span> <span class="n">processInfo</span><span class="p">[</span><span class="s1">&#39;styles&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">processInfo</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;=</span> <span class="mi">30</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">Grouping </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">verbosityIndent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">))</span>
+            <span class="n">projectileName</span><span class="p">,</span> <span class="n">productName</span> <span class="o">=</span> <span class="n">processInfo</span><span class="o">.</span><span class="n">getProjectileName</span><span class="p">(</span> <span class="p">),</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span>
+            <span class="k">if</span><span class="p">(</span> <span class="s1">&#39;discrete&#39;</span> <span class="ow">in</span> <span class="n">product</span><span class="o">.</span><span class="n">attributes</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">Eg</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;discrete&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span> <span class="n">energyUnit</span> <span class="p">)</span>
+                <span class="n">TM_1</span><span class="p">,</span> <span class="n">TM_E</span> <span class="o">=</span> <span class="n">transferMatricesModule</span><span class="o">.</span><span class="n">discreteGammaAngularData</span><span class="p">(</span> <span class="n">processInfo</span><span class="p">,</span> <span class="n">projectileName</span><span class="p">,</span> <span class="n">productName</span><span class="p">,</span> <span class="n">Eg</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span>
+                   <span class="n">angularSubform</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;transferMatrixComment&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; outgoing data for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;productLabel&#39;</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="s1">&#39;primary&#39;</span> <span class="ow">in</span> <span class="n">product</span><span class="o">.</span><span class="n">attributes</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">projectile</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">target</span>
+                <span class="n">mass1</span><span class="p">,</span> <span class="n">mass2</span> <span class="o">=</span> <span class="n">projectile</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span> <span class="n">massUnit</span> <span class="p">),</span> <span class="n">target</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span> <span class="n">massUnit</span> <span class="p">)</span>
+                <span class="n">massRatio</span> <span class="o">=</span> <span class="n">mass2</span> <span class="o">/</span> <span class="p">(</span> <span class="n">mass1</span> <span class="o">+</span> <span class="n">mass2</span> <span class="p">)</span>
+                <span class="n">ELevel</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;primary&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">getValueAs</span><span class="p">(</span> <span class="n">energyUnit</span> <span class="p">)</span>
+                <span class="n">TM_1</span><span class="p">,</span> <span class="n">TM_E</span> <span class="o">=</span> <span class="n">transferMatricesModule</span><span class="o">.</span><span class="n">primaryGammaAngularData</span><span class="p">(</span> <span class="n">processInfo</span><span class="p">,</span> <span class="n">projectileName</span><span class="p">,</span> <span class="n">productName</span><span class="p">,</span> <span class="n">ELevel</span><span class="p">,</span> <span class="n">massRatio</span><span class="p">,</span> <span class="n">crossSection</span><span class="p">,</span>
+                   <span class="n">angularSubform</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;transferMatrixComment&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; outgoing data for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;productLabel&#39;</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;Unsupported gamma; gamma must be &quot;discrete&quot; or &quot;primary&quot;&#39;</span> <span class="p">)</span>
+            <span class="n">miscellaneousModule</span><span class="o">.</span><span class="n">TMs2Form</span><span class="p">(</span> <span class="n">processInfo</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">newForms</span><span class="p">,</span> <span class="n">TM_1</span><span class="p">,</span> <span class="n">TM_E</span><span class="p">,</span> <span class="n">crossSection</span><span class="o">.</span><span class="n">axes</span> <span class="p">)</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">newForms</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="form.parseXMLNode"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.form.parseXMLNode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">angularElement</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Translate &lt;angular&gt; element from xml.&quot;&quot;&quot;</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">angularElement</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">subformClass</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">isotropic2d</span><span class="o">.</span><span class="n">moniker</span>   <span class="p">:</span> <span class="n">isotropic2d</span><span class="p">,</span>
+                <span class="n">forward</span><span class="o">.</span><span class="n">moniker</span>     <span class="p">:</span> <span class="n">forward</span><span class="p">,</span>
+                <span class="n">XYs2d</span><span class="o">.</span><span class="n">moniker</span>       <span class="p">:</span> <span class="n">XYs2d</span><span class="p">,</span>
+                <span class="n">regions2d</span><span class="o">.</span><span class="n">moniker</span>   <span class="p">:</span> <span class="n">regions2d</span><span class="p">,</span>
+            <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">angularElement</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">subformClass</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;encountered unknown angular subform: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">angularElement</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">angularSubform</span> <span class="o">=</span> <span class="n">subformClass</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">angularElement</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">angularSubform</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="twoBodyForm"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.twoBodyForm">[docs]</a><span class="k">class</span> <span class="nc">twoBodyForm</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">form</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;angularTwoBody&#39;</span>
+    <span class="n">subformAttributes</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;angularSubform&#39;</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="n">subformAttributes</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">angularSubform</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">angularSubform</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">baseModule</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="p">(</span> <span class="n">angularSubform</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="twoBodyForm.averageMu"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.twoBodyForm.averageMu">[docs]</a>    <span class="k">def</span> <span class="nf">averageMu</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+ 
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">averageMu</span><span class="p">(</span> <span class="n">E</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="twoBodyForm.calculateAverageProductData"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.twoBodyForm.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;productFrame&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="twoBodyForm.convertUnits"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.twoBodyForm.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;See documentation for reactionSuite.convertUnits.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="twoBodyForm.evaluate"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.twoBodyForm.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">phi</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">frame</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">frame</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">energy</span> <span class="p">)</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">mu</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;Only frame of product is currently supported&#39;</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="twoBodyForm.getEnergyArray"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.twoBodyForm.getEnergyArray">[docs]</a>    <span class="k">def</span> <span class="nf">getEnergyArray</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">EMin</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">EMax</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">getEnergyArray</span><span class="p">(</span> <span class="n">EMin</span> <span class="o">=</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span> <span class="o">=</span> <span class="n">EMax</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="twoBodyForm.invert"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.twoBodyForm.invert">[docs]</a>    <span class="k">def</span> <span class="nf">invert</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="twoBodyForm.isIsotropic"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.twoBodyForm.isIsotropic">[docs]</a>    <span class="k">def</span> <span class="nf">isIsotropic</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">isIsotropic</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="twoBodyForm.isTwoBody"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.twoBodyForm.isTwoBody">[docs]</a>    <span class="k">def</span> <span class="nf">isTwoBody</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="twoBodyForm.processMC_cdf"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.twoBodyForm.processMC_cdf">[docs]</a>    <span class="k">def</span> <span class="nf">processMC_cdf</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">verbosity</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span>
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">Grouping </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">))</span>
+
+        <span class="n">subform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">to_xs_pdf_cdf1d</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">subform</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="kc">None</span> <span class="p">)</span>
+
+        <span class="n">form</span> <span class="o">=</span> <span class="n">twoBodyForm</span><span class="p">(</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span><span class="p">,</span> <span class="n">subform</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">form</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="twoBodyForm.processMultiGroup"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.twoBodyForm.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.processing</span> <span class="k">import</span> <span class="n">group</span> <span class="k">as</span> <span class="n">groupModule</span>
+        <span class="kn">from</span> <span class="nn">fudge.processing.deterministic</span> <span class="k">import</span> <span class="n">transferMatrices</span> <span class="k">as</span> <span class="n">transferMatricesModule</span>
+
+        <span class="n">verbosity</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span>
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">]</span>
+        <span class="n">productLabel</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;productLabel&#39;</span><span class="p">]</span>
+        <span class="n">outputChannel</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;reaction&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">outputChannel</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">Grouping </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">))</span>
+
+        <span class="n">angularSubform</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">angularSubform</span><span class="p">,</span> <span class="n">recoil</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">angularSubform</span> <span class="o">=</span> <span class="n">angularSubform</span><span class="o">.</span><span class="n">getNumericalDistribution</span><span class="p">(</span> <span class="p">)</span>
+
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">outputChannel</span><span class="o">.</span><span class="n">Q</span><span class="p">[</span><span class="s1">&#39;eval&#39;</span><span class="p">]</span>
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">Q</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">)</span>
+<span class="c1"># BRBBRB</span>
+        <span class="n">residual</span> <span class="o">=</span> <span class="n">outputChannel</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;productIndex&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="n">residual</span> <span class="o">=</span> <span class="n">outputChannel</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">residualMass</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;masses&#39;</span><span class="p">][</span><span class="s1">&#39;Residual&#39;</span><span class="p">]</span>
+        <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;masses&#39;</span><span class="p">][</span><span class="s1">&#39;Residual&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">residual</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;massUnit&#39;</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">TM_1</span><span class="p">,</span> <span class="n">TM_E</span> <span class="o">=</span> <span class="n">transferMatricesModule</span><span class="o">.</span><span class="n">twoBodyTransferMatrix</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;crossSection&#39;</span><span class="p">],</span> <span class="n">angularSubform</span><span class="p">,</span> 
+                <span class="n">Q</span><span class="p">,</span> <span class="n">comment</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;transferMatrixComment&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; outgoing data for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">productLabel</span> <span class="p">)</span>
+        <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;masses&#39;</span><span class="p">][</span><span class="s1">&#39;Residual&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">residualMass</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">groupModule</span><span class="o">.</span><span class="n">TMs2Form</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">TM_1</span><span class="p">,</span> <span class="n">TM_E</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="twoBodyForm.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.twoBodyForm.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angularSubform</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="twoBodyForm.parseXMLNode"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.twoBodyForm.parseXMLNode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">angularElement</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Translate &lt;angularTwoBody&gt; element from xml. Returns instance of angular.twoBodyForm.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">angularElement</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+        <span class="n">subformElement</span> <span class="o">=</span> <span class="n">angularElement</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">subformClass</span> <span class="o">=</span> <span class="p">{</span>    <span class="n">isotropic2d</span><span class="o">.</span><span class="n">moniker</span>   <span class="p">:</span> <span class="n">isotropic2d</span><span class="p">,</span>
+                            <span class="n">recoil</span><span class="o">.</span><span class="n">moniker</span>      <span class="p">:</span> <span class="n">recoil</span><span class="p">,</span>
+                            <span class="n">XYs2d</span><span class="o">.</span><span class="n">moniker</span>       <span class="p">:</span> <span class="n">XYs2d</span><span class="p">,</span>
+                            <span class="n">regions2d</span><span class="o">.</span><span class="n">moniker</span>   <span class="p">:</span> <span class="n">regions2d</span><span class="p">,</span>
+            <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">subformElement</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">subformClass</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s1">&#39;unknown angular subform &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">subformElement</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">angularSubform</span> <span class="o">=</span> <span class="n">subformClass</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">subformElement</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="n">angularForm</span> <span class="o">=</span> <span class="n">twoBodyForm</span><span class="p">(</span> <span class="n">angularElement</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;label&#39;</span> <span class="p">),</span> 
+                <span class="n">angularElement</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;productFrame&#39;</span> <span class="p">),</span> <span class="n">angularSubform</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">angularForm</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="calculateAverageProductData"><a class="viewcode-back" href="../../../../../fudge/fudge.gnds.productData.distributions.html#fudge.gnds.productData.distributions.angular.calculateAverageProductData">[docs]</a><span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function calculates average product data for two-body reactions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">calculateDepositionEnergyAtE</span><span class="p">(</span> <span class="n">angularData</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">parameters</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">a1x</span><span class="p">,</span> <span class="n">a2y</span><span class="p">,</span> <span class="n">Qp</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;a1x&#39;</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;a2y&#39;</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;Qp&#39;</span><span class="p">]</span>
+        <span class="n">dE</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">E</span> <span class="o">-</span> <span class="n">Qp</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">a1x</span> <span class="o">*</span> <span class="n">E</span> <span class="o">+</span> <span class="n">a2y</span> <span class="o">*</span> <span class="n">dE</span> <span class="o">+</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">a1x</span> <span class="o">*</span> <span class="n">a2y</span> <span class="o">*</span> <span class="n">E</span> <span class="o">*</span> <span class="n">dE</span> <span class="p">)</span> <span class="o">*</span> <span class="n">angularData</span><span class="o">.</span><span class="n">averageMu</span><span class="p">(</span> <span class="n">E</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">energyAccuracy</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">calculateDepositionEnergyAtEForPhotoProjectile</span><span class="p">(</span> <span class="n">angularData</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">parameters</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">mass2</span><span class="p">,</span> <span class="n">massx</span><span class="p">,</span> <span class="n">massy</span><span class="p">,</span> <span class="n">Q</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;m2&#39;</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;mx&#39;</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;my&#39;</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span>
+        <span class="n">E__E_m2</span> <span class="o">=</span> <span class="n">E</span> <span class="o">/</span> <span class="p">(</span> <span class="n">E</span> <span class="o">+</span> <span class="n">mass2</span> <span class="p">)</span>
+        <span class="n">dE</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="mf">0.</span><span class="p">,</span> <span class="p">(</span> <span class="n">E__E_m2</span> <span class="o">*</span> <span class="n">mass2</span> <span class="p">)</span> <span class="o">+</span> <span class="n">Q</span> <span class="p">)</span> <span class="o">*</span> <span class="n">massy</span> <span class="o">/</span> <span class="p">(</span> <span class="n">massx</span> <span class="o">+</span> <span class="n">massy</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">E__E_m2</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">massx</span> <span class="o">+</span> <span class="n">dE</span> <span class="o">+</span> <span class="n">E__E_m2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">dE</span> <span class="o">*</span> <span class="n">massx</span> <span class="p">)</span> <span class="o">*</span> <span class="n">angularData</span><span class="o">.</span><span class="n">averageMu</span><span class="p">(</span> <span class="n">E</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">energyAccuracy</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">calculateDepositionEnergyThicken</span> <span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">angular</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">relativeTolerance</span><span class="p">,</span> <span class="n">absoluteTolerance</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">angular</span> <span class="o">=</span> <span class="n">angular</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">relativeTolerance</span> <span class="o">=</span> <span class="n">relativeTolerance</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">absoluteTolerance</span> <span class="o">=</span> <span class="n">absoluteTolerance</span>
+
+        <span class="k">def</span> <span class="nf">evaluateAtX</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angular</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">calculateDepositionMomentumAtE</span><span class="p">(</span> <span class="n">angularData</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">parameters</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">mass1</span><span class="p">,</span> <span class="n">massx</span><span class="p">,</span> <span class="n">b1x</span><span class="p">,</span> <span class="n">a2y</span><span class="p">,</span> <span class="n">Qp</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;m1&#39;</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;mx&#39;</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;b1x&#39;</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;a2y&#39;</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;Qp&#39;</span><span class="p">]</span>
+        <span class="n">dE</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">E</span> <span class="o">-</span> <span class="n">Qp</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">b1x</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">E</span> <span class="o">/</span> <span class="n">mass1</span> <span class="p">)</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">massx</span> <span class="o">*</span> <span class="n">a2y</span> <span class="o">*</span> <span class="n">dE</span> <span class="p">)</span> <span class="o">*</span> <span class="n">angularData</span><span class="o">.</span><span class="n">averageMu</span><span class="p">(</span> <span class="n">E</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">momentumAccuracy</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">calculateDepositionMomentumAtEForPhotoProjectile</span><span class="p">(</span> <span class="n">angularData</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">parameters</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">mass2</span><span class="p">,</span> <span class="n">massx</span><span class="p">,</span> <span class="n">massy</span><span class="p">,</span> <span class="n">Q</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;m2&#39;</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;mx&#39;</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;my&#39;</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;Q&#39;</span><span class="p">]</span>
+        <span class="n">E__E_m2</span> <span class="o">=</span> <span class="n">E</span> <span class="o">/</span> <span class="p">(</span> <span class="n">E</span> <span class="o">+</span> <span class="n">mass2</span> <span class="p">)</span>
+        <span class="n">dE</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="mf">0.</span><span class="p">,</span> <span class="p">(</span> <span class="n">E__E_m2</span> <span class="o">*</span> <span class="n">mass2</span> <span class="p">)</span> <span class="o">+</span> <span class="n">Q</span> <span class="p">)</span> <span class="o">*</span> <span class="n">massy</span> <span class="o">/</span> <span class="p">(</span> <span class="n">massx</span> <span class="o">+</span> <span class="n">massy</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">E__E_m2</span> <span class="o">*</span> <span class="n">massx</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">dE</span> <span class="o">*</span> <span class="n">massx</span> <span class="p">)</span> <span class="o">*</span> <span class="n">angularData</span><span class="o">.</span><span class="n">averageMu</span><span class="p">(</span> <span class="n">E</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">momentumAccuracy</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">calculateDepositionMomentumThicken</span> <span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">angular</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">relativeTolerance</span><span class="p">,</span> <span class="n">absoluteTolerance</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">angular</span> <span class="o">=</span> <span class="n">angular</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">relativeTolerance</span> <span class="o">=</span> <span class="n">relativeTolerance</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">absoluteTolerance</span> <span class="o">=</span> <span class="n">absoluteTolerance</span>
+
+        <span class="k">def</span> <span class="nf">evaluateAtX</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">angular</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;calculateAverageProductData&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>      <span class="c1"># This happends when, for example, the angular is a regions2d form.</span>
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="n">energyUnit</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;incidentEnergyUnit&#39;</span><span class="p">]</span>
+    <span class="n">massUnit</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;massUnit&#39;</span><span class="p">]</span>
+    <span class="n">energyAccuracy</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;energyAccuracy&#39;</span><span class="p">]</span>
+    <span class="n">momentumAccuracy</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;momentumAccuracy&#39;</span><span class="p">]</span>
+    <span class="n">reactionSuite</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span>
+    <span class="n">reaction</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;reaction&#39;</span><span class="p">]</span>
+    <span class="n">outputChannel</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;outputChannel&#39;</span><span class="p">]</span>
+    <span class="n">productIndex</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;productIndex&#39;</span><span class="p">]</span>
+
+    <span class="n">mass1</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;projectileMass&#39;</span><span class="p">]</span>
+    <span class="n">mass2</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;targetMass&#39;</span><span class="p">]</span>
+
+    <span class="n">productx</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span> <span class="n">outputChannel</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span> <span class="p">]</span>
+    <span class="n">producty</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span> <span class="n">outputChannel</span><span class="o">.</span><span class="n">products</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">id</span> <span class="p">]</span>
+    <span class="k">if</span> <span class="n">productx</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span> <span class="n">productx</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span> <span class="n">productx</span><span class="o">.</span><span class="n">pid</span> <span class="p">]</span>
+    <span class="k">if</span> <span class="n">producty</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span> <span class="n">producty</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span> <span class="n">producty</span><span class="o">.</span><span class="n">pid</span> <span class="p">]</span>
+    <span class="n">massx</span> <span class="o">=</span> <span class="n">productx</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span> <span class="n">massUnit</span> <span class="p">)</span>
+    <span class="n">massy</span> <span class="o">=</span> <span class="n">producty</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span> <span class="n">massUnit</span> <span class="p">)</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="n">productIndex</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="n">massx</span><span class="p">,</span> <span class="n">massy</span> <span class="o">=</span> <span class="n">massy</span><span class="p">,</span> <span class="n">massx</span>
+    <span class="n">m12</span><span class="p">,</span> <span class="n">mxy</span> <span class="o">=</span> <span class="n">mass1</span> <span class="o">+</span> <span class="n">mass2</span><span class="p">,</span> <span class="n">massx</span> <span class="o">+</span> <span class="n">massy</span>
+    <span class="n">b1x</span><span class="p">,</span> <span class="n">a1x</span><span class="p">,</span> <span class="n">a2y</span> <span class="o">=</span> <span class="n">mass1</span> <span class="o">*</span> <span class="n">massx</span> <span class="o">/</span> <span class="n">m12</span><span class="p">,</span> <span class="n">mass1</span> <span class="o">*</span> <span class="n">massx</span> <span class="o">/</span> <span class="p">(</span> <span class="n">m12</span> <span class="o">*</span> <span class="n">m12</span> <span class="p">),</span> <span class="n">mass2</span> <span class="o">*</span> <span class="n">massy</span> <span class="o">/</span> <span class="p">(</span> <span class="n">m12</span> <span class="o">*</span> <span class="n">mxy</span> <span class="p">)</span>
+    <span class="n">Qm</span> <span class="o">=</span> <span class="n">m12</span> <span class="o">-</span> <span class="n">mxy</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">reaction</span><span class="o">.</span><span class="n">getQ</span><span class="p">(</span> <span class="n">energyUnit</span><span class="p">,</span> <span class="n">final</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span>
+    <span class="n">Qp</span> <span class="o">=</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span> <span class="n">Q</span> <span class="p">)</span> <span class="o">*</span> <span class="n">m12</span> <span class="o">/</span> <span class="n">mass2</span>              <span class="c1"># This is the threshold in the COM frame.</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="n">mass1</span> <span class="o">==</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">:</span>                         <span class="c1"># Photo as projectile</span>
+        <span class="n">energyFunc</span> <span class="o">=</span> <span class="n">calculateDepositionEnergyAtEForPhotoProjectile</span>
+        <span class="n">momentumFunc</span> <span class="o">=</span> <span class="n">calculateDepositionMomentumAtEForPhotoProjectile</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;m2&#39;</span> <span class="p">:</span> <span class="n">mass2</span><span class="p">,</span> <span class="s1">&#39;mx&#39;</span> <span class="p">:</span> <span class="n">massx</span><span class="p">,</span> <span class="s1">&#39;my&#39;</span> <span class="p">:</span> <span class="n">massy</span><span class="p">,</span> <span class="s1">&#39;Q&#39;</span> <span class="p">:</span> <span class="n">Q</span> <span class="p">}</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">energyFunc</span> <span class="o">=</span> <span class="n">calculateDepositionEnergyAtE</span>
+        <span class="n">momentumFunc</span> <span class="o">=</span> <span class="n">calculateDepositionMomentumAtE</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;m1&#39;</span> <span class="p">:</span> <span class="n">mass1</span><span class="p">,</span> <span class="s1">&#39;mx&#39;</span> <span class="p">:</span> <span class="n">massx</span><span class="p">,</span> <span class="s1">&#39;a1x&#39;</span> <span class="p">:</span> <span class="n">a1x</span><span class="p">,</span> <span class="s1">&#39;a2y&#39;</span> <span class="p">:</span> <span class="n">a2y</span><span class="p">,</span> <span class="s1">&#39;b1x&#39;</span> <span class="p">:</span> <span class="n">b1x</span><span class="p">,</span> <span class="s1">&#39;Qp&#39;</span> <span class="p">:</span> <span class="n">Qp</span> <span class="p">}</span>
+
+    <span class="n">Es</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getEnergyArray</span><span class="p">(</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;EMin&#39;</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;EMax&#39;</span><span class="p">]</span> <span class="p">)</span>
+    <span class="n">aveEnergy</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">E</span><span class="p">,</span> <span class="n">energyFunc</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">parameters</span> <span class="p">)</span> <span class="p">]</span> <span class="k">for</span> <span class="n">E</span> <span class="ow">in</span> <span class="n">Es</span> <span class="p">]</span>
+    <span class="n">aveEnergy</span> <span class="o">=</span> <span class="n">fudgemath</span><span class="o">.</span><span class="n">thickenXYList</span><span class="p">(</span> <span class="n">aveEnergy</span><span class="p">,</span> <span class="n">calculateDepositionEnergyThicken</span><span class="p">(</span> <span class="n">aveEnergy</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">energyFunc</span><span class="p">,</span> 
+            <span class="n">parameters</span><span class="p">,</span> <span class="n">energyAccuracy</span><span class="p">,</span> <span class="mf">1e-10</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="n">aveMomentum</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">E</span><span class="p">,</span> <span class="n">momentumFunc</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">parameters</span> <span class="p">)</span> <span class="p">]</span> <span class="k">for</span> <span class="n">E</span> <span class="ow">in</span> <span class="n">Es</span> <span class="p">]</span>
+    <span class="n">aveMomentum</span> <span class="o">=</span> <span class="n">fudgemath</span><span class="o">.</span><span class="n">thickenXYList</span><span class="p">(</span> <span class="n">aveMomentum</span><span class="p">,</span> <span class="n">calculateDepositionMomentumThicken</span><span class="p">(</span> <span class="n">aveMomentum</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">momentumFunc</span><span class="p">,</span> 
+            <span class="n">parameters</span><span class="p">,</span> <span class="n">momentumAccuracy</span><span class="p">,</span> <span class="mf">1e-10</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="n">aveEnergy</span> <span class="p">],</span> <span class="p">[</span> <span class="n">aveMomentum</span> <span class="p">]</span> <span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../../index.html">
+              <img class="logo" src="../../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

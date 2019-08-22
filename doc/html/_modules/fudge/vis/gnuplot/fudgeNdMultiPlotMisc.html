@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.vis.gnuplot.fudgeNdMultiPlotMisc &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.vis.gnuplot.fudgeNdMultiPlotMisc &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,7 +25,7 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +35,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -84,7 +81,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">lines</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span> <span class="o">=</span> <span class="n">fileName</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span> <span class="o">=</span> <span class="n">dimension</span>
-        <span class="n">tkSimpleDialog</span><span class="o">.</span><span class="n">Dialog</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="n">title</span> <span class="p">)</span>
+        <span class="n">tkSimpleDialog</span><span class="o">.</span><span class="n">Dialog</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="n">title</span> <span class="p">)</span>
 
 <div class="viewcode-block" id="fudgeNdMultiPlotFileReadGetInfo.body"><a class="viewcode-back" href="../../../../fudge/fudge.vis.gnuplot.html#fudge.vis.gnuplot.fudgeNdMultiPlotMisc.fudgeNdMultiPlotFileReadGetInfo.body">[docs]</a>    <span class="k">def</span> <span class="nf">body</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">frame</span> <span class="p">)</span> <span class="p">:</span>
 
@@ -253,7 +250,7 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
 
-        <span class="n">fudgeNdMultiPlotItem</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;system&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">active</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span>
+        <span class="n">fudgeNdMultiPlotItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;system&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">active</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lineType</span> <span class="o">=</span> <span class="s1">&#39;solid&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lineWidth</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">symbolType</span> <span class="o">=</span> <span class="s1">&#39;none&#39;</span>
@@ -268,7 +265,7 @@
         <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">()</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">dimension_</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">dimension</span> <span class="o">!=</span> <span class="n">dimension_</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s2">&quot;dimension = </span><span class="si">%d</span><span class="s2"> does not agree with data&#39;s dimension of </span><span class="si">%d</span><span class="s2"> for title = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> \
             <span class="p">(</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">dimension_</span><span class="p">,</span> <span class="n">title</span> <span class="p">)</span> <span class="p">)</span>
-        <span class="n">fudgeNdMultiPlotItem</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">active</span> <span class="o">=</span> <span class="n">active</span> <span class="p">)</span>
+        <span class="n">fudgeNdMultiPlotItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">active</span> <span class="o">=</span> <span class="n">active</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gnuPlotItem</span> <span class="o">=</span> <span class="n">Gnuplot</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="n">title</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="fudgeNdMultiPlotFile"><a class="viewcode-back" href="../../../../fudge/fudge.vis.gnuplot.html#fudge.vis.gnuplot.fudgeNdMultiPlotMisc.fudgeNdMultiPlotFile">[docs]</a><span class="k">class</span> <span class="nc">fudgeNdMultiPlotFile</span><span class="p">(</span> <span class="n">fudgeNdMultiPlotItem</span> <span class="p">)</span> <span class="p">:</span>
@@ -276,7 +273,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">,</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">active</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">replot</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">xColumn</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">yColumn</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">zColumn</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">tColumn</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="k">if</span><span class="p">(</span> <span class="n">title</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span> <span class="p">:</span> <span class="n">title</span> <span class="o">=</span> <span class="n">fileName</span>
-        <span class="n">fudgeNdMultiPlotItem</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">active</span> <span class="o">=</span> <span class="n">active</span><span class="p">,</span> <span class="n">xColumn</span> <span class="o">=</span> <span class="n">xColumn</span><span class="p">,</span> <span class="n">yColumn</span> <span class="o">=</span> <span class="n">yColumn</span><span class="p">,</span> <span class="n">zColumn</span> <span class="o">=</span> <span class="n">zColumn</span><span class="p">,</span> <span class="n">tColumn</span> <span class="o">=</span> <span class="n">yColumn</span> <span class="p">)</span>
+        <span class="n">fudgeNdMultiPlotItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">active</span> <span class="o">=</span> <span class="n">active</span><span class="p">,</span> <span class="n">xColumn</span> <span class="o">=</span> <span class="n">xColumn</span><span class="p">,</span> <span class="n">yColumn</span> <span class="o">=</span> <span class="n">yColumn</span><span class="p">,</span> <span class="n">zColumn</span> <span class="o">=</span> <span class="n">zColumn</span><span class="p">,</span> <span class="n">tColumn</span> <span class="o">=</span> <span class="n">yColumn</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gnuPlotItem</span> <span class="o">=</span> <span class="n">fileName</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gnuPlotItem</span> <span class="o">=</span> <span class="n">Gnuplot</span><span class="o">.</span><span class="n">File</span><span class="p">(</span> <span class="n">fileName</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="n">title</span> <span class="p">)</span></div>
 
@@ -749,13 +746,13 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

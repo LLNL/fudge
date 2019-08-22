@@ -65,11 +65,10 @@ from pqu import PQU as PQUModule
 
 from xData import multiD_XYs as multiD_XYsModule
 
-from xData import series1d as series1dModule
-from fudge.gnd.productData.distributions import energyAngular as energyAngularModule
+from fudge.gnds.productData.distributions import energyAngular as energyAngularModule
 
 from ... import endfFormats as endfFormatsModule
-from ... import gndToENDF6 as gndToENDF6Module
+from ... import gndsToENDF6 as gndsToENDF6Module
 
 #
 # form
@@ -80,9 +79,9 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     frame = self.productFrame
     if( hasattr( subform, 'toENDF6' ) ) :
         LAW, MF6 = subform.toENDF6( flags, targetInfo )
-        gndToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, frame, MF6 )
+        gndsToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, frame, MF6 )
     else :
-        print 'WARNING: energyAngular subform "%s" has no toENDF6 method' % subform.moniker
+        print( 'WARNING: energyAngular subform "%s" has no toENDF6 method' % subform.moniker )
 
 energyAngularModule.form.toENDF6 = toENDF6
 
@@ -91,8 +90,8 @@ energyAngularModule.form.toENDF6 = toENDF6
 #
 def toENDF6( self, flags, targetInfo ) :
 
-    EInInterpolation = gndToENDF6Module.gndToENDF2PlusDInterpolationFlag( self.interpolation, self.interpolationQualifier )
-    EpInterpolation0 = gndToENDF6Module.gndToENDF2PlusDInterpolationFlag( self[0].interpolation, self[0].interpolationQualifier )
+    EInInterpolation = gndsToENDF6Module.gndsToENDF2PlusDInterpolationFlag( self.interpolation, self.interpolationQualifier )
+    EpInterpolation0 = gndsToENDF6Module.gndsToENDF2PlusDInterpolationFlag( self[0].interpolation, self[0].interpolationQualifier )
     if( EpInterpolation0 == 1 ) :       # flat interpolation
         LEP = 1
     elif( EpInterpolation0 == 2 ) :     # lin-lin interpolation
@@ -105,7 +104,7 @@ def toENDF6( self, flags, targetInfo ) :
     if( not( isinstance( self[0], multiD_XYsModule.XYs2d ) ) ) : raise 'hell - fix me'
     if( isinstance( self[0][0], energyAngularModule.Legendre ) ) :
         for energyIn in self :
-            EpInterpolation = gndToENDF6Module.gndToENDF2PlusDInterpolationFlag( energyIn.interpolation, energyIn.interpolationQualifier )
+            EpInterpolation = gndsToENDF6Module.gndsToENDF2PlusDInterpolationFlag( energyIn.interpolation, energyIn.interpolationQualifier )
             if( EpInterpolation != EpInterpolation0 ) : raise 'hell - fix me'
             NA, data = 0, []
             for energy_p in energyIn :
@@ -119,7 +118,7 @@ def toENDF6( self, flags, targetInfo ) :
         LANG = 1
     elif( isinstance( self[0][0], energyAngularModule.XYs1d ) ) :
         for energyIn in self :
-            EpInterpolation = gndToENDF6Module.gndToENDF2PlusDInterpolationFlag( energyIn.interpolation, energyIn.interpolationQualifier )
+            EpInterpolation = gndsToENDF6Module.gndsToENDF2PlusDInterpolationFlag( energyIn.interpolation, energyIn.interpolationQualifier )
             if( EpInterpolation != EpInterpolation0 ) : raise 'hell - fix me'
             data = []
             NAp = 2 * len( energyIn[0] )

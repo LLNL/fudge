@@ -61,6 +61,8 @@
 # 
 # <<END-copyright>>
 
+from __future__ import print_function
+
 __metaclass__ = type
 
 import ancestry as ancestryModule
@@ -110,6 +112,19 @@ class table( ancestryModule.ancestry ):
             [row.append(0) for row in self.data]
         for idx, col in enumerate(self.columns): col.index = idx
 
+    def convertUnits( self, unitMap ):
+        """
+        unitMap is a dictionary of the form { 'eV' : 'MeV', 'b' : 'mb' }.
+        Converts all columns whose units appear as keys in unitMap
+        """
+
+        for idx, column in enumerate(self.columns):
+            if column.unit in unitMap:
+                factor = PQUModule.PQU(1, column.unit).getValueAs(unitMap[column.unit])
+                column.unit = unitMap[column.unit]
+                for row in self.data:
+                    row[idx] *= factor
+
     def getColumn( self, columnNameOrIndex, unit=None ):
         """ get data from one column, identified by the column 'name' attribute.
         Convert results to desired unit if specified """
@@ -142,6 +157,7 @@ class table( ancestryModule.ancestry ):
         addHeaderUnit = kwargs.get( 'addHeaderUnit', False )
         outline = kwargs.get( 'outline', False )
         columnWidths = [0] * self.nColumns
+        xml = []
         for col in range(self.nColumns):
             columnDat = [row[col] for row in self.data if not isinstance(row[col], blank)]
             asStrings = map( PQUModule.toShortestString, columnDat )
@@ -165,7 +181,7 @@ class table( ancestryModule.ancestry ):
 
             header = ['%s<!--' % (' '*(len(indent)-1)) + ' | '.join([('%%%is'%columnWidths[i]) % nameList[i]
                 for i in range(self.nColumns)]) + '  -->'   for nameList in names]
-            xml = header
+            xml += header
 
         if addHeaderUnit:
             """ put column unit at the top of the table """
@@ -280,7 +296,7 @@ if __name__ == '__main__':
             [5.6, 1.5, 2.76, blank()]):
         tt.addRow( dat )
     xmlstring = '\n'.join( tt.toXMLList() )
-    print xmlstring
+    print(xmlstring)
 
     from xml.etree import cElementTree as parser
     element = parser.fromstring( xmlstring )
@@ -289,4 +305,4 @@ if __name__ == '__main__':
     assert xmlstring == xmlstring2
 
     # extract a column, converting eV -> MeV
-    print tt2.getColumn('captureWidth','MeV')
+    print(tt2.getColumn('captureWidth', 'MeV'))

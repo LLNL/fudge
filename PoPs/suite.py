@@ -85,20 +85,17 @@ class suite( ancestryModule.ancestry ) :
         | allowedClasses    | A list of classes. Only objects matching one of the   |
         |                   | classes can be add.                                   |
         + ------------------+-------------------------------------------------------+
-        | key               | The name of the member in an object that is used as   |
-        |                   | the key. Default is 'label'.                          |
-        + ------------------+-------------------------------------------------------+
         | replace           | If False, the add method will only allow an object to |
-        |                   | be insert if no object object in the list has the     |
-        |                   | same key. If True, and an object of the same key      |
-        |                   | exists, the added object replaces the old object at   |
+        |                   | be insert if no object in the list has the same key.  |
+        |                   | If True and an object of the same key exists the      |
+        |                   | added object replaces the old object at the same      |
         |                   | position in the list. Default is True.                |
         + ------------------+-------------------------------------------------------+
     """
 
     __metaclass__ = abc.ABCMeta
 
-    def __init__( self, allowedClasses, key = 'label', replace = True ) :
+    def __init__( self, allowedClasses, replace = True ) :
 
         ancestryModule.ancestry.__init__( self )
 
@@ -111,9 +108,6 @@ class suite( ancestryModule.ancestry ) :
         if( not( isinstance( replace, bool ) ) ) : raise TypeError( 'replace must be a bool instance.' )
         self.__replace = replace
 
-        if( not( isinstance( key, str ) ) ) : raise TypeError( 'key must be a string instance.' )
-        self.__key = key
-
         self.__items = []
 
     def __contains__( self, key ) :
@@ -123,7 +117,7 @@ class suite( ancestryModule.ancestry ) :
         return( False )
 
     def __getitem__( self, key ) :
-        if not self.__items: raise KeyError('suite is empty')
+
         if( isinstance( key, int ) ) : return( self.__items[key] )
         if( not( isinstance( key, str ) ) ) : raise TypeError( 'key must be a string' )
 
@@ -146,11 +140,6 @@ class suite( ancestryModule.ancestry ) :
         return( self.__allowedClasses )     # No fear, user cannot alter as __allowedClasses is a tuple.
 
     @property
-    def key( self ) :
-
-        return( self.__key )
-
-    @property
     def replace( self ) :
 
         return( self.__replace )
@@ -165,7 +154,7 @@ class suite( ancestryModule.ancestry ) :
         if( not( classAllowed ) ) : raise TypeError( 'Invalid class "%s" for suite "%s"' % ( item.__class__, self.moniker ) )
 
         index, replace = self.addIndex( item )
-        item.setAncestor( self, attribute = self.__key )
+        item.setAncestor( self, attribute = item.keyName )
         if( replace ) : del self.__items[index]
         self.__items.insert( index, item )
 
@@ -178,7 +167,7 @@ class suite( ancestryModule.ancestry ) :
         for i1, _item in enumerate( self.__items ) :
             if( _item.key == item.key ) :
                 if( self.replace ) : return( i1, True )
-                raise KeyError( 'item with key = "%s" already present in non-replaceable suite' % getattr( item.key ) )
+                raise KeyError( 'item with key = "%s" already present in non-replaceable suite' % item.key )
         return( index, False )
 
     def check( self, info ):
@@ -202,6 +191,10 @@ class suite( ancestryModule.ancestry ) :
                 del self.__items[i1]
                 return( True )
         return( False )
+
+    def replicate( self, other ) :
+
+        for item in other : self.add( item.copy( ) )
 
     def toXML( self, indent = "", **kwargs ) :
 
@@ -275,9 +268,7 @@ class suite( ancestryModule.ancestry ) :
     @classmethod
     def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
 
-        kwargs = element.attrib.copy( )
-        if( 'Z' in kwargs ) : kwargs['Z'] = int( kwargs['Z'] )
-        return( cls( **kwargs ).parseXMLNode( element, xPath, linkData ) )
+        return( cls( element.attrib ).parseXMLNode( element, xPath, linkData ) )
 
     @classmethod
     def parseXMLStringAsClass( cls, string ) :
@@ -296,7 +287,7 @@ class sortedSuite( suite ) :
             cmp = item.sortCompare( _item )
             if( cmp == 0 ) :
                 if( self.replace ) : return( i1, True )
-                raise KeyError( 'item with key = "%s" already present in non-replaceable suite' % getattr( item, self.__key ) )
+                raise KeyError( 'item with key = "%s" already present in non-replaceable suite' % item.key )
             elif( cmp < 0 ) :
                 return( i1, False )
         return( len( self ), False )

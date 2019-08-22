@@ -63,21 +63,23 @@
 
 import xData.XYs as XYsModule
 import xData.regions as regionsModule
+import xData.standards as standardsModule
 
 from PoPs import IDs as IDsPoPsModule
-from PoPs.families import nuclearLevel as nuclearLevelModule
+from PoPs.families import nuclide as nuclideModule
+from PoPs.groups import misc as chemicalElementMiscModule
 
 from fudge.legacy.converting import endf_endl as endf_endlModule
-from fudge.gnd import tokens as tokensModule
-from fudge.gnd import channels as channelsModule
-from fudge.gnd.reactions import base as baseModule
-from fudge.gnd.productData import multiplicity as multiplicityModule
-from fudge.gnd.differentialCrossSection import CoulombElastic
-from fudge.gnd.channelData.fissionEnergyReleased import fissionEnergyReleased
-from fudge.gnd.productData.distributions import angular as angularModule
-from fudge.gnd.productData.distributions import unspecified as unspecifiedModule
+from fudge.gnds import tokens as tokensModule
+from fudge.gnds import channels as channelsModule
+from fudge.gnds.reactions import base as baseModule
+from fudge.gnds.productData import multiplicity as multiplicityModule
+from fudge.gnds.reactionData.doubleDifferentialCrossSection.chargedParticleElastic import CoulombPlusNuclearElastic
+from fudge.gnds.channelData.fissionEnergyReleased import fissionEnergyReleased
+from fudge.gnds.productData.distributions import angular as angularModule
+from fudge.gnds.productData.distributions import unspecified as unspecifiedModule
 
-from .. import gndToENDF6 as gndToENDF6Module
+from .. import gndsToENDF6 as gndsToENDF6Module
 from .. import endfFormats as endfFormatsModule
 
 def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
@@ -87,10 +89,11 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
         if( parent.outputChannel is None ) : return( False )
         doMF4AsMF6 = False
         for product in parent.outputChannel :
+            conversionFlag = targetInfo['ENDFconversionFlags'].get(product,"")
             if( len( product.distribution ) and not isinstance( product.distribution.evaluated, unspecifiedModule.form ) ) :
-                if ( product.id not in ( 'n', IDsPoPsModule.photon ) ) :   # MF4/5 can only handle neutrons
+                if ( product.id not in ( IDsPoPsModule.neutron, IDsPoPsModule.photon ) ) :   # MF4/5 can only handle neutrons
                     doMF4AsMF6 = True
-                elif ( product.attributes.get( 'ENDFconversionFlag' ) == 'MF6' ) :  # sometimes neutrons still go in MF6
+                elif ( conversionFlag == 'MF6' ) :  # sometimes neutrons still go in MF6
                     doMF4AsMF6 = True
         return( doMF4AsMF6 )
 
@@ -134,19 +137,21 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
                 thinnedWeights.append( weights[i-1] )
         return( thinnedWeights )
 
-    if self.dCrossSection_dOmega:
-        differentialForm = self.dCrossSection_dOmega[ targetInfo['style'] ]
-        if isinstance( differentialForm, CoulombElastic.form ) and differentialForm.data is None:
+    targetInfo['reaction'] = self
+
+    if self.doubleDifferentialCrossSection:
+        differentialForm = self.doubleDifferentialCrossSection[ targetInfo['style'] ]
+        if isinstance( differentialForm, CoulombPlusNuclearElastic.form ) and differentialForm.data is None:
             return  # Pure-Coulomb elastic scattering can't be translated back to ENDF. Skip reaction
 
     reactionSuite = targetInfo['reactionSuite']
     outputChannel = self.outputChannel
     if isinstance( outputChannel, channelsModule.productionChannel ) :
-        print '        toENDF6 does not support writing of "%s" channel' % outputChannel.genre
+        print( '        toENDF6 does not support writing of "%s" channel' % outputChannel.genre )
         return
     MT = self.ENDF_MT
-    if( flags['verbosity'] >= 10 ) : print '%s%s' % ( verbosityIndent, outputChannel.toString( simpleString = True ) )
-    targetInfo['Q'] = self.getQ( 'eV', groundStateQ = True )
+    if( flags['verbosity'] >= 10 ) : print( '%s%s' % ( verbosityIndent, outputChannel.toString( simpleString = True ) ) )
+    targetInfo['Q'] = self.getQ( 'eV', final = False )
     targetInfo['QM'] = None
 
     LR, tryLR = 0, False
@@ -164,7 +169,7 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
                 decayProductName = decayProduct.id
                 if( decayProductName not in [ primaryResidualName, IDsPoPsModule.photon ] ) : decayProducts.append( decayProductName )
         if( len( decayProducts ) == 1 ) :   # Kludge for Carbon breakup into 3 alphas.
-            if( ( primaryResidualName == 'C0' ) and ( decayProducts == [ 'He4' ] ) ) : LR = 23
+            if( ( primaryResidualName in ('C0','C12') ) and ( decayProducts == [ 'He4' ] ) ) : LR = 23
             else : LR = 1   # FIXME may want to use other more specific LR flags
         elif( len( decayProducts ) > 1 ) :                                        # This must be a breakup reaction.
             if( numberOfDistributions > 0 ) :
@@ -176,7 +181,6 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
                 MTProducts.productCounts[outputChannel[0].id] += 1
                 for decayProduct in decayProducts[:-1] :
                     particle = reactionSuite.PoPs[decayProduct]
-                    if( isinstance( particle, nuclearLevelModule.particle ) ) : decayProduct = particle.getAncestor( ).id
                     MTProducts.productCounts[decayProduct] += 1
                 for MT_LR in [ 22, 23, 24, 25, 28, 29, 30, 32, 33, 34, 35, 36 ] :   # 39 and 40 not allowed in ENDF6
                     if( endf_endlModule.endfMTtoC_ProductLists[MT_LR].productCounts == MTProducts.productCounts ) :
@@ -190,21 +194,24 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
 
     level = 0.
     for product in outputChannel :
+        baseID, chemicalElementSymbol, A, levelID, isNucleus, anti, qualifier = chemicalElementMiscModule.chemicalElementALevelIDsAndAnti( product.id, qualifierAllowed = True )
+        if( A is None ) : continue
         productID = product.id.split( '{' )[0]
         _product = reactionSuite.PoPs[productID]
-        if( isinstance( _product, nuclearLevelModule.particle ) ) :
-            if( _product.intIndex > 0 ) : level = _product.energy[0].float( 'eV' )
+        if( isinstance( _product, nuclideModule.particle ) ) :
+            if( _product.index > 0 ) : level = _product.energy[0].float( 'eV' )
 
     targetInfo['EMin'], targetInfo['EMax'] = self.crossSection.domainMin, self.crossSection.domainMax     # Need to convert to eV.
-    if( self.EFL is not None ) : targetInfo['EFL'] = self.EFL.getValueAs( "eV" )
     self.crossSection.toENDF6( MT, endfMFList, targetInfo, level, LR )
-    if( 'EFL' in targetInfo ) : del targetInfo['EFL']
+
+    self.doubleDifferentialCrossSection.toENDF6( MT, endfMFList, targetInfo )
 
     doMF4AsMF6 = False
     if( reactionSuite.projectile not in ( IDsPoPsModule.neutron, IDsPoPsModule.photon ) ) : doMF4AsMF6 = True
     for product in outputChannel :
         if( len( product.distribution ) and not isinstance( product.distribution.evaluated, unspecifiedModule.form ) ) :
-            if( product.id not in ( 'n', IDsPoPsModule.photon ) and ( product.getAttribute('ENDFconversionFlag') != 'implicitProduct' ) ) :
+            conversionFlag = targetInfo['ENDFconversionFlags'].get(product,"")
+            if( product.id not in ( 'n', IDsPoPsModule.photon ) and ( conversionFlag != 'implicitProduct' ) ) :
                 if not isinstance(self.outputChannel, channelsModule.twoBodyOutputChannel):
                     doMF4AsMF6 = True
         doMF4AsMF6 = doMF4AsMF6 or checkDecayProducts( product )
@@ -236,38 +243,49 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
         targetInfo['productToken'] = product.id
         targetInfo['productLabel'] = product.label
         product.toENDF6( MT, endfMFList, flags, targetInfo, verbosityIndent = verbosityIndent + '    ' )
-    gammas = targetInfo['gammas']
+
+    gammas = []
+    for gamma in targetInfo['gammas'] :
+        if( isinstance( gamma.multiplicity[targetInfo['style']], multiplicityModule.branching1d ) ) : continue
+        gammas.append( gamma )
     if( len( gammas ) ) :
         gamma = gammas[0]
         targetInfo['zapID'] = gamma.id
         targetInfo['particleMass'] = gamma.getMass( 'eV/c**2' )
         multiplicity = gamma.multiplicity
-        if( gamma.getAttribute( 'ENDFconversionFlag' ) == 'MF6' ) :
+        conversionFlag = targetInfo['ENDFconversionFlags'].get(gamma,"")
+        if( conversionFlag == 'MF6' ) :
             targetInfo['multiplicity'] = gamma.multiplicity
-            gndToENDF6Module.gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas )
-        elif( gamma.getAttribute( 'ENDFconversionFlag' ) == 'MF13' ) :
+            gndsToENDF6Module.gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas )
+        elif( 'MF13' in conversionFlag ) :
             targetInfo['crossSection'] = self.crossSection[targetInfo['style']]
-            gndToENDF6Module.gammasToENDF6_MF12_13( MT, 13, endfMFList, flags, targetInfo, gammas )
-        elif( isinstance( multiplicity, multiplicityModule.constant1d ) ) :      # This should probably be changed to unknown in some cases?????
+            gndsToENDF6Module.gammasToENDF6_MF12_13( MT, 13, endfMFList, flags, targetInfo, gammas )
+        elif( isinstance( multiplicity, multiplicityModule.constant1d ) ) :
             pass
-        elif( isinstance( multiplicity, multiplicityModule.unknown ) ) :      # This should probably be changed to unknown in some cases?????
+        elif( isinstance( multiplicity, multiplicityModule.unspecified ) ) :
             pass
         else :
-            gndToENDF6Module.gammasToENDF6_MF12_13( MT, 12, endfMFList, flags, targetInfo, gammas )
+            gndsToENDF6Module.gammasToENDF6_MF12_13( MT, 12, endfMFList, flags, targetInfo, gammas )
+
     if( len( targetInfo['MF6LCTs'] ) > 0 ) :
-        LCT = targetInfo['MF6LCTs'][0]
-        for i in targetInfo['MF6LCTs'] :
-            if( not( LCT is None ) ) : break
+        lcts = targetInfo['MF6LCTs']
+        LCT = lcts[0]
         if( LCT is None ) : LCT = 2
-        for i in targetInfo['MF6LCTs'] :
+        for i in lcts:
             if( i is None ) : continue
             if( i != LCT ) : LCT = 3
         if( 500 <= MT <= 572 ) : LCT = 0
         if( LR > 0 ) :  # break-up reaction, check if we should use LCT=4
-            lcts = targetInfo['MF6LCTs']
-            if lcts[0] == 2 and all( [lct==1 for lct in lcts[1:]] ): LCT=4
+            if('implicitProduct' in targetInfo['ENDFconversionFlags'].get(self.outputChannel[1], '') and
+                    self.outputChannel[1].distribution.evaluated.productFrame ==
+                    standardsModule.frames.centerOfMassToken):
+                if lcts[0] == 2 and all( [lct==1 for lct in lcts[1:]] ): LCT=4
+            elif lcts[:2] == [2,2] and all( [lct==1 for lct in lcts[2:]] ): LCT=4
+
         MF6or26 = { 3 : 6, 23 : 26 }[targetInfo['crossSectionMF']]
         endfMFList[MF6or26][MT].insert( 0, endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], 0, LCT, len( targetInfo['MF6LCTs'] ), 0 ) )
         endfMFList[MF6or26][MT].append( endfFormatsModule.endfSENDLineNumber( ) )
+
+    targetInfo['reaction'] = None
 
 baseModule.base_reaction.toENDF6 = toENDF6

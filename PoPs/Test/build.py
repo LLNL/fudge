@@ -83,7 +83,7 @@ from PoPs.families import gaugeBoson as gaugeBosonModule
 from PoPs.families import lepton as leptonModule
 from PoPs.families import baryon as baryonModule
 from PoPs.families import nucleus as nucleusModule
-from PoPs.families import nuclearLevel as nuclearLevelModule
+from PoPs.families import nuclide as nuclideModule
 
 from PoPs.groups import isotope as isotopeModule
 from PoPs.groups import chemicalElement as chemicalElementModule
@@ -123,16 +123,17 @@ particle = miscModule.buildParticleFromRawData( baryonModule.particle, 'p',
         charge = (  1, 'e' ),                   halflife = ( 'stable', 's' ) )
 database.add( particle )
 
-nucleus = miscModule.buildParticleFromRawData( nucleusModule.particle, 'O16_e0', index = 0, energy = ( 0.0, 'eV' ) )
-particle = miscModule.buildParticleFromRawData( nuclearLevelModule.particle, 'O16_e0',
-        mass = ( 15.994913988, 'amu' ), nucleus = nucleus )
+nucleus = miscModule.buildParticleFromRawData( nucleusModule.particle, 'O16', index = 0, energy = ( 0.0, 'eV' ) )
+particle = miscModule.buildParticleFromRawData( nuclideModule.particle, 'O16',
+        mass = ( 15.994913988, 'amu' ), energy = ( 0.0, 'eV' ) )
 database.add( particle )
 
-nucleus = miscModule.buildParticleFromRawData( nucleusModule.particle, 'O16_e3', index = 3, energy = ( 6917100.0, 'eV' ) )
-particle = miscModule.buildParticleFromRawData( nuclearLevelModule.particle, 'O16_e3', nucleus = nucleus )
+nucleus = miscModule.buildParticleFromRawData( nucleusModule.particle, 'o16_e3', index = 3, energy = ( 6917100.0, 'eV' ) )
+particle = miscModule.buildParticleFromRawData( nuclideModule.particle, 'O16_e3', nucleus = nucleus )
 database.add( particle )
 
 xmld1 = database.toXML( )
 print xmld1
 database2 = database.parseXMLStringAsClass( xmld1 )
+
 if( xmld1 != database2.toXML( ) ) : raise Exception( 'Fix me.' )

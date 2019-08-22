@@ -63,7 +63,7 @@
 
 import base
 import covarianceSuite
-import distributions
 import mixed
 import modelParameters
 import summed
+import shortRangeSelfScalingVariance

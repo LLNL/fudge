@@ -61,12 +61,13 @@
 # 
 # <<END-copyright>>
 
-from fudge.gnd.productData.distributions import reference as referenceModule
-from fudge.gnd.differentialCrossSection import CoulombElastic as CoulombElasticModule
+from fudge.gnds.productData.distributions import reference as referenceModule
+from fudge.gnds.reactionData.doubleDifferentialCrossSection.chargedParticleElastic import CoulombPlusNuclearElastic as CPNElasticModule
+
 
 def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
-    if isinstance(self.link, CoulombElasticModule.form):
+    if isinstance(self.link, CPNElasticModule.form):
         self.link.toENDF6( MT, endfMFList, flags, targetInfo )
     else:
         pass

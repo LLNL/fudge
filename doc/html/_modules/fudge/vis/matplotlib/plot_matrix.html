@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.vis.matplotlib.plot_matrix &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.vis.matplotlib.plot_matrix &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,7 +25,7 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +35,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -54,7 +51,8 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span>
-<span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="k">import</span> <span class="n">LogNorm</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">colors</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">ticker</span>
 
 <div class="viewcode-block" id="plot_matrix"><a class="viewcode-back" href="../../../../fudge/fudge.vis.matplotlib.html#fudge.vis.matplotlib.plot_matrix.plot_matrix">[docs]</a><span class="k">def</span> <span class="nf">plot_matrix</span><span class="p">(</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">energyBoundariesX</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">energyBoundariesY</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Matrix&quot;</span><span class="p">,</span> <span class="n">xyTitle</span><span class="o">=</span><span class="s1">&#39;Energy (MeV)&#39;</span><span class="p">,</span>
         <span class="n">xylog</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">zlog</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">zRange</span><span class="o">=</span><span class="p">(),</span> <span class="n">switchY</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colorMap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">,</span> <span class="n">subplot</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
@@ -112,11 +110,21 @@
                 <span class="nb">print</span> <span class="s2">&quot;WARNING: no matrix elements &gt; 0. Switching to linear scale for z-axis&quot;</span>
                 <span class="n">zlog</span><span class="o">=</span><span class="kc">False</span>
 
-    <span class="c1"># z-axis log scale?</span>
-    <span class="k">if</span> <span class="n">zlog</span><span class="p">:</span> <span class="n">zopts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;norm&#39;</span><span class="p">:</span> <span class="n">LogNorm</span><span class="p">(</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span> <span class="p">)</span> <span class="p">}</span>
-    <span class="k">else</span><span class="p">:</span> <span class="n">zopts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vmin&#39;</span><span class="p">:</span><span class="n">vmin</span><span class="p">,</span> <span class="s1">&#39;vmax&#39;</span><span class="p">:</span><span class="n">vmax</span> <span class="p">}</span>
+    <span class="n">colorBarOpts</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">zlog</span><span class="p">:</span>    <span class="c1"># z-axis log scale</span>
+        <span class="k">if</span> <span class="n">vmin</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">zopts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;norm&#39;</span><span class="p">:</span> <span class="n">colors</span><span class="o">.</span><span class="n">SymLogNorm</span><span class="p">(</span> <span class="n">linthresh</span><span class="o">=</span><span class="n">vmax</span><span class="o">*</span><span class="mf">1e-9</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span> <span class="p">)}</span>
 
-<span class="c1">#    zopts[&#39;interpolation&#39;] = &#39;none&#39; # cleaner plot</span>
+            <span class="n">ticks</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># FIXME future versions of matplotlib may do this automatically for SymLogNorm</span>
+            <span class="n">zmax</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span> <span class="n">vmax</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span> <span class="n">ticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="o">-</span><span class="n">zmax</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="o">*</span><span class="n">i</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">ticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span> <span class="n">ticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">zmax</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="o">*</span><span class="n">i</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">colorBarOpts</span><span class="p">[</span><span class="s1">&#39;ticks&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ticks</span>
+            <span class="n">colorBarOpts</span><span class="p">[</span><span class="s1">&#39;format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ticker</span><span class="o">.</span><span class="n">LogFormatterMathtext</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">zopts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;norm&#39;</span><span class="p">:</span> <span class="n">colors</span><span class="o">.</span><span class="n">LogNorm</span><span class="p">(</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span> <span class="p">)</span> <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span> <span class="n">zopts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vmin&#39;</span><span class="p">:</span><span class="n">vmin</span><span class="p">,</span> <span class="s1">&#39;vmax&#39;</span><span class="p">:</span><span class="n">vmax</span> <span class="p">}</span>
 
     <span class="c1"># color map:</span>
     <span class="n">zopts</span><span class="p">[</span><span class="s1">&#39;cmap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">colorMap</span>
@@ -125,15 +133,15 @@
     <span class="k">if</span> <span class="n">xylog</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">energyBoundariesX</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;xylog option requires energy group boundary info&quot;</span><span class="p">)</span>
         <span class="n">X</span><span class="p">,</span><span class="n">Y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">function_base</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">energyBoundariesX</span><span class="p">,</span><span class="n">energyBoundariesY</span><span class="p">)</span>
-        <span class="n">pyplot</span><span class="o">.</span><span class="n">pcolor</span><span class="p">(</span> <span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="o">**</span><span class="n">zopts</span> <span class="p">)</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span> <span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="o">**</span><span class="n">zopts</span> <span class="p">)</span>
         <span class="n">pyplot</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span> <span class="n">subplot</span><span class="p">,</span> <span class="n">xscale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">yscale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span> <span class="p">)</span>
     <span class="k">elif</span> <span class="n">energyBoundariesX</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">pyplot</span><span class="o">.</span><span class="n">pcolor</span><span class="p">(</span> <span class="n">energyBoundariesX</span><span class="p">,</span> <span class="n">energyBoundariesY</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="o">**</span><span class="n">zopts</span> <span class="p">)</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span> <span class="n">energyBoundariesX</span><span class="p">,</span> <span class="n">energyBoundariesY</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="o">**</span><span class="n">zopts</span> <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">pyplot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span> <span class="n">matrix</span><span class="p">,</span> <span class="o">**</span><span class="n">zopts</span> <span class="p">)</span>
+        <span class="n">pyplot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">zopts</span> <span class="p">)</span>
 
     <span class="n">pyplot</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-    <span class="n">pyplot</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+    <span class="n">pyplot</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span> <span class="o">**</span><span class="n">colorBarOpts</span> <span class="p">)</span>
     <span class="n">pyplot</span><span class="o">.</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">jet</span><span class="o">.</span><span class="n">set_under</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="generateColorMap"><a class="viewcode-back" href="../../../../fudge/fudge.vis.matplotlib.html#fudge.vis.matplotlib.plot_matrix.generateColorMap">[docs]</a><span class="k">def</span> <span class="nf">generateColorMap</span><span class="p">():</span>
@@ -141,27 +149,27 @@
     <span class="kn">import</span> <span class="nn">matplotlib</span>
     <span class="n">cdict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;blue&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
             <span class="p">(</span><span class="mf">0.34999999999999998</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-            <span class="p">(</span><span class="mf">0.499</span><span class="p">,</span> <span class="mf">0.4828709677</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-            <span class="p">(</span><span class="mf">0.501</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.4828709677</span><span class="p">),</span>
+            <span class="p">(</span><span class="mf">0.4995</span><span class="p">,</span> <span class="mf">0.4828709677</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="p">(</span><span class="mf">0.5005</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.4828709677</span><span class="p">),</span>
             <span class="p">(</span><span class="mf">0.65999999999999992</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
             <span class="p">(</span><span class="mf">0.89000000000000001</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
             <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)],</span>
         <span class="s1">&#39;green&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
             <span class="p">(</span><span class="mf">0.089999999999999969</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
             <span class="p">(</span><span class="mf">0.35999999999999999</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-            <span class="p">(</span><span class="mf">0.499</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-            <span class="p">(</span><span class="mf">0.501</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="p">(</span><span class="mf">0.4995</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="p">(</span><span class="mf">0.5005</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
             <span class="p">(</span><span class="mf">0.625</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
             <span class="p">(</span><span class="mf">0.875</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
             <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
         <span class="s1">&#39;red&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
             <span class="p">(</span><span class="mf">0.10999999999999999</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
             <span class="p">(</span><span class="mf">0.33999999999999997</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-            <span class="p">(</span><span class="mf">0.499</span><span class="p">,</span> <span class="mf">0.516129</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-            <span class="p">(</span><span class="mf">0.501</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.516129</span><span class="p">),</span>
+            <span class="p">(</span><span class="mf">0.4995</span><span class="p">,</span> <span class="mf">0.516129</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="p">(</span><span class="mf">0.5005</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.516129</span><span class="p">),</span>
             <span class="p">(</span><span class="mf">0.65000000000000002</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
             <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]}</span> 
-    <span class="k">return</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">LinearSegmentedColormap</span><span class="p">(</span><span class="s1">&#39;correlation&#39;</span><span class="p">,</span><span class="n">cdict</span><span class="p">,</span><span class="mi">512</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">LinearSegmentedColormap</span><span class="p">(</span><span class="s1">&#39;correlation&#39;</span><span class="p">,</span><span class="n">cdict</span><span class="p">,</span><span class="mi">1024</span><span class="p">)</span></div>
 
 </pre></div>
 
@@ -196,13 +204,13 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

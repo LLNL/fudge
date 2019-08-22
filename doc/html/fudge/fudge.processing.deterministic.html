@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.processing.deterministic package &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.processing.deterministic package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -30,7 +27,7 @@
     <link rel="next" title="fudge.processing.montecarlo package" href="fudge.processing.montecarlo.html" />
     <link rel="prev" title="fudge.processing package" href="fudge.processing.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -46,7 +43,7 @@
         <li class="right" >
           <a href="fudge.processing.html" title="fudge.processing package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="fudge.processing.html" accesskey="U">fudge.processing package</a> &#187;</li> 
       </ul>
@@ -64,6 +61,11 @@
 </div>
 <div class="section" id="module-fudge.processing.deterministic.transferMatrices">
 <span id="fudge-processing-deterministic-transfermatrices-module"></span><h2>fudge.processing.deterministic.transferMatrices module<a class="headerlink" href="#module-fudge.processing.deterministic.transferMatrices" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="fudge.processing.deterministic.transferMatrices.EEpMuPDataToString">
+<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">EEpMuPDataToString</code><span class="sig-paren">(</span><em>EEpMuPData</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#EEpMuPDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.EEpMuPDataToString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.EEpMuP_TransferMatrix">
 <code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">EEpMuP_TransferMatrix</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>productFrame</em>, <em>crossSection</em>, <em>energyAngularData</em>, <em>multiplicity</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#EEpMuP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.EEpMuP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
@@ -160,10 +162,15 @@
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.discreteGammaAngularData">
-<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">discreteGammaAngularData</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>gammaEnergy</em>, <em>crossSection</em>, <em>angularData</em>, <em>multiplicity=1</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#discreteGammaAngularData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.discreteGammaAngularData" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">discreteGammaAngularData</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>gammaEnergy</em>, <em>crossSection</em>, <em>angularData</em>, <em>multiplicity</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#discreteGammaAngularData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.discreteGammaAngularData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. This routine is also used
 for pair-production which pass angularData as None.</p>
 </dd></dl>
+
+<dl class="function">
+<dt id="fudge.processing.deterministic.transferMatrices.doubleDifferential_EEpMuP">
+<code class="descclassname">fudge.processing.deterministic.transferMatrices.</code><code class="descname">doubleDifferential_EEpMuP</code><span class="sig-paren">(</span><em>style</em>, <em>tempInfo</em>, <em>productFrame</em>, <em>crossSection</em>, <em>EEpMuPData</em>, <em>multiplicity</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#doubleDifferential_EEpMuP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.doubleDifferential_EEpMuP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.energyFunctionToString">
@@ -207,12 +214,12 @@ for pair-production which pass angularData as None.</p>
 target mass divide by the sum of the projectile and target masses.</p>
 <p>This function perform the integration</p>
 <blockquote>
-<div>TM = int_g dE int_h dE&#8217; S(E) M(E) f(E) P(E -&gt; E&#8217;) / int_g dE f(E)</div></blockquote>
-<p>where int_g is the integral of E from E_i to E_{i+1}, int_g is the integral of E&#8217; from E&#8217;_j to E&#8217;_{j+1}, S(E) is the cross section,
-M(E) is the products multiplicity, f(E) is the flux weighting and P(E -&gt; E&#8217;) is the probability for a projectile of energy E producing
-a primary gamma of energy E&#8217; for binding energy bindingEnergy. This function assumes that M(E) is a constant. For primary gamma&#8217;s captured
-into binding energy bindingEnergy P(E -&gt; E&#8217;) = deltaFunction( E&#8217; - ( bindingEnergy + massRatio E ) ) where massRatio = mt / ( mp + mt ),
-mp is the projectile&#8217;s mass and mt is the target&#8217;s mass. Note, this formula is from the ENDF manual which ignores the recoil of the residual
+<div>TM = int_g dE int_h dE’ S(E) M(E) f(E) P(E -&gt; E’) / int_g dE f(E)</div></blockquote>
+<p>where int_g is the integral of E from E_i to E_{i+1}, int_g is the integral of E’ from E’_j to E’_{j+1}, S(E) is the cross section,
+M(E) is the products multiplicity, f(E) is the flux weighting and P(E -&gt; E’) is the probability for a projectile of energy E producing
+a primary gamma of energy E’ for binding energy bindingEnergy. This function assumes that M(E) is a constant. For primary gamma’s captured
+into binding energy bindingEnergy P(E -&gt; E’) = deltaFunction( E’ - ( bindingEnergy + massRatio E ) ) where massRatio = mt / ( mp + mt ),
+mp is the projectile’s mass and mt is the target’s mass. Note, this formula is from the ENDF manual which ignores the recoil of the residual
 nucleus.</p>
 </dd></dl>
 
@@ -323,14 +330,14 @@ region within a regions2d form.</p>
         <li class="right" >
           <a href="fudge.processing.html" title="fudge.processing package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="fudge.processing.html" >fudge.processing package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

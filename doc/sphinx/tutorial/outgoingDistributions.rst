@@ -1,14 +1,14 @@
 Outgoing Distributions
 ======================
 
-Applications of nuclear data are often sensitive not only to the reaction cross section, but also to the angular distributions and energy spectra of the reaction products. Each product in GND therefore contains a 'distribution' element. The distribution data may be given in several different ways::
+Applications of nuclear data are often sensitive not only to the reaction cross section, but also to the angular distributions and energy spectra of the reaction products. Each product in GNDS therefore contains a 'distribution' element. The distribution data may be given in several different ways::
 
 Angular distributions
 ---------------------
 
 For reactions producing exactly two outgoing products (such as n + Mn55 -> p + Cr55), the evaluation only needs to include an angular distribution for one product. The kinematics of these 'two-body' reactions mean that the angular distribution for the other product (and the energy spectra for both) can be computed from the first product.
 
-There are several ways of describing angular distributions in GND:
+There are several ways of describing angular distributions in GNDS:
 
 - Isotropic
 - Legendre coefficients for each incident energy,
@@ -18,7 +18,7 @@ There are several ways of describing angular distributions in GND:
 Energy distributions
 --------------------
 
-For a two-body reaction, an energy distribution could be supplied instead of an angular distribution. In practice, however, energy distributions are only given for non-2-body reactions. In GND, these distributions are used when the outgoing angle and energy are assumed to be uncorrelated. There are many ways of storing energy spectra, including::
+For a two-body reaction, an energy distribution could be supplied instead of an angular distribution. In practice, however, energy distributions are only given for non-2-body reactions. In GNDS, these distributions are used when the outgoing angle and energy are assumed to be uncorrelated. There are many ways of storing energy spectra, including::
 
 - Pointwise
 - Watt spectra
@@ -50,9 +50,9 @@ incident-energy-dependent multiplicity is listed instead. Methods for storing th
 Where are the discrete gammas?
 ------------------------------
 
-Discrete gammas can appear in several places in a GND evaluation. Where possible, they are located inside
+Discrete gammas can appear in several places in a GNDS evaluation. Where possible, they are located inside
 the PoPs particle database, where they are listed as decay modes from excited nuclear states down to lower energy states.
 In other cases, the source of the gamma may not be known exactly (or may not have been included in the ENDF evaluation
-that was translated to GND).  In those cases, discrete gammas are listed as normal reaction products,
+that was translated to GNDS).  In those cases, discrete gammas are listed as normal reaction products,
 with uncorrelated distributions here the energy distribution is listed as ``discreteGamma``.
 Primary gammas are listed in a similar fashion, as uncorrelated distributions with a ``primaryGamma`` energy distribution.

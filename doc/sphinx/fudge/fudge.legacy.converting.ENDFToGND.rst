@@ -1,53 +1,53 @@
-fudge.legacy.converting.ENDFToGND package
+fudge.legacy.converting.ENDFToGNDS package
 =========================================
 
 Submodules
 ----------
 
-fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_0 module
+fudge.legacy.converting.ENDFToGNDS.ENDF_ITYPE_0 module
 -----------------------------------------------------
 
-.. automodule:: fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_0
+.. automodule:: fudge.legacy.converting.ENDFToGNDS.ENDF_ITYPE_0
     :members:
     :undoc-members:
     :show-inheritance:
 
-fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_0_Misc module
+fudge.legacy.converting.ENDFToGNDS.ENDF_ITYPE_0_Misc module
 ----------------------------------------------------------
 
-.. automodule:: fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_0_Misc
+.. automodule:: fudge.legacy.converting.ENDFToGNDS.ENDF_ITYPE_0_Misc
     :members:
     :undoc-members:
     :show-inheritance:
 
-fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_3 module
+fudge.legacy.converting.ENDFToGNDS.ENDF_ITYPE_3 module
 -----------------------------------------------------
 
-.. automodule:: fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_3
+.. automodule:: fudge.legacy.converting.ENDFToGNDS.ENDF_ITYPE_3
     :members:
     :undoc-members:
     :show-inheritance:
 
-fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_3_6_Misc module
+fudge.legacy.converting.ENDFToGNDS.ENDF_ITYPE_3_6_Misc module
 ------------------------------------------------------------
 
-.. automodule:: fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_3_6_Misc
+.. automodule:: fudge.legacy.converting.ENDFToGNDS.ENDF_ITYPE_3_6_Misc
     :members:
     :undoc-members:
     :show-inheritance:
 
-fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_6 module
+fudge.legacy.converting.ENDFToGNDS.ENDF_ITYPE_6 module
 -----------------------------------------------------
 
-.. automodule:: fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_6
+.. automodule:: fudge.legacy.converting.ENDFToGNDS.ENDF_ITYPE_6
     :members:
     :undoc-members:
     :show-inheritance:
 
-fudge.legacy.converting.ENDFToGND.endfFileToGNDMisc module
+fudge.legacy.converting.ENDFToGNDS.endfFileToGNDSMisc module
 ----------------------------------------------------------
 
-.. automodule:: fudge.legacy.converting.ENDFToGND.endfFileToGNDMisc
+.. automodule:: fudge.legacy.converting.ENDFToGNDS.endfFileToGNDSMisc
     :members:
     :undoc-members:
     :show-inheritance:
@@ -56,7 +56,7 @@ fudge.legacy.converting.ENDFToGND.endfFileToGNDMisc module
 Module contents
 ---------------
 
-.. automodule:: fudge.legacy.converting.ENDFToGND
+.. automodule:: fudge.legacy.converting.ENDFToGNDS
     :members:
     :undoc-members:
     :show-inheritance:

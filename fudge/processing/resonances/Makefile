@@ -73,3 +73,4 @@ clean:
 	rm -f *.pyc
 
 realclean: clean
+	cd test; $(MAKE) realclean

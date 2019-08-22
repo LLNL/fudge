@@ -1,4 +1,4 @@
-History of Fudge and GND
+History of Fudge and GNDS
 ========================
 
 * UKUNDL, ENDL, ENDF
@@ -9,6 +9,6 @@ History of Fudge and GND
 * fudge begins
 * fete (piece of junk)
 * a crisis becomes an opportunity: LLNL need for new processing codes
-    * ASC support for rewriting ncfgen, ndfgen and ENDL format: GND and new Fudge
+    * ASC support for rewriting ncfgen, ndfgen and ENDL format: GNDS and new Fudge
     * ARRA support for  ENDF translators
 * WPEC-38

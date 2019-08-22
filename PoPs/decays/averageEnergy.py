@@ -68,16 +68,41 @@ This module contains the average energy classes.
 import abc
 
 from xData import physicalQuantity as physicalQuantityModule
+from xData.uncertainty.physicalQuantity import uncertainty as uncertaintyModule
 
 from .. import suite as suiteModule
 
+#
+# FIXME Need a physicalQuantity class with keyName.
+#
 class averageEnergy( physicalQuantityModule.physicalQuantity ) :
 
     moniker = 'averageEnergy'
+    keyName = 'label'
 
     def __init__( self, value, unit ) :
 
         physicalQuantityModule.physicalQuantity.__init__( self, value, unit, self._label )
+
+    # overrides required since __init__ arguments differ
+    def copy( self ) :
+
+        instance = self.__class__( self.value, self.unit )
+        instance.uncertainty = self.uncertainty
+        return( instance )
+
+    @classmethod
+    def parseXMLNode( cls, element, xPath, linkData ):
+
+        xPath.append( element.tag )
+
+        instance = cls( float( element.get( 'value' ) ), element.get( 'unit' ) )
+        for child in element :
+            if( child.tag == uncertaintyModule.uncertainty.moniker ) :
+                instance.uncertainty = uncertaintyModule.uncertainty.parseXMLNodeAsClass( child, xPath, linkData )
+
+        xPath.pop( )
+        return( instance )
 
 class lightParticles( averageEnergy ) :
 
@@ -159,5 +184,13 @@ class averageEnergies( suiteModule.suite ) :
 
         xPath.append( element.tag )
 
+        for child in element:
+            label = child.get('label')
+            for subclass in (
+                lightParticles, electroMagneticRadiation, heavyParticles, betaMinus, betaPlus, AugerElectron,
+                conversionElectron, gamma, xRay, internalBremsstrahlung, annihilation, alpha, recoil,
+                spontaneousFission, fissionNeutrons, proton, neutrino
+            ):
+                if label == subclass._label:
+                    self.add( subclass.parseXMLNode( child, xPath, linkData ) )
         xPath.pop( )
-        return( self )

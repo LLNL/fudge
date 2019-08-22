@@ -1,4 +1,4 @@
-from fudge.gnd.reactionData.crossSection import component, XYs1d, upperEps
+from fudge.gnds.reactionData.crossSection import component, XYs1d, upperEps
 import math, os
 from xData import XYs, standards
 from numpy import logspace
@@ -17,11 +17,11 @@ def read_evaluation(endfFile):
     '''
     if not os.path.exists( endfFile ): raise IOError( "File named "+endfFile+" doesn't exist!" )
     if open(endfFile).readline().startswith( "<?xml" ):
-        from fudge.gnd import reactionSuite
+        from fudge.gnds import reactionSuite
         return {'reactionSuite':reactionSuite.readXML( endfFile ),'covarianceSuite':None,'info':{},'errors':[]}
     else:
-        from fudge.legacy.converting import endfFileToGND
-        return endfFileToGND.endfFileToGND( endfFile, toStdOut=False, skipBadData=True, continuumSpectraFix=True )
+        from fudge.legacy.converting import endfFileToGNDS
+        return endfFileToGNDS.endfFileToGNDS( endfFile, toStdOut=False, skipBadData=True, continuumSpectraFix=True )
 
 
 def equal_lethargy_bins(numBins,domainMin=1e-5,domainMax=20.0e6,reverse=False):
@@ -42,43 +42,45 @@ def convert_units_to_energy(T,energyUnits='eV'):
 
 
 def function_to_XYs( func, fpars,
-               Egrid=equal_lethargy_bins(1000),
-               domainUnit='eV', domainName='energy_in', rangeUnit='1/eV', rangeName='flux', accuracy=upperEps ):
+                     Egrid=equal_lethargy_bins(1000),
+                     domainUnit='eV', domainName='energy_in', rangeUnit='1/eV', rangeName='flux',
+                     accuracy=upperEps ):
     '''
     Helper function to convert a user-created function (OK, one of the spectra below) into an XYs instance
     that can be integrated, grouped, whatever.  We pre-defined a energy grid (in eV) that should work well
     even for pathological "spectra" like the problematic 1/E for the resonance integral.
     '''
-    return XYs.XYs1d.createFromFunction( \
-            XYs1d.defaultAxes(labelsUnits={ \
-                XYs.yAxisIndex : ( rangeName, rangeUnit ), \
-                XYs.xAxisIndex : ( domainName, domainUnit ) }), \
-            Xs=Egrid,\
-            func=func, \
-            parameters=fpars, \
-            accuracy=accuracy, \
-            biSectionMax=20, \
-            checkForRoots = False, \
-            infill = 1, \
+    return XYs.XYs1d.createFromFunction(
+            XYs1d.defaultAxes( labelsUnits={
+                XYs.yAxisIndex : ( rangeName, rangeUnit ),
+                XYs.xAxisIndex : ( domainName, domainUnit ) } ),
+            Xs=Egrid,
+            func=func,
+            parameters=fpars,
+            accuracy=accuracy,
+            biSectionMax=20,
+            checkForRoots = False,
+            infill = 1,
             safeDivide = 1 )
 
 
-def grouped_values_to_XYs( groupBdries, valueList, \
-                           domainUnit='eV', domainName='energy_in', rangeUnit='1/eV', rangeName='flux', \
+def grouped_values_to_XYs( groupBdries, valueList,
+                           domainUnit='eV', domainName='energy_in', rangeUnit='1/eV', rangeName='flux',
                            accuracy=upperEps, domainMin=1e-5, domainMax=20.0):
     if len(groupBdries) != len(valueList)+1:
         raise ValueError("Group boundries and value lists have incompatable lengths: len(bdries)=%i, len(vals)=%i"%(len(groupBdries),len(valueList)))
-    return XYs.XYs1d(\
-        data=[groupBdries, [valueList[0]]+valueList], \
-        dataForm="xsandys", \
-        interpolation=standards.interpolation.flatToken, \
-        axes=XYs1d.defaultAxes(labelsUnits={ \
-                XYs.yAxisIndex : ( rangeName, rangeUnit ), \
-                XYs.xAxisIndex : ( domainName, domainUnit ) }) )
+    curve = XYs.XYs1d(
+        data=[groupBdries, [valueList[0]]+valueList],
+        dataForm="xsandys",
+        interpolation=standards.interpolation.flatToken,
+        axes=XYs1d.defaultAxes( labelsUnits={
+                XYs.yAxisIndex : ( rangeName, rangeUnit ),
+                XYs.xAxisIndex : ( domainName, domainUnit ) } ) )
+    return curve
 
 def check_is_cross_section( x ):
     if not isinstance( x, component ):
-        raise TypeError( "Not instance of fudge.gnd.reactionData.crossSection.component" )
+        raise TypeError( "Not instance of fudge.gnds.reactionData.crossSection.component" )
 
 
 # -------------------------------------------------------------------------------

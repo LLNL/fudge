@@ -72,16 +72,15 @@ PTW1D_INCLUDE_PATH = $(PTW1D_PATH)/include
 PTW1D_LIB_PATH = $(PTW1D_PATH)/lib
 PTW1D_ARCHIVE_FILE = $(PTW1D_LIB_PATH)/libptwX.a
 
-CDEBUGFLAGS = -g -O0 -Wall
 ptwXCFLAGS = -I$(NUMERICALFUNCTIONS_INCLUDE_PATH) -L$(NUMERICALFUNCTIONS_LIB_PATH) -lnumericalfunctions    \
               -lnfut_utilities                                                                              \
               -I$(SMR_PATH)/include -L$(SMR_PATH)/lib -lstatusMessageReporting
-localCFLAGS = $(CDEBUGFLAGS) $(CFLAGS) $(ptwXCFLAGS) -lm
+localCFLAGS = $(CFLAGS) $(ptwXCFLAGS)
 
 default: binary1
 
 binary1: binary1.c $(PTWXY_ARCHIVE_FILE)
-	$(CC) -o binary1 binary1.c $(localCFLAGS)
+	$(CC) -o binary1 binary1.c $(localCFLAGS) -lm
 
 check: default
 	./binary1 $(CHECKOPTIONS)

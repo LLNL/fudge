@@ -63,25 +63,26 @@
 
 import textwrap
 
-from PoPs import misc as miscPoPsModule
 from PoPs import IDs as IDsPoPsModule
 from PoPs.quantities import halflife as halflifePoPsModule
 from PoPs.families import gaugeBoson as gaugeBosonPoPsModule
 from PoPs.families import lepton as leptonPoPsModule
-from PoPs.families import nuclearLevel as nuclearLevelPoPsModule
+from PoPs.families import baryon as baryonPoPsModule
+from PoPs.families import nuclide as nuclidePoPsModule
 from PoPs.families import nucleus as nucleusPoPsModule
 from PoPs.groups import isotope as isotopePoPsModule
 from PoPs.groups import chemicalElement as chemicalElementPoPsModule
+from PoPs.groups import misc as chemicalElementMiscPoPsModule
 
-from fudge.particles import nuclear as nuclearModule
 from fudge.legacy.converting import endf_endl as endf_endlModule
 from fudge.legacy.converting import massTracker as massTrackerModule
 
-from fudge.gnd import documentation as documentationModule
-from fudge.gnd import reactionSuite as reactionSuiteModule
+from fudge.gnds import documentation as documentationModule
+from fudge.gnds import reactionSuite as reactionSuiteModule
 
 from . import endfFormats as endfFormatsModule
-from . import gndToENDF6 as gndToENDF6Module
+from . import gndsToENDF6 as gndsToENDF6Module
+from . import ENDFconversionFlags as ENDFconversionFlagsModule
 from .productData import multiplicity as multiplicityModule
 
 __metaclass__ = type
@@ -95,38 +96,57 @@ def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None, u
     evaluatedStyle = self.styles.getEvaluatedStyle( )
     if( evaluatedStyle is None ) : raise ValueError( 'no evaluation style found' )
 
-    if( flags['verbosity'] >= 10 ) : print '%s%s' % ( verbosityIndent, self.inputParticlesToReactionString( suffix = " -->" ) )
+    if( flags == {} ) : flags['verbosity'] = 0
+    if( flags['verbosity'] >= 10 ) :
+        print ( '%s%s' % ( verbosityIndent, self.inputParticlesToReactionString( suffix = " -->" ) ) )
     verbosityIndent2 = verbosityIndent + ' ' * ( len( self.inputParticlesToReactionString( suffix = " -->" ) ) + 1 )
 
-    projectileZA = miscPoPsModule.ZA( self.PoPs[self.projectile] )
+    projectileZA = chemicalElementMiscPoPsModule.ZA( self.PoPs[self.projectile] )
     IPART = projectileZA
     if( self.projectile == 'e-' ) : IPART = 11
 
-    targetZA, MAT = endf_endlModule.ZAAndMATFromParticleName( self.target )
+    targetID = self.target
+    if( targetID in self.PoPs.aliases ) : targetID = self.PoPs[targetID].pid
+    targetZA, MAT = endf_endlModule.ZAAndMATFromParticleName( targetID )
     targetZ, targetA = divmod( targetZA, 1000 )
 
     targetInfo = {}
     targetInfo['massTracker'] = massTrackerModule.massTracker()
     for particle in self.PoPs :
-        if( isinstance( particle, ( gaugeBosonPoPsModule.particle, leptonPoPsModule.particle, isotopePoPsModule.suite ) ) ) : 
-            ZA = miscPoPsModule.ZA( particle )
-            if( isinstance( particle, isotopePoPsModule.suite ) ) :
-                if( particle[0].intIndex != 0 ) : continue
+        if( isinstance( particle, ( gaugeBosonPoPsModule.particle, leptonPoPsModule.particle, baryonPoPsModule.particle, nuclidePoPsModule.particle ) ) ) : 
+            ZA = chemicalElementMiscPoPsModule.ZA( particle )
+            if( isinstance( particle, nuclidePoPsModule.particle ) ) :
+                if( particle.index != 0 ) : continue
             if( len( particle.mass ) > 0 ) : targetInfo['massTracker'].addMassAMU( ZA, particle.getMass( 'amu' ) )
-        elif( isinstance( particle, chemicalElementPoPsModule.suite ) ) :
-            ZA = 1000 * particle.Z
+
+    targetInfo['ENDFconversionFlags'] = {}
+    if 'LLNL' in self.applicationData:
+        conversionFlags = [data for data in self.applicationData['LLNL']
+                           if isinstance(data, ENDFconversionFlagsModule.ENDFconversionFlags)]
+        if len(conversionFlags) > 0:
+            for link in conversionFlags[0].flags:
+                targetInfo['ENDFconversionFlags'][link.link] = link['flags']
+
+    for chemicalElement in self.PoPs.chemicalElements :
+        ZA = 1000 * chemicalElement.Z
+        try :
+            targetInfo['massTracker'].getMassAMU( ZA )
+        except :                                                # If not present, i.e., a raise, add.
             targetInfo['massTracker'].addMassAMU( ZA, targetInfo['massTracker'].getElementalMassAMU( ZA ) )
 
     targetInfo['style'] = style
     targetInfo['reactionSuite'] = self
     targetInfo['ZA'] = targetZA
 
-    target = self.PoPs[self.target]
+    try :
+        target = self.PoPs[targetID]
+    except :
+        target = self.PoPs.chemicalElements.getSymbol( targetID )
 
     levelIndex = 0
     levelEnergy_eV = 0
-    if( isinstance( target, nuclearLevelPoPsModule.particle ) ) :      # isomer target
-        levelIndex = target.intIndex
+    if( isinstance( target, nuclidePoPsModule.particle ) ) :      # isomer target
+        levelIndex = target.index
         levelEnergy_eV = target.energy[0].float( 'eV' )
     targetInfo['mass'] = targetInfo['massTracker'].getMassAWR( targetZA, levelEnergyInEv = levelEnergy_eV )
 
@@ -146,6 +166,9 @@ def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None, u
         if( 500 <= reaction.ENDF_MT < 573 ) : ITYPE = 3
     targetInfo['crossSectionMF'] = { 0 : 3, 3 : 23 }[ITYPE]
 
+    if ITYPE == 3:
+        targetInfo['EFL'] = 0
+
     targetInfo['delayedRates'] = []
     targetInfo['MTs'], targetInfo['MF8'], targetInfo['LRs'] = {}, {}, {}
     endfMFList = { 1 : { 451 : [] }, 2 : {}, 3 : {}, 4 : {}, 5 : {}, 6 : {}, 8 : {}, 9 : {}, 10 : {}, 12 : {}, 13 : {},
@@ -163,21 +186,20 @@ def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None, u
 
     for reaction in self :
         reaction.toENDF6( endfMFList, flags, targetInfo, verbosityIndent = verbosityIndent2 )
-    gndToENDF6Module.upDateENDFMF8Data( endfMFList, targetInfo )
+    gndsToENDF6Module.upDateENDFMF8Data( endfMFList, targetInfo )
     for MT, production_gammas in targetInfo['production_gammas'].items( ) :
         MF, production_gammas = production_gammas[0], production_gammas[1:]
         for productionReaction in production_gammas :
             gammas = [ gamma for gamma in productionReaction.outputChannel ]
             targetInfo['crossSection'] = productionReaction.crossSection[targetInfo['style']]
-            gndToENDF6Module.gammasToENDF6_MF12_13( MT, MF, endfMFList, flags, targetInfo, gammas )
+            gndsToENDF6Module.gammasToENDF6_MF12_13( MT, MF, endfMFList, flags, targetInfo, gammas )
 
     for particle in self.PoPs :
-        if( isinstance( particle, nucleusPoPsModule.particle ) ) :
+        if( isinstance( particle, ( nucleusPoPsModule.particle, nuclidePoPsModule.particle ) ) ) :
             if( len( particle.decayData.decayModes ) > 0 ) :
-                for baseMT in [ 50, 600, 650, 700, 750, 800 ] :
+                for baseMT in [ 50, 600, 650, 700, 750, 800, 1000 ] :   # 1000 causes raise in endf_endlModule.ENDF_MTZAEquation.
                     residualZA = endf_endlModule.ENDF_MTZAEquation( projectileZA, targetZA, baseMT )[0][-1]
-                    atomID = particle.findClassInAncestry( isotopePoPsModule.suite ).id
-                    if( nuclearModule.nucleusNameFromZA( residualZA ) == atomID ) : break
+                    if( chemicalElementMiscPoPsModule.ZA( particle ) == residualZA ) : break
                 addDecayGamma( self.PoPs, particle, baseMT, endfMFList, flags, targetInfo )
 
     if 'totalNubar' in targetInfo:
@@ -204,7 +226,7 @@ def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None, u
 
     endfDoc = self.documentation.get( 'endfDoc' )
     if( endfDoc is None ) :
-        docHeader2 = [  ' %2d-%-2s-%3d LLNL       EVAL-OCT03 Unknown' % ( targetZ, nuclearModule.elementSymbolFromZ( targetZ ), targetA ),
+        docHeader2 = [  ' %2d-%-2s-%3d LLNL       EVAL-OCT03 Unknown' % ( targetZ, chemicalElementMiscPoPsModule.symbolFromZ[targetZ], targetA ),
                         '                      DIST-DEC99                       19990101   ',
                         '----ENDL              MATERIAL %4d' % MAT,
                         '-----INCIDENT %s DATA' %
@@ -227,19 +249,18 @@ def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None, u
         endfDoc = endfDoc.getLines( )
 
         # update the documentation, including metadata on first 4 lines:
-    if self.getReaction( 'fission' ) is not None:
+    if len( [reac for reac in self.reactions if reac.outputChannel.isFission()] ) > 0:
         LFI = True
     else:
         LFI = False
     LRP = -1
     if( self.resonances is not None ) :
-        if( self.resonances.scatteringRadius ) :
-            LRP = 0
-        elif( self.resonances.reconstructCrossSection ) :
+        LRP = 0
+        if( self.resonances.reconstructCrossSection ) :
             LRP = 1
-        elif( self.resonances.unresolved and not self.resonances.resolved ) : # self-shielding only
+        elif( self.resonances.unresolved is not None and self.resonances.resolved is None ) : # self-shielding only
             LRP = 1
-        else :
+        elif( self.resonances.resolved is not None or self.resonances.unresolved is not None ) :
             LRP = 2
 
     crossSectionScale = self.reactions[0].domainUnitConversionFactor( 'eV' )
@@ -265,9 +286,11 @@ def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None, u
     NLIB = kwargs.get( 'NLIB', NLIB )
 
     STA = 0
-    target = self.PoPs[self.target]
-    if( isinstance( target, isotopePoPsModule.suite ) ) :
-        target = target[0]
+    try :
+        target = self.PoPs[targetID]
+    except :
+        target = self.PoPs.chemicalElements.getSymbol( targetID )
+    if( isinstance( target, nuclidePoPsModule.particle ) ) :
         if( len( target.nucleus.halflife ) > 0 ) :
             if( target.nucleus.halflife[0].value == halflifePoPsModule.UNSTABLE ) : STA = 1
     if( levelIndex > 0 ) : STA = 1
@@ -290,7 +313,7 @@ def addDecayGamma( PoPs, particle, baseMT, endfMFList, flags, targetInfo ) :
 
     MF = 12
     LP = 0
-    MT = baseMT + particle.intIndex
+    MT = baseMT + particle.index
     gammaData = []
     levelEnergy_eV = particle.energy[0].float( 'eV' )
     for decayMode in particle.decayData.decayModes :
@@ -299,7 +322,10 @@ def addDecayGamma( PoPs, particle, baseMT, endfMFList, flags, targetInfo ) :
         if( len( IDs ) != 1 ) : raise Exception( 'Do not know how to handle this.' )
         probability = decayMode.probability[0].value
         finalEnergy_eV = PoPs[IDs[0]].energy[0].float( 'eV' )
-        gammaData.append( [ finalEnergy_eV, probability ] )
+        _data = [finalEnergy_eV, probability]
+        if decayMode.photonEmissionProbabilities:
+            _data.append( decayMode.photonEmissionProbabilities[0].value )
+        gammaData.append( _data )
 
     gammaData.sort( reverse = True )
     nGammas = len( gammaData )

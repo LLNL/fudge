@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pqu package &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>pqu package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,7 +25,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +35,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -64,7 +61,7 @@
 NumberDict instances support addition, and subtraction with other NumberDict
 instances, and multiplication and division by scalars.</p>
 <p>This class is used by the PhysicalUnit class to track units and their power.
-For example, for the unit &#8216;m**2 / kg**3&#8217;, the dictionary items are [(&#8216;kg&#8217;, -3), (&#8216;m&#8217;, 2)].</p>
+For example, for the unit ‘m**2 / kg**3’, the dictionary items are [(‘kg’, -3), (‘m’, 2)].</p>
 </dd></dl>
 
 </div>
@@ -73,14 +70,14 @@ For example, for the unit &#8216;m**2 / kg**3&#8217;, the dictionary items are [
 <div class="section" id="introduction">
 <h3>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h3>
 <p>This module contains classes and functions for representing and manipulating a value with units and uncertainty, 
-herein called a &#8220;Physical Quantity with Uncertainty&#8221; or PQU. For example, if the distance between start and 
-finish lines is measured to be &#8216;100.1 m&#8217; with an uncertainty of &#8216;0.4 m&#8217;, it can be inputted to PQU as the string
-&#8216;100.1(4) m&#8217; or &#8216;100.1 +/- 0.4 m&#8217; (both are allowed input forms as well as several others - see <a href="#id3"><span class="problematic" id="id4">`PQU`_</span></a>).</p>
+herein called a “Physical Quantity with Uncertainty” or PQU. For example, if the distance between start and 
+finish lines is measured to be ‘100.1 m’ with an uncertainty of ‘0.4 m’, it can be inputted to PQU as the string
+‘100.1(4) m’ or ‘100.1 +/- 0.4 m’ (both are allowed input forms as well as several others - see <a href="#id3"><span class="problematic" id="id4">`PQU`_</span></a>).</p>
 <p>From this module, most users should only need the PQU class which stores a PQU object and
 supports common math operations (e.g., addition, subtraction, multiplication) including the operation on 
 the units and uncertainty. 
-For example, if a person races between the start and finish lines in a time of &#8216;16.3 +/- 0.1 s&#8217;, the PQU class can 
-be used to determine the person&#8217;s speed as:</p>
+For example, if a person races between the start and finish lines in a time of ‘16.3 +/- 0.1 s’, the PQU class can 
+be used to determine the person’s speed as:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pqu</span> <span class="k">import</span> <span class="n">PQU</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">distance</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;100.1(4) m&#39;</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">time</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;16.3 +/- 0.1 s&#39;</span> <span class="p">)</span>
@@ -92,7 +89,7 @@ be used to determine the person&#8217;s speed as:</p>
 </pre></div>
 </div>
 <p>In addition to calculating the speed and unit, the PQU class has also propagated the significant digits and the uncertainty. In this example
-the uncertainty was propagated using Goodman&#8217;s expression for uncorrelated values (see <a class="reference internal" href="#uncertainty-propagation">Uncertainty propagation</a>). The
+the uncertainty was propagated using Goodman’s expression for uncorrelated values (see <a class="reference internal" href="#uncertainty-propagation">Uncertainty propagation</a>). The
 propagation of significant digits explains why the printed speed has only 3 digits. The following Python code illustrates
 significant digits for the speed calculation:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="mf">100.1</span> <span class="o">/</span> <span class="mf">16.3</span>
@@ -105,9 +102,9 @@ significant digits for the speed calculation:</p>
 </pre></div>
 </div>
 <p>As can be seen, the internal speed value is as expected. However, since the PQU class (with the help
-of the pqu_float class) tracks a value&#8217;s significant digits, when a PQU instance is printed (via the __str__
-method), only at most &#8216;significantDigits&#8217; are displayed. The allowed range for &#8216;significantDigits&#8217; is
-1 to sys.float_info.dig + 1 inclusive. For addition and subtraction, the member &#8216;order&#8217; is also required and
+of the pqu_float class) tracks a value’s significant digits, when a PQU instance is printed (via the __str__
+method), only at most ‘significantDigits’ are displayed. The allowed range for ‘significantDigits’ is
+1 to sys.float_info.dig + 1 inclusive. For addition and subtraction, the member ‘order’ is also required and
 is why the following output is the same for both print statements:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">distance</span>
 <span class="go">100.1(4) m</span>
@@ -115,9 +112,9 @@ is why the following output is the same for both print statements:</p>
 <span class="go">100.1 +/- 0.4 m</span>
 </pre></div>
 </div>
-<p>How is &#8216;significantDigits&#8217; determined? That depends on how PQU is called. If a string without
-uncertainty is entered as the only argument then &#8216;significantDigits&#8217; is the number of digits in the string
-(ignoring leading &#8216;0&#8217;). Some examples are:</p>
+<p>How is ‘significantDigits’ determined? That depends on how PQU is called. If a string without
+uncertainty is entered as the only argument then ‘significantDigits’ is the number of digits in the string
+(ignoring leading ‘0’). Some examples are:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;12.345&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span> <span class="p">)</span>
 <span class="go">value = 1.23450000000000006e+01, significantDigits = 5, order = 1, isPercent = False, unit = &quot;&quot;</span>
 <span class="go">uncertainty = </span>
@@ -135,7 +132,7 @@ uncertainty is entered as the only argument then &#8216;significantDigits&#8217;
 <span class="go">uncertainty = </span>
 </pre></div>
 </div>
-<p>If the string has an uncertainty, then it is also used in calculating &#8216;significantDigits&#8217;.
+<p>If the string has an uncertainty, then it is also used in calculating ‘significantDigits’.
 Some examples are (note - these are the same as the last examples, with uncertainties added):</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;12.345 +/- 1e-8&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span> <span class="p">)</span>
 <span class="go">value = 1.23450000000000006e+01, significantDigits = 10, order = 1, isPercent = False, unit = &quot;&quot;</span>
@@ -186,53 +183,53 @@ as a <a class="reference internal" href="#pqu.PQU.pqu_uncertainty" title="pqu.PQ
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>meter</td>
-<td>&#8216;m&#8217;</td>
+<td>‘m’</td>
 <td>length</td>
 </tr>
 <tr class="row-odd"><td>kilogram</td>
-<td>&#8216;kg&#8217;</td>
+<td>‘kg’</td>
 <td>mass</td>
 </tr>
 <tr class="row-even"><td>second</td>
-<td>&#8216;s&#8217;</td>
+<td>‘s’</td>
 <td>time</td>
 </tr>
 <tr class="row-odd"><td>Ampere</td>
-<td>&#8216;A&#8217;</td>
+<td>‘A’</td>
 <td>electrical current</td>
 </tr>
 <tr class="row-even"><td>Kelvin</td>
-<td>&#8216;K&#8217;</td>
+<td>‘K’</td>
 <td>thermodynamic temperature</td>
 </tr>
 <tr class="row-odd"><td>mole</td>
-<td>&#8216;mol&#8217;</td>
+<td>‘mol’</td>
 <td>amount of substance</td>
 </tr>
 <tr class="row-even"><td>candela</td>
-<td>&#8216;cd&#8217;</td>
+<td>‘cd’</td>
 <td>luminous intensity</td>
 </tr>
 <tr class="row-odd"><td>radian</td>
-<td>&#8216;rad&#8217;</td>
+<td>‘rad’</td>
 <td>angle</td>
 </tr>
 <tr class="row-even"><td>steradian</td>
-<td>&#8216;sr&#8217;</td>
+<td>‘sr’</td>
 <td>solid angle</td>
 </tr>
 </tbody>
 </table>
 </div></blockquote>
 <p>Any PQU can be represented as a combination of each of these units with an associated power for each unit. As example, a force
-has the base units &#8216;kg&#8217; and &#8216;m&#8217; to power 1 as well as &#8216;s&#8217; to power -2 (represented as the string &#8216;kg * m / s**2&#8217;).
-All other units are stored with these units as a base and a conversion factor. For example, the unit for foot (&#8216;ft&#8217;) is
+has the base units ‘kg’ and ‘m’ to power 1 as well as ‘s’ to power -2 (represented as the string ‘kg * m / s**2’).
+All other units are stored with these units as a base and a conversion factor. For example, the unit for foot (‘ft’) is
 stored as a meter with the conversion factor of 0.3048. Two units are said to be compatible if they have the same power for each
-base unit. Hence, &#8216;ft&#8217; is compatible with &#8216;m&#8217; but not &#8216;kg&#8217; or &#8216;s&#8217;. Furthermore, the electron-Volt (&#8216;eV&#8217;) is compatible
-with Joule (&#8216;J&#8217;) and Watt-second (&#8216;W * s&#8217;) but not Watt (&#8216;W&#8217;).</p>
+base unit. Hence, ‘ft’ is compatible with ‘m’ but not ‘kg’ or ‘s’. Furthermore, the electron-Volt (‘eV’) is compatible
+with Joule (‘J’) and Watt-second (‘W * s’) but not Watt (‘W’).</p>
 <p>The PQU package has many defined units with prefixes (see <a class="reference internal" href="#defined-prefixes-and-units">Defined prefixes and units</a>). In general, the
 PQU methods that operate on PQU objects do not attempt to simplify the units, even if the result is dimensionless.
-For example, consider the division of &#8216;3.2 m&#8217; by 11.2 km:</p>
+For example, consider the division of ‘3.2 m’ by 11.2 km:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pqu</span> <span class="k">import</span> <span class="n">PQU</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;3.2 m&#39;</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;11.2 km&#39;</span> <span class="p">)</span>
@@ -257,7 +254,7 @@ example showing the use of the <a class="reference internal" href="#pqu.PQU.PQU.
 </pre></div>
 </div>
 <p>The method <a class="reference internal" href="#pqu.PQU.PQU.inUnitsOf" title="pqu.PQU.PQU.inUnitsOf"><code class="xref py py-meth docutils literal"><span class="pre">PQU.inUnitsOf()</span></code></a> is useful for returning a physical quantity in units of descending compatible units. 
-For example, <a class="reference internal" href="#pqu.PQU.PQU.inUnitsOf" title="pqu.PQU.PQU.inUnitsOf"><code class="xref py py-meth docutils literal"><span class="pre">PQU.inUnitsOf()</span></code></a> will convert &#8216;3123452.12 s&#8217; into days, hours, minutes and seconds, or just hours and seconds as:</p>
+For example, <a class="reference internal" href="#pqu.PQU.PQU.inUnitsOf" title="pqu.PQU.PQU.inUnitsOf"><code class="xref py py-meth docutils literal"><span class="pre">PQU.inUnitsOf()</span></code></a> will convert ‘3123452.12 s’ into days, hours, minutes and seconds, or just hours and seconds as:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;3123452.12 s&#39;</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">inUnitsOf</span><span class="p">(</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span> <span class="p">)</span>
 <span class="go">(PQU( &quot;36.0000000 d&quot; ), PQU( &quot;3.000000 h&quot; ), PQU( &quot;37.0000 min&quot; ), PQU( &quot;32.12 s&quot; ))</span>
@@ -272,7 +269,7 @@ For example, <a class="reference internal" href="#pqu.PQU.PQU.inUnitsOf" title="
 <p>PQU has a set of defined constants that are hardwired and a set that are not hardwired. The non-hardwired
 constants reside in the module pqu_constants.py and are import by PQU when it is first loaded. It is 
 possible to change a non-hardwired constant by loading the pqu_constants.py module before PQU is imported, redefining
-the constant and then importing PQU. For example, as of this writing the elementary charge is defined as &#8216;1.60217653e-19 * C&#8217;:</p>
+the constant and then importing PQU. For example, as of this writing the elementary charge is defined as ‘1.60217653e-19 * C’:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pqu</span> <span class="k">import</span> <span class="n">PQU</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">eV</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;eV&#39;</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">eV</span>
@@ -281,7 +278,7 @@ the constant and then importing PQU. For example, as of this writing the element
 <span class="go">1.60217653e-19 J</span>
 </pre></div>
 </div>
-<p>The following lines change the elementary charge to &#8216;1.6 * C&#8217;:</p>
+<p>The following lines change the elementary charge to ‘1.6 * C’:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pqu</span> <span class="k">import</span> <span class="n">pqu_constants</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pqu_constants</span><span class="o">.</span><span class="n">e</span> <span class="o">=</span> <span class="s1">&#39;1.6 * C&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pqu</span> <span class="k">import</span> <span class="n">PQU</span>                 <span class="c1"># This import does not work with doctest as PQU was previously imported.</span>
@@ -292,7 +289,7 @@ the constant and then importing PQU. For example, as of this writing the element
 <span class="go">1.6 J</span>
 </pre></div>
 </div>
-<p>The python &#8216;reload&#8217; function can also be used as:</p>
+<p>The python ‘reload’ function can also be used as:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pqu</span> <span class="k">import</span> <span class="n">PQU</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">eV</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;eV&#39;</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">eV</span>
@@ -316,8 +313,8 @@ the constant and then importing PQU. For example, as of this writing the element
 </div>
 <div class="section" id="uncertainty-propagation">
 <h3>Uncertainty propagation<a class="headerlink" href="#uncertainty-propagation" title="Permalink to this headline">¶</a></h3>
-<p>This section describes the propagation of uncertainties for the binary operators &#8216;+&#8217;, &#8216;-&#8216;, &#8216;*&#8217; and &#8216;/&#8217; as well as the power operator
-(i.e., &#8216;**&#8217;). Firstly, a comment on the limits of uncertainty propagation. Uncertainties were added mainly to support the inputting
+<p>This section describes the propagation of uncertainties for the binary operators ‘+’, ‘-‘, ‘*’ and ‘/’ as well as the power operator
+(i.e., ‘**’). Firstly, a comment on the limits of uncertainty propagation. Uncertainties were added mainly to support the inputting
 and outputting (i.e., converting to and from a string) of a physical quantity with an associated uncertainty. As can be seen from the documentation below,
 the supported propagations of uncertainties are limited to simple propagation rules.</p>
 <p>In the following discussion, Q1, Q2 and Q3 will be PQU instances with values
@@ -355,7 +352,7 @@ the two operands are the same instance, 100% correlation is assumed. For example
 </pre></div>
 </div>
 <p>There is one exception (depending on your divide-by-zero belief) to this rule of same instance and that happens when the 
-value of the operand is 0. Divide-by-zero always executes a raise of &#8216;ZeroDivisionError&#8217;, even for &#8216;a / a&#8217;.</p>
+value of the operand is 0. Divide-by-zero always executes a raise of ‘ZeroDivisionError’, even for ‘a / a’.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Q2</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s2">&quot;0.00 +/- 0.02&quot;</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">Q2</span> <span class="o">/</span> <span class="s2">&quot;2 +/- 0.5&quot;</span>
 <span class="go">0.00 +/- 0.01</span>
@@ -369,18 +366,18 @@ value of the operand is 0. Divide-by-zero always executes a raise of &#8216;Zero
 </div>
 <p>For the rest of this discussion, the two binary operands will be assumed to not be the same instance.
 For addition and subtraction with PQU instances Q1 and Q2 as operands the uncertainty is propagated as dQ3 = sqrt( dQ1**2 + dQ2**2 ).
-For multiplication with PQU instances Q1 and Q2 as operands the uncertainty is propagated using Goodman&#8217;s expression with
-uncorrelated values (i.e., as dQ3 = sqrt( ( V2 * dQ1 )**2 + ( V1 * dQ2) <a href="#id1"><span class="problematic" id="id2">**</span></a>2 + ( dQ1 * dQ2 )**2 )). For division, the expression &#8216;Q1 / Q2&#8217;
-is converted to &#8216;Q1 * Q3&#8217; with &#8216;Q3 = PQU( 1 / V2, unit = 1 / U2, uncertainty = dQ2 / ( V2 * V2 ) )&#8217; where U2 is the unit of Q2.</p>
+For multiplication with PQU instances Q1 and Q2 as operands the uncertainty is propagated using Goodman’s expression with
+uncorrelated values (i.e., as dQ3 = sqrt( ( V2 * dQ1 )**2 + ( V1 * dQ2) <a href="#id1"><span class="problematic" id="id2">**</span></a>2 + ( dQ1 * dQ2 )**2 )). For division, the expression ‘Q1 / Q2’
+is converted to ‘Q1 * Q3’ with ‘Q3 = PQU( 1 / V2, unit = 1 / U2, uncertainty = dQ2 / ( V2 * V2 ) )’ where U2 is the unit of Q2.</p>
 <p>For the power method, simple propagation is perform which is only valid if the uncertainty is small relative to the value. 
-This is, for &#8216;Q2 = pow( Q1, n1 )&#8217; the uncertainty for Q2 is &#8216;dQ2 = n1 * V1**(n1-1) * dQ1&#8217;.
-Note, the &#8216;sqrt&#8217; method is equivalent to the &#8216;pow&#8217; method with power of 0.5.</p>
+This is, for ‘Q2 = pow( Q1, n1 )’ the uncertainty for Q2 is ‘dQ2 = n1 * V1**(n1-1) * dQ1’.
+Note, the ‘sqrt’ method is equivalent to the ‘pow’ method with power of 0.5.</p>
 <p>For the trigonometry methods, no propagation of uncertainty is performed.</p>
 </div>
 <div class="section" id="pqu-methods-by-functionality">
 <h3>PQU methods by functionality<a class="headerlink" href="#pqu-methods-by-functionality" title="Permalink to this headline">¶</a></h3>
 <p>This section classifies some of the methods in the PQU class by their function.</p>
-<p>For PQU methods that require a second operand (e.g., &#8216;+&#8217;, &#8216;/&#8217;), the second operand will be passed to the
+<p>For PQU methods that require a second operand (e.g., ‘+’, ‘/’), the second operand will be passed to the
 staticmethod <code class="xref py py-meth docutils literal"><span class="pre">PQU._getOtherAsPQU()</span></code> to determine if it is a suitable object. A suitable object includes any string that
 is a valid PQU. For example: <a class="reference internal" href="#pqu.PQU.PQU.toString" title="pqu.PQU.PQU.toString"><code class="xref py py-meth docutils literal"><span class="pre">PQU.toString()</span></code></a></p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;12.345&#39;</span> <span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;3.23&quot;</span>
@@ -391,14 +388,14 @@ is a valid PQU. For example: <a class="reference internal" href="#pqu.PQU.PQU.to
 </div>
 <p><strong>isCompatible</strong></p>
 <blockquote>
-<div>Returns True if self&#8217;s unit is compatible with the units of the argument and False otherwise.</div></blockquote>
+<div>Returns True if self’s unit is compatible with the units of the argument and False otherwise.</div></blockquote>
 <p><strong>isPercent, isDimensionless, isLength, isMass, isTime, isCurrent, isTemperature, isMoles, isLuminousIntensity,
 isAngle, isSolidAngle, isEnergy, isSpin, isCharge</strong></p>
 <blockquote>
 <div>These methods return True if self is compatible with the unit implied by the method name.</div></blockquote>
 <p><strong>__float__</strong></p>
 <blockquote>
-<div>This method is called when the a PQU is the argument to the &#8216;float&#8217; function (e.g., float( pqu )).
+<div>This method is called when the a PQU is the argument to the ‘float’ function (e.g., float( pqu )).
 This method returns a python float for the value of the PQU instance. As example:</div></blockquote>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pqu</span> <span class="o">=</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="s1">&#39;13.7 +/- 0.1 mi/h&#39;</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">pqu</span> <span class="p">)</span>
@@ -409,7 +406,7 @@ This method returns a python float for the value of the PQU instance. As example
 <p>The PQU class has methods for the following arithmetic operations. Unless stated, a new PQU instance is returned.</p>
 <p><strong>__abs__, __neg__</strong></p>
 <blockquote>
-<div>These are the standard unitary operators that only operate on the PQU&#8217;s value.</div></blockquote>
+<div>These are the standard unitary operators that only operate on the PQU’s value.</div></blockquote>
 <p><strong>__add__, __radd__, __iadd__, __sub__, __rsub__, __isub__</strong></p>
 <blockquote>
 <div>These are the standard binary operators for addition and subtraction. For these operators, the other
@@ -419,11 +416,11 @@ As expected, the __iadd__ and __isub__ methods modify self and return it.</div><
 <blockquote>
 <div><p>These are the standard binary operators for multiplication and division. For these operators, the other
 operand is passed to <code class="xref py py-meth docutils literal"><span class="pre">PQU._getOtherAsPQU()</span></code>. As expected, the __imul__ and __idiv__ methods modify self and
-return it. All these methods call the __mul__ method; except, when a division happens, and &#8216;self is other&#8217;
+return it. All these methods call the __mul__ method; except, when a division happens, and ‘self is other’
 and the denominator is not 0.
-That is, the expression &#8216;a / a&#8217; is handled as a special case when float( a ) != 0. In this case, a 
+That is, the expression ‘a / a’ is handled as a special case when float( a ) != 0. In this case, a 
 dimensionless PQU is returned with value 1 and no uncertainty.</p>
-<p>If self is not other, the uncertainty is propagated using Goodman&#8217;s expression for uncorrelated values.
+<p>If self is not other, the uncertainty is propagated using Goodman’s expression for uncorrelated values.
 Otherwise, 100% correlated uncertainty is assumed.</p>
 </div></blockquote>
 <p><strong>__pow__</strong></p>
@@ -436,14 +433,14 @@ only if the result can be represented by integer powers of the base units.</div>
 <blockquote>
 <div>These methods compare self to another object. For these operators, the other
 object is passed to <code class="xref py py-meth docutils literal"><span class="pre">PQU._getOtherAsPQU()</span></code>. The first 6 methods all call the <a class="reference internal" href="#pqu.PQU.compare" title="pqu.PQU.compare"><code class="xref py py-func docutils literal"><span class="pre">compare()</span></code></a> method
-with epsilonFactor = 5. All methods except &#8216;equivalent&#8217; compare 
-self&#8217;s and other&#8217;s values only. The &#8216;equivalent&#8217; method also considers self&#8217;s and other&#8217;s uncertainty.</div></blockquote>
+with epsilonFactor = 5. All methods except ‘equivalent’ compare 
+self’s and other’s values only. The ‘equivalent’ method also considers self’s and other’s uncertainty.</div></blockquote>
 <p><strong>__deepcopy__, convertToUnit, copyToUnit, inUnitsOf, getUnitAsString, getValueAs, getUncertaintyValueAs</strong></p>
 <blockquote>
-<div>These methods change a PQU&#8217;s unit or return a new instance.</div></blockquote>
+<div>These methods change a PQU’s unit or return a new instance.</div></blockquote>
 <p><strong>truncate</strong></p>
 <blockquote>
-<div>This method changes a PQU&#8217;s value and uncertainty to agree with its printed value as defined
+<div>This method changes a PQU’s value and uncertainty to agree with its printed value as defined
 by its significant digits.</div></blockquote>
 <p><strong>changeUncertaintyStyle, changeUncertaintyPercent</strong></p>
 <blockquote>
@@ -461,11 +458,11 @@ are only intended for internal use.</p>
 <h3>History<a class="headerlink" href="#history" title="Permalink to this headline">¶</a></h3>
 <p>This module is based on the Scientific/Physics/PhysicalQuantities.py module (Last revision: 2007-5-25)
 written by Konrad Hinsen &lt;<a class="reference external" href="mailto:hinsen&#37;&#52;&#48;cnrs-orleans&#46;fr">hinsen<span>&#64;</span>cnrs-orleans<span>&#46;</span>fr</a>&gt; with contributions from Greg Ward and Berthold Hoellmann.</p>
-<p>Most of the additions to Hinsen&#8217;s version were done by Nidhi R. Patel and Bret R. Beck &lt;<a class="reference external" href="mailto:beck6&#37;&#52;&#48;llnl&#46;gov">beck6<span>&#64;</span>llnl<span>&#46;</span>gov</a>&gt;
+<p>Most of the additions to Hinsen’s version were done by Nidhi R. Patel and Bret R. Beck &lt;<a class="reference external" href="mailto:beck6&#37;&#52;&#48;llnl&#46;gov">beck6<span>&#64;</span>llnl<span>&#46;</span>gov</a>&gt;
 with feedback from Caleb M. Mattoon, Neil Summers and David Brown.</p>
 <p>The values of physical constants are taken from the 2010 recommended values from
 CODATA. Other conversion factors (e.g. for British units) come from various 
-sources. I can&#8217;t guarantee for the correctness of all entries in the unit table,
+sources. I can’t guarantee for the correctness of all entries in the unit table,
 so use this at your own risk.</p>
 </div>
 <div class="section" id="issues-or-features-to-be-aware-of">
@@ -473,10 +470,10 @@ so use this at your own risk.</p>
 <p>This section describes several oddities about PQU.</p>
 <blockquote>
 <div><ul class="simple">
-<li>Units &#8216;oz&#8217;, &#8216;lb&#8217; and &#8216;ton&#8217; (i.e., ounce, pound and ton respectively) are units of mass and not force.
-As example, the unit &#8216;psi&#8217; (i.e., pounds per square inch) is equivalent to about &#8216;32.174 ft / s**2 * lb / inch**2&#8217;.</li>
+<li>Units ‘oz’, ‘lb’ and ‘ton’ (i.e., ounce, pound and ton respectively) are units of mass and not force.
+As example, the unit ‘psi’ (i.e., pounds per square inch) is equivalent to about ‘32.174 ft / s**2 * lb / inch**2’.</li>
 <li>In the following, the first line products a significantDigits that is small but correct per PQU 
-rules as the number of significant digits is determined by the &#8216;1&#8217;.</li>
+rules as the number of significant digits is determined by the ‘1’.</li>
 </ul>
 </div></blockquote>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pqu</span> <span class="k">import</span> <span class="n">PQU</span>
@@ -497,12 +494,12 @@ rules as the number of significant digits is determined by the &#8216;1&#8217;.<
 </div>
 <blockquote>
 <div><ul class="simple">
-<li>The temperature units are Kelvin (i.e., &#8216;K&#8217;), Celsius (&#8216;degC&#8217;), Rankine (&#8216;degR&#8217;) and Fahrenheit (&#8216;degF&#8217;).
-Two of these units (i.e., &#8216;degC&#8217; and &#8216;degF&#8217;) cannot be used with any other unit including itself. That is,
-PQU( value, &#8216;degC&#8217; ) and PQU( value, &#8216;degF&#8217; ) are the only allowed forms when &#8216;degF&#8217; or &#8216;degC&#8217; are present.
-The two absolute temperature units (i.e., &#8216;K&#8217; and &#8216;degR&#8217;) have no such restriction. As an example, heat 
-capacity can be expressed in units of &#8216;W/(m * K)&#8217; or &#8216;BTU/(hr * ft * degR)&#8217; but cannot be expressed in units
-of &#8216;W/(m * degC)&#8217; or &#8216;BTU/(hr * ft * degF)&#8217;.
+<li>The temperature units are Kelvin (i.e., ‘K’), Celsius (‘degC’), Rankine (‘degR’) and Fahrenheit (‘degF’).
+Two of these units (i.e., ‘degC’ and ‘degF’) cannot be used with any other unit including itself. That is,
+PQU( value, ‘degC’ ) and PQU( value, ‘degF’ ) are the only allowed forms when ‘degF’ or ‘degC’ are present.
+The two absolute temperature units (i.e., ‘K’ and ‘degR’) have no such restriction. As an example, heat 
+capacity can be expressed in units of ‘W/(m * K)’ or ‘BTU/(hr * ft * degR)’ but cannot be expressed in units
+of ‘W/(m * degC)’ or ‘BTU/(hr * ft * degF)’.
 Any temperature unit can be converted to another temperature unit. For example,</li>
 </ul>
 </div></blockquote>
@@ -518,7 +515,7 @@ Any temperature unit can be converted to another temperature unit. For example,<
 </div>
 <blockquote>
 <div><ul class="simple">
-<li>PQU, actually PhysicalUnit, allows the unit to have values. For example &#8216;m/s/25**3&#8217; is currently a valid
+<li>PQU, actually PhysicalUnit, allows the unit to have values. For example ‘m/s/25**3’ is currently a valid
 unit and stored that way.  This should probably not be allowed and will probably be 
 deprecated (i.e., do not rely on it).
 The following illustrates the issue:</li>
@@ -580,26 +577,26 @@ The following illustrates the issue:</li>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">----</span>  <span class="o">------</span> <span class="o">------</span>
 <span class="n">name</span>  <span class="n">factor</span> <span class="n">symbol</span>
 <span class="o">----</span>  <span class="o">------</span> <span class="o">------</span>
-<span class="n">yotta</span> <span class="mi">1</span><span class="n">e</span><span class="o">+</span><span class="mi">24</span>  <span class="n">Y</span>                                              
-<span class="n">zetta</span> <span class="mi">1</span><span class="n">e</span><span class="o">+</span><span class="mi">21</span>  <span class="n">Z</span>                                              
-<span class="n">exa</span>   <span class="mi">1</span><span class="n">e</span><span class="o">+</span><span class="mi">18</span>  <span class="n">E</span>                                              
-<span class="n">peta</span>  <span class="mi">1</span><span class="n">e</span><span class="o">+</span><span class="mi">15</span>  <span class="n">P</span>                                              
-<span class="n">tera</span>  <span class="mi">1</span><span class="n">e</span><span class="o">+</span><span class="mi">12</span>  <span class="n">T</span>                                              
-<span class="n">giga</span>  <span class="mi">1</span><span class="n">e</span><span class="o">+</span><span class="mi">09</span>  <span class="n">G</span>                                              
-<span class="n">mega</span>  <span class="mi">1</span><span class="n">e</span><span class="o">+</span><span class="mi">06</span>  <span class="n">M</span>                                              
-<span class="n">kilo</span>  <span class="mi">1</span><span class="n">e</span><span class="o">+</span><span class="mi">03</span>  <span class="n">k</span>                                              
-<span class="n">hecto</span> <span class="mi">1</span><span class="n">e</span><span class="o">+</span><span class="mi">02</span>  <span class="n">h</span>                                              
-<span class="n">deka</span>  <span class="mi">1</span><span class="n">e</span><span class="o">+</span><span class="mi">01</span>  <span class="n">da</span>                                             
-<span class="n">deci</span>  <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">01</span>  <span class="n">d</span>                                              
-<span class="n">centi</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">02</span>  <span class="n">c</span>                                              
-<span class="n">milli</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">03</span>  <span class="n">m</span>                                              
-<span class="n">micro</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">06</span>  <span class="n">mu</span>                                             
-<span class="n">nano</span>  <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">09</span>  <span class="n">n</span>                                              
-<span class="n">pico</span>  <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">12</span>  <span class="n">p</span>                                              
-<span class="n">femto</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">15</span>  <span class="n">f</span>                                              
-<span class="n">atto</span>  <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">18</span>  <span class="n">a</span>                                              
-<span class="n">zepto</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">21</span>  <span class="n">z</span>                                              
-<span class="n">yocto</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">24</span>  <span class="n">y</span>                                              
+<span class="n">yotta</span> <span class="mf">1e+24</span>  <span class="n">Y</span>                                              
+<span class="n">zetta</span> <span class="mf">1e+21</span>  <span class="n">Z</span>                                              
+<span class="n">exa</span>   <span class="mf">1e+18</span>  <span class="n">E</span>                                              
+<span class="n">peta</span>  <span class="mf">1e+15</span>  <span class="n">P</span>                                              
+<span class="n">tera</span>  <span class="mf">1e+12</span>  <span class="n">T</span>                                              
+<span class="n">giga</span>  <span class="mf">1e+09</span>  <span class="n">G</span>                                              
+<span class="n">mega</span>  <span class="mf">1e+06</span>  <span class="n">M</span>                                              
+<span class="n">kilo</span>  <span class="mf">1e+03</span>  <span class="n">k</span>                                              
+<span class="n">hecto</span> <span class="mf">1e+02</span>  <span class="n">h</span>                                              
+<span class="n">deka</span>  <span class="mf">1e+01</span>  <span class="n">da</span>                                             
+<span class="n">deci</span>  <span class="mf">1e-01</span>  <span class="n">d</span>                                              
+<span class="n">centi</span> <span class="mf">1e-02</span>  <span class="n">c</span>                                              
+<span class="n">milli</span> <span class="mf">1e-03</span>  <span class="n">m</span>                                              
+<span class="n">micro</span> <span class="mf">1e-06</span>  <span class="n">mu</span>                                             
+<span class="n">nano</span>  <span class="mf">1e-09</span>  <span class="n">n</span>                                              
+<span class="n">pico</span>  <span class="mf">1e-12</span>  <span class="n">p</span>                                              
+<span class="n">femto</span> <span class="mf">1e-15</span>  <span class="n">f</span>                                              
+<span class="n">atto</span>  <span class="mf">1e-18</span>  <span class="n">a</span>                                              
+<span class="n">zepto</span> <span class="mf">1e-21</span>  <span class="n">z</span>                                              
+<span class="n">yocto</span> <span class="mf">1e-24</span>  <span class="n">y</span>                                              
 </pre></div>
 </div>
 </div>
@@ -824,22 +821,22 @@ A PQU is anything that the staticmethod parsers.parsePQUString can parse.</p>
 </tr>
 <tr class="row-even"><td>number</td>
 <td>Any of the following, int, float, pqu_float, a string representing a float (i.e.,
-the python float function must be able to convert the string - e.g., &#8216;12.3e3&#8217; but
-not &#8216;12.3 eV&#8217;) or any object having a __float__ method (hence, a numpy float
+the python float function must be able to convert the string - e.g., ‘12.3e3’ but
+not ‘12.3 eV’) or any object having a __float__ method (hence, a numpy float
 will work).</td>
 </tr>
 <tr class="row-odd"><td>uncertainty = number_unc</td>
 <td>The uncertainty argument must be a valid number or a pqu_uncertainty object.
-If number, uncertainty is of style &#8216;+/-&#8216;.</td>
+If number, uncertainty is of style ‘+/-‘.</td>
 </tr>
 <tr class="row-even"><td>unit = string_pu</td>
-<td>The unit argument must be a valid unit string (e.g., &#8220;MeV&#8221;, &#8220;MeV/m&#8221; but not
-&#8220;1 MeV&#8221;) or a PhysicalUnit object.</td>
+<td>The unit argument must be a valid unit string (e.g., “MeV”, “MeV/m” but not
+“1 MeV”) or a PhysicalUnit object.</td>
 </tr>
 <tr class="row-odd"><td>string</td>
 <td>String can be anything that the method parsers.parsePQUString is
-capable of parsing (e.g., &#8216;1.23&#8217;, &#8216;1.23 m&#8217;, &#8216;1.23%&#8217;, &#8216;1.23(12) m&#8217;,
-&#8216;1.23 +/- 0.12m&#8217;). If it contains a unit (uncertainty) then the unit
+capable of parsing (e.g., ‘1.23’, ‘1.23 m’, ‘1.23%’, ‘1.23(12) m’,
+‘1.23 +/- 0.12m’). If it contains a unit (uncertainty) then the unit
 (uncertainty) argument must be None.</td>
 </tr>
 </tbody>
@@ -858,18 +855,18 @@ capable of parsing (e.g., &#8216;1.23&#8217;, &#8216;1.23 m&#8217;, &#8216;1.23%
 <dl class="docutils">
 <dt>For example, the following are allowed and are the same:</dt>
 <dd><ul class="first last simple">
-<li>PQU( &#8220;1.23&#8221;, &#8220;m&#8221;, &#8220;12%&#8221; )</li>
-<li>PQU( &#8220;1.23 m&#8221;, uncertainty = &#8220;12%&#8221; )</li>
-<li>PQU( &#8220;1.23 +/- 12%&#8221;, &#8220;m&#8221; )</li>
-<li>PQU( &#8220;1.23 +/- 12%&#8221;, &#8220;m&#8221;, None )    # Same as above as None is the default.</li>
-<li>PQU( &#8220;1.23+/-12% m&#8221; )</li>
+<li>PQU( “1.23”, “m”, “12%” )</li>
+<li>PQU( “1.23 m”, uncertainty = “12%” )</li>
+<li>PQU( “1.23 +/- 12%”, “m” )</li>
+<li>PQU( “1.23 +/- 12%”, “m”, None )    # Same as above as None is the default.</li>
+<li>PQU( “1.23+/-12% m” )</li>
 </ul>
 </dd>
 <dt>While the following are not allowed:</dt>
 <dd><ul class="first last simple">
-<li>PQU( &#8220;1.23+/-12% m&#8221;, &#8220;m&#8221; )                    # Unit already given in value.</li>
-<li>PQU( &#8220;1.23+/-12% m&#8221;, uncertainty = &#8220;12%&#8221; )    # Uncertainty already given in value.</li>
-<li>PQU( &#8220;1.23+/-12% m&#8221;, &#8220;m&#8221;, &#8220;12%&#8221; )             # Unit and uncertainty already given in value.</li>
+<li>PQU( “1.23+/-12% m”, “m” )                    # Unit already given in value.</li>
+<li>PQU( “1.23+/-12% m”, uncertainty = “12%” )    # Uncertainty already given in value.</li>
+<li>PQU( “1.23+/-12% m”, “m”, “12%” )             # Unit and uncertainty already given in value.</li>
 </ul>
 </dd>
 </dl>
@@ -877,14 +874,14 @@ capable of parsing (e.g., &#8216;1.23&#8217;, &#8216;1.23 m&#8217;, &#8216;1.23%
 <dl class="method">
 <dt id="pqu.PQU.PQU.changeUncertaintyPercent">
 <code class="descname">changeUncertaintyPercent</code><span class="sig-paren">(</span><em>toPercent</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.changeUncertaintyPercent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.changeUncertaintyPercent" title="Permalink to this definition">¶</a></dt>
-<dd><p>If self&#8217;s style is not pqu_uncertaintyStylePlusMinus a raise is executed. Otherwise, if toPercent
-is True (False) self&#8217;s uncertainty will be converted to a percent (non-percent) if not already a percent
+<dd><p>If self’s style is not pqu_uncertaintyStylePlusMinus a raise is executed. Otherwise, if toPercent
+is True (False) self’s uncertainty will be converted to a percent (non-percent) if not already a percent
 (non-percent).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>toPercent</strong> (<cite>bool</cite>) &#8211; Specifies whether self&#8217;s uncertainty should be percent or not</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>toPercent</strong> (<cite>bool</cite>) – Specifies whether self’s uncertainty should be percent or not</td>
 </tr>
 </tbody>
 </table>
@@ -893,13 +890,13 @@ is True (False) self&#8217;s uncertainty will be converted to a percent (non-per
 <dl class="method">
 <dt id="pqu.PQU.PQU.changeUncertaintyStyle">
 <code class="descname">changeUncertaintyStyle</code><span class="sig-paren">(</span><em>style</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.changeUncertaintyStyle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.changeUncertaintyStyle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Changes self.uncertainty&#8217;s style. If style is the same as self.uncertainty&#8217;s style nothing is done. If style
-or self.uncertainty&#8217;s style is pqu_uncertainty.pqu_uncertaintyStyleNone as raise is executed.</p>
+<dd><p>Changes self.uncertainty’s style. If style is the same as self.uncertainty’s style nothing is done. If style
+or self.uncertainty’s style is pqu_uncertainty.pqu_uncertaintyStyleNone as raise is executed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>style</strong> &#8211; One of the three pqu_uncertainty styles</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>style</strong> – One of the three pqu_uncertainty styles</td>
 </tr>
 </tbody>
 </table>
@@ -908,7 +905,7 @@ or self.uncertainty&#8217;s style is pqu_uncertainty.pqu_uncertaintyStyleNone as
 <dl class="method">
 <dt id="pqu.PQU.PQU.compare">
 <code class="descname">compare</code><span class="sig-paren">(</span><em>other</em>, <em>epsilonFactor=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.compare" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compares self&#8217;s value to other&#8217;s value (other&#8217;s value is first converted to unit of self) using the
+<dd><p>Compares self’s value to other’s value (other’s value is first converted to unit of self) using the
 <a class="reference internal" href="#pqu.PQU.compare" title="pqu.PQU.compare"><code class="xref py py-func docutils literal"><span class="pre">compare()</span></code></a> function.</p>
 <p>Also see method <a class="reference internal" href="#pqu.PQU.PQU.equivalent" title="pqu.PQU.PQU.equivalent"><code class="xref py py-meth docutils literal"><span class="pre">PQU.equivalent()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -916,8 +913,8 @@ or self.uncertainty&#8217;s style is pqu_uncertainty.pqu_uncertaintyStyleNone as
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>other</strong> (<em>A PQU equivalent instance</em>) &#8211; The PQU instance to compare to self</li>
-<li><strong>epsilonFactor</strong> &#8211; See the <a class="reference internal" href="#pqu.PQU.compare" title="pqu.PQU.compare"><code class="xref py py-func docutils literal"><span class="pre">compare()</span></code></a> function</li>
+<li><strong>other</strong> (<em>A PQU equivalent instance</em>) – The PQU instance to compare to self</li>
+<li><strong>epsilonFactor</strong> – See the <a class="reference internal" href="#pqu.PQU.compare" title="pqu.PQU.compare"><code class="xref py py-func docutils literal"><span class="pre">compare()</span></code></a> function</li>
 </ul>
 </td>
 </tr>
@@ -931,15 +928,15 @@ or self.uncertainty&#8217;s style is pqu_uncertainty.pqu_uncertaintyStyleNone as
 <dl class="method">
 <dt id="pqu.PQU.PQU.convertToUnit">
 <code class="descname">convertToUnit</code><span class="sig-paren">(</span><em>unit</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.convertToUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.convertToUnit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Changes self&#8217;s unit to unit and adjusts the value such that the new value/unit is equivalent to
+<dd><p>Changes self’s unit to unit and adjusts the value such that the new value/unit is equivalent to
 the original value/unit. The new unit must be compatible with the original unit of self.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>unit</strong> (<em>str</em>) &#8211; a unit equivalent</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>unit</strong> (<em>str</em>) – a unit equivalent</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>TypeError</strong> &#8211; if the unit string is not a known unit or is a unit incompatible with self&#8217;s unit</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>TypeError</strong> – if the unit string is not a known unit or is a unit incompatible with self’s unit</td>
 </tr>
 </tbody>
 </table>
@@ -953,7 +950,7 @@ the original value/unit. The new unit must be compatible with the original unit 
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>unit</strong> (<em>str</em>) &#8211; a unit equivalent</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>unit</strong> (<em>str</em>) – a unit equivalent</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#module-pqu.PQU" title="pqu.PQU">PQU</a></td>
 </tr>
@@ -972,17 +969,17 @@ the original value/unit. The new unit must be compatible with the original unit 
 <code class="descname">equivalent</code><span class="sig-paren">(</span><em>other</em>, <em>factor=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.equivalent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.equivalent" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method compares self to other and returns True if they are equivalent and False otherwise. The
 two are considered equivalent if their bands overlap. The band for self (or other) is all
-values within &#8216;factor times uncertainty&#8217; of its value. That is, the band for self is the ranges from
-&#8216;value - factor * uncertainty&#8217; to &#8216;value + factor * uncertainty&#8217;.</p>
+values within ‘factor times uncertainty’ of its value. That is, the band for self is the ranges from
+‘value - factor * uncertainty’ to ‘value + factor * uncertainty’.</p>
 <p>Note, this is different than the <a class="reference internal" href="#pqu.PQU.compare" title="pqu.PQU.compare"><code class="xref py py-meth docutils literal"><span class="pre">compare()</span></code></a> method which compares the values using sys.float_info.epsilon
-to calculate a &#8216;band&#8217; and not their uncertainties.</p>
+to calculate a ‘band’ and not their uncertainties.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>other</strong> (<em>a PQU equivalent</em>) &#8211; The object to compare to self</li>
-<li><strong>factor</strong> (<cite>float</cite>) &#8211; the 1/2 width in standard deviations of the band</li>
+<li><strong>other</strong> (<em>a PQU equivalent</em>) – The object to compare to self</li>
+<li><strong>factor</strong> (<cite>float</cite>) – the 1/2 width in standard deviations of the band</li>
 </ul>
 </td>
 </tr>
@@ -996,7 +993,7 @@ to calculate a &#8216;band&#8217; and not their uncertainties.</p>
 <dl class="method">
 <dt id="pqu.PQU.PQU.getSignificantDigits">
 <code class="descname">getSignificantDigits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.getSignificantDigits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.getSignificantDigits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the number of significant digits for self&#8217;s value.</p>
+<dd><p>Returns the number of significant digits for self’s value.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1010,8 +1007,8 @@ to calculate a &#8216;band&#8217; and not their uncertainties.</p>
 <dl class="method">
 <dt id="pqu.PQU.PQU.getUncertaintyValueAs">
 <code class="descname">getUncertaintyValueAs</code><span class="sig-paren">(</span><em>unit=None</em>, <em>asPQU=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.getUncertaintyValueAs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.getUncertaintyValueAs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a python float representing self&#8217;s uncertainty value. If the uncertainty is a percent, the returned
-float is self&#8217;s value times self&#8217;s uncertainty value.</p>
+<dd><p>Returns a python float representing self’s uncertainty value. If the uncertainty is a percent, the returned
+float is self’s value times self’s uncertainty value.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1025,7 +1022,7 @@ float is self&#8217;s value times self&#8217;s uncertainty value.</p>
 <dl class="method">
 <dt id="pqu.PQU.PQU.getUnitAsString">
 <code class="descname">getUnitAsString</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.getUnitAsString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.getUnitAsString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a string representation of self&#8217;s unit.</p>
+<dd><p>Returns a string representation of self’s unit.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1039,7 +1036,7 @@ float is self&#8217;s value times self&#8217;s uncertainty value.</p>
 <dl class="method">
 <dt id="pqu.PQU.PQU.getUnitSymbol">
 <code class="descname">getUnitSymbol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pqu.PQU.PQU.getUnitSymbol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a string representation of self&#8217;s unit.</p>
+<dd><p>Returns a string representation of self’s unit.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1053,18 +1050,18 @@ float is self&#8217;s value times self&#8217;s uncertainty value.</p>
 <dl class="method">
 <dt id="pqu.PQU.PQU.getValue">
 <code class="descname">getValue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.getValue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a python float representing self&#8217;s value. This is equivalent to &#8216;float( self )&#8217;.</p>
+<dd><p>Returns a python float representing self’s value. This is equivalent to ‘float( self )’.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pqu.PQU.PQU.getValueAs">
 <code class="descname">getValueAs</code><span class="sig-paren">(</span><em>unit</em>, <em>asPQU=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.getValueAs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.getValueAs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self&#8217;s value in units of unit. Unit must be compatible with self&#8217;s unit.</p>
+<dd><p>Returns self’s value in units of unit. Unit must be compatible with self’s unit.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>unit</strong> &#8211; The unit to return self&#8217;s value in</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>unit</strong> – The unit to return self’s value in</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><cite>float</cite></td>
 </tr>
@@ -1101,13 +1098,13 @@ systems like hour/minute/second.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>units</strong> (<cite>str</cite> or sequence of <cite>str</cite>) &#8211; one or several units</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>units</strong> (<cite>str</cite> or sequence of <cite>str</cite>) – one or several units</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">one or more physical quantities</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><cite>PQU</cite> or <cite>tuple</cite> of <cite>PQU</cite></td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>TypeError</strong> &#8211; if any of the specified units are not compatible with the original unit</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>TypeError</strong> – if any of the specified units are not compatible with the original unit</td>
 </tr>
 </tbody>
 </table>
@@ -1158,12 +1155,12 @@ systems like hour/minute/second.</p>
 <dl class="method">
 <dt id="pqu.PQU.PQU.isCompatible">
 <code class="descname">isCompatible</code><span class="sig-paren">(</span><em>unit</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isCompatible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isCompatible" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns True if self&#8217;s unit is compatible with unit.</p>
+<dd><p>Returns True if self’s unit is compatible with unit.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>unit</strong> (<cite>str</cite>) &#8211; a unit</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>unit</strong> (<cite>str</cite>) – a unit</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><cite>bool</cite></td>
 </tr>
@@ -1293,8 +1290,8 @@ PhysicalUnit or PQU.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>elf</strong> (<em>a unit equivalent</em>) &#8211; The instance to compare to unit</li>
-<li><strong>unit</strong> (<em>a unit equivalent</em>) &#8211; The desired unit</li>
+<li><strong>elf</strong> (<em>a unit equivalent</em>) – The instance to compare to unit</li>
+<li><strong>unit</strong> (<em>a unit equivalent</em>) – The desired unit</li>
 </ul>
 </td>
 </tr>
@@ -1322,7 +1319,7 @@ PhysicalUnit or PQU.</p>
 <dl class="method">
 <dt id="pqu.PQU.PQU.isSpin">
 <code class="descname">isSpin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.isSpin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.isSpin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns True if self has unit of spin (i.e., same as &#8216;hbar&#8217;) and False otherwise.</p>
+<dd><p>Returns True if self has unit of spin (i.e., same as ‘hbar’) and False otherwise.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1371,8 +1368,8 @@ Otherwise, a raise is executed.  For scaleValue argument see <a class="reference
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>isPercent</strong> &#8211; See <a class="reference internal" href="#pqu.PQU.pqu_float.setPercentFlag" title="pqu.PQU.pqu_float.setPercentFlag"><code class="xref py py-meth docutils literal"><span class="pre">pqu_float.setPercentFlag()</span></code></a></li>
-<li><strong>scaleValue</strong> &#8211; See <a class="reference internal" href="#pqu.PQU.pqu_float.setPercentFlag" title="pqu.PQU.pqu_float.setPercentFlag"><code class="xref py py-meth docutils literal"><span class="pre">pqu_float.setPercentFlag()</span></code></a></li>
+<li><strong>isPercent</strong> – See <a class="reference internal" href="#pqu.PQU.pqu_float.setPercentFlag" title="pqu.PQU.pqu_float.setPercentFlag"><code class="xref py py-meth docutils literal"><span class="pre">pqu_float.setPercentFlag()</span></code></a></li>
+<li><strong>scaleValue</strong> – See <a class="reference internal" href="#pqu.PQU.pqu_float.setPercentFlag" title="pqu.PQU.pqu_float.setPercentFlag"><code class="xref py py-meth docutils literal"><span class="pre">pqu_float.setPercentFlag()</span></code></a></li>
 </ul>
 </td>
 </tr>
@@ -1385,11 +1382,11 @@ Otherwise, a raise is executed.  For scaleValue argument see <a class="reference
 <code class="descname">simplify</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.simplify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.simplify" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method returns a PQU instance that is the same as self but with its units simplified. This is,
 units that have the same base units are reduce to one of those units. For example, if self is equivalent to
-&#8216;1.2 km/m**3&#8217; then the returned instance will be equivalent to &#8216;1.2e3 / m**2&#8217; or &#8216;1.2e9 / km**2&#8217;
+‘1.2 km/m**3’ then the returned instance will be equivalent to ‘1.2e3 / m**2’ or ‘1.2e9 / km**2’
 (the actual units returned are not guaranteed). As another example, if self is equivalent to
-&#8216;1.2 ft**3 / lb / s / ( m**2 / kg )&#8217; then one returned outcome is &#8216;0.2457793723470261 ft/s&#8217;.
-That is, the &#8216;ft&#8217; and &#8216;m&#8217; units have the same base units and are all converted to &#8216;ft&#8217; (in
-this case) and the &#8216;lb&#8217; and &#8216;kg&#8217; are all converted to &#8216;lb&#8217; (or &#8216;kg&#8217;).</p>
+‘1.2 ft**3 / lb / s / ( m**2 / kg )’ then one returned outcome is ‘0.2457793723470261 ft/s’.
+That is, the ‘ft’ and ‘m’ units have the same base units and are all converted to ‘ft’ (in
+this case) and the ‘lb’ and ‘kg’ are all converted to ‘lb’ (or ‘kg’).</p>
 </dd></dl>
 
 <dl class="method">
@@ -1413,7 +1410,7 @@ this case) and the &#8216;lb&#8217; and &#8216;kg&#8217; are all converted to &#
 <dl class="method">
 <dt id="pqu.PQU.PQU.toString">
 <code class="descname">toString</code><span class="sig-paren">(</span><em>significantDigits=None</em>, <em>keepPeriod=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.toString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a string representation of self (e.g., &#8216;35 +/- 1.2% J&#8217;).</p>
+<dd><p>Returns a string representation of self (e.g., ‘35 +/- 1.2% J’).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1427,15 +1424,15 @@ this case) and the &#8216;lb&#8217; and &#8216;kg&#8217; are all converted to &#
 <dl class="method">
 <dt id="pqu.PQU.PQU.truncate">
 <code class="descname">truncate</code><span class="sig-paren">(</span><em>value=False</em>, <em>uncertainty=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PQU.truncate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PQU.truncate" title="Permalink to this definition">¶</a></dt>
-<dd><p>If value is True, calls self.value&#8217;s truncate method. If uncertainty is True, calls self.uncertainty&#8217;s truncate method.
+<dd><p>If value is True, calls self.value’s truncate method. If uncertainty is True, calls self.uncertainty’s truncate method.
 See <a class="reference internal" href="#pqu.PQU.pqu_float.truncate" title="pqu.PQU.pqu_float.truncate"><code class="xref py py-meth docutils literal"><span class="pre">pqu_float.truncate()</span></code></a></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>value</strong> (<cite>bool</cite>) &#8211; If True self&#8217;s value is truncated</li>
-<li><strong>uncertainty</strong> (<cite>bool</cite>) &#8211; If True self&#8217;s uncertainty is truncated</li>
+<li><strong>value</strong> (<cite>bool</cite>) – If True self’s value is truncated</li>
+<li><strong>uncertainty</strong> (<cite>bool</cite>) – If True self’s uncertainty is truncated</li>
 </ul>
 </td>
 </tr>
@@ -1464,12 +1461,12 @@ multiplied, divided, and raised to integer powers.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>symbols</strong> (<cite>dict</cite> or <cite>str</cite>) &#8211; a dictionary mapping each symbol component to its associated integer
+<li><strong>symbols</strong> (<cite>dict</cite> or <cite>str</cite>) – a dictionary mapping each symbol component to its associated integer
 power (e.g., <code class="docutils literal"><span class="pre">{'m':</span> <span class="pre">1,</span> <span class="pre">'s':</span> <span class="pre">-1}</span></code>) for <cite>m/s</cite>). As a shorthand, a string may be 
 passed which is assigned an implicit power 1.</li>
-<li><strong>factor</strong> (<cite>float</cite>) &#8211; a scaling factor</li>
-<li><strong>offset</strong> (<cite>float</cite>) &#8211; an additive offset to the base unit (used only for temperatures)</li>
-<li><strong>powers</strong> (<cite>list</cite> of <cite>int</cite>) &#8211; the integer powers for each of the nine base units</li>
+<li><strong>factor</strong> (<cite>float</cite>) – a scaling factor</li>
+<li><strong>offset</strong> (<cite>float</cite>) – an additive offset to the base unit (used only for temperatures)</li>
+<li><strong>powers</strong> (<cite>list</cite> of <cite>int</cite>) – the integer powers for each of the nine base units</li>
 </ul>
 </td>
 </tr>
@@ -1482,13 +1479,13 @@ passed which is assigned an implicit power 1.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<cite>PhysicalUnit</cite>) &#8211; another unit</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<cite>PhysicalUnit</cite>) – another unit</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the conversion factor from this unit to another unit</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><cite>float</cite></td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>TypeError</strong> &#8211; if the units are not compatible</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>TypeError</strong> – if the units are not compatible</td>
 </tr>
 </tbody>
 </table>
@@ -1501,13 +1498,13 @@ passed which is assigned an implicit power 1.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<cite>PhysicalUnit</cite>) &#8211; another unit</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<cite>PhysicalUnit</cite>) – another unit</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the conversion factor and offset from this unit to another unit</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">(<cite>float</cite>, <cite>float</cite>)</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>TypeError</strong> &#8211; if the units are not compatible</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>TypeError</strong> – if the units are not compatible</td>
 </tr>
 </tbody>
 </table>
@@ -1535,7 +1532,7 @@ passed which is assigned an implicit power 1.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<cite>PhysicalUnit</cite>) &#8211; another unit</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<cite>PhysicalUnit</cite>) – another unit</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><cite>True</cite> if the units are compatible, i.e. if the powers of the base units are the same</td>
 </tr>
@@ -1562,12 +1559,12 @@ passed which is assigned an implicit power 1.</li>
 <dl class="method">
 <dt id="pqu.PQU.PhysicalUnit.setSymbol">
 <code class="descname">setSymbol</code><span class="sig-paren">(</span><em>symbol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PhysicalUnit.setSymbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PhysicalUnit.setSymbol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s symbols to symbol with power 1.</p>
+<dd><p>Sets self’s symbols to symbol with power 1.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>symbol</strong> (<cite>str</cite>) &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>symbol</strong> (<cite>str</cite>) – </td>
 </tr>
 </tbody>
 </table>
@@ -1576,9 +1573,9 @@ passed which is assigned an implicit power 1.</li>
 <dl class="method">
 <dt id="pqu.PQU.PhysicalUnit.simplifyUnitsFactor">
 <code class="descname">simplifyUnitsFactor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#PhysicalUnit.simplifyUnitsFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.PhysicalUnit.simplifyUnitsFactor" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method returns a PQU instance that can be used to simplify self&#8217;s units.
+<dd><p>This method returns a PQU instance that can be used to simplify self’s units.
 That is, all units with the same base units are reduced to a single unit. For example,
-if self has units of &#8216;km/m&#8217; then the returned PQU is equivalent to &#8216;1e3 m/km&#8217;.</p>
+if self has units of ‘km/m’ then the returned PQU is equivalent to ‘1e3 m/km’.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1607,22 +1604,22 @@ where the fuzz factor is epsilonFactor * sys.float_info.epsilon. This function r
 <blockquote>
 <div>0          if the floats are comparable as given by epsilonFactor (see below),
 otherwise, it returns 1 (-1) if value1 is greater (less) than value2.</div></blockquote>
-<p>Two floats are comparable if the magnitude of the &#8216;relative difference&#8217; between them is less than or equal to 
+<p>Two floats are comparable if the magnitude of the ‘relative difference’ between them is less than or equal to 
 epsilonFactor * sys.float_info.epsilon. The relative difference is defined as</p>
 <blockquote>
 <div>( value1 - value2 ) / max( abs( value1 ), abs( value2 ) )</div></blockquote>
 <p>Hence, two floats are comparable if</p>
 <blockquote>
 <div>( value1 - value2 ) &lt;= epsilonFactor * sys.float_info.epsilon * max( abs( value1 ), abs( value2 ) )</div></blockquote>
-<p>For the default epsilonFactor = 0, a 0 is return (i.e., the two floats are &#8216;equal&#8217;) only if they have the same value</p>
+<p>For the default epsilonFactor = 0, a 0 is return (i.e., the two floats are ‘equal’) only if they have the same value</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>value1</strong> (<em>any object which float</em><em>(</em><em></em><em>) </em><em>accepts</em>) &#8211; value to compare to value2</li>
-<li><strong>value2</strong> (<em>any object which float</em><em>(</em><em></em><em>) </em><em>accepts</em>) &#8211; value to compare to value1</li>
-<li><strong>epsilonFactor</strong> (<em>any object which float</em><em>(</em><em></em><em>) </em><em>accepts</em>) &#8211; The factor to scale sys.float_info.epsilon to determine the fuzz factor.</li>
+<li><strong>value1</strong> (<em>any object which float</em><em>(</em><em>) </em><em>accepts</em>) – value to compare to value2</li>
+<li><strong>value2</strong> (<em>any object which float</em><em>(</em><em>) </em><em>accepts</em>) – value to compare to value1</li>
+<li><strong>epsilonFactor</strong> (<em>any object which float</em><em>(</em><em>) </em><em>accepts</em>) – The factor to scale sys.float_info.epsilon to determine the fuzz factor.</li>
 </ul>
 </td>
 </tr>
@@ -1658,28 +1655,28 @@ epsilonFactor * sys.float_info.epsilon. The relative difference is defined as</p
 <dl class="function">
 <dt id="pqu.PQU.floatToShortestString">
 <code class="descclassname">pqu.PQU.</code><code class="descname">floatToShortestString</code><span class="sig-paren">(</span><em>value</em>, <em>significantDigits=15</em>, <em>trimZeros=True</em>, <em>keepPeriod=False</em>, <em>favorEFormBy=0</em>, <em>includeSign=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#floatToShortestString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.floatToShortestString" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns the shortest string representation of the float &#8216;value&#8217; that is accurate to 
-&#8216;significantDigits&#8217; digits when converted back to a float.</p>
-<p>The float is converted to both the E-form (i.e., &#8216;%e&#8217;) and F-form (i.e., &#8216;%f&#8217;) with significantDigits.
-Then, after &#8216;trimZeros&#8217; and &#8216;keepPeriod&#8217; options are implemented, if the length of the E-form minus 
+<dd><p>This function returns the shortest string representation of the float ‘value’ that is accurate to 
+‘significantDigits’ digits when converted back to a float.</p>
+<p>The float is converted to both the E-form (i.e., ‘%e’) and F-form (i.e., ‘%f’) with significantDigits.
+Then, after ‘trimZeros’ and ‘keepPeriod’ options are implemented, if the length of the E-form minus 
 favorEFormBy is less than or equal to the length of the F-form, the E-form is returned. Otherwise 
 the F-form is returned.</p>
-<p>For example, for significantDigits = 12 the returned string for the float 1.234 will be &#8220;1.234&#8221;, and
-not &#8220;1.234000000000&#8221; or &#8220;1.23400000000e+00&#8221; while the string for the float 1.234e-9 will be &#8220;1.234-9&#8221;, and
-not &#8220;0.00000000123400000000&#8221; or &#8220;1.23400000000e-09&#8221;.</p>
+<p>For example, for significantDigits = 12 the returned string for the float 1.234 will be “1.234”, and
+not “1.234000000000” or “1.23400000000e+00” while the string for the float 1.234e-9 will be “1.234-9”, and
+not “0.00000000123400000000” or “1.23400000000e-09”.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>value</strong> (<em>float</em>) &#8211; The float to convert.</li>
-<li><strong>significantDigits</strong> (<em>integer</em>) &#8211; The number of significant digits desired. Restricted to the range 0 to 24 inclusive.</li>
-<li><strong>trimZeros</strong> (<em>bool</em>) &#8211; If True, unneeded zeros to the right of &#8216;.&#8217; are removed.</li>
-<li><strong>keepPeriod</strong> (<em>bool</em>) &#8211; If False, &#8216;.&#8217; is removed if there is no digit to its right.</li>
-<li><strong>favorEFormBy</strong> (<em>integer</em>) &#8211; The integer subtracted from the length of the E-form before the form
+<li><strong>value</strong> (<em>float</em>) – The float to convert.</li>
+<li><strong>significantDigits</strong> (<em>integer</em>) – The number of significant digits desired. Restricted to the range 0 to 24 inclusive.</li>
+<li><strong>trimZeros</strong> (<em>bool</em>) – If True, unneeded zeros to the right of ‘.’ are removed.</li>
+<li><strong>keepPeriod</strong> (<em>bool</em>) – If False, ‘.’ is removed if there is no digit to its right.</li>
+<li><strong>favorEFormBy</strong> (<em>integer</em>) – The integer subtracted from the length of the E-form before the form
 with the shortest representation is determined.</li>
-<li><strong>includeSign</strong> (<em>bool</em>) &#8211; If True, the returned string will always start with a sign character 
-(i.e., &#8216;+&#8217; or &#8216;-&#8216;). Otherwise, only negative values will have a sign.</li>
+<li><strong>includeSign</strong> (<em>bool</em>) – If True, the returned string will always start with a sign character 
+(i.e., ‘+’ or ‘-‘). Otherwise, only negative values will have a sign.</li>
 </ul>
 </td>
 </tr>
@@ -1702,18 +1699,18 @@ with the shortest representation is determined.</li>
 float characters. This method returns a tuple of length 3. The first item of the tuple is the float 
 value returned as a pqu_float instance with significantDigits determined from the string.  The second 
 item is significantDigitsForZero which, if the string represents a 0 value, gives the number of significant 
-digits for the zero; otherwise None is returned. As example, the string &#8216;000.000&#8217; has 4 significant digits 
-(i.e., it is considered equivalent to the representation &#8216;0.000&#8217;).  The last object is the string of all 
-characters after the last one used for converting the float.  For example, with str1 = &#8216;   12.345e3ABCD XYS&#8217; 
+digits for the zero; otherwise None is returned. As example, the string ‘000.000’ has 4 significant digits 
+(i.e., it is considered equivalent to the representation ‘0.000’).  The last object is the string of all 
+characters after the last one used for converting the float.  For example, with str1 = ‘   12.345e3ABCD XYS’ 
 the returned tuple is:</p>
-<p>( pqu_float( 1.2345e4, 5 ), None, &#8216;ABCD XYS&#8217; ).</p>
+<p>( pqu_float( 1.2345e4, 5 ), None, ‘ABCD XYS’ ).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>str1</strong> &#8211; String to parse.</li>
-<li><strong>fullStr</strong> &#8211; String which str1 is a part of.</li>
+<li><strong>str1</strong> – String to parse.</li>
+<li><strong>fullStr</strong> – String which str1 is a part of.</li>
 </ul>
 </td>
 </tr>
@@ -1730,7 +1727,7 @@ the returned tuple is:</p>
 <dd><p>Parses the string str1 and returns the tuple ( value, unit, uncertainty ) where value is an instance of pqu_float, 
 unit is an instance of PhysicalUnit and uncertainty is an instance of pqu_uncertainty.</p>
 <p>The string can be one of the following PQU forms. Here, F represents a valid float string, () represents
-the string &#8216;(#)&#8217; where &#8216;#&#8217; is a 1 or 2 digit number, +/- represents the string &#8216;+/- F&#8217;, % is itself
+the string ‘(#)’ where ‘#’ is a 1 or 2 digit number, +/- represents the string ‘+/- F’, % is itself
 and u is a unit.</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -1755,7 +1752,7 @@ and u is a unit.</p>
 <tbody valign="top">
 <tr class="row-even"><td>0</td>
 <td>F</td>
-<td>&#8216;234&#8217;</td>
+<td>‘234’</td>
 <td><ol class="first last arabic simple" start="234">
 <li></li>
 </ol>
@@ -1766,7 +1763,7 @@ and u is a unit.</p>
 </tr>
 <tr class="row-odd"><td>1</td>
 <td>F%</td>
-<td>&#8216;234%&#8217;</td>
+<td>‘234%’</td>
 <td>2.34</td>
 <td>N/A</td>
 <td>N/A</td>
@@ -1774,18 +1771,18 @@ and u is a unit.</p>
 </tr>
 <tr class="row-even"><td>2</td>
 <td>F u</td>
-<td>&#8216;234 m&#8217;</td>
+<td>‘234 m’</td>
 <td><ol class="first last arabic simple" start="234">
 <li></li>
 </ol>
 </td>
 <td>N/A</td>
 <td>N/A</td>
-<td>&#8216;m&#8217;</td>
+<td>‘m’</td>
 </tr>
 <tr class="row-odd"><td>3</td>
 <td>F()</td>
-<td>&#8216;234(5)&#8217;</td>
+<td>‘234(5)’</td>
 <td><ol class="first last arabic simple" start="234">
 <li></li>
 </ol>
@@ -1802,7 +1799,7 @@ and u is a unit.</p>
 </tr>
 <tr class="row-even"><td>4</td>
 <td>F()%</td>
-<td>&#8216;234(5)%&#8217;</td>
+<td>‘234(5)%’</td>
 <td>2.34</td>
 <td>2.29</td>
 <td>2.39</td>
@@ -1810,7 +1807,7 @@ and u is a unit.</p>
 </tr>
 <tr class="row-odd"><td>5</td>
 <td>F() u</td>
-<td>&#8216;234(5) m&#8217;</td>
+<td>‘234(5) m’</td>
 <td><ol class="first last arabic simple" start="234">
 <li></li>
 </ol>
@@ -1823,11 +1820,11 @@ and u is a unit.</p>
 <li></li>
 </ol>
 </td>
-<td>&#8216;m&#8217;</td>
+<td>‘m’</td>
 </tr>
 <tr class="row-even"><td>6</td>
 <td>F +/-</td>
-<td>&#8216;234 +/- 5&#8217;</td>
+<td>‘234 +/- 5’</td>
 <td><ol class="first last arabic simple" start="234">
 <li></li>
 </ol>
@@ -1844,7 +1841,7 @@ and u is a unit.</p>
 </tr>
 <tr class="row-odd"><td>7</td>
 <td>F +/-%</td>
-<td>&#8216;234 +/- 5%&#8217;</td>
+<td>‘234 +/- 5%’</td>
 <td><ol class="first last arabic simple" start="234">
 <li></li>
 </ol>
@@ -1861,7 +1858,7 @@ and u is a unit.</p>
 </tr>
 <tr class="row-even"><td>8</td>
 <td>F +/- u</td>
-<td>&#8216;234 +/- 5 m&#8217;</td>
+<td>‘234 +/- 5 m’</td>
 <td><ol class="first last arabic simple" start="234">
 <li></li>
 </ol>
@@ -1874,11 +1871,11 @@ and u is a unit.</p>
 <li></li>
 </ol>
 </td>
-<td>&#8216;m&#8217;</td>
+<td>‘m’</td>
 </tr>
 <tr class="row-odd"><td>9</td>
 <td>F +/-% u</td>
-<td>&#8216;234 +/- 5% m&#8217;</td>
+<td>‘234 +/- 5% m’</td>
 <td><ol class="first last arabic simple" start="234">
 <li></li>
 </ol>
@@ -1891,11 +1888,11 @@ and u is a unit.</p>
 <li></li>
 </ol>
 </td>
-<td>&#8216;m&#8217;</td>
+<td>‘m’</td>
 </tr>
 <tr class="row-even"><td>10</td>
 <td>(F +/-)%</td>
-<td>&#8216;(234 +/- 5)%&#8217;</td>
+<td>‘(234 +/- 5)%’</td>
 <td>2.34</td>
 <td>2.29</td>
 <td>2.39</td>
@@ -1908,7 +1905,7 @@ and u is a unit.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>str1</strong> &#8211; String to parse.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>str1</strong> – String to parse.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">( <a class="reference internal" href="#pqu.PQU.pqu_float" title="pqu.PQU.pqu_float">pqu_float</a>, <a class="reference internal" href="#pqu.PQU.PhysicalUnit" title="pqu.PQU.PhysicalUnit">PhysicalUnit</a>, <a class="reference internal" href="#pqu.PQU.pqu_uncertainty" title="pqu.PQU.pqu_uncertainty">pqu_uncertainty</a> )</td>
 </tr>
@@ -1919,18 +1916,18 @@ and u is a unit.</p>
 <dl class="staticmethod">
 <dt id="pqu.PQU.parsers.parseParenthesisUncertainty">
 <em class="property">static </em><code class="descname">parseParenthesisUncertainty</code><span class="sig-paren">(</span><em>str1</em>, <em>fullStr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#parsers.parseParenthesisUncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.parsers.parseParenthesisUncertainty" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method parses the beginning of str1 for the sub-string &#8216;(#)&#8217; where &#8216;#&#8217; is a 1 or 2 digit
+<dd><p>This method parses the beginning of str1 for the sub-string ‘(#)’ where ‘#’ is a 1 or 2 digit
 number.  This method returns a tuple of length 2. The first item of the tuple is the number returned as 
-a pqu_uncertainty of style pqu_uncertaintyStyleParenthesis. Characters after the &#8216;)&#8217; are returned 
-as the second item. For example, with str1 = &#8216;(34) ABCD XYS&#8217; the returned tuple is:</p>
-<p>( pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStyleParenthesis, 34, significantDigits = 2 ), &#8216; ABCD XYS&#8217; ).</p>
+a pqu_uncertainty of style pqu_uncertaintyStyleParenthesis. Characters after the ‘)’ are returned 
+as the second item. For example, with str1 = ‘(34) ABCD XYS’ the returned tuple is:</p>
+<p>( pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStyleParenthesis, 34, significantDigits = 2 ), ‘ ABCD XYS’ ).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>str1</strong> &#8211; String to parse.</li>
-<li><strong>fullStr</strong> &#8211; String which str1 is a part of.</li>
+<li><strong>str1</strong> – String to parse.</li>
+<li><strong>fullStr</strong> – String which str1 is a part of.</li>
 </ul>
 </td>
 </tr>
@@ -1944,19 +1941,19 @@ as the second item. For example, with str1 = &#8216;(34) ABCD XYS&#8217; the ret
 <dl class="staticmethod">
 <dt id="pqu.PQU.parsers.parsePlusMinusUncertainty">
 <em class="property">static </em><code class="descname">parsePlusMinusUncertainty</code><span class="sig-paren">(</span><em>str1</em>, <em>fullStr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#parsers.parsePlusMinusUncertainty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.parsers.parsePlusMinusUncertainty" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method parses the beginning of str1 for the sub-string &#8216;+/-&#8216; followed by a float string. An arbitrary number of 
-white spaces can exists before the &#8216;+/-&#8216; sub-string and between it and the float string. This method
+<dd><p>This method parses the beginning of str1 for the sub-string ‘+/-‘ followed by a float string. An arbitrary number of 
+white spaces can exists before the ‘+/-‘ sub-string and between it and the float string. This method
 returns a tuple of length 2. The first item of the tuple is float value returned as a pqu_uncertainty
 of style pqu_uncertaintyStylePlusMinus. Characters after the last one used for converting the float are 
-returned as the second item. For example, with str1 = &#8216; +/-  12. ABCD XYS&#8217; the returned tuple is:</p>
-<p>( pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStylePlusMinus, 12. ), &#8216; ABCD XYS&#8217; )</p>
+returned as the second item. For example, with str1 = ‘ +/-  12. ABCD XYS’ the returned tuple is:</p>
+<p>( pqu_uncertainty( pqu_uncertainty.pqu_uncertaintyStylePlusMinus, 12. ), ‘ ABCD XYS’ )</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>str1</strong> &#8211; String to parse.</li>
-<li><strong>fullStr</strong> &#8211; String which str1 is a part of.</li>
+<li><strong>str1</strong> – String to parse.</li>
+<li><strong>fullStr</strong> – String which str1 is a part of.</li>
 </ul>
 </td>
 </tr>
@@ -1976,15 +1973,15 @@ returned as the second item. For example, with str1 = &#8216; +/-  12. ABCD XYS&
 <p>This class is used by PQU and pqu_uncertainty to store more information about a float than
 is provided by the python float class as well as methods to operator on this information. The main members are:</p>
 <ul class="simple">
-<li>value              &#8212; The python value of the float.</li>
-<li>significantDigits  &#8212; The number of significant digits the value possess as defined by the creator of self.</li>
+<li>value              — The python value of the float.</li>
+<li>significantDigits  — The number of significant digits the value possess as defined by the creator of self.</li>
 <li><dl class="first docutils">
-<dt>order              &#8212; An integer that represents the order of the most significant digit of self. </dt>
+<dt>order              — An integer that represents the order of the most significant digit of self. </dt>
 <dd>Calculated internally equivalent to int( log10( value ) ) and stored for convenience.</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
-<dt>_isPercent         &#8212; True if self represents a percent and False otherwise. Note, the value is always stored as</dt>
+<dt>_isPercent         — True if self represents a percent and False otherwise. Note, the value is always stored as</dt>
 <dd>the non-percent value (e.g., 1% and 12% are stored as 0.01 and 0.12 respectively).</dd>
 </dl>
 </li>
@@ -1992,13 +1989,13 @@ is provided by the python float class as well as methods to operator on this inf
 <dl class="staticmethod">
 <dt id="pqu.PQU.pqu_float.calculateOrder">
 <em class="property">static </em><code class="descname">calculateOrder</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.calculateOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.calculateOrder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the order of value. Value must be convertible to a float. A float&#8217;s order is the exponent in the
-representation &#8216;m * 10**o&#8217; where &#8216;m&#8217; is the mantissa and &#8216;o&#8217; is the exponent. For example, 1.234e43 has order 43.</p>
+<dd><p>Returns the order of value. Value must be convertible to a float. A float’s order is the exponent in the
+representation ‘m * 10**o’ where ‘m’ is the mantissa and ‘o’ is the exponent. For example, 1.234e43 has order 43.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> &#8211; any object convertible to a float.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> – any object convertible to a float.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">integer</td>
 </tr>
@@ -2009,10 +2006,10 @@ representation &#8216;m * 10**o&#8217; where &#8216;m&#8217; is the mantissa and
 <dl class="staticmethod">
 <dt id="pqu.PQU.pqu_float.fixFloatsOrder">
 <em class="property">static </em><code class="descname">fixFloatsOrder</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.fixFloatsOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.fixFloatsOrder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Many numbers are not represented in IEEE floating point by there true value. For example, &#8216;1e-12&#8217; is 
+<dd><p>Many numbers are not represented in IEEE floating point by there true value. For example, ‘1e-12’ is 
 stored as the float 9.9999999999999998e-13. The order of the true value is -12 while the order of the floating 
 point representation is -13.  This function is implemented to help with this issue.  For example, for 
-PQU the string &#8220;2.300000000003 (1)&#8221; was originally being reprinted as &#8220;2.300000000003 (10)&#8221; because of this issue.
+PQU the string “2.300000000003 (1)” was originally being reprinted as “2.300000000003 (10)” because of this issue.
 To check for this, the value is multiplied by a small (of order sys.float_info.epsilon) factor to see if order 
 changes.  If it does, value is set to the smallest multiplier greater than 1 for which order is changed. 
 The fixed value and its order are returned.</p>
@@ -2020,7 +2017,7 @@ The fixed value and its order are returned.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> &#8211; any object convertible to a float.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> – any object convertible to a float.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">tuple of float and integer</td>
 </tr>
@@ -2031,7 +2028,7 @@ The fixed value and its order are returned.</p>
 <dl class="method">
 <dt id="pqu.PQU.pqu_float.getOrder">
 <code class="descname">getOrder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.getOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.getOrder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self&#8217;s order.</p>
+<dd><p>Returns self’s order.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2045,7 +2042,7 @@ The fixed value and its order are returned.</p>
 <dl class="method">
 <dt id="pqu.PQU.pqu_float.getSignificantDigits">
 <code class="descname">getSignificantDigits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.getSignificantDigits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.getSignificantDigits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self&#8217;s significant digits.</p>
+<dd><p>Returns self’s significant digits.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2059,7 +2056,7 @@ The fixed value and its order are returned.</p>
 <dl class="method">
 <dt id="pqu.PQU.pqu_float.getValue">
 <code class="descname">getValue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.getValue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self&#8217;s value. Equivalent to float( self ).</p>
+<dd><p>Returns self’s value. Equivalent to float( self ).</p>
 </dd></dl>
 
 <dl class="method">
@@ -2102,7 +2099,7 @@ if isPercent is True (False).</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>isPercent</strong> (<cite>bool</cite>) &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>isPercent</strong> (<cite>bool</cite>) – </td>
 </tr>
 </tbody>
 </table>
@@ -2113,12 +2110,12 @@ if isPercent is True (False).</p>
 <dl class="method">
 <dt id="pqu.PQU.pqu_float.setSignificantDigits">
 <code class="descname">setSignificantDigits</code><span class="sig-paren">(</span><em>significantDigits</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.setSignificantDigits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.setSignificantDigits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s significant digits to significantDigits.</p>
+<dd><p>Sets self’s significant digits to significantDigits.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>significantDigits</strong> (<cite>int</cite>) &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>significantDigits</strong> (<cite>int</cite>) – </td>
 </tr>
 </tbody>
 </table>
@@ -2128,22 +2125,22 @@ if isPercent is True (False).</p>
 <dt id="pqu.PQU.pqu_float.surmiseSignificantDigits">
 <em class="property">static </em><code class="descname">surmiseSignificantDigits</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.surmiseSignificantDigits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.surmiseSignificantDigits" title="Permalink to this definition">¶</a></dt>
 <dd><p>This factory function returns a pqu_float instance given a float value and set its significantDigits to
-something &#8220;reasonable&#8221;. The significantDigits are determined by using PQU.floatToShortestString with trimZeros = True.</p>
+something “reasonable”. The significantDigits are determined by using PQU.floatToShortestString with trimZeros = True.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pqu.PQU.pqu_float.toString">
 <code class="descname">toString</code><span class="sig-paren">(</span><em>trimZeros=True</em>, <em>keepPeriod=True</em>, <em>includePercent=True</em>, <em>favorEFormBy=0</em>, <em>significantDigits=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.toString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a string representation of self (i.e., &#8216;1.234e6&#8217; or &#8216;12%&#8217;) using function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal"><span class="pre">floatToShortestString()</span></code></a>.</p>
+<dd><p>Returns a string representation of self (i.e., ‘1.234e6’ or ‘12%’) using function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal"><span class="pre">floatToShortestString()</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>trimZeros</strong> (<em>bool</em>) &#8211; See function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal"><span class="pre">floatToShortestString()</span></code></a></li>
-<li><strong>keepPeriod</strong> (<em>bool</em>) &#8211; See function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal"><span class="pre">floatToShortestString()</span></code></a></li>
-<li><strong>favorEFormBy</strong> (<em>int</em>) &#8211; See function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal"><span class="pre">floatToShortestString()</span></code></a></li>
-<li><strong>significantDigits</strong> &#8211; (<em>int</em> or <em>None</em>) Used to override self&#8217;s default significantDigits</li>
+<li><strong>trimZeros</strong> (<em>bool</em>) – See function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal"><span class="pre">floatToShortestString()</span></code></a></li>
+<li><strong>keepPeriod</strong> (<em>bool</em>) – See function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal"><span class="pre">floatToShortestString()</span></code></a></li>
+<li><strong>favorEFormBy</strong> (<em>int</em>) – See function <a class="reference internal" href="#pqu.PQU.floatToShortestString" title="pqu.PQU.floatToShortestString"><code class="xref py py-func docutils literal"><span class="pre">floatToShortestString()</span></code></a></li>
+<li><strong>significantDigits</strong> – (<em>int</em> or <em>None</em>) Used to override self’s default significantDigits</li>
 </ul>
 </td>
 </tr>
@@ -2157,14 +2154,14 @@ something &#8220;reasonable&#8221;. The significantDigits are determined by usin
 <dl class="method">
 <dt id="pqu.PQU.pqu_float.truncate">
 <code class="descname">truncate</code><span class="sig-paren">(</span><em>significantDigits=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_float.truncate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_float.truncate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adjusts self&#8217;s value so that only significantDigits are non-zero. For example, if value is 3.453983207834109
-and significantDigits = 4 then the value is set to 3.454. If significantDigits is None, self&#8217;s significantDigits
+<dd><p>Adjusts self’s value so that only significantDigits are non-zero. For example, if value is 3.453983207834109
+and significantDigits = 4 then the value is set to 3.454. If significantDigits is None, self’s significantDigits
 is used.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>significantDigits</strong> (None or <cite>int</cite>) &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>significantDigits</strong> (None or <cite>int</cite>) – </td>
 </tr>
 </tbody>
 </table>
@@ -2180,21 +2177,21 @@ is used.</p>
 The members are:</p>
 <ul class="simple">
 <li><dl class="first docutils">
-<dt>style &#8212; One of the three following uncertainty styles supported by PQU:</dt>
+<dt>style — One of the three following uncertainty styles supported by PQU:</dt>
 <dd><ul class="first last">
 <li>pqu_uncertaintyStyleNone          - No uncertainty was given for the PQU instance.</li>
-<li>pqu_uncertaintyStylePlusMinus     - The uncertainty was given as &#8216;+/- value&#8217; (e.g., &#8216;123 +/- 32&#8217;).</li>
-<li>pqu_uncertaintyStyleParenthesis   - The uncertainty was given as &#8216;(value)&#8217; (e.g., &#8216;123(32)&#8217;.</li>
+<li>pqu_uncertaintyStylePlusMinus     - The uncertainty was given as ‘+/- value’ (e.g., ‘123 +/- 32’).</li>
+<li>pqu_uncertaintyStyleParenthesis   - The uncertainty was given as ‘(value)’ (e.g., ‘123(32)’.</li>
 </ul>
 </dd>
 </dl>
 </li>
-<li>value &#8212; The value stored as a pqu_float.</li>
+<li>value — The value stored as a pqu_float.</li>
 </ul>
 <dl class="method">
 <dt id="pqu.PQU.pqu_uncertainty.getProperValue">
 <code class="descname">getProperValue</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_uncertainty.getProperValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_uncertainty.getProperValue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self&#8217;s value. If value is a percent, returned result is multiplied by argument v first, where v
+<dd><p>Returns self’s value. If value is a percent, returned result is multiplied by argument v first, where v
 is expected to be the number associated the the percent value.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2209,7 +2206,7 @@ is expected to be the number associated the the percent value.</p>
 <dl class="method">
 <dt id="pqu.PQU.pqu_uncertainty.getStyle">
 <code class="descname">getStyle</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_uncertainty.getStyle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_uncertainty.getStyle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self&#8217;s style.</p>
+<dd><p>Returns self’s style.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2280,14 +2277,14 @@ is expected to be the number associated the the percent value.</p>
 <dl class="method">
 <dt id="pqu.PQU.pqu_uncertainty.toString">
 <code class="descname">toString</code><span class="sig-paren">(</span><em>prefix=' '</em>, <em>significantDigits=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_uncertainty.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_uncertainty.toString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a string representation of self (i.e., &#8216;+/- 1.2%&#8217;).</p>
+<dd><p>Returns a string representation of self (i.e., ‘+/- 1.2%’).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>prefix</strong> (<em>str</em>) &#8211; A prefix for the &#8216;+/-&#8216; style</li>
-<li><strong>significantDigits</strong> &#8211; Passed onto method <a class="reference internal" href="#pqu.PQU.pqu_float.toString" title="pqu.PQU.pqu_float.toString"><code class="xref py py-meth docutils literal"><span class="pre">pqu_float.toString()</span></code></a></li>
+<li><strong>prefix</strong> (<em>str</em>) – A prefix for the ‘+/-‘ style</li>
+<li><strong>significantDigits</strong> – Passed onto method <a class="reference internal" href="#pqu.PQU.pqu_float.toString" title="pqu.PQU.pqu_float.toString"><code class="xref py py-meth docutils literal"><span class="pre">pqu_float.toString()</span></code></a></li>
 </ul>
 </td>
 </tr>
@@ -2301,7 +2298,7 @@ is expected to be the number associated the the percent value.</p>
 <dl class="method">
 <dt id="pqu.PQU.pqu_uncertainty.truncate">
 <code class="descname">truncate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pqu/PQU.html#pqu_uncertainty.truncate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pqu.PQU.pqu_uncertainty.truncate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adjusts self&#8217;s value so that only the significant digits are non-zero. This is most useful when a PQU instance is
+<dd><p>Adjusts self’s value so that only the significant digits are non-zero. This is most useful when a PQU instance is
 calculated from other PQU instance which can create an uncertainty with many non-zero digits. As example, adding two
 PQUs with uncertainties 1.3 and 3.2 each with two significant digits, produces the uncertainty sqrt( 1.3**2 + 3.2**2 ) 
 = 3.453983207834109. This uncertainty also only has two significant digits. After calling truncate the uncertainty
@@ -2318,28 +2315,28 @@ become 3.5 which is the value that the method toString would return.</p>
 <dl class="function">
 <dt id="pqu.PQU.toShortestString">
 <code class="descclassname">pqu.PQU.</code><code class="descname">toShortestString</code><span class="sig-paren">(</span><em>value</em>, <em>significantDigits=15</em>, <em>trimZeros=True</em>, <em>keepPeriod=False</em>, <em>favorEFormBy=0</em>, <em>includeSign=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pqu.PQU.toShortestString" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function returns the shortest string representation of the float &#8216;value&#8217; that is accurate to 
-&#8216;significantDigits&#8217; digits when converted back to a float.</p>
-<p>The float is converted to both the E-form (i.e., &#8216;%e&#8217;) and F-form (i.e., &#8216;%f&#8217;) with significantDigits.
-Then, after &#8216;trimZeros&#8217; and &#8216;keepPeriod&#8217; options are implemented, if the length of the E-form minus 
+<dd><p>This function returns the shortest string representation of the float ‘value’ that is accurate to 
+‘significantDigits’ digits when converted back to a float.</p>
+<p>The float is converted to both the E-form (i.e., ‘%e’) and F-form (i.e., ‘%f’) with significantDigits.
+Then, after ‘trimZeros’ and ‘keepPeriod’ options are implemented, if the length of the E-form minus 
 favorEFormBy is less than or equal to the length of the F-form, the E-form is returned. Otherwise 
 the F-form is returned.</p>
-<p>For example, for significantDigits = 12 the returned string for the float 1.234 will be &#8220;1.234&#8221;, and
-not &#8220;1.234000000000&#8221; or &#8220;1.23400000000e+00&#8221; while the string for the float 1.234e-9 will be &#8220;1.234-9&#8221;, and
-not &#8220;0.00000000123400000000&#8221; or &#8220;1.23400000000e-09&#8221;.</p>
+<p>For example, for significantDigits = 12 the returned string for the float 1.234 will be “1.234”, and
+not “1.234000000000” or “1.23400000000e+00” while the string for the float 1.234e-9 will be “1.234-9”, and
+not “0.00000000123400000000” or “1.23400000000e-09”.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>value</strong> (<em>float</em>) &#8211; The float to convert.</li>
-<li><strong>significantDigits</strong> (<em>integer</em>) &#8211; The number of significant digits desired. Restricted to the range 0 to 24 inclusive.</li>
-<li><strong>trimZeros</strong> (<em>bool</em>) &#8211; If True, unneeded zeros to the right of &#8216;.&#8217; are removed.</li>
-<li><strong>keepPeriod</strong> (<em>bool</em>) &#8211; If False, &#8216;.&#8217; is removed if there is no digit to its right.</li>
-<li><strong>favorEFormBy</strong> (<em>integer</em>) &#8211; The integer subtracted from the length of the E-form before the form
+<li><strong>value</strong> (<em>float</em>) – The float to convert.</li>
+<li><strong>significantDigits</strong> (<em>integer</em>) – The number of significant digits desired. Restricted to the range 0 to 24 inclusive.</li>
+<li><strong>trimZeros</strong> (<em>bool</em>) – If True, unneeded zeros to the right of ‘.’ are removed.</li>
+<li><strong>keepPeriod</strong> (<em>bool</em>) – If False, ‘.’ is removed if there is no digit to its right.</li>
+<li><strong>favorEFormBy</strong> (<em>integer</em>) – The integer subtracted from the length of the E-form before the form
 with the shortest representation is determined.</li>
-<li><strong>includeSign</strong> (<em>bool</em>) &#8211; If True, the returned string will always start with a sign character 
-(i.e., &#8216;+&#8217; or &#8216;-&#8216;). Otherwise, only negative values will have a sign.</li>
+<li><strong>includeSign</strong> (<em>bool</em>) – If True, the returned string will always start with a sign character 
+(i.e., ‘+’ or ‘-‘). Otherwise, only negative values will have a sign.</li>
 </ul>
 </td>
 </tr>
@@ -2356,10 +2353,10 @@ with the shortest representation is determined.</li>
 <dd><p>This function is designed as a convenience function for working with PQU 
 and float instances. That is, instead of checking the type of value, let valueOrPQ handle some of the
 details. The first argument can be either a PQU or something
-that is a valid argument for the python &#8216;float&#8217; function (e.g., 1.23, &#8220;1.23&#8221;). The returned instance
+that is a valid argument for the python ‘float’ function (e.g., 1.23, “1.23”). The returned instance
 is a PQU if asPQU is True and a float otherwise. The unitFrom and unitTo
-arguments can be either None, a PhysicalUnit or a string that represents a PhysicalUnit (e.g., &#8220;m&#8221;, &#8220;&#8221;,
-&#8220;MeV * b&#8221;). If unitTo is not None, the returned instance will be in units of unitTo. If unitFrom is not None
+arguments can be either None, a PhysicalUnit or a string that represents a PhysicalUnit (e.g., “m”, “”,
+“MeV * b”). If unitTo is not None, the returned instance will be in units of unitTo. If unitFrom is not None
 and the first argument (i.e., value) is a PQU instance, they must have the
 same units.</p>
 <p>Note, this function was originally written when PQU did not support dimensionless
@@ -2377,9 +2374,9 @@ units. As it now supports dimensionless units, this function may not be of much 
 <col width="38%" />
 </colgroup>
 <thead valign="bottom">
-<tr class="row-odd"><th class="head">&nbsp;</th>
-<th class="head">&nbsp;</th>
-<th class="head">&nbsp;</th>
+<tr class="row-odd"><th class="head">&#160;</th>
+<th class="head">&#160;</th>
+<th class="head">&#160;</th>
 <th class="head" colspan="2">from _getUnit</th>
 <th class="head" colspan="2">returned value asPQU</th>
 </tr>
@@ -2481,10 +2478,10 @@ unitTo</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>value</strong> (<em>PQU instance</em><em> or </em><em>any object which float</em><em>(</em><em></em><em>) </em><em>accepts</em>) &#8211; The number object convert if requested</li>
-<li><strong>unitFrom</strong> (<em>None</em><em> or </em><em>instance from which units can be determined</em>) &#8211; If not None, the unit for value</li>
-<li><strong>unitTo</strong> (<em>None</em><em> or </em><em>instance from which units can be determined</em>) &#8211; If not None, the unit the returned value is in</li>
-<li><strong>asPQU</strong> (<cite>bool</cite>) &#8211; If True returned instance is a PQU; otherwise, it is a float</li>
+<li><strong>value</strong> (<em>PQU instance</em><em> or </em><em>any object which float</em><em>(</em><em>) </em><em>accepts</em>) – The number object convert if requested</li>
+<li><strong>unitFrom</strong> (<em>None</em><em> or </em><em>instance from which units can be determined</em>) – If not None, the unit for value</li>
+<li><strong>unitTo</strong> (<em>None</em><em> or </em><em>instance from which units can be determined</em>) – If not None, the unit the returned value is in</li>
+<li><strong>asPQU</strong> (<cite>bool</cite>) – If True returned instance is a PQU; otherwise, it is a float</li>
 </ul>
 </td>
 </tr>
@@ -2579,12 +2576,12 @@ unitTo</td>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

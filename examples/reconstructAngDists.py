@@ -62,17 +62,17 @@
 # <<END-copyright>>
 
 import argparse, fudge
-import fudge.legacy.converting.endfFileToGND
-import fudge.gnd.covariances.covarianceSuite
+import fudge.legacy.converting.endfFileToGNDS
+import fudge.gnds.covariances.covarianceSuite
 import fudge.processing.resonances.reconstructResonances
 
 
 def parseArgs():
     '''Parse the command line arguments'''
-    parser = argparse.ArgumentParser(description='Plot nuclear data from an ENDF or GND file')
+    parser = argparse.ArgumentParser(description='Plot nuclear data from an ENDF or GNDS file')
     parser.add_argument('--mt',     metavar='mt', type=int, help='MT of the angular distribution to work on.' )
     parser.add_argument('--check',  default=False, action='store_true', help="Check the resulting evaluation")
-    parser.add_argument('--format', choices=['gnd','endf','table'], default='gnd', help="Format to save the results in outFile, with results from --strategy switch")
+    parser.add_argument('--format', choices=['gnds','endf','table'], default='gnds', help="Format to save the results in outFile, with results from --strategy switch")
     parser.add_argument('--strategy', choices=['merge','replace','dryrun'], default='dryrun', help="How to merge with existing fast angular distribution")
     parser.add_argument('endf',     metavar='endf', type=str, help='ENDF file' )
     parser.add_argument('-o',       dest='outFile', default=None, type=str, help='Output file' )
@@ -84,8 +84,8 @@ def smallBanner( x, wingsize=10 ):
 
 
 def getPlotTable( nativeData ):
-    '''Make a table that we can feed to a spreadsheet from an instance of fudge.gnd.productData.distributions.angular.LegendrePointwise'''
-    if not isinstance( nativeData, fudge.gnd.productData.distributions.angular.LegendrePointwise ): raise TypeError( "Must be of type fudge.gnd.productData.distributions.angular.LegendrePointwise")
+    '''Make a table that we can feed to a spreadsheet from an instance of fudge.gnds.productData.distributions.angular.LegendrePointwise'''
+    if not isinstance( nativeData, fudge.gnds.productData.distributions.angular.LegendrePointwise): raise TypeError("Must be of type fudge.gnds.productData.distributions.angular.LegendrePointwise")
     table = []
     for x in nativeData: 
         table.append([0.0]*(2+nativeData.maxLegendreOrder()))
@@ -98,24 +98,24 @@ if __name__ == "__main__":
 
     args = parseArgs()
 
-    gndMap = {}
+    gndsMap = {}
 
     print smallBanner( "Reading %s" % args.endf )
 
-    # Is the file a GND file?
+    # Is the file a GNDS file?
     if open(args.endf).readline().startswith( "<?xml" ):
-        RS = fudge.gnd.reactionSuite.readXML( args.endf )
-        try:    CS = fudge.gnd.covariances.covarianceSuite.readXML( args.endf.replace( '.gnd.', '.gndCov.' ) )
-        except: CS = fudge.gnd.covariances.covarianceSuite()
-        gndMap[args.endf] = [ RS, CS ]
+        RS = fudge.gnds.reactionSuite.readXML( args.endf)
+        try:    CS = fudge.gnds.covariances.covarianceSuite.readXML( args.endf.replace('.gnds.', '.gndsCov.'))
+        except: CS = fudge.gnds.covariances.covarianceSuite()
+        gndsMap[args.endf] = [ RS, CS ]
 
     # Maybe its an ENDF file?
     elif open(args.endf).readline().endswith(' 0  0    0\n'): 
-        results = fudge.legacy.converting.endfFileToGND.endfFileToGND( args.endf, toStdOut = False, skipBadData = True ) 
-        if type( results ) == dict:    gndMap[args.endf] = [ results['reactionSuite'], results['covarianceSuite'] ]
-        elif type( results ) == tuple: gndMap[args.endf] = [ results[0], results[1] ]
+        results = fudge.legacy.converting.endfFileToGNDS.endfFileToGNDS( args.endf, toStdOut = False, skipBadData = True )
+        if type( results ) == dict:    gndsMap[args.endf] = [ results['reactionSuite'], results['covarianceSuite'] ]
+        elif type( results ) == tuple: gndsMap[args.endf] = [ results[0], results[1] ]
         else: 
-            raise TypeError( "endfFileToGND.endfFileToGND() returned a "+str(type(results))+", I don't know what to do with it" )
+            raise TypeError( "endfFileToGNDS.endfFileToGNDS() returned a "+str(type(results))+", I don't know what to do with it" )
 
     # Failed!
     else: print "WARNING: Unknown file type, not reading %s"% args.endf
@@ -125,15 +125,15 @@ if __name__ == "__main__":
     # component that we can just attach to the product (possibly after matching onto an existing table)
     if args.strategy == 'dryrun': exit()
     print smallBanner( "Reconstructing resonance cross sections" )
-    gndMap[args.endf][0].reconstructResonances()
+    gndsMap[args.endf][0].reconstructResonances()
     print smallBanner( "Reconstructing resonance angular distributions" )
-    newAngDists = fudge.processing.resonances.reconstructResonances.reconstructAngularDistributions( gndMap[args.endf][0] )
+    newAngDists = fudge.processing.resonances.reconstructResonances.reconstructAngularDistributions( gndsMap[args.endf][0] )
     
     
     # If we reconstructed the angular distributions too, put them in the appropriate 
     # reaction/outputChannel/product/distributions/angular/LegendrePointwise
     # Right now only elastic is supported
-    product = gndMap[args.endf][0].getReaction( 'elastic' ).outputChannel.getProductWithName( 'n' )
+    product = gndsMap[args.endf][0].getReaction( 'elastic' ).outputChannel.getProductWithName( 'n' )
     if args.strategy == 'replace': product.addDistributionComponent( angDists['elastic'] )
     elif args.strategy =='merge':  
         print smallBanner( "Merging angular distributions" )
@@ -153,7 +153,7 @@ if __name__ == "__main__":
     # Check evaluation
     if args.check:
         print smallBanner( "Checking final evaluation" )
-        print gndMap[args.endf][0].check()
+        print gndsMap[args.endf][0].check()
 
     # Save the results
     if args.outFile is not None:
@@ -163,9 +163,9 @@ if __name__ == "__main__":
                 '\n'.join( 
                     getPlotTable( product.getDistributionComponentByToken( product.getDistributionNativeData(  ) ).getNativeData() )))
         elif args.format == 'endf':
-            open( args.outFile, mode='w' ).write( gndMap[args.endf][0].toENDF6(flags={'verbosity':0},covarianceSuite=gndMap[args.endf][1]) )
+            open( args.outFile, mode='w' ).write( gndsMap[args.endf][0].toENDF6(flags={'verbosity':0},covarianceSuite=gndsMap[args.endf][1]) )
         else: 
-            gndMap[args.endf][0].saveToFile( args.outFile )
+            gndsMap[args.endf][0].saveToFile( args.outFile )
     
     
     

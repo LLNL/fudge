@@ -63,14 +63,12 @@
 
 .PHONY: check clean realclean
 
-CC = gcc
-CFLAGS = -g -O0 -Wall
 ARFLAGS = rc
 
 SMR_PATH = ../../../../statusMessageReporting
 NUMERICALFUNCTIONS_PATH = ../../..
 
-localCFLAGS = -I$(NUMERICALFUNCTIONS_PATH)/include -I$(SMR_PATH)/include
+localCFLAGS = $(CFLAGS) -I$(NUMERICALFUNCTIONS_PATH)/include -I$(SMR_PATH)/include
 
 default: libptwXY_utilities.a
 	cp ptwXY_utilities.h ../../../include
@@ -81,7 +79,7 @@ libptwXY_utilities.a: ptwXY_utilities.o
 	ranlib $@
 
 ptwXY_utilities.o: ptwXY_utilities.c ptwXY_utilities.h
-	$(CC) $(CFLAGS) -c -o ptwXY_utilities.o ptwXY_utilities.c $(localCFLAGS)
+	$(CC) -c -o ptwXY_utilities.o ptwXY_utilities.c $(localCFLAGS)
 
 check: default
 

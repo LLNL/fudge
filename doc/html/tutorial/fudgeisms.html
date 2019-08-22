@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>4.8. Fudge idiosyncrasies &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>4.8. Fudge idiosyncrasies &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -27,10 +24,10 @@
     <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="5. Processing GND files" href="processing.html" />
+    <link rel="next" title="5. Processing GNDS files" href="processing.html" />
     <link rel="prev" title="4.7. Particles" href="particles.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -41,12 +38,12 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="processing.html" title="5. Processing GND files"
+          <a href="processing.html" title="5. Processing GNDS files"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="particles.html" title="4.7. Particles"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="diggingDeeper.html" accesskey="U">4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a> &#187;</li> 
       </ul>
@@ -62,12 +59,12 @@
 <div class="section" id="the-concept-of-styles">
 <h2>4.8.1. The concept of styles<a class="headerlink" href="#the-concept-of-styles" title="Permalink to this headline">¶</a></h2>
 <p>Evaluated nuclear data is sometimes stored in a form that is not easily plotted or used by application codes. For
-example, cross section data may be given as a combination of resonance parameters and a piecewise &#8216;background&#8217;, but
+example, cross section data may be given as a combination of resonance parameters and a piecewise ‘background’, but
 for plotting it must be converted to pointwise, linearly-interpolable data.</p>
-<p>GND permits storing both of these data types (or &#8216;styles&#8217; of data) together in the same hierarchy, so that the user has easy access to the
+<p>GNDS permits storing both of these data types (or ‘styles’ of data) together in the same hierarchy, so that the user has easy access to the
 original style used by the evaluator as well as to the reconstructed style that was derived from it for easy plotting.
-Since multiple styles of data can appear in an evaluation, GND needs to be able to keep them straight. A GND file contains
-a &#8216;styles&#8217; section near the top, where each style is defined and given a unique label.  Those same labels are used
+Since multiple styles of data can appear in an evaluation, GNDS needs to be able to keep them straight. A GNDS file contains
+a ‘styles’ section near the top, where each style is defined and given a unique label.  Those same labels are used
 throughout the file to indicate what style each data form is associated with.</p>
 </div>
 <div class="section" id="data-components">
@@ -98,7 +95,7 @@ throughout the file to indicate what style each data form is associated with.</p
                         title="previous chapter">4.7. Particles</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="processing.html"
-                        title="next chapter">5. Processing GND files</a></p>
+                        title="next chapter">5. Processing GNDS files</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -130,19 +127,19 @@ throughout the file to indicate what style each data form is associated with.</p
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="processing.html" title="5. Processing GND files"
+          <a href="processing.html" title="5. Processing GNDS files"
              >next</a> |</li>
         <li class="right" >
           <a href="particles.html" title="4.7. Particles"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="diggingDeeper.html" >4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

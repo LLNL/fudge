@@ -64,12 +64,10 @@
 SMR_PATH = ../../../../../statusMessageReporting
 NUMERICALFUNCTIONS_PATH = ../../../..
 
-CC = gcc
-CDEBUGFLAGS = -g -O0 -Wall
 ptwXYCFLAGS = -I$(NUMERICALFUNCTIONS_PATH)/include -L$(NUMERICALFUNCTIONS_PATH)/lib -lnumericalfunctions \
               -I$(SMR_PATH)/include -L$(SMR_PATH)/lib -lstatusMessageReporting \
               -lptwXY_utilities -lnfut_utilities
-localCFLAGS = $(CDEBUGFLAGS) $(CFLAGS) $(ptwXYCFLAGS) -lm
+localCFLAGS = $(CFLAGS) $(ptwXYCFLAGS)
 
 TARGETS = GaussianQuadrature
 
@@ -78,7 +76,7 @@ TARGETS = GaussianQuadrature
 default: $(TARGETS)
 
 GaussianQuadrature: GaussianQuadrature.c
-	$(CC) -o GaussianQuadrature GaussianQuadrature.c -lnumericalfunctions -lm $(localCFLAGS)
+	$(CC) -o GaussianQuadrature GaussianQuadrature.c -lnumericalfunctions $(localCFLAGS) -lm
 
 check: default
 	for f in $(TARGETS); do ./$$f $(CHECKOPTIONS); done

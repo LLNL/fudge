@@ -67,17 +67,17 @@ import argparse, traceback, sys
 
 def readEvaluation( filename, verbose=True, skipBadData=True, continuumSpectraFix=False ):
     '''
-    Read in an evaluation in either Fudge/GND or ENDF and return result as Fudge classes
+    Read in an evaluation in either Fudge/GNDS or ENDF and return result as Fudge classes
     '''
 
     firstline = open(filename).readline()
 
-    # Is the file a GND file?
+    # Is the file a GNDS file?
     if firstline.startswith( "<?xml" ):
-        import fudge.gnd
-        RS = fudge.gnd.reactionSuite.readXML( filename )
+        import fudge.gnds
+        RS = fudge.gnds.reactionSuite.readXML( filename)
         try:
-            CS = fudge.gnd.covariances.covarianceSuite.readXML( filename.replace( '.gnd.', '.gndCov.' ) )
+            CS = fudge.gnds.covariances.covarianceSuite.readXML( filename.replace('.gnds.', '.gndsCov.'))
         except:
             CS = None
         return {'reactionSuite':RS, 'covarianceSuite':CS, 'errors':[]}
@@ -87,16 +87,16 @@ def readEvaluation( filename, verbose=True, skipBadData=True, continuumSpectraFi
             firstline.endswith(' 0  0    0\r') or \
             firstline.endswith(' 0  0    0\r\n') or \
             filename.endswith('.endf'):
-        from fudge.legacy.converting import endfFileToGND
-        return endfFileToGND.endfFileToGND( filename, toStdOut=verbose, skipBadData=skipBadData, continuumSpectraFix=continuumSpectraFix )
+        from fudge.legacy.converting import endfFileToGNDS
+        return endfFileToGNDS.endfFileToGNDS( filename, toStdOut=verbose, skipBadData=skipBadData, continuumSpectraFix=continuumSpectraFix )
 
     # Failed!
     else: print "WARNING: Unknown file type, not reading %s"% filename
 
 def process_args():
     '''Process command line options'''
-    parser = argparse.ArgumentParser(description='Check an ENDF or GND file')
-    parser.add_argument('inFile', type=str, help='The ENDF or GND file you want to check.' )
+    parser = argparse.ArgumentParser(description='Check an ENDF or GNDS file')
+    parser.add_argument('inFile', type=str, help='The ENDF or GNDS file you want to check.' )
     parser.add_argument('-v', dest='verbose', default=False, action='store_true', help='Enable verbose output' )
     parser.add_argument('--skipCov',default=False,action='store_true',help='skip covariance checks' )
     parser.add_argument('--skipEnergyBalance',default=False,action='store_true',help='skip energy balance checks' )

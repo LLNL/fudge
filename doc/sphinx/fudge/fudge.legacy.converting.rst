@@ -6,15 +6,15 @@ Subpackages
 
 .. toctree::
 
-    fudge.legacy.converting.ENDFToGND
+    fudge.legacy.converting.ENDFToGNDS
 
 Submodules
 ----------
 
-fudge.legacy.converting.endfFileToGND module
+fudge.legacy.converting.endfFileToGNDS module
 --------------------------------------------
 
-.. automodule:: fudge.legacy.converting.endfFileToGND
+.. automodule:: fudge.legacy.converting.endfFileToGNDS
     :members:
     :undoc-members:
     :show-inheritance:
@@ -27,10 +27,10 @@ fudge.legacy.converting.endfFormats module
     :undoc-members:
     :show-inheritance:
 
-fudge.legacy.converting.endfThermScattToGND module
+fudge.legacy.converting.endfThermScattToGNDS module
 --------------------------------------------------
 
-.. automodule:: fudge.legacy.converting.endfThermScattToGND
+.. automodule:: fudge.legacy.converting.endfThermScattToGNDS
     :members:
     :undoc-members:
     :show-inheritance:
@@ -43,26 +43,26 @@ fudge.legacy.converting.endf_endl module
     :undoc-members:
     :show-inheritance:
 
-fudge.legacy.converting.endlToGND module
+fudge.legacy.converting.endlToGNDS module
 ----------------------------------------
 
-.. automodule:: fudge.legacy.converting.endlToGND
+.. automodule:: fudge.legacy.converting.endlToGNDS
     :members:
     :undoc-members:
     :show-inheritance:
 
-fudge.legacy.converting.gndToENDF6 module
+fudge.legacy.converting.gndsToENDF6 module
 -----------------------------------------
 
-.. automodule:: fudge.legacy.converting.gndToENDF6
+.. automodule:: fudge.legacy.converting.gndsToENDF6
     :members:
     :undoc-members:
     :show-inheritance:
 
-fudge.legacy.converting.toGNDMisc module
+fudge.legacy.converting.toGNDSMisc module
 ----------------------------------------
 
-.. automodule:: fudge.legacy.converting.toGNDMisc
+.. automodule:: fudge.legacy.converting.toGNDSMisc
     :members:
     :undoc-members:
     :show-inheritance:

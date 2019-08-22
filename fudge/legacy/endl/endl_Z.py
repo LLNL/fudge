@@ -65,38 +65,41 @@
 This module contains a set of routines that return the symbol or name for an element.
 """
 
-from fudge.particles.nuclear import elementsZSymbolName
+from PoPs.groups import misc as chemicalElementMiscModule
 
 def endl_nZs( ) :
     """Returns the number of elements, starting at neutron with Z = 0, for which data is present.
     The largest element for which information can be obtained has Z = endl_nZs( ) - 1."""
 
-    return len(elementsZSymbolName)
+    return( len( chemicalElementMiscModule.chemicalElementZSymbolNames ) )
 
 def endl_ZSymbol( Z ) :
     """Returns the symbol for the specified Z or 'None' if Z is out-of-bounds."""
-
-    if Z in elementsZSymbolName:
-        return elementsZSymbolName[Z][0]
-    return None
+    try :
+        return( chemicalElementMiscModule.symbolFromZ[Z] )
+    except :
+        return None
 
 def endl_ZLabel( Z ) :
     """Returns the label (i.e., name) for the specified Z or 'None' if Z is out-of-bounds."""
 
-    if Z in elementsZSymbolName:
-        return elementsZSymbolName[Z][1]
-    return None
+    try :
+        return( chemicalElementMiscModule.nameFromZ[Z] )
+    except :
+        return None
 
 def endl_ZSymbolToZ( symbol ) :
     """Returns the Z for the specified symbol or 'None' if no match for symbol."""
 
-    for Z,(Symbol,Name) in elementsZSymbolName.items() :
-        if( Symbol == symbol ) : return Z
-    return None
+    try :
+        return( chemicalElementMiscModule.ZFromSymbol[symbol] )
+    except :
+        return None
 
 def endl_ZLabelToZ( label ) :
     """Returns the Z for the specified label or 'None' if no match for label."""
 
-    for Z,(Symbol,Name) in elementsZSymbolName.items() :
-        if( Name == label ) : return Z
-    return None
+    try :
+        return( chemicalElementMiscModule.ZFromName[label] )
+    except :
+        return None

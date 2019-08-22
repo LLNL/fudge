@@ -61,10 +61,12 @@
 # 
 # <<END-copyright>>
 
+import numpy
+
 from pqu import PQU as PQUModule
 
-from fudge.gnd.covariances import modelParameters as modelParametersModule
-from fudge.gnd import resonances as resonancesModule
+from fudge.gnds.covariances import covarianceSuite as covarianceSuiteModule, modelParameters as modelParametersModule
+from fudge.gnds import resonances as resonancesModule
 
 from .. import endfFormats as endfFormatsModule
 from site_packages.legacy.toENDF6 import resonances as resonancesRewriteModule
@@ -98,7 +100,53 @@ def writeLCOMP2( matrix, NDIGIT, NNN ):
     return endf
 
 def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
-    """ go back to ENDF format """
+    """
+    Write all unresolved covariance data to ENDF6
+    """
+
+    resolved, unresolved = [],[]
+    for section_ in self:
+        if isinstance(section_, modelParametersModule.averageParameterCovariance):
+            unresolved.append(section_)
+        else:
+            resolved.append(section_)
+
+    NER = len(resolved)
+    if unresolved: NER += 1
+
+    res = targetInfo['reactionSuite'].resonances
+    if resolved:
+        if isinstance( res.resolved.evaluated, resonancesModule.BreitWigner ):
+            LFW = res.resolved.evaluated.resonanceParameters.table.getColumn('fissionWidth') is not None
+        elif isinstance( res.resolved.evaluated, resonancesModule.RMatrix ):
+            LFW = any( [RR.reactionLink.link.outputChannel.isFission() for RR in res.resolved.evaluated.resonanceReactions])
+    else:
+        LFW = any( [RR.reactionLink.link.outputChannel.isFission() for RR in res.unresolved.evaluated.resonanceReactions])
+
+    # MF32 header information:
+    ZAM, AWT = targetInfo['ZA'], targetInfo['mass']
+    NIS, ABN, ZAI = 1, 1.0, ZAM  # assuming only one isotope per file
+    endf = [endfFormatsModule.endfHeadLine(ZAM, AWT, 0, 0, NIS, 0)]
+    endf.append(endfFormatsModule.endfHeadLine(ZAI, ABN, 0, LFW, NER, 0))
+
+    endfMFList[32][151] = endf
+
+    for section_ in resolved:
+        section_[targetInfo['style']].toENDF6(endfMFList, flags, targetInfo, verbosityIndent)
+    if unresolved:      # these need to all be done together
+        averageParametersToENDF6(unresolved, endfMFList, flags, targetInfo, verbosityIndent)
+
+    endfMFList[32][151].append( endfFormatsModule.endfSENDLineNumber() )
+
+covarianceSuiteModule.parameterCovariances.toENDF6 = toENDF6
+
+
+def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
+    """
+    Translate resolved resonance covariance back to ENDF-6
+    """
+    import numpy
+
     def swaprows( matrix, i1, i2, nrows ):
         # may need to rearrange parameters: ENDF often sorts first by L rather than by energy
         rows = matrix[i1:i1+nrows].copy()
@@ -108,32 +156,26 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
 
     # need the resonance parameters as well as covariance matrix:
     res = targetInfo['reactionSuite'].resonances
+    conversionFlags = targetInfo['ENDFconversionFlags'].get(self,"")
 
-    if isinstance( res.resolved.evaluated, resonancesModule.SLBW ): LRF = 1
-    elif isinstance( res.resolved.evaluated, resonancesModule.MLBW ): LRF = 2
-    elif isinstance(res.resolved.evaluated, resonancesModule.RMatrix): LRF = 7
+    LRF = 7
+    if isinstance( res.resolved.evaluated, resonancesModule.BreitWigner ):
+        LRF = {
+            resonancesModule.BreitWigner.singleLevel: 1,
+            resonancesModule.BreitWigner.multiLevel: 2
+        }[ res.resolved.evaluated.approximation ]
+    elif 'LRF3' in conversionFlags:
+        LRF = 3
 
-    if LRF == 7:
-        LFW = any([RR.reactionLink.link.outputChannel.isFission() for RR in res.resolved.evaluated.resonanceReactions])
-        if 'LRF3' in self.ENDFconversionFlags:
-            LRF = 3
-    else:
-        LFW = res.resolved.evaluated.resonanceParameters.table.getColumn('fissionWidth') is not None
-
-    # MF32 header information:
-    ZAM, AWT = targetInfo['ZA'], targetInfo['mass']
-    NIS, ABN, ZAI = 1, 1.0, ZAM  # assuming only one isotope per file
-    NER = 1
-    endf = [endfFormatsModule.endfHeadLine( ZAM, AWT, 0, 0, NIS, 0 )]
-    endf.append(endfFormatsModule.endfHeadLine(ZAI, ABN, 0, LFW, NER, 0))
+    endf = []
     EL, EH = res.resolved.domainMin, res.resolved.domainMax
-    LRU, NRO = 1, 0
+    AWT, LRU, NRO = targetInfo['mass'], 1, 0
     NAPS = not res.resolved.evaluated.calculateChannelRadius
     endf.append(endfFormatsModule.endfHeadLine(EL, EH, LRU, LRF, NRO, NAPS))
 
     LCOMP = 1
-    if 'LCOMP=0' in self.ENDFconversionFlags: LCOMP = 0
-    elif 'LCOMP=2' in self.ENDFconversionFlags: LCOMP = 2
+    if 'LCOMP=0' in conversionFlags: LCOMP = 0
+    elif 'LCOMP=2' in conversionFlags: LCOMP = 2
 
     if LRF in (1,2):
         RPs = res.resolved.evaluated.resonanceParameters.table
@@ -142,18 +184,19 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
         SPI = targetInfo['spin']
         AP = res.resolved.evaluated.scatteringRadius.getValueAs('10*fm')
 
-        sortByL = "sortByL" in self.ENDFconversionFlags
+        sortByL = "sortByL" in conversionFlags
         Ls = RPs.getColumn('L')
         NLS = len(set(Ls))
         LAD = 0
-        if LCOMP==2 or not sortByL: NLS = 0
+        if LCOMP in (1,2) or not sortByL: NLS = 0
         ISR = any( [isinstance(parameter.link, resonancesModule.scatteringRadius) for parameter in self.parameters] )
         endf.append( endfFormatsModule.endfHeadLine( SPI,AP,LAD,LCOMP,NLS,ISR ) )
         MLS = 0
         if ISR:
             MLS = 1 # currently don't handle energy-dependent DAP
-            DAP = PQUModule.PQU( self.matrix.data[0][0], self.parameters[0].unit ).getValueAs('10*fm')
-            endf.append( endfFormatsModule.endfDataLine( [0,DAP] ) )
+            DAP = PQUModule.PQU( self.matrix.constructArray()[0,0],
+                self.parameters[0].link.form.axes[0].unit ).getValueAs('10*fm')
+            endf.append( endfFormatsModule.endfContLine( 0,DAP,0,0,0,0 ) )
 
         # MF32 repeats the resonance parameter information.
         # Extract that info from reactionSuite.resonances:
@@ -168,6 +211,13 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
             table[2] = Js
         table = zip(*table)
         matrix = self.matrix.constructArray()[MLS:,MLS:]
+        # toss out extra rows/columns of zeros (for column 'L')
+        MPAR2 = len(matrix) / len(table)
+        index = []
+        for idx in range(len(table)):
+            index += [idx*MPAR2+1, idx*MPAR2+2, idx*MPAR2+3]    # indices to remove
+        keep = numpy.array( sorted( set(range(len(matrix))).difference(index)) )
+        matrix = matrix[keep.reshape(-1,1),keep]
         MPAR = len(matrix) / len(table)
 
         if sortByL:
@@ -207,7 +257,6 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
         if LCOMP==1:
             NSRS, NLRS = 1,0    # short-range correlations only
             endf.append( endfFormatsModule.endfHeadLine( AWT, 0, 0, 0, NSRS, NLRS ) )
-            MPAR = len( self.parameters[0].parametersPerResonance.split(',') )
             NRB = NRes
             NVS = (NRB*MPAR)*(NRB*MPAR+1)/2 # length of the upper diagonal matrix
             endf.append( endfFormatsModule.endfHeadLine( 0,0, MPAR, 0, NVS+6*NRB, NRB ) )
@@ -224,11 +273,15 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
             dat = matrix.diagonal()
             NRes = 0
             matrixDat = []
+            omitResonance = []
             for i in range(len(table)):
                 params = table[i][1:7]
                 uncerts = [dat[MPAR*i],0,0,dat[MPAR*i+1],dat[MPAR*i+2],0]
                 if MPAR==4: uncerts[-1] = dat[MPAR*i+3]
-                if not any(uncerts): continue  # Some resonances may not be included in MF=32
+                if not any(uncerts):
+                    omitResonance.extend([True]*MPAR)  # resonance is not included in MF=32
+                    continue
+                omitResonance.extend([False]*MPAR)
                 matrixDat += endfFormatsModule.endfDataList( params )
                 matrixDat += endfFormatsModule.endfDataList( uncerts )
                 NRes += 1
@@ -237,7 +290,10 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
             endf += matrixDat
 
             # correlation matrix:
-            NDIGIT = [a for a in self.ENDFconversionFlags.split(',') if a.startswith('NDIGIT')]
+            if any(omitResonance):  # see Pt192
+                omitResonance = numpy.array(omitResonance)
+                matrix = matrix[~omitResonance][:,~omitResonance]
+            NDIGIT = [a for a in conversionFlags.split(',') if a.startswith('NDIGIT')]
             NDIGIT = int( NDIGIT[0][-1] )
             endf += writeLCOMP2( matrix, NDIGIT, NRes*MPAR )
 
@@ -251,22 +307,23 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
         SPI = targetInfo['spin']
         AP = conversionDetails['AP']
 
-        sortByL = "sortByL" in self.ENDFconversionFlags
+        sortByL = "sortByL" in conversionFlags
         Ls = table['Ls']
         NLS = len(set(Ls))
         LAD = 0
-        if LCOMP==2 and res.resolved.evaluated.reconstructAngular: LAD=1
+        if LCOMP==2 and res.resolved.evaluated.supportsAngularReconstruction: LAD=1
         if LCOMP==2 or not sortByL: NLS = 0
         ISR = any( [isinstance(parameter.link, resonancesModule.scatteringRadius) for parameter in self.parameters] )
         endf.append( endfFormatsModule.endfHeadLine( SPI,AP,LAD,LCOMP,NLS,ISR ) )
         MLS = 0
+        matrix = self.matrix.constructArray()
         if ISR:
             MLS = 1 # currently don't handle energy-dependent DAP
-            DAP = PQUModule.PQU( self.matrix.data[0][0], self.parameters[0].unit ).getValueAs('10*fm')
+            DAP = PQUModule.PQU( matrix[0,0], self.parameters[0].link.form.axes[0].unit ).getValueAs('10*fm')
             endf.append( endfFormatsModule.endfHeadLine( 0,0,0,0,MLS,1 ) )
             endf.append( endfFormatsModule.endfDataLine( [DAP] ) )
 
-        matrix = self.matrix.constructArray()[MLS:,MLS:]
+        matrix = matrix[MLS:,MLS:]
         MPAR = len(matrix) / NRes
 
         if not sortByL:
@@ -285,6 +342,21 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
         for i1 in range(len(elist1)):   # switch order of elastic and capture widths
             swaprows(matrix, MPAR * i1 + 1, MPAR * i1 + 2, 1)
 
+        omitRow = numpy.sum(matrix, axis=1) == 0
+
+        # check for empty rows/columns:
+        if any(omitRow):
+            omitResonance = []
+            for idx in range(len(sortedTable)):
+                if numpy.all(omitRow[MPAR*idx:MPAR*(idx+1)]):
+                    omitResonance.append(idx)
+                else:
+                    omitRow[MPAR*idx:MPAR*(idx+1)] = 0  # only omit of all parameters are zero for this resonance
+            for idx in omitResonance[::-1]:
+                sortedTable.pop(idx)
+            NRes = len(sortedTable)
+            matrix = matrix[~omitRow][:, ~omitRow]
+
         if LCOMP==0:
             tableIndex = 0
             for L in set( Ls ):
@@ -302,7 +374,7 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
                     endf += endfFormatsModule.endfDataList( lis )
                 tableIndex += NRS
 
-        if LCOMP==1:
+        elif LCOMP==1:
             NSRS, NLRS = 1,0    # short-range correlations only
             endf.append( endfFormatsModule.endfHeadLine( AWT, 0, 0, 0, NSRS, NLRS ) )
             NRB = NRes
@@ -334,7 +406,7 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
             endf += matrixDat
 
             # correlation matrix:
-            NDIGIT = [a for a in self.ENDFconversionFlags.split(',') if a.startswith('NDIGIT')]
+            NDIGIT = [a for a in conversionFlags.split(',') if a.startswith('NDIGIT')]
             NDIGIT = int( NDIGIT[0][-1] )
             endf += writeLCOMP2( matrix, NDIGIT, NRes*MPAR )
 
@@ -361,7 +433,7 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
                 NX = (NCH//6 + 1)*NRB
                 endf.append( endfFormatsModule.endfContLine(0,0,NCH,NRB,6*NX,NX) )
                 for res in spingrp.resonanceParameters.table:
-                    for jidx in xrange(NCH // 6 + 1):
+                    for jidx in range(NCH // 6 + 1):
                         endfLine = res[jidx * 6:jidx * 6 + 6]
                         while len(endfLine) < 6: endfLine.append(0)
                         endf.append(endfFormatsModule.endfDataLine(endfLine))
@@ -387,7 +459,7 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
                 NRSA = len(spingrp.resonanceParameters.table)
                 if NRSA==0: continue
                 NCH, spinGroupHeader = resonancesRewriteModule.writeRMatrixSpinGroupHeader(RML, spingrp)
-                NNN += NRSA * NCH
+                NNN += NRSA * (NCH + 1) # +1 for resonance energy
                 endf.extend( spinGroupHeader )
 
                 # write resonance parameters (redundant with MF=2), followed by uncertainties
@@ -410,13 +482,80 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
                     endf.append( endfFormatsModule.endfDataLine( [0,0,0,0,0,0] ) )
 
             # correlation matrix:
-            NDIGIT = [a for a in self.ENDFconversionFlags.split(',') if a.startswith('NDIGIT')]
+            NDIGIT = [a for a in conversionFlags.split(',') if a.startswith('NDIGIT')]
             NDIGIT = int(NDIGIT[0][-1])
             endf += writeLCOMP2(matrix, NDIGIT, NNN)
         else:
             raise NotImplementedError("MF32 LRF7 with LCOMP=%d" % LCOMP)
 
-    endf.append( endfFormatsModule.endfSENDLineNumber() )
-    endfMFList[32][151] = endf
+    endfMFList[32][151] += endf
 
-modelParametersModule.parameterCovariance.toENDF6 = toENDF6
+modelParametersModule.parameterCovarianceMatrix.toENDF6 = toENDF6
+
+
+def averageParametersToENDF6( averageParameterSections, endfMFList, flags, targetInfo, verbosityIndent):
+    """
+    Unresolved resonance parameters need to be converted from multiple sections back into a single
+    covariance matrix for ENDF-6
+    """
+
+    endf = []
+    res = targetInfo['reactionSuite'].resonances
+    URR = res.unresolved
+    EL,EH = URR.domainMin, URR.domainMax
+    LRU,LRF,NRO,NAPS = 2,1,0,0
+    endf.append(endfFormatsModule.endfContLine(EL,EH,LRU,LRF,NRO,NAPS))
+
+    SPI = targetInfo['spin']
+    if res.unresolved.evaluated.scatteringRadius is not None:
+        AP = res.unresolved.evaluated.scatteringRadius.getValueAs('10*fm')
+    else:
+        AP = res.scatteringRadius.getValueAs('10*fm')
+
+    NLS = len(URR.evaluated.Ls)
+    AWRI = targetInfo['mass']
+    endf.append(endfFormatsModule.endfHeadLine(SPI, AP, 0, 0, NLS, 0))
+
+    MPARs, diagonal, diagonalPointers = [], [], []
+    for lsection in URR.evaluated.Ls:
+        NJS = len( lsection.Js )
+        endf.append(endfFormatsModule.endfHeadLine(AWRI,0,lsection.L,0,6*NJS,NJS))
+
+        for jsection in lsection.Js:
+
+            params = {'D':0, 'AJ':jsection.J, 'GNO':0, 'GG':0, 'GF':0, 'GX':0}
+            MPARs.append( len(jsection.widths) )
+            for width in jsection.widths:
+                covarianceMatrix = width.data.uncertainty.data.link
+
+                savedParams = targetInfo['ENDFconversionFlags'].get(covarianceMatrix,"").split(',')
+                for p in savedParams:
+                    key, value = p.split('=')
+                    params[key] = float(value)
+
+                if covarianceMatrix.matrix.array.shape != (1,1):
+                    raise NotImplementedError("ENDF-6 format does not support energy-dependent unresolved covariances")
+                diagonal.append( covarianceMatrix.matrix.array.values[0] )
+                diagonalPointers.append( width )
+
+            endf.append(endfFormatsModule.endfDataLine([params[key] for key in ('D','AJ','GNO','GG','GF','GX')]))
+
+    assert len(set(MPARs)) == 1 # same number of widths for each L/J section
+    MPAR = MPARs[0]
+    NPAR = len(diagonal)
+
+    endf.append(endfFormatsModule.endfContLine(0,0,MPAR,0,(NPAR*(NPAR+1))/2,NPAR))
+    matrix = numpy.identity(NPAR) * diagonal
+
+    crossTerms = [section for section in averageParameterSections if section.crossTerm]
+    for crossTerm in crossTerms:
+        ridx = diagonalPointers.index( crossTerm.rowData.link )
+        cidx = diagonalPointers.index( crossTerm.columnData.link )
+        matrix[ridx,cidx] = matrix[cidx,ridx] = crossTerm[targetInfo['style']].matrix.array.values[0]
+
+    datalist = []
+    for idx,row in enumerate(matrix):
+        datalist += row[idx:].tolist()
+    endf += endfFormatsModule.endfDataList(datalist)
+
+    endfMFList[32][151] += endf

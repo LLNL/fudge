@@ -109,9 +109,9 @@ def _mutualifyGrouping3Data( f1, f2, f3, printMutualDomainWarning = False ) :
         if( len( f3 ) > 0 ) : f3 = f3.domainSlice( domainMin = domainMin, domainMax = domainMax )
     return( f1, f2, f3 )
 
-def groupOneFunctionAndFlux( style, tempInfo, f1 ) :
+def groupOneFunctionAndFlux( style, tempInfo, f1, styleFilter = None ) :
 
-    if( isinstance( f1, linkModule.link ) ) : f1 = style.findFormMatchingDerivedStyle( f1.link )
+    if( isinstance( f1, linkModule.link ) ) : f1 = style.findFormMatchingDerivedStyle( f1.link, styleFilter = styleFilter )
     f1 = _toLinear( f1 )
     groupBoundaries, flux = _groupFunctionsAndFluxInit( style, tempInfo, f1 )
     return( f1.groupTwoFunctions( groupBoundaries, flux, norm = tempInfo['groupedFlux'] ) )

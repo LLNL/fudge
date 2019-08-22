@@ -69,8 +69,8 @@ conserveParticleAndEnergy = 'conserveParticleAndEnergy'
 
 from PoPs import IDs as IDsPoPsModule
 
-from fudge.gnd import styles as stylesModule
-from fudge.gnd import reactionSuite as reactionSuiteModule
+from fudge.gnds import styles as stylesModule
+from fudge.gnds import reactionSuite as reactionSuiteModule
 
 class tempInfo :
 
@@ -207,11 +207,11 @@ class processInfo :
 
     def getProjectileName( self ) :
 
-        return( self.target.projectile.name )
+        return( self.target.projectile.pid )
 
     def getTargetName( self ) :
 
-        return( self.target.target.name )
+        return( self.target.target.pid )
 
     def isProcessParticle( self, name ) :
 
@@ -234,14 +234,14 @@ class processInfoParticle :
 
     def __init__( self, name, groups, lMax, conservationFlag = conserveParticle ) :
 
-        self.name = name
+        self.pid = name
         self.groups = groups
         self.lMax = lMax
         self.conservationFlag = conservationFlag
 
     def __repr__( self ) :
 
-        s = '\n%s %s %s\n' % ( self.name, self.lMax, self.conservationFlag )
+        s = '\n%s %s %s\n' % ( self.pid, self.lMax, self.conservationFlag )
         s += `self.groups`
         return( s )
 
@@ -252,7 +252,7 @@ class processInfoLLNL( processInfo ) :
         particles = {}
         for particle in groups :
             lMax_ = 0
-            if( particle == target.projectile.name ) : lMax_ = lMax
+            if( particle == target.projectile.pid ) : lMax_ = lMax
             conservationFlag = conserveParticleAndEnergy
             if( particle == 'n' ) : conservationFlag = conserveParticle
             if( particle == IDsPoPsModule.photon ) : conservationFlag = conserveEnergy

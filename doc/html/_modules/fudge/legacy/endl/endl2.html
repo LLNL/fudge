@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.legacy.endl.endl2 &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.legacy.endl.endl2 &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,7 +25,7 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +35,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
       </ul>
@@ -59,7 +56,7 @@ This module contains miscellaneous functions.
 
 import math
 from fudge.core.utilities import brb
-from fudge.particles import nuclear
+import misc as miscModule
 import endl_C
 import endl_I
 import endl_Z
@@ -444,14 +441,14 @@ import endl_y
         return ZStr
     return ZStr + ASep + `A` + Suffix</div>
 
-<div class="viewcode-block" id="endlToGNDName"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl2.endlToGNDName">[docs]</a>def endlToGNDName( yoOrZA ) :
+<div class="viewcode-block" id="endlToGNDSName"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl2.endlToGNDSName">[docs]</a>def endlToGNDSName( yoOrZA ) :
 
     return( symbolForYoOrZA( yoOrZA, NameASeperator = &#39;&#39;, ZAOnly = True, AddNatural = True, m_to_m1 = True, suffixSeperator = &#39;_&#39; ) )</div>
 
-<div class="viewcode-block" id="gndNameToEndlZ_A_Suffix"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl2.gndNameToEndlZ_A_Suffix">[docs]</a>def gndNameToEndlZ_A_Suffix( name ) :
-    &quot;&quot;&quot;Returns the tuple (Z, A, suffix, ZA) for a gnd isotope name (e.g., gnd name = &#39;Am242_m1&#39; returns ( 95, 242, &#39;m1&#39;, 95242 ).&quot;&quot;&quot;
+<div class="viewcode-block" id="gndsNameToEndlZ_A_Suffix"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl2.gndsNameToEndlZ_A_Suffix">[docs]</a>def gndsNameToEndlZ_A_Suffix( name ) :
+    &quot;&quot;&quot;Returns the tuple (Z, A, suffix, ZA) for a gnds isotope name (e.g., gnds name = &#39;Am242_m1&#39; returns ( 95, 242, &#39;m1&#39;, 95242 ).&quot;&quot;&quot;
 
-    return( nuclear.getZ_A_suffix_andZAFromName( name ) )</div>
+    return( miscModule.getZ_A_suffix_andZAFromName( name ) )</div>
 
 <div class="viewcode-block" id="fileInfo"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl2.fileInfo">[docs]</a>def fileInfo( yi, ZA, fileName ) :
     &quot;&quot;&quot;Obtains yo, C, I and S from fileName and calls reactionInfo.&quot;&quot;&quot;
@@ -511,8 +508,8 @@ import endl_y
     outgoingNames = [ &#39;H3&#39;, &#39;He4&#39;, &#39;Tm176&#39; ]
     Q = reactionQByIsotopeNames( incomingNames, outgoingNames )&quot;&quot;&quot;
 
-    incomingZAs = [ gndNameToEndlZ_A_Suffix( name )[-1] for name in incomingNames ]
-    outgoingZAs = [ gndNameToEndlZ_A_Suffix( name )[-1] for name in outgoingNames ]
+    incomingZAs = [ gndsNameToEndlZ_A_Suffix( name )[-1] for name in incomingNames ]
+    outgoingZAs = [ gndsNameToEndlZ_A_Suffix( name )[-1] for name in outgoingNames ]
     return( reactionQByZAs( incomingZAs, outgoingZAs, bdflsFile ) )</div>
 
 <div class="viewcode-block" id="possibleReactions"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl2.possibleReactions">[docs]</a>def possibleReactions( projectile, target, energy_MeV, maxProducts = 4, bdflsFile = None ) :
@@ -600,14 +597,14 @@ import endl_y
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

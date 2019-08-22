@@ -1,4 +1,4 @@
-<PoPs name="test" version="1.2.3" format="PoPs 0.1">
+<PoPs name="test" version="1.2.3" format="0.1">
   <gaugeBosons>
     <gaugeBoson id="photon"></gaugeBoson></gaugeBosons>
   <leptons>
@@ -8,23 +8,30 @@
     <baryon id="n_anti"></baryon>
     <baryon id="p"></baryon></baryons>
   <chemicalElements>
-    <chemicalElement id="N" Z="7" name="Nitrogen">
-      <isotope id="N15" A="15">
-        <nuclearLevel id="N15_e5">
-          <nucleus id="n15_e5" index="5"></nucleus></nuclearLevel>
-        <nuclearLevel id="N15_e7">
-          <nucleus id="n15_e7" index="7"></nucleus></nuclearLevel></isotope></chemicalElement>
-    <chemicalElement id="O" Z="8" name="Oxygen">
-      <isotope id="O16" A="16">
-        <nuclearLevel id="O16_e12">
-          <nucleus id="o16_e12" index="12"></nucleus></nuclearLevel></isotope></chemicalElement>
-    <chemicalElement id="Pu" Z="94" name="Plutonium">
-      <isotope id="Pu237" A="237"></isotope>
-      <isotope id="Pu238" A="238">
-        <nuclearLevel id="Pu238_e0">
-          <nucleus id="pu238_e0" index="0"></nucleus></nuclearLevel>
-        <nuclearLevel id="Pu240_e2">
-          <nucleus id="pu238_e2" index="2"></nucleus></nuclearLevel></isotope>
-      <isotope id="Pu239" A="239">
-        <nuclearLevel id="Pu239_e4">
-          <nucleus id="pu239_e4" index="4"></nucleus></nuclearLevel></isotope></chemicalElement></chemicalElements></PoPs>
+    <chemicalElement symbol="N" Z="7" name="Nitrogen">
+      <isotopes>
+        <isotope symbol="N15" A="15">
+          <nuclides>
+            <nuclide id="N15_e5">
+              <nucleus id="n15_e5" index="5"></nucleus></nuclide>
+            <nuclide id="N15_e7">
+              <nucleus id="n15_e7" index="7"></nucleus></nuclide></nuclides></isotope></isotopes></chemicalElement>
+    <chemicalElement symbol="O" Z="8" name="Oxygen">
+      <isotopes>
+        <isotope symbol="O16" A="16">
+          <nuclides>
+            <nuclide id="O16_e12">
+              <nucleus id="o16_e12" index="12"></nucleus></nuclide></nuclides></isotope></isotopes></chemicalElement>
+    <chemicalElement symbol="Pu" Z="94" name="Plutonium">
+      <isotopes>
+        <isotope symbol="Pu237" A="237"></isotope>
+        <isotope symbol="Pu238" A="238">
+          <nuclides>
+            <nuclide id="Pu238">
+              <nucleus id="pu238" index="0"></nucleus></nuclide>
+            <nuclide id="Pu238_e2">
+              <nucleus id="pu238_e2" index="2"></nucleus></nuclide></nuclides></isotope>
+        <isotope symbol="Pu239" A="239">
+          <nuclides>
+            <nuclide id="Pu239_e4">
+              <nucleus id="pu239_e4" index="4"></nucleus></nuclide></nuclides></isotope></isotopes></chemicalElement></chemicalElements></PoPs>

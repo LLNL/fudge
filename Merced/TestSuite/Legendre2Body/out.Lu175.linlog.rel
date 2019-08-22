@@ -1,4 +1,4 @@
-xndfgenGetTransfer: version 1
+merced: version 1
 Comment:  n1 + Lu175 --> Lu175 + n1 outgoing data for n
 Comment:  masses and Q value must be in the same units as bin boundaries
 Comment:  You don't need to give the residual's mass---it's calculated from the Q value

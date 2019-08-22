@@ -743,6 +743,8 @@ def floatToShortestString( value, significantDigits = 15, trimZeros = True, keep
     :rtype: `str`
     """
 
+    if type(value)==str: return value
+
     def isfinite( value ) :
         """Returns True if value is neither infinite nor not-a-number (NaN) and False otherwise."""
 

@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>4.4. Fission &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>4.4. Fission &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -30,7 +27,7 @@
     <link rel="next" title="4.5. Summed Reactions" href="summedReactions.html" />
     <link rel="prev" title="4.3. Outgoing Distributions" href="outgoingDistributions.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -46,7 +43,7 @@
         <li class="right" >
           <a href="outgoingDistributions.html" title="4.3. Outgoing Distributions"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="diggingDeeper.html" accesskey="U">4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a> &#187;</li> 
       </ul>
@@ -59,7 +56,7 @@
             
   <div class="section" id="fission">
 <h1>4.4. Fission<a class="headerlink" href="#fission" title="Permalink to this headline">¶</a></h1>
-<p>While fission is treated as a single reaction in both ENDF and GND, in reality it is composed of many different reactions each of which produces a different set of outgoing particles. Fission poses a special challenge for GND since, unlike most other reactions, we cannot explicitly list all the outgoing products. Instead we list average values for outgoing neutrons and gammas, and ignore the fission fragments (except to give the average energy deposited in them).</p>
+<p>While fission is treated as a single reaction in both ENDF and GNDS, in reality it is composed of many different reactions each of which produces a different set of outgoing particles. Fission poses a special challenge for GNDS since, unlike most other reactions, we cannot explicitly list all the outgoing products. Instead we list average values for outgoing neutrons and gammas, and ignore the fission fragments (except to give the average energy deposited in them).</p>
 <p>A neutron-induced fission channel generally contains several outgoing products:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">A</span> <span class="n">prompt</span> <span class="n">neutron</span>
 <span class="o">-</span> <span class="n">One</span> <span class="ow">or</span> <span class="n">more</span> <span class="n">delayed</span> <span class="n">neutrons</span><span class="p">,</span> <span class="ow">and</span>
@@ -68,11 +65,11 @@
 </div>
 <p>In each case the multiplicity is generally a function of incident energy.</p>
 <div class="section" id="first-second-third-chance">
-<h2>4.4.1. First, second, third chance, ...<a class="headerlink" href="#first-second-third-chance" title="Permalink to this headline">¶</a></h2>
+<h2>4.4.1. First, second, third chance, …<a class="headerlink" href="#first-second-third-chance" title="Permalink to this headline">¶</a></h2>
 <p>For most evaluations in major libraries, total fission (MT=18) contains a full description of the cross section,
 product multiplicities and distributions. Additional fission cross sections like first-chance, 2nd-chance, etc.
 are often also listed, but do not contain any description of outgoing products.
-GND (and Fudge) handle these with the <code class="docutils literal"><span class="pre">fissionComponent</span></code> container, which contains a cross section
+GNDS (and Fudge) handle these with the <code class="docutils literal"><span class="pre">fissionComponent</span></code> container, which contains a cross section
 and Q-value but not necessarily a list of products.</p>
 </div>
 <div class="section" id="the-cross-section">
@@ -83,11 +80,11 @@ reconstruction.</p>
 </div>
 <div class="section" id="nubar">
 <h2>4.4.3. nubar<a class="headerlink" href="#nubar" title="Permalink to this headline">¶</a></h2>
-<p>The average neutron multiplicity &#8216;nubar&#8217; is stored as the multiplicity of outgoing fission neutrons.
-Nubar is typically separated into two components: &#8216;prompt&#8217;, for neutrons produced during the fission process,
-and &#8216;delayed&#8217; for beta-delayed neutrons emitted by the fission fragments.
+<p>The average neutron multiplicity ‘nubar’ is stored as the multiplicity of outgoing fission neutrons.
+Nubar is typically separated into two components: ‘prompt’, for neutrons produced during the fission process,
+and ‘delayed’ for beta-delayed neutrons emitted by the fission fragments.
 Evaluations typically contain multiple delayed fission neutrons, grouped by the average beta-decay lifetime of
-the parent fission products.  The ENDF-6 format only supports storing a single delayed nubar, so in GND
+the parent fission products.  The ENDF-6 format only supports storing a single delayed nubar, so in GNDS
 we typically see multiple delayed neutrons with multiplicities that link back to the first delayed neutron using
 the <code class="docutils literal"><span class="pre">reference</span></code> multiplicity class.</p>
 </div>
@@ -99,7 +96,7 @@ weakly coupled), and can be represented using <code class="docutils literal"><sp
 The angular distribution is typically <code class="docutils literal"><span class="pre">isotropic</span></code> in the laboratory frame.
 The outgoing energy distribution can be stored in several different ways:</p>
 <ul class="simple">
-<li>XYs2d  (i.e. a point-wise P(E&#8217; | E) distribution)</li>
+<li>XYs2d  (i.e. a point-wise P(E’ | E) distribution)</li>
 <li>Watt spectrum</li>
 <li>Simple Maxwellian fission spectrum</li>
 <li>Madland-Nix model</li>
@@ -134,7 +131,7 @@ for the PFNS, with a Legendre expansion given for each combination of incident a
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">4.4. Fission</a><ul>
-<li><a class="reference internal" href="#first-second-third-chance">4.4.1. First, second, third chance, ...</a></li>
+<li><a class="reference internal" href="#first-second-third-chance">4.4.1. First, second, third chance, …</a></li>
 <li><a class="reference internal" href="#the-cross-section">4.4.2. The cross section</a></li>
 <li><a class="reference internal" href="#nubar">4.4.3. nubar</a></li>
 <li><a class="reference internal" href="#pfns">4.4.4. PFNS</a></li>
@@ -188,14 +185,14 @@ for the PFNS, with a Legendre expansion given for each combination of incident a
         <li class="right" >
           <a href="outgoingDistributions.html" title="4.3. Outgoing Distributions"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="diggingDeeper.html" >4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

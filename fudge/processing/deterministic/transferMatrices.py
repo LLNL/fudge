@@ -61,7 +61,9 @@
 # 
 # <<END-copyright>>
 
-import os, subprocess
+import os
+import subprocess
+import math
 
 from pqu import PQU as PQUModule
 
@@ -76,12 +78,12 @@ from xData import XYs as XYsModule
 from xData import multiD_XYs as multiD_XYsModule
 from xData import regions as regionsModule
 
-from fudge.gnd.productData import multiplicity as multiplicityModule
+from fudge.gnds.productData import multiplicity as multiplicityModule
 
-from fudge.gnd.productData.distributions import angular as angularModule
-from fudge.gnd.productData.distributions import energy as energyModule
-from fudge.gnd.productData.distributions import energyAngular as energyAngularModule
-from fudge.gnd.productData.distributions import angularEnergy as angularEnergyModule
+from fudge.gnds.productData.distributions import angular as angularModule
+from fudge.gnds.productData.distributions import energy as energyModule
+from fudge.gnds.productData.distributions import energyAngular as energyAngularModule
+from fudge.gnds.productData.distributions import angularEnergy as angularEnergyModule
 
 linlin = standardsModule.interpolation.linlinToken
 linlog = standardsModule.interpolation.linlogToken
@@ -89,7 +91,7 @@ loglin = standardsModule.interpolation.loglinToken
 loglog = standardsModule.interpolation.loglogToken
 flat = standardsModule.interpolation.flatToken
 
-GND2ProcessingInterpolationQualifiers = { 
+GNDS2ProcessingInterpolationQualifiers = {
     '' : 'direct', 
     standardsModule.interpolation.unitBaseToken : standardsModule.interpolation.unitBaseToken,
     standardsModule.interpolation.unitBaseUnscaledToken : standardsModule.interpolation.unitBaseUnscaledToken,
@@ -118,7 +120,7 @@ def twoBodyTransferMatrix( style, tempInfo, productFrame, crossSection, angularD
     calls itself in the two regions and sums the result.
     """
 
-    if( isinstance( angularData, angularModule.isotropic ) ) : angularData = angularData.toPointwise_withLinearXYs( )
+    if( isinstance( angularData, angularModule.isotropic2d ) ) : angularData = angularData.toPointwise_withLinearXYs( )
 
     if( isinstance( angularData, angularModule.XYs2d ) ) :
         TM1, TME = twoBodyTransferMatrix2( style, tempInfo, crossSection, angularData, Q, productFrame, comment = comment )
@@ -133,7 +135,8 @@ def twoBodyTransferMatrix( style, tempInfo, productFrame, crossSection, angularD
                     weightData = [ [ lowestBound, 0 ], [ region.domainMin, 1 ], [ highestBound, 1 ] ]
                 else :
                     weightData = [ [ lowestBound, 0 ], [ region.domainMin, 1 ], [ region.domainMax, 0 ], [ highestBound, 0 ] ]
-                _weight = XYsModule.XYs1d( data = weightData, axes = weightAxes )
+                _weight = XYsModule.XYs1d( data = weightData, axes = weightAxes,
+                        interpolation = standardsModule.interpolation.flatToken )
 
                 tempInfo['workFile'].append( 'r%s' % iRegion )
                 try :
@@ -185,10 +188,13 @@ def wholeAtomScattering( style, tempInfo, productFrame, formFactor, realAnomalou
     incidentEnergyUnit = tempInfo['incidentEnergyUnit']
     waveLengthUnit = formFactor.axes[1].unit
     inverseWaveLengthToEnergyFactor = PQUModule.PQU( 1, 'hplanck * c * %s' % waveLengthUnit ).getValueAs( incidentEnergyUnit )
+    electronRadius = PQUModule.PQU( 1, "e**2 / ( 4 * pi * eps0 * me * c**2 )" )
+    ThomsonScatteringCrossSection = 8 * math.pi * electronRadius**2 / 3
 
     s1  = versionStr + '\n'
     s1 += "Process: 'coherent scattering'\n"
-    s1 += 'inverseWaveLengthToEnergyFactor = %s\n' % inverseWaveLengthToEnergyFactor
+    s1 += 'inverseWaveLengthToEnergyFactor: %s\n' % inverseWaveLengthToEnergyFactor
+    s1 += 'ThompsonScattering: %s\n' % ThomsonScatteringCrossSection.getValueAs( 'b' )
 
     s1 += commonDataToString( comment, style, tempInfo, None, productFrame )
     s1 += startOfNewData
@@ -209,10 +215,14 @@ def comptonScattering( style, tempInfo, productFrame, scatteringFunction, commen
     incidentEnergyUnit = tempInfo['incidentEnergyUnit']
     waveLengthUnit = scatteringFunction.axes[1].unit
     inverseWaveLengthToEnergyFactor = PQUModule.PQU( 1, 'hplanck * c * %s' % waveLengthUnit ).getValueAs( incidentEnergyUnit )
+    electronRadius = PQUModule.PQU( 1, "e**2 / ( 4 * pi * eps0 * me * c**2 )" )
+    ThomsonScatteringCrossSection = 8 * math.pi * electronRadius**2 / 3
 
     s1  = versionStr + '\n'
     s1 += "Process: 'Compton scattering'\n"
-    s1 += 'inverseWaveLengthToEnergyFactor = %s\n' % inverseWaveLengthToEnergyFactor
+    s1 += 'inverseWaveLengthToEnergyFactor: %s\n' % inverseWaveLengthToEnergyFactor
+    s1 += 'ThompsonScattering: %s\n' % ThomsonScatteringCrossSection.getValueAs( 'b' )
+    s1 += 'Electron mass: %s\n' % PQUModule.PQU( 1, "me * c**2" ).getValueAs( incidentEnergyUnit )
 
     s1 += commonDataToString( comment, style, tempInfo, None, productFrame )
     s1 += '\n'.join( twoDToString( "ScatteringFactorData", scatteringFunction ) )
@@ -267,6 +277,9 @@ def EEpMuP_TransferMatrix( style, tempInfo, productFrame, crossSection, energyAn
     if( isinstance( energyAngularData[0][0], energyAngularModule.Legendre ) ) :
         return( Legendre_TransferMatrix( style, tempInfo, productFrame, crossSection, 
                 energyAngularData, multiplicity, comment = comment ) )
+    elif( isinstance( energyAngularData[0][0], energyAngularModule.XYs1d ) ) :
+        return( doubleDifferential_EEpMuP(  style, tempInfo, productFrame, crossSection,
+                energyAngularData, multiplicity, comment = comment ) )
     else :
         raise Exception( "Unsupported P(mu) for P(E',mu|E) = %s" % energyAngularData[0][0].moniker )
 
@@ -282,6 +295,20 @@ def Legendre_TransferMatrix( style, tempInfo, productFrame, crossSection, Legend
     s += commonDataToString( comment, style, tempInfo, crossSection, productFrame, multiplicity = multiplicity )
     s += LegendreDataToString( LegendreData )
 
+    return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'] ) )
+
+def doubleDifferential_EEpMuP( style, tempInfo, productFrame, crossSection, EEpMuPData, multiplicity, comment = None ) :
+    
+    logFile = tempInfo['logFile']
+    workDir = tempInfo['workDir']
+    
+    s  = versionStr + '\n'
+    s += "Process: pointwise energy-angle data\n"
+    
+    s += "Quadrature method: adaptive\n"
+    s += commonDataToString( comment, style, tempInfo, crossSection, productFrame, multiplicity = multiplicity )
+    s += EEpMuPDataToString( EEpMuPData )
+    
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'] ) )
 
 def uncorrelated_EMuP_EEpP_TransferMatrix( style, tempInfo, crossSection, productFrame, angularData, energyData, 
@@ -336,7 +363,7 @@ def uncorrelated_EMuP_EEpP_TransferMatrix( style, tempInfo, crossSection, produc
     s = versionStr + '\n' + sProcess + sSpecific + sCommon + sData
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'] ) )
 
-def discreteGammaAngularData( style, tempInfo, gammaEnergy, crossSection, angularData, multiplicity = 1, comment = None ) :
+def discreteGammaAngularData( style, tempInfo, gammaEnergy, crossSection, angularData, multiplicity, comment = None ) :
     """Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. This routine is also used
     for pair-production which pass angularData as None."""
 
@@ -484,7 +511,7 @@ def executeCommand( logFile, file, cmd, workDir, workFile ) :
                 if( l0Cell < 0 ) :
                     negative_l0Counter += 1
                     largestNegative = min( largestNegative, l0Cell )
-                    fOut.write( 'negative l=0 for weight %s at row %3d column %3d: %s\n' % ( weight, ig, ih, l0Cell ) )
+                    fOut.write( '    negative l=0 for weight %s at row %3d column %3d: %s\n' % ( weight, ig, ih, l0Cell ) )
         return( negative_l0Counter )
 
     if( workFile == [] ) :
@@ -510,14 +537,13 @@ def executeCommand( logFile, file, cmd, workDir, workFile ) :
     fOut = open( infoFile, 'a' )
     fOut.write( str( t0 ) + "\n" )
     if( status != 0 ) :
-        print "status = ", status
-        print s
+        print("status = ", status)
         raise Exception( 'Transfer failed for %s %s' % ( file, fullFileName ) )
     TM1, TME = parseOutputFile( fullFileName + '.out' )
     negative_l0Counter = 0
     if( TM1 is not None ) : negative_l0Counter = checkNegative_l0( TM1, "0", fOut )
     if( TME is not None ) : negative_l0Counter += checkNegative_l0( TME, "E", fOut )
-    if( negative_l0Counter > 0 ) : print 'WARNING: %d negative l=0 elements found in transfer matrix' % negative_l0Counter
+    if( negative_l0Counter > 0 ) : print('    WARNING: %d negative l=0 elements found in transfer matrix' % negative_l0Counter)
     fOut.close( )
     if( workDir is None ) :
         os.remove( fullFileName + '.out' )
@@ -684,9 +710,9 @@ def angularToString( angularData, crossSection, weight = None, twoBody = False, 
     weightString = ''
     if( weight is not None ) : weightString = startOfNewData + '\n'.join( twoDToString( "weight", weight, addExtraBlankLine = False ) ) + '\n'
 
-    if( isinstance( angularData, angularModule.isotropic ) ) :
+    if( isinstance( angularData, angularModule.isotropic2d ) ) :
         s = "Angular data: n = 2\n"
-        s += 'Incident energy interpolation: %s %s\n' % ( linlin, GND2ProcessingInterpolationQualifiers[""] )
+        s += 'Incident energy interpolation: %s %s\n' % ( linlin, GNDS2ProcessingInterpolationQualifiers[""] )
         s += 'Outgoing cosine interpolation: %s\n' % linlin
         for x in [ crossSection.domainMin, crossSection.domainMax ] : s += " %s : n = 2\n   -1 0.5\n   1 0.5\n" % ( doubleFmt % x )
 
@@ -700,14 +726,15 @@ def angularToString( angularData, crossSection, weight = None, twoBody = False, 
             if( angularData.interpolation not in [ linlin, flat ] ) :
                 _angularData = angularData.copy( )
                 _angularData.interpolation = linlin
-                if( changeInterpolationQualifierWarning ) : print 'WARNING: interpolation %s is ignored, treated as %s' % ( angularData.interpolation, _angularData.interpolation )
+                if( changeInterpolationQualifierWarning ) :
+                    print('WARNING: interpolation %s is ignored, treated as %s' % ( angularData.interpolation, _angularData.interpolation ))
 
             if( twoBody ) :
                 s += 'Incident energy interpolation: %s %s\n' % \
-                        ( angularData.interpolation, GND2ProcessingInterpolationQualifiers[angularData.interpolationQualifier] )
+                        ( angularData.interpolation, GNDS2ProcessingInterpolationQualifiers[angularData.interpolationQualifier] )
             else :
                 s += 'Incident energy interpolation: %s %s\n' % ( angularData.interpolation,
-                        GND2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] ) # Ignoring data's interpolation qualifier.
+                        GNDS2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] ) # Ignoring data's interpolation qualifier.
 
             interpolations = set( POfMu.interpolation for POfMu in angularData )
             linearizeXYs = False
@@ -728,7 +755,9 @@ def angularToString( angularData, crossSection, weight = None, twoBody = False, 
             if( interpolation not in [ linlin, flat ] ) :
                 _angularData = angularData.copy( )
                 _angularData.interpolation = linlin
-                if( changeInterpolationQualifierWarning ) : print 'WARNING: ignoring interpolation "%s" and using "%s" instead' % ( angularData.interpolation, _angularData.interpolation )
+                if( changeInterpolationQualifierWarning ) :
+                    print('WARNING: ignoring interpolation "%s" and using "%s" instead' %
+                          ( angularData.interpolation, _angularData.interpolation ) )
                 angularData = _angularData
 
             s = [ "Legendre coefficients: n = %s" % len( angularData ) ]
@@ -772,7 +801,8 @@ def energyFunctionToString( energyData, weight = None ) :
 
     if( weight is None ) :
         axes = axesModule.axes( )
-        weight = XYsModule.XYs1d( data = [ [ parameter1.domainMin, 1. ], [ parameter1.domainMax, 1. ] ], axes = axes )
+        weight = XYsModule.XYs1d( data = [ [ parameter1.domainMin, 1. ], [ parameter1.domainMax, 1. ] ], axes = axes, 
+                interpolation = standardsModule.interpolation.flatToken )
     else :
         weight = weight.weight
     sData += twoDToString( "weight", weight, addExtraBlankLine = False )
@@ -818,9 +848,9 @@ def EEpPDataToString( EEpPData, changeInterpolationQualifierWarning = False ) :
     qualifier = EEpPData.interpolationQualifier
     if( qualifier == standardsModule.interpolation.noneQualifierToken ) :
         if( EEpPData.interpolation != standardsModule.interpolation.flatToken ):
-            if( changeInterpolationQualifierWarning ) : print '    WARNING: changing interpolation qualifier from None to unitbase'
+            if( changeInterpolationQualifierWarning ) : print('    WARNING: changing interpolation qualifier from None to unitbase')
             qualifier = standardsModule.interpolation.unitBaseToken
-    s += 'Incident energy interpolation: %s %s\n' % ( EEpPData.interpolation, GND2ProcessingInterpolationQualifiers[qualifier] )
+    s += 'Incident energy interpolation: %s %s\n' % ( EEpPData.interpolation, GNDS2ProcessingInterpolationQualifiers[qualifier] )
 
     linearizeXYs = False
     for POfEp in EEpPData :
@@ -845,7 +875,7 @@ def LEEpPDataToString( LEEpPData ) :
     s  = startOfNewData
     s += "LEEpPData: n = %d\n" % len( LEEpPData )
     s += 'Incident energy interpolation: %s %s\n' % (
-            linlin, GND2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] )
+            linlin, GNDS2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] )
     s += 'Outgoing energy interpolation: %s\n' % linlin
     for l_EEpP in LEEpPData :
         s += startOfNewSubData + '\n'
@@ -860,13 +890,14 @@ def LegendreDataToString( LegendreData, changeInterpolationQualifierWarning = Fa
 
     qualifier = LegendreData.interpolationQualifier
     if( qualifier == standardsModule.interpolation.noneQualifierToken ) : qualifier = standardsModule.interpolation.unitBaseToken
-    s.append( 'Incident energy interpolation: %s %s' % ( LegendreData.interpolation, GND2ProcessingInterpolationQualifiers[qualifier] ) )
+    s.append( 'Incident energy interpolation: %s %s' % ( LegendreData.interpolation, GNDS2ProcessingInterpolationQualifiers[qualifier] ) )
 
     interpolation = LegendreData[0].interpolation
     if( interpolation in [ linlin, flat ] ) :
         s.append( 'Outgoing energy interpolation: %s' % interpolation )
     else :
-        if( changeInterpolationQualifierWarning ) : print '    WARNING: converting interpolation from "%s" to "%s".' % ( interpolation, linlin )
+        if( changeInterpolationQualifierWarning ) :
+            print ('    WARNING: converting interpolation from "%s" to "%s".' % (interpolation, linlin))
         s.append( 'Outgoing energy interpolation: %s' % linlin )
 
     for EEpCl in LegendreData :
@@ -889,10 +920,10 @@ def EMuEpPDataToString( EMuEpPData ) :
     if( EMuEpPData.interpolation != linlin ) :
         raise Exception( 'interpolation = "%s" is not supported' % EMuEpPData.interpolation )
     s += 'Incident energy interpolation: %s %s\n' % ( linlin,
-            GND2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] )
+            GNDS2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] )
 
     s += 'Outgoing cosine interpolation: %s %s\n' % ( linlin, 
-            GND2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] )
+            GNDS2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] )
 
     s += 'Outgoing energy interpolation: %s\n' % linlin
 
@@ -901,6 +932,30 @@ def EMuEpPDataToString( EMuEpPData ) :
         E = muEpP.value
         s += "  E = %s: n = %d\n" % ( doubleFmt % E, len( muEpP ) )
         s += threeDToString( muEpP )
+    return( s )
+
+def EEpMuPDataToString( EEpMuPData ) :
+
+    s  = startOfNewData
+    s += "EEpMuPData: n = %d\n" % len( EEpMuPData )
+
+    qualifier = EEpMuPData.interpolationQualifier
+    if( qualifier not in [ standardsModule.interpolation.noneQualifierToken, standardsModule.interpolation.unitBaseToken ] ) :
+        raise Exception( 'interpolation qualifier = %s is not supported' % qualifier )
+    if( EEpMuPData.interpolation != linlin ) :
+        raise Exception( 'interpolation = "%s" is not supported' % EEpMuPData.interpolation )
+    s += 'Incident energy interpolation: %s %s\n' % ( linlin,
+            GNDS2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] )
+
+    s += 'Outgoing cosine interpolation: %s %s\n' % ( linlin, 
+            GNDS2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] )
+
+    s += 'Outgoing energy interpolation: %s\n' % linlin
+
+    for EpMuP in EEpMuPData :
+        s += startOfNewSubData + '\n'
+        s += "  E = %s: n = %d\n" % ( doubleFmt % EpMuP.value, len( EpMuP ) )
+        s += threeDToString( EpMuP )
     return( s )
 
 def KalbachMannDataToString( KalbachMannData, energy_in_unit ) :
@@ -926,13 +981,13 @@ def KalbachMannDataToString( KalbachMannData, energy_in_unit ) :
     s  = startOfNewData
     s += "Kalbach probabilities: n = %s\n" % len( _fSubform )
     s += "Incident energy interpolation: %s %s\n" % ( linlin,
-            GND2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] )
+            GNDS2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseToken] )
     s += "Outgoing energy interpolation: %s\n" % fSubform[0].interpolation
     s += threeDListToString( _fSubform )
 
     s += "Kalbach r parameter: n = %s\n" % len( rSubform )
     s += "Incident energy interpolation: %s %s\n" % ( rSubform.interpolation, 
-            GND2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseUnscaledToken] )
+            GNDS2ProcessingInterpolationQualifiers[standardsModule.interpolation.unitBaseUnscaledToken] )
     s += "Outgoing energy interpolation: %s\n" % rSubform[0].interpolation
     s += threeDListToString( _rSubform )
 
@@ -971,7 +1026,7 @@ def twoDToString( label, data, addHeader = True, addExtraBlankLine = True ) :
         data = data.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
         interpolationStr = 'Interpolation: %s' % data.interpolation
     else :
-        print 'ERROR from', __file__
+        print ('ERROR from %s' % __file__)
         try :
             brb.objectoutline( data )
         except :
@@ -993,7 +1048,7 @@ def threeDToString( data, linearizeXYs = False ) :
     for w_xy in data :
         a.append( startOfNewSubData )
         if( type( w_xy ) == type( [] ) ) :       # ???? This is a kludge until Legendre EEpP data is represented like angular EMuP data.
-            raise Exception( 'need to update for new gnd forms' )
+            raise Exception( 'need to update for new gnds forms' )
             x, yz = xyz
         else :
             w = w_xy.value

@@ -165,19 +165,19 @@ class constant( baseModule.xDataFunctional )  :
             if( key not in attributes ) : raise TypeError( 'Invalid attribute "%s"' % key )
             attrs[key] = attributes[key]( item )
 
-        uncertainties = None
+        uncertainty = None
         for subElement in xDataElement :
             if( subElement.tag == 'axes' ) :
                 axes = axesModule.axes.parseXMLNode( subElement, xPath, linkData )
-            elif( subElement.tag == 'uncertainties' ) :
+            elif( subElement.tag == 'uncertainty' ) :
                 from . import uncertainties as uncertaintiesModule
-                uncertainties = uncertaintiesModule.uncertainties.parseXMLNode( subElement, xPath, linkData )
+                uncertainty = uncertaintiesModule.uncertainty.parseXMLNode( subElement, xPath, linkData )
             else :
                 raise TypeError( 'sub-element "%s" not valid' % subElement.tag )
 
         _constant = attrs.pop( 'constant' )
         newConstant = cls( _constant, axes = axes, **attrs )
-        newConstant.uncertainties = uncertainties
+        newConstant.uncertainty = uncertainty
         return newConstant
 
     @staticmethod

@@ -64,12 +64,10 @@
 SMR_PATH = ../../../../../statusMessageReporting
 NUMERICALFUNCTIONS_PATH = ../../../..
 
-CC = gcc
-CDEBUGFLAGS = -g -O0 -Wall
 ptwXYCFLAGS = -I$(NUMERICALFUNCTIONS_PATH)/include -L$(NUMERICALFUNCTIONS_PATH)/lib -lnumericalfunctions \
               -I$(SMR_PATH)/include -L$(SMR_PATH)/lib -lstatusMessageReporting \
               -lptwXY_utilities -lnfut_utilities
-localCFLAGS = $(CDEBUGFLAGS) $(CFLAGS) $(ptwXYCFLAGS) -lm
+localCFLAGS = $(CFLAGS) $(ptwXYCFLAGS)
 
 TARGETS = to_ptwXY
 
@@ -78,7 +76,7 @@ TARGETS = to_ptwXY
 default: $(TARGETS)
 
 to_ptwXY: to_ptwXY.c
-	$(CC) -o to_ptwXY to_ptwXY.c -lnumericalfunctions -lm $(localCFLAGS)
+	$(CC) -o to_ptwXY to_ptwXY.c -lnumericalfunctions $(localCFLAGS) -lm
 
 check: default
 	for f in $(TARGETS); do ./$$f $(CHECKOPTIONS); done

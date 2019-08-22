@@ -69,13 +69,13 @@ from xData import axes as axesModule
 from xData import regions as regionsModule
 from xData import standards as standardsModule
 
-import fudge.gnd.productData.distributions.uncorrelated as uncorrelatedModule
-import fudge.gnd.productData.distributions.energy as energyModule
-import fudge.gnd.productData.distributions.angular as angularModule
-import fudge.gnd.productData.distributions.energyAngular as energyAngularModule
+import fudge.gnds.productData.distributions.uncorrelated as uncorrelatedModule
+import fudge.gnds.productData.distributions.energy as energyModule
+import fudge.gnds.productData.distributions.angular as angularModule
+import fudge.gnds.productData.distributions.energyAngular as energyAngularModule
 
 from ... import endfFormats as endfFormatsModule
-from ... import gndToENDF6 as gndToENDF6Module
+from ... import gndsToENDF6 as gndsToENDF6Module
 
 #
 # form
@@ -84,7 +84,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     """
     In ENDF MF=6, some distributions should really be treated as uncorrelated: NBodyPhaseSpace, and also 
     Legendre expansions when only L=0 is listed.
-    For GND we split these into uncorrelated angular (isotropic) and energy distributions.
+    For GNDS we split these into uncorrelated angular (isotropic) and energy distributions.
     Must put back in original format when writing back to ENDF.
     """
 
@@ -101,7 +101,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
             angularForm = angularModule.form( self.label, frame, angularSubform )
             energyForm.toENDF6( MT, endfMFList, flags, targetInfo )
             angularForm.toENDF6( MT, endfMFList, flags, targetInfo )
-        elif( isinstance( angularSubform, angularModule.isotropic ) ) :                # Change to energyAngular with Legendre
+        elif( isinstance( angularSubform, angularModule.isotropic2d ) ) :                # Change to energyAngular with Legendre
             if( not( isinstance( energySubform, energyModule.XYs2d ) ) ) : raise 'hell - fix me'
             axes = axesModule.axes( rank = 4 )
             axes[3] = axesModule.axis( 'energy_in', 3, 'eV' )
@@ -116,11 +116,11 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
                 if isinstance( EIn, regionsModule.regions1d ):
                     # writing to MF6 LAW=1, LANG=1 doesn't support multiple regions, must recombine.
                     if( len( set( [ ein.interpolation for ein in EIn ] ) ) != 1 ) :
-                        raise NotImplemented, "ENDF MF6 LAW=1 LANG=1 doesn't support multiple E' interpolations!"
+                        raise NotImplemented( "ENDF MF6 LAW=1 LANG=1 doesn't support multiple E' interpolations!" )
                     xyvals = EIn[0].copyDataToXYs()
                     for region in EIn[1:]:
                         xynew = region.copyDataToXYs()
-                        xynew[0][0] *= 1.00000001
+                        xynew[0][0] *= 1.0000000001
                         xyvals.extend( xynew )
                     EIn_copy = EIn[0].copy( )
                     EIn_copy.value = EIn.value
@@ -145,7 +145,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
                 standardsModule.interpolation.loglogToken ) ) :
                 LANG = 14
             MF6 = [ endfFormatsModule.endfContLine( 0, 0, LANG, LEP, 1, len( energySubform ) ) ]
-            EInInterpolation = gndToENDF6Module.gndToENDFInterpolationFlag( energySubform.interpolation )
+            EInInterpolation = gndsToENDF6Module.gndsToENDFInterpolationFlag( energySubform.interpolation )
             MF6 +=  endfFormatsModule.endfInterpolationList( [ len( energySubform ), EInInterpolation ] )
             for indexE, EEpP in enumerate( energySubform ) :
                 EMuP = angularSubform[indexE]
@@ -158,7 +158,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
                     for muP in EMuP : data += muP
                     MF6 += endfFormatsModule.endfDataList( data )
             LAW = 1
-            gndToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, frame, MF6 )
+            gndsToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, frame, MF6 )
         else :
             raise Exception( 'uncorrelated.toENDF6 not supported for energy subform = %s and angular subform = %s' %
                 ( energySubform.moniker, angularSubform.moniker ) )
@@ -168,6 +168,6 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
             angularForm.toENDF6( MT, endfMFList, flags, targetInfo )
         energyForm = energyModule.form( "", frame, self.energySubform.data )
         energyForm.toENDF6( MT, endfMFList, flags, targetInfo )
-        if( MT == 527 ) : endfMFList[26][MT][0]
+        if( MT == 527 ) : endfMFList[26][MT][0]     # FIXME statement has no effect
 
 uncorrelatedModule.form.toENDF6 = toENDF6

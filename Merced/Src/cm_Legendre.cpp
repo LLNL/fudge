@@ -8,63 +8,6 @@
  * ******** merced: calculate the transfer matrix *********
  *
  * # <<BEGIN-copyright>>
-  Copyright (c) 2017, Lawrence Livermore National Security, LLC.
-  Produced at the Lawrence Livermore National Laboratory.
-  Written by the LLNL Nuclear Data and Theory group
-          (email: mattoon1@llnl.gov)
-  LLNL-CODE-725546.
-  All rights reserved.
-  
-  This file is part of the Merced package, used to generate nuclear reaction
-  transfer matrices for deterministic radiation transport.
-  
-  
-      Please also read this link - Our Notice and Modified BSD License
-  
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
-      * Redistributions of source code must retain the above copyright
-        notice, this list of conditions and the disclaimer below.
-      * Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the disclaimer (as noted below) in the
-        documentation and/or other materials provided with the distribution.
-      * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-        to endorse or promote products derived from this software without specific
-        prior written permission.
-  
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-  THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  
-  
-  Additional BSD Notice
-  
-  1. This notice is required to be provided under our contract with the U.S.
-  Department of Energy (DOE). This work was produced at Lawrence Livermore
-  National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-  
-  2. Neither the United States Government nor Lawrence Livermore National Security,
-  LLC nor any of their employees, makes any warranty, express or implied, or assumes
-  any liability or responsibility for the accuracy, completeness, or usefulness of any
-  information, apparatus, product, or process disclosed, or represents that its use
-  would not infringe privately-owned rights.
-  
-  3. Also, reference herein to any specific commercial products, process, or services
-  by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-  or imply its endorsement, recommendation, or favoring by the United States Government
-  or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-  herein do not necessarily state or reflect those of the United States Government or
-  Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-  product endorsement purposes.
-  
  * # <<END-copyright>>
 */
 // implementation of the classes used to handle Legendre expansions of energy 
@@ -343,7 +286,8 @@ bool cm_Legendre_Ein_param::CP_next_Ecm( )
   Ein1_data.prev_data.copy_coef( Ein1_data.next_data );
 
   // update the pointers
-  if( next_left_Eout_data->get_E_out( ) <= Ein0_data.prev_data.get_E_out( ) )
+  if( next_left_Eout_data->get_E_out( ) <= (1.0 + skip_tol )*
+       Ein0_data.prev_data.get_E_out( ) )
   {
     left_Eout_data = next_left_Eout_data;
     ++next_left_Eout_data;
@@ -376,7 +320,8 @@ bool cm_Legendre_Ein_param::CP_next_Ecm( )
       Ein0_data.prev_data.copy_coef( *left_Eout_data );
     }
   }
-  if( next_right_Eout_data->get_E_out( ) <= Ein1_data.prev_data.get_E_out( ) )
+  if( next_right_Eout_data->get_E_out( ) <= (1.0 + skip_tol )*
+      Ein1_data.prev_data.get_E_out( ) )
   {
     right_Eout_data = next_right_Eout_data;
     ++next_right_Eout_data;
@@ -571,14 +516,14 @@ void cm_Legendre::setup_map( )
   map.setup_ratios( particles.mProj, particles.mTarg, particles.mProd );
 }
 // ----------- cm_Legendre::get_Ein_range --------------
-//  Gets the range of nontrivial incident energy bins; computes first_Ein and last_Ein
+//  Gets the range of nontrivial incident energy bins; computes E_first, first_Ein and last_Ein
 // returns true if the threshold is too high for the energy bins
 bool cm_Legendre::get_Ein_range( const dd_vector& sigma, const dd_vector& mult,
     const dd_vector& weight,
     const Flux_List& e_flux, const Energy_groups& Ein_groups )
 {
-  double E_first;
   double E_last;
+
   cm_Legendre_Ein_param initial_param;
   bool done = initial_param.get_Ein_range( sigma, mult, weight, e_flux,
                                          Ein_groups, &E_first, &E_last );
@@ -686,6 +631,8 @@ void cm_Legendre::get_T( const dd_vector& sigma, const dd_vector& multiple,
 // Initializes the quadrature parameters; returns true if the threshold is too high
 void cm_Legendre::setup_param( cm_Legendre_Ein_param *Ein_param )
 {
+  static double skip_tol = Global.Value( "abs_tol" );
+
   Ein_param->Ein_interp = Ein_interp;
   Ein_param->Eout_interp = Eout_interp;
   Ein_param->map = &map;
@@ -698,7 +645,10 @@ void cm_Legendre::setup_param( cm_Legendre_Ein_param *Ein_param )
   Ein_param->left_Ein_data = begin( );
   Ein_param->right_Ein_data = Ein_param->left_Ein_data;
   ++Ein_param->right_Ein_data;
-  while( Ein_param->right_Ein_data->get_E_in( ) <= Ein_param->data_E_0 )
+
+  while( ( Ein_param->right_Ein_data->get_E_in( ) < E_first * ( 1.0 + skip_tol ) ) ||
+	 ( Ein_param->right_Ein_data->get_E_in( ) < (*Ein_param->Ein_ptr) *
+           ( 1.0 + skip_tol ) ) )
   {
     Ein_param->left_Ein_data = Ein_param->right_Ein_data;
     ++Ein_param->right_Ein_data;
@@ -712,6 +662,11 @@ void cm_Legendre::setup_param( cm_Legendre_Ein_param *Ein_param )
   if( first_Ein > Ein_param->data_E_0 )
   {
     Ein_param->data_E_0 = first_Ein;
+    bool data_bad = Ein_param->update_pointers( first_Ein );
+    if( data_bad )
+    {
+      FatalError( "cm_Legendre::setup_param", "energies inconsistent" );
+    }
   }
   // the Vcm_Vlab_hit_list objects need the gamma for the energy of translation of the center of mass
   Ein_param->lower_hits.G0_data.gamma = map.gamma;

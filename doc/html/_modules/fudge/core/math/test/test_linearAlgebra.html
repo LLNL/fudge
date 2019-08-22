@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.core.math.test.test_linearAlgebra &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.core.math.test.test_linearAlgebra &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,7 +25,7 @@
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +35,7 @@
         <li class="right" >
           <a href="../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -74,7 +71,7 @@
         <span class="c1">#return self.assertTrue( ( a == b ).all() )</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">array_equal</span><span class="p">(</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="p">)</span> <span class="p">)</span></div>
     
-<div class="viewcode-block" id="MatrixTests.assertMatrixAlmostEqual"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.MatrixTests.assertMatrixAlmostEqual">[docs]</a>    <span class="k">def</span> <span class="nf">assertMatrixAlmostEqual</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">05</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">08</span> <span class="p">):</span>
+<div class="viewcode-block" id="MatrixTests.assertMatrixAlmostEqual"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.MatrixTests.assertMatrixAlmostEqual">[docs]</a>    <span class="k">def</span> <span class="nf">assertMatrixAlmostEqual</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-05</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-08</span> <span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">allclose</span><span class="p">(</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="n">rtol</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">atol</span> <span class="p">)</span> <span class="p">)</span></div>
     
 <div class="viewcode-block" id="MatrixTests.assertMatrixTrue"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.MatrixTests.assertMatrixTrue">[docs]</a>    <span class="k">def</span> <span class="nf">assertMatrixTrue</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">a</span> <span class="p">):</span>
@@ -262,52 +259,52 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">assertMatrixAlmostEqual</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">*</span> <span class="n">B</span><span class="p">,</span> <span class="n">identity</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="p">)</span> <span class="p">)</span> 
         <span class="bp">self</span><span class="o">.</span><span class="n">assertMatrixAlmostEqual</span><span class="p">(</span> <span class="n">B</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">identity</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="p">)</span> <span class="p">)</span> </div>
  
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
-<div class="viewcode-block" id="EigendecompositionTests.test_construct_matrixinverse_by_pruning"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests.test_construct_matrixinverse_by_pruning">[docs]</a>    <span class="k">def</span> <span class="nf">test_construct_matrixinverse_by_pruning</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<div class="viewcode-block" id="EigendecompositionTests.test_construct_matrixinverse_by_pruning"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests.test_construct_matrixinverse_by_pruning">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
+    <span class="k">def</span> <span class="nf">test_construct_matrixinverse_by_pruning</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Try to construct the matrix inverse using the PRUNED eigenvalue decomposition&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="n">numpy</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
             <span class="n">B</span> <span class="o">=</span> <span class="n">pruned_matrix_inverse</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertMatrixAlmostEqual</span><span class="p">(</span> <span class="n">B</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">identity</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="p">),</span> <span class="n">rtol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">05</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">08</span> <span class="p">)</span> </div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertMatrixAlmostEqual</span><span class="p">(</span> <span class="n">B</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">identity</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="p">),</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-05</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-08</span> <span class="p">)</span> </div>
         
 <div class="viewcode-block" id="EigendecompositionTests.test_construct_matrix_by_pruning"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests.test_construct_matrix_by_pruning">[docs]</a>    <span class="k">def</span> <span class="nf">test_construct_matrix_by_pruning</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span> 
         <span class="sd">&quot;&quot;&quot;Try to reconstruct the matix using the PRUNED eigenvalue decomposition&quot;&quot;&quot;</span>
         <span class="n">B</span> <span class="o">=</span> <span class="n">pruned_matrix</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assertMatrixAlmostEqual</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">04</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">06</span> <span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertMatrixAlmostEqual</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-04</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-06</span> <span class="p">)</span></div></div>
     
 <div class="viewcode-block" id="EigendecompositionTests_allShouldFail"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail">[docs]</a><span class="k">class</span> <span class="nc">EigendecompositionTests_allShouldFail</span><span class="p">(</span> <span class="n">EigendecompositionTests</span> <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; For some input matrices, all tests are expected to fail. They should inherit from</span>
 <span class="sd">    this class instead of EigendecompositionTests &quot;&quot;&quot;</span>
 
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>    
-<div class="viewcode-block" id="EigendecompositionTests_allShouldFail.test_eigenmodes_are_really_eigenmodes"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail.test_eigenmodes_are_really_eigenmodes">[docs]</a>    <span class="k">def</span> <span class="nf">test_eigenmodes_are_really_eigenmodes</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<div class="viewcode-block" id="EigendecompositionTests_allShouldFail.test_eigenmodes_are_really_eigenmodes"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail.test_eigenmodes_are_really_eigenmodes">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>    
+    <span class="k">def</span> <span class="nf">test_eigenmodes_are_really_eigenmodes</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_eigenmodes_are_really_eigenmodes</span><span class="p">()</span></div>
 
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>    
-<div class="viewcode-block" id="EigendecompositionTests_allShouldFail.test_eigenvector_orthogonality"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail.test_eigenvector_orthogonality">[docs]</a>    <span class="k">def</span> <span class="nf">test_eigenvector_orthogonality</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<div class="viewcode-block" id="EigendecompositionTests_allShouldFail.test_eigenvector_orthogonality"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail.test_eigenvector_orthogonality">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>    
+    <span class="k">def</span> <span class="nf">test_eigenvector_orthogonality</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_eigenvector_orthogonality</span><span class="p">()</span></div>
 
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>    
-<div class="viewcode-block" id="EigendecompositionTests_allShouldFail.test_eigenvector_normalization"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail.test_eigenvector_normalization">[docs]</a>    <span class="k">def</span> <span class="nf">test_eigenvector_normalization</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<div class="viewcode-block" id="EigendecompositionTests_allShouldFail.test_eigenvector_normalization"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail.test_eigenvector_normalization">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>    
+    <span class="k">def</span> <span class="nf">test_eigenvector_normalization</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_eigenvector_normalization</span><span class="p">()</span></div>
 
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>    
-<div class="viewcode-block" id="EigendecompositionTests_allShouldFail.test_eigenvector_orthonormality"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail.test_eigenvector_orthonormality">[docs]</a>    <span class="k">def</span> <span class="nf">test_eigenvector_orthonormality</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<div class="viewcode-block" id="EigendecompositionTests_allShouldFail.test_eigenvector_orthonormality"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail.test_eigenvector_orthonormality">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>    
+    <span class="k">def</span> <span class="nf">test_eigenvector_orthonormality</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_eigenvector_orthonormality</span><span class="p">()</span></div>
     
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>    
-<div class="viewcode-block" id="EigendecompositionTests_allShouldFail.test_reconstruct_matrix_from_eigendecomposition"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail.test_reconstruct_matrix_from_eigendecomposition">[docs]</a>    <span class="k">def</span> <span class="nf">test_reconstruct_matrix_from_eigendecomposition</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<div class="viewcode-block" id="EigendecompositionTests_allShouldFail.test_reconstruct_matrix_from_eigendecomposition"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail.test_reconstruct_matrix_from_eigendecomposition">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>    
+    <span class="k">def</span> <span class="nf">test_reconstruct_matrix_from_eigendecomposition</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_reconstruct_matrix_from_eigendecomposition</span><span class="p">()</span></div>
 
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>    
-<div class="viewcode-block" id="EigendecompositionTests_allShouldFail.test_construct_matrixinverse_from_eigendecomposition"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail.test_construct_matrixinverse_from_eigendecomposition">[docs]</a>    <span class="k">def</span> <span class="nf">test_construct_matrixinverse_from_eigendecomposition</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<div class="viewcode-block" id="EigendecompositionTests_allShouldFail.test_construct_matrixinverse_from_eigendecomposition"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail.test_construct_matrixinverse_from_eigendecomposition">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>    
+    <span class="k">def</span> <span class="nf">test_construct_matrixinverse_from_eigendecomposition</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_construct_matrixinverse_from_eigendecomposition</span><span class="p">()</span></div>
  
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
-<div class="viewcode-block" id="EigendecompositionTests_allShouldFail.test_construct_matrixinverse_by_pruning"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail.test_construct_matrixinverse_by_pruning">[docs]</a>    <span class="k">def</span> <span class="nf">test_construct_matrixinverse_by_pruning</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<div class="viewcode-block" id="EigendecompositionTests_allShouldFail.test_construct_matrixinverse_by_pruning"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail.test_construct_matrixinverse_by_pruning">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
+    <span class="k">def</span> <span class="nf">test_construct_matrixinverse_by_pruning</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_construct_matrixinverse_by_pruning</span><span class="p">()</span> </div>
         
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>    
-<div class="viewcode-block" id="EigendecompositionTests_allShouldFail.test_construct_matrix_by_pruning"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail.test_construct_matrix_by_pruning">[docs]</a>    <span class="k">def</span> <span class="nf">test_construct_matrix_by_pruning</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span> 
+<div class="viewcode-block" id="EigendecompositionTests_allShouldFail.test_construct_matrix_by_pruning"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.EigendecompositionTests_allShouldFail.test_construct_matrix_by_pruning">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>    
+    <span class="k">def</span> <span class="nf">test_construct_matrix_by_pruning</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span> 
         <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_construct_matrix_by_pruning</span><span class="p">()</span> </div></div>
 
 <span class="c1"># --------- Specific Covariance Test Cases -----------</span>
@@ -332,24 +329,24 @@
     <span class="sd">&quot;&quot;&quot;Pathological, all correlated, legal, but NOT INVERTIBLE&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="AllCorrelatedCovarianceTests.setUpMtx"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.AllCorrelatedCovarianceTests.setUpMtx">[docs]</a>    <span class="k">def</span> <span class="nf">setUpMtx</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">mat</span><span class="p">(</span> <span class="p">[[</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">],[</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">],[</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]]</span> <span class="p">)</span> </div>
 
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
-<div class="viewcode-block" id="AllCorrelatedCovarianceTests.test_construct_matrixinverse_from_eigendecomposition"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.AllCorrelatedCovarianceTests.test_construct_matrixinverse_from_eigendecomposition">[docs]</a>    <span class="k">def</span> <span class="nf">test_construct_matrixinverse_from_eigendecomposition</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<div class="viewcode-block" id="AllCorrelatedCovarianceTests.test_construct_matrixinverse_from_eigendecomposition"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.AllCorrelatedCovarianceTests.test_construct_matrixinverse_from_eigendecomposition">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
+    <span class="k">def</span> <span class="nf">test_construct_matrixinverse_from_eigendecomposition</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_construct_matrixinverse_from_eigendecomposition</span><span class="p">()</span></div>
 
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
-<div class="viewcode-block" id="AllCorrelatedCovarianceTests.test_eigenvector_orthogonality"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.AllCorrelatedCovarianceTests.test_eigenvector_orthogonality">[docs]</a>    <span class="k">def</span> <span class="nf">test_eigenvector_orthogonality</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<div class="viewcode-block" id="AllCorrelatedCovarianceTests.test_eigenvector_orthogonality"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.AllCorrelatedCovarianceTests.test_eigenvector_orthogonality">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
+    <span class="k">def</span> <span class="nf">test_eigenvector_orthogonality</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_eigenvector_orthogonality</span><span class="p">()</span></div>
 
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
-<div class="viewcode-block" id="AllCorrelatedCovarianceTests.test_eigenvector_orthonormality"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.AllCorrelatedCovarianceTests.test_eigenvector_orthonormality">[docs]</a>    <span class="k">def</span> <span class="nf">test_eigenvector_orthonormality</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<div class="viewcode-block" id="AllCorrelatedCovarianceTests.test_eigenvector_orthonormality"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.AllCorrelatedCovarianceTests.test_eigenvector_orthonormality">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
+    <span class="k">def</span> <span class="nf">test_eigenvector_orthonormality</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_eigenvector_orthonormality</span><span class="p">()</span></div></div>
 
 <div class="viewcode-block" id="AlmostAllCorrelatedCovarianceTests"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.AlmostAllCorrelatedCovarianceTests">[docs]</a><span class="k">class</span> <span class="nc">AlmostAllCorrelatedCovarianceTests</span><span class="p">(</span> <span class="n">Eigendecomposition_base</span><span class="p">,</span> <span class="n">EigendecompositionTests</span> <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Pathological, all correlated, legal, but NOT INVERTIBLE&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="AlmostAllCorrelatedCovarianceTests.setUpMtx"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.AlmostAllCorrelatedCovarianceTests.setUpMtx">[docs]</a>    <span class="k">def</span> <span class="nf">setUpMtx</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">mat</span><span class="p">(</span> <span class="p">[[</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">],[</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">],[</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.0001</span><span class="p">]]</span> <span class="p">)</span> </div>
 
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
-<div class="viewcode-block" id="AlmostAllCorrelatedCovarianceTests.test_construct_matrixinverse_from_eigendecomposition"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.AlmostAllCorrelatedCovarianceTests.test_construct_matrixinverse_from_eigendecomposition">[docs]</a>    <span class="k">def</span> <span class="nf">test_construct_matrixinverse_from_eigendecomposition</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<div class="viewcode-block" id="AlmostAllCorrelatedCovarianceTests.test_construct_matrixinverse_from_eigendecomposition"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.AlmostAllCorrelatedCovarianceTests.test_construct_matrixinverse_from_eigendecomposition">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
+    <span class="k">def</span> <span class="nf">test_construct_matrixinverse_from_eigendecomposition</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_construct_matrixinverse_from_eigendecomposition</span><span class="p">()</span></div></div>
 
 
@@ -382,12 +379,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="IllegalCovarianceTest.setUpMtx"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.IllegalCovarianceTest.setUpMtx">[docs]</a>    <span class="k">def</span> <span class="nf">setUpMtx</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">mat</span><span class="p">(</span> <span class="p">[[</span><span class="mf">1.</span><span class="p">,</span><span class="mf">2.</span><span class="p">,</span><span class="mf">3.</span><span class="p">],[</span><span class="mf">1.</span><span class="p">,</span><span class="mf">2.</span><span class="p">,</span><span class="mf">1.</span><span class="p">],[</span><span class="mf">3.</span><span class="p">,</span><span class="mf">2.</span><span class="p">,</span><span class="mf">1.</span><span class="p">]]</span> <span class="p">)</span></div>
 
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
-<div class="viewcode-block" id="IllegalCovarianceTest.test_construct_matrix_by_pruning"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.IllegalCovarianceTest.test_construct_matrix_by_pruning">[docs]</a>    <span class="k">def</span> <span class="nf">test_construct_matrix_by_pruning</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<div class="viewcode-block" id="IllegalCovarianceTest.test_construct_matrix_by_pruning"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.IllegalCovarianceTest.test_construct_matrix_by_pruning">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
+    <span class="k">def</span> <span class="nf">test_construct_matrix_by_pruning</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_construct_matrix_by_pruning</span><span class="p">()</span></div>
 
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
-<div class="viewcode-block" id="IllegalCovarianceTest.test_construct_matrixinverse_from_eigendecomposition"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.IllegalCovarianceTest.test_construct_matrixinverse_from_eigendecomposition">[docs]</a>    <span class="k">def</span> <span class="nf">test_construct_matrixinverse_from_eigendecomposition</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+<div class="viewcode-block" id="IllegalCovarianceTest.test_construct_matrixinverse_from_eigendecomposition"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.IllegalCovarianceTest.test_construct_matrixinverse_from_eigendecomposition">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">expectedFailure</span>
+    <span class="k">def</span> <span class="nf">test_construct_matrixinverse_from_eigendecomposition</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_construct_matrixinverse_from_eigendecomposition</span><span class="p">()</span></div></div>
 
 <div class="viewcode-block" id="RealCovarianceTests"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.test.html#fudge.core.math.test.test_linearAlgebra.RealCovarianceTests">[docs]</a><span class="k">class</span> <span class="nc">RealCovarianceTests</span><span class="p">(</span> <span class="n">Eigendecomposition_base</span><span class="p">,</span> <span class="n">EigendecompositionTests</span> <span class="p">):</span>
@@ -447,7 +444,7 @@
             <span class="mf">8.73319300e-05</span><span class="p">,</span>   <span class="mf">7.57803500e-05</span><span class="p">,</span>   <span class="mf">5.91586900e-05</span><span class="p">,</span>   <span class="mf">3.81553500e-05</span><span class="p">,</span>
             <span class="mf">1.34232900e-05</span><span class="p">]]</span> <span class="p">)</span></div></div>
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="c1">#In numpy, have around( obj[, decimals[, out] ), _round() too</span>
     <span class="c1">#numpy.testing.assert_approx_equal(actual, desired, significant=7, err_msg=&#39;&#39;, verbose=True)</span>
@@ -484,13 +481,13 @@
         <li class="right" >
           <a href="../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

@@ -67,7 +67,7 @@ default: merced
 
 merced: 
 	cd ../Merced; $(MAKE)
-	cp ../Merced/bin/merced .
+	mv ../Merced/bin/merced .
 
 check:
 

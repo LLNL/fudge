@@ -7,63 +7,6 @@
  * ******** merced: calculate the transfer matrix *********
  *
  * # <<BEGIN-copyright>>
-  Copyright (c) 2017, Lawrence Livermore National Security, LLC.
-  Produced at the Lawrence Livermore National Laboratory.
-  Written by the LLNL Nuclear Data and Theory group
-          (email: mattoon1@llnl.gov)
-  LLNL-CODE-725546.
-  All rights reserved.
-  
-  This file is part of the Merced package, used to generate nuclear reaction
-  transfer matrices for deterministic radiation transport.
-  
-  
-      Please also read this link - Our Notice and Modified BSD License
-  
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
-      * Redistributions of source code must retain the above copyright
-        notice, this list of conditions and the disclaimer below.
-      * Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the disclaimer (as noted below) in the
-        documentation and/or other materials provided with the distribution.
-      * Neither the name of LLNS/LLNL nor the names of its contributors may be used
-        to endorse or promote products derived from this software without specific
-        prior written permission.
-  
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
-  THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
-  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-  
-  
-  Additional BSD Notice
-  
-  1. This notice is required to be provided under our contract with the U.S.
-  Department of Energy (DOE). This work was produced at Lawrence Livermore
-  National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
-  
-  2. Neither the United States Government nor Lawrence Livermore National Security,
-  LLC nor any of their employees, makes any warranty, express or implied, or assumes
-  any liability or responsibility for the accuracy, completeness, or usefulness of any
-  information, apparatus, product, or process disclosed, or represents that its use
-  would not infringe privately-owned rights.
-  
-  3. Also, reference herein to any specific commercial products, process, or services
-  by trade name, trademark, manufacturer or otherwise does not necessarily constitute
-  or imply its endorsement, recommendation, or favoring by the United States Government
-  or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
-  herein do not necessarily state or reflect those of the United States Government or
-  Lawrence Livermore National Security, LLC, and shall not be used for advertising or
-  product endorsement purposes.
-  
  * # <<END-copyright>>
 */
 // Implement the classes used for identification of the reaction data
@@ -85,12 +28,9 @@ double num_check_param::value( double E_in )
   {
     return 0.0;
   }
-  // assume that model_weight is a histogram
   double vaerde = sigma.value( E_in ) *
-    mult.value( E_in ) * e_flux.value( E_in ) * model_weight.first.y;
-  // for linlin model_weight:
-  //  double vaerde = sigma.value( E_in ) *
-  //    mult.value( E_in ) * e_flux.value( E_in ) * model_weight.value( E_in );
+    mult.value( E_in ) * e_flux.value( E_in ) * model_weight.value( E_in );
+
   return vaerde;
 }
 
@@ -349,6 +289,11 @@ bool reaction::common_input( const string &dataID, data_parser &input_file )
     int num_flux = input_file.get_next_int( );
     // read the approximate flux
     transfer.e_flux.read_flux( input_file, num_flux );
+    if( transfer.e_flux.interp != LINLIN )
+    {
+      FatalError( "reaction::common_input", 
+		  "only linlear-linear flux is implemented" );
+    }
     found_it = true;
   }
   else if( tempID == "cross section" )
@@ -356,6 +301,11 @@ bool reaction::common_input( const string &dataID, data_parser &input_file )
     int num_sigma = input_file.get_next_int( );
     // read the cross section
     cross_section.read_data_interp( input_file, num_sigma );
+    if( cross_section.interp_type != LINLIN )
+    {
+      FatalError( "reaction::common_input", 
+		  "only linlear-linear cross section is implemented" );
+    }
     found_it = true;
   }
   else if( tempID == "multiplicity" )
@@ -363,6 +313,11 @@ bool reaction::common_input( const string &dataID, data_parser &input_file )
     int num_mult = input_file.get_next_int( );
     // read the multiplicities
     multiple.read_data_interp( input_file, num_mult );
+    if( multiple.interp_type != LINLIN )
+    {
+      FatalError( "reaction::common_input", 
+		  "only linlear-linear multiplicity is implemented" );
+    }
     found_it = true;
   }
   else if( tempID == "weight" )
@@ -370,6 +325,11 @@ bool reaction::common_input( const string &dataID, data_parser &input_file )
     int num_weight = input_file.get_next_int( );
     // read the weights
     model_weight.read_data_interp( input_file, num_weight );
+    if( model_weight.interp_type != HISTOGRAM )
+    {
+      FatalError( "reaction::common_input", 
+		  "only histogram weight is implemented" );
+    }
     found_it = true;
   }
   else if( tempID == "projectile's mass" )
@@ -1462,6 +1422,7 @@ void reaction::number_check( )
   num_check_param num_check;
 
   // pointers to the cross section
+  num_check.sigma.Eout_interp = cross_section.interp_type;
   dd_vector::const_iterator this_sigma = cross_section.begin( );
   dd_vector::const_iterator next_sigma = this_sigma;
   ++next_sigma;
@@ -1471,11 +1432,13 @@ void reaction::number_check( )
   {
     multiple.make_flat( cross_section, 1.0 );
   }
+  num_check.mult.Eout_interp = multiple.interp_type;
   dd_vector::const_iterator this_mult = multiple.begin( );
   dd_vector::const_iterator next_mult = this_mult;
   ++next_mult;
 
   // pointers to the flux data
+  num_check.e_flux.Eout_interp = transfer.e_flux.interp;
   Flux_List::const_iterator flux_ptr = transfer.e_flux.begin( );
   Flux_List::const_iterator next_flux = flux_ptr;
   ++next_flux;
@@ -1485,6 +1448,7 @@ void reaction::number_check( )
   {
     model_weight.make_flat( cross_section, 1.0 );
   }
+  num_check.model_weight.Eout_interp = model_weight.interp_type;
   dd_vector::const_iterator this_model_weight = model_weight.begin( );
   dd_vector::const_iterator next_model_weight = this_model_weight;
   ++next_model_weight;

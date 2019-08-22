@@ -4,7 +4,7 @@ import argparse, copy
 from pqu import PQU
 from fudge.core.utilities.brb import *
 from xData.isclose import isclose
-import fudge.gnd.resonances as resModule
+import fudge.gnds.resonances as resModule
 import fudge.processing.resonances.reconstructResonances as resReconstructModule
 
 NUMERICAL_TYPES=[float,int,PQU.PQU]
@@ -30,11 +30,11 @@ def read_evaluation(inFile, skipBadData=True, verbose=False, reconstructResonanc
     '''
     if not os.path.exists(inFile): raise IOError("File named " + inFile + " doesn't exist!")
     if open(inFile).readline().startswith("<?xml"):
-        from fudge.gnd import reactionSuite
+        from fudge.gnds import reactionSuite
         return {'reactionSuite': reactionSuite.readXML(inFile), 'covarianceSuite': None, 'info': {}, 'errors': []}
     else:
-        from fudge.legacy.converting import endfFileToGND
-        return endfFileToGND.endfFileToGND(inFile, toStdOut=verbose, skipBadData=skipBadData, reconstructResonances=reconstructResonances)
+        from fudge.legacy.converting import endfFileToGNDS
+        return endfFileToGNDS.endfFileToGNDS(inFile, toStdOut=verbose, skipBadData=skipBadData, reconstructResonances=reconstructResonances)
 
 
 def print_comparison( aVal, bVal, itemName ):
@@ -57,20 +57,23 @@ def print_comparison( aVal, bVal, itemName ):
 
 def get_rrr_type(reactionSuite):
     t = reactionSuite.resonances.resolved.evaluated.moniker
-    if t == "R_Matrix_Limited":
-        pass
+    if hasattr(reactionSuite.resonances.resolved.evaluated,"approximation"):
         t+=', '+reactionSuite.resonances.resolved.evaluated.approximation+' approximation'
     return t
 
 
 def get_rrr( reactionSuite, verbose=False, warnOnly=False, multipleSScheme='ENDF'):
-    resCls = resReconstructModule.getResonanceReconstructionClass(reactionSuite.resonances.resolved.evaluated.moniker)
+    resCls = resReconstructModule.getResonanceReconstructionClass(reactionSuite.resonances.resolved.evaluated)
     rrr = resCls(reactionSuite, None, enableAngDists=False, verbose=verbose)
     if isinstance(rrr,resReconstructModule.RMcrossSection):
         rrr.setResonanceParametersByChannel(useReichMooreApproximation=True,warnOnly=warnOnly,multipleSScheme=multipleSScheme)
     else: rrr.setResonanceParametersByChannel(warnOnly=warnOnly)
     return rrr
 
+
+def channel_details(c,indent=8,verbose=False):
+    return indent*' '+"%2i Reaction %s, J,L,s=%s,%s,%s, Xi=%s"%\
+                      (c.index,c.reaction.rjust(13),str(c.J),str(c.l),str(c.s),str(c.Xi))
 
 def resonance_details( fname, reactionSuite, rrrReconstructor, indent=4, verbose=False ):
     def getAP(_rrr):
@@ -87,7 +90,9 @@ def resonance_details( fname, reactionSuite, rrrReconstructor, indent=4, verbose
         'Compound nucleus formed: %s'%reactionSuite.compound_nucleus,
         'Format: %s'%get_rrr_type(reactionSuite),
         'Num. channels: %i'%rrrReconstructor.nChannels,
-        indent*' '+'PUTCHANNELSUMMARYHERE',
+        '\n'.join(
+            map(lambda x:channel_details(x[0], indent=int(x[1]!=0)*4+4),
+                [ (z,i) for i,z in enumerate(rrrReconstructor.channels)])),
         'Num. resonances: %i'%rrrReconstructor.nResonances,
         'LMax: %i' % rrrReconstructor.getLMax(),
         'LowerBound: %s'%str(reactionSuite.resonances.resolved.domainMin),

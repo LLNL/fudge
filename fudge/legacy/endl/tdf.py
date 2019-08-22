@@ -124,7 +124,7 @@ fudgemisc.verbose( 0 )
 
 
 #default_C_list = ( 11, 40, 41, 42, 12, 44, 45, 39) # try to get Li6__H2_H1__H3__He4 too!
-default_C_list = ( 11, 18, 26, 27, 34, 37, 39, 40, 41, 42, 12, 44, 45, 47, 48  ) ### new complete list for P. Bedrossian
+default_C_list = ( 11, 18, 26, 27, 37, 39, 40, 41, 42, 12, 44, 45, 47, 48  ) ### new complete list for P. Bedrossian (34 is pnaa and tdfgen cannot handle 4-body final state kinematics)
 
 default_lib_path = "/usr/gapps/data/nuclear/endl_official/"
 
@@ -195,12 +195,12 @@ def processTDF_Reaction( target, C, S = None, X1 = None, X2 = None, X3 = None, X
         ZA = target.ZA
         ZAZ, ZAA = endl2.ZandAFromZA( ZA )
 
-        if( projectileMass > targetMass ) :
-            reaction = '%s%d+%s%d' % ( endl_Z.endl_ZSymbol( yiZ ), yiA, endl_Z.endl_ZSymbol( ZAZ ), ZAA )
-            #print "Skipping reaction "+reaction+", it is in inverse kinematics"
+        if( projectileMass > targetMass ) and ZAA>1:
+            reaction = '%s%d+%s%d' % ( localZsymbol( yiZ ), yiA, localZsymbol( ZAZ ), ZAA )
+            print "Skipping reaction "+reaction+", it is in inverse kinematics"
             return
         else :
-            reaction = '%s%d+%s%d=' % ( endl_Z.endl_ZSymbol( ZAZ ), ZAA, endl_Z.endl_ZSymbol( yiZ ), yiA )
+            reaction = '%s%d+%s%d=' % ( localZsymbol( ZAZ ), ZAA, localZsymbol( yiZ ), yiA )
 
         if Q<0.0 : 
             print "%s is an endothermic reaction"%reaction
@@ -226,7 +226,7 @@ def processTDF_Reaction( target, C, S = None, X1 = None, X2 = None, X3 = None, X
         outGoing.sort( )
         s = ''
         for mass, iZA, Z, A in outGoing :
-            reaction += '%s%s%d' % ( s, endl_Z.endl_ZSymbol( Z ), A )
+            reaction += '%s%s%d' % ( s, localZsymbol( Z ), A )
             s = '+'
         
         if xsec.S != 0:
@@ -373,7 +373,7 @@ def process_one_evaluation( yi, ZA, libraryName = 'endl2008.2', libraryVersion =
         try:
             reactionname = processTDF_Reaction( target, C, workDir = workDir, outputDir = outputDir, libraryName = libraryName, libraryVersion = libraryVersion, verbose = verbose, dryrun = dryrun )
             reactionnames.append(reactionname)
-            print 'adding to tdf list :',reactionname
+            if verbose : print 'adding to tdf list :',reactionname
         except RuntimeError, err:
             print err
             print "\n.... continuing\n"
@@ -430,6 +430,12 @@ def usage():
     print "         --workdir       sets fudge's working directory"
     print "         --all           process all reactions in all evaluations for all projectiles in library"
     print "         --dryrun        runs through data lookup and name munging, but does write out any files"
+
+def localZsymbol(Z):
+    if Z==0 : 
+        return 'n'
+    else :
+        return endl_Z.endl_ZSymbol( Z )
 
 # ------------- version -----------------
 def version():

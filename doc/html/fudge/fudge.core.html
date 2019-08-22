@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.core package &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.core package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -30,7 +27,7 @@
     <link rel="next" title="fudge.core.math package" href="fudge.core.math.html" />
     <link rel="prev" title="fudge Package" href="index.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -46,7 +43,7 @@
         <li class="right" >
           <a href="index.html" title="fudge Package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">fudge Package</a> &#187;</li> 
       </ul>
     </div>  
@@ -100,7 +97,7 @@
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.math.html#fudge-core-math-fudge2dgrouping-module">fudge.core.math.fudge2dGrouping module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.fudgemath">fudge.core.math.fudgemath module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.linearAlgebra">fudge.core.math.linearAlgebra module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.matrix">fudge.core.math.matrix module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.core.math.html#fudge-core-math-matrix-module">fudge.core.math.matrix module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.math.html#module-fudge.core.math.miscellaneous">fudge.core.math.miscellaneous module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.math.html#fudge-core-math-pointwisexy-module">fudge.core.math.pointwiseXY module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.math.html#fudge-core-math-table-module">fudge.core.math.table module</a></li>
@@ -124,7 +121,7 @@
 <li class="toctree-l3"><a class="reference internal" href="fudge.core.utilities.html#references">References</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.argparse">fudge.core.utilities.argparse module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#fudge-core-utilities-argparse-module">fudge.core.utilities.argparse module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.brb">fudge.core.utilities.brb module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.fudgeExceptions">fudge.core.utilities.fudgeExceptions module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fudge.core.utilities.html#module-fudge.core.utilities.fudgeFileMisc">fudge.core.utilities.fudgeFileMisc module</a></li>
@@ -166,7 +163,7 @@
 <dd><p>Checks if self has a getFormat method. If it does not, then None is returned. If it does then: 
 1) if getFormat returns a string or None then it is returned else getFormat must return an 
 integer, n1. If n1 is 12 (default for legacy ENDL) then None is returned else returns string 
-&#8216;%n1.n2e&#8217; where n2 = n1 - 7.</p>
+‘%n1.n2e’ where n2 = n1 - 7.</p>
 </dd></dl>
 
 <dl class="function">
@@ -177,7 +174,7 @@ integer, n1. If n1 is 12 (default for legacy ENDL) then None is returned else re
 <dl class="function">
 <dt id="fudge.core.fudgemisc.readOnly">
 <code class="descclassname">fudge.core.fudgemisc.</code><code class="descname">readOnly</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/fudgemisc.html#readOnly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.fudgemisc.readOnly" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets Fudge&#8217;s internal readonly flag which causes fudge to not create working directories 
+<dd><p>Sets Fudge’s internal readonly flag which causes fudge to not create working directories 
 for the isotopes read in. Note, you cannot unset this flag once readOnly has been called.</p>
 </dd></dl>
 
@@ -190,7 +187,7 @@ for the isotopes read in. Note, you cannot unset this flag once readOnly has bee
 <dl class="function">
 <dt id="fudge.core.fudgemisc.verbose">
 <code class="descclassname">fudge.core.fudgemisc.</code><code class="descname">verbose</code><span class="sig-paren">(</span><em>mode=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/core/fudgemisc.html#verbose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.fudgemisc.verbose" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets Fudge&#8217;s internal verbose flag to mode. Mode = 0 suppress all informational messages.</p>
+<dd><p>Sets Fudge’s internal verbose flag to mode. Mode = 0 suppress all informational messages.</p>
 </dd></dl>
 
 </div>
@@ -262,13 +259,13 @@ for the isotopes read in. Note, you cannot unset this flag once readOnly has bee
         <li class="right" >
           <a href="index.html" title="fudge Package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

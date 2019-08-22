@@ -147,7 +147,7 @@ class xDataFunctional( xDataCoreMembers ) :
 
         self.axes = axes
 
-        self.uncertainties = None
+        self.uncertainty = None
 
     @abc.abstractproperty
     def dimension( self ) :
@@ -211,13 +211,13 @@ class xDataFunctional( xDataCoreMembers ) :
     def getPrimaryXData( self ) :
 
         ancestor = self
-        while( not( ancestor.isPrimaryXData( ) ) ) : ancestor = ancestor.getAncestor( )
+        while( not( ancestor.isPrimaryXData( ) ) ) : ancestor = ancestor.ancestor
         return( ancestor )
 
     def isPrimaryXData( self ) :
         """Returns False if self is contained in a higher dimension xDataFunctional and False otherwise."""
 
-        ancestry = self.getAncestor( )
+        ancestry = self.ancestor
         if( ancestry is None ) : return( True )
         return( not( isinstance( ancestry, xDataFunctional ) ) )
 

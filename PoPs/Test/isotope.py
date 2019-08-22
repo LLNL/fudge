@@ -63,6 +63,8 @@
 # 
 # <<END-copyright>>
 
+from PoPs.groups import misc as chemicalElementMiscModule
+
 from PoPs.quantities import quantity as quantityModule
 from PoPs.quantities import mass as massModule
 from PoPs.quantities import spin as spinModule
@@ -71,27 +73,23 @@ from PoPs.quantities import charge as chargeModule
 from PoPs.quantities import halflife as halflifeModule
 from PoPs.quantities import nuclearEnergyLevel as nuclearEnergyLevelModule
 
-from PoPs.families import nucleus as nucleusModule 
-from PoPs.families import nuclearLevel as nuclearLevelModule 
+from PoPs.families import nuclide as nuclideModule 
 from PoPs.groups import isotope as isotopeModule
 
-A = '16'
-isotopeID = isotopeModule.isotopeIDFromElementIDAndA( 'O', A )
-isotope = isotopeModule.suite( isotopeID, A )
+A = 16
+isotopeID = chemicalElementMiscModule.isotopeSymbolFromChemicalElementIDAndA( 'O', A )
+isotope = isotopeModule.isotope( isotopeID, A )
 
-data = [ [ '0', 15.99491461956, 0,       None, None, None, None ],
-         [ '1',           None, 6049400, None, None, None, None ],
-         [ '2',           None, 6129893, None, None, None, None ],
-         [ '3',           None, 6917100, None, None, None, None ] ]
+data = [ [ 0, 15.99491461956, 0,       None, None, None, None ],
+         [ 1,           None, 6049400, None, None, None, None ],
+         [ 2,           None, 6129893, None, None, None, None ],
+         [ 3,           None, 6917100, None, None, None, None ] ]
 
 for index, mass, energy, charge, halflife, spin, parity in data :
-    name = nucleusModule.nucleusNameFromNucleusNameAndIndex( isotopeID, index )
-    nucleus = nucleusModule.particle( name, index )
+    name = chemicalElementMiscModule.nuclideIDFromIsotopeSymbolAndIndex( isotopeID, index )
+    level = nuclideModule.particle( name )
     energy = nuclearEnergyLevelModule.double( 'base', energy, quantityModule.stringToPhysicalUnit( 'eV' ) )
-    nucleus.energy.add( energy )
-
-    name = nucleusModule.levelNameFromIsotopeNameAndIndex( isotopeID, index )
-    level = nuclearLevelModule.particle( name, nucleus )
+    level.nucleus.energy.add( energy )
 
     if( mass is not None ) :
         mass = massModule.double( 'base', mass, quantityModule.stringToPhysicalUnit( 'amu' ) )
@@ -117,14 +115,15 @@ for index, mass, energy, charge, halflife, spin, parity in data :
 
 xmli1 = isotope.toXML( )
 print xmli1
-isotope2 = isotopeModule.suite.parseXMLStringAsClass( xmli1 )
+isotope2 = isotopeModule.isotope.parseXMLStringAsClass( xmli1 )
 if( xmli1 != isotope2.toXML( ) ) : raise Exception( 'Fix me.' )
 
-print isotope.mass.pqu( )
-print isotope.mass.pqu( 'MeV/c**2' )
-print isotope.mass.float( 'MeV/c**2' )
+nuclide = isotope[isotopeID]
+print nuclide.mass.pqu( )
+print nuclide.mass.pqu( 'MeV/c**2' )
+print nuclide.mass.float( 'MeV/c**2' )
 
 print
-print isotope.energy.pqu( )
-print isotope.energy.pqu( 'MeV' )
-print isotope.energy.float( 'MeV' )
+print nuclide.energy.pqu( )
+print nuclide.energy.pqu( 'MeV' )
+print nuclide.energy.float( 'MeV' )

@@ -18,9 +18,9 @@ To install the package:
 
     ::
 
-        $tar -xvf fudge-4.2.2.tar.gz
+        $tar -xvf fudge-4.2.3.tar.gz
     
-3) The unzipped directory is named 'fudge-4.2.2'. Navigate into the new directory, and type
+3) The unzipped directory is named 'fudge-4.2.3'. Navigate into the new directory, and type
 
     ::
 

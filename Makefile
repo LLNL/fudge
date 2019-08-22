@@ -63,7 +63,7 @@
 
 .PHONY: default build inplace bin clean realclean build extensions
 
-EXTENSIONS = statusMessageReporting numericalFunctions crossSectionAdjustForHeatedTarget Merced
+EXTENSIONS = statusMessageReporting numericalFunctions crossSectionAdjustForHeatedTarget Merced bin
 
 EPYDOC=epydoc-2.6
 PYTHON=python
@@ -75,6 +75,7 @@ build:
 
 inplace:
 	$(PYTHON) setup.py --quiet build_ext --inplace build
+	@echo 'INFO: This target does not build merced'
 
 bin:
 	cd bin; $(MAKE)
@@ -88,6 +89,8 @@ clean:
 	$(MAKE) extensions MODE=realclean
 
 realclean: clean
+	rm -rf Out
+	cd fudge; $(MAKE) realclean
 
 pyclean:
 	find . -name "*.pyc" -exec rm -f {} \;
@@ -100,7 +103,7 @@ docs:
 	cd doc/sphinx; $(MAKE) $(MODE) html; cd ../..
 
 rebuild-test-data:
-	cd fudge/gnd/covariances/test; python rebuild_test_data.py
+	cd fudge/gnds/covariances/test; python rebuild_test_data.py
 	cd fudge/processing/resonances/test; python rebuild_test_data.py
 
 dist:
@@ -124,6 +127,7 @@ check-nf:
 	cd numericalFunctions/nf_specialFunctions/Python/Test/UnitTesting/; $(MAKE) check
 
 check-smr:
+	cd statusMessageReporting/; $(MAKE)
 	cd statusMessageReporting/Test/; $(MAKE) check
 
 FUDGETESTFILES = \
@@ -132,20 +136,20 @@ FUDGETESTFILES = \
     fudge/processing/resonances/test/test_reconstructResonances.py  \
     fudge/processing/resonances/test/test_getScatteringMatrices.py \
     fudge/legacy/endl/test/test_endlProject.py \
-    fudge/gnd/productData/distributions/test/__init__.py \
-    fudge/gnd/reactionData/test/test_crossSection.py \
-    fudge/gnd/covariances/test/test_base.py \
-    fudge/gnd/covariances/test/test_mixed.py \
-    fudge/gnd/covariances/test/test_summed.py \
-    fudge/gnd/covariances/test/test_covarianceSuite.py \
-    fudge/particles/test/testParticles.py
+    fudge/gnds/productData/distributions/test/__init__.py \
+    fudge/gnds/reactionData/test/test_crossSection.py \
+    fudge/gnds/covariances/test/test_base.py \
+    fudge/gnds/covariances/test/test_mixed.py \
+    fudge/gnds/covariances/test/test_summed.py \
+    fudge/gnds/covariances/test/test_covarianceSuite.py
+#    fudge/particles/test/testParticles.py
 
 FUDGECOVTESTFILES = \
-    fudge/gnd/reactionData/test/test_crossSection.py \
-    fudge/gnd/covariances/test/test_base.py \
-    fudge/gnd/covariances/test/test_mixed.py \
-    fudge/gnd/covariances/test/test_summed.py \
-    fudge/gnd/covariances/test/test_covarianceSuite.py
+    fudge/gnds/reactionData/test/test_crossSection.py \
+    fudge/gnds/covariances/test/test_base.py \
+    fudge/gnds/covariances/test/test_mixed.py \
+    fudge/gnds/covariances/test/test_summed.py \
+    fudge/gnds/covariances/test/test_covarianceSuite.py
 
 check-cov:
 	for testFile in $(FUDGECOVTESTFILES); do echo ; \

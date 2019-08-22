@@ -1,7 +1,10 @@
 from __future__ import print_function
+
 import fudge
 from fudge.vis.matplotlib import plot2d, DataSet2d, DataSet3d
-import fudge.gnd.sums
+import fudge.gnds.sums
+
+from fudge.legacy.endl import misc as miscENDLModule
 
 from . import plotstyles
 
@@ -299,8 +302,8 @@ def getC4DataSets( c4File, mt, mf, target, projectile, plotSyle={} ):
     print(fudge.core.utilities.brb.winged_banner( 'Retrieving C4 data from: '+str( c4File ) ))
     flist = filter(
         lambda x: x.MT == mt and x.MF == mf
-                  and x.target == fudge.particles.nuclear.getZAFromName( target )
-                  and x.projectile == fudge.particles.nuclear.getZAFromName( projectile ),
+                  and x.target == miscENDLModule.getZAFromName( target )
+                  and x.projectile == miscENDLModule.getZAFromName( projectile ),
         c4.readC4File( open( c4File ).readlines(), asPointList=True ) )
     i = -1
     dat = []
@@ -402,7 +405,7 @@ def getXdXYdYDataSets( xdxydyData, plotStyle ):
 #---------------------------------------------------
 # cross section plots
 #---------------------------------------------------
-def makeCrossSectionPlot( gndMap={}, xyData=[], xydyData=[], xdxydyData=[], c4File=None,
+def makeCrossSectionPlot( gndsMap={}, xyData=[], xydyData=[], xdxydyData=[], c4File=None,
                           mt=0, projectile='n', target='1H',
                           nounc=False, nox4=False, showparts=False, nox4evals=True, nox4legend=False,
                           evaluationStyle='recon', logX=None, logY=None,
@@ -416,33 +419,33 @@ def makeCrossSectionPlot( gndMap={}, xyData=[], xydyData=[], xdxydyData=[], c4Fi
         else: raise KeyError( "Unknown MT: "+str( mt ) )
 
     # A place to store the sum of isotopes if we are dealing with isotopic mixtures
-    if 'mixture' in gndMap:
+    if 'mixture' in gndsMap:
         mixtureSum=None
         import pqu.PQU as PQU
-        eMin=PQU.PQU(gndMap['mixture']['eMin'])
-        eMax=PQU.PQU(gndMap['mixture']['eMax'])
-        isoFiles = [gndMap['mixture']['isotopes'][iso]['pathToFile'] for iso in gndMap['mixture']['isotopes']]
+        eMin=PQU.PQU(gndsMap['mixture']['eMin'])
+        eMax=PQU.PQU(gndsMap['mixture']['eMax'])
+        isoFiles = [gndsMap['mixture']['isotopes'][iso]['pathToFile'] for iso in gndsMap['mixture']['isotopes']]
 
     # Get the ENDF data for plotting
     endfData=[]
     rawEndfData=[]
     rawEndfUnc=[]
-    for endf in gndMap:
+    for endf in gndsMap:
         if endf=='mixture': continue
         thisSetStyle = plotstyles.getThisSetStyle(plotStyle, 'evaluation', endf)
 
         print(fudge.core.utilities.brb.winged_banner( "Preparing data for "+endf ))
-        reactionSuite, covarianceSuite = gndMap[endf]
+        reactionSuite, covarianceSuite = gndsMap[endf]
 
         weight=1.0
-        if 'mixture' in gndMap:
-            for iso in gndMap['mixture']['isotopes']:
-                if gndMap['mixture']['isotopes'][iso]['pathToFile']==endf:
-                    weight=gndMap['mixture']['isotopes'][iso]['atomicFraction']
-                    thisSetStyle['legend']=gndMap['mixture']['isotopes'][iso].get('legend',thisSetStyle['legend'])
-                    thisSetStyle['lineWidth']=gndMap['mixture']['isotopes'][iso].get('lineWidth',thisSetStyle['lineWidth'])
-                    thisSetStyle['lineStyle']=gndMap['mixture']['isotopes'][iso].get('lineStyle',thisSetStyle['lineStyle'])
-                    thisSetStyle['lineColor']=gndMap['mixture']['isotopes'][iso].get('lineColor',thisSetStyle['lineColor'])
+        if 'mixture' in gndsMap:
+            for iso in gndsMap['mixture']['isotopes']:
+                if gndsMap['mixture']['isotopes'][iso]['pathToFile']==endf:
+                    weight=gndsMap['mixture']['isotopes'][iso]['atomicFraction']
+                    thisSetStyle['legend']=gndsMap['mixture']['isotopes'][iso].get('legend',thisSetStyle['legend'])
+                    thisSetStyle['lineWidth']=gndsMap['mixture']['isotopes'][iso].get('lineWidth',thisSetStyle['lineWidth'])
+                    thisSetStyle['lineStyle']=gndsMap['mixture']['isotopes'][iso].get('lineStyle',thisSetStyle['lineStyle'])
+                    thisSetStyle['lineColor']=gndsMap['mixture']['isotopes'][iso].get('lineColor',thisSetStyle['lineColor'])
                     break
 
         try:
@@ -455,7 +458,7 @@ def makeCrossSectionPlot( gndMap={}, xyData=[], xydyData=[], xdxydyData=[], c4Fi
                 try:
                     # Extract the cross section data from the endf file
                     csData = thisReaction.crossSection.toPointwise_withLinearXYs(lowerEps=1e-8, upperEps=1e-8)*weight
-                    if 'mixture' in gndMap and endf in isoFiles:
+                    if 'mixture' in gndsMap and endf in isoFiles:
                         if mixtureSum is None: mixtureSum =  csData.domainSlice(eMin.getValueAs(csData.domainUnit),eMax.getValueAs(csData.domainUnit))
                         else:                  mixtureSum += csData.domainSlice(eMin.getValueAs(csData.domainUnit),eMax.getValueAs(csData.domainUnit))
                     rawEndfData.append( csData )
@@ -472,6 +475,10 @@ def makeCrossSectionPlot( gndMap={}, xyData=[], xydyData=[], xdxydyData=[], c4Fi
                             except ValueError as err:
                                 print("WARNING: When adding uncertainty to plot from %s for MT %i failed with error ValueError(\"%s\")" % ( endf, mt, str(err) ))
                                 rawEndfUnc.append( None )
+                            except IndexError as err:
+                                print("WARNING: When adding uncertainty to plot from %s for MT %i failed with error IndexError(\"%s\")" % (
+                                    endf, mt, str(err)))
+                                rawEndfUnc.append(None)
                             except TypeError as err:
                                 print("WARNING: When adding uncertainty to plot from %s for MT %i failed with error TypeError(\"%s\")" % ( endf, mt, str(err) ))
                                 rawEndfUnc.append( None )
@@ -491,7 +498,7 @@ def makeCrossSectionPlot( gndMap={}, xyData=[], xydyData=[], xdxydyData=[], c4Fi
 
             # and plot all the rest, they don't get covariances...
             if showparts:
-                if isinstance( thisReaction, fudge.gnd.sums.crossSectionSum ):
+                if isinstance( thisReaction, fudge.gnds.sums.crossSectionSum):
                     for summand in thisReaction.summands:
                         # FIXME: I shouldn't have to do this, but apparently I need to
                         summand.setAncestor(thisReaction.summands)
@@ -502,21 +509,21 @@ def makeCrossSectionPlot( gndMap={}, xyData=[], xydyData=[], xdxydyData=[], c4Fi
                         csData = otherCS.toPointwise_withLinearXYs(lowerEps=1e-8, upperEps=1e-8)
                         if csData != None:    rawEndfData.append( csData )
                         else:                 continue
-                        if len(gndMap) == 1:  endfData.append( DataSet2d( rawEndfData[-1], legend = 'MT=%i'%( otherReaction.ENDF_MT ) ) )
+                        if len(gndsMap) == 1:  endfData.append( DataSet2d( rawEndfData[-1], legend = 'MT=%i'%( otherReaction.ENDF_MT ) ) )
                         else:                 endfData.append( DataSet2d( rawEndfData[-1], legend = endf+' (MT=%i)'%( otherReaction.ENDF_MT )  ) )
             print()
 
         except TypeError as err: print("WARNING: Adding data from %s for MT %i failed with error \"%s\"" % ( endf, mt, str(err) ))
 
     # Add in the sum of any isotopic mixture
-    if 'mixture' in gndMap:
+    if 'mixture' in gndsMap:
         endfData.append(
             DataSet2d(
                 mixtureSum,
-                legend=gndMap['mixture']['legend'],
-                lineWidth=gndMap['mixture']['lineWidth'],
-                lineStyle=gndMap['mixture']['lineStyle'],
-                color=gndMap['mixture']['lineColor']))
+                legend=gndsMap['mixture']['legend'],
+                lineWidth=gndsMap['mixture']['lineWidth'],
+                lineStyle=gndsMap['mixture']['lineStyle'],
+                color=gndsMap['mixture']['lineColor']))
 
     # Get the C4 data for plotting
     c4Data = []
@@ -526,7 +533,7 @@ def makeCrossSectionPlot( gndMap={}, xyData=[], xydyData=[], xdxydyData=[], c4Fi
     # Get the EXFOR data for plotting
     exforData = []
     if ( not nox4 ) and ( reactionName is not None ):
-        sym, A, m = fudge.particles.nuclear.elementAFromName( target )
+        sym, A, m = miscENDLModule.elementAFromName( target )
         exforData = getEXFORSets( sym, A, reaction = projectile+','+reactionName, quantity = "SIG", nox4evals = nox4evals, nox4legend = nox4legend, plotSyle=plotStyle  )
 
     # Actually make the plot
@@ -551,7 +558,7 @@ def makeCrossSectionPlot( gndMap={}, xyData=[], xydyData=[], xdxydyData=[], c4Fi
 
 
 
-def makeCrossSectionUncertaintyPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
+def makeCrossSectionUncertaintyPlot( gndsMap={}, xyData={}, xydyData={}, xdxydyData={},
                                      mt=0, projectile='n', target='1H',
                                      evaluationStyle='eval',
                                      outFile=None, plotStyle={}, figsize=(20,10), useBokeh=False ):
@@ -573,7 +580,7 @@ def makeCrossSectionUncertaintyPlot( gndMap={}, xyData={}, xydyData={}, xdxydyDa
             errorbarColor=getStyle( plotStyle, 'evaluations', endf, 'errorColor' ) ) )
 
 
-def makeCrossSectionIntegralsPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
+def makeCrossSectionIntegralsPlot( gndsMap={}, xyData={}, xydyData={}, xdxydyData={},
                                    mt=0, projectile='n', target='1H',
                                    evaluationStyle='eval',
                                    outFile=None, plotStyle={}, figsize=(20,10), useBokeh=False ):
@@ -584,7 +591,7 @@ def makeCrossSectionIntegralsPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData
 #---------------------------------------------------
 # special atomic data plots
 #---------------------------------------------------
-def makeEnergyTransferPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
+def makeEnergyTransferPlot( gndsMap={}, xyData={}, xydyData={}, xdxydyData={},
                             mt=0, projectile='e-', target='1H', product='e-',
                             evaluationStyle='eval',
                             outFile=None, plotStyle={}, figsize=(20,10), useBokeh=False ):
@@ -593,11 +600,11 @@ def makeEnergyTransferPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
 
     # Get the ENDF data for plotting
     endfData=[]
-    for endf in gndMap:
+    for endf in gndsMap:
         if endf=='mixture': continue
 
         print(fudge.core.utilities.brb.winged_banner( "Preparing data for "+endf ))
-        reactionSuite, covarianceSuite = gndMap[endf]
+        reactionSuite, covarianceSuite = gndsMap[endf]
 
         # collect complete list of matching reactions
         reactionList = []
@@ -634,7 +641,7 @@ def makeEnergyTransferPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
                       useBokeh=useBokeh )
 
 
-def makeFormFactorPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
+def makeFormFactorPlot( gndsMap={}, xyData={}, xydyData={}, xdxydyData={},
                         mt=0, projectile='gamma', target='1H', product='gamma',
                         evaluationStyle='eval',
                         outFile=None, plotStyle={}, figsize=(20,10), useBokeh=False ):
@@ -649,11 +656,11 @@ def makeFormFactorPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
 
     # Get the ENDF data for plotting
     endfData=[]
-    for endf in gndMap:
+    for endf in gndsMap:
         if endf=='mixture': continue
 
         print(fudge.core.utilities.brb.winged_banner( "Preparing data for "+endf ))
-        reactionSuite, covarianceSuite = gndMap[endf]
+        reactionSuite, covarianceSuite = gndsMap[endf]
 
         # Extract the cross section data from the endf file
         for MT in mtList:
@@ -687,7 +694,7 @@ def makeFormFactorPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
                       useBokeh=useBokeh )
 
 
-def makeAnomolousScatteringFactorPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
+def makeAnomolousScatteringFactorPlot( gndsMap={}, xyData={}, xydyData={}, xdxydyData={},
                                        mt=502, projectile='gamma', target='1H', product='gamma',
                                        evaluationStyle='eval',
                                        outFile=None, plotStyle={}, figsize=(20,10), useBokeh=False ):
@@ -696,11 +703,11 @@ def makeAnomolousScatteringFactorPlot( gndMap={}, xyData={}, xydyData={}, xdxydy
 
     # Get the ENDF data for plotting
     endfData=[]
-    for endf in gndMap:
+    for endf in gndsMap:
         if endf=='mixture': continue
 
         print(fudge.core.utilities.brb.winged_banner( "Preparing data for "+endf ))
-        reactionSuite, covarianceSuite = gndMap[endf]
+        reactionSuite, covarianceSuite = gndsMap[endf]
 
         # Extract the cross section data from the endf file
         dist = getReactions( reactionSuite, mt )[0].outputChannel.getProductWithName(product).distributions.getNativeData()
@@ -736,8 +743,8 @@ def makeAnomolousScatteringFactorPlot( gndMap={}, xyData={}, xydyData={}, xdxydy
 #---------------------------------------------------
 # multiplicity plots
 #---------------------------------------------------
-def makeMultiplicityPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
-                          mt=0, projectile='n', target='1H', product='n',
+def makeMultiplicityPlot( gndsMap={}, xyData={}, xydyData={}, xdxydyData={},
+                          mt=0, projectile='n', target='H1', product='n',
                           c4File=None,
                           showparts=True,
                           nox4evals=True,
@@ -767,12 +774,12 @@ def makeMultiplicityPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
     # Get the ENDF data for plotting
     endfData=[]
     rawEndfData=[]
-    for endf in gndMap:
+    for endf in gndsMap:
         if endf=='mixture': continue
         thisSetStyle = plotstyles.getThisSetStyle(plotStyle, 'evaluation', endf)
 
         print(fudge.core.utilities.brb.winged_banner( "Preparing data for "+endf ))
-        reactionSuite, covarianceSuite = gndMap[endf]
+        reactionSuite, covarianceSuite = gndsMap[endf]
 
         # Extract the data from the endf file & give the data rational names (esp. for nubar)
         thisChannel = getReactions( reactionSuite, mt )[0].outputChannel
@@ -829,7 +836,7 @@ def makeMultiplicityPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
     # Get the EXFOR data for plotting
     exforData = []
     if (not nox4) and (reactionName is not None):
-        sym, A, m = fudge.particles.nuclear.elementAFromName(target)
+        sym, A, m = miscENDLModule.elementAFromName( target )
         exforData = getEXFORSets(sym, A, reaction=projectile + ',' + reactionName, quantity="NU",
                                  nox4evals=nox4evals, nox4legend=nox4legend, plotSyle=plotStyle)
 
@@ -841,7 +848,7 @@ def makeMultiplicityPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
                      xydyData=xydyData,
                      xdxydyData=xdxydyData,
                      plotStyle=plotStyle,
-                     suggestTitle=getSuggestTitle(target, projectile, reactionName, mt),
+                     suggestTitle=("multiplicity of %s from "%product)+getSuggestTitle(target, projectile, reactionName, mt),
                      suggestXLog=False,
                      suggestYLog=False,
                      figsize=figsize,
@@ -852,24 +859,24 @@ def makeMultiplicityPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
 #---------------------------------------------------
 # energy/momentum deposition plots
 #---------------------------------------------------
-def makeEnergyDepositPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
+def makeEnergyDepositPlot( gndsMap={}, xyData={}, xydyData={}, xdxydyData={},
                            mt=0, projectile='n', target='1H', product='n',
                            evaluationStyle='eval', observable=None,
                            outFile=None, plotStyle={}, figsize=(20,10), useBokeh=False ):
 
     raise NotImplementedError("FIXME: I need updating for new FUDGE")
 
-    from fudge.gnd.productData import energyDeposition
+    from fudge.gnds.productData import energyDeposition
     import fudge.core.math.xData.XYs as XYs
 
     endfData = []
 
     # Get the ENDF data for plotting
-    for endf in gndMap:
+    for endf in gndsMap:
         if endf=='mixture': continue
 
         print(fudge.core.utilities.brb.winged_banner( "Preparing data for "+endf ))
-        reactionSuite, covarianceSuite = gndMap[endf]
+        reactionSuite, covarianceSuite = gndsMap[endf]
 
         # Set up MT list.
         # This is the list of all MT that we will search for data to sum into the plot.
@@ -945,14 +952,14 @@ def makeEnergyDepositPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
                       useBokeh=useBokeh )
 
 
-def makeMomentumDepositPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
+def makeMomentumDepositPlot( gndsMap={}, xyData={}, xydyData={}, xdxydyData={},
                              mt=0, projectile='n', target='1H', product='n',
                              evaluationStyle='eval', observable=None,
                              outFile=None, plotStyle={}, figsize=(20,10), useBokeh=False ):
 
     raise NotImplementedError("FIXME: I need updating for new FUDGE")
 
-    from fudge.gnd.productData import momentumDeposition
+    from fudge.gnds.productData import momentumDeposition
     import fudge.core.math.xData.XYs as XYs
     import math
 
@@ -960,13 +967,13 @@ def makeMomentumDepositPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
     endfData = []
 
     # Get the ENDF data for plotting
-    for endf in gndMap:
+    for endf in gndsMap:
         if endf=='mixture': continue
 
         print(fudge.core.utilities.brb.winged_banner( "Preparing data for "+endf ))
-        reactionSuite, covarianceSuite = gndMap[endf]
+        reactionSuite, covarianceSuite = gndsMap[endf]
 
-        if projectileMass == None:projectileMass = gndMap[endf][0].projectile.getMass('eV/c/c')
+        if projectileMass == None:projectileMass = gndsMap[endf][0].projectile.getMass('eV/c/c')
 
         # Set up MT list.
         # This is the list of all MT that we will search for data to sum into the plot.
@@ -1042,7 +1049,7 @@ def makeMomentumDepositPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
                       useBokeh=useBokeh )
 
 
-def makeFissionEnergyReleasePlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
+def makeFissionEnergyReleasePlot( gndsMap={}, xyData={}, xydyData={}, xdxydyData={},
                                   mt=0, projectile='n', target='1H', product='n',
                                   evaluationStyle='eval',
                                   outFile=None, plotStyle={}, figsize=(20,10), useBokeh=False ):
@@ -1052,7 +1059,7 @@ def makeFissionEnergyReleasePlot( gndMap={}, xyData={}, xydyData={}, xdxydyData=
 #---------------------------------------------------
 # angular distribution plots
 #---------------------------------------------------
-def makeAngDistMubarPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
+def makeAngDistMubarPlot( gndsMap={}, xyData={}, xydyData={}, xdxydyData={},
                           mt=0, projectile='n', target='1H', product='n',
                           evaluationStyle='eval', referenceFrame=None,
                           outFile=None, plotStyle={}, figsize=(20,10), useBokeh=False ):
@@ -1067,11 +1074,11 @@ def makeAngDistMubarPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
 
     # Get the ENDF data for plotting
     endfData = []
-    for endf in gndMap:
+    for endf in gndsMap:
         if endf=='mixture': continue
 
         print(fudge.core.utilities.brb.winged_banner( "Preparing data for "+endf ))
-        reactionSuite, covarianceSuite = gndMap[endf]
+        reactionSuite, covarianceSuite = gndsMap[endf]
         try:             thisReaction = reactionSuite.getReaction(mt)
         except KeyError: thisReaction = None # no data to plot 'cuz MT not in the reactionSuite
         if thisReaction is not None:
@@ -1114,7 +1121,7 @@ def makeAngDistMubarPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
 
 
 
-def makeAngDistLegendreMomentPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData={},
+def makeAngDistLegendreMomentPlot( gndsMap={}, xyData={}, xydyData={}, xdxydyData={},
                                    mt=0, L=1, projectile='n', target='1H', product='n',
                                    evaluationStyle='eval', referenceFrame='centerOfMass',
                                    outFile=None, plotStyle={}, figsize=(20,10), useBokeh=False ):
@@ -1131,12 +1138,30 @@ def makeAngDistLegendreMomentPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData
         # Reorder the distributions so we have a table of energies for each L
         for ireg, reg in enumerate(myRegions):
             eList = reg.getEnergyArray()
-            if not all([isinstance(x,fudge.gnd.productData.distributions.angular.Legendre) for x in reg.functionals]):
-                raise TypeError("All energies must have a Legendre distribution associated with them")
             print('            Regions #%i with %i points, '% (ireg,len(reg)), reg.domainMin, '-', reg.domainMax, reg.domainUnit)
-            for iE,legs in enumerate(reg):
-                for L,coeff in enumerate(legs):
-                    theLegMoments[L].append((eList[iE],coeff))
+            for iE,funcs in enumerate(reg): # loop over functional containers in this region
+
+                # If in Legendre moments already, just add them to the plot
+                if isinstance(funcs,fudge.gnds.productData.distributions.angular.Legendre):
+                    legs=funcs
+                    for L, coeff in enumerate(legs):
+                        theLegMoments[L].append((eList[iE], coeff))
+
+                # If is pointwise, we'll fit each energy's XYs1d with Legendre moments before plotting
+                else:
+                    import numpy.polynomial.legendre as legendreModule
+                    xys=(funcs-0.5).copyDataToXsAndYs() # subtract L=0 term, that better give 1/2
+                    LMax=min(max(1,len(xys[1])-3),50)
+                    minResidual=100.e12
+                    for l in range(LMax):
+                        fit_result=legendreModule.legfit(xys[0],xys[1],l,full=True)
+                        legs=fit_result[0]
+                        residuals=fit_result[1][0]
+                        if minResidual < residuals: break
+                        minResidual=min(minResidual,residuals)
+                    legs[0]=0.5 # set the L=0 term since it had better be 1/2 (before fixing normalization)
+                    for L, coeff in enumerate(legs):
+                        theLegMoments[L].append((eList[iE], coeff*2./(2.*L+1.))) # numpy & ENDF normalization a little different, so fix it here
 
         # Put the points in order
         for L in theLegMoments: theLegMoments[L].sort( key=lambda x: x[0] )
@@ -1166,11 +1191,11 @@ def makeAngDistLegendreMomentPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData
 
     # Get the ENDF data for plotting
     endfData = []
-    for endf in gndMap:
+    for endf in gndsMap:
         if endf=='mixture': continue
 
         print(fudge.core.utilities.brb.winged_banner( "Preparing data for "+endf ))
-        reactionSuite, covarianceSuite = gndMap[endf]
+        reactionSuite, covarianceSuite = gndsMap[endf]
         try:             thisReaction = reactionSuite.getReaction(mt)
         except KeyError: thisReaction = None # no data to plot 'cuz MT not in the reactionSuite
         if thisReaction is not None:
@@ -1202,6 +1227,7 @@ def makeAngDistLegendreMomentPlot( gndMap={}, xyData={}, xydyData={}, xdxydyData
                       suggestYLog = ( mt in [ 1, 2, 18, 102 ] + range(501, 574) ),
                       suggestFrame=referenceFrame,
                       figsize=figsize,
-                      useBokeh=useBokeh )
+                      useBokeh=useBokeh,
+                      outFile=outFile )
 
 

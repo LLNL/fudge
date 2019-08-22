@@ -61,15 +61,18 @@
 # 
 # <<END-copyright>>
 
-from PoPs import misc as miscPoPsModule
-from PoPs.families import nuclearLevel as nuclearLevelModule
+from xData import standards as standardsModule
+
+from PoPs.groups import misc as chemicalElementMiscPoPsModule
+from PoPs.families import nuclide as nuclideModule
 
 from fudge.legacy.converting import endf_endl as endf_endlModule
-from fudge.gnd.covariances import covarianceSuite as covarianceSuiteModule
-from fudge.gnd.covariances import section as sectionModule
-from fudge.gnd.covariances import distributions as distributionsModule
+
+from fudge.gnds.covariances import covarianceSuite as covarianceSuiteModule
+from fudge.gnds.covariances import mixed as covarianceMixedModule
 
 from .. import endfFormats as endfFormatsModule
+from .modelParameters import averageParametersToENDF6
 
 def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
     """Convert to ENDF format."""
@@ -77,14 +80,14 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
     reactionSuite = targetInfo['reactionSuite']
 
     ZAM, AWT = targetInfo['ZA'], targetInfo['mass']
-    NIS, ABN = 1, 1.0;
+    NIS, ABN = 1, 1.0
     ZAI = ZAM  # assuming one isotope/file
     MTL = 0 # mtl=1 sections are handled in lumpedCovariance
 
-    for section_ in self.modelParameterCovariances:
-        section_.toENDF6(endfMFList, flags, targetInfo, verbosityIndent)
+    if self.parameterCovariances:
+        self.parameterCovariances.toENDF6(endfMFList, flags, targetInfo, verbosityIndent)
 
-    sections = self.sections[:]
+    sections = self.covarianceSections
     # sort covariances by MF/MT:
     mfmts = []
     for section_ in sections:
@@ -102,9 +105,21 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
         if mf in (31,33):
             endf = [endfFormatsModule.endfHeadLine( ZAM, AWT, 0, MTL, 0, len(thisMFMT) )]
         elif mf==34:
-            if isinstance( thisMFMT[0][ targetInfo['style'] ], distributionsModule.LegendreOrderCovarianceForm ): LTT = 1
-            NMT1 = len(thisMFMT)
+            LTT = 1
+            NMT1 = 1    # cross-reaction terms not yet supported
             endf = [endfFormatsModule.endfHeadLine( ZAM, AWT, 0, LTT, 0, NMT1 )]
+            MAT1 = 0
+            MT1 = mt
+            L1s, L2s = [],[]
+            for section_ in thisMFMT:
+                L1s.append( section_.rowData['L'] )
+                if section_.columnData:
+                    L2s.append( section_.columnData['L'] )
+                else:
+                    L2s.append( L1s[-1] )
+            NL = len(set(L1s))
+            NL1 = len(set(L2s))
+            endf += [ endfFormatsModule.endfHeadLine( 0.0, 0.0, MAT1, MT1, NL, NL1 ) ]
         elif mf==35:
             endf = [endfFormatsModule.endfHeadLine( ZAM, AWT, 0, MTL, len(thisMFMT), 0 )]
         elif mf==40:
@@ -112,31 +127,49 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
         for section_ in thisMFMT:
             MAT1 = 0
             form = section_[ targetInfo['style'] ]
-            if section_.columnData and isinstance(section_.columnData.link, sectionModule.externalReaction):
-                otherTarget = section_.columnData.link.target
-                ZA, MAT1 = endf_endlModule.ZAAndMATFromParticleName( otherTarget )
+            conversionFlags = targetInfo['ENDFconversionFlags'].get(form, "")
+            if (section_.columnData is not None and
+                    section_.columnData.root is not None and
+                    section_.columnData.root[1:] in self.externalFiles):
+                otherTarget = section_.columnData.root[1:]
+                if otherTarget != 'reactions':
+                    ZA, MAT1 = endf_endlModule.ZAAndMATFromParticleName( otherTarget )
             if mf==34:
-                L1s = [subsec.L1 for subsec in form]
-                L2s = [subsec.L2 for subsec in form]
-                NL = len( set(L1s) );  NL1 = len( set(L2s) )
-                if section_.columnData: raise NotImplemented # cross-reaction or cross-material
-                MT1 = mt
-                endf += [ endfFormatsModule.endfHeadLine( 0.0, 0.0, MAT1, MT1, NL, NL1 ) ]
+                L1 = int(section_.rowData['L'])
+                if section_.columnData:
+                    L2 = int(section_.columnData['L'])
+                else:
+                    L2 = L1
+                NI = 1
+                if isinstance(form, covarianceMixedModule.mixedForm):
+                    NI = len(form)
+                    frame = form[0].productFrame
+                else:
+                    frame = form.productFrame
+                LCT = {standardsModule.frames.labToken: 1,
+                       standardsModule.frames.centerOfMassToken: 2}[frame]
+                if 'LCT=0' in conversionFlags:
+                    LCT = 0
+                endf += [ endfFormatsModule.endfHeadLine( 0.0, 0.0, L1, L2, LCT, NI ) ]
             if mf==40:
                 rowData = section_.rowData
                 if( isinstance( rowData, str ) ) :
                     raise Exception( "Don't string me along!" ) # FIXME
                 else:
                     quant = rowData.link
-                    product = quant.findAttributeInAncestry('outputChannel')[0]
-                    QI = quant.findAttributeInAncestry('getQ')('eV')
-                    LFS, level = 0, 0.
-                    particle = reactionSuite.PoPs[product.id]
-                    if( isinstance( particle, nuclearLevelModule.particle ) ) :
-                        LFS = particle.intIndex
-                        level = particle.energy[0].float( 'eV' )
-                    QM = QI + level
-                    IZAP = miscPoPsModule.ZA( reactionSuite.PoPs[product.id] )
+                    if mt == 18:
+                        QM, QI = quant.findAttributeInAncestry('getQ')('eV'), 0
+                        LFS, level, IZAP = 0,0,-1
+                    else:
+                        product = quant.findAttributeInAncestry('outputChannel')[0]
+                        QI = quant.findAttributeInAncestry('getQ')('eV')
+                        LFS, level = 0, 0.
+                        particle = reactionSuite.PoPs[product.id]
+                        if( isinstance( particle, nuclideModule.particle ) ) :
+                            LFS = particle.index
+                            level = particle.energy[0].float( 'eV' )
+                        QM = QI + level
+                        IZAP = chemicalElementMiscPoPsModule.ZA( reactionSuite.PoPs[product.id] )
                     NL = 1
                     endf += [endfFormatsModule.endfHeadLine( QM, QI, IZAP, LFS, 0, NL ) ]
                     XMF1, XLFS1, NC, NI = 10,LFS, 0,1
@@ -153,7 +186,7 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
     # also add ENDF-style pointers for lumped covariance data:
     for reactionSum in targetInfo['reactionSuite'].sums.crossSections:
         MT1 = reactionSum.ENDF_MT
-        if MT1 not in xrange(851,872): continue
+        if MT1 not in range(851,872): continue
         for summand in reactionSum.summands:
             mt = summand.link.findAttributeInAncestry('ENDF_MT')
             endfMFList[33][mt] = [endfFormatsModule.endfHeadLine(ZAM,AWT,0,MT1,0,0),

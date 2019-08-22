@@ -45,7 +45,7 @@ def get_KENO_flux( file ):
     return grouped_values_to_XYs( energies, fluxes, domainUnit=energyUnits, rangeUnit=fluxUnits )
 
 def get_ENDF_flux( file, mat, mf, mt ):
-    import fudge.legacy.converting.ENDFToGND.endfFileToGNDMisc as endfFileToGNDMiscModule
+    import fudge.legacy.converting.ENDFToGNDS.endfFileToGNDSMisc as endfFileToGNDSMiscModule
     import xData.axes as axesModule
     import xData.XYs as XYsModule
     # Grab the data corresponding to the spectrum
@@ -58,7 +58,7 @@ def get_ENDF_flux( file, mat, mf, mt ):
     spectrumAxes[0] = axesModule.axis( 'spectrum', 0, '1/eV' )
     spectrumAxes[1] = axesModule.axis( 'energy_in', 1, 'eV' )
     # Now make the spectrum as an XYs1d
-    dataLine, TAB1, spectrumRegions = endfFileToGNDMiscModule.getTAB1Regions(1, MF3Data, allowInterpolation6=True,
+    dataLine, TAB1, spectrumRegions = endfFileToGNDSMiscModule.getTAB1Regions(1, MF3Data, allowInterpolation6=True,
                                                                                  logFile=None, #info.logs,
                                                                                  axes=spectrumAxes,
                                                                                  cls=XYsModule.XYs1d)

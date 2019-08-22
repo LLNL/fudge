@@ -1,4 +1,4 @@
-from fudge.gnd.reactionData.crossSection import lowerEps
+from fudge.gnds.reactionData.crossSection import lowerEps
 from pqu import PQU
 from spectra import *
 
@@ -275,7 +275,7 @@ def computeScatteringRadius( rs, useCovariance=True, covariance=None, verbose=Fa
     # get RRR parameter averages
     if (hasattr(rs.resonances,'resolved') and rs.resonances.resolved is not None):
         import fudge.processing.resonances.reconstructResonances as RRReconstruct
-        resCls = RRReconstruct.getResonanceReconstructionClass(rs.resonances.resolved.evaluated.moniker)
+        resCls = RRReconstruct.getResonanceReconstructionClass(rs.resonances.resolved.evaluated)
         rrr = resCls( rs, None, enableAngDists=False, verbose=verbose )
         rrr.setResonanceParametersByChannel()
         R=rrr.getScatteringLength()

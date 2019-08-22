@@ -68,6 +68,8 @@ import random
 from PoPs import database as databaseModule
 from PoPs import alias as aliasModule
 
+from PoPs.groups import misc as chemicalElementMiscModule
+
 from PoPs.quantities import quantity as quantityModule
 from PoPs.quantities import mass as massModule
 from PoPs.quantities import spin as spinModule
@@ -79,24 +81,23 @@ from PoPs.quantities import nuclearEnergyLevel as nuclearEnergyLevelModule
 from PoPs.families import gaugeBoson as gaugeBosonModule
 from PoPs.families import lepton as leptonModule
 from PoPs.families import baryon as baryonModule
-from PoPs.families import nuclearLevel as nuclearLevelModule
-from PoPs.families import nucleus as nucleusModule
+from PoPs.families import nuclide as nuclideModule
 
 from PoPs.groups import isotope as isotopeModule
 from PoPs.groups import chemicalElement as chemicalElementModule
 
 database = databaseModule.database( 'test', '1.2.3' )
 
-def nuclearLevel( Z, A, data ) :
+def nuclides( Z, A, data ) :
 
-    symbol = chemicalElementModule.symbolFromZ[Z]
-    isotopeID = isotopeModule.isotopeIDFromElementIDAndA( symbol, A )
+    symbol = chemicalElementMiscModule.symbolFromZ[Z]
+    isotopeID = chemicalElementMiscModule.isotopeSymbolFromChemicalElementIDAndA( symbol, A )
     keys = random.sample( [ key for key in data ], len( data ) )
     for index in keys :
-        name = nucleusModule.levelNameFromIsotopeNameAndIndex( isotopeID, index )
+        name = chemicalElementMiscModule.nuclideIDFromIsotopeSymbolAndIndex( isotopeID, index )
         nameLower = name[:1].lower( ) + name[1:]
-        nucleus = nucleusModule.particle( nameLower, index )
-        level = nuclearLevelModule.particle( name, nucleus )
+        level = nuclideModule.particle( name )
+        nucleus = level.nucleus
 
         atomicMass, nuclearMass, energy, charge, halflife, spin, parity = data[index]
 
@@ -134,32 +135,32 @@ def nuclearLevel( Z, A, data ) :
         database.add( level )
 
 #                         atomMass    nuclearMass,     energy,   charge, halflife,   spin, parity
-H1Data =   { '0' : [ 1.00782503207, 1.007276466879,          0,        1,  'stable',  '1/2',      1 ] }
-nuclearLevel( 1, '1', H1Data )
+H1Data =   { 0 : [ 1.00782503207, 1.007276466879,          0,        1,  'stable',  '1/2',      1 ] }
+nuclides( 1, 1, H1Data )
 
 nuclearMass = 2.01410177785 - 0.0005485801
 #                         atomMass    nuclearMass,     energy,   charge,  halflife,   spin, parity
-H2Data =   { '0' : [ 2.01410177785,   nuclearMass,          0,        1,  'stable',   None,      1 ] }
-nuclearLevel( 1, '2', H2Data )
+H2Data =   { 0 : [ 2.01410177785,   nuclearMass,          0,        1,  'stable',   None,      1 ] }
+nuclides( 1, 2, H2Data )
 
 nuclearMass = 3.01604927767 - 0.0005485801
 #                         atomMass    nuclearMass,     energy,   charge,  halflife,   spin, parity
-H3Data =   { '0' : [ 3.01604927767,   nuclearMass,          0,        1, '12.32 yr',  '1/2',      1 ] }
-nuclearLevel( 1, '3', H3Data )
+H3Data =   { 0 : [ 3.01604927767,   nuclearMass,          0,        1, '12.32 yr',  '1/2',      1 ] }
+nuclides( 1, 3, H3Data )
 
 #                         atomMass    nuclearMass,     energy,   charge, halflife,   spin, parity
-O16Data = { '0' : [ 15.99491461956,       None,             0,     None,     None,   None,   None ],
-            '1' : [           None,       None,      6049.400,     None,     None,   None,   None ],
-            '2' : [           None,       None,      6129.893,     None,     None,   None,   None ],
-            '3' : [           None,       None,      6917.100,     None,     None,   None,   None ] }
-for A, data in [ [ '17', O16Data ], [ '16', O16Data ] ] : nuclearLevel( 8, A, data )
+O16Data = { 0 : [ 15.99491461956,       None,             0,     None,     None,   None,   None ],
+            1 : [           None,       None,      6049.400,     None,     None,   None,   None ],
+            2 : [           None,       None,      6129.893,     None,     None,   None,   None ],
+            3 : [           None,       None,      6917.100,     None,     None,   None,   None ] }
+for A, data in [ [ 17, O16Data ], [ 16, O16Data ] ] : nuclides( 8, A, data )
 
 #                    atomMass      nuclearMass,   energy, charge, halflife, spin, parity
-Am242Data = { '0' : [ 242.059549159,      None,        0,   None, '16.02 h',    1,     -1 ],
-              '1' : [          None,      None,   44.092,   None,      None,    0,     -1 ],
-              '2' : [          None,      None,    48.60,   None,  '141 yr',    5,     -1 ],
-              '3' : [          None,      None,    52.70,   None,      None,    3,     -1 ] }
-nuclearLevel( 95, '242', Am242Data )
+Am242Data = { 0 : [ 242.059549159,      None,        0,   None, '16.02 h',    1,     -1 ],
+              1 : [          None,      None,   44.092,   None,      None,    0,     -1 ],
+              2 : [          None,      None,    48.60,   None,  '141 yr',    5,     -1 ],
+              3 : [          None,      None,    52.70,   None,      None,    3,     -1 ] }
+nuclides( 95, 242, Am242Data )
 database.add( aliasModule.metaStable( 'Am242_m1', 'Am242_e2', 1 ) )
 
 photon = gaugeBosonModule.particle( 'photon' )
@@ -211,9 +212,7 @@ for id, mass, charge, halflife, spin, parity, generation in leptons :
 database.add( aliasModule.particle( 'electron', 'e-' ) )
 database.add( aliasModule.particle( 'e+', 'e-_anti' ) )
 database.add( aliasModule.particle( 'positron', 'e-_anti' ) )
-database.add( aliasModule.particle( 'h2', 'h2_e0' ) )
 database.add( aliasModule.particle( 'd', 'h2' ) )
-database.add( aliasModule.particle( 'h3', 'h3_e0' ) )
 database.add( aliasModule.particle( 't', 'h3' ) )
 
 baryons = [ [ 'n', 1.00866491588,     0,    881.5, '1/2', 1 ],

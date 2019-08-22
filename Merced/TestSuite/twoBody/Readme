@@ -39,3 +39,6 @@ in.inelastic-Kr78-Gauss6: inelastic scattering using Newtonian kinetics and 6-th
 
 in.inelastic-Kr78.rel: inelastic scattering using relativistic kinetics and adaptive 
   quadrature.  The output file is out.inelastic-Kr78.
+
+in.capture: for capture of an incident neutron by a proton.  The data are for the
+  outgoing deuteron, with the photon as the residual.  The output file is out.capture.

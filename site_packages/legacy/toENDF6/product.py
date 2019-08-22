@@ -61,12 +61,17 @@
 # 
 # <<END-copyright>>
 
-from PoPs import misc as miscPoPsModule
+from PoPs.groups import misc as chemicalElementMiscPoPsModule
 from PoPs import IDs as IDsPoPsModule
 
-from fudge.gnd import tokens as tokensModule
-from fudge.gnd import product as productModule
-from fudge.gnd.productData.distributions import unspecified as unspecifiedModule 
+from fudge.gnds import tokens as tokensModule
+from fudge.gnds import product as productModule
+from fudge.gnds.productData.distributions import unspecified as unspecifiedModule
+
+from xData import standards as standardsModule
+
+from . import gndsToENDF6 as gndsToENDF6Module
+from . import endfFormats as endfFormatsModule
 
 def toENDF6( self, MT, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
 
@@ -86,30 +91,28 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
         elif( self.getAttribute( 'emissionMode' ) == 'total' ) :
                 targetInfo['totalNubar'] = getPromptOrTotalNubar( self )
 
-    if( flags['verbosity'] >= 10 ) : print '%s%s: label = %s: to ENDF6:' % ( verbosityIndent, self.id, self.label )
+    if( flags['verbosity'] >= 10 ) : print( '%s%s: label = %s: to ENDF6:' % ( verbosityIndent, self.id, self.label ) )
     priorMF6flag = targetInfo['doMF4AsMF6']
-    if( self.attributes.get( 'ENDFconversionFlag' ) == 'MF6' ) :
+    conversionFlag = targetInfo['ENDFconversionFlags'].get(self,"")
+    if( conversionFlag == 'MF6' ) :
         targetInfo['doMF4AsMF6'] = True # flag was set in reaction.py, but may need to be overwritten
 
     gammasPresent = False
     if( self.outputChannel is not None ) :
         for product in self.outputChannel : gammasPresent = gammasPresent or ( product.id == IDsPoPsModule.photon )
     if( len( self.distribution ) or gammasPresent ) :        # First part should now always be true.
-        distribution = self.distribution[targetInfo['style']]
-        doDistribution = True
-        if( isinstance( distribution, unspecifiedModule.form ) ) :
-            if( ( MT not in [ 527, 528 ] ) or ( self.id != IDsPoPsModule.electron ) ) : doDistribution = False
-        if( doDistribution ) :
-            targetInfo['zapID'] = self.id
-            particle = targetInfo['reactionSuite'].PoPs[self.id]
-            ZA = miscPoPsModule.ZA( particle )
-            try :
-                targetInfo['particleMass'] = targetInfo['massTracker'].getMassAWR( ZA, asTarget = False )
-            except :
-                pass
-            targetInfo['multiplicity'] = self.multiplicity
-            if not (self.getAttribute('ENDFconversionFlag') == 'implicitProduct'):
-                self.distribution.toENDF6( MT, endfMFList, flags, targetInfo )
+        targetInfo['zapID'] = self.id
+        particle = targetInfo['reactionSuite'].PoPs[self.id]
+        ZA = chemicalElementMiscPoPsModule.ZA( particle )
+        try :
+            targetInfo['particleMass'] = targetInfo['massTracker'].getMassAWR( ZA, asTarget = False )
+        except :
+            pass
+        targetInfo['multiplicity'] = self.multiplicity
+        if conversionFlag != 'implicitProduct':
+            self.distribution.toENDF6( MT, endfMFList, flags, targetInfo )
+        if MT in (527, 528) and targetInfo['style'] in self.energyDeposition:
+            energyLoss(self, MT, endfMFList, flags, targetInfo)
     if( self.outputChannel is not None ) :
         priorIndex, priorToken, priorLabel = targetInfo['productIndex'], targetInfo['productToken'], targetInfo['productLabel']
         for index, product in enumerate( self.outputChannel ) :
@@ -124,3 +127,18 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
     targetInfo['doMF4AsMF6'] = priorMF6flag
 
 productModule.product.toENDF6 = toENDF6
+
+def energyLoss( self, MT, endfMFList, flags, targetInfo ) :
+
+    energyLoss = self.energyDeposition[ targetInfo['style'] ]
+    data = [ [ energyLoss.domainMin, energyLoss.domainMin ], [ energyLoss.domainMax, energyLoss.domainMax ] ]
+    energyLoss = energyLoss.__class__( data = data, axes = energyLoss.axes ) - energyLoss
+    data = []
+    for xy in energyLoss.copyDataToXYs( ) : data += xy
+    NE = len( energyLoss )
+    EInInterpolation = gndsToENDF6Module.gndsToENDFInterpolationFlag( energyLoss.interpolation )
+    ENDFDataList = [ endfFormatsModule.endfContLine( 0, 0, 0, 0, 1, NE ) ] + \
+            endfFormatsModule.endfInterpolationList( [ NE, EInInterpolation ] )
+    ENDFDataList += endfFormatsModule.endfDataList( data )
+    frame = standardsModule.frames.labToken
+    gndsToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, 8, frame, ENDFDataList )

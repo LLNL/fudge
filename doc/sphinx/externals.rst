@@ -13,7 +13,7 @@ Also known as physicalQuantitiesWithUncertainties, this is a Python package for 
 
 numericalFunctions
 ------------------
-A package written primarily in C that handles many of the low-level data containers used by ``Fudge`` and GND.
+A package written primarily in C that handles many of the low-level data containers used by ``Fudge`` and GNDS.
 Documentation is available :download:`here <../../numericalFunctions/Doc/ptwXY.pdf>`
 
 xData

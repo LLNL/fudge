@@ -66,18 +66,18 @@
 usage = """
 >rePrint.py ENDF-formatted-file.endf [MT]
 
-rePrint translates an ENDF file to the new GND format. If MT is given, only translate the specified MT.
+rePrint translates an ENDF file to the new GNDS format. If MT is given, only translate the specified MT.
 """
 
 import sys, os, shutil
 binDir = os.path.dirname( os.path.abspath( __file__ ) )
 sys.path.insert( 0, os.path.dirname( binDir ) )
 
-import site_packages.legacy.toENDF6.toENDF6     # this import adds 'toENDF6' methods to many GND classes
+import site_packages.legacy.toENDF6.toENDF6     # this import adds 'toENDF6' methods to many GNDS classes
 import site_packages.legacy.toENDF6.endfFormats as endfFormatsModule
 
-from fudge.legacy.converting import endfFileToGND
-from fudge.legacy.converting.ENDFToGND import endfFileToGNDMisc
+from fudge.legacy.converting import endfFileToGNDS
+from fudge.legacy.converting.ENDFToGNDS import endfFileToGNDSMisc
 from fudge.core.utilities import subprocessing
 
 def process_args( ) :       # see https://docs.python.org/2/howto/argparse.html
@@ -85,22 +85,22 @@ def process_args( ) :       # see https://docs.python.org/2/howto/argparse.html
     from argparse import ArgumentParser
 
     parser = ArgumentParser( description=usage )
-    parser.add_argument( 'inputFile', type=str, help='ENDF-6 file to translate to/from GND')
+    parser.add_argument( 'inputFile', type=str, help='ENDF-6 file to translate to/from GNDS')
     parser.add_argument( 'MT', type=int, nargs="?", default=None )
     parser.add_argument( '-v', '--verbose', default = 0, action = "count",
                         help = "enable verbose output")
     parser.add_argument( '--verboseWarnings', default = False, action = "store_true",
                         help = "increase detail for warnings" )
     parser.add_argument( '-x', '--xmlOnly', default=False, action="store_true",
-                        help = "only translate ENDF to GND/Python and write xml files. Do not re-write endf file" )
+                        help = "only translate ENDF to GNDS/Python and write xml files. Do not re-write endf file" )
     parser.add_argument( '-t', '--translateOnly', default=False, action="store_true",
-                        help = "only translate ENDF to GND/Python, do not write any files" )
+                        help = "only translate ENDF to GNDS/Python, do not write any files" )
     parser.add_argument( "-c", '--checkCovars', default = False, action = "store_true",
                         help = "enable covariance checking" )
     parser.add_argument( "-s", "--skipBadData", default = False, action = "store_true",
                         help = "Recover from format errors if possible" )
     parser.add_argument( "-o", "--outline", default = False, action = "store_true",
-                        help = "Set outline option to True for GND/XML output" )
+                        help = "Set outline option to True for GNDS/XML output" )
     parser.add_argument( "--skipCovariances", default = False, action = "store_true",
                         help = "Do not translate covariance data" )
     parser.add_argument( "--skipReconstruction", default = False, action = "store_true",
@@ -112,8 +112,8 @@ def process_args( ) :       # see https://docs.python.org/2/howto/argparse.html
                         help = "Skip unnormalizeable continuum gamma distributions" )
     parser.add_argument( "--ignoreBadDate", default = False, action = "store_true",
                         help = "If true ignore malformed date in MF=1 MT=")
-    parser.add_argument( "--ignoreMF10Fission", default = False, action = "store_true",
-                        help = "Skip MF=8/10 MT=18 data (unofficial format used in ENDF-VIII W candidates)" )
+    parser.add_argument( "--acceptBadMF10FissionZAP", default = False, action = "store_true",
+                        help = "allow MF=10 MT=18 IZAP=0" )
     parser.add_argument( "--output", default = 'test', dest='outputFile',
                         help = "Prefix for resulting endf6 output file names" )
 
@@ -126,7 +126,7 @@ subprocessing.deleteFilesUsingGlob( args.outputFile + '.endf6*' )
 if( args.MT is None ) :
     shutil.copy2( args.inputFile, args.outputFile + '.endf6.orig2' )
 else :
-    header, MAT, MTDatas = endfFileToGNDMisc.parseENDFByMT_MF( args.inputFile, stripMATMFMTCount = False )
+    header, MAT, MTDatas = endfFileToGNDSMisc.parseENDFByMT_MF( args.inputFile, stripMATMFMTCount = False )
     f = open( args.outputFile + '.endf6.orig2', 'w' )
     f.write( header + '\n' )
     MTs = [ 451, args.MT ]
@@ -162,11 +162,11 @@ flags = { 'verbosity' : 0 }
 subprocessing.executeCommand( [ 'python', os.path.join( binDir, 'reForm.py' ), args.outputFile + '.endf6.orig2', args.outputFile + '.endf6.orig' ] )
 subprocessing.deleteFilesUsingGlob( args.outputFile + '.endf6.orig2' )
 style = 'eval'
-rce = endfFileToGND.endfFileToGND( args.inputFile, singleMTOnly = args.MT, toStdOut = args.verbose,
+rce = endfFileToGNDS.endfFileToGNDS( args.inputFile, singleMTOnly = args.MT, toStdOut = args.verbose,
                                    skipBadData = args.skipBadData, doCovariances = not( args.skipCovariances ),
                                    verboseWarnings = args.verboseWarnings, verbose = args.verbose,
                                    printBadNK14 = args.printBadNK14, continuumSpectraFix = args.continuumSpectraFix,
-                                   ignoreBadDate = args.ignoreBadDate, ignoreMF10Fission = args.ignoreMF10Fission,
+                                   ignoreBadDate = args.ignoreBadDate, acceptBadMF10FissionZAP = args.acceptBadMF10FissionZAP,
                                    reconstructResonances = not args.skipReconstruction )
 errs = rce['errors']
 if( 'reactionSuite' in rce ) :
@@ -186,21 +186,27 @@ if( 'reactionSuite' in rce ) :
     with open( args.outputFile + '.endf6', 'w' ) as fout:
         fout.write( reactions.toENDF6( style, flags, covarianceSuite = covariances ) )
 
-    subprocessing.executeCommand( [ 'python', os.path.join( binDir, 'noLineNumbers.py' ), args.outputFile + '.endf6', args.outputFile + '.endf6.noLineNumbers' ] )
-    subprocessing.executeCommand( [ 'python', os.path.join( binDir, 'noLineNumbers.py' ), args.outputFile + '.endf6.orig', args.outputFile + '.endf6.orig.noLineNumbers' ] )
-    subprocessing.deleteFilesUsingGlob( args.outputFile + '.endf6.orig.noLineNumbers[0-9]*' )
-    if( True ) : subprocessing.executeCommand( [ 'rm', '-f', args.outputFile + '.endf6', args.outputFile + '.endf6.orig', args.outputFile + '.endf6.orig.noLineNumbers.clean' ] )
-elif( 'element' in rce ) :
-    element = rce['element']
-    f = open( args.outputFile + '.endf6.xml', 'w' )
-    f.write( '\n'.join( element.toXMLList( outline = args.outline ) + [ '' ] ) )
-    f.close( )
+elif( 'fissionFragmentData' in rce ) :
+    fissionFragmentData = rce['fissionFragmentData']
+    fOut = open( args.outputFile + '.endf6.xml', 'w' )
+    fOut.write( fissionFragmentData.toXML( ) + '\n' )
+    fOut.close( )
+    sys.exit( 0 )
+
 elif( 'PoPs' in rce ) :
     pops = rce['PoPs']
-    f = open( args.outputFile + '.endf6.xml', 'w' )
-    f.write( '\n'.join( pops.toXMLList( outline = args.outline ) + [ '' ] ) )
-    f.close( )
+    pops.saveToFile( args.outputFile + '.endf6.xml', outline = args.outline )
+
+    if( args.verbose ) : flags['verbosity'] = 31
+    with open( args.outputFile + '.endf6', 'w' ) as fout:
+        fout.write( pops.toENDF6( style, flags ) )
+
 else :
-    raise Exception( 'Unsupported return from endfFileToGND.endfFileToGND' )
+    raise Exception( 'Unsupported return from endfFileToGNDS.endfFileToGNDS' )
+
+subprocessing.executeCommand( [ 'python', os.path.join( binDir, 'noLineNumbers.py' ), args.outputFile + '.endf6', args.outputFile + '.endf6.noLineNumbers' ] )
+subprocessing.executeCommand( [ 'python', os.path.join( binDir, 'noLineNumbers.py' ), args.outputFile + '.endf6.orig', args.outputFile + '.endf6.orig.noLineNumbers' ] )
+subprocessing.deleteFilesUsingGlob( args.outputFile + '.endf6.orig.noLineNumbers[0-9]*' )
+if( True ) : subprocessing.executeCommand( [ 'rm', '-f', args.outputFile + '.endf6', args.outputFile + '.endf6.orig', args.outputFile + '.endf6.orig.noLineNumbers.clean' ] )
 
 sys.exit( len( errs ) )

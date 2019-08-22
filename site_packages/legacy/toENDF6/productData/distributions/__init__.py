@@ -70,5 +70,5 @@ import KalbachMann
 import photonScattering
 import uncorrelated
 import reference
-import unknown
+import unspecified
 # import Legendre

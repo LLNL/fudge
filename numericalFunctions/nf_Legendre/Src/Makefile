@@ -64,8 +64,8 @@
 NUMERICALFUNCTIONS_PATH = ../..
 NUMERICALFUNCTIONS_INCLUDE_PATH = $(NUMERICALFUNCTIONS_PATH)/include
 
-CFLAGS = -g -O0 -Wall
-localCFLAGS = $(CFLAGS) $(nf_LegendreCFLAGS) -I$(NUMERICALFUNCTIONS_INCLUDE_PATH) -I$(SMR_PATH)/include
+localCFLAGS = $(CFLAGS) -I$(NUMERICALFUNCTIONS_INCLUDE_PATH) -I$(SMR_PATH)/include
+
 objects = nf_Legendre.o nf_Legendre_GaussianQuadrature.o
 
 .PHONY: default clean realclean

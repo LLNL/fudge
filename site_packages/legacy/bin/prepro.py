@@ -70,14 +70,14 @@ sys.path.insert( 0, os.path.dirname( binDir ) )
 from pqu import PQU as PQUModule
 from xData import standards as standardsModule
 
-import site_packages.legacy.toENDF6.toENDF6     # this import adds 'toENDF6' methods to many GND classes
+import site_packages.legacy.toENDF6.toENDF6     # this import adds 'toENDF6' methods to many GNDS classes
 import site_packages.legacy.toENDF6.endfFormats as endfFormatsModule
 
-from fudge.legacy.converting import endfFileToGND
-from fudge.legacy.converting.ENDFToGND import endfFileToGNDMisc
+from fudge.legacy.converting import endfFileToGNDS
+from fudge.legacy.converting.ENDFToGNDS import endfFileToGNDSMisc
 
-from fudge.gnd import sums as sumsModule
-from fudge.gnd.reactionData import crossSection as crossSectionModule
+from fudge.gnds import sums as sumsModule
+from fudge.gnds.reactionData import crossSection as crossSectionModule
 
 from argparse import ArgumentParser
 
@@ -103,9 +103,9 @@ __doc__ = usage
 
 parser = ArgumentParser( description = usage )
 parser.add_argument( 'inputFile', type = str,
-        help = 'ENDF-6 file to translate to GND and write back to ENDF with PREPRO-like changes.')
+        help = 'ENDF-6 file to translate to GNDS and write back to ENDF with PREPRO-like changes.')
 parser.add_argument( '-s', '--skipBadData', default = False, action = 'store_true',
-        help = 'Recover from format errors if possible when converting ENDF to GND.' )
+        help = 'Recover from format errors if possible when converting ENDF to GNDS.' )
 parser.add_argument( '-t', '--temperature', default = 0, action = 'store', type = float,
         help = '''Set the temperature to heat cross section to. "k" times temperature (i.e., "k * T") 
         unit is assumed to be the same as the incident energy unit (e.g., "eV" for an ENDF file).''' )
@@ -119,8 +119,8 @@ parser.add_argument( '-r', '--useRedsFloatFormat', default = True, action = 'sto
         help = '''If True (default) write floats to the ENDF file using Red Cullen's high precision format.''' )
 parser.add_argument( '-d', '--debug', default = False, action = 'store_true',
         help = 'Reread the outputted ENDF file to see if it is okay. This is for debugging.' )
-parser.add_argument( '-g', '--gnd', default = False, action = 'store_true',
-        help = 'Write out GND file. This is for debugging.' )
+parser.add_argument( '-g', '--gnds', default = False, action = 'store_true',
+        help = 'Write out GNDS file. This is for debugging.' )
 
 args = parser.parse_args()
 
@@ -130,13 +130,13 @@ if( args.verbose ) :
         print "%s = %s" % ( key, getattr( args, key ) )
 
 evaluatedStyle = 'eval'
-rce = endfFileToGND.endfFileToGND( args.inputFile, toStdOut = args.verbose, skipBadData = args.skipBadData, 
+rce = endfFileToGNDS.endfFileToGNDS( args.inputFile, toStdOut = args.verbose, skipBadData = args.skipBadData,
                                    doCovariances = False, verboseWarnings = False, 
                                    printBadNK14 = args.printBadNK14, continuumSpectraFix = args.continuumSpectraFix )
 
 
 reactionSuite = rce['reactionSuite']
-if( args.gnd ) : reactionSuite.saveToFile( 'test.endf6.xml' )
+if( args.gnds ) : reactionSuite.saveToFile( 'test.endf6.xml' )
 
 if( args.verbose ) : print 'Performing PREPRO operations.'
 temperature = PQUModule.PQU( args.temperature, "%s / k" % reactionSuite.reactions[0].crossSection.domainUnit )
@@ -186,6 +186,6 @@ with open( outputFileName, 'w' ) as fout :
 
 if( args.debug ) : 
     if( args.verbose ) : print 'Debugging.'
-    endfFileToGND.endfFileToGND( args.inputFile, toStdOut = args.verbose, skipBadData = args.skipBadData,
+    endfFileToGNDS.endfFileToGNDS( args.inputFile, toStdOut = args.verbose, skipBadData = args.skipBadData,
                                  doCovariances = False, verboseWarnings = False,
                                  printBadNK14 = args.printBadNK14, continuumSpectraFix = args.continuumSpectraFix )

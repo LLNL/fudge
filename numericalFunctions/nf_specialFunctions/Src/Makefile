@@ -64,8 +64,7 @@
 NUMERICALFUNCTIONS_PATH = ../..
 NUMERICALFUNCTIONS_INCLUDE_PATH = $(NUMERICALFUNCTIONS_PATH)/include
 
-CFLAGS = -g -O0 -Wall
-localCFLAGS = $(CFLAGS) $(NFUCFLAGS) -I$(NUMERICALFUNCTIONS_INCLUDE_PATH) -I$(SMR_PATH)/include
+localCFLAGS = $(CFLAGS) -I$(NUMERICALFUNCTIONS_INCLUDE_PATH) -I$(SMR_PATH)/include
 
 objects = nf_exponentialIntegral.o nf_gammaFunctions.o nf_incompleteGammaFunctions.o nf_polevl.o nf_angularMomentumCoupling.o
 

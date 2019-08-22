@@ -61,7 +61,7 @@
 # 
 # <<END-copyright>>
 
-SHELL = /bin/ksh
+SHELL = /bin/sh
 
 .PHONY: default lib include check clean realclean doSubDirs
 

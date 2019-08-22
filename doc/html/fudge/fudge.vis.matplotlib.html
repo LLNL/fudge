@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.vis.matplotlib package &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.vis.matplotlib package &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -30,7 +27,7 @@
     <link rel="next" title="numericalFunctions Package" href="numericalFunctions.html" />
     <link rel="prev" title="fudge.vis.gnuplot package" href="fudge.vis.gnuplot.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -46,7 +43,7 @@
         <li class="right" >
           <a href="fudge.vis.gnuplot.html" title="fudge.vis.gnuplot package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="fudge.vis.html" accesskey="U">fudge.vis package</a> &#187;</li> 
       </ul>
@@ -98,8 +95,8 @@
 (and also toPointwise_withLinearXYs if infill is True).</li>
 <li>uncertainty: the uncertainty on the data as either a list of [ x, y ] pairs or as an object that has
 the method evaluate.</li>
-<li>dataType (&#8216;scatter&#8217;, &#8216;line&#8217;, or None): by default lists of points are rendered as &#8216;scatter&#8217; and the
-others as &#8216;line&#8217;.  Override the default behavior with this keyword.</li>
+<li>dataType (‘scatter’, ‘line’, or None): by default lists of points are rendered as ‘scatter’ and the
+others as ‘line’.  Override the default behavior with this keyword.</li>
 <li>xUnits: If the data object has an axes member, units are taken from it. Otherwise this argument is used
 to for the x units. When the units are given as None and the data/uncertainty do not have an axes member
 units are assumed to match those of the plot axis. The default is None.</li>
@@ -116,7 +113,7 @@ DataSetParameters.</p>
 <dl class="method">
 <dt id="fudge.vis.matplotlib.plot2d.DataSet2d.convertUnits">
 <code class="descname">convertUnits</code><span class="sig-paren">(</span><em>xUnit=None</em>, <em>yUnit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet2d.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet2d.convertUnits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert self&#8217;s units to xUnit and yUnit</p>
+<dd><p>Convert self’s units to xUnit and yUnit</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -141,14 +138,14 @@ DataSetParameters.</p>
 <dl class="method">
 <dt id="fudge.vis.matplotlib.plot2d.DataSet3d.addToPlot">
 <code class="descname">addToPlot</code><span class="sig-paren">(</span><em>thePlot</em>, <em>plotType='contour'</em>, <em>numContours=10</em>, <em>logX=False</em>, <em>logY=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet3d.addToPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet3d.addToPlot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Default plotType set to &#8216;contour&#8217; so that can use the __makePlot2d function to drive both the regular 
+<dd><p>Default plotType set to ‘contour’ so that can use the __makePlot2d function to drive both the regular 
 2d plotting and contour plotting</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.vis.matplotlib.plot2d.DataSet3d.convertUnits">
 <code class="descname">convertUnits</code><span class="sig-paren">(</span><em>xUnit=None</em>, <em>yUnit=None</em>, <em>zUnit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSet3d.convertUnits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSet3d.convertUnits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert self&#8217;s units to xUnit and yUnit and zUnit</p>
+<dd><p>Convert self’s units to xUnit and yUnit and zUnit</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -167,10 +164,10 @@ DataSetParameters.</p>
 <dt id="fudge.vis.matplotlib.plot2d.DataSetParameters">
 <em class="property">class </em><code class="descclassname">fudge.vis.matplotlib.plot2d.</code><code class="descname">DataSetParameters</code><span class="sig-paren">(</span><em>legend=''</em>, <em>symbol=None</em>, <em>symbolSize=5</em>, <em>color=None</em>, <em>lineStyle=None</em>, <em>lineWidth=None</em>, <em>errorbarCapSize=3</em>, <em>errorbarLineWidth=1.5</em>, <em>errorbarColor=None</em>, <em>formatString=None</em>, <em>dataType=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fudge/vis/matplotlib/plot2d.html#DataSetParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.DataSetParameters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Base class for all DataSet classes (DataSet2d, DataSet3d, ...)</p>
+<p>Base class for all DataSet classes (DataSet2d, DataSet3d, …)</p>
 <p>Member data (set these with __init__ function):</p>
 <ul class="simple">
-<li>legend (optional, defaults to &#8216;&#8217;)</li>
+<li>legend (optional, defaults to ‘’)</li>
 <li>symbol</li>
 <li>symbolColor</li>
 <li>symbolSize</li>
@@ -229,7 +226,7 @@ using an html hex string, as in:</p>
 </pre></div>
 </div>
 <p>or you can pass an R , G , B tuple, where each of R , G , B are in the range [0,1].
-Finally, legal html names for colors, like &#8220;red&#8221;, &#8220;burlywood&#8221; and &#8220;chartreuse&#8221; are 
+Finally, legal html names for colors, like “red”, “burlywood” and “chartreuse” are 
 supported.</p>
 <p>The following format string characters are accepted to control the line style or 
 marker:</p>
@@ -245,82 +242,82 @@ marker:</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&#8216;-&#8216;</td>
+<tr class="row-even"><td>‘-‘</td>
 <td>solid line style</td>
 </tr>
-<tr class="row-odd"><td>&#8216;&#8211;&#8217;</td>
+<tr class="row-odd"><td>‘–’</td>
 <td>dashed line style</td>
 </tr>
-<tr class="row-even"><td>&#8216;-.&#8217;</td>
+<tr class="row-even"><td>‘-.’</td>
 <td>dash-dot line style</td>
 </tr>
-<tr class="row-odd"><td>&#8216;:&#8217;</td>
+<tr class="row-odd"><td>‘:’</td>
 <td>dotted line style</td>
 </tr>
-<tr class="row-even"><td>&#8216;.&#8217;</td>
+<tr class="row-even"><td>‘.’</td>
 <td>point marker</td>
 </tr>
-<tr class="row-odd"><td>&#8216;,&#8217;</td>
+<tr class="row-odd"><td>‘,’</td>
 <td>pixel marker</td>
 </tr>
-<tr class="row-even"><td>&#8216;o&#8217;</td>
+<tr class="row-even"><td>‘o’</td>
 <td>circle marker</td>
 </tr>
-<tr class="row-odd"><td>&#8216;v&#8217;</td>
+<tr class="row-odd"><td>‘v’</td>
 <td>triangle_down marker</td>
 </tr>
-<tr class="row-even"><td>&#8216;^&#8217;</td>
+<tr class="row-even"><td>‘^’</td>
 <td>triangle_up marker</td>
 </tr>
-<tr class="row-odd"><td>&#8216;&lt;&#8217;</td>
+<tr class="row-odd"><td>‘&lt;’</td>
 <td>triangle_left marker</td>
 </tr>
-<tr class="row-even"><td>&#8216;&gt;&#8217;</td>
+<tr class="row-even"><td>‘&gt;’</td>
 <td>triangle_right marker</td>
 </tr>
-<tr class="row-odd"><td>&#8216;1&#8217;</td>
+<tr class="row-odd"><td>‘1’</td>
 <td>tri_down marker</td>
 </tr>
-<tr class="row-even"><td>&#8216;2&#8217;</td>
+<tr class="row-even"><td>‘2’</td>
 <td>tri_up marker</td>
 </tr>
-<tr class="row-odd"><td>&#8216;3&#8217;</td>
+<tr class="row-odd"><td>‘3’</td>
 <td>tri_left marker</td>
 </tr>
-<tr class="row-even"><td>&#8216;4&#8217;</td>
+<tr class="row-even"><td>‘4’</td>
 <td>tri_right marker</td>
 </tr>
-<tr class="row-odd"><td>&#8216;s&#8217;</td>
+<tr class="row-odd"><td>‘s’</td>
 <td>square marker</td>
 </tr>
-<tr class="row-even"><td>&#8216;p&#8217;</td>
+<tr class="row-even"><td>‘p’</td>
 <td>pentagon marker</td>
 </tr>
-<tr class="row-odd"><td>&#8216;*&#8217;</td>
+<tr class="row-odd"><td>‘*’</td>
 <td>star marker</td>
 </tr>
-<tr class="row-even"><td>&#8216;h&#8217;</td>
+<tr class="row-even"><td>‘h’</td>
 <td>hexagon1 marker</td>
 </tr>
-<tr class="row-odd"><td>&#8216;H&#8217;</td>
+<tr class="row-odd"><td>‘H’</td>
 <td>hexagon2 marker</td>
 </tr>
-<tr class="row-even"><td>&#8216;+&#8217;</td>
+<tr class="row-even"><td>‘+’</td>
 <td>plus marker</td>
 </tr>
-<tr class="row-odd"><td>&#8216;x&#8217;</td>
+<tr class="row-odd"><td>‘x’</td>
 <td>x marker</td>
 </tr>
-<tr class="row-even"><td>&#8216;D&#8217;</td>
+<tr class="row-even"><td>‘D’</td>
 <td>diamond marker</td>
 </tr>
-<tr class="row-odd"><td>&#8216;d&#8217;</td>
+<tr class="row-odd"><td>‘d’</td>
 <td>thin_diamond marker</td>
 </tr>
-<tr class="row-even"><td>&#8216;|&#8217;</td>
+<tr class="row-even"><td>‘|’</td>
 <td>vline marker</td>
 </tr>
-<tr class="row-odd"><td>&#8216;_&#8217;</td>
+<tr class="row-odd"><td>‘_’</td>
 <td>hline marker</td>
 </tr>
 </tbody>
@@ -347,7 +344,7 @@ marker:</p>
 <dl class="data">
 <dt id="fudge.vis.matplotlib.plot2d.INCLASSAXISSETTING">
 <code class="descclassname">fudge.vis.matplotlib.plot2d.</code><code class="descname">INCLASSAXISSETTING</code><em class="property"> = False</em><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.INCLASSAXISSETTING" title="Permalink to this definition">¶</a></dt>
-<dd><p>A few words about MatPlotLib symbols (&#8220;markers&#8221; in MatPlotLib-speak)...</p>
+<dd><p>A few words about MatPlotLib symbols (“markers” in MatPlotLib-speak)…</p>
 <p>.    point
 ,    pixel
 o    circle
@@ -355,22 +352,22 @@ v    triangle_down
 ^    triangle_up
 &lt;    triangle_left
 &gt;    triangle_right
-1    tri_down &#8211; DAB 11/17/2014: doesn&#8217;t show up
-2    tri_up &#8211; DAB 11/17/2014: doesn&#8217;t show up
-3    tri_left &#8211; DAB 11/17/2014: doesn&#8217;t show up
-4    tri_right &#8211; DAB 11/17/2014: doesn&#8217;t show up
+1    tri_down – DAB 11/17/2014: doesn’t show up
+2    tri_up – DAB 11/17/2014: doesn’t show up
+3    tri_left – DAB 11/17/2014: doesn’t show up
+4    tri_right – DAB 11/17/2014: doesn’t show up
 8    octagon
 s    square
 p    pentagon
 *    star
 h    hexagon1
 H    hexagon2
-+    plus &#8211; DAB 11/17/2014: barely visable
-x    x &#8211; DAB 11/17/2014: barely visable
++    plus – DAB 11/17/2014: barely visable
+x    x – DAB 11/17/2014: barely visable
 D    diamond
 d    thin_diamond
-|    vline &#8211; DAB 11/17/2014: doesn&#8217;t show up
-_    hline &#8211; DAB 11/17/2014: doesn&#8217;t show up</p>
+|    vline – DAB 11/17/2014: doesn’t show up
+_    hline – DAB 11/17/2014: doesn’t show up</p>
 </dd></dl>
 
 <dl class="class">
@@ -419,7 +416,7 @@ _    hline &#8211; DAB 11/17/2014: doesn&#8217;t show up</p>
 <li>xAxisSettings (optional)</li>
 <li>yAxisSettings (optional)</li>
 <li>numContours (optional, defaults to 10): number of contours in the plot assuming linear spacing between intervals from the min to max data values</li>
-<li>title (optional, defaults to &#8216;&#8217; )</li>
+<li>title (optional, defaults to ‘’ )</li>
 <li>legendOn (optional, defaults to True)</li>
 <li>outFile (optional)</li>
 </ul>
@@ -439,7 +436,7 @@ if you meant something different.</p>
 <li>zAxisSettings (optional)</li>
 <li>sliceXCoords: a list or value</li>
 <li>sliceYCoords: a list or value</li>
-<li>title (optional, defaults to &#8216;&#8217; )</li>
+<li>title (optional, defaults to ‘’ )</li>
 <li>legendOn (optional, defaults to True)</li>
 <li>outFile (optional)</li>
 </ul>
@@ -448,7 +445,7 @@ if you meant something different.</p>
 <dl class="data">
 <dt id="fudge.vis.matplotlib.plot2d.nLineStyles">
 <code class="descclassname">fudge.vis.matplotlib.plot2d.</code><code class="descname">nLineStyles</code><em class="property"> = 4</em><a class="headerlink" href="#fudge.vis.matplotlib.plot2d.nLineStyles" title="Permalink to this definition">¶</a></dt>
-<dd><p>A few words about MatPlotLib colors....</p>
+<dd><p>A few words about MatPlotLib colors….</p>
 <p>Commands which take color arguments can use several formats to specify the colors. For the basic built-in colors, you can use a single letter</p>
 <p>b: blue
 g: green
@@ -459,11 +456,11 @@ y: yellow
 k: black
 w: white
 Gray shades can be given as a string encoding a float in the 0-1 range, e.g.:</p>
-<p>color = &#8216;0.75&#8217;
+<p>color = ‘0.75’
 For a greater range of colors, you have two options. You can specify the color using an html hex string, as in:</p>
-<p>color = &#8216;#eeefff&#8217;
+<p>color = ‘#eeefff’
 or you can pass an R , G , B tuple, where each of R , G , B are in the range [0,1].</p>
-<p>Finally, legal html names for colors, like &#8216;red&#8217;, &#8216;burlywood&#8217; and &#8216;chartreuse&#8217; are supported.</p>
+<p>Finally, legal html names for colors, like ‘red’, ‘burlywood’ and ‘chartreuse’ are supported.</p>
 </dd></dl>
 
 <dl class="function">
@@ -485,14 +482,14 @@ or you can pass an R , G , B tuple, where each of R , G , B are in the range [0,
 <dd><p>Plot a matrix. Arguments are:
 &#64;matrix (required): 2-dimensional numpy array (or equivalent)
 &#64;energyBoundariesX: list of group boundary edges. If omitted, use matrix indices for axis
-&#64;energyBoundariesY: &#8220;&#8221;. If omitted, use same boundaries as x-axis
+&#64;energyBoundariesY: “”. If omitted, use same boundaries as x-axis
 &#64;title
 &#64;xyTitle: specify x (and optionally y) titles. May be string or tuple of two strings
 &#64;xylog: if True, energyBoundariesX (and Y if different) must also be specified
 &#64;zlog
 &#64;zRange: for plotting a sub-range of z
 &#64;switchY: if True, plot matrix[0,0] at upper left rather than lower left
-&#64;colorMap: select color range for z-axis. Options include &#8216;jet&#8217;, &#8216;jet_r&#8217;, &#8216;correlation&#8217;, etc.
+&#64;colorMap: select color range for z-axis. Options include ‘jet’, ‘jet_r’, ‘correlation’, etc.
 &#64;subplot: matplotlib.axes.AxesSubplot instance (for drawing matrix inside larger figure)</p>
 <p>This prepares a 2-d matrix plot. Use pyplot.show() to view the result.</p>
 </dd></dl>
@@ -565,14 +562,14 @@ or you can pass an R , G , B tuple, where each of R , G , B are in the range [0,
         <li class="right" >
           <a href="fudge.vis.gnuplot.html" title="fudge.vis.gnuplot package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="fudge.vis.html" >fudge.vis package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

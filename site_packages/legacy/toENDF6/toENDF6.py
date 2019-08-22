@@ -65,13 +65,13 @@ from . import reactionSuite
 from . import product
 from . import resonances
 from . import sums
-# from . import xParticle
 
 from . import reactions
 from . import reactionData
 from . import channelData
 from . import covariances
 from . import productData
-from . import differentialCrossSection
 
 from . import thermalScattering
+
+from . import PoPs_toENDF6

@@ -63,6 +63,8 @@
 # 
 # <<END-copyright>>
 
+from PoPs.groups import misc as chemicalElementMiscModule
+
 from PoPs.quantities import quantity as quantityModule
 from PoPs.quantities import mass as massModule
 from PoPs.quantities import spin as spinModule
@@ -71,17 +73,14 @@ from PoPs.quantities import charge as chargeModule
 from PoPs.quantities import halflife as halflifeModule
 from PoPs.quantities import nuclearEnergyLevel as nuclearEnergyLevelModule
 
-from PoPs.families import nucleus as nucleusModule 
-from PoPs.families import nuclearLevel as nuclearLevelModule 
+from PoPs.families import nuclide as nuclideModule 
 
-index = '3'
-name = nucleusModule.levelNameFromIsotopeNameAndIndex( 'o16', index )
-nucleus = nucleusModule.particle( name, index )
+index = 3
+name = chemicalElementMiscModule.nuclideIDFromIsotopeSymbolAndIndex( 'O16', index )
+
+level = nuclideModule.particle( name )
 energy = nuclearEnergyLevelModule.double( 'base', 6917100, quantityModule.stringToPhysicalUnit( 'eV' ) )
-nucleus.energy.add( energy )
-
-name = nucleusModule.levelNameFromIsotopeNameAndIndex( 'O16', index )
-level = nuclearLevelModule.particle( name, nucleus )
+level.nucleus.energy.add( energy )
 
 mass = massModule.double( 'base', 15.99491461956, quantityModule.stringToPhysicalUnit( 'amu' ) )
 level.mass.add( mass )
@@ -100,7 +99,7 @@ level.parity.add( parity )
 
 xmll1 = level.toXML( )
 print xmll1
-level2 = nuclearLevelModule.particle.parseXMLStringAsClass( level.toXML( ) )
+level2 = nuclideModule.particle.parseXMLStringAsClass( level.toXML( ) )
 if( xmll1 != level2.toXML( ) ) : raise Exception( 'Fix me.' )
 
 print level.mass[0].pqu( )

@@ -238,7 +238,7 @@ class XYsnd( baseModule.xDataFunctional ) :
 
         if( extrapolation not in standardsModule.validExtrapolations ) :
             raise ValueError( 'Invalid extrapolation value = "%s"' % extrapolation )
-        position, function1, function2, frac = self.getBoundingSubFunctions( domainValue )
+        position, function1, function2, frac, interpolation, interpolationQualifier = self.getBoundingSubFunctions( domainValue )
         if( position is None ) : raise Exception( "No data to interpolate" )
 
         if( frac <= epsilon ) :             # If close to first point pick it.
@@ -251,8 +251,9 @@ class XYsnd( baseModule.xDataFunctional ) :
             if( position in ( '=', '<', '>' ) ) :
                 if( position != '=' ) :
                     if( extrapolation != standardsModule.flatExtrapolationToken ) :
+                        index = { '<' : 0, '>' : -1 }[position]
                         raise Exception( "evaluation point = %s %s than %s" % 
-                                ( value, { '<' : 'less', '>' : 'greater' }[position], self[0].value ) )
+                                ( value, { '<' : 'less', '>' : 'greater' }[position], self[index].value ) )
                 function = function1.copy( )
                 function.value = value
             else :
@@ -267,8 +268,7 @@ class XYsnd( baseModule.xDataFunctional ) :
                     xy = XYsModule.pointwiseXY_C.unitbaseInterpolate( value, function1.value, function1,
                                                                              function2.value, function2, 0 )
                 else :
-                    f = ( function2.value - value ) / ( function2.value - function1.value )
-                    xy = f * function1 + ( 1. - f ) * function2
+                    xy = ( 1.0 - frac ) * function1 + frac * function2
                 function = function1.returnAsClass( function1, xy, value = value )
         return( function )
 
@@ -348,19 +348,21 @@ class XYsnd( baseModule.xDataFunctional ) :
 
     def getBoundingSubFunctions( self, value ) :
 
-        if( len( self ) == 0 ) : return( None, None, None, None )
+        interpolation = self.interpolation
+        interpolationQualifier = self.interpolationQualifier
+        if( len( self ) == 0 ) : return( None, None, None, None, interpolation, interpolationQualifier )
         if( value < self[0].value ) :
             frac = ( self[0].value - value ) / max( abs( value ), abs( self[0].value ) )
-            return( '<', self[0], None, frac )
+            return( '<', self[0], None, frac, interpolation, interpolationQualifier )
         if( value > self[-1].value ) :
             frac = ( value - self[-1].value ) / max( abs( value ), abs( self[-1].value ) )
-            return( '>', self[-1], None, frac )
+            return( '>', self[-1], None, frac, interpolation, interpolationQualifier )
         for index, functional2 in enumerate( self ) :
             if( functional2.value >= value ) : break
             functional1 = functional2
-        if( value == functional2.value ) : return( '=', functional2, None, 0 )
+        if( value == functional2.value ) : return( '=', functional2, None, 0, interpolation, interpolationQualifier )
         frac = ( value - functional1.value ) / ( functional2.value - functional1.value )
-        return( '', functional1, functional2, frac )
+        return( '', functional1, functional2, frac, interpolation, interpolationQualifier )
 
     def normalize( self, insitu = True, dimension = None ) :
 
@@ -511,7 +513,7 @@ class XYsnd( baseModule.xDataFunctional ) :
             XMLList += self.functionals[-1].toXMLList( indent2, **kwargs )
         else :
             for functional in self.functionals : XMLList += functional.toXMLList( indent2, **kwargs )
-        if( self.uncertainties ) : XMLList += self.uncertainties.toXMLList( indent2, **kwargs )
+        if( self.uncertainty ) : XMLList += self.uncertainty.toXMLList( indent2, **kwargs )
         XMLList[-1] += '</%s>' % self.moniker
         return( XMLList )
 
@@ -544,12 +546,12 @@ class XYsnd( baseModule.xDataFunctional ) :
                 axes = axesModule.axes.parseXMLNode( subElement, xPath, linkData )
 
         multid_xys = cls( axes = axes, **attrs )
-        uncertainties = None
+        uncertainty = None
         for child in xDataElement :
             if( child.tag == axesModule.axes.moniker ) :
                 continue
-            elif( child.tag == uncertaintiesModule.uncertainties.moniker ) :
-                uncertainties = uncertaintiesModule.uncertainties.parseXMLNode( child, xPath, linkData )
+            elif( child.tag == uncertaintiesModule.uncertainty.moniker ) :
+                uncertainty = uncertaintiesModule.uncertainty.parseXMLNode( child, xPath, linkData )
                 continue
             else :
                 subElementClass = None
@@ -560,7 +562,7 @@ class XYsnd( baseModule.xDataFunctional ) :
                 if( subElementClass is None ) : raise TypeError( 'unknown sub-element "%s" in element "%s"' % ( child.tag, cls.moniker ) )
                 xdata = subElementClass.parseXMLNode( child, xPath = xPath, linkData = linkData, axes = axes )
                 multid_xys.append( xdata )
-        if uncertainties is not None: multid_xys.uncertainties = uncertainties
+        if uncertainty is not None: multid_xys.uncertainty = uncertainty
 
         xPath.pop( )
         return( multid_xys )

@@ -61,8 +61,23 @@
 # 
 # <<END-copyright>>
 
+# parallel processing default
+VERSION = PARALLEL
+# uncomment the next line to make serial processing the default
+#VERSION = SERIAL
+
 CXX = g++
+
+ifeq "$(VERSION)" "PARALLEL"
 CXXFLAGS = -Wall -fopenmp
+LINKER = -lm  -lstdc++ -fopenmp
+else ifeq "$(VERSION)" "SERIAL"
+CXXFLAGS = -Wall
+LINKER = -lm  -lstdc++
+else #"$(VERSION)" "DEBUG"
+CXXFLAGS = -Wall -O0 -g
+LINKER = -g -lm  -lstdc++
+endif
 
 ENSCRIPT_SWITCHES = -2rjC -Ecpp --color --mark-wrapped-lines=arrow --line-numbers -H2
 A2PS_SWITCHES = -r --columns=2 -j -C --tabsize=4 --pretty-print=c++ -g -b
@@ -180,239 +195,294 @@ help:
 #-------------------------------------
 
 $(EXE): $(OBJS)
-	$(CXX) $(OBJS) -g -lm  -lstdc++ -fopenmp -o $(EXE)
+	$(CXX) $(OBJS) $(LINKER) -o $(EXE)
 
 version.hpp: $(SOURCES)
 	python create_version_hpp.py
 
+Compton.o: Compton.cpp \
+  Compton.hpp Energy_groups.hpp Eout_integrals.hpp \
+  Legendre_data.hpp coef_vector.hpp data_parser.hpp \
+  dd_vector.hpp global_params.hpp math_util.hpp \
+  max_output_order.hpp messaging.hpp param_base.hpp \
+  quadrature.hpp transfer.hpp x_vector.hpp
+
+Ecm_Elab_geom.o: Ecm_Elab_geom.cpp \
+  Ecm_Elab_geom.hpp Energy_groups.hpp Eout_integrals.hpp \
+  Legendre_data.hpp Vcm_Vlab_Hit.hpp box_geom.hpp \
+  coef_vector.hpp data_parser.hpp dd_vector.hpp \
+  global_params.hpp mappings.hpp math_util.hpp \
+  max_output_order.hpp messaging.hpp param_base.hpp \
+  quadrature.hpp
+
+Energy_groups.o: Energy_groups.cpp \
+  Energy_groups.hpp data_parser.hpp global_params.hpp \
+  messaging.hpp
+
+Eout_integrals.o: Eout_integrals.cpp \
+  Eout_integrals.hpp Legendre_data.hpp coef_vector.hpp \
+  data_parser.hpp dd_vector.hpp global_params.hpp \
+  max_output_order.hpp messaging.hpp
+
+Legendre2Body.o: Legendre2Body.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre2Body.hpp \
+  Legendre_data.hpp angle_dist.hpp box_geom.hpp coef_vector.hpp \
+  data_parser.hpp dd_vector.hpp global_params.hpp mappings.hpp \
+  math_util.hpp max_output_order.hpp messaging.hpp \
+  param_base.hpp quadrature.hpp relativistic.hpp transfer.hpp
+
+Legendre_data.o: Legendre_data.cpp \
+  Legendre_data.hpp data_parser.hpp dd_vector.hpp \
+  global_params.hpp messaging.hpp
+
+MadlandNix.o: MadlandNix.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  MadlandNix.hpp box_geom.hpp coef_vector.hpp data_parser.hpp \
+  dd_vector.hpp energy_function.hpp global_params.hpp \
+  math_util.hpp max_output_order.hpp messaging.hpp \
+  param_base.hpp protos.h quadrature.hpp transfer.hpp
+
+Maxwell.o: Maxwell.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  Maxwell.hpp box_geom.hpp coef_vector.hpp data_parser.hpp \
+  dd_vector.hpp energy_function.hpp evaporation.hpp \
+  global_params.hpp math_util.hpp max_output_order.hpp \
+  messaging.hpp param_base.hpp protos.h quadrature.hpp \
+  transfer.hpp
+
+Vcm_Vlab_Hit.o: Vcm_Vlab_Hit.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  Vcm_Vlab_Hit.hpp box_geom.hpp coef_vector.hpp data_parser.hpp \
+  dd_vector.hpp global_params.hpp mappings.hpp math_util.hpp \
+  max_output_order.hpp messaging.hpp param_base.hpp \
+  quadrature.hpp
+
+Watt.o: Watt.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  Watt.hpp box_geom.hpp coef_vector.hpp data_parser.hpp \
+  dd_vector.hpp energy_function.hpp global_params.hpp \
+  math_util.hpp max_output_order.hpp messaging.hpp \
+  param_base.hpp protos.h quadrature.hpp transfer.hpp
+
+angle_dist.o: angle_dist.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  angle_dist.hpp box_geom.hpp coef_vector.hpp data_parser.hpp \
+  dd_vector.hpp global_params.hpp mappings.hpp math_util.hpp \
+  max_output_order.hpp messaging.hpp param_base.hpp \
+  quadrature.hpp relativistic.hpp transfer.hpp
+
+box_geom.o: box_geom.cpp \
+  box_geom.hpp data_parser.hpp dd_vector.hpp global_params.hpp \
+  messaging.hpp
+
+cm_Legendre.o: cm_Legendre.cpp \
+  Ecm_Elab_geom.hpp Energy_groups.hpp Eout_integrals.hpp \
+  Legendre_data.hpp Vcm_Vlab_Hit.hpp box_geom.hpp \
+  cm_Legendre.hpp coef_vector.hpp cumulative_points.hpp \
+  data_parser.hpp dd_vector.hpp global_params.hpp mappings.hpp \
+  math_util.hpp max_output_order.hpp messaging.hpp \
+  param_base.hpp quadrature.hpp transfer.hpp
+
+coef_vector.o: coef_vector.cpp \
+  Legendre_data.hpp coef_vector.hpp data_parser.hpp \
+  dd_vector.hpp global_params.hpp max_output_order.hpp \
+  messaging.hpp
+
+coherent.o: coherent.cpp \
+   Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  box_geom.hpp coef_vector.hpp coherent.hpp data_parser.hpp \
+  dd_vector.hpp global_params.hpp math_util.hpp \
+  max_output_order.hpp messaging.hpp param_base.hpp \
+  quadrature.hpp transfer.hpp x_vector.hpp
+
+cumulative_points.o: cumulative_points.cpp \
+  cumulative_points.hpp data_parser.hpp dd_vector.hpp \
+  messaging.hpp
+
+data_parser.o: data_parser.cpp \
+  data_parser.hpp messaging.hpp
+
+dd_vector.o: dd_vector.cpp \
+  data_parser.hpp dd_vector.hpp global_params.hpp messaging.hpp
+
+energy_dist.o: energy_dist.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  box_geom.hpp coef_vector.hpp cumulative_points.hpp \
+  data_parser.hpp dd_vector.hpp energy_dist.hpp \
+  energy_dist_base.hpp global_params.hpp math_util.hpp \
+  max_output_order.hpp messaging.hpp param_base.hpp \
+  quadrature.hpp standard_Legendre.hpp transfer.hpp
+
+energy_dist_base.o: energy_dist_base.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  box_geom.hpp coef_vector.hpp cumulative_points.hpp \
+  data_parser.hpp dd_vector.hpp energy_dist_base.hpp \
+  global_params.hpp max_output_order.hpp messaging.hpp \
+  param_base.hpp quadrature.hpp transfer.hpp
+
+energy_function.o: energy_function.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  box_geom.hpp coef_vector.hpp data_parser.hpp dd_vector.hpp \
+  energy_function.hpp global_params.hpp math_util.hpp \
+  max_output_order.hpp messaging.hpp param_base.hpp \
+  quadrature.hpp transfer.hpp
+
+evaporation.o: evaporation.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  box_geom.hpp coef_vector.hpp data_parser.hpp dd_vector.hpp \
+  energy_function.hpp evaporation.hpp global_params.hpp \
+  math_util.hpp max_output_order.hpp messaging.hpp \
+  param_base.hpp protos.h quadrature.hpp transfer.hpp
+
 expn.o: expn.cpp protos.h
+
+gamma2body.o: gamma2body.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  box_geom.hpp coef_vector.hpp data_parser.hpp dd_vector.hpp \
+  gamma2body.hpp gamma_2_body_map.hpp global_params.hpp \
+  mappings.hpp math_util.hpp max_output_order.hpp messaging.hpp \
+  param_base.hpp quadrature.hpp transfer.hpp
+
+gamma_2_body_map.o: gamma_2_body_map.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  coef_vector.hpp data_parser.hpp dd_vector.hpp \
+  gamma_2_body_map.hpp global_params.hpp mappings.hpp \
+  math_util.hpp max_output_order.hpp messaging.hpp \
+  param_base.hpp quadrature.hpp
+
+general_evap.o: general_evap.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  coef_vector.hpp data_parser.hpp dd_vector.hpp \
+  general_evap.hpp global_params.hpp math_util.hpp \
+  max_output_order.hpp messaging.hpp param_base.hpp \
+  quadrature.hpp transfer.hpp
+
+global_params.o: global_params.cpp global_params.hpp \
+  data_parser.hpp messaging.hpp
 
 igam.o: igam.cpp protos.h
 
-mtherr.o: mtherr.cpp protos.h
-
-angle_dist.o: angle_dist.hpp angle_dist.cpp \
-  box_geom.hpp coef_vector.hpp data_parser.hpp dd_vector.hpp \
-  Energy_groups.hpp Eout_integrals.hpp \
-  global_params.hpp Legendre_data.hpp mappings.hpp math_util.hpp \
-  max_output_order.hpp \
-  messaging.hpp param_base.hpp quadrature.hpp relativistic.hpp transfer.hpp
-
-box_geom.o: box_geom.hpp box_geom.cpp dd_vector.hpp global_params.hpp \
-  messaging.hpp
-
-cm_Legendre.o: cm_Legendre.hpp cm_Legendre.cpp box_geom.hpp coef_vector.hpp \
-  cumulative_points.hpp data_parser.hpp dd_vector.hpp Ecm_Elab_geom.hpp \
-  Energy_groups.hpp Eout_integrals.hpp \
-  global_params.hpp Legendre_data.hpp mappings.hpp math_util.hpp \
-  max_output_order.hpp messaging.hpp \
-  quadrature.hpp transfer.hpp Vcm_Vlab_Hit.hpp
-
-coef_vector.o: coef_vector.hpp coef_vector.cpp dd_vector.hpp global_params.hpp \
-  Legendre_data.hpp max_output_order.hpp messaging.hpp
-
-coherent.o: coherent.hpp coherent.cpp  \
-  box_geom.hpp coef_vector.hpp data_parser.hpp dd_vector.hpp \
-  Energy_groups.hpp Eout_integrals.hpp \
-  global_params.hpp math_util.hpp max_output_order.hpp Legendre_data.hpp \
-  max_output_order.hpp messaging.hpp \
-  param_base.hpp quadrature.hpp transfer.hpp x_vector.hpp
-
-Compton.o: Compton.hpp Compton.cpp coef_vector.hpp \
-  data_parser.hpp dd_vector.hpp Energy_groups.hpp Eout_integrals.hpp \
-  global_params.hpp \
-  Legendre_data.hpp math_util.hpp max_output_order.hpp messaging.hpp \
-  param_base.hpp quadrature.hpp \
-  transfer.hpp x_vector.hpp
-
-cumulative_points.o: cumulative_points.hpp cumulative_points.cpp \
-  data_parser.hpp dd_vector.hpp messaging.hpp
-
-data_parser.o: data_parser.hpp data_parser.cpp messaging.hpp
-
-dd_vector.o: dd_vector.cpp dd_vector.hpp data_parser.hpp \
-  global_params.hpp messaging.hpp
-
-Ecm_Elab_geom.o: Ecm_Elab_geom.hpp Ecm_Elab_geom.cpp box_geom.hpp dd_vector.hpp \
-  mappings.hpp math_util.hpp messaging.hpp param_base.hpp Vcm_Vlab_Hit.hpp
-
-energy_dist.o: energy_dist.hpp energy_dist.cpp box_geom.hpp \
-  coef_vector.hpp cumulative_points.hpp data_parser.hpp dd_vector.hpp \
-  energy_dist_base.hpp \
-  Energy_groups.hpp Eout_integrals.hpp global_params.hpp Legendre_data.hpp \
-  math_util.hpp max_output_order.hpp \
-  messaging.hpp param_base.hpp quadrature.hpp standard_Legendre.hpp transfer.hpp
-
-energy_dist_base.o: energy_dist_base.hpp energy_dist_base.cpp box_geom.hpp \
-  coef_vector.hpp cumulative_points.hpp data_parser.hpp dd_vector.hpp \
-  Energy_groups.hpp Eout_integrals.hpp \
-  global_params.hpp Legendre_data.hpp math_util.hpp max_output_order.hpp \
-  messaging.hpp \
-  param_base.hpp quadrature.hpp transfer.hpp
-
-energy_function.o: energy_function.hpp energy_function.cpp box_geom.hpp \
-  coef_vector.hpp data_parser.hpp dd_vector.hpp Energy_groups.hpp \
-  Eout_integrals.hpp \
-  global_params.hpp Legendre_data.hpp math_util.hpp max_output_order.hpp \
-  messaging.hpp \
-  param_base.hpp quadrature.hpp transfer.hpp
-
-Energy_groups.o: Energy_groups.hpp Energy_groups.cpp data_parser.hpp \
-  messaging.hpp
-
-Eout_integrals.o: Eout_integrals.cpp  Eout_integrals.hpp coef_vector.hpp \
-  data_parser.hpp dd_vector.hpp Legendre_data.hpp \
-  math_util.hpp messaging.hpp param_base.hpp
-
-evaporation.o: evaporation.hpp evaporation.cpp protos.h box_geom.hpp \
-  coef_vector.hpp data_parser.hpp dd_vector.hpp energy_function.hpp \
-  Energy_groups.hpp Eout_integrals.hpp global_params.hpp Legendre_data.hpp \
-  math_util.hpp max_output_order.hpp \
-  messaging.hpp param_base.hpp quadrature.hpp transfer.hpp
-
-gamma_2_body_map.o: gamma_2_body_map.hpp gamma_2_body_map.hpp dd_vector.hpp \
-  global_params.hpp mappings.hpp math_util.hpp messaging.hpp
-
-gamma2body.o: gamma2body.hpp gamma2body.cpp \
-  coef_vector.hpp data_parser.hpp dd_vector.hpp Energy_groups.hpp \
-  Eout_integrals.hpp gamma_2_body_map.hpp \
-  global_params.hpp Legendre_data.hpp mappings.hpp math_util.hpp \
-  max_output_order.hpp \
-  messaging.hpp param_base.hpp quadrature.hpp transfer.hpp
-
-general_evap.o: general_evap.hpp general_evap.cpp \
-  coef_vector.hpp data_parser.hpp dd_vector.hpp Energy_groups.hpp \
-  global_params.hpp \
-  Legendre_data.hpp math_util.hpp max_output_order.hpp \
-  messaging.hpp param_base.hpp quadrature.hpp \
+isotropic.o: isotropic.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  box_geom.hpp coef_vector.hpp cumulative_points.hpp \
+  data_parser.hpp dd_vector.hpp energy_dist.hpp \
+  energy_dist_base.hpp global_params.hpp isotropic.hpp \
+  math_util.hpp max_output_order.hpp messaging.hpp \
+  param_base.hpp quadrature.hpp standard_Legendre.hpp \
   transfer.hpp
 
-global_params.o: global_params.cpp global_params.hpp data_parser.hpp \
-  messaging.hpp
+joint_dist.o: joint_dist.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  angle_dist.hpp box_geom.hpp coef_vector.hpp data_parser.hpp \
+  dd_vector.hpp global_params.hpp joint_dist.hpp mappings.hpp \
+  math_util.hpp max_output_order.hpp messaging.hpp \
+  param_base.hpp quadrature.hpp relativistic.hpp transfer.hpp
 
-isotropic.o: isotropic.hpp isotropic.cpp box_geom.hpp \
-  coef_vector.hpp cumulative_points.hpp data_parser.hpp dd_vector.hpp \
-  energy_dist.hpp energy_dist_base.hpp \
-  Energy_groups.hpp Eout_integrals.hpp global_params.hpp Legendre_data.hpp \
-  math_util.hpp max_output_order.hpp \
-  messaging.hpp param_base.hpp quadrature.hpp standard_Legendre.hpp transfer.hpp
+kalbach.o: kalbach.cpp \
+  Ecm_Elab_geom.hpp Energy_groups.hpp Eout_integrals.hpp \
+  Legendre_data.hpp Vcm_Vlab_Hit.hpp box_geom.hpp \
+  coef_vector.hpp data_parser.hpp dd_vector.hpp \
+  global_params.hpp kalbach.hpp kalbach_data.hpp mappings.hpp \
+  math_util.hpp max_output_order.hpp messaging.hpp \
+  param_base.hpp quadrature.hpp transfer.hpp
 
-joint_dist.o: joint_dist.hpp joint_dist.cpp angle_dist.hpp \
-  box_geom.hpp coef_vector.hpp data_parser.hpp dd_vector.hpp Energy_groups.hpp \
-  Eout_integrals.hpp global_params.hpp Legendre_data.hpp mappings.hpp \
-  math_util.hpp max_output_order.hpp messaging.hpp param_base.hpp \
-  quadrature.hpp transfer.hpp
-
-kalbach.o: kalbach.hpp kalbach.cpp box_geom.hpp coef_vector.hpp data_parser.hpp \
-  dd_vector.hpp Ecm_Elab_geom.hpp energy_dist_base.hpp Energy_groups.hpp \
-  Eout_integrals.hpp \
-  global_params.hpp kalbach_data.hpp Legendre_data.hpp mappings.hpp \
-  math_util.hpp max_output_order.hpp messaging.hpp param_base.hpp \
-  quadrature.hpp transfer.hpp \
-  Vcm_Vlab_Hit.hpp
-
-kalbach_data.o: kalbach_data.hpp kalbach_data.cpp data_parser.hpp \
-  dd_vector.hpp mappings.hpp messaging.hpp
-
-Legendre_data.o: Legendre_data.hpp Legendre_data.cpp data_parser.hpp \
-  dd_vector.hpp messaging.hpp
-
-Legendre2Body.o: Legendre2Body.cpp Legendre2Body.hpp angle_dist.hpp  \
-  box_geom.hpp coef_vector.hpp data_parser.hpp dd_vector.hpp \
-  Energy_groups.hpp Eout_integrals.hpp \
-  global_params.hpp Legendre_data.hpp mappings.hpp math_util.hpp \
-  max_output_order.hpp \
-  messaging.hpp param_base.hpp quadrature.hpp relativistic.hpp transfer.hpp
+kalbach_data.o: kalbach_data.cpp \
+  data_parser.hpp dd_vector.hpp global_params.hpp \
+  kalbach_data.hpp mappings.hpp messaging.hpp
 
 # logger.o: logger.cpp logger.hpp data_parser.hpp global_params.hpp version.hpp
 
-mappings.o: mappings.cpp mappings.hpp dd_vector.hpp global_params.hpp \
-  math_util.hpp messaging.hpp
-
-math_util.o: math_util.cpp math_util.hpp coef_vector.hpp data_parser.hpp \
-  dd_vector.hpp  global_params.hpp Legendre_data.hpp max_output_order.hpp \
-  messaging.hpp param_base.hpp \
+mappings.o: mappings.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  coef_vector.hpp data_parser.hpp dd_vector.hpp \
+  global_params.hpp mappings.hpp math_util.hpp \
+  max_output_order.hpp messaging.hpp param_base.hpp \
   quadrature.hpp
 
-MadlandNix.o: MadlandNix.hpp MadlandNix.cpp protos.h box_geom.hpp coef_vector.hpp \
-  data_parser.hpp dd_vector.hpp energy_function.hpp Energy_groups.hpp \
-  Eout_integrals.hpp \
-  evaporation.hpp global_params.hpp Legendre_data.hpp math_util.hpp \
-  max_output_order.hpp messaging.hpp \
-  param_base.hpp quadrature.hpp transfer.hpp
+math_util.o: math_util.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  coef_vector.hpp data_parser.hpp dd_vector.hpp \
+  global_params.hpp math_util.hpp max_output_order.hpp \
+  messaging.hpp param_base.hpp quadrature.hpp
 
-Maxwell.o: Maxwell.hpp Maxwell.cpp protos.h box_geom.hpp coef_vector.hpp \
-  data_parser.hpp dd_vector.hpp energy_function.hpp Energy_groups.hpp \
-  Eout_integrals.hpp \
-  evaporation.hpp global_params.hpp Legendre_data.hpp math_util.hpp \
-  max_output_order.hpp messaging.hpp \
-  param_base.hpp quadrature.hpp transfer.hpp
+messaging.o: messaging.cpp messaging.hpp \
+  global_params.hpp
 
-messaging.o: messaging.cpp messaging.hpp global_params.hpp
+mtherr.o: mtherr.cpp protos.h
 
-param_base.o: param_base.cpp param_base.hpp coef_vector.hpp data_parser.hpp \
-  dd_vector.hpp Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
-  max_output_order.hpp messaging.hpp
+param_base.o: param_base.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  coef_vector.hpp data_parser.hpp dd_vector.hpp \
+  global_params.hpp max_output_order.hpp messaging.hpp \
+  param_base.hpp
 
-phase_space.o: phase_space.hpp phase_space.cpp box_geom.hpp coef_vector.hpp data_parser.hpp \
-  dd_vector.hpp Ecm_Elab_geom.hpp energy_dist_base.hpp Energy_groups.hpp \
-  Eout_integrals.hpp Legendre_data.hpp mappings.hpp \
-  math_util.hpp max_output_order.hpp messaging.hpp param_base.hpp \
-  quadrature.hpp transfer.hpp Vcm_Vlab_Hit.hpp
+phase_space.o: phase_space.cpp \
+  Ecm_Elab_geom.hpp Energy_groups.hpp Eout_integrals.hpp \
+  Legendre_data.hpp Vcm_Vlab_Hit.hpp box_geom.hpp \
+  coef_vector.hpp data_parser.hpp dd_vector.hpp \
+  global_params.hpp mappings.hpp math_util.hpp \
+  max_output_order.hpp messaging.hpp param_base.hpp \
+  phase_space.hpp quadrature.hpp transfer.hpp
 
-reaction.o: reaction.cpp reaction.hpp angle_dist.hpp box_geom.hpp cm_Legendre.hpp \
-  coef_vector.hpp coherent.hpp Compton.hpp cumulative_points.hpp data_parser.hpp \
-  dd_vector.hpp Ecm_Elab_geom.hpp energy_dist.hpp energy_dist_base.hpp \
-  energy_function.hpp Energy_groups.hpp Eout_integrals.hpp evaporation.hpp \
-  gamma_2_body_map.hpp gamma2body.hpp \
-  general_evap.hpp global_params.hpp isotropic.hpp joint_dist.hpp kalbach.hpp \
-  kalbach_data.hpp Legendre_data.hpp Legendre2Body.hpp mappings.hpp \
-  math_util.hpp MadlandNix.hpp max_output_order.hpp \
-  Maxwell.hpp messaging.hpp param_base.hpp phase_space.hpp quadrature.hpp \
-  relativistic.hpp standard_Legendre.hpp transfer.hpp uncorrelated.hpp \
-  Vcm_Vlab_Hit.hpp Watt.hpp x_vector.hpp
+reaction.o: reaction.cpp \
+  Compton.hpp Ecm_Elab_geom.hpp Energy_groups.hpp \
+  Eout_integrals.hpp Legendre2Body.hpp Legendre_data.hpp \
+  MadlandNix.hpp Maxwell.hpp Vcm_Vlab_Hit.hpp Watt.hpp \
+  angle_dist.hpp box_geom.hpp cm_Legendre.hpp coef_vector.hpp \
+  coherent.hpp cumulative_points.hpp data_parser.hpp \
+  dd_vector.hpp energy_dist.hpp energy_dist_base.hpp \
+  energy_function.hpp evaporation.hpp gamma2body.hpp \
+  gamma_2_body_map.hpp general_evap.hpp global_params.hpp \
+  isotropic.hpp joint_dist.hpp kalbach.hpp kalbach_data.hpp \
+  mappings.hpp math_util.hpp max_output_order.hpp messaging.hpp \
+  param_base.hpp phase_space.hpp quadrature.hpp reaction.hpp \
+  relativistic.hpp standard_Legendre.hpp transfer.hpp \
+  uncorrelated.hpp x_vector.hpp
 
-relativistic.o: relativistic.cpp relativistic.hpp dd_vector.hpp global_params.hpp \
-  mappings.hpp math_util.hpp messaging.hpp
+relativistic.o: relativistic.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
+  coef_vector.hpp data_parser.hpp dd_vector.hpp \
+  global_params.hpp mappings.hpp math_util.hpp \
+  max_output_order.hpp messaging.hpp param_base.hpp \
+  quadrature.hpp relativistic.hpp
 
-standard_Legendre.o: standard_Legendre.hpp standard_Legendre.cpp box_geom.hpp \
-  coef_vector.hpp cumulative_points.hpp data_parser.hpp dd_vector.hpp Energy_groups.hpp \
-  Eout_integrals.hpp global_params.hpp Legendre_data.hpp math_util.hpp \
-  max_output_order.hpp messaging.hpp param_base.hpp quadrature.hpp transfer.hpp
-
-transfer.o: transfer.cpp transfer.hpp coef_vector.hpp data_parser.hpp \
-  dd_vector.hpp Energy_groups.hpp global_params.hpp Legendre_data.hpp \
-  max_output_order.hpp messaging.hpp quadrature.hpp 
-
-uncorrelated.o: uncorrelated.hpp uncorrelated.cpp angle_dist.hpp \
+standard_Legendre.o: standard_Legendre.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre_data.hpp \
   box_geom.hpp coef_vector.hpp cumulative_points.hpp \
-  data_parser.hpp dd_vector.hpp energy_dist_base.hpp \
-  energy_dist.hpp Energy_groups.hpp global_params.hpp Legendre_data.hpp \
-  Legendre2Body.hpp mappings.hpp \
-  math_util.hpp max_output_order.hpp messaging.hpp param_base.hpp \
-  quadrature.hpp transfer.hpp
+  data_parser.hpp dd_vector.hpp global_params.hpp math_util.hpp \
+  max_output_order.hpp messaging.hpp param_base.hpp \
+  quadrature.hpp standard_Legendre.hpp transfer.hpp
 
-Vcm_Vlab_Hit.o: Vcm_Vlab_Hit.hpp Vcm_Vlab_Hit.cpp box_geom.hpp \
-  mappings.hpp math_util.hpp messaging.hpp
+transfer.o: transfer.cpp \
+  Energy_groups.hpp Legendre_data.hpp coef_vector.hpp \
+  data_parser.hpp dd_vector.hpp global_params.hpp \
+  max_output_order.hpp messaging.hpp quadrature.hpp \
+  transfer.hpp
 
-Watt.o: Watt.hpp Watt.cpp protos.h box_geom.hpp coef_vector.hpp data_parser.hpp \
-  dd_vector.hpp energy_function.hpp Energy_groups.hpp Eout_integrals.hpp \
-  evaporation.hpp \
-  global_params.hpp Legendre_data.hpp math_util.hpp max_output_order.hpp \
-  messaging.hpp \
-  param_base.hpp quadrature.hpp transfer.hpp
+uncorrelated.o: uncorrelated.cpp \
+  Energy_groups.hpp Eout_integrals.hpp Legendre2Body.hpp \
+  Legendre_data.hpp angle_dist.hpp box_geom.hpp coef_vector.hpp \
+  cumulative_points.hpp data_parser.hpp dd_vector.hpp \
+  energy_dist.hpp energy_dist_base.hpp global_params.hpp \
+  mappings.hpp math_util.hpp max_output_order.hpp messaging.hpp \
+  param_base.hpp quadrature.hpp relativistic.hpp \
+  standard_Legendre.hpp transfer.hpp uncorrelated.hpp
 
-x_vector.o: x_vector.hpp x_vector.cpp data_parser.hpp dd_vector.hpp \
-  global_params.hpp messaging.hpp
+x_vector.o: x_vector.cpp \
+  data_parser.hpp dd_vector.hpp global_params.hpp messaging.hpp \
+  x_vector.hpp
 
-main.o: main.cpp angle_dist.hpp box_geom.hpp cm_Legendre.hpp coef_vector.hpp \
-  coherent.hpp Compton.hpp cumulative_points.hpp data_parser.hpp dd_vector.hpp \
-  Ecm_Elab_geom.hpp energy_dist.hpp energy_dist_base.hpp evaporation.hpp \
-  energy_function.hpp Energy_groups.hpp Eout_integrals.hpp gamma_2_body_map.hpp  \
-  gamma2body.hpp general_evap.hpp \
-  global_params.hpp isotropic.hpp joint_dist.hpp kalbach.hpp kalbach_data.hpp \
-  Legendre_data.hpp Legendre2Body.hpp mappings.hpp math_util.hpp \
-  MadlandNix.hpp max_output_order.hpp \
-  Maxwell.hpp messaging.hpp reaction.hpp param_base.hpp phase_space.hpp \
-  quadrature.hpp relativistic.hpp standard_Legendre.hpp transfer.hpp \
-  uncorrelated.hpp Vcm_Vlab_Hit.hpp Watt.hpp x_vector.hpp
+main.o: main.cpp \
+  Compton.hpp Ecm_Elab_geom.hpp Energy_groups.hpp \
+  Eout_integrals.hpp Legendre2Body.hpp Legendre_data.hpp \
+  MadlandNix.hpp Maxwell.hpp Vcm_Vlab_Hit.hpp Watt.hpp \
+  angle_dist.hpp box_geom.hpp cm_Legendre.hpp coef_vector.hpp \
+  coherent.hpp cumulative_points.hpp data_parser.hpp \
+  dd_vector.hpp energy_dist.hpp energy_dist_base.hpp \
+  energy_function.hpp evaporation.hpp gamma2body.hpp \
+  gamma_2_body_map.hpp general_evap.hpp global_params.hpp \
+  isotropic.hpp joint_dist.hpp kalbach.hpp kalbach_data.hpp \
+  mappings.hpp math_util.hpp max_output_order.hpp messaging.hpp \
+  param_base.hpp phase_space.hpp quadrature.hpp reaction.hpp \
+  relativistic.hpp standard_Legendre.hpp transfer.hpp \
+  uncorrelated.hpp x_vector.hpp

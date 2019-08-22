@@ -70,8 +70,7 @@ from PoPs import database as databaseModule
 from PoPs.families import gaugeBoson as gaugeBosonModule
 from PoPs.families import lepton as leptonModule
 from PoPs.families import baryon as baryonModule
-from PoPs.families import nucleus as nucleusModule
-from PoPs.families import nuclearLevel as nuclearLevelModule
+from PoPs.families import nuclide as nuclideModule
 
 from PoPs.groups import isotope as isotopeModule
 from PoPs.groups import chemicalElement as chemicalElementModule
@@ -105,55 +104,46 @@ database.add( baryon )
 #
 # Test adding a nuclear level to database.
 #
-nucleus = nucleusModule.particle( 'o16_e12', index = '12' )
-level = nuclearLevelModule.particle( 'O16_e12', nucleus )
+level = nuclideModule.particle( 'O16_e12' )
 database.add( level )
 
 #
 # Test adding an isotope to database.
 #
-isotope = isotopeModule.suite( 'N15', '15' )
+isotope = isotopeModule.isotope( 'N15', 15 )
 database.add( isotope )
-nucleus = nucleusModule.particle( 'n15_e5', index = '5' )
-level = nuclearLevelModule.particle( 'N15_e5', nucleus )
+level = nuclideModule.particle( 'N15_e5' )
 database.add( level )
 
 #
 # Test adding a nuclear level to an isotope.
 #
-isotope = database['N15']
-nucleus = nucleusModule.particle( 'n15_e7', index = '7' )
-level = nuclearLevelModule.particle( 'N15_e7', nucleus )
-isotope.add( level )
+level = nuclideModule.particle( 'N15_e7' )
+database.add( level )
 
 #
 # Test adding a chemical element to database.
 #
-chemicalElement = chemicalElementModule.suite( 'Pu', 94, 'Plutonium' )
+chemicalElement = chemicalElementModule.chemicalElement( 'Pu', 94, 'Plutonium' )
 database.add( chemicalElement )
-isotope = isotopeModule.suite( 'Pu238', '238' )
+isotope = isotopeModule.isotope( 'Pu238', 238 )
 database.add( isotope )
-nucleus = nucleusModule.particle( 'pu238_e0', index = '0' )
-level = nuclearLevelModule.particle( 'Pu238_e0', nucleus )
+level = nuclideModule.particle( 'Pu238' )
 database.add( level )
-nucleus = nucleusModule.particle( 'pu238_e2', index = '2' )
-level = nuclearLevelModule.particle( 'Pu240_e2', nucleus )
+level = nuclideModule.particle( 'Pu238_e2' )
 database.add( level )
 
 #
 # Test adding an isotope to a chemical element.
 #
-chemicalElement = database['Pu']
-isotope = isotopeModule.suite( 'Pu237', '237' )
-chemicalElement.add( isotope )
+isotope = isotopeModule.isotope( 'Pu237', 237 )
+database.add( isotope )
 
 #
 # Test adding a nuclear level to a chemical element.
 #
-chemicalElement = database['Pu']
-nucleus = nucleusModule.particle( 'pu239_e4', index = '4' )
-level = nuclearLevelModule.particle( 'Pu239_e4', nucleus )
-chemicalElement.add( level )
+level = nuclideModule.particle( 'Pu239_e4' )
+database.add( level )
 
 xmld1 = database.toXML( )
 print xmld1

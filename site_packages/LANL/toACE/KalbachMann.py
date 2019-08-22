@@ -62,40 +62,42 @@
 # <<END-copyright>>
 
 """
-This module adds the method toACE to the classes in the fudge.gnd.productData.distributions.energyAngular module.
+This module adds the method toACE to the classes in the fudge.gnds.productData.distributions.energyAngular module.
 """
 
 from xData import standards as standardsModule
-from fudge.gnd.productData.distributions import KalbachMann as KalbachMannModule
+from fudge.gnds.productData.distributions import KalbachMann as KalbachMannModule
 
 def toACE( self, label, offset, weight, **kwargs ) :
 
     header = [ 0, 44, offset + len( weight ) + 4 ] + weight
     fSubformData = self.fSubform.data
-    e_inFactor = fSubformData.domainUnitConversionFactor( 'MeV' )
-    e_outFactor =  fSubformData.axes[1].unitConversionFactor( 'MeV' )
 
     interpolation = fSubformData.interpolation
-    if( interpolation != standardsModule.interpolation.linlinToken ) :
-        raise Exception( 'interpolation = "%s" not supported' % interpolation )
+    if( interpolation != standardsModule.interpolation.linlinToken ) : raise ValueError( 'interpolation = "%s" not supported' % interpolation )
 
-    NE, e_ins, Ls, epData = len( fSubformData ), [], [], []
+    NE = len( fSubformData )
+    e_ins = []
+    Ls = []
+    epData = []
     offset += len( header ) + 1 + 1 + 2 * NE + 1        # header length plus NR, NE, Es, Ls, (1-based).
-    for POfEp in fSubformData :
-        pdf, Rs, As = self.getFRAatEnergy_asLinearPointwise( POfEp.value )
-        _pdf, Rs, As = pdf.commonDomainGrid( [ Rs, As ] )
-        e_ins.append( POfEp.value * e_inFactor )
+    for i1, POfEp in enumerate( fSubformData ) :
+        e_ins.append( POfEp.value )
         Ls.append( offset + len( epData ) )
-        _pdf = _pdf.normalize( )
-        cdf = _pdf.runningIntegral( )
-        eps, pdf = [], []
-        for x1, y1 in _pdf :
-            eps.append( e_outFactor * x1 )
-            pdf.append( y1 / e_outFactor )
-        Rs = [ r for x, r in Rs ]
-        As = [ a for x, a in As ]
-        cdf[-1] = 1.
-        epData += [ 2, len( eps ) ] + eps + pdf + cdf + Rs + As
+
+        eps = POfEp.xs.values.values
+        pdf = POfEp.pdf.values.values
+        cdf = POfEp.cdf.values.values
+
+        function = self.rSubform.data[i1]
+        Rs = [ function.evaluate( ep ) for ep in eps ]
+
+        function = self.aSubform.data[i1]
+        As = [ function.evaluate( ep ) for ep in eps ]
+
+        interpolation = { standardsModule.interpolation.flatToken : 1, standardsModule.interpolation.linlinToken : 2 }[POfEp.interpolation]
+        epData += [ interpolation, len( eps ) ] + eps + pdf + cdf + Rs + As
+
     return( header + [ 0, NE ] + e_ins + Ls + epData )
 
 KalbachMannModule.form.toACE = toACE

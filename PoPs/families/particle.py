@@ -67,8 +67,6 @@ This module contains the parity classes.
 
 import abc
 
-from xData import ancestry as ancestryModule
-
 from .. import misc as miscModule
 from .. import suite as suiteModule
 from .. import warning as warningModule
@@ -80,37 +78,17 @@ from ..quantities import parity as parityModule
 from ..quantities import charge as chargeModule
 from ..quantities import halflife as halflifeModule
 
-from ..decays import decay as decayModule
 from ..decays import decayData as decayDataModule
 
-class alias( ancestryModule.ancestry ) :
+class alias( miscModule.classWithIDKey ) :
 
     __metaclass__ = abc.ABCMeta
 
     def __init__( self, id, particle ) :
 
-        ancestryModule.ancestry.__init__( self )
-
-        if( not( isinstance( id, str ) ) ) : TypeError( '''id must be a str instance.''' )
-        self.__id = id
+        miscModule.classWithIDKey.__init__( self, id )
 
         self.__particle = particle
-
-    @property
-    def id( self ) :
-
-        return( self.__id )
-
-    @property
-    def key( self ) :
-
-        return( self.__id )
-
-    @key.setter
-    def key( self, value ) :
-
-        if( not( isinstance( value, str ) ) ) : raise TypeError( 'id must be a string instance.' )
-        self.__id = value
 
     @property
     def pid( self ) :
@@ -152,7 +130,7 @@ class alias( ancestryModule.ancestry ) :
 
         return( self.__particle.halflife )
 
-class particle( ancestryModule.ancestry ) :
+class particle( miscModule.classWithIDKey ) :
     """
     This is the abstract base class for all particles.
     """
@@ -161,11 +139,9 @@ class particle( ancestryModule.ancestry ) :
 
     def __init__( self, id ) :
 
+        miscModule.classWithIDKey.__init__( self, id )
+
         base, anti, qualifier = miscModule.baseAntiQualifierFromID( id )
-
-        ancestryModule.ancestry.__init__( self )
-
-        self.__id = id
 
         self.__anti = anti == miscModule.antiSuffix
 
@@ -174,25 +150,8 @@ class particle( ancestryModule.ancestry ) :
         self.__parity = self.addSuite( parityModule )
         self.__charge = self.addSuite( chargeModule )
         self.__halflife = self.addSuite( halflifeModule )
-        self.__decays = self.addSuite( decayModule )
         self.__decayData = decayDataModule.decayData( )
         self.__decayData.setAncestor( self )
-
-    @property
-    def id( self ) :
-
-        return( self.__id )
-
-    @property
-    def key( self ) :
-
-        return( self.__id )
-
-    @key.setter
-    def key( self, value ) :
-
-        if( not( isinstance( value, str ) ) ) : raise TypeError( 'id must be a string instance.' )
-        self.__id = value
 
     @property
     def isAnti( self ) :
@@ -230,11 +189,6 @@ class particle( ancestryModule.ancestry ) :
         return( self.__halflife )
 
     @property
-    def decays( self ) :
-
-        return( self.__decays )
-
-    @property
     def decayData( self ) :
 
         return( self.__decayData )
@@ -255,9 +209,10 @@ class particle( ancestryModule.ancestry ) :
         warnings = []
 
         BRSumAbsTol = info.get('branchingRatioSumTolerance', 1e-6)
-        probabilitySum = sum( [decay.probability for decay in self.decays] )
-        if self.decays and abs(probabilitySum - 1.0) > BRSumAbsTol:
-            warnings.append(warningModule.unnormalizedDecayProbabilities(probabilitySum, self))
+# CMM FIXME
+#        probabilitySum = sum( [decay.probability for decay in self.decays] )
+#        if self.decays and abs(probabilitySum - 1.0) > BRSumAbsTol:
+#            warnings.append(warningModule.unnormalizedDecayProbabilities(probabilitySum, self))
         return warnings
 
     def buildFromRawData( self, mass = None, spin = None, parity = None, charge = None, halflife = None, label = 'default' ) :
@@ -288,7 +243,6 @@ class particle( ancestryModule.ancestry ) :
         self.__parity.convertUnits( unitMap )
         self.__charge.convertUnits( unitMap )
         self.__halflife.convertUnits( unitMap )
-        self.__decays.convertUnits( unitMap )
         self.__decayData.convertUnits( unitMap )
 
     def copy( self ) :
@@ -306,8 +260,16 @@ class particle( ancestryModule.ancestry ) :
         for item in self.__parity : other.parity.add( item.copy( ) )
         for item in self.__charge : other.charge.add( item.copy( ) )
         for item in self.__halflife : other.halflife.add( item.copy( ) )
-        for item in self.__decays : other.decays.add( item.copy( ) )
         self.__decayData.copyItems( other.decayData )
+
+    def replicate( self, other ) :
+
+        self.__mass.replicate( other.mass )
+        self.__spin.replicate( other.spin )
+        self.__parity.replicate( other.parity )
+        self.__charge.replicate( other.charge )
+        self.__halflife.replicate( other.halflife )
+        self.__decayData = other.decayData.copy( )
 
     def getMass( self, unit ) :
 
@@ -345,7 +307,6 @@ class particle( ancestryModule.ancestry ) :
         XMLStringList += self.charge.toXMLList( indent = indent2, **kwargs )
         XMLStringList += self.halflife.toXMLList( indent = indent2, **kwargs )
 
-        XMLStringList += self.decays.toXMLList( indent = indent2, **kwargs )
         XMLStringList += self.decayData.toXMLList( indent = indent2, **kwargs )
 
         XMLStringList += self.extraXMLElements( indent2, **kwargs )
@@ -358,27 +319,36 @@ class particle( ancestryModule.ancestry ) :
 
         return( False )
 
-    @classmethod
-    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+    def parseXMLNode( self, element, xPath, linkData ) :
 
-        xPath.append( element.tag )
-
-        kwargs = element.attrib.copy( )
-        del kwargs['id']
-        self = cls( element.attrib['id'], **kwargs )
+        xPath.append( '%s[@id="%s"]' % ( element.tag, element.get( 'id' ) ) )
 
         children = { 'mass' : massModule,       'spin' : spinModule,            'parity' : parityModule, 
-                     'charge' : chargeModule,   'halflife' : halflifeModule,    'decays' : decayModule }
+                     'charge' : chargeModule,   'halflife' : halflifeModule }
         for child in element :
             if( child.tag in children ) :
                 children[child.tag].suite.parseXMLNode( getattr( self, child.tag ), child, xPath, linkData )
-            elif( child.tag == 'decayData' ) :  # not a suite so can't be treated like other children
+            elif( child.tag == decayDataModule.decayData.moniker ) :  # not a suite so can't be treated like other children
                 self.decayData.parseXMLNode( child, xPath, linkData )
             else :
                 if( not( self.parseExtraXMLElement( child, xPath, linkData ) ) ) :
                     raise ValueError( 'sub-element = "%s" not allowed' % child.tag )
 
         xPath.pop( )
+        return( self )
+
+    @classmethod
+    def parseXMLNodeAsClass( cls, element, xPath, linkData ) :
+
+        xPath.append( '%s[@id="%s"]' % ( element.tag, element.get( 'id' ) ) )
+
+        kwargs = element.attrib.copy( )
+        del kwargs['id']
+        self = cls( element.attrib['id'], **kwargs )
+        xPath.pop()
+
+        self.parseXMLNode( element, xPath, linkData )
+
         return( self )
 
     @classmethod
@@ -393,7 +363,7 @@ class suite( suiteModule.sortedSuite ) :
 
     def __init__( self, replace = True ) :
 
-        suiteModule.sortedSuite.__init__( self, allowedClasses = ( self.particle, ), key = 'id', replace = replace )
+        suiteModule.sortedSuite.__init__( self, allowedClasses = ( self.particle, ), replace = replace )
 
     def parseXMLNode( self, element, xPath, linkData ) :
 

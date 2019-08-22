@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 # <<BEGIN-copyright>>
 # Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
@@ -61,11 +62,13 @@
 # 
 # <<END-copyright>>
 
+from __future__ import print_function
+
 """
 compareCrossSections.py: compare the cross section for given MT number from two different evaluated files.
 """
 import os
-import sys
+import sys, traceback
 
 def compare_plot( xsc1, xsc2, title="comparison plot", legend1="first file", legend2="second file",
         saveFile=None, legendXY = (0.05, 0.95) ):
@@ -83,7 +86,7 @@ def compare_plot( xsc1, xsc2, title="comparison plot", legend1="first file", leg
     x2,y2 = map(numpy.array, mean.copyDataToXsAndYs())
     y2[ (y2==0)*(y1==0) ] = 1.0 # silence zero/zero division warnings
     relative_diff = zip(x1, y1/y2 * 100)
-    
+
     """ # XYs division can take a long time, unnecessary in this case
     mean.setSafeDivide( True )  # control divide/0 errors
     relative_diff = (xsc1 - xsc2) / mean * 100
@@ -100,7 +103,7 @@ def compare_plot( xsc1, xsc2, title="comparison plot", legend1="first file", leg
     fig = plt.figure( figsize=(10,8) )
     fig.subplots_adjust( top=0.88, bottom=0.12, wspace=0.4 )
 
-    ax1 = subplot2grid((4,1), (0,0), rowspan=3)
+    ax1 = plt.subplot2grid((4,1), (0,0), rowspan=3)
     mplot = plot2d.__makePlot2d( [plot1, plot2], xAxisSettings, yAxisSettings,
             legendOn=True, legendXY=legendXY, thePlot = ax1, minY=0 )
     plt.setp( ax1.get_xticklabels(), visible=False )
@@ -111,9 +114,9 @@ def compare_plot( xsc1, xsc2, title="comparison plot", legend1="first file", leg
     xAxisSettings = plot2d.AxisSettings( label="$E_n$ (%s)" % xUnit, isLog=True )
     yAxisSettings = plot2d.AxisSettings( label="% diff" )
 
-    ax2 = subplot2grid((4,1), (3,0), sharex=ax1)
+    ax2 = plt.subplot2grid((4,1), (3,0), sharex=ax1)
     plot2d.__makePlot2d( [reldiff_plot], xAxisSettings, yAxisSettings,
-            legendOn=False, thePlot = ax2, minY=0 )
+            legendOn=False, thePlot = ax2, minY=0)
     # tick marks may be too dense on this y-axis:
     #ax2.get_yaxis().set_ticks( [-0.2,0,0.2] )
 
@@ -121,30 +124,14 @@ def compare_plot( xsc1, xsc2, title="comparison plot", legend1="first file", leg
     if saveFile: plt.savefig( saveFile )
     else: plt.show()
 
-# Useful function, may not be available on older matplotlib installations:
-def subplot2grid(shape, loc, rowspan=1, colspan=1, **kwargs):
-    from matplotlib.pyplot import GridSpec, gcf
-    fig = gcf()
-    s1,s2 = shape
-    subplotspec = GridSpec(s1, s2).new_subplotspec(loc, rowspan=rowspan, colspan=colspan)
-    a = fig.add_subplot(subplotspec, **kwargs)
-    bbox = a.bbox
-    byebye = []
-    for other in fig.axes:
-        if other==a: continue
-        if bbox.fully_overlaps(other.bbox):
-            byebye.append(other)
-    for ax in byebye: delaxes(ax)
-    return a
-
 def process_args():
     from argparse import ArgumentParser
     parser = ArgumentParser(
             description = """Compare the same cross section in two different evaluations,
             or compare a summed cross section from one evaluation with the sum of its parts
             (using option --summed).""",
-            epilog = """Input files can be in GND or ENDF format.
-            Resonances will be reconstructed ONLY for input files in GND format.
+            epilog = """Input files can be in GNDS or ENDF format.
+            Resonances will be reconstructed ONLY for input files in GNDS format.
             For ENDF-6 files, reconstruction should be done before-hand using RECENT or another tool.""",
             )
     parser.add_argument( "mt", type=int, help="ENDF MT of reaction to compare" )
@@ -159,6 +146,7 @@ def process_args():
             help="legend location: 'ul', 'ur', 'll' or 'lr'" )
     parser.add_argument( "-T", "--title", default=None,
             help="specify plot title" )
+    parser.add_argument( "-o", "--outfile", default=None, help="Output file name")
     parser.add_argument( "--xUnit", type=str, help="Convert x-axes to this unit (e.g. MeV)" )
     parser.add_argument( "--yUnit", type=str, help="Convert y-axes to this unit (e.g. mb)" )
     parser.add_argument( "-S", "--summed", action='store_true', default=False,
@@ -166,9 +154,9 @@ def process_args():
     return parser.parse_args()
 
 if __name__ == '__main__':
-    from fudge.gnd import reactionSuite as reactionSuiteModule, sums as sumsModule, styles as stylesModule
-    from fudge.gnd.reactionData import crossSection
-    from fudge.legacy.converting import endfFileToGND
+    from fudge.gnds import reactionSuite as reactionSuiteModule, styles as stylesModule
+    from fudge.gnds.reactionData import crossSection
+    from fudge.legacy.converting import endfFileToGNDS
 
     args = process_args()
 
@@ -179,10 +167,13 @@ if __name__ == '__main__':
             RS = reactionSuiteModule.readXML( filename )
         except:
             try:
-                rce = endfFileToGND.endfFileToGND( filename, singleMTOnly = singleMTOnly, parseCrossSectionOnly = True, skipBadData = True )
+                rce = endfFileToGNDS.endfFileToGNDS( filename, singleMTOnly = singleMTOnly,
+                                                     skipBadData = True, continuumSpectraFix = True )
                 RS, c = rce['reactionSuite'], rce['covarianceSuite']
-            except:
-                print "File %s doesn't seem to be a legal ENDF or GND file!" % filename
+            except Exception as excep:
+                print("Exception raised:", excep)
+                print("File %s doesn't seem to be a legal ENDF or GNDS file!" % filename)
+                traceback.print_exc(file=sys.stdout)
                 sys.exit()
         RS.originalFile = filename
         return RS
@@ -193,7 +184,7 @@ if __name__ == '__main__':
             allReacs += list(reactionSuite.reactions)
         reac = [r for r in allReacs if r.ENDF_MT == MT]
         if len(reac) != 1:
-            print "Couldn't find unique reaction for MT%d in %s" % (MT,reactionSuite.originalFile)
+            print("Couldn't find unique reaction for MT%d in %s" % (MT, reactionSuite.originalFile))
         xsc = reac[0].crossSection
         if isinstance( xsc.evaluated, crossSection.resonancesWithBackground ):
             evalStyle = reactionSuite.styles.getEvaluatedStyle()
@@ -207,9 +198,9 @@ if __name__ == '__main__':
     if args.summed:
         RS = getReactionSuite( args.file1 )
         xs1 = getXS(RS, args.mt, sumsOnly = True)
-        summedReac = [r for r in (RS.sums) if isinstance(r, sumsModule.crossSections) and int( r.ENDF_MT ) == args.mt]
+        summedReac = [r for r in (RS.sums.crossSections) if int( r.ENDF_MT ) == args.mt]
         if len(summedReac) != 1:
-            print "Couldn't find unique summed reaction for MT%d in %s" % (args.mt,RS.originalFile)
+            print("Couldn't find unique summed reaction for MT%d in %s" % (args.mt, RS.originalFile))
             sys.exit(1)
         summedReac = summedReac[0]
         if reconstructedStyleName in summedReac.summands[0].link:
@@ -246,4 +237,4 @@ if __name__ == '__main__':
     legendXY = {'ul': (0.05, 0.95), 'ur': (0.75, 0.95),
             'll': (0.05, 0.2), 'lr': (0.75, 0.2)}.get( args.legendLocation )
 
-    compare_plot( xs1, xs2, title=title, legend1=l1, legend2=l2, legendXY=legendXY )
+    compare_plot( xs1, xs2, title=title, legend1=l1, legend2=l2, legendXY=legendXY, saveFile=args.outfile )

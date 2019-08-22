@@ -63,18 +63,24 @@
 
 import itertools
 
-from fudge.gnd import thermalScattering as thermalScatteringModule
+from fudge.gnds import thermalScattering as thermalScatteringModule
 
 from . import endfFormats as endfFormatsModule
-from . import gndToENDF6
+from . import gndsToENDF6
 
 #
 # thermalScattering
 #
-def toENDF6( self, flags = {}, verbosityIndent = '', covarianceSuite = None ):
+def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None, useRedsFloatFormat = False,
+             lineNumbers = True, **kwargs ):
+
+    _useRedsFloatFormat = endfFormatsModule.useRedsFloatFormat
+    endfFormatsModule.useRedsFloatFormat = useRedsFloatFormat
+
     endfMFList = { 1 : { 451 : [] }, 7 : {} }
-    targetInfo = {'ZA':self.MAT + 100, 'mass':float(self.mass)}
+    targetInfo = {'ZA':self.MAT + 100, 'mass':float(self.mass), 'style':style}
     MAT = self.MAT
+
     NSUB, NVER = 12, 8  # 12: thermal scattering sub-library, 8: ENDF/B-VIII
 
     for subsection in (self.coherentElastic, self.incoherentElastic, self.incoherentInelastic):
@@ -89,7 +95,9 @@ def toENDF6( self, flags = {}, verbosityIndent = '', covarianceSuite = None ):
             endfFormatsModule.endfHeadLine( 0.0, 0.0, 0, 0, len(endfDoc), 0 ) ]
     endfMFList[1][451] = docHeader + endfDoc
 
-    return endfFormatsModule.endfMFListToFinalFile( endfMFList, MAT, lineNumbers=True )
+    endfFormatsModule.useRedsFloatFormat = _useRedsFloatFormat
+
+    return endfFormatsModule.endfMFListToFinalFile( endfMFList, MAT, lineNumbers=lineNumbers )
 thermalScatteringModule.thermalScattering.toENDF6 = toENDF6
 
 #
@@ -116,8 +124,8 @@ def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
     LT = len(Tlist)-1
     # first temperature includes the energy list:
     endf = [endfFormatsModule.endfHeadLine( Tlist[0], 0, LT, 0, 1, len(data[0]) ) ]
-    independentInterp = gndToENDF6.gndToENDFInterpolationFlag( gridded.axes[1].interpolation )
-    dependentInterp = gndToENDF6.gndToENDFInterpolationFlag( gridded.axes[2].interpolation )
+    independentInterp = gndsToENDF6.gndsToENDFInterpolationFlag( gridded.axes[1].interpolation )
+    dependentInterp = gndsToENDF6.gndsToENDFInterpolationFlag( gridded.axes[2].interpolation )
     endf += ['%11i%11i%44s' % (len(data[0]), independentInterp, '' )]    # no trailing zeros
     endf += endfFormatsModule.endfDataList( list( itertools.chain( *zip(Elist, data[0]) ) ) )
 
@@ -147,8 +155,7 @@ thermalScatteringModule.incoherentElastic.toENDF6 = toENDF6
 def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
     NR = 1; NP = len(self)
     endf = [endfFormatsModule.endfHeadLine( targetInfo['characteristicCrossSection'], 0, 0, 0, NR, NP )]
-    interp = gndToENDF6.gndToENDFInterpolationFlag( self.interpolation )
-    #endf += ['%11i%11i%44s' % (len(self), interp, '')]
+    interp = gndsToENDF6.gndsToENDFInterpolationFlag( self.interpolation )
     endf += endfFormatsModule.endfInterpolationList( (len(self), interp) )
     endf += endfFormatsModule.endfDataList( list( itertools.chain( *self.copyDataToXYs() ) ) )
     return endf
@@ -192,11 +199,11 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ):
 
     LT = len(Tlist)-1
     if LT:
-        T_interp = gndToENDF6.gndToENDFInterpolationFlag( gridded.axes[3].interpolation )
+        T_interp = gndsToENDF6.gndsToENDFInterpolationFlag( gridded.axes[3].interpolation )
     else:
         T_interp = None
-    beta_interp = gndToENDF6.gndToENDFInterpolationFlag( gridded.axes[2].interpolation )
-    alpha_interp = gndToENDF6.gndToENDFInterpolationFlag( gridded.axes[1].interpolation )
+    beta_interp = gndsToENDF6.gndsToENDFInterpolationFlag( gridded.axes[2].interpolation )
+    alpha_interp = gndsToENDF6.gndsToENDFInterpolationFlag( gridded.axes[1].interpolation )
 
     for index, beta in enumerate( betas ):
         data = array[index,:,:] # 2D sub-array for this beta
@@ -224,7 +231,7 @@ thermalScatteringModule.incoherentInelastic.toENDF6 = toENDF6
 def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
     NR = 1; NP = len(self)
     endf = [endfFormatsModule.endfHeadLine( 0, 0, 0, 0, NR, NP )]
-    interp = gndToENDF6.gndToENDFInterpolationFlag( self.interpolation )
+    interp = gndsToENDF6.gndsToENDFInterpolationFlag( self.interpolation )
     endf += endfFormatsModule.endfInterpolationList( (len(self), interp) )
     #endf += ['%11i%11i%44s' % (len(self), interp, '')]
     endf += endfFormatsModule.endfDataList( list( itertools.chain( *self.copyDataToXYs() ) ) )

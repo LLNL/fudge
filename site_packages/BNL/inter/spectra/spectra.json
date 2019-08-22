@@ -18,8 +18,8 @@
     "path":"IMF007.001"
   },
   "SigmaSigma":{
-    "reference":"",
-    "description":"",
+    "reference":"J.GRUNDL AND C.EISENHAUER, BENCHMARK NEUTRON FIELDS REACTOR DOSIMETRY, PP. 53-104 IN VOL. I OF IAEA-208, INTERNATIONAL ATOMIC ENERGY AGENCY (1978)",
+    "description":"SIGMA-SIGMA = COUPLED THERMAL/FAST URANIUM + BORON CARBIDE (Spherical assembly)",
     "format":"ENDF-6",
     "path":"irdf2002_spectra.dat/7/3/261"
   },
@@ -131,20 +131,20 @@
     ]
   },
   "U235ThermFiss":{
-    "reference":"",
-    "description":"",
+    "reference":"J.GRUNDL AND C.EISENHAUER, NBS, PRIVATE COMMUNICATION",
+    "description":"U-235 THERMAL FISSION -- NBS EVALUATION",
     "format":"ENDF-6",
     "path":"irdf2002_spectra.dat/1/3/261"
   },
   "ISNF":{
-    "reference":"",
-    "description":"",
+    "reference":"J.GRUNDL AND C.EISENHAUER, BENCHMARK NEUTRON FIELDS REACTOR DOSIMETRY, PP. 53-104 IN VOL. I OF IAEA-208, INTERNATIONAL ATOMIC ENERGY AGENCY (1978)",
+    "description":"INTERMEDIATE-ENERGY STANDARD NEUTRON FIELD (NBS)",
     "format":"ENDF-6",
     "path":"irdf2002_spectra.dat/4/3/261"
   },
   "CFRMF":{
-    "reference":"",
-    "description":"",
+    "reference":"J.GRUNDL AND C.EISENHAUER, BENCHMARK NEUTRON FIELDS REACTOR DOSIMETRY, PP. 53-104 IN VOL. I OF IAEA-208, INTERNATIONAL ATOMIC ENERGY AGENCY (1978)",
+    "description":"COUPLED FAST REACTIVITY MEASUREMENT FACILITY (IDAHO)",
     "format":"ENDF-6",
     "path":"irdf2002_spectra.dat/5/3/261"
   },

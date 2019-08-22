@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.legacy.endl.endlZA &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.legacy.endl.endlZA &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,7 +25,7 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +35,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
       </ul>
@@ -79,7 +76,7 @@ import endl_I
 import endl_Z
 import endlReactionParameters
 try :
-    from fudge.structure import xensl
+    from .structure import xensl
 except :
     endlmisc.printWarning( &#39;Could not import xensl.py&#39; )
 
@@ -98,11 +95,11 @@ except :
         self.Z, self.A = endl2.ZandAFromZA( self.ZA )
         self.suffix = suffix_
         self.targetName   = endl2.nameForYoOrZA(   self.sZA, NameASeperator = &quot;&quot;, ZAOnly = 1, AddNatural = 1, m_to_m1 = True, suffixSeperator = &#39;_&#39; )
-        self.targetSymbol = endl2.endlToGNDName( self.sZA )
+        self.targetSymbol = endl2.endlToGNDSName( self.sZA )
         self.name = self.targetSymbol
         self.yiTags = endlmisc.incidentParticleTags( yi )
         self.yi = self.yiTags[0]
-        self.projectileName = endl2.endlToGNDName( self.yi )
+        self.projectileName = endl2.endlToGNDSName( self.yi )
         self.readOnly = readOnly or fudgeParameters.ReadOnly
         gappsDir = os.path.realpath( &#39;/usr/gapps/data/nuclear&#39; )
         self.documentation = None
@@ -1188,10 +1185,10 @@ can be used to get a reference to the neutron in-elastic cross section,
                 if( datum.I == 9 ) : addFile( datum.toZAsFrame( newProjectileMass, newTargetMass, halflife, self.bdflsFile )[0], halflife )
         return( newTarget )</div>
 
-<div class="viewcode-block" id="endlZA.toGND"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlZA.endlZA.toGND">[docs]</a>    def toGND( self, evaluationLibrary, evaluationVersion, excludeAverageProductData = True, testing = False, verbose = 0 ) :
+<div class="viewcode-block" id="endlZA.toGNDS"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlZA.endlZA.toGNDS">[docs]</a>    def toGNDS( self, evaluationLibrary, evaluationVersion, excludeAverageProductData = True, testing = False, verbose = 0 ) :
 
-        import fudge.legacy.converting.endlToGND as endlToGND
-        return( endlToGND.toGND( self, evaluationLibrary, evaluationVersion, excludeAverageProductData = excludeAverageProductData, verbose = verbose ) )</div>
+        import fudge.legacy.converting.endlToGNDS as endlToGNDS
+        return(endlToGNDS.toGNDS( self, evaluationLibrary, evaluationVersion, excludeAverageProductData = excludeAverageProductData, verbose = verbose))</div>
 
 <div class="viewcode-block" id="endlZA.adjustcs"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlZA.endlZA.adjustcs">[docs]</a>    def adjustcs( self, C = 10, S = None, X1 = None, X2 = None, X3 = None, X4 = None, Q = None, f = 5.e-5, csRelChangeNotice = .1 ) :
         &quot;&quot;&quot;Adjust the cross section given by C, S, X1, X2, X3, X4 and Q  so that the total cross section remains fixed.  
@@ -1351,14 +1348,14 @@ can be used to get a reference to the neutron in-elastic cross section,
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

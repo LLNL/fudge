@@ -63,7 +63,10 @@
 # 
 # <<END-copyright>>
 
-import sys, os
+from __future__ import print_function
+import sys
+import os
+import shutil
 
 from argparse import ArgumentParser
 
@@ -76,9 +79,9 @@ from xData import physicalQuantity as physicalQuantityModule
 
 from pqu import PQU as PQUModule
 
-import fudge.gnd.physicalQuantity as temperatureModule
-import fudge.gnd.styles as stylesModule
-import fudge.gnd.reactionSuite as reactionSuiteModule
+import fudge.gnds.physicalQuantity as temperatureModule
+import fudge.gnds.styles as stylesModule
+import fudge.gnds.reactionSuite as reactionSuiteModule
 from fudge.legacy.endl import bdfls as bdflsModule
 
 from fudge.processing import flux as fluxModule
@@ -91,18 +94,20 @@ lMaxDefault = 9
 fidDefault = 'LLNL_fid_1'
 bdflsDefault = '/usr/gapps/data/nuclear/bdfls.archive/bdfls.Audi_etal.2003.12.22'
 reconAccuracyDefault = 1e-6
+CoulombPlusNuclearMuCutOffDefault = 0.94                                            # This is the mu cutoff used for ENDL data.
 tempsDefault = '2.586e-8'
 tempUnitDefault = 'MeV/k'
 energyUnitDefault = 'MeV'
 outputDefault = 'SRC'
 
+EVprefixDefault = 'eval'
+RCprefixDefault = 'recon'
+muCutoffPrefixDefault = 'muCutoff'
+AEPprefixDefault = 'apd'
+HTprefixDefault = 'heated'
 MGprefixDefault = 'MultiGroup'
 MCprefixDefault = 'MonteCarlo'
 UPprefixDefault = 'UpScatter'
-HTprefixDefault = 'heated'
-AEPprefixDefault = 'apd'
-EVprefixDefault = 'eval'
-RCprefixDefault = 'recon'
 
     ### Default group structures
 gids = {'n'      : 'LLNL_gid_7',
@@ -116,43 +121,51 @@ gidDefaults = ""
 for gid in gids : gidDefaults += '%s="%s", ' % ( gid, gids[gid] )
 gidDefaults = gidDefaults[:-2]
  
-description = """Processes all data in a GND file."""
+description = """Processes all data in a GNDS file."""
 
 parser = ArgumentParser( description = description )
-parser.add_argument( "gnd", type = str,                                                                 help = 'gnd file to process')
+parser.add_argument( "gnds", type = str,                                                                help = 'input gnds file to process')
+parser.add_argument( "outputFile", nargs = "?", default = None,                                         help = 'output file' )
 
-parser.add_argument( "--tag", type = str, default = '.proc',                                             help = 'tag to indicate data has been processed')
+parser.add_argument( "--tag", type = str, default = '.proc',                                            help = 'tag to indicate data has been processed')
 parser.add_argument( '-o', '--output', default = outputDefault,                                         help = 'directory to write output file. If "SRC", writes to source directory. Default is %s' % outputDefault )
 parser.add_argument( "--writeConvertedUnits", action = 'store_true', default = False,                   help = 'write data to file after units converted' )
 
 parser.add_argument( "--energyUnit", type = str, default = energyUnitDefault,                           help = 'energy unit to convert to. Default is %s ' % energyUnitDefault)
-parser.add_argument( "-t", "--temperatures", action='append', default = None,                           help = "temperatures for heating, use successive -t arguments" )
-parser.add_argument( "--temperatureUnit", type = str, default = tempUnitDefault,                        help = 'temperature unit to convert to, default is %s ' % tempUnitDefault )
-parser.add_argument( "--bdfls", type = str, default = bdflsDefault,                                     help = "bdfls file to use. Default is %s " % bdflsDefault )
-parser.add_argument( "--fluxID", type = str, default = fidDefault,                                      help = 'Flux ID from bdfls. Default is %s ' % fidDefault )
-parser.add_argument( "-g", "--gid", type = str, action='append', default = None,                        help = "particle grouping schemes :  <particle>=LLNL_gid_<integer>. Default is %s." % gidDefaults )
-parser.add_argument( "--legendreMax", type = int, default = lMaxDefault,                                help = "Maximum Legendre order for Sn prcessed data. Default is %s." % lMaxDefault )
-parser.add_argument( "-mg", "--MultiGroup", action = 'store_true',                                      help = "flag for MultiGroup processing" )
-parser.add_argument( "-mc", "--MonteCarlo", action = 'store_true',                                      help = "flag for Monte Carlo processing" )
-parser.add_argument( "-up", "--UpScatter", action = 'store_true',                                       help = "flag for Upscatter processing" )
+
 parser.add_argument( "--reconstruct", type = str, choices = ['all','crossSection','angular'], default='crossSection', 
                                                                                                         help = "What kind of reconstructing should be done ('all','crossSection','angular')" )
+parser.add_argument( "--CoulombPlusNuclearMuCutOff", type = float, default = CoulombPlusNuclearMuCutOffDefault,
+                                                                                                        help = 'For Coulomb + nuclear elastic scattering mu is limited to [ -1, muCutOff ] to make the cross section finite. For identical particles mu is limited to [ -muCutOff, muCutOff ]. muCutOff must be in the range ( -1 to 1 ). Default is %s.' % CoulombPlusNuclearMuCutOffDefault )
+
+parser.add_argument( "-t", "--temperatures", type = float, action='append', default = None,             help = "temperatures for heating, use successive -t arguments" )
+parser.add_argument( "--temperatureUnit", type = str, default = tempUnitDefault,                        help = 'temperature unit to convert to, default is %s ' % tempUnitDefault )
+
+parser.add_argument( "--bdfls", type = str, default = bdflsDefault,                                     help = "bdfls file to use. Default is %s " % bdflsDefault )
+parser.add_argument( "--fluxID", type = str, default = fidDefault,                                      help = 'Flux ID from bdfls. Default is %s ' % fidDefault )
+parser.add_argument( "-g", "--gid", type = str, action='append', default = None,                        help = "particle grouping schemes : <particle>=LLNL_gid_<integer>. Default is %s." % gidDefaults )
+parser.add_argument( "--legendreMax", type = int, default = lMaxDefault,                                help = "Maximum Legendre order for Sn prcessed data. Default is %s." % lMaxDefault )
+parser.add_argument( "-mg", "--MultiGroup", action = 'store_true',                                      help = "flag for MultiGroup processing" )
+parser.add_argument( "-up", "--UpScatter", action = 'store_true',                                       help = "flag for Upscatter processing" )
+
+parser.add_argument( "-mc", "--MonteCarlo", action = 'store_true',                                      help = "flag for Monte Carlo processing" )
 
 parser.add_argument( "--threads",type = int, default = 1,                                               help = "number of threads to use for temperatures loop" )
 parser.add_argument( "-v", "--verbose", action = "count", default = 0,                                  help = "enable verbose output" )
 parser.add_argument( "--reconAccuracy", type = float, default = reconAccuracyDefault,                   help = "Accuracy for reconstructing resonances. Default is %.1e" % reconAccuracyDefault )
 
+parser.add_argument( "--prefixEval", type = str, default=EVprefixDefault,                               help = "prefix for Evaluation styles. Default is %s." % EVprefixDefault )
+parser.add_argument( "--prefixRecon", type = str, default=RCprefixDefault,                              help = "prefix for Resonance Reconstruction styles. Default is %s." % RCprefixDefault )
+parser.add_argument( '--prefixMuCutoff', type = str, default = muCutoffPrefixDefault,                   help = 'prefix for Coulomb + nuclear elastic scattering mu cutoff style. Default is "%s".' % muCutoffPrefixDefault )
+parser.add_argument( "--prefixAep", type = str, default=AEPprefixDefault,                               help = "prefix for Average Energy to Product styles. Default is %s." % AEPprefixDefault )
+parser.add_argument( "--prefixHeated", type = str, default=HTprefixDefault,                             help = "prefix for heated styles. Default is %s." % HTprefixDefault )
 parser.add_argument( "--prefixMultiGroup", type = str, default=MGprefixDefault,                         help = "prefix for MultiGroup styles. Default is %s." % MGprefixDefault )
 parser.add_argument( "--prefixMonteCarlo", type = str, default=MCprefixDefault,                         help = "prefix for MonteCarlo styles. Default is %s." % MCprefixDefault )
 parser.add_argument( "--prefixUpscatter", type = str, default=UPprefixDefault,                          help = "prefix for UpScatter styles. Default is %s." % UPprefixDefault )
-parser.add_argument( "--prefixHeated", type = str, default=HTprefixDefault,                             help = "prefix for heated styles. Default is %s." % HTprefixDefault )
-parser.add_argument( "--prefixAep", type = str, default=AEPprefixDefault,                               help = "prefix for Average Energy to Product styles. Default is %s." % AEPprefixDefault )
-parser.add_argument( "--prefixEval", type = str, default=EVprefixDefault,                               help = "prefix for Evaluation styles. Default is %s." % EVprefixDefault )
-parser.add_argument( "--prefixRecon", type = str, default=RCprefixDefault,                              help = "prefix for Resonance Reconstruction styles. Default is %s." % RCprefixDefault )
 
 args = parser.parse_args( )
 
-logFile = open( 'logFile' + args.tag, 'w' )  
+logFile = open( 'logFile' + args.tag, 'w' )
 
 bdflsFile = args.bdfls 
 bdfls = bdflsModule.getDefaultBdfls( template = bdflsFile )
@@ -178,28 +191,32 @@ if not ( args.gid == None ) :
 
 
 transportables = []
-for particle in gids :    
-    gbs = valuesModule.values( [  PQUModule.PQU( boundary, 'MeV' ).getValueAs( args.energyUnit )  for boundary in bdfls.group(gids[particle]).gb  ] )
+for particle in gids :
+    gbs = valuesModule.values( [ PQUModule.PQU( boundary, 'MeV' ).getValueAs( args.energyUnit ) for boundary in bdfls.group(gids[particle]).gb ] )
     grid = axesModule.grid( 'energy_in', 0, args.energyUnit, axesModule.boundariesGridToken, gbs )
     group = groupModule.group( gids[particle], grid )
     transportables.append( transportablesModule.transportable( particle, transportablesModule.conserve.number, group ) )
         
-#### read in GND file
-reactionSuite = reactionSuiteModule.readXML( args.gnd )
+#### read in GNDS file
+reactionSuite = reactionSuiteModule.readXML( args.gnds )
 
 if( reactionSuite.projectile != IDsPoPsModule.neutron ) : tempsDefault = 0
 if( args.temperatures == None ) : args.temperatures = [ tempsDefault ]
+args.temperatures.sort( )
 
 ### fail on detection of existing processed data
 for style in reactionSuite.styles :
-    if( isinstance( style, stylesModule.heated )  or   isinstance( style, stylesModule.MC ) or   isinstance( style, stylesModule.multiGroup ) )  : 
-        raise Exception("File already contains processed data. Please use a clean file!")
+    if( isinstance( style, ( stylesModule.heated, stylesModule.griddedCrossSection, stylesModule.multiGroup, stylesModule.griddedCrossSection ) ) ) : 
+        raise Exception( "File already contains processed data. Please use a clean file!" )
 
 ### convert units if necessary
-reactionSuite.convertUnits( {'MeV': args.energyUnit, 'eV': args.energyUnit }  )
-convertedUnitsFileName = args.gnd.replace( '.xml', '.%s.xml' % 'conv' )
-if( outputDefault != args.output ) : convertedUnitsFileName = os.path.join( args.output, os.path.basename( convertedUnitsFileName ) )
-if( args.writeConvertedUnits ) : reactionSuite.saveToFile( convertedUnitsFileName, xs_pdf_cdf1d_singleLine = True )
+reactionSuite.convertUnits( {'MeV': args.energyUnit, 'eV': args.energyUnit } )
+if( args.writeConvertedUnits ) :
+    convertedUnitsFileName = args.outputFile
+    if( convertedUnitsFileName is None ) : convertedUnitsFileName = args.gnds
+    convertedUnitsFileName = convertedUnitsFileName + '.convertedUnits'
+    if( outputDefault != args.output ) : convertedUnitsFileName = os.path.join( args.output, os.path.basename( convertedUnitsFileName ) )
+    reactionSuite.saveToFile( convertedUnitsFileName, xs_pdf_cdf1d_singleLine = True )
 
 try :
     evalStyle = reactionSuite.styles[args.prefixEval]
@@ -210,7 +227,7 @@ baseStyle = evalStyle
 ### reconstruct resonances
 if( reactionSuite.supportsResonanceReconstruction() ) :
 ### FIXME: need to add logic about the choice of reconstruction types (different style for reconstructed angular vs crossSection)
-    if( args.verbose > 0 ) : print 'Processing resonances'
+    if( args.verbose > 0 ) : print('Processing resonances')
     reconStyle = reactionSuite.styles.getStyleOfClass(stylesModule.crossSectionReconstructed)
     if reconStyle == None: 
         reconStyle = stylesModule.crossSectionReconstructed( args.prefixRecon, evalStyle.label, date = dateTimeStr )
@@ -218,21 +235,29 @@ if( reactionSuite.supportsResonanceReconstruction() ) :
         reactionSuite.reconstructResonances( reconStyle )   ### FIXME need logfile arguments in this process call
     baseStyle = reconStyle
 
+CoulombPlusNuclearMuCutoffs = reactionSuite.CoulombPlusNuclearMuCutoffs( )
+if( CoulombPlusNuclearMuCutoffs is not None ) :
+    if( args.CoulombPlusNuclearMuCutOff not in CoulombPlusNuclearMuCutoffs ) :
+        muCutoffStyle = stylesModule.CoulombPlusNuclearElasticMuCutoff( args.prefixMuCutoff, baseStyle.label, args.CoulombPlusNuclearMuCutOff, date = dateTimeStr )
+        reactionSuite.styles.add( muCutoffStyle )
+        reactionSuite.processCoulombPlusNuclearMuCutoff( muCutoffStyle )
+        baseStyle = muCutoffStyle
+
 ### Calculate Average Product Data  ( Energy and Momenta )
 apdStyle = reactionSuite.styles.getStyleOfClass( stylesModule.averageProductData )
 if apdStyle == None: 
-    if( args.verbose > 0 ) : print 'Processing average product data'
+    if( args.verbose > 0 ) : print('Processing average product data')
     apdStyle = stylesModule.averageProductData( args.prefixAep, baseStyle.label, date = dateTimeStr )
     reactionSuite.styles.add( apdStyle )
     reactionSuite.calculateAverageProductData( apdStyle, indent = '  ', verbosity = args.verbose - 2 )  ### FIXME need logfile arguments in this process call
 preLoopStyle = apdStyle
 
 if( args.MonteCarlo ) :
-    if( args.verbose > 0 ) : print 'Processing Monte Carlo'
-    MonteCarlostyle = stylesModule.MC( '%s' % ( args.prefixMonteCarlo ), apdStyle.label, date = dateTimeStr )
-    reactionSuite.styles.add( MonteCarlostyle )    
-    reactionSuite.processMC( MonteCarlostyle, verbosity = args.verbose - 1 )
-    preLoopStyle = MonteCarlostyle
+    if( args.verbose > 0 ) : print('Processing Monte Carlo')
+    MonteCarloStyle = stylesModule.MonteCarlo_cdf( '%s' % ( args.prefixMonteCarlo ), apdStyle.label, date = dateTimeStr )
+    reactionSuite.styles.add( MonteCarloStyle )
+    reactionSuite.processMC_cdf( MonteCarloStyle, verbosity = args.verbose - 1 )
+    preLoopStyle = MonteCarloStyle
         
 if( args.MultiGroup ) :
     multiGroupStyle = stylesModule.multiGroup( '%s' % ( args.prefixMultiGroup ), args.legendreMax, date = dateTimeStr )
@@ -240,7 +265,7 @@ if( args.MultiGroup ) :
         multiGroupStyle.transportables.add( transportable )
     reactionSuite.styles.add( multiGroupStyle )
 
-### heat the xs and AEPs with a style for each temperature
+### heat the cross sections and AEPs with a style for each temperature
 for temperatureIndex, temperatureValue in enumerate( args.temperatures ) :
 
     suffix = '_%03d' % temperatureIndex
@@ -248,8 +273,9 @@ for temperatureIndex, temperatureValue in enumerate( args.temperatures ) :
     temperature = temperatureModule.temperature( temperatureValue, args.temperatureUnit )
     if( reactionSuite.projectile != IDsPoPsModule.neutron ) :
         if( float( temperature ) > 0 ) : raise ValueError( 'Can only heat neutron as projectile cross sections.' )
-    if( float( temperature ) > 0 ) :
-        if( args.verbose > 0 ) : print 'Heating to %s %s' % ( temperature.value, temperature.unit )
+        temperature = reactionSuite.styles[0].temperature
+    if( float( temperature ) >= 0 ) :
+        if( args.verbose > 0 ) : print( 'Heating to %s %s' % ( temperature.value, temperature.unit ) )
 
         heatStyle = stylesModule.heated( args.prefixHeated + suffix, preLoopStyle.label, temperature, date = dateTimeStr )
         reactionSuite.styles.add( heatStyle )
@@ -257,18 +283,28 @@ for temperatureIndex, temperatureValue in enumerate( args.temperatures ) :
         loopStyle = heatStyle
     else :
         loopStyle = preLoopStyle
-    
+
+    if( args.MonteCarlo ) :
+        if( args.verbose > 1 ) : print('  Processing gridded cross sections')
+        griddedCrossSectionStyle = stylesModule.griddedCrossSection( args.prefixMonteCarlo + suffix, loopStyle.label, date = dateTimeStr )
+        reactionSuite.styles.add( griddedCrossSectionStyle )
+        reactionSuite.processGriddedCrossSections( griddedCrossSectionStyle, verbosity = args.verbose - 2, indent = '    ' )
+
     if( args.MultiGroup ) :
-        if( args.verbose > 1 ) : print '  Processing multi group'
+        if( args.verbose > 1 ) : print('  Processing multi group')
         heatedMultiGroupStyle = stylesModule.heatedMultiGroup( args.prefixMultiGroup + suffix, loopStyle.label, multiGroupStyle.label, flux, date = dateTimeStr )
         reactionSuite.styles.add( heatedMultiGroupStyle )
-        reactionSuite.processMultiGroup( heatedMultiGroupStyle, verbosity = args.verbose - 2, logFile = logFile, indent = '    ' )
+        workDir = os.path.join( 'Merced.work', reactionSuite.projectile, reactionSuite.target, "T_%s_%s" % 
+                ( temperatureValue, args.temperatureUnit.replace( " ", "" ).replace( os.sep, "_" ) ) )
+        if( os.path.exists( workDir ) ) : shutil.rmtree( workDir )
+        reactionSuite.processMultiGroup( heatedMultiGroupStyle, verbosity = args.verbose - 2, logFile = logFile, indent = '    ', workDir = workDir )
         if args.UpScatter: 
             heatUpscatterStyle = stylesModule.UpScatter( args.prefixUpScatter + suffix, heatedMultiGroupStyle.label, date = dateTimeStr ) 
             reactionSuite.styles.add( heatUpscatterStyle )
             reactionSuite.processUP( heatUpscatterStyle, verbosity = args.verbose - 2 )  ### not implemented yet?  ### FIXME need logfile arguments in this process call
 
-processedFileName = args.gnd.replace( '.xml', '%s.xml' % args.tag )
+processedFileName = args.outputFile
+if( processedFileName is None ) : processedFileName = args.gnds.replace( '.xml', '%s.xml' % args.tag )
 if( outputDefault != args.output ) : processedFileName = os.path.join( args.output, os.path.basename( processedFileName ) )
 reactionSuite.saveToFile( processedFileName, xs_pdf_cdf1d_singleLine = True )
 

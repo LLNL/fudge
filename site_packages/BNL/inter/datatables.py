@@ -87,7 +87,9 @@ class DataTable( xData.table.table ):
         icol= self.columns.index( column[0] )
         row = [a for a in self.rows if a==rowName]
         if not row: return None
-        if len(row) > 1: raise ValueError("Row named '%s' is not unique!" % rowName)
+        if len(row) > 1:
+            print("WARNING: Row named '%s' is not unique! %s" % (rowName,str(row)))
+#            raise ValueError("Row named '%s' is not unique!" % rowName)
         irow = self.rows.index( row[0] )
         return self.data[irow][icol]
 

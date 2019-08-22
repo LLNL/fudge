@@ -64,14 +64,12 @@
 SMR_PATH = ../../../../../statusMessageReporting
 NUMERICALFUNCTIONS_PATH = ../../../..
 
-CC = gcc
-CDEBUGFLAGS = -g -O0 -Wall
 ptwXYCFLAGS = -lnfut_utilities -lptwXY_utilities \
 			  -I$(NUMERICALFUNCTIONS_PATH)/include -L$(NUMERICALFUNCTIONS_PATH)/lib -lnumericalfunctions \
               -I$(SMR_PATH)/include -L$(SMR_PATH)/lib -lstatusMessageReporting
-localCFLAGS = $(CDEBUGFLAGS) $(CFLAGS) $(ptwXYCFLAGS) -lm
+localCFLAGS = $(CFLAGS) $(ptwXYCFLAGS)
 
-TARGETS = toLinearLinear unitbase unitbase2 chargedParticle strings strings2 badLogValue
+TARGETS = toLinearLinear unitbase unitbase2 chargedParticle strings badLogValue strings2
 
 .PHONY: default check clean realclean $(TARGETS)
 
@@ -107,8 +105,8 @@ check: default
 	./test.com unitbase2 $(CHECKOPTIONS)
 	./test.com chargedParticle $(CHECKOPTIONS)
 	./test.com strings.com $(CHECKOPTIONS)
-	./test.com strings2 $(CHECKOPTIONS)
 	./test.com badLogValue $(CHECKOPTIONS)
+	./test.com strings2 $(CHECKOPTIONS)
 
 clean:
 	rm -f *.dat v

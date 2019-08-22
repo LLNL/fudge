@@ -62,12 +62,12 @@
 # <<END-copyright>>
 
 NUMERICALFUNCTIONS_DIR = ../../
-Libs = -lnumericalfunctions -L$(NUMERICALFUNCTIONS_DIR)/lib -lm
+Libs = -lnumericalfunctions -L$(NUMERICALFUNCTIONS_DIR)/lib
 
 .PHONY: clean realclean
 
 E1: E1.c
-	$(CC) $(CFLAGS) -I$(NUMERICALFUNCTIONS_DIR)/include -o E1 E1.c $(Libs)
+	$(CC) $(CFLAGS) -I$(NUMERICALFUNCTIONS_DIR)/include -o E1 E1.c $(Libs) -lm
 
 clean:
 	rm -f E1

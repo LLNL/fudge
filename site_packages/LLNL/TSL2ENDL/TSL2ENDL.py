@@ -73,23 +73,23 @@ from fudge import fudgeParameters
 fudgeParameters.VerboseMode = 0
 
 from fudge.legacy.endl import endlProject as endlProjectClass
-from fudge.gnd import thermalScattering as thermalScatteringModule
+from fudge.gnds import thermalScattering as thermalScatteringModule
 
 import coherentElastic as coherentElasticModule
 import incoherentElastic as incoherentElasticModule
 import incoherentInelastic as incoherentInelasticModule
 
 description1 = """
-This module converts data in a GND theramal scattering law file into ENDL data and adds it to a base endl ZA directory.
+This module converts data in a GNDS theramal scattering law file into ENDL data and adds it to a base endl ZA directory.
 
-    TSL2ENDL.py /usr/workspace/wsa/ndg/Sab/tsl-HinCH2.gnd.xml /usr/gapps/data/nuclear/endl_official/endl2009.2 1001 1901
+    TSL2ENDL.py /usr/workspace/wsa/ndg/Sab/tsl-HinCH2.gnds.xml /usr/gapps/data/nuclear/endl_official/endl2009.2 1001 1901
 """
 
 __doc__ = description1
 
 parser = ArgumentParser( description = description1 )
 parser.add_argument( 'TSLFile', type = str,
-        help = 'Path to the GND thermal scattering law file.' )
+        help = 'Path to the GNDS thermal scattering law file.' )
 parser.add_argument( 'endlDatabase', type = str,
         help = 'Path to the endl database containing the ZA data to use as the base endl ZA' +
         '(e.g., "/usr/gapps/data/nuclear/endl_official/endl2009.2").' )

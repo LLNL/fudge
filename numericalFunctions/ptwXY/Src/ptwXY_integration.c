@@ -88,7 +88,15 @@ nfu_status ptwXY_f_integrate( statusMessageReporting *smr, ptwXY_interpolation i
         double x2, double y2, double *value ) {
 
     nfu_status status = nfu_Okay;
-    double r;
+    double r, _sign = 1.0;
+    double ratioX, logX, ratioY, logY, numerator;
+
+    if( x2 < x1 ) {
+        double x = x1;
+        x1 = x2;
+        x2 = x;
+        _sign = -1.;
+    }
 
     *value = 0.;
     switch( interpolation ) {
@@ -127,42 +135,29 @@ nfu_status ptwXY_f_integrate( statusMessageReporting *smr, ptwXY_interpolation i
         }
         break;
     case ptwXY_interpolationLogLog :                            /* x log, y log */
-        if( ( x1 <= 0. ) || ( x2 <= 0. ) || ( y1 <= 0. ) || ( y2 <= 0. ) ) {
-            smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badIntegrationInput, 
-                    "0 or negative values for log-x and log-y integration: x1 = %.17e, y1 = %.17e, x2 = %.17e, y2 = %.17e", 
-                    x1, y1, x2, y2 );
-            status = nfu_badIntegrationInput; }
+        ratioX = x2 / x1;
+        if( fabs( ratioX - 1. ) < 1e-4 ) {
+            ratioX -= 1.0;
+            logX = ratioX * ( 1. + ratioX * ( -0.5 + ratioX * ( 1. / 3. - 0.25 * ratioX ) ) );
+            ratioX = x2 / x1; }
         else {
-            int i, n;
-            double a, z, lx, ly, s, f;
+            logX = log( ratioX );
+        }
 
-            r = y2 / y1;
-            if( fabs( r - 1. ) < 1e-4 ) {
-                ly = ( y2 - y1 ) / y1;
-                ly = ly * ( 1. + ly * ( -0.5 + ly * ( 1. / 3. - 0.25 * ly ) ) ); }
-            else {
-                ly = log( r );
-            }
-            r = x2 / x1;
-            if( fabs( r - 1. ) < 1e-4 ) {
-                lx = ( x2 - x1 ) / x1;
-                lx = lx * ( 1 + lx * ( -0.5 + lx * ( 1. / 3. - 0.25 * lx ) ) ); }
-            else {
-                lx = log( r );
-            }
-            a = ly / lx;
-            if( fabs( r - 1. ) < 1e-3 ) {
-                z = ( x2 - x1 ) / x1;
-                n = (int) a;
-                if( n > 10 ) n = 12;
-                if( n < 4 ) n = 6;
-                a = a - n + 1;
-                f = n + 1.;
-                for( i = 0, s = 0.; i < n; i++, a++, f-- ) s = ( 1. + s ) * a * z / f;
-                *value = y1 * ( x2 - x1 ) * ( 1. + s ); }
-            else {
-                *value = y1 * x1 * ( pow( r, a + 1. ) - 1. ) / ( a + 1. );
-            }
+        ratioY = y2 / y1;
+        if( fabs( ratioY - 1. ) < 1e-4 ) {
+            ratioY -= 1.0;
+            logY = ratioY * ( 1. + ratioY * ( -0.5 + ratioY * ( 1. / 3. - 0.25 * ratioY ) ) );
+            ratioY = y2 / y1; }
+        else {
+            logY = log( ratioY );
+        }
+
+        numerator = ratioX * ratioY - 1.0;
+        if( numerator < 1e-4 ) {
+            *value = y1 * x1 * logX * ( 1.0 + 0.5 * numerator * ( 1.0 + numerator * ( 1 + 0.5 * numerator * ( 1 + 19.0 * numerator / 30.0 ) ) / 6.0 ) ); }
+        else {
+            *value = y1 * x1 * numerator / ( logY / logX + 1.0 );
         }
         break;
     case ptwXY_interpolationFlat :                            /* x ?, y flat */
@@ -172,6 +167,9 @@ nfu_status ptwXY_f_integrate( statusMessageReporting *smr, ptwXY_interpolation i
         smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Other interpolation not supported for integration." );
         status = nfu_otherInterpolation;
     }
+
+    *value *= _sign;
+
     return( status );
 }
 /*
@@ -353,7 +351,7 @@ nfu_status ptwXY_integrateWithWeight_x( statusMessageReporting *smr, ptwXYPoints
         double *value ) {
 
     int64_t i, n = ptwXY->length;
-    double sum = 0., x, y, x1, x2, y1, y2, _sign = 1., a1, inv_a1, a1x1, a1x2;
+    double sum = 0., x, y, x1, x2, y1, y2, _sign = 1., invLog, dx, dy, ratioX, logX, ratioY, logY, numerator;
     ptwXYPoint *point;
     nfu_status status;
 
@@ -364,11 +362,8 @@ nfu_status ptwXY_integrateWithWeight_x( statusMessageReporting *smr, ptwXYPoints
         return( nfu_badSelf );
     }
 
-    if(     ( ptwXY->interpolation != ptwXY_interpolationLinLin ) && 
-            ( ptwXY->interpolation != ptwXY_interpolationLogLin ) &&
-            ( ptwXY->interpolation != ptwXY_interpolationFlat ) ) {
-        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_unsupportedInterpolation,
-            "Unsupported interpolation = '%s'", ptwXY->interpolationString );
+    if( ptwXY->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_unsupportedInterpolation, "Unsupported interpolation = '%s'", ptwXY->interpolationString );
         return( nfu_unsupportedInterpolation );
     }
 
@@ -428,11 +423,58 @@ nfu_status ptwXY_integrateWithWeight_x( statusMessageReporting *smr, ptwXYPoints
             sum += ( x2 - x1 ) * ( y1 * ( 2 * x1 + x2 ) + y2 * ( x1 + 2 * x2 ) ) / 6.;
             break;
         case ptwXY_interpolationLogLin :
-            inv_a1 = ( x2 - x1 ) / log( y2 / y1 );
-            a1 = 1 / inv_a1;
-            a1x1 = a1 * x1;
-            a1x2 = a1 * x2;
-            sum += inv_a1 * inv_a1 * ( exp( a1x2 ) * ( a1x2 - 1 ) - exp( a1x1 ) * ( a1x1 - 1 ) );
+            ratioY = y2 / y1;
+            dx = x2 - x1;
+            dy = y2 - y1;
+            if( fabs( ratioY - 1 ) < 1e-3 ) {
+                double sum2 = 0.0;
+
+                ratioY -= 1.0;
+                sum2 = x1 * ( 1.0 + 0.5 * ratioY * ( 1.0 + ratioY * ( -1.0 + 0.5 * ratioY * ( 1.0 - 19 * ratioY / 30 ) ) / 6.0 ) );
+                sum2 += 0.5 * ( x2 - x1 ) * ( 1.0 + ratioY * ( 2.0 + 0.25 * ratioY * ( -1.0 + ratioY * ( 7 - 4.25 * ratioY ) / 15.0 ) ) / 3.0 );
+                sum += y1 * ( x2 - x1 ) * sum2;
+                }
+            else {
+                invLog = 1.0 / log( ratioY );
+                sum += dx * invLog * ( dx * ( y2 - dy * invLog ) + x1 * dy );
+            }
+            break;
+        case ptwXY_interpolationLinLog :
+            sum += 0.5 * ( x2 - x1 ) * y1 * ( x1 + x2 );
+            ratioX = x2 / x1;
+            if( fabs( ratioX - 1 ) < 1e-3 ) {
+                ratioX -= 1.0;
+                sum += 0.5 * ( y2 - y1 ) * x1 * ( x2 - x1 ) * ( 1.0 + ratioX * ( 5.0 + ratioX * ratioX * ( 1.0 + ratioX ) / 30.0 ) / 6.0 ); }
+            else {
+                logX = log( ratioX );
+                sum += 0.25 * ( y2 - y1 ) * x1 * x1 * ( 1.0 + ratioX * ratioX * ( 2.0 * logX - 1.0 ) ) / logX;
+            }
+            break;
+        case ptwXY_interpolationLogLog :
+            ratioX = x2 / x1;
+            if( fabs( ratioX - 1. ) < 1e-4 ) {
+                ratioX -= 1.0;
+                logX = ratioX * ( 1. + ratioX * ( -0.5 + ratioX * ( 1. / 3. - 0.25 * ratioX ) ) );
+                ratioX = x2 / x1; }
+            else {
+                logX = log( ratioX );
+            }
+
+            ratioY = y2 / y1;
+            if( fabs( ratioY - 1. ) < 1e-4 ) {
+                ratioY -= 1.0;
+                logY = ratioY * ( 1. + ratioY * ( -0.5 + ratioY * ( 1. / 3. - 0.25 * ratioY ) ) );
+                ratioY = y2 / y1; }
+            else {
+                logY = log( ratioY );
+            }
+
+            numerator = ratioX * ratioX * ratioY - 1.0;
+            if( numerator < 1e-4 ) {
+                sum += y1 * x1 * x1 * logX * ( 1.0 + 0.5 * numerator * ( 1.0 + numerator * ( 1 + 0.5 * numerator * ( 1 + 19.0 * numerator / 30.0 ) ) / 6.0 ) ); }
+            else {
+                sum += y1 * x1 * x1 * numerator / ( logY / logX + 2.0 );
+            }
             break;
         default :       /* Only to stop compilers from complaining. */
             break;
@@ -1000,7 +1042,7 @@ nfu_status ptwXY_integrateWithFunction( statusMessageReporting *smr, ptwXYPoints
         integral += integral_;
         xa = xb;
     }
-    *value = integral;
+    *value = sign * integral;
 
     return( nfu_Okay );
 }

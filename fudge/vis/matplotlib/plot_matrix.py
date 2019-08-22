@@ -63,7 +63,8 @@
 
 import numpy
 from matplotlib import pyplot
-from matplotlib.colors import LogNorm
+from matplotlib import colors
+from matplotlib import ticker
 
 def plot_matrix( matrix, energyBoundariesX=None, energyBoundariesY=None, title="Matrix", xyTitle='Energy (MeV)',
         xylog=False, zlog=False, zRange=(), switchY=True, colorMap='jet', subplot=None ):
@@ -121,11 +122,21 @@ def plot_matrix( matrix, energyBoundariesX=None, energyBoundariesY=None, title="
                 print "WARNING: no matrix elements > 0. Switching to linear scale for z-axis"
                 zlog=False
 
-    # z-axis log scale?
-    if zlog: zopts = {'norm': LogNorm( vmin=vmin, vmax=vmax ) }
-    else: zopts = {'vmin':vmin, 'vmax':vmax }
+    colorBarOpts = {}
+    if zlog:    # z-axis log scale
+        if vmin < 0:
+            zopts = {'norm': colors.SymLogNorm( linthresh=vmax*1e-9, vmin=vmin, vmax=vmax )}
 
-#    zopts['interpolation'] = 'none' # cleaner plot
+            ticks = []  # FIXME future versions of matplotlib may do this automatically for SymLogNorm
+            zmax = 10**numpy.floor( numpy.log10( vmax ) )
+            for i in range(4): ticks.append( -zmax * 10**(-3*i) )
+            ticks.append(0)
+            for i in range(3,-1,-1): ticks.append( zmax * 10**(-3*i) )
+            colorBarOpts['ticks'] = ticks
+            colorBarOpts['format'] = ticker.LogFormatterMathtext()
+        else:
+            zopts = {'norm': colors.LogNorm( vmin=vmin, vmax=vmax ) }
+    else: zopts = {'vmin':vmin, 'vmax':vmax }
 
     # color map:
     zopts['cmap'] = colorMap
@@ -134,15 +145,15 @@ def plot_matrix( matrix, energyBoundariesX=None, energyBoundariesY=None, title="
     if xylog:
         if energyBoundariesX is None: raise Exception("xylog option requires energy group boundary info")
         X,Y = numpy.lib.function_base.meshgrid(energyBoundariesX,energyBoundariesY)
-        pyplot.pcolor( X,Y, matrix, **zopts )
+        pyplot.pcolormesh( X,Y, matrix, **zopts )
         pyplot.setp( subplot, xscale='log', yscale='log' )
     elif energyBoundariesX is not None:
-        pyplot.pcolor( energyBoundariesX, energyBoundariesY, matrix, **zopts )
+        pyplot.pcolormesh( energyBoundariesX, energyBoundariesY, matrix, **zopts )
     else:
-        pyplot.imshow( matrix, **zopts )
+        pyplot.imshow( matrix, interpolation='none', **zopts )
 
     pyplot.title(title)
-    pyplot.colorbar()
+    pyplot.colorbar( **colorBarOpts )
     pyplot.matplotlib.cm.jet.set_under('w')
 
 def generateColorMap():
@@ -150,25 +161,25 @@ def generateColorMap():
     import matplotlib
     cdict = {'blue': [(0.0, 0, 0),
             (0.34999999999999998, 0, 0),
-            (0.499, 0.4828709677, 1),
-            (0.501, 1, 0.4828709677),
+            (0.4995, 0.4828709677, 1),
+            (0.5005, 1, 0.4828709677),
             (0.65999999999999992, 1, 1),
             (0.89000000000000001, 1, 1),
             (1.0, 0.5, 0.5)],
         'green': [(0.0, 0, 0),
             (0.089999999999999969, 0, 0),
             (0.35999999999999999, 1, 1),
-            (0.499, 1, 1),
-            (0.501, 1, 1),
+            (0.4995, 1, 1),
+            (0.5005, 1, 1),
             (0.625, 1, 1),
             (0.875, 0, 0),
             (1.0, 0, 0)],
         'red': [(0.0, 0.5, 0.5),
             (0.10999999999999999, 1, 1),
             (0.33999999999999997, 1, 1),
-            (0.499, 0.516129, 1),
-            (0.501, 1, 0.516129),
+            (0.4995, 0.516129, 1),
+            (0.5005, 1, 0.516129),
             (0.65000000000000002, 0, 0),
             (1.0, 0, 0)]} 
-    return matplotlib.colors.LinearSegmentedColormap('correlation',cdict,512)
+    return matplotlib.colors.LinearSegmentedColormap('correlation',cdict,1024)
 

@@ -97,6 +97,92 @@ ptwXPoints *ptwXY_getXArray( statusMessageReporting *smr, ptwXYPoints *ptwXY ) {
 /*
 ************************************************************
 */
+ptwXPoints *ptwXY_ysMappedToXs( statusMessageReporting *smr, ptwXYPoints *ptwXY, ptwXPoints *Xs, int64_t *offset ) {
+
+    int64_t iXY, iX, nXY = ptwXY_length( NULL, ptwXY ), nX = ptwX_length( NULL, Xs );
+    ptwXYPoint *point1, *point2;
+    ptwXY_interpolation interpolation = ptwXY_getInterpolation( ptwXY );
+    ptwXPoints *Ys = NULL;
+
+    *offset = 0;
+
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
+
+    if( Xs->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid destination." );
+        return( NULL );
+    }
+
+    if( ( nXY == 1 ) || ( nX == 1 ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_tooFewPoints, "number of points less than 2: %lld  %lld", nXY, nX );
+        return( NULL );
+    }
+
+    if( ( nXY == 0 ) || ( nX == 0 ) ) {
+        if( ( Ys = ptwX_new( smr, 0 ) ) == NULL ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( NULL );
+        }
+        return( Ys );
+    }
+
+    point1 = &ptwXY->points[0];
+    point2 = &ptwXY->points[nXY-1];
+
+    for( iX = 0; iX < nX; ++iX ) {
+        if( Xs->points[iX] >= point1->x ) break;
+    }
+    *offset = iX;
+
+    for( iX = 0; iX < nX; ++iX ) {
+        if( Xs->points[iX] > point2->x ) break;
+    }
+    nX = iX;
+    iX = *offset;
+
+    if( ( Ys = ptwX_new( smr, nX - iX ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
+    if( nX - iX < 2 ) return( Ys );
+
+    for( iXY = 1; iXY < nXY; ++iXY ) {
+        point2 = &ptwXY->points[iXY];
+        if( point2->x >= Xs->points[iX] ) break;
+        point1 = point2;
+    }
+
+    for( ; iXY < nXY; ++iXY ) {
+        point2 = &ptwXY->points[iXY];
+
+        while( iX < nX ) {
+            double xValue = Xs->points[iX], yValue;
+
+            if( xValue > point2->x ) break;
+
+            if( ptwXY_interpolatePoint( smr, interpolation, xValue, &yValue, point1->x, point1->y, point2->x, point2->y ) != nfu_Okay ) {
+                smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+                ptwX_free( Ys );
+                return( NULL );
+            }
+            if( ptwX_setPointAtIndex( smr, Ys, ptwX_length( NULL, Ys ), yValue ) != nfu_Okay ) {
+                smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+                ptwX_free( Ys );
+                return( NULL );
+            }
+            ++iX;
+        }
+        point1 = point2;
+    }
+
+    return( Ys );
+}
+/*
+************************************************************
+*/
 nfu_status ptwXY_dullEdges( statusMessageReporting *smr, ptwXYPoints *ptwXY, double lowerEps, double upperEps, int positiveXOnly ) {
 
 #define minEps 5e-16

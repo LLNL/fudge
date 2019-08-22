@@ -64,7 +64,7 @@
 # <<END-copyright>>
 
 """
-Translate GND/XML to HDF5. Each xml element becomes a group in HDF, except a few elements that become
+Translate GNDS/XML to HDF5. Each xml element becomes a group in HDF, except a few elements that become
 HDF datasets. Attributes are translated to HDF5 metadata
 """
 import sys
@@ -125,7 +125,7 @@ def addNode( parent, node, index, suffix=None ):
 
 def addValues( parent, node, index, suffix=None, isTwoDimensional=False ):
     """
-    <values> elements in GND store a list of numbers. Convert to HDF5 dataset
+    <values> elements in GNDS store a list of numbers. Convert to HDF5 dataset
     """
     name = fixName(node, suffix)
 
@@ -137,7 +137,7 @@ def addValues( parent, node, index, suffix=None, isTwoDimensional=False ):
 
 def addTableData( parent, node, index, rows, columns, suffix=None ):
     """
-    <data> elements in GND store a table. Convert to HDF5 dataset.
+    <data> elements in GNDS store a table. Convert to HDF5 dataset.
     Note that tables can be empty
     """
     name = fixName(node, suffix)

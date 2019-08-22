@@ -68,7 +68,7 @@ binDir = os.path.dirname( os.path.abspath( __file__ ) )
 sys.path.insert( 0, os.path.dirname( binDir ) )
 
 def process_args():
-    parser = argparse.ArgumentParser(description = 'Translate an ENDF file to the new GND format')
+    parser = argparse.ArgumentParser(description = 'Translate an ENDF file to the new GNDS format')
     parser.set_defaults( verbose = True )
     parser.add_argument("-v", action="store_true", dest='verbose', help="enable verbose output")
     parser.add_argument("-q", action="store_false", dest='verbose', help="disable verbose output")
@@ -102,11 +102,11 @@ def print_ZA_by_E( d, ZA, state=0 ):
 if __name__ == "__main__":
     args = process_args()
     if args.fudgepath != '' and args.fudgepath not in sys.path: sys.path.append( args.fudgepath )
-    from fudge.legacy.converting.endfFileToGNDMisc import parseENDFByMT_MF
-    from fudge.legacy.converting.endfFileToGND import endfFileToGND
+    from fudge.legacy.converting.endfFileToGNDSMisc import parseENDFByMT_MF
+    from fudge.legacy.converting.endfFileToGNDS import endfFileToGNDS
     header, MAT, theData = parseENDFByMT_MF( args.inFile )
 
-    x, c, i = endfFileToGND( args.inFile )
+    x, c, i = endfFileToGNDS( args.inFile )
     
     # ifpy = ( 454, 8 ), independent (prompt) fission yields
     # cfpy = ( 459, 8 ), cummulative (delayed) fission yields

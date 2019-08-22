@@ -62,3 +62,6 @@
 # <<END-copyright>>
 
 import crossSection
+import doubleDifferentialCrossSection
+import photonScattering
+import chargedParticleElastic

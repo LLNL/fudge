@@ -101,15 +101,15 @@ int main( int argc, char **argv ) {
     if( echo ) printf( "%s\n", __FILE__ );
 
     errCount += integrate( &smr, flat[0], flat[1], flat[2], flat[3], 9., 9., 9., 9. );
-    errCount += integrate( &smr, slope[0], slope[1], slope[2], slope[3], 18., 20.015744631999329, 16.384306079283071, 18.410234412974571 );
+    errCount += integrate( &smr, slope[0], slope[1], slope[2], slope[3], 18., 20.015744631999329, 16.384306079283071, 1.84102344129745710e+01 );
     slope[2] = slope[0] * ( 1 + 1e-3 );
-    errCount += integrate( &smr, slope[0], slope[1], slope[2], slope[3], 0.0059999999999993392, 0.0060004997501579282, 0.0054614353597604226, 0.0054619253462386856 );
+    errCount += integrate( &smr, slope[0], slope[1], slope[2], slope[3], 0.0059999999999993392, 0.0060004997501579282, 0.0054614353597604226, 5.46192534635673351e-03 );
     slope[2] = slope[0] * ( 1 + 1e-4 * ( 1. + 1e-8 ) );
-    errCount += integrate( &smr, slope[0], slope[1], slope[2], slope[3], 6.0000000600046732e-4, 6.000050057508588e-4, 5.4614354143796317e-4, 5.4614844341595715e-4 );
+    errCount += integrate( &smr, slope[0], slope[1], slope[2], slope[3], 6.0000000600046732e-4, 6.000050057508588e-4, 5.4614354143796317e-4, 5.46148443428480447e-04 );
     slope[2] = slope[0] * ( 1 + 1e-4 * ( 1. - 1e-8 ) );
-    errCount += integrate( &smr, slope[0], slope[1], slope[2], slope[3], 5.9999999399940052e-4, 6.0000499374931635e-4, 5.4614353051412137e-4, 5.4614843249191933e-4 );
+    errCount += integrate( &smr, slope[0], slope[1], slope[2], slope[3], 5.9999999399940052e-4, 6.0000499374931635e-4, 5.4614353051412137e-4, 5.46148432504442623e-04 );
     slope[2] = slope[0] * ( 1 + 1e-5 );
-    errCount += integrate( &smr, slope[0], slope[1], slope[2], slope[3], 6.0000000000393072e-5, 6.0000050000143072e-5, 5.4614353597968027e-5, 5.4614402618738265e-5 );
+    errCount += integrate( &smr, slope[0], slope[1], slope[2], slope[3], 6.0000000000393072e-5, 6.0000050000143072e-5, 5.4614353597968027e-5, 5.46144026199979856e-05 );
 
     exit( errCount );
 }
@@ -143,7 +143,6 @@ static int integrate2( statusMessageReporting *smr, char *label, ptwXY_interpola
     r = d;
     if( s != 0 ) r /= s;
     if( fabs( r ) > 1e-12 ) printf( "ERROR %s: %s compare, %e %e %e %e %e\n", __FILE__, label, answer, integral, s, d, r );
-
 
     sprintf( str, "%.17g", integral );
     e = strchr( str, 'e' );

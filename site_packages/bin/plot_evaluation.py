@@ -79,7 +79,7 @@ from site_packages.BNL.plot_evaluation import plotstyles
 # Set up the command line parser
 #---------------------------------------------------
 def parseArgs():
-    parser = argparse.ArgumentParser(description='Plot nuclear data from an ENDF or GND file')
+    parser = argparse.ArgumentParser(description='Plot nuclear data from an ENDF or GNDS file')
 
     # Required things so we know what to plot
     parser.add_argument('mt',       metavar='mt', type=int, help='MT of the cross section to plot.  If set to 0, will try to make all plots for all open channels (requires -o option too)' )
@@ -92,22 +92,22 @@ def parseArgs():
     parser.add_argument("--verboseWarnings", action="store_true", default=False, help="print verbose warnings")
     parser.add_argument("--printBadNK14", action="store_true", default=False, help="print bad NK's if found")
     parser.add_argument("--ignoreBadDate", action="store_true", default=False, help="ignore malformed ENDF dates")
-    parser.add_argument("--ignoreMF10Fission", action="store_true", default=False, help="ignore fission in MF=10 (for IAEA W evaluation)")
+    parser.add_argument("--acceptBadMF10FissionZAP", action="store_true", default=False, help="allow MF=10 MT=18 IZAP=0")
     parser.add_argument("--traceback", action="store_true", default=False, help="print traceback on exception")
 
     # Plot output file controls
     parser.add_argument('-o',       dest='outFile', default=None, type=str, help='Output file for plot (disables interactive plotting)' )
 
     # Override the target/projectile/product of interest
-    parser.add_argument('--target',     default=None, type=str, help="The target nucleus, given in GND notation, e.g. 'Pu239' (Default is None which means to take it from the first ENDF file)" )
-    parser.add_argument('--projectile', default=None, type=str, help="The projectile particles, given in GND notation, e.g. 'n' (Default is None which means to take it from the first ENDF file)" )
-    parser.add_argument('--product',    default=None, type=str, help="The product particle of interest, given in GND notation, e.g. 'n' (Default is None which means to take the first emitted particle for this observable)" )
+    parser.add_argument('--target',     default=None, type=str, help="The target nucleus, given in GNDS notation, e.g. 'Pu239' (Default is None which means to take it from the first ENDF file)" )
+    parser.add_argument('--projectile', default=None, type=str, help="The projectile particles, given in GNDS notation, e.g. 'n' (Default is None which means to take it from the first ENDF file)" )
+    parser.add_argument('--product',    default=None, type=str, help="The product particle of interest, given in GNDS notation, e.g. 'n' (Default is None which means to take the first emitted particle for this observable)" )
 
     # Resolved resonance region reconstruction controls
     parser.add_argument('--enableRRAngDist', default=False, action='store_true', help='Reconstruct the angular distribution from the resolved resonance parameters (default: False)' )
     parser.add_argument('--noReconstruct',   dest='doResonanceReconstruction', default=True, action='store_false', help="Don't reconstruct resonances (default: False)'" )
     parser.add_argument('--showURRCloud',    default=False, action='store_true', help='Overlay a contour plot of the PDF for the cross section in the URR (default: False)' )
-    parser.add_argument('--evaluationStyle', default='eval', type=str, help="Style in GND file to show")
+    parser.add_argument('--evaluationStyle', default='eval', type=str, help="Style in GNDS file to show")
 
     # Uncertainty related options
     parser.add_argument('--uncRatio',       default=False, action='store_true', help='Plot a ratio of the uncertainty over the data (default: False)' )
@@ -154,6 +154,9 @@ if __name__ == "__main__":
     projectile = args.projectile
     product = args.product
 
+ #   print(product)
+ #   exit()
+
     # Read in the plot style information
     userDefs = plotstyles.readUserStyles( args.style )
     if False:  # for debugging
@@ -165,7 +168,7 @@ if __name__ == "__main__":
     xyData = {}
     xydyData = {}
     xdxydyData = {}
-    gndMap = collections.OrderedDict()
+    gndsMap = collections.OrderedDict()
     mtMap = {}
     print( fudge.core.utilities.brb.banner( "Reading evaluation files" ) )
     for endf in args.endf:
@@ -185,11 +188,11 @@ if __name__ == "__main__":
             print('    Disabled plotting evaluation uncertainty')
             args.noUnc=True
             print()
-            gndMap['mixture']=mixture
+            gndsMap['mixture']=mixture
             for iso in mixture['isotopes']:
                 isoEndf=mixture['isotopes'][iso]['pathToFile']
                 print( fudge.core.utilities.brb.winged_banner("Reading " + isoEndf) )
-                gndMap[isoEndf] = plotio.readEvaluation( isoEndf,
+                gndsMap[isoEndf] = plotio.readEvaluation( isoEndf,
                                                          skipBadData=args.skipBadData,
                                                          reconstructResonances=args.doResonanceReconstruction,
                                                          continuumSpectraFix=args.continuumSpectraFix,
@@ -198,7 +201,7 @@ if __name__ == "__main__":
                                                          verboseWarnings=args.verboseWarnings,
                                                          printBadNK14=args.printBadNK14,
                                                          ignoreBadDate=args.ignoreBadDate,
-                                                         ignoreMF10Fission=args.ignoreMF10Fission)
+                                                         acceptBadMF10FissionZAP=args.acceptBadMF10FissionZAP)
 
         # Try plain XY data
         elif endf.endswith( '.xy.dat'):       xyData[endf]   = plotio.readXYData( endf )
@@ -210,7 +213,7 @@ if __name__ == "__main__":
         elif endf.endswith( '.xdxydy.dat'):   xdxydyData[endf] = plotio.readXdXYdYData( endf )
 
         # Must be an evaluation
-        else: gndMap[endf]   = plotio.readEvaluation( endf,
+        else: gndsMap[endf]   = plotio.readEvaluation( endf,
                                                       skipBadData=args.skipBadData,
                                                       reconstructResonances=args.doResonanceReconstruction,
                                                       continuumSpectraFix=args.continuumSpectraFix,
@@ -219,15 +222,15 @@ if __name__ == "__main__":
                                                       verboseWarnings=args.verboseWarnings,
                                                       printBadNK14=args.printBadNK14,
                                                       ignoreBadDate=args.ignoreBadDate,
-                                                      ignoreMF10Fission=args.ignoreMF10Fission)
+                                                      acceptBadMF10FissionZAP=args.acceptBadMF10FissionZAP)
 
-        if not endf in gndMap: continue
+        if not endf in gndsMap: continue
 
-        mtMap[endf] = getEvaluationMTs( gndMap[endf][0] )
+        mtMap[endf] = getEvaluationMTs( gndsMap[endf][0] )
 
     # Get the target & projectile
-    if target is None:     target = str(gndMap.items()[0][1][0].target)
-    if projectile is None: projectile = str(gndMap.items()[0][1][0].projectile)
+    if target is None:     target = str(gndsMap.items()[0][1][0].target)
+    if projectile is None: projectile = str(gndsMap.items()[0][1][0].projectile)
 
     # MT is specified by the user.  Just plot that.
     if args.mt != 0: mtList = [ args.mt ]
@@ -305,7 +308,7 @@ if __name__ == "__main__":
             print(fudge.core.utilities.brb.banner( "Generating plots for "+target+"("+reaction.lower()+')' ))
             if args.observable == "mubar":
                 makeAngDistMubarPlot(
-                    gndMap, xyData, xydyData, xdxydyData,
+                    gndsMap, xyData, xydyData, xdxydyData,
                     mt=mt,
                     projectile=projectile, target=target, product=product,
                     referenceFrame=args.referenceFrame,
@@ -318,7 +321,7 @@ if __name__ == "__main__":
                 if mt not in [502,504]:
                     print("in ENDF, formFactor data only exists for (in)coherent photon-atom scattering (MT=502, 504), so only showing MT=502 and 504")
                 makeFormFactorPlot(
-                    gndMap, xyData, xydyData, xdxydyData,
+                    gndsMap, xyData, xydyData, xdxydyData,
                     projectile=projectile, target=target, product=product,
                     outFile=outFile,
                     plotStyle=userDefs,
@@ -330,7 +333,7 @@ if __name__ == "__main__":
                 if mt != 502:
                     print("in ENDF, anomolousScatteringFactor data only exists for coherent photon-atom scattering (MT=502), so only showing MT=502")
                 makeAnomolousScatteringFactorPlot(
-                    gndMap, xyData, xydyData, xdxydyData,
+                    gndsMap, xyData, xydyData, xdxydyData,
                     projectile=projectile, target=target, product=product,
                     outFile=outFile,
                     plotStyle=userDefs,
@@ -343,7 +346,7 @@ if __name__ == "__main__":
                     print("in ENDF, energyTransfer data only exists for bremstrahlung reactions (MT=527, 528)")
                     continue
                 makeEnergyTransferPlot(
-                    gndMap, xyData, xydyData, xdxydyData,
+                    gndsMap, xyData, xydyData, xdxydyData,
                     mt=mt,
                     projectile=projectile, target=target, product=product,
                     outFile=outFile,
@@ -353,7 +356,7 @@ if __name__ == "__main__":
 
             elif args.observable in ["energyDeposit",'energyBalance'] :
                 makeEnergyDepositPlot(
-                    gndMap, xyData, xydyData, xdxydyData,
+                    gndsMap, xyData, xydyData, xdxydyData,
                     mt=mt,
                     projectile=projectile, target=target, product=product,
                     outFile=outFile,
@@ -364,7 +367,7 @@ if __name__ == "__main__":
 
             elif args.observable == "fissionEnergyRelease":
                 makeFissionEnergyReleasePlot(
-                    gndMap, xyData, xydyData, xdxydyData,
+                    gndsMap, xyData, xydyData, xdxydyData,
                     mt=mt,
                     projectile=projectile, target=target, product=product,
                     outFile=outFile,
@@ -374,7 +377,7 @@ if __name__ == "__main__":
 
             elif args.observable == "nubar":
                 makeMultiplicityPlot(
-                    gndMap, xyData, xydyData, xdxydyData,
+                    gndsMap, xyData, xydyData, xdxydyData,
                     mt=mt,
                     projectile=projectile, target=target, product=product,
                     c4File=args.c4File,
@@ -393,7 +396,7 @@ if __name__ == "__main__":
                     print("Total elastic cross section doesn't make sense for charged particles, skipping plot\n")
                     continue
                 makeCrossSectionIntegralsPlot(
-                    gndMap, xyData, xydyData, xdxydyData,
+                    gndsMap, xyData, xydyData, xdxydyData,
                     mt=mt,
                     projectile=projectile, target=target, product=product,
                     outFile=outFile,
@@ -407,7 +410,7 @@ if __name__ == "__main__":
                     continue
                 if  args.uncRatio:
                     makeCrossSectionUncertaintyPlot(
-                        gndMap, xyData, xydyData, xdxydyData, c4File=args.c4File,
+                        gndsMap, xyData, xydyData, xdxydyData, c4File=args.c4File,
                         mt=0,
                         projectile='n', target='1H',
                         outFile=None,
@@ -418,7 +421,7 @@ if __name__ == "__main__":
                 else:
                     try:
                         makeCrossSectionPlot(
-                            gndMap, xyData, xydyData, xdxydyData,
+                            gndsMap, xyData, xydyData, xdxydyData,
                             mt=mt,
                             c4File=args.c4File,
                             projectile=projectile, target=target,
@@ -438,7 +441,7 @@ if __name__ == "__main__":
                     except ValueError as err:
                         if 'absolute vs. relative' in err.message:
                             makeCrossSectionPlot(
-                                gndMap, xyData, xydyData, xdxydyData,
+                                gndsMap, xyData, xydyData, xdxydyData,
                                 mt=mt,
                                 projectile=projectile, target=target,
                                 nounc=True,
@@ -459,7 +462,7 @@ if __name__ == "__main__":
                     except AttributeError as err:
                         if "summedCovariance' object has no attribute 'axes" in err.message:
                             makeCrossSectionPlot(
-                                gndMap, xyData, xydyData, xdxydyData,
+                                gndsMap, xyData, xydyData, xdxydyData,
                                 mt=mt,
                                 projectile=projectile, target=target,
                                 nounc=True,
@@ -479,7 +482,7 @@ if __name__ == "__main__":
 
             elif args.observable in ["momentumDeposit", 'momentumBalance']:
                 makeMomentumDepositPlot(
-                    gndMap, xyData, xydyData, xdxydyData,
+                    gndsMap, xyData, xydyData, xdxydyData,
                     mt=mt,
                     projectile=projectile, target=target, product=product,
                     outFile=outFile,
@@ -490,7 +493,7 @@ if __name__ == "__main__":
 
             elif args.observable == "LegendreMoment":
                 makeAngDistLegendreMomentPlot(
-                    gndMap, xyData, xydyData, xdxydyData,
+                    gndsMap, xyData, xydyData, xdxydyData,
                     mt=mt,
                     L=args.L,
                     projectile=projectile, target=target, product=product,

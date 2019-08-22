@@ -64,8 +64,8 @@
 NUMERICALFUNCTIONS_PATH = ../..
 NUMERICALFUNCTIONS_INCLUDE_PATH = $(NUMERICALFUNCTIONS_PATH)/include
 
-CFLAGS = -g -O0 -Wall
-localCFLAGS = $(CFLAGS) $(ptwCFLAGS) $(ptwXYCFLAGS) -I$(NUMERICALFUNCTIONS_INCLUDE_PATH) -I$(SMR_PATH)/include
+ptwXYCFLAGS = -I$(NUMERICALFUNCTIONS_INCLUDE_PATH) -I$(SMR_PATH)/include
+localCFLAGS = $(CFLAGS) $(ptwXYCFLAGS)
 objects = ptwXY_core.o ptwXY_methods.o ptwXY_misc.o ptwXY_functions.o ptwXY_convenient.o ptwXY_integration.o \
     ptwXY_binaryOperators.o ptwXY_unitaryOperators.o ptwXY_interpolation.o
 

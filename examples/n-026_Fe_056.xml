@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<reactionSuite projectile="n" target="Fe56" evaluation="ENDF/B-7.1" version="GND 1.8" xmlns:xlink="http://www.w3.org/1999/xlink" projectileFrame="lab">
+<reactionSuite projectile="n" target="Fe56" evaluation="ENDF/B-7.1" version="GNDS 1.8" xmlns:xlink="http://www.w3.org/1999/xlink" projectileFrame="lab">
   <styles>
     <evaluated label="eval" date="1996-09-01" library="ENDF/B" version="7.1.4">
       <temperature value="0.0" unit="K"/></evaluated></styles>

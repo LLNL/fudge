@@ -1,12 +1,10 @@
-<PoPs name="test" version="1.2.3" format="PoPs 0.1">
+<PoPs name="test" version="1.2.3" format="0.1">
   <aliases>
     <metaStable id="Am242_m1" pid="Am242_e2" metaStableIndex="1"/>
     <particle id="electron" pid="e-"/>
     <particle id="e+" pid="e-_anti"/>
     <particle id="positron" pid="e-_anti"/>
-    <particle id="h2" pid="h2_e0"/>
     <particle id="d" pid="h2"/>
-    <particle id="h3" pid="h3_e0"/>
     <particle id="t" pid="h3"/></aliases>
   <gaugeBosons>
     <gaugeBoson id="photon">
@@ -100,132 +98,141 @@
       <halflife>
         <string label="base" value="stable" unit="s"/></halflife></baryon></baryons>
   <chemicalElements>
-    <chemicalElement id="H" Z="1" name="Hydrogen">
-      <isotope id="H1" A="1">
-        <nuclearLevel id="H1_e0">
-          <mass>
-            <double label="base" value="1.00782503207" unit="amu"/></mass>
-          <nucleus id="h1_e0" index="0">
-            <mass>
-              <double label="base" value="1.00727646688" unit="amu"/></mass>
-            <spin>
-              <fraction label="base" value="1/2" unit="hbar"/></spin>
-            <parity>
-              <integer label="base" value="1"/></parity>
-            <charge>
-              <integer label="base" value="1" unit="e"/></charge>
-            <halflife>
-              <string label="base" value="stable" unit="s"/></halflife>
-            <energy>
-              <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclearLevel></isotope>
-      <isotope id="H2" A="2">
-        <nuclearLevel id="H2_e0">
-          <mass>
-            <double label="base" value="2.01410177785" unit="amu"/></mass>
-          <nucleus id="h2_e0" index="0">
-            <mass>
-              <double label="base" value="2.01355319775" unit="amu"/></mass>
-            <parity>
-              <integer label="base" value="1"/></parity>
-            <charge>
-              <integer label="base" value="1" unit="e"/></charge>
-            <halflife>
-              <string label="base" value="stable" unit="s"/></halflife>
-            <energy>
-              <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclearLevel></isotope>
-      <isotope id="H3" A="3">
-        <nuclearLevel id="H3_e0">
-          <mass>
-            <double label="base" value="3.01604927767" unit="amu"/></mass>
-          <nucleus id="h3_e0" index="0">
-            <mass>
-              <double label="base" value="3.01550069757" unit="amu"/></mass>
-            <spin>
-              <fraction label="base" value="1/2" unit="hbar"/></spin>
-            <parity>
-              <integer label="base" value="1"/></parity>
-            <charge>
-              <integer label="base" value="1" unit="e"/></charge>
-            <halflife>
-              <double label="base" value="12.32" unit="yr"/></halflife>
-            <energy>
-              <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclearLevel></isotope></chemicalElement>
-    <chemicalElement id="O" Z="8" name="Oxygen">
-      <isotope id="O16" A="16">
-        <nuclearLevel id="O16_e0">
-          <mass>
-            <double label="base" value="15.9949146196" unit="amu"/></mass>
-          <nucleus id="o16_e0" index="0">
-            <energy>
-              <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclearLevel>
-        <nuclearLevel id="O16_e1">
-          <nucleus id="o16_e1" index="1">
-            <energy>
-              <double label="base" value="6049.4" unit="keV"/></energy></nucleus></nuclearLevel>
-        <nuclearLevel id="O16_e2">
-          <nucleus id="o16_e2" index="2">
-            <energy>
-              <double label="base" value="6129.893" unit="keV"/></energy></nucleus></nuclearLevel>
-        <nuclearLevel id="O16_e3">
-          <nucleus id="o16_e3" index="3">
-            <energy>
-              <double label="base" value="6917.1" unit="keV"/></energy></nucleus></nuclearLevel></isotope>
-      <isotope id="O17" A="17">
-        <nuclearLevel id="O17_e0">
-          <mass>
-            <double label="base" value="15.9949146196" unit="amu"/></mass>
-          <nucleus id="o17_e0" index="0">
-            <energy>
-              <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclearLevel>
-        <nuclearLevel id="O17_e1">
-          <nucleus id="o17_e1" index="1">
-            <energy>
-              <double label="base" value="6049.4" unit="keV"/></energy></nucleus></nuclearLevel>
-        <nuclearLevel id="O17_e2">
-          <nucleus id="o17_e2" index="2">
-            <energy>
-              <double label="base" value="6129.893" unit="keV"/></energy></nucleus></nuclearLevel>
-        <nuclearLevel id="O17_e3">
-          <nucleus id="o17_e3" index="3">
-            <energy>
-              <double label="base" value="6917.1" unit="keV"/></energy></nucleus></nuclearLevel></isotope></chemicalElement>
-    <chemicalElement id="Am" Z="95" name="Americium">
-      <isotope id="Am242" A="242">
-        <nuclearLevel id="Am242_e0">
-          <mass>
-            <double label="base" value="242.059549159" unit="amu"/></mass>
-          <nucleus id="am242_e0" index="0">
-            <spin>
-              <fraction label="base" value="1" unit="hbar"/></spin>
-            <parity>
-              <integer label="base" value="-1"/></parity>
-            <halflife>
-              <double label="base" value="16.02" unit="h"/></halflife>
-            <energy>
-              <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclearLevel>
-        <nuclearLevel id="Am242_e1">
-          <nucleus id="am242_e1" index="1">
-            <spin>
-              <fraction label="base" value="0" unit="hbar"/></spin>
-            <parity>
-              <integer label="base" value="-1"/></parity>
-            <energy>
-              <double label="base" value="44.092" unit="keV"/></energy></nucleus></nuclearLevel>
-        <nuclearLevel id="Am242_e2">
-          <nucleus id="am242_e2" index="2">
-            <spin>
-              <fraction label="base" value="5" unit="hbar"/></spin>
-            <parity>
-              <integer label="base" value="-1"/></parity>
-            <halflife>
-              <double label="base" value="141.0" unit="yr"/></halflife>
-            <energy>
-              <double label="base" value="48.6" unit="keV"/></energy></nucleus></nuclearLevel>
-        <nuclearLevel id="Am242_e3">
-          <nucleus id="am242_e3" index="3">
-            <spin>
-              <fraction label="base" value="3" unit="hbar"/></spin>
-            <parity>
-              <integer label="base" value="-1"/></parity>
-            <energy>
-              <double label="base" value="52.7" unit="keV"/></energy></nucleus></nuclearLevel></isotope></chemicalElement></chemicalElements></PoPs>
+    <chemicalElement symbol="H" Z="1" name="Hydrogen">
+      <isotopes>
+        <isotope symbol="H1" A="1">
+          <nuclides>
+            <nuclide id="H1">
+              <mass>
+                <double label="base" value="1.00782503207" unit="amu"/></mass>
+              <nucleus id="h1" index="0">
+                <mass>
+                  <double label="base" value="1.00727646688" unit="amu"/></mass>
+                <spin>
+                  <fraction label="base" value="1/2" unit="hbar"/></spin>
+                <parity>
+                  <integer label="base" value="1"/></parity>
+                <charge>
+                  <integer label="base" value="1" unit="e"/></charge>
+                <halflife>
+                  <string label="base" value="stable" unit="s"/></halflife>
+                <energy>
+                  <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclide></nuclides></isotope>
+        <isotope symbol="H2" A="2">
+          <nuclides>
+            <nuclide id="H2">
+              <mass>
+                <double label="base" value="2.01410177785" unit="amu"/></mass>
+              <nucleus id="h2" index="0">
+                <mass>
+                  <double label="base" value="2.01355319775" unit="amu"/></mass>
+                <parity>
+                  <integer label="base" value="1"/></parity>
+                <charge>
+                  <integer label="base" value="1" unit="e"/></charge>
+                <halflife>
+                  <string label="base" value="stable" unit="s"/></halflife>
+                <energy>
+                  <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclide></nuclides></isotope>
+        <isotope symbol="H3" A="3">
+          <nuclides>
+            <nuclide id="H3">
+              <mass>
+                <double label="base" value="3.01604927767" unit="amu"/></mass>
+              <nucleus id="h3" index="0">
+                <mass>
+                  <double label="base" value="3.01550069757" unit="amu"/></mass>
+                <spin>
+                  <fraction label="base" value="1/2" unit="hbar"/></spin>
+                <parity>
+                  <integer label="base" value="1"/></parity>
+                <charge>
+                  <integer label="base" value="1" unit="e"/></charge>
+                <halflife>
+                  <double label="base" value="12.32" unit="yr"/></halflife>
+                <energy>
+                  <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclide></nuclides></isotope></isotopes></chemicalElement>
+    <chemicalElement symbol="O" Z="8" name="Oxygen">
+      <isotopes>
+        <isotope symbol="O16" A="16">
+          <nuclides>
+            <nuclide id="O16">
+              <mass>
+                <double label="base" value="15.9949146196" unit="amu"/></mass>
+              <nucleus id="o16" index="0">
+                <energy>
+                  <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclide>
+            <nuclide id="O16_e1">
+              <nucleus id="o16_e1" index="1">
+                <energy>
+                  <double label="base" value="6049.4" unit="keV"/></energy></nucleus></nuclide>
+            <nuclide id="O16_e2">
+              <nucleus id="o16_e2" index="2">
+                <energy>
+                  <double label="base" value="6129.893" unit="keV"/></energy></nucleus></nuclide>
+            <nuclide id="O16_e3">
+              <nucleus id="o16_e3" index="3">
+                <energy>
+                  <double label="base" value="6917.1" unit="keV"/></energy></nucleus></nuclide></nuclides></isotope>
+        <isotope symbol="O17" A="17">
+          <nuclides>
+            <nuclide id="O17">
+              <mass>
+                <double label="base" value="15.9949146196" unit="amu"/></mass>
+              <nucleus id="o17" index="0">
+                <energy>
+                  <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclide>
+            <nuclide id="O17_e1">
+              <nucleus id="o17_e1" index="1">
+                <energy>
+                  <double label="base" value="6049.4" unit="keV"/></energy></nucleus></nuclide>
+            <nuclide id="O17_e2">
+              <nucleus id="o17_e2" index="2">
+                <energy>
+                  <double label="base" value="6129.893" unit="keV"/></energy></nucleus></nuclide>
+            <nuclide id="O17_e3">
+              <nucleus id="o17_e3" index="3">
+                <energy>
+                  <double label="base" value="6917.1" unit="keV"/></energy></nucleus></nuclide></nuclides></isotope></isotopes></chemicalElement>
+    <chemicalElement symbol="Am" Z="95" name="Americium">
+      <isotopes>
+        <isotope symbol="Am242" A="242">
+          <nuclides>
+            <nuclide id="Am242">
+              <mass>
+                <double label="base" value="242.059549159" unit="amu"/></mass>
+              <nucleus id="am242" index="0">
+                <spin>
+                  <fraction label="base" value="1" unit="hbar"/></spin>
+                <parity>
+                  <integer label="base" value="-1"/></parity>
+                <halflife>
+                  <double label="base" value="16.02" unit="h"/></halflife>
+                <energy>
+                  <double label="base" value="0.0" unit="keV"/></energy></nucleus></nuclide>
+            <nuclide id="Am242_e1">
+              <nucleus id="am242_e1" index="1">
+                <spin>
+                  <fraction label="base" value="0" unit="hbar"/></spin>
+                <parity>
+                  <integer label="base" value="-1"/></parity>
+                <energy>
+                  <double label="base" value="44.092" unit="keV"/></energy></nucleus></nuclide>
+            <nuclide id="Am242_e2">
+              <nucleus id="am242_e2" index="2">
+                <spin>
+                  <fraction label="base" value="5" unit="hbar"/></spin>
+                <parity>
+                  <integer label="base" value="-1"/></parity>
+                <halflife>
+                  <double label="base" value="141.0" unit="yr"/></halflife>
+                <energy>
+                  <double label="base" value="48.6" unit="keV"/></energy></nucleus></nuclide>
+            <nuclide id="Am242_e3">
+              <nucleus id="am242_e3" index="3">
+                <spin>
+                  <fraction label="base" value="3" unit="hbar"/></spin>
+                <parity>
+                  <integer label="base" value="-1"/></parity>
+                <energy>
+                  <double label="base" value="52.7" unit="keV"/></energy></nucleus></nuclide></nuclides></isotope></isotopes></chemicalElement></chemicalElements></PoPs>

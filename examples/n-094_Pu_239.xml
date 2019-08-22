@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<reactionSuite projectile="n" target="Pu239" evaluation="ENDF/B-7.1" version="GND 1.8" xmlns:xlink="http://www.w3.org/1999/xlink" projectileFrame="lab">
+<reactionSuite projectile="n" target="Pu239" evaluation="ENDF/B-7.1" version="GNDS 1.8" xmlns:xlink="http://www.w3.org/1999/xlink" projectileFrame="lab">
   <styles>
     <evaluated label="eval" date="2006-09-01" library="ENDF/B" version="7.1.5">
       <temperature value="0.0" unit="K"/></evaluated></styles>
@@ -6516,7 +6516,7 @@ Ta08 P.Talou, T.Kawano and P.G.Young, "Covariance matrices for
                     <XYs1d value="500000.0"><values length="40">0 0 2.5e4 8.285e-7 5e4 1.6487e-6 7.5e4 2.1541e-6 1e5 2.6512e-6 1.25e5 2.9826e-6 1.5e5 3.1483e-6 1.75e5 3.314e-6 2e5 3.3057e-6 2.25e5 3.1483e-6 2.5e5 3.024e-6 2.75e5 2.85832e-6 3e5 2.6512e-6 3.25e5 2.3198e-6 3.5e5 1.9884e-6 3.75e5 1.61557e-6 4e5 1.1599e-6 4.25e5 7.8707e-7 4.5e5 4.1425e-7 4.75e5 0</values></XYs1d>
                     <XYs1d value="1090000.0"><values length="46">0 0 2.4e4 0 24900 1e-9 2.5e4 6.70439e-7 7.5e4 1.62866e-6 1.25e5 2.04398e-6 1.75e5 2.17154e-6 2.25e5 2.10827e-6 2.75e5 1.94806e-6 3.25e5 1.72458e-6 3.75e5 1.50109e-6 4.25e5 1.30925e-6 4.75e5 1.08577e-6 5.25e5 8.84737e-7 5.75e5 7.34728e-7 6.25e5 6.0717e-7 6.75e5 5.11255e-7 7.25e5 4.15331e-7 7.75e5 3.19407e-7 8.25e5 2.55107e-7 8.75e5 1.91848e-7 9.25e5 1.60214e-7 9.75e5 1.27549e-7</values></XYs1d>
                     <XYs1d value="20000000.0"><values length="46">0 0 2.4e4 0 24900 1e-9 2.5e4 6.70439e-7 7.5e4 1.62866e-6 1.25e5 2.04398e-6 1.75e5 2.17154e-6 2.25e5 2.10827e-6 2.75e5 1.94806e-6 3.25e5 1.72458e-6 3.75e5 1.50109e-6 4.25e5 1.30925e-6 4.75e5 1.08577e-6 5.25e5 8.84737e-7 5.75e5 7.34728e-7 6.25e5 6.0717e-7 6.75e5 5.11255e-7 7.25e5 4.15331e-7 7.75e5 3.19407e-7 8.25e5 2.55107e-7 8.75e5 1.91848e-7 9.25e5 1.60214e-7 9.75e5 1.27549e-7</values></XYs1d></XYs2d></energy></uncorrelated></distribution></product>
-          <product name="photon" label="photon__a" originationLevel="285500 eV">
+          <product name="photon" label="photon__a">
             <multiplicity>
               <regions1d label="eval">
                 <axes>
@@ -6536,7 +6536,7 @@ Ta08 P.Talou, T.Kawano and P.G.Young, "Covariance matrices for
                       <axis index="2" label="energy_in" unit="eV"/>
                       <axis index="1" label="energy_out" unit="eV"/>
                       <axis index="0" label="P(energy_out|energy_in)" unit="1/eV"/></axes></discreteGamma></energy></uncorrelated></distribution></product>
-          <product name="photon" label="photon__b" originationLevel="285500 eV">
+          <product name="photon" label="photon__b">
             <multiplicity>
               <regions1d label="eval">
                 <axes>
@@ -6556,7 +6556,7 @@ Ta08 P.Talou, T.Kawano and P.G.Young, "Covariance matrices for
                       <axis index="2" label="energy_in" unit="eV"/>
                       <axis index="1" label="energy_out" unit="eV"/>
                       <axis index="0" label="P(energy_out|energy_in)" unit="1/eV"/></axes></discreteGamma></energy></uncorrelated></distribution></product>
-          <product name="photon" label="photon__c" originationLevel="285500 eV">
+          <product name="photon" label="photon__c">
             <multiplicity>
               <regions1d label="eval">
                 <axes>
@@ -6576,7 +6576,7 @@ Ta08 P.Talou, T.Kawano and P.G.Young, "Covariance matrices for
                       <axis index="2" label="energy_in" unit="eV"/>
                       <axis index="1" label="energy_out" unit="eV"/>
                       <axis index="0" label="P(energy_out|energy_in)" unit="1/eV"/></axes></discreteGamma></energy></uncorrelated></distribution></product>
-          <product name="photon" label="photon__d" originationLevel="285500 eV">
+          <product name="photon" label="photon__d">
             <multiplicity>
               <regions1d label="eval">
                 <axes>
@@ -6596,7 +6596,7 @@ Ta08 P.Talou, T.Kawano and P.G.Young, "Covariance matrices for
                       <axis index="2" label="energy_in" unit="eV"/>
                       <axis index="1" label="energy_out" unit="eV"/>
                       <axis index="0" label="P(energy_out|energy_in)" unit="1/eV"/></axes></discreteGamma></energy></uncorrelated></distribution></product>
-          <product name="photon" label="photon__e" originationLevel="163500 eV">
+          <product name="photon" label="photon__e">
             <multiplicity>
               <regions1d label="eval">
                 <axes>
@@ -6616,7 +6616,7 @@ Ta08 P.Talou, T.Kawano and P.G.Young, "Covariance matrices for
                       <axis index="2" label="energy_in" unit="eV"/>
                       <axis index="1" label="energy_out" unit="eV"/>
                       <axis index="0" label="P(energy_out|energy_in)" unit="1/eV"/></axes></discreteGamma></energy></uncorrelated></distribution></product>
-          <product name="photon" label="photon__f" originationLevel="163500 eV">
+          <product name="photon" label="photon__f">
             <multiplicity>
               <regions1d label="eval">
                 <axes>
@@ -6636,7 +6636,7 @@ Ta08 P.Talou, T.Kawano and P.G.Young, "Covariance matrices for
                       <axis index="2" label="energy_in" unit="eV"/>
                       <axis index="1" label="energy_out" unit="eV"/>
                       <axis index="0" label="P(energy_out|energy_in)" unit="1/eV"/></axes></discreteGamma></energy></uncorrelated></distribution></product>
-          <product name="photon" label="photon__g" originationLevel="75710 eV">
+          <product name="photon" label="photon__g">
             <multiplicity>
               <regions1d label="eval">
                 <axes>
@@ -6656,7 +6656,7 @@ Ta08 P.Talou, T.Kawano and P.G.Young, "Covariance matrices for
                       <axis index="2" label="energy_in" unit="eV"/>
                       <axis index="1" label="energy_out" unit="eV"/>
                       <axis index="0" label="P(energy_out|energy_in)" unit="1/eV"/></axes></discreteGamma></energy></uncorrelated></distribution></product>
-          <product name="photon" label="photon__h" originationLevel="57270 eV">
+          <product name="photon" label="photon__h">
             <multiplicity>
               <regions1d label="eval">
                 <axes>
@@ -6676,7 +6676,7 @@ Ta08 P.Talou, T.Kawano and P.G.Young, "Covariance matrices for
                       <axis index="2" label="energy_in" unit="eV"/>
                       <axis index="1" label="energy_out" unit="eV"/>
                       <axis index="0" label="P(energy_out|energy_in)" unit="1/eV"/></axes></discreteGamma></energy></uncorrelated></distribution></product>
-          <product name="photon" label="photon__i" originationLevel="57270 eV">
+          <product name="photon" label="photon__i">
             <multiplicity>
               <regions1d label="eval">
                 <axes>
@@ -6696,7 +6696,7 @@ Ta08 P.Talou, T.Kawano and P.G.Young, "Covariance matrices for
                       <axis index="2" label="energy_in" unit="eV"/>
                       <axis index="1" label="energy_out" unit="eV"/>
                       <axis index="0" label="P(energy_out|energy_in)" unit="1/eV"/></axes></discreteGamma></energy></uncorrelated></distribution></product>
-          <product name="photon" label="photon__j" originationLevel="7850 eV">
+          <product name="photon" label="photon__j">
             <multiplicity>
               <regions1d label="eval">
                 <axes>

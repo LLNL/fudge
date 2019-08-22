@@ -1,20 +1,17 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>fudge.legacy.endl.endl_Z &#8212; Fudge and GND 4.2.2 beta documentation</title>
-    
+    <title>fudge.legacy.endl.endl_Z &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '4.2.2 beta',
+        VERSION:     '4.2.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -28,7 +25,7 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +35,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
       </ul>
@@ -57,41 +54,44 @@
 <span class="sd">This module contains a set of routines that return the symbol or name for an element.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">fudge.particles.nuclear</span> <span class="k">import</span> <span class="n">elementsZSymbolName</span>
+<span class="kn">from</span> <span class="nn">PoPs.groups</span> <span class="k">import</span> <span class="n">misc</span> <span class="k">as</span> <span class="n">chemicalElementMiscModule</span>
 
 <div class="viewcode-block" id="endl_nZs"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_Z.endl_nZs">[docs]</a><span class="k">def</span> <span class="nf">endl_nZs</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Returns the number of elements, starting at neutron with Z = 0, for which data is present.</span>
 <span class="sd">    The largest element for which information can be obtained has Z = endl_nZs( ) - 1.&quot;&quot;&quot;</span>
 
-    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">elementsZSymbolName</span><span class="p">)</span></div>
+    <span class="k">return</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">chemicalElementMiscModule</span><span class="o">.</span><span class="n">chemicalElementZSymbolNames</span> <span class="p">)</span> <span class="p">)</span></div>
 
 <div class="viewcode-block" id="endl_ZSymbol"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_Z.endl_ZSymbol">[docs]</a><span class="k">def</span> <span class="nf">endl_ZSymbol</span><span class="p">(</span> <span class="n">Z</span> <span class="p">)</span> <span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Returns the symbol for the specified Z or &#39;None&#39; if Z is out-of-bounds.&quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">Z</span> <span class="ow">in</span> <span class="n">elementsZSymbolName</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">elementsZSymbolName</span><span class="p">[</span><span class="n">Z</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">return</span> <span class="kc">None</span></div>
+    <span class="k">try</span> <span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">chemicalElementMiscModule</span><span class="o">.</span><span class="n">symbolFromZ</span><span class="p">[</span><span class="n">Z</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">except</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="endl_ZLabel"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_Z.endl_ZLabel">[docs]</a><span class="k">def</span> <span class="nf">endl_ZLabel</span><span class="p">(</span> <span class="n">Z</span> <span class="p">)</span> <span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Returns the label (i.e., name) for the specified Z or &#39;None&#39; if Z is out-of-bounds.&quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="n">Z</span> <span class="ow">in</span> <span class="n">elementsZSymbolName</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">elementsZSymbolName</span><span class="p">[</span><span class="n">Z</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-    <span class="k">return</span> <span class="kc">None</span></div>
+    <span class="k">try</span> <span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">chemicalElementMiscModule</span><span class="o">.</span><span class="n">nameFromZ</span><span class="p">[</span><span class="n">Z</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">except</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="endl_ZSymbolToZ"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_Z.endl_ZSymbolToZ">[docs]</a><span class="k">def</span> <span class="nf">endl_ZSymbolToZ</span><span class="p">(</span> <span class="n">symbol</span> <span class="p">)</span> <span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Returns the Z for the specified symbol or &#39;None&#39; if no match for symbol.&quot;&quot;&quot;</span>
 
-    <span class="k">for</span> <span class="n">Z</span><span class="p">,(</span><span class="n">Symbol</span><span class="p">,</span><span class="n">Name</span><span class="p">)</span> <span class="ow">in</span> <span class="n">elementsZSymbolName</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="p">:</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">Symbol</span> <span class="o">==</span> <span class="n">symbol</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="n">Z</span>
-    <span class="k">return</span> <span class="kc">None</span></div>
+    <span class="k">try</span> <span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">chemicalElementMiscModule</span><span class="o">.</span><span class="n">ZFromSymbol</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">except</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="endl_ZLabelToZ"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_Z.endl_ZLabelToZ">[docs]</a><span class="k">def</span> <span class="nf">endl_ZLabelToZ</span><span class="p">(</span> <span class="n">label</span> <span class="p">)</span> <span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Returns the Z for the specified label or &#39;None&#39; if no match for label.&quot;&quot;&quot;</span>
 
-    <span class="k">for</span> <span class="n">Z</span><span class="p">,(</span><span class="n">Symbol</span><span class="p">,</span><span class="n">Name</span><span class="p">)</span> <span class="ow">in</span> <span class="n">elementsZSymbolName</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="p">:</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">Name</span> <span class="o">==</span> <span class="n">label</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="n">Z</span>
-    <span class="k">return</span> <span class="kc">None</span></div>
+    <span class="k">try</span> <span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">chemicalElementMiscModule</span><span class="o">.</span><span class="n">ZFromName</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">except</span> <span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
 </pre></div>
 
           </div>
@@ -125,14 +125,14 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

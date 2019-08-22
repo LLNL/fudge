@@ -61,6 +61,7 @@
 # 
 # <<END-copyright>>
 
+from __future__ import print_function
 import abc
 
 __metaclass__ = type
@@ -74,7 +75,7 @@ class ancestry :
     in the hierarchy using xlinks.  For example, if rs is a class with moniker 'reactionSuite' containing 
     reactionA and reactionB, each with moniker 'reaction', then
         
-        >>>reactionA.getAncestor() -> rs
+        >>>reactionA.ancestor -> rs
         >>>reactionB.toXLink() -> "/reactionSuite/reaction[@label='1']"
 
     This class defines three members:
@@ -97,7 +98,7 @@ class ancestry :
 
     def __init__( self ) :
 
-        self.ancestor = None
+        self.__ancestor = None
         self.attribute = None
 
     def __str__( self ) :
@@ -109,6 +110,12 @@ class ancestry :
 
         pass
 
+    @property
+    def ancestor( self ) :
+        """Returns self's ancestor."""
+
+        return( self.__ancestor )
+
     def checkAncestry( self, verbose = 0, level = 0 ) :
 
         def check( child ) :
@@ -117,17 +124,17 @@ class ancestry :
             if( self.isChild( child ) ) :
                 child.checkAncestry( verbose = verbose, level = level )
             else :
-                print 'WARNING from checkAncestry: member "%s" not a child of %s' % ( member, self.toXLink( ) )
-                print '    Its ancestry is: %s' % child.toXLink( )
+                print('WARNING from checkAncestry: member "%s" not a child of %s' % (member, self.toXLink()))
+                print('    Its ancestry is: %s' % child.toXLink())
 
         if( self.ancestryMembers == ( '', ) ) : return
 
         prefix = ( level + 1 ) * '    '
         if( len( self.ancestryMembers ) == 0 ) :
-            if( verbose != 0 ) : print "%s---- no items in ancestryMembers for %s" % ( prefix, self.toXLink( ) )
+            if( verbose != 0 ) : print("%s---- no items in ancestryMembers for %s" % (prefix, self.toXLink()))
         for member in self.ancestryMembers :
             if( member == '' ) : continue
-            if( verbose > 0 ) : print "%s%s" % ( prefix, member )
+            if( verbose > 0 ) : print("%s%s" % (prefix, member))
             doLoop = False
             if( member[0] == '[' ) :
                 member = member[1:]
@@ -139,19 +146,19 @@ class ancestry :
                 else :
                     check( m1 )
             else :
-                print 'WARNING from checkAncestry: %s does not have member "%s"' % ( self.toXLink( ), member )
+                print('WARNING from checkAncestry: %s does not have member "%s"' % (self.toXLink(), member))
 
     def findAttributeInAncestry( self, attributeName ) :
 
         if( hasattr( self, attributeName ) ) : return( getattr( self, attributeName ) )
-        if( self.ancestor is None ) : raise Exception( 'Could not find attribute name = %s in ancestry' % attributeName )
-        return( self.ancestor.findAttributeInAncestry( attributeName ) )
+        if( self.__ancestor is None ) : raise Exception( 'Could not find attribute name = %s in ancestry' % attributeName )
+        return( self.__ancestor.findAttributeInAncestry( attributeName ) )
 
     def findClassInAncestry( self, class_ ) :
 
         if( isinstance( self, class_ ) ) : return( self )
-        if( self.ancestor is None ) : raise Exception( 'Could not find class name = %s in ancestry' % class_.__name__ )
-        return( self.ancestor.findClassInAncestry( class_ ) )
+        if( self.__ancestor is None ) : raise Exception( 'Could not find class name = %s in ancestry' % class_.__name__ )
+        return( self.__ancestor.findClassInAncestry( class_ ) )
 
     def findEntity( self, entityName, attribute = None, value = None ) :
         """
@@ -165,7 +172,7 @@ class ancestry :
         if( entityName in ( '.', self.moniker ) ) :
             return self
         elif( entityName == '..' ) :
-            return self.ancestor
+            return self.__ancestor
         entity = None
         if( attribute is None ) :
             entity = getattr( self, entityName )
@@ -181,31 +188,26 @@ class ancestry :
             raise AttributeError( "Can't find entity %s in %s" % (entityName,self) )
         return entity
 
-    def getAncestor( self ) :
-        """Returns self's ancestor."""
-
-        return( self.ancestor )
-
     def getRootAncestor( self ) :
         """Traverse up the ancestry tree to the root ancestor and return it. The root ancestor is the instance whose ancestor is None."""
 
         ancestor = self
-        while( ancestor.ancestor is not None ) : ancestor = ancestor.ancestor
+        while( ancestor.__ancestor is not None ) : ancestor = ancestor.__ancestor
         return( ancestor )
 
     def isChild( self, child ) :
 
-        if( isinstance( child, ancestry ) ) : return( child.ancestor == self )
+        if( isinstance( child, ancestry ) ) : return( child.__ancestor == self )
         return( False )
 
     def isParent( self, parent ) :
 
-        return( self.ancestor == parent )
+        return( self.__ancestor == parent )
 
     def setAncestor( self, ancestor, attribute = None ) :
         """Sets self's ancestor to ancestor."""
 
-        self.ancestor = ancestor 
+        self.__ancestor = ancestor 
         self.attribute = attribute
 
     def toRelativeXLink( self, other = None ) :
@@ -216,8 +218,8 @@ class ancestry :
         """
 
         if( other is None ) :
-            if( self.ancestor is None ) : return( '' )
-            return( self.ancestor.toRelativeXLink( ) + '../' )
+            if( self.__ancestor is None ) : return( '' )
+            return( self.__ancestor.toRelativeXLink( ) + '../' )
         else :
             if( self.getRootAncestor( ) is not other.getRootAncestor( ) ) : 
                 raise Exception( 'Root ancestors not the same ("%s" != "%s")' % ( self.toXLink( ), other.toXLink( ) ) )
@@ -227,7 +229,7 @@ class ancestry :
                 if( i1 >= len( othersPath ) ) : break
                 if( tag != othersPath[i1] ) : break
             relativePath = ''
-            for i2 in xrange( len( thisPath ) - i1) : relativePath += '../'
+            for i2 in range( len( thisPath ) - i1) : relativePath += '../'
             relativePath += '/'.join( othersPath[i1:] )
             return( relativePath )
 
@@ -239,7 +241,7 @@ class ancestry :
         """
 
         s1, attribute = '', ''
-        if( self.ancestor is not None ) : s1 = self.ancestor.toXLink( )
+        if( self.__ancestor is not None ) : s1 = self.__ancestor.toXLink( )
         if( ( attributeName is None ) and ( self.attribute is not None ) ) : 
             attributeName, attributeValue = self.attribute, getattr( self, self.attribute )
         if( attributeName is not None ) :
@@ -264,8 +266,8 @@ class ancestry :
             xPathNext = xPathList[0]
             try:
                 if "[@" in xPathNext:
-                    r1,r2 = xPathNext.split("[@")
-                    r2,r3 = r2.split("=")
+                    r1,r2 = xPathNext.split("[@",1)
+                    r2,r3 = r2.split("=",1)
                     r3 = r3.rstrip(']')[1:-1]
                     nodeNext = node.findEntity( r1, r2, r3 )
                 else:
@@ -291,10 +293,9 @@ class ancestry :
         except XPathNotFound:
             raise XPathNotFound( "Cannot locate path '%s'" % xPath )
 
-
 class XPathNotFound( Exception ):
-    pass
 
+    pass
 
 if( __name__ == '__main__' ) :
 
@@ -356,18 +357,18 @@ if( __name__ == '__main__' ) :
     p.addChild( c )
     gc1 = grandson( 'Joe' )
     c.addChild( gc1 )
-    print str( p )
-    print str( c )
-    print str( gc1 )
+    print(str(p))
+    print(str( c ))
+    print(str( gc1 ))
     gc2 = granddaughter( 'Tami' )
     c.addChild( gc2 )
-    print gc2
+    print(gc2)
 
-    print p.findEntity( 'child', 'name', 'Mary' )
-    print c.findEntity( 'child', 'name', 'Tom' )
-    print c.findEntity( 'granddaughter', 'name', 'Tami' )
-    print c.findEntity( 'grandson', 'name', 'Joe' )
+    print(p.findEntity( 'child', 'name', 'Mary' ))
+    print(c.findEntity( 'child', 'name', 'Tom' ))
+    print(c.findEntity( 'granddaughter', 'name', 'Tami' ))
+    print(c.findEntity( 'grandson', 'name', 'Joe' ))
 
-    print
-    print 'Checking ancestry:'
+    print()
+    print('Checking ancestry:')
     p.checkAncestry( )

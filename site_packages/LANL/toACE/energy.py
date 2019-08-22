@@ -62,25 +62,19 @@
 # <<END-copyright>>
 
 """
-This module adds the method toACE to the classes in the fudge.gnd.productData.distributions.energy module.
+This module adds the method toACE to the classes in the fudge.gnds.productData.distributions.energy module.
 """
 
 from fudge.core.utilities import brb
 
 from xData import standards as standardsModule
+from xData import XYs as XYsModule
 
-from fudge.gnd.productData.distributions import energy as energyModule
+from fudge.gnds.productData.distributions import energy as energyModule
 
-#
-#   XYs2d energy (i.e., f(E'|E)) logic
-#
-def toACE( self, label, offset, weight, **kwargs ) :
+def ACEInterpolation( function, label ) :
 
-    header = [ 0, 4, offset + len( weight ) + 4 ] + weight
-    e_inFactor, e_outFactor = self.domainUnitConversionFactor( 'MeV' ), self[0].domainUnitConversionFactor( 'MeV' )
-    NE = len( self )
-
-    interpolation = self.interpolation
+    interpolation = function.interpolation
     INTE = -1
     if( interpolation == standardsModule.interpolation.flatToken ) :
         INTE = 1
@@ -91,37 +85,33 @@ def toACE( self, label, offset, weight, **kwargs ) :
         print '    WARNING: for %s changing interpolation from "%s" to "%s"' % \
                 ( label, interpolation, standardsModule.interpolation.linlinToken )
 
-    INTT = -1
-    POfEp = self[0]
-    if( isinstance( POfEp, energyModule.XYs1d ) ) :
-        interpolation = POfEp.interpolation
-        if( interpolation == standardsModule.interpolation.flatToken ) :
-            INTT = 1
-        elif( interpolation == standardsModule.interpolation.linlinToken ) :
-            INTT = 2
+    return( INTE )
+#
+#   XYs2d energy (i.e., f(E'|E)) logic
+#
+def toACE( self, label, offset, weight, **kwargs ) :
 
-    distribution = self
-    if( INTT == -1 ) : distribution = self.toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = 0, upperEps = 1e-6 )
+    header = [ 0, 4, offset + len( weight ) + 4 ] + weight
 
-    e_ins, Ls, epData = [], [], []
+    INTE = ACEInterpolation( self, label )
+    INTT = ACEInterpolation( self[0], label )
+
+    NE = len( self )
+    e_ins = []
+    Ls = []
+    epData = []
     offset += len( header ) + 3 + 1 + 2 * NE + 1        # header plus NR, NE, Es, Ls, (1-based).
-    for _xys in distribution :
-        e_ins.append( _xys.value * e_inFactor )
+    for xs_pdf_cdf in self :
+        e_ins.append( xs_pdf_cdf.value )
         Ls.append( offset + len( epData ) )
-        if( not( isinstance( _xys, energyModule.XYs1d ) ) ) :
-            _xys = _xys.toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = 0, upperEps = 1e-6 )
-        xys = _xys.normalize( )
-        cdf = xys.runningIntegral( )
-        eps, pdf = [], []
-        for x1, y1 in xys :
-            eps.append( e_outFactor * x1 )
-            pdf.append( y1 / e_outFactor )
-        cdf[-1] = 1.
+        eps = xs_pdf_cdf.xs.values.values
+        pdf = xs_pdf_cdf.pdf.values.values
+        cdf = xs_pdf_cdf.cdf.values.values
         epData += [ INTT, len( eps ) ] + eps + pdf + cdf
+
     return( header + [ 1, NE, INTE, NE ] + e_ins + Ls + epData )
 
 energyModule.XYs2d.toACE = toACE
-
 #
 #   NBodyPhaseSpace logic
 #
@@ -137,14 +127,14 @@ energyModule.NBodyPhaseSpace.toACE = toACE
 def toACE( self, label, offset, weight, **kwargs ) :
 
     header = [ 0, self.LF, offset + len( weight ) + 4 ] + weight
+
     theta = self.parameter1.data.toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = 0, upperEps = 1e-6 )
-    e_inFactor = theta.axes[1].unitConversionFactor( 'MeV' )
-    e_outFactor = theta.axes[0].unitConversionFactor( 'MeV' )
 
     NE, e_ins, Ts = len( theta ), [], []
     for x1, y1 in theta :
-        e_ins.append( x1 * e_inFactor )
-        Ts.append( y1 * e_outFactor )
+        e_ins.append( x1 )
+        Ts.append( y1  )
+
     return( header + [ 0, NE ] + e_ins + Ts + [ self.U.getValueAs( 'MeV' ) ] )
 
 energyModule.evaporationSpectrum.toACE = toACE
@@ -159,11 +149,10 @@ def toACE( self, label, offset, weight, **kwargs ) :
     for functional in self :
         weightEs = []
         weightPs = []
-        e_inFactor = functional.weight.axes[1].unitConversionFactor( 'MeV' )
         for E1, P1 in functional.weight :
-            weightEs.append( e_inFactor * E1 )
+            weightEs.append( E1 )
             weightPs.append( P1 )
-        weight = [ len( weightEs ) ] + weightEs + weightPs
+        weight = [ 0, len( weightEs ) ] + weightEs + weightPs
         DLW = functional.functional.toACE( label, offset, weight, **kwargs )
         offset += len( DLW )
         if( functional is not self[-1] ) : DLW[0] = offset + 1
@@ -181,18 +170,14 @@ def toACE( self, label, offset, weight, **kwargs ) :
     header = [ 0, self.LF, offset + len( weight ) + 4 ] + weight
 
     A = self.parameter1.data
-    e_inFactor = A.axes[1].unitConversionFactor( 'MeV' )
-    aFactor = A.axes[0].unitConversionFactor( 'MeV' )
     A = A.toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = 0, upperEps = 1e-6 )
-    data = [ 0, len( A ) ]
-    for E1, a1 in A : data += [ e_inFactor * E1, aFactor * a1 ]
+    xs, ys = A.copyDataToXsAndYs( )
+    data = [ 0, len( A ) ] + xs + ys
 
     B = self.parameter2.data
-    e_inFactor = B.axes[1].unitConversionFactor( 'MeV' )
-    bFactor = B.axes[0].unitConversionFactor( '1/MeV' )
     B = B.toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = 0, upperEps = 1e-6 )
-    data += [ 0, len( B ) ]
-    for E1, b1 in B : data += [ e_inFactor * E1, bFactor * b1 ]
+    xs, ys = B.copyDataToXsAndYs( )
+    data += [ 0, len( B ) ] + xs + ys
     data.append( self.U.getValueAs( 'MeV' ) )
 
     return( header + data )
@@ -200,7 +185,7 @@ def toACE( self, label, offset, weight, **kwargs ) :
 energyModule.WattSpectrum.toACE = toACE
 
 #
-#   Watt spectrum logic
+#   MadlandNix spectrum logic
 #
 def toACE( self, label, offset, weight, **kwargs ) :
 
@@ -213,6 +198,18 @@ energyModule.MadlandNix.toACE = toACE
 #
 def toACE( self, label, offset, weight, **kwargs ) :
 
-    return( self.toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = 0, upperEps = 1e-6 ).toACE( label, offset, weight, **kwargs ) )
+    header = [ 0, self.LF, offset + len( weight ) + 4 ] + weight
+
+    theta = self.parameter1.data
+    if( not( isinstance( theta, XYsModule.XYs1d ) ) ) : raise TypeError( 'unsupported theta form: moniker = "%s".' % theta.moniker )
+    NE = len( theta )
+    INTE = ACEInterpolation( theta, label )
+    e_ins, Ts = theta.copyDataToXsAndYs( )
+    function = self.parameter2.data
+    eps = function.xs.values.values
+    pdf = function.pdf.values.values
+    cdf = function.cdf.values.values
+
+    return( header + [ 0, NE ] + e_ins + Ts + [ len( eps ) ] + eps + pdf + cdf )
 
 energyModule.generalEvaporationSpectrum.toACE = toACE

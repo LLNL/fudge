@@ -61,10 +61,9 @@
 # 
 # <<END-copyright>>
 
-from fudge.gnd.productData import multiplicity as multiplicityModule
-from fudge.gnd.productData.distributions import angular as angularModule
+from fudge.gnds.productData import multiplicity as multiplicityModule
 
-from .. import gndToENDF6 as gndToENDF6Module
+from .. import gndsToENDF6 as gndsToENDF6Module
 from .. import endfFormats as endfFormatsModule
 
 #
@@ -85,7 +84,7 @@ multiplicityModule.constant1d.toENDF6List = toENDF6List
 def toENDF6List( self, targetInfo ) :
 
     nPoints = len( self )
-    interpolationFlatData = [ nPoints, gndToENDF6Module.gndToENDFInterpolationFlag( self.interpolation ) ]
+    interpolationFlatData = [ nPoints, gndsToENDF6Module.gndsToENDFInterpolationFlag( self.interpolation ) ]
     endfMult = endfFormatsModule.endfNdDataList( self.copyDataToXYs( ) )
     return( interpolationFlatData, nPoints, endfMult )
 
@@ -100,7 +99,7 @@ def toENDF6List( self, targetInfo ) :
     counter = 0
     lastX, lastY = None, None
     for region in self :
-        ENDFInterpolation = gndToENDF6Module.gndToENDFInterpolationFlag( region.interpolation )
+        ENDFInterpolation = gndsToENDF6Module.gndsToENDFInterpolationFlag( region.interpolation )
         data = region.copyDataToXYs( )
         if( lastX is not None ) :
             if( lastY == data[0][1] ) : data = data[1:]

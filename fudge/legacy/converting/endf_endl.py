@@ -62,11 +62,12 @@
 # <<END-copyright>>
 
 from PoPs import IDs as IDsPoPsModule
+from PoPs.groups import misc as chemicalElementMiscPoPsModule
 
-from fudge.particles import nuclear
+from fudge.legacy.endl import misc as miscENDLModule
 
 endfMATBases = { 0 :   1,
-                 1 :   1,  2 :   3,  3 :   6,  4 :   9,  5 :  10,  6 :  12,  7 :  14,  8 :  16,  9 :  19, 10 :  -1,
+                 1 :   1,  2 :   3,  3 :   6,  4 :   9,  5 :  10,  6 :  12,  7 :  14,  8 :  16,  9 :  19, 10 :  20,
                 11 :  23, 12 :  24, 13 :  27, 14 :  28, 15 :  31, 16 :  32, 17 :  35, 18 :  36, 19 :  39, 20 :  40,
                 21 :  45, 22 :  46, 23 :  50, 24 :  50, 25 :  55, 26 :  54, 27 :  59, 28 :  58, 29 :  63, 30 :  64,
                 31 :  69, 32 :  70, 33 :  75, 34 :  74, 35 :  79, 36 :  78, 37 :  85, 38 :  84, 39 :  89, 40 :  90,
@@ -95,7 +96,7 @@ def endfZAPFromMT( MT ) :
 
 def ZAAndMATFromParticleName( particleName ) :
 
-    Z, A, suffix, ZA = nuclear.getZ_A_suffix_andZAFromName( particleName )
+    Z, A, suffix, ZA = miscENDLModule.getZ_A_suffix_andZAFromName( particleName )
     m = 0
     if( len( suffix ) ) :
         if( suffix[0] == 'm' ) : m = int( suffix[1:] )
@@ -117,9 +118,9 @@ def getParticleNameFromMAT( MAT ):
     Z, MATstuff = divmod( MAT, 100 )
     nStable, nIsomer = divmod( (MATstuff-25), 3 )
     A = endfMATBases[Z] + nStable
-    name = nuclear.nucleusNameFromZA( 1000*Z + A )
-    if nIsomer: name += '_m%i' % nIsomer
-    return name
+    name = chemicalElementMiscPoPsModule.idFromZAndA( Z, A )
+    if( nIsomer ) : name += '_m%d' % nIsomer
+    return( name )
 
 class endfMTtoC_ProductList :
 
@@ -546,10 +547,10 @@ def ENDF_MTZAEquation( projectileZA, targetZA, MT ) :
     if( ( MT < 0 ) or ( MT > 999 ) or ( MT in [ 1, 3, 5, 10, 18, 19, 20, 21, 27, 38, 101, 151 ] or ( 200 < MT < 600 ) or ( 850 < MT < 875 ) ) ) :
         raise Exception( 'MT = %s is no supported' % MT )
     elif( MT == 2 ) :
-        productCounts = { nuclear.nucleusNameFromZA( projectileZA ) : 1 }
+        productCounts = { chemicalElementMiscPoPsModule.idFromZA( projectileZA ) : 1 }
         level = None
     elif( MT == 4 ) :
-        productCounts = { nuclear.nucleusNameFromZA( projectileZA ) : 1 }
+        productCounts = { chemicalElementMiscPoPsModule.idFromZA( projectileZA ) : 1 }
         level = None
     else :
         productCounts = endfMTtoC_ProductLists[MT].productCounts
@@ -557,12 +558,13 @@ def ENDF_MTZAEquation( projectileZA, targetZA, MT ) :
     compoundZA = projectileZA + targetZA
     residualZA = compoundZA
     productCountList = []
-    adder, equationZA, equation = '', [], '%s + %s ->' % ( nuclear.nucleusNameFromZA( projectileZA ), nuclear.nucleusNameFromZA( targetZA ) )
+    adder, equationZA, equation = '', [], '%s + %s ->' % \
+            ( chemicalElementMiscPoPsModule.idFromZA( projectileZA ), chemicalElementMiscPoPsModule.idFromZA( targetZA ) )
     for product in productCounts :
         if( product == IDsPoPsModule.photon ) :
             productZA = 0
         else :
-            productZA = nuclear.getZ_A_suffix_andZAFromName( product )[-1]
+            productZA = miscENDLModule.getZ_A_suffix_andZAFromName( product )[-1]
         if( productCounts[product] > 0 ) : productCountList.append( [ productZA, product, productCounts[product] ] )
     productCountList.sort( )
     for productZA, token, count in productCountList :
@@ -573,15 +575,11 @@ def ENDF_MTZAEquation( projectileZA, targetZA, MT ) :
             adder = '+ '
     levelStr = ''
     if( not( level is None ) ) :
-        if( type( level ) == type( 0 ) ) :
+        if( isinstance( level, int ) ) :
+            if( level < 0 ) : ValueError( 'level = %s must be >= 0' % level )
             if( level > 0 ) : levelStr = "_e%s" % level
-        elif( type( level ) == type( '' ) ) :
-            if( level == 'c' ) :
-                levelStr = '_c'
-            else :
-                raise Exception( 'Unknown level specifier = %s' % level )
         else :
             raise Exception( 'Unknown level specifier = %s' % level )
-    equation += ' %s%s%s' % ( adder, nuclear.nucleusNameFromZA( residualZA ), levelStr )
+    equation += ' %s%s%s' % ( adder, chemicalElementMiscPoPsModule.idFromZA( residualZA ), levelStr )
     equationZA.append( residualZA )
     return( equationZA, equation )

@@ -67,9 +67,11 @@ This module contains classes for dealing with a bdfls file and its contents.
 
 import os
 import string
+
+from PoPs.groups import misc as chemicalElementMiscPoPsModule
+
 from fudge.core import fudgemisc
 from fudge.core.utilities import fudgeFileMisc, subprocessing
-from fudge.particles import nuclear
 from fudge.vis.gnuplot import plotbase
 
 default_bdfls = None
@@ -102,11 +104,10 @@ def targetToZA( za ) :
                     for i, s in enumerate( za ) :
                         if( s.isdigit( ) ) : break
                     Z, A = za[:i], za[i:]
-                foundZA = False
-                if Z in nuclear.elementsSymbolZ:
-                    iza = 1000 * nuclear.elementZFromSymbol( Z ) + int ( A )
-                    foundZA = True
-                if( not foundZA ) : raise Exception( 'Could not handle za = %s.' % `za` )
+                try :
+                    iza = 1000 * chemicalElementMiscPoPsModule.ZFromSymbol[Z] + int ( A )
+                except :
+                    raise Exception( 'Could not handle za = %s.' % `za` )
         else :
             raise Exception( 'za = "%s" cannot be converted into an integer' % `za` )
     return( iza )

@@ -83,7 +83,7 @@ FUDGETESTFILES = \
     BNL/inter/report.py \
     BNL/plot_evaluation/plotstyles.py \
     BNL/pprint.py \
-    BNL/gnd_utils.py \
+    BNL/gnds_utils.py \
     BNL/endf_utils.py \
     BNL/test/__init__.py \
     BNL/c4.py

@@ -67,7 +67,7 @@ This module contains miscellaneous functions.
 
 import math
 from fudge.core.utilities import brb
-from fudge.particles import nuclear
+import misc as miscModule
 import endl_C
 import endl_I
 import endl_Z
@@ -452,14 +452,14 @@ def symOrNameForYoOrZA( yoOrZA, wantName, ASep = "", ZAOnly = 0, AddNatural = 1,
         return ZStr
     return ZStr + ASep + `A` + Suffix
 
-def endlToGNDName( yoOrZA ) :
+def endlToGNDSName( yoOrZA ) :
 
     return( symbolForYoOrZA( yoOrZA, NameASeperator = '', ZAOnly = True, AddNatural = True, m_to_m1 = True, suffixSeperator = '_' ) )
 
-def gndNameToEndlZ_A_Suffix( name ) :
-    """Returns the tuple (Z, A, suffix, ZA) for a gnd isotope name (e.g., gnd name = 'Am242_m1' returns ( 95, 242, 'm1', 95242 )."""
+def gndsNameToEndlZ_A_Suffix( name ) :
+    """Returns the tuple (Z, A, suffix, ZA) for a gnds isotope name (e.g., gnds name = 'Am242_m1' returns ( 95, 242, 'm1', 95242 )."""
 
-    return( nuclear.getZ_A_suffix_andZAFromName( name ) )
+    return( miscModule.getZ_A_suffix_andZAFromName( name ) )
 
 def fileInfo( yi, ZA, fileName ) :
     """Obtains yo, C, I and S from fileName and calls reactionInfo."""
@@ -519,8 +519,8 @@ def reactionQByIsotopeNames( incomingNames, outgoingNames, bdflsFile = None ) :
     outgoingNames = [ 'H3', 'He4', 'Tm176' ]
     Q = reactionQByIsotopeNames( incomingNames, outgoingNames )"""
 
-    incomingZAs = [ gndNameToEndlZ_A_Suffix( name )[-1] for name in incomingNames ]
-    outgoingZAs = [ gndNameToEndlZ_A_Suffix( name )[-1] for name in outgoingNames ]
+    incomingZAs = [ gndsNameToEndlZ_A_Suffix( name )[-1] for name in incomingNames ]
+    outgoingZAs = [ gndsNameToEndlZ_A_Suffix( name )[-1] for name in outgoingNames ]
     return( reactionQByZAs( incomingZAs, outgoingZAs, bdflsFile ) )
 
 def possibleReactions( projectile, target, energy_MeV, maxProducts = 4, bdflsFile = None ) :

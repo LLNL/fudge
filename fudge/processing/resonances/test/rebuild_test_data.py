@@ -67,12 +67,12 @@ import sys, os, glob
 binDir = os.path.dirname( os.path.abspath( __file__ ) )
 sys.path.insert(0, os.path.dirname( binDir ) )
 
-from fudge.legacy.converting import endfFileToGND
+from fudge.legacy.converting import endfFileToGNDS
 
 def process_args():
     # see http://docs.python.org/lib/optparse-tutorial.html
     import argparse
-    parser = argparse.ArgumentParser(description="translates an ENDF files to the new GND format")
+    parser = argparse.ArgumentParser(description="translates an ENDF files to the new GNDS format")
     parser.add_argument("-v", action="store_true", dest="verbose", help="enable verbose output")
     parser.add_argument("-q", action="store_false", dest="verbose", help="disable verbose output")
     parser.add_argument("-k", action="store_true", dest="keepGoing", default=False, help="keep going, namely skip to next file on error")
@@ -84,8 +84,8 @@ args = process_args()
 
 
 for inFile in glob.glob('*.endf'):
-    outFile = inFile.replace('.endf','.gnd.xml')
-    outCovFile = inFile.replace('.endf','.gndCov.xml')
+    outFile = inFile.replace('.endf','.gnds.xml')
+    outCovFile = inFile.replace('.endf','.gndsCov.xml')
 
     x=None
     c=None
@@ -94,11 +94,11 @@ for inFile in glob.glob('*.endf'):
         print
         print
         print 50*'-'
-        print "Translating ENDF file into GND: ", inFile
+        print "Translating ENDF file into GNDS: ", inFile
         print 50 * '-'
 
     try:
-        results = endfFileToGND.endfFileToGND( inFile, toStdOut = args.verbose, skipBadData = args.skipBadData )
+        results = endfFileToGNDS.endfFileToGNDS( inFile, toStdOut = args.verbose, skipBadData = args.skipBadData )
         x = results['reactionSuite']
         c = results['covarianceSuite']
     except Exception as err:

@@ -1,0 +1,491 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>fudge.gnds.thermalScattering &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '4.2.3 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.gnds.thermalScattering</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">documentation</span> <span class="k">as</span> <span class="n">documentationModule</span><span class="p">,</span> <span class="n">suites</span> <span class="k">as</span> <span class="n">suitesModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">XYs</span> <span class="k">as</span> <span class="n">XYsModule</span><span class="p">,</span> <span class="n">physicalQuantity</span> <span class="k">as</span> <span class="n">physicalQuantityModule</span><span class="p">,</span> <span class="n">gridded</span> <span class="k">as</span> <span class="n">griddedModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
+
+
+<div class="viewcode-block" id="thermalScattering"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.thermalScattering">[docs]</a><span class="k">class</span> <span class="nc">thermalScattering</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;thermalScattering&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;mass&#39;</span><span class="p">,</span> <span class="s1">&#39;cutoffEnergy&#39;</span><span class="p">,</span> <span class="s1">&#39;coherentElastic&#39;</span><span class="p">,</span> <span class="s1">&#39;incoherentElastic&#39;</span><span class="p">,</span> <span class="s1">&#39;incoherentInelastic&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cutoffEnergy</span><span class="p">,</span> <span class="n">material</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">MAT</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">documentation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coherentElastic</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">incoherentElastic</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">incoherentInelastic</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">material</span> <span class="o">=</span> <span class="n">material</span>
+<span class="c1"># BRB6 hardwired</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="o">=</span><span class="s1">&#39;n&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">MAT</span> <span class="o">=</span> <span class="n">MAT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="n">mass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cutoffEnergy</span> <span class="o">=</span> <span class="n">cutoffEnergy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span> <span class="o">=</span> <span class="n">documentation</span>
+<span class="c1"># BRB6 need to check for correct class.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coherentElastic</span> <span class="o">=</span> <span class="n">coherentElastic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">incoherentElastic</span> <span class="o">=</span> <span class="n">incoherentElastic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">incoherentInelastic</span> <span class="o">=</span> <span class="n">incoherentInelastic</span>
+
+<div class="viewcode-block" id="thermalScattering.toXMLList"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.thermalScattering.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">xml</span> <span class="o">=</span> <span class="p">[</span> <span class="n">indent</span><span class="o">+</span><span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1"> material=&quot;</span><span class="si">%s</span><span class="s1">&quot; MAT=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">material</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">MAT</span><span class="p">)</span> <span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">xml</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xml</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutoffEnergy</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xml</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">ts</span> <span class="ow">in</span> <span class="p">(</span><span class="n">coherentElastic</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span><span class="n">incoherentElastic</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span><span class="n">incoherentInelastic</span><span class="o">.</span><span class="n">moniker</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ts</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">xml</span> <span class="o">+=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ts</span><span class="p">)</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xml</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indent</span><span class="o">+</span><span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">xml</span></div>
+
+<div class="viewcode-block" id="thermalScattering.check"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.thermalScattering.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check all data in the reactionSuite, returning a list of warnings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">warning</span>
+
+        <span class="n">options</span> <span class="o">=</span> <span class="p">{</span> <span class="p">}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span> <span class="n">options</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">,</span> <span class="s2">&quot;check() received unknown keyword argument &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">key</span>
+
+        <span class="c1"># assemble some useful info, to be handed down to children&#39;s check() functions:</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;reactionSuite&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">,</span> <span class="p">}</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="n">options</span> <span class="p">)</span>
+
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s1">&#39;ReactionSuite: </span><span class="si">%s</span><span class="s1"> + </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projectile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">material</span><span class="p">),</span> <span class="n">warnings</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">info</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="thermalScattering.saveToFile"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.thermalScattering.saveToFile">[docs]</a>    <span class="k">def</span> <span class="nf">saveToFile</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">):</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+<span class="c1"># BRB6 hardwired</span>
+            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="thermalScattering.parseXMLNode"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.thermalScattering.parseXMLNode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span> <span class="p">):</span>
+
+        <span class="n">xPath</span> <span class="o">=</span> <span class="p">[</span> <span class="n">thermalScattering</span><span class="o">.</span><span class="n">moniker</span> <span class="p">]</span>
+        <span class="n">linkData</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;material&#39;</span><span class="p">:</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;material&#39;</span><span class="p">),</span>
+                <span class="s1">&#39;MAT&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MAT&#39;</span><span class="p">)</span> <span class="p">)</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
+                <span class="n">_class</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">documentationModule</span><span class="o">.</span><span class="n">documentation</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">documentationModule</span><span class="o">.</span><span class="n">documentation</span><span class="p">,</span>
+                    <span class="n">mass</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">mass</span><span class="p">,</span>
+                    <span class="n">cutoffEnergy</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">cutoffEnergy</span><span class="p">,</span>
+                    <span class="n">coherentElastic</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">coherentElastic</span><span class="p">,</span>
+                    <span class="n">incoherentElastic</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">incoherentElastic</span><span class="p">,</span>
+                    <span class="n">incoherentInelastic</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">incoherentInelastic</span>
+                <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span>
+                <span class="k">if</span> <span class="n">_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: encountered unexpected element &#39;</span><span class="si">%s</span><span class="s2">&#39; in thermalScattering!&quot;</span> <span class="o">%</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="p">[</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="p">]</span> <span class="o">=</span> <span class="n">_class</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+            <span class="n">TS</span> <span class="o">=</span> <span class="n">thermalScattering</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error encountered at xpath = /</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">xPath</span><span class="p">))</span>
+            <span class="k">raise</span>
+
+        <span class="k">return</span> <span class="n">TS</span></div></div>
+
+
+<div class="viewcode-block" id="mass"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.mass">[docs]</a><span class="k">class</span> <span class="nc">mass</span><span class="p">(</span> <span class="n">physicalQuantityModule</span><span class="o">.</span><span class="n">physicalQuantity</span> <span class="p">):</span>
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;mass&#39;</span></div>
+
+
+<div class="viewcode-block" id="cutoffEnergy"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.cutoffEnergy">[docs]</a><span class="k">class</span> <span class="nc">cutoffEnergy</span><span class="p">(</span> <span class="n">physicalQuantityModule</span><span class="o">.</span><span class="n">physicalQuantity</span> <span class="p">):</span>
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;cutoffEnergy&#39;</span></div>
+
+
+<div class="viewcode-block" id="coherentElastic"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.coherentElastic">[docs]</a><span class="k">class</span> <span class="nc">coherentElastic</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;coherentElastic&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S_table</span><span class="p">):</span>
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">S_table</span> <span class="o">=</span> <span class="n">S_table</span>
+
+<div class="viewcode-block" id="coherentElastic.toXMLList"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.coherentElastic.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">xml</span> <span class="o">=</span> <span class="p">[</span><span class="n">indent</span><span class="o">+</span><span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">]</span>
+        <span class="n">xml</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">S_table</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xml</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span> <span class="n">xml</span></div>
+
+<div class="viewcode-block" id="coherentElastic.parseXMLNode"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.coherentElastic.parseXMLNode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">Stab</span> <span class="o">=</span> <span class="n">S_table</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="n">cohEl</span> <span class="o">=</span> <span class="n">coherentElastic</span><span class="p">(</span> <span class="n">Stab</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">cohEl</span></div></div>
+
+
+<div class="viewcode-block" id="S_table"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.S_table">[docs]</a><span class="k">class</span> <span class="nc">S_table</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; For elastic coherent, cumulative structure factor &#39;S&#39; is given as function of incident energy and temp. &quot;&quot;&quot;</span> 
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;S_table&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gridded2d</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gridded2d</span> <span class="o">=</span> <span class="n">gridded2d</span>
+
+<div class="viewcode-block" id="S_table.toXMLList"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.S_table.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">xml</span> <span class="o">=</span> <span class="p">[</span><span class="n">indent</span><span class="o">+</span><span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">]</span>
+        <span class="n">xml</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gridded2d</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xml</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span> <span class="n">xml</span></div>
+
+<div class="viewcode-block" id="S_table.parseXMLNode"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.S_table.parseXMLNode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">g2d</span> <span class="o">=</span> <span class="n">griddedModule</span><span class="o">.</span><span class="n">gridded2d</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="n">Stab</span> <span class="o">=</span> <span class="n">S_table</span><span class="p">(</span> <span class="n">g2d</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">Stab</span></div></div>
+
+
+<div class="viewcode-block" id="incoherentElastic"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.incoherentElastic">[docs]</a><span class="k">class</span> <span class="nc">incoherentElastic</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">):</span>
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;incoherentElastic&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">characteristicCrossSection</span><span class="p">,</span> <span class="n">DebyeWaller</span><span class="p">):</span>
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">characteristicCrossSection</span> <span class="o">=</span> <span class="n">characteristicCrossSection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DebyeWaller</span> <span class="o">=</span> <span class="n">DebyeWaller</span>
+
+<div class="viewcode-block" id="incoherentElastic.toXMLList"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.incoherentElastic.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">xml</span> <span class="o">=</span> <span class="p">[</span><span class="n">indent</span><span class="o">+</span><span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">]</span>
+        <span class="n">xml</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">characteristicCrossSection</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xml</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DebyeWaller</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xml</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span> <span class="n">xml</span></div>
+
+<div class="viewcode-block" id="incoherentElastic.parseXMLNode"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.incoherentElastic.parseXMLNode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">xsc</span> <span class="o">=</span> <span class="n">characteristicCrossSection</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">characteristicCrossSection</span><span class="o">.</span><span class="n">moniker</span><span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">)</span>
+        <span class="n">DW</span> <span class="o">=</span> <span class="n">DebyeWaller</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">DebyeWaller</span><span class="o">.</span><span class="n">moniker</span><span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">)</span>
+        <span class="n">incElastic</span> <span class="o">=</span> <span class="n">incoherentElastic</span><span class="p">(</span> <span class="n">xsc</span><span class="p">,</span> <span class="n">DW</span> <span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">incElastic</span></div></div>
+
+<div class="viewcode-block" id="characteristicCrossSection"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.characteristicCrossSection">[docs]</a><span class="k">class</span> <span class="nc">characteristicCrossSection</span><span class="p">(</span> <span class="n">physicalQuantityModule</span><span class="o">.</span><span class="n">physicalQuantity</span> <span class="p">):</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;characteristicCrossSection&#39;</span></div>
+
+
+<div class="viewcode-block" id="DebyeWaller"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.DebyeWaller">[docs]</a><span class="k">class</span> <span class="nc">DebyeWaller</span><span class="p">(</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For incoherent elastic sections, all we need is a characteristic cross section and a</span>
+<span class="sd">    temperature-dependent list of the Debye-Waller integral &quot;&quot;&quot;</span>
+
+    <span class="n">mutableYUnit</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s2">&quot;DebyeWaller&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="incoherentInelastic"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.incoherentInelastic">[docs]</a><span class="k">class</span> <span class="nc">incoherentInelastic</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">):</span>
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;incoherentInelastic&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S_alpha_beta</span><span class="p">,</span> <span class="n">calculatedAtThermal</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">asymmetric</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">atoms</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scatteringAtoms</span> <span class="o">=</span> <span class="n">scatteringAtoms</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">atoms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scatteringAtoms</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">atom</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">S_alpha_beta</span> <span class="o">=</span> <span class="n">S_alpha_beta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calculatedAtThermal</span> <span class="o">=</span> <span class="n">calculatedAtThermal</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">asymmetric</span> <span class="o">=</span> <span class="n">asymmetric</span>
+
+<div class="viewcode-block" id="incoherentInelastic.toXMLList"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.incoherentInelastic.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">incrementalIndent</span>
+
+        <span class="n">attrs</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;calculatedAtThermal&#39;</span><span class="p">,</span> <span class="s1">&#39;asymmetric&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attr</span><span class="p">):</span> <span class="n">attrs</span> <span class="o">+=</span> <span class="s1">&#39; </span><span class="si">%s</span><span class="s1">=&quot;true&quot;&#39;</span> <span class="o">%</span> <span class="n">attr</span>
+        <span class="n">xml</span> <span class="o">=</span> <span class="p">[</span><span class="n">indent</span><span class="o">+</span><span class="s1">&#39;&lt;</span><span class="si">%s%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)]</span>
+        <span class="n">xml</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scatteringAtoms</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span> <span class="p">)</span>
+        <span class="n">xml</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">S_alpha_beta</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xml</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span> <span class="n">xml</span></div>
+
+<div class="viewcode-block" id="incoherentInelastic.parseXMLNode"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.incoherentInelastic.parseXMLNode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">incoherentElastic</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;calculatedAtThermal&#39;</span><span class="p">:</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;calculatedAtThermal&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;asymmetric&#39;</span><span class="p">:</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;asymmetric&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span>
+        <span class="p">}</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">scatteringAtom</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span><span class="p">)</span>
+                           <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;scatteringAtoms&#39;</span><span class="p">)]</span>
+        <span class="n">Sab</span> <span class="o">=</span> <span class="n">S_alpha_beta</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">S_alpha_beta</span><span class="o">.</span><span class="n">moniker</span> <span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="n">incInelastic</span> <span class="o">=</span> <span class="n">incoherentInelastic</span><span class="p">(</span> <span class="n">Sab</span><span class="p">,</span> <span class="n">atoms</span> <span class="o">=</span> <span class="n">atoms</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">incInelastic</span></div></div>
+
+
+<div class="viewcode-block" id="scatteringAtoms"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.scatteringAtoms">[docs]</a><span class="k">class</span> <span class="nc">scatteringAtoms</span><span class="p">(</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">suite</span> <span class="p">):</span>
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;scatteringAtoms&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="n">suitesModule</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">scatteringAtom</span><span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="scatteringAtom"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.scatteringAtom">[docs]</a><span class="k">class</span> <span class="nc">scatteringAtom</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Inelastic incoherent scattering requires a description of each atom that is scattered off &quot;&quot;&quot;</span>
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;scatteringAtom&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">numberPerMolecule</span><span class="p">,</span> <span class="n">mass</span><span class="p">,</span> <span class="n">freeAtomCrossSection</span><span class="p">,</span> <span class="n">e_critical</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">e_max</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">functionalForm</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">T_effective</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">):</span>
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numberPerMolecule</span> <span class="o">=</span> <span class="n">numberPerMolecule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">=</span> <span class="n">mass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">freeAtomCrossSection</span> <span class="o">=</span> <span class="n">freeAtomCrossSection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e_critical</span> <span class="o">=</span> <span class="n">e_critical</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e_max</span> <span class="o">=</span> <span class="n">e_max</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">functionalForm</span> <span class="o">=</span> <span class="n">functionalForm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">T_effective</span> <span class="o">=</span> <span class="n">T_effective</span>
+
+<div class="viewcode-block" id="scatteringAtom.boundCrossSection"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.scatteringAtom.boundCrossSection">[docs]</a>    <span class="k">def</span> <span class="nf">boundCrossSection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">freeAtomCrossSection</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span></div>
+
+<div class="viewcode-block" id="scatteringAtom.shortCollisionTime"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.scatteringAtom.shortCollisionTime">[docs]</a>    <span class="k">def</span> <span class="nf">shortCollisionTime</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">T</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equation 7.8 in ENDF manual</span>
+<span class="sd">        :param alpha:</span>
+<span class="sd">        :param beta:</span>
+<span class="sd">        :param T:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">Teff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">T_effective</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+        <span class="c1">#num = math.exp( -(alpha-abs(beta))**2 * T / (4*alpha*Teff) - (beta + abs(beta))/2)</span>
+        <span class="c1"># reformulate using T/Teff = 1-f, should be more numerically stable</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">T</span><span class="o">/</span><span class="n">Teff</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span> <span class="p">(</span><span class="n">f</span> <span class="o">*</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">beta</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">+</span> <span class="n">beta</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">den</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">Teff</span> <span class="o">/</span> <span class="n">T</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">num</span><span class="o">/</span><span class="n">den</span></div>
+
+<div class="viewcode-block" id="scatteringAtom.toXMLList"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.scatteringAtom.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">attrs</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">functionalForm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">attrs</span> <span class="o">=</span> <span class="s1">&#39; functionalForm=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">functionalForm</span>
+        <span class="n">xml</span> <span class="o">=</span> <span class="p">[</span><span class="n">indent</span><span class="o">+</span><span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1"> label=&quot;</span><span class="si">%s</span><span class="s1">&quot; numberPerMolecule=&quot;</span><span class="si">%i</span><span class="s1">&quot;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">numberPerMolecule</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;mass&#39;</span><span class="p">,</span><span class="s1">&#39;freeAtomCrossSection&#39;</span><span class="p">,</span><span class="s1">&#39;e_critical&#39;</span><span class="p">,</span><span class="s1">&#39;e_max&#39;</span><span class="p">,</span><span class="s1">&#39;T_effective&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">xml</span> <span class="o">+=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attribute</span><span class="p">)</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xml</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span> <span class="n">xml</span></div>
+
+<div class="viewcode-block" id="scatteringAtom.parseXMLNode"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.scatteringAtom.parseXMLNode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;numberPerMolecule&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;numberPerMolecule&#39;</span><span class="p">)),</span>
+            <span class="s1">&#39;functionalForm&#39;</span><span class="p">:</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;functionalForm&#39;</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
+            <span class="n">_class</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">mass</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">mass</span><span class="p">,</span>
+                <span class="n">freeAtomCrossSection</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">freeAtomCrossSection</span><span class="p">,</span>
+                <span class="n">e_critical</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">e_critical</span><span class="p">,</span>
+                <span class="n">e_max</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">e_max</span><span class="p">,</span>
+                <span class="n">T_effective</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">T_effective</span>
+            <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="kc">None</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">_class</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: encountered unexpected element &#39;</span><span class="si">%s</span><span class="s2">&#39; in scatteringAtom!&quot;</span> <span class="o">%</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="p">]</span> <span class="o">=</span> <span class="n">_class</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="n">SA</span> <span class="o">=</span> <span class="n">scatteringAtom</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">SA</span></div></div>
+
+
+<div class="viewcode-block" id="freeAtomCrossSection"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.freeAtomCrossSection">[docs]</a><span class="k">class</span> <span class="nc">freeAtomCrossSection</span><span class="p">(</span> <span class="n">physicalQuantityModule</span><span class="o">.</span><span class="n">physicalQuantity</span> <span class="p">):</span>
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;freeAtomCrossSection&#39;</span></div>
+
+<div class="viewcode-block" id="e_critical"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.e_critical">[docs]</a><span class="k">class</span> <span class="nc">e_critical</span><span class="p">(</span> <span class="n">physicalQuantityModule</span><span class="o">.</span><span class="n">physicalQuantity</span> <span class="p">):</span>
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;e_critical&#39;</span></div>
+
+<div class="viewcode-block" id="e_max"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.e_max">[docs]</a><span class="k">class</span> <span class="nc">e_max</span><span class="p">(</span> <span class="n">physicalQuantityModule</span><span class="o">.</span><span class="n">physicalQuantity</span> <span class="p">):</span>
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;e_max&#39;</span></div>
+
+<div class="viewcode-block" id="T_effective"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.T_effective">[docs]</a><span class="k">class</span> <span class="nc">T_effective</span><span class="p">(</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; In incoherent inelastic sections, each scattering atom using the short collision time (SCT)</span>
+<span class="sd">    approximation needs an effective temperature. &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;T_effective&#39;</span>
+    <span class="n">mutableYUnit</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="S_alpha_beta"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.S_alpha_beta">[docs]</a><span class="k">class</span> <span class="nc">S_alpha_beta</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Inelastic incoherent section contains S as a function of (alpha,beta,T).</span>
+<span class="sd">    Currently supports gridded3d, other options may be supported later.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;S_alpha_beta&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gridded3d</span><span class="p">):</span>
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gridded3d</span> <span class="o">=</span> <span class="n">gridded3d</span>
+
+<div class="viewcode-block" id="S_alpha_beta.toXMLList"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.S_alpha_beta.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">xml</span> <span class="o">=</span> <span class="p">[</span><span class="n">indent</span><span class="o">+</span><span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">]</span>
+        <span class="n">xml</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gridded3d</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xml</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span> <span class="n">xml</span></div>
+
+<div class="viewcode-block" id="S_alpha_beta.parseXMLNode"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.S_alpha_beta.parseXMLNode">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">g3d</span> <span class="o">=</span> <span class="n">griddedModule</span><span class="o">.</span><span class="n">gridded3d</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="n">Sab</span> <span class="o">=</span> <span class="n">S_alpha_beta</span><span class="p">(</span> <span class="n">g3d</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">Sab</span></div></div>
+
+
+<div class="viewcode-block" id="readXML"><a class="viewcode-back" href="../../../fudge/fudge.gnds.html#fudge.gnds.thermalScattering.readXML">[docs]</a><span class="k">def</span> <span class="nf">readXML</span><span class="p">(</span> <span class="n">gndsFile</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read a GNDS/xml file and create a new reactionSuite instance from the result.</span>
+
+<span class="sd">    :param gndsFile: path to a GNDS file, as a string.</span>
+<span class="sd">    :return: reactionSuite instance containing all data from the file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">xml.etree</span> <span class="k">import</span> <span class="n">cElementTree</span>
+    <span class="c1"># wrapper around the xml parser:</span>
+    <span class="kn">from</span> <span class="nn">fudge.core.utilities.xmlNode</span> <span class="k">import</span> <span class="n">xmlNode</span>
+
+    <span class="n">tsElement</span> <span class="o">=</span> <span class="n">cElementTree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span> <span class="n">gndsFile</span> <span class="p">)</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+    <span class="n">tsElement</span> <span class="o">=</span> <span class="n">xmlNode</span><span class="p">(</span> <span class="n">tsElement</span><span class="p">,</span> <span class="n">xmlNode</span><span class="o">.</span><span class="n">etree</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">thermalScattering</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">tsElement</span> <span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

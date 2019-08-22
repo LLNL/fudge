@@ -335,6 +335,43 @@ ptwXYPoints *ptwXY_clone( statusMessageReporting *smr, ptwXYPoints *ptwXY ) {
 /*
 ************************************************************
 */
+ptwXYPoints *ptwXY_clone2( statusMessageReporting *smr, ptwXYPoints const *ptwXY ) {
+
+    int64_t length = ptwXY->length;
+    ptwXYPoints *ptwXY2 = NULL;
+    ptwXYPoint *pointsFrom, *pointsTo;
+    ptwXYOverflowPoint *last = ptwXY->overflowHeader.prior;
+
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( NULL );
+    }
+
+    ptwXY2 = ptwXY_new( smr, ptwXY->interpolation, ptwXY->interpolationString,
+            ptwXY->biSectionMax, ptwXY->accuracy, length, ptwXY->overflowAllocatedSize, ptwXY->userFlag );
+    if( ptwXY2 == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+
+    pointsFrom = &(ptwXY->points[ptwXY_getNonOverflowLength( smr, ptwXY ) - 1]);
+    pointsTo = &(ptwXY2->points[length - 1]);
+    while( last != &(ptwXY->overflowHeader) ) {
+        if( ( pointsFrom >= ptwXY->points ) && ( pointsFrom->x > last->point.x ) ) {
+            *pointsTo = *pointsFrom;
+            --pointsFrom; }
+        else {
+            *pointsTo = last->point;
+            last = last->prior;
+        }
+        --pointsTo;
+    }
+
+    for( ; pointsFrom >= ptwXY->points; --pointsFrom, --pointsTo ) *pointsTo = *pointsFrom;
+    ptwXY2->length = length;
+
+    return( ptwXY2 );
+}
+/*
+************************************************************
+*/
 ptwXYPoints *ptwXY_cloneToInterpolation( statusMessageReporting *smr, ptwXYPoints *ptwXY, ptwXY_interpolation interpolationTo ) {
 
     ptwXYPoints *n1;
@@ -931,7 +968,7 @@ ptwXYPoint *ptwXY_getPointAtIndex( statusMessageReporting *smr, ptwXYPoints *ptw
 /*
 ************************************************************
 */
-ptwXYPoint *ptwXY_getPointAtIndex_Unsafely( ptwXYPoints *ptwXY, int64_t index ) {
+ptwXYPoint *ptwXY_getPointAtIndex_Unsafely( ptwXYPoints const *ptwXY, int64_t index ) {
 
     int64_t i;
     ptwXYOverflowPoint *overflowPoint;

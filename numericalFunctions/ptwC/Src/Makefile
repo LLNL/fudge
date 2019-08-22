@@ -63,8 +63,7 @@
 
 NUMERICALFUNCTIONS_PATH = ../..
 
-CFLAGS = -g -O0 -Wall
-localCFLAGS = $(CFLAGS) $(NFUCFLAGS) -I$(SMR_PATH)/include
+localCFLAGS = $(CFLAGS) -I$(SMR_PATH)/include
 objects = nf_utilities.o nf_stringToInt32s.o nf_stringToDoubles.o
 
 .PHONY: default clean realclean

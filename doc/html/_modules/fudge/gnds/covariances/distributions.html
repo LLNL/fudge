@@ -1,0 +1,217 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>fudge.gnds.covariances.distributions &#8212; Fudge and GNDS 4.2.3 beta documentation</title>
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.3 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.gnds.covariances.distributions</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">from</span> <span class="nn">xData.ancestry</span> <span class="k">import</span> <span class="n">ancestry</span>
+<span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">suites</span> <span class="k">as</span> <span class="n">suitesModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">mixed</span><span class="p">,</span> <span class="n">covarianceMatrix</span>
+
+<span class="sd">&quot;&quot;&quot;Special classes for storing covariances for product distributions.&quot;&quot;&quot;</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<div class="viewcode-block" id="LegendreOrderCovarianceForm"><a class="viewcode-back" href="../../../../fudge/fudge.gnds.covariances.html#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm">[docs]</a><span class="k">class</span> <span class="nc">LegendreOrderCovarianceForm</span><span class="p">(</span> <span class="n">ancestry</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Stores covariance between energy-dependent Legendre coefficients for a reaction.</span>
+<span class="sd">    This class contains one or more LegendreLValue sections, each section containing the matrix</span>
+<span class="sd">    between a pair of L-values </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;LegendreOrderCovariance&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">lvalues</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">ancestry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lvalues</span> <span class="o">=</span> <span class="n">lvalues</span> <span class="ow">or</span> <span class="p">[]</span> <span class="c1">#: the l values of course</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>   <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lvalues</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="LegendreOrderCovarianceForm.addLegendreOrder"><a class="viewcode-back" href="../../../../fudge/fudge.gnds.covariances.html#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.addLegendreOrder">[docs]</a>    <span class="k">def</span> <span class="nf">addLegendreOrder</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">LValue</span> <span class="p">):</span>
+        <span class="n">LValue</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lvalues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">LValue</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LegendreOrderCovarianceForm.check"><a class="viewcode-back" href="../../../../fudge/fudge.gnds.covariances.html#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.gnds</span> <span class="k">import</span> <span class="n">warning</span>
+
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">Lvalue</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">Lvalue_warnings</span> <span class="o">=</span> <span class="n">Lvalue</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">Lvalue_warnings</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> L=</span><span class="si">%i</span><span class="s1"> vs </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">Lvalue</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span><span class="n">Lvalue</span><span class="o">.</span><span class="n">L1</span><span class="p">,</span><span class="n">Lvalue</span><span class="o">.</span><span class="n">L2</span><span class="p">),</span> <span class="n">Lvalue_warnings</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="LegendreOrderCovarianceForm.convertUnits"><a class="viewcode-back" href="../../../../fudge/fudge.gnds.covariances.html#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">):</span>
+
+        <span class="k">for</span> <span class="n">lvalue</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span> <span class="n">lvalue</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LegendreOrderCovarianceForm.fix"><a class="viewcode-back" href="../../../../fudge/fudge.gnds.covariances.html#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.fix">[docs]</a>    <span class="k">def</span> <span class="nf">fix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span> <span class="p">):</span> <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="LegendreOrderCovarianceForm.toXMLList"><a class="viewcode-back" href="../../../../fudge/fudge.gnds.covariances.html#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> label=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">lvalue</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lvalues</span> <span class="p">:</span> <span class="n">xmlString</span> <span class="o">+=</span> <span class="n">lvalue</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span> <span class="n">xmlString</span></div>
+
+<div class="viewcode-block" id="LegendreOrderCovarianceForm.parseXMLNode"><a class="viewcode-back" href="../../../../fudge/fudge.gnds.covariances.html#fudge.gnds.covariances.distributions.LegendreOrderCovarianceForm.parseXMLNode">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">LegendreOrderCovarianceForm</span><span class="p">(</span> <span class="n">label</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s2">&quot;label&quot;</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="c1"># add L&#39;s to each component:</span>
+        <span class="k">for</span> <span class="n">lValue</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">addLegendreOrder</span><span class="p">(</span> <span class="n">LegendreLValue</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">lValue</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">form</span></div></div>
+
+
+<div class="viewcode-block" id="LegendreLValue"><a class="viewcode-back" href="../../../../fudge/fudge.gnds.covariances.html#fudge.gnds.covariances.distributions.LegendreLValue">[docs]</a><span class="k">class</span> <span class="nc">LegendreLValue</span><span class="p">(</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">suite</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Represents one subsection of the Legendre coefficient covariance matrix:</span>
+<span class="sd">    covariance between coefficients for two Legendre orders at various energies </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;LegendreLValue&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L1</span><span class="p">,</span> <span class="n">L2</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="n">suitesModule</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">covarianceMatrix</span><span class="p">,</span> <span class="n">mixed</span><span class="o">.</span><span class="n">mixedForm</span><span class="p">]</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">L1</span> <span class="o">=</span> <span class="n">L1</span> <span class="c1">#:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">L2</span> <span class="o">=</span> <span class="n">L2</span> <span class="c1">#:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span> <span class="c1">#:</span>
+
+<div class="viewcode-block" id="LegendreLValue.check"><a class="viewcode-back" href="../../../../fudge/fudge.gnds.covariances.html#fudge.gnds.covariances.distributions.LegendreLValue.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
+
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">L1</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">L2</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="n">warnings</span> <span class="o">+=</span> <span class="n">form</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+        <span class="c1"># FIXME what about cross-terms between L-values?</span>
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="LegendreLValue.fix"><a class="viewcode-back" href="../../../../fudge/fudge.gnds.covariances.html#fudge.gnds.covariances.distributions.LegendreLValue.fix">[docs]</a>    <span class="k">def</span> <span class="nf">fix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span> <span class="p">):</span> <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="LegendreLValue.toXMLList"><a class="viewcode-back" href="../../../../fudge/fudge.gnds.covariances.html#fudge.gnds.covariances.distributions.LegendreLValue.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> L1=&quot;</span><span class="si">%i</span><span class="s1">&quot; L2=&quot;</span><span class="si">%i</span><span class="s1">&quot; frame=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span>
+            <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">L2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">xmlString</span> <span class="o">+=</span> <span class="n">form</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span> <span class="n">xmlString</span></div>
+
+<div class="viewcode-block" id="LegendreLValue.parseXMLNode"><a class="viewcode-back" href="../../../../fudge/fudge.gnds.covariances.html#fudge.gnds.covariances.distributions.LegendreLValue.parseXMLNode">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">component</span> <span class="o">=</span> <span class="n">LegendreLValue</span><span class="p">(</span> <span class="nb">int</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;L1&quot;</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;L2&quot;</span><span class="p">)),</span>
+                <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;frame&quot;</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
+            <span class="n">formCls</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">covarianceMatrix</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">covarianceMatrix</span><span class="p">,</span>
+                    <span class="n">mixed</span><span class="o">.</span><span class="n">mixedForm</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">mixed</span><span class="o">.</span><span class="n">mixedForm</span>
+                    <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">form</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">formCls</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Encountered unknown covariance type &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">form</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+            <span class="n">component</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">formCls</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">form</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">component</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GNDS 4.2.3 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>
