@@ -1,0 +1,347 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.processing.resonances.getCoulombWavefunctions &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.processing.resonances.getCoulombWavefunctions</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">_getCoulombWavefunctions</span>
+<span class="kn">from</span> <span class="nn">numericalFunctions</span> <span class="k">import</span> <span class="n">specialFunctions</span> <span class="k">as</span> <span class="n">nf_sf</span>
+
+<div class="viewcode-block" id="getCoulombWavefunctions"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.getCoulombWavefunctions.getCoulombWavefunctions">[docs]</a><span class="k">def</span> <span class="nf">getCoulombWavefunctions</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">L</span><span class="p">):</span>
+    <span class="c1"># .... Check arguments:</span>
+    <span class="n">NE</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="p">(</span><span class="n">rho</span><span class="p">,</span><span class="n">eta</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="o">!=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;rho and eta must be numpy arrays!&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;rho and eta must be float arrays!&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">((</span><span class="n">NE</span><span class="p">,),</span> <span class="p">(</span><span class="n">NE</span><span class="p">,</span><span class="mi">1</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;rho and eta must be 1-d arrays, of the same length!&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">int</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;L must be an integer!&quot;</span><span class="p">)</span>
+
+    <span class="n">F</span><span class="p">,</span><span class="n">G</span> <span class="o">=</span> <span class="n">_getCoulombWavefunctions</span><span class="o">.</span><span class="n">getCoulombWavefunctions</span><span class="p">(</span> <span class="n">rho</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="n">L</span> <span class="p">)</span>
+    <span class="n">F</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">rho</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">F</span><span class="p">,</span><span class="n">G</span><span class="p">)</span></div>
+
+<span class="n">SQRTTWOPI</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+
+<div class="viewcode-block" id="coulombNormalizationFactor"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.getCoulombWavefunctions.coulombNormalizationFactor">[docs]</a><span class="k">def</span> <span class="nf">coulombNormalizationFactor</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Coulomb wavefunction normalization factor (see DLMF Eq. 33.2.5 or Abramowitz &amp; Stegun Eq. 14.1.7),</span>
+<span class="sd">    :math:`C_\\ell(\\eta)={2^\\ell e^{2\pi\\eta}|\Gamma(\\ell+1+i\\eta)|}/{(2\\ell+1)!}`</span>
+
+<span class="sd">    Because we&#39;re working with numpy arrays of :math:`\\eta` (for parallelization ala&#39; Caleb&#39;s tricks), the logic</span>
+<span class="sd">    of numpy masked arrays is at work here to handle different regimes of eta.</span>
+
+<span class="sd">    :param int L: the L to evaluate at</span>
+<span class="sd">    :param numpy.array(type=float) eta: array of :math:`\eta` values</span>
+<span class="sd">    :return: array of normalizations</span>
+<span class="sd">    :rtype: numpy.array(type=float)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">eta</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+    <span class="n">cnorm</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">eta</span><span class="p">)</span>
+    <span class="n">ETA_SMALLCUT</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">16</span>
+    <span class="n">ETA_BIGCUT</span> <span class="o">=</span> <span class="mf">20.0</span>
+    <span class="n">small_eta</span> <span class="o">=</span> <span class="n">eta</span> <span class="o">&lt;</span> <span class="n">ETA_SMALLCUT</span>
+    <span class="n">medium_eta</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span> <span class="n">eta</span> <span class="o">&gt;=</span> <span class="n">ETA_SMALLCUT</span><span class="p">,</span> <span class="n">eta</span> <span class="o">&lt;</span> <span class="n">ETA_BIGCUT</span> <span class="p">)</span>
+    <span class="n">big_eta</span>  <span class="o">=</span> <span class="n">eta</span> <span class="o">&gt;=</span> <span class="n">ETA_BIGCUT</span>
+
+    <span class="c1"># Small eta&#39;s are simple, basically just set them to zero in the equation</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">small_eta</span><span class="p">):</span>
+        <span class="n">cnorm</span><span class="p">[</span><span class="n">small_eta</span><span class="p">]</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span><span class="n">L</span><span class="p">)</span><span class="o">*</span><span class="nb">abs</span><span class="p">(</span><span class="n">nf_sf</span><span class="o">.</span><span class="n">gamma</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mf">1.0</span><span class="p">))</span><span class="o">/</span><span class="n">nf_sf</span><span class="o">.</span><span class="n">gamma</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">L</span><span class="o">+</span><span class="mf">2.0</span><span class="p">)</span>
+
+    <span class="c1"># Medium eta&#39;s ... gotta do the real thing (See DLMF, Eq. 33.2.6)</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">medium_eta</span><span class="p">):</span>
+        <span class="n">twopieta</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">eta</span><span class="p">[</span><span class="n">medium_eta</span><span class="p">]</span>
+        <span class="n">eta2</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">eta</span><span class="p">[</span><span class="n">medium_eta</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">stuffinsqrt</span><span class="o">=</span><span class="mf">1.0</span>
+        <span class="n">prefactor</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span><span class="n">L</span><span class="p">)</span><span class="o">/</span><span class="n">nf_sf</span><span class="o">.</span><span class="n">gamma</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">L</span><span class="o">+</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span> <span class="n">stuffinsqrt</span><span class="o">*=</span><span class="n">eta2</span><span class="o">+</span><span class="n">k</span><span class="o">*</span><span class="n">k</span>
+        <span class="n">cnorm</span><span class="p">[</span><span class="n">medium_eta</span><span class="p">]</span> <span class="o">=</span> <span class="n">prefactor</span><span class="o">*</span><span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">twopieta</span><span class="o">*</span><span class="n">stuffinsqrt</span><span class="o">/</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">twopieta</span><span class="p">)</span><span class="o">-</span><span class="mf">1.0</span><span class="p">))</span>
+
+    <span class="c1"># Big eta&#39;s, hafta use Stirling&#39;s formulas for the gamma function (See Abramowitz &amp; Stegun, Eq. 6.1.39)</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">big_eta</span><span class="p">):</span>
+        <span class="n">stirlingsGamma</span> <span class="o">=</span> <span class="n">SQRTTWOPI</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">eta</span><span class="p">[</span><span class="n">big_eta</span><span class="p">])</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">eta</span><span class="p">[</span><span class="n">big_eta</span><span class="p">],</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">eta</span><span class="p">[</span><span class="n">big_eta</span><span class="p">]</span><span class="o">+</span><span class="n">L</span><span class="o">+</span><span class="mf">0.5</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">cnorm</span><span class="p">[</span><span class="n">big_eta</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span><span class="n">L</span><span class="p">)</span><span class="o">*</span><span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">eta</span><span class="p">[</span><span class="n">big_eta</span><span class="p">]</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span><span class="o">*</span><span class="n">stirlingsGamma</span><span class="o">/</span><span class="n">nf_sf</span><span class="o">.</span><span class="n">gamma</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">L</span><span class="o">+</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">cnorm</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">big_eta</span><span class="p">,</span><span class="nb">abs</span><span class="p">(</span><span class="n">cnorm</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">100</span><span class="p">)]</span><span class="o">=</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">100</span>
+
+    <span class="k">return</span> <span class="n">cnorm</span></div>
+
+<div class="viewcode-block" id="coulombPenetrationFactor"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.getCoulombWavefunctions.coulombPenetrationFactor">[docs]</a><span class="k">def</span> <span class="nf">coulombPenetrationFactor</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Coulomb penetrability, :math:`P_\\ell`,</span>
+<span class="sd">    :math:`P_\\ell(\\rho,\\eta)={\\rho}/{(A_\\ell(\\rho,\\eta))^2}`</span>
+<span class="sd">    where :math:`(A_\\ell(\\rho,\\eta))^2=(G_\\ell(\\rho,\\eta))^2+(F_\\ell(\\rho,\\eta))^2`</span>
+
+<span class="sd">    Because we&#39;re working with numpy arrays of :math:`\eta` (for parallelization ala&#39; Caleb&#39;s tricks), the logic</span>
+<span class="sd">    of numpy masked arrays is at work here to handle different regimes of eta.</span>
+
+<span class="sd">    Here we use an external subroutine `coulfg2` from Thompson et al, converted to c and wrapped</span>
+
+<span class="sd">    :param L: the L to evaluate at</span>
+<span class="sd">    :type L: int</span>
+<span class="sd">    :param rho: array of :math:`\\rho` values</span>
+<span class="sd">    :type rho: numpy.array(type=float)</span>
+<span class="sd">    :param eta: array of :math:`\eta` values</span>
+<span class="sd">    :type eta: numpy.array(type=float)</span>
+<span class="sd">    :return: array of penetrabilities</span>
+<span class="sd">    :rtype: numpy.array(type=float)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_checkRhoAndEta</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+
+    <span class="n">RHOCUT</span><span class="o">=</span><span class="mf">0.035</span><span class="o">*</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">pen</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
+    <span class="n">bad_rho</span> <span class="o">=</span> <span class="n">rho</span>  <span class="o">&lt;</span>  <span class="n">RHOCUT</span>
+    <span class="n">good_rho</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">&gt;=</span> <span class="n">RHOCUT</span>
+
+    <span class="c1"># For small rho, coulfg barfs.  We&#39;ll use the asymptotic forms of F &amp; G from DLMF Eqs. 33.5.1 &amp; 33.5.2.</span>
+    <span class="c1"># We can neglect contribution from F^2 to A^2, since goes like rho^2l for small rho</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">bad_rho</span><span class="p">):</span>
+        <span class="n">cnorm</span> <span class="o">=</span> <span class="n">coulombNormalizationFactor</span><span class="p">(</span><span class="n">L</span><span class="p">,</span><span class="n">eta</span><span class="p">[</span><span class="n">bad_rho</span><span class="p">])</span>
+        <span class="n">pen</span><span class="p">[</span><span class="n">bad_rho</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">rho</span><span class="p">[</span><span class="n">bad_rho</span><span class="p">],</span><span class="mf">2.0</span><span class="o">*</span><span class="n">L</span><span class="o">+</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">power</span><span class="p">(</span> <span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">L</span><span class="o">+</span><span class="mf">1.0</span><span class="p">)</span><span class="o">*</span><span class="n">cnorm</span><span class="p">,</span> <span class="mf">2.0</span> <span class="p">)</span>
+
+    <span class="c1"># For moderate rho, we&#39;re good to go, I think</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">good_rho</span><span class="p">):</span>
+        <span class="n">F</span><span class="p">,</span> <span class="n">G</span>  <span class="o">=</span> <span class="n">getCoulombWavefunctions</span><span class="p">(</span> <span class="n">rho</span><span class="p">[</span><span class="n">good_rho</span><span class="p">],</span> <span class="n">eta</span><span class="p">[</span><span class="n">good_rho</span><span class="p">],</span> <span class="n">L</span> <span class="p">)</span>
+        <span class="n">pen</span><span class="p">[</span><span class="n">good_rho</span><span class="p">]</span> <span class="o">=</span> <span class="n">rho</span><span class="p">[</span><span class="n">good_rho</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">F</span><span class="o">*</span><span class="n">F</span><span class="o">+</span><span class="n">G</span><span class="o">*</span><span class="n">G</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">pen</span><span class="p">)):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;WARNING: Pen messed up! For L=</span><span class="si">%i</span><span class="s2">, (rho,eta,pen)=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">L</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">rho</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span><span class="n">eta</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span><span class="n">pen</span><span class="o">.</span><span class="n">flatten</span><span class="p">())))</span>
+        <span class="k">if</span> <span class="kc">False</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">pen</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">pen</span><span class="p">)]</span><span class="o">=</span><span class="mf">0.0</span>
+
+    <span class="k">return</span> <span class="n">pen</span></div>
+
+<div class="viewcode-block" id="coulombPhi"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.getCoulombWavefunctions.coulombPhi">[docs]</a><span class="k">def</span> <span class="nf">coulombPhi</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Coulomb phase, :math:`\\varphi_\\ell`, :math:`\\varphi_\\ell(\\rho,\\eta)=\\arg(G_\\ell(\\rho,\\eta)+iF_\\ell(\\rho,\\eta))`</span>
+
+<span class="sd">    Because we&#39;re working with numpy arrays of :math:`\\eta` (for parallelization ala&#39; Caleb&#39;s tricks), the logic</span>
+<span class="sd">    of numpy masked arrays is at work here to handle different regimes of eta.</span>
+
+<span class="sd">    Here we use an external subroutine &#39;coulfg2&#39; from Thompson et al, converted to c and wrapped</span>
+
+<span class="sd">    :param int L: the L to evaluate at</span>
+<span class="sd">    :param numpy.array(type=float) rho: array of :math:`\\rho` values</span>
+<span class="sd">    :param numpy.array(type=float) eta: array of :math:`\\eta` values</span>
+<span class="sd">    :return: numpy.array(type=float) of phases</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_checkRhoAndEta</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+
+    <span class="n">RHOCUT</span><span class="o">=</span><span class="mf">0.04</span><span class="o">*</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">BIGRHOETA</span><span class="o">=</span><span class="mf">30.0</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">small_rho</span> <span class="o">=</span> <span class="n">rho</span>  <span class="o">&lt;</span>  <span class="n">RHOCUT</span>
+    <span class="n">good_rhoeta</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">rho</span> <span class="o">&gt;=</span> <span class="n">RHOCUT</span><span class="p">,</span> <span class="n">rho</span><span class="o">*</span><span class="n">eta</span><span class="o">&lt;=</span><span class="n">BIGRHOETA</span><span class="p">)</span>
+    <span class="n">big_rhoeta</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span> <span class="n">rho</span> <span class="o">&gt;=</span> <span class="n">RHOCUT</span><span class="p">,</span> <span class="n">rho</span><span class="o">*</span><span class="n">eta</span><span class="o">&gt;</span><span class="n">BIGRHOETA</span><span class="p">)</span> <span class="c1">#rho*eta &gt; BIGRHOETA</span>
+
+    <span class="c1"># For small rho, coulfg barfs.  We&#39;ll use the asymptotic forms of F &amp; G from DLMF Eqs. 33.5.1 &amp; 33.5.2.</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">small_rho</span><span class="p">):</span>
+        <span class="n">cnorm</span> <span class="o">=</span> <span class="n">coulombNormalizationFactor</span><span class="p">(</span> <span class="n">L</span><span class="p">,</span> <span class="n">eta</span><span class="p">[</span><span class="n">small_rho</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="n">cnorm</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">power</span><span class="p">(</span> <span class="n">rho</span><span class="p">[</span><span class="n">small_rho</span><span class="p">],</span> <span class="n">L</span><span class="o">+</span><span class="mi">1</span> <span class="p">)</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">power</span><span class="p">(</span> <span class="n">cnorm</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">power</span><span class="p">(</span> <span class="n">rho</span><span class="p">[</span><span class="n">small_rho</span><span class="p">],</span><span class="n">L</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">L</span><span class="o">+</span><span class="mf">1.0</span><span class="p">),</span> <span class="o">-</span><span class="mf">1.0</span> <span class="p">)</span> <span class="c1"># by using numpy.power, we can safely handle 1/0</span>
+        <span class="n">phi</span><span class="p">[</span><span class="n">small_rho</span><span class="p">]</span> <span class="o">=</span> <span class="n">F</span><span class="o">/</span><span class="n">G</span>
+
+    <span class="c1"># For moderate rho, we&#39;re good to go, I think</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">good_rhoeta</span><span class="p">):</span>
+        <span class="n">F</span><span class="p">,</span> <span class="n">G</span> <span class="o">=</span> <span class="n">getCoulombWavefunctions</span><span class="p">(</span> <span class="n">rho</span><span class="p">[</span><span class="n">good_rhoeta</span><span class="p">],</span> <span class="n">eta</span><span class="p">[</span><span class="n">good_rhoeta</span><span class="p">],</span> <span class="n">L</span> <span class="p">)</span>
+        <span class="n">phi</span><span class="p">[</span><span class="n">good_rhoeta</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">F</span><span class="p">,</span><span class="n">G</span><span class="p">)</span> <span class="c1">#numpy.angle( G+1j*F )</span>
+
+    <span class="c1"># For super big rho, have to use asymptotic expression for phase</span>
+    <span class="c1"># F &amp; G asymptotic forms are from DLMF Eqs. 33.10.1 &amp; 33.10.2</span>
+    <span class="c1"># arg(Gamma(L+1+ieta) uses A&amp;S Eqs. 6.1.27 and 6.3.2</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">big_rhoeta</span><span class="p">):</span>
+        <span class="n">nMax</span><span class="o">=</span><span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">numpy</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">eta</span><span class="p">[</span><span class="n">big_rhoeta</span><span class="p">])</span>
+      <span class="c1">#  if any(eta[big_rhoeta]&gt;0.0): nMax[eta[big_rhoeta]&gt;0.0] = nMax[eta[big_rhoeta]&gt;0.0] / numpy.round( max(eta[ big_rhoeta ]) )</span>
+        <span class="n">nMax</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">nMax</span><span class="p">))</span>
+
+        <span class="c1"># Coulomb asymptotic phase</span>
+        <span class="n">sigmaL</span> <span class="o">=</span> <span class="n">eta</span><span class="p">[</span><span class="n">big_rhoeta</span><span class="p">]</span><span class="o">*</span><span class="n">digamma</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span> <span class="p">[</span>
+                                                      <span class="n">eta</span><span class="p">[</span><span class="n">big_rhoeta</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mf">1.0</span><span class="o">+</span><span class="n">n</span><span class="p">)</span> <span class="o">-</span>
+                                                      <span class="n">numpy</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span> <span class="n">eta</span><span class="p">[</span><span class="n">big_rhoeta</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mf">1.0</span><span class="o">+</span><span class="n">n</span><span class="p">)</span> <span class="p">)</span>
+                                                      <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">nMax</span><span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+
+        <span class="c1"># and finally phi(rho), asymptotically</span>
+        <span class="n">phi</span><span class="p">[</span><span class="n">big_rhoeta</span><span class="p">]</span> <span class="o">=</span> <span class="n">rho</span><span class="p">[</span><span class="n">big_rhoeta</span><span class="p">]</span> <span class="o">-</span> <span class="n">eta</span><span class="p">[</span><span class="n">big_rhoeta</span><span class="p">]</span><span class="o">*</span><span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">rho</span><span class="p">[</span><span class="n">big_rhoeta</span><span class="p">])</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">L</span><span class="o">/</span><span class="mf">2.0</span> <span class="o">+</span> <span class="n">sigmaL</span>
+
+    <span class="c1"># Quality control on pathological phases</span>
+    <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">phi</span><span class="p">)):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;WARNING: Phase messed up! For L=</span><span class="si">%i</span><span class="s2">, (rho,eta,phi)=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">L</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">rho</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span><span class="n">eta</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span><span class="n">phi</span><span class="o">.</span><span class="n">flatten</span><span class="p">())))</span>
+        <span class="k">if</span> <span class="kc">False</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">phi</span><span class="p">[</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="k">return</span> <span class="n">phi</span></div>
+
+<div class="viewcode-block" id="coulombShiftFactor"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.getCoulombWavefunctions.coulombShiftFactor">[docs]</a><span class="k">def</span> <span class="nf">coulombShiftFactor</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Coulomb shift, :math:`S_\ell`, :math:`S_\\ell(\\rho,\\eta)=({\\rho}/{A_\\ell(\\rho,\\eta)})({\partial A_\\ell(\\rho,\\eta)}/{\partial\\rho})`</span>
+<span class="sd">    where :math:`(A_\\ell(\\rho,\\eta))^2=(G_\\ell(\\rho,\\eta))^2+(F_\\ell(\\rho,\\eta))^2`</span>
+
+<span class="sd">    Because we&#39;re working with numpy arrays of :math:`\eta` (for parallelization ala&#39; Caleb&#39;s tricks), the logic</span>
+<span class="sd">    of numpy masked arrays is at work here to handle different regimes of eta.</span>
+
+<span class="sd">    Here we use an external subroutine &#39;coulfg2&#39; from Thompson et al, converted to c and wrapped</span>
+
+<span class="sd">    :param L: the L to evaluate at</span>
+<span class="sd">    :type L: int</span>
+<span class="sd">    :param rho: array of :math:`\\rho` values</span>
+<span class="sd">    :type rho: numpy.array(type=float)</span>
+<span class="sd">    :param eta: array of :math:`\eta` values</span>
+<span class="sd">    :type eta: numpy.array(type=float)</span>
+<span class="sd">    :return: array of shifts</span>
+<span class="sd">    :rtype: numpy.array(type=float)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_checkRhoAndEta</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+    <span class="n">RHOCUT</span><span class="o">=</span><span class="mf">0.035</span><span class="o">*</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">shift</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
+    <span class="n">bad_rho</span>  <span class="o">=</span> <span class="n">rho</span> <span class="o">&lt;</span>  <span class="n">RHOCUT</span>
+    <span class="n">good_rho</span> <span class="o">=</span> <span class="n">rho</span> <span class="o">&gt;=</span> <span class="n">RHOCUT</span>
+
+    <span class="c1"># For small rho, coulfg barfs.  We&#39;ll use the asymptotic forms of F &amp; G from DLMF Eqs. 33.5.1 &amp; 33.5.2.</span>
+    <span class="c1"># If you work it out, noting that A^2 is dominated by the 1/rho^L behavior of G, it gets real simple</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">bad_rho</span><span class="p">):</span>
+        <span class="n">shift</span><span class="p">[</span><span class="n">bad_rho</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span> <span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">+</span> <span class="n">eta</span><span class="p">[</span><span class="n">bad_rho</span><span class="p">]</span><span class="o">*</span><span class="n">rho</span><span class="p">[</span><span class="n">bad_rho</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">-</span>
+                           <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span><span class="o">+</span><span class="n">numpy</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">eta</span><span class="p">[</span><span class="n">bad_rho</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mf">1.0</span><span class="p">),</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="p">((</span><span class="mi">2</span><span class="o">*</span><span class="n">L</span><span class="o">+</span><span class="mf">1.0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">L</span><span class="o">+</span><span class="mf">3.0</span><span class="p">))</span> <span class="o">*</span>
+                           <span class="n">coulombNormalizationFactor</span><span class="p">(</span><span class="n">L</span><span class="p">,</span><span class="n">eta</span><span class="p">[</span><span class="n">bad_rho</span><span class="p">])</span> <span class="o">/</span>
+                           <span class="n">coulombNormalizationFactor</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">eta</span><span class="p">[</span><span class="n">bad_rho</span><span class="p">])</span> <span class="p">)</span>
+
+    <span class="c1"># For moderate rho, we&#39;re good to go, I think.  These use the derivatives of F &amp; G in the DLMF Eq. 33.4.4</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">good_rho</span><span class="p">):</span>
+        <span class="n">F</span><span class="p">,</span> <span class="n">G</span>   <span class="o">=</span> <span class="n">getCoulombWavefunctions</span><span class="p">(</span> <span class="n">rho</span><span class="p">[</span><span class="n">good_rho</span><span class="p">],</span> <span class="n">eta</span><span class="p">[</span><span class="n">good_rho</span><span class="p">],</span> <span class="n">L</span> <span class="p">)</span>
+        <span class="n">F1</span><span class="p">,</span> <span class="n">G1</span> <span class="o">=</span> <span class="n">getCoulombWavefunctions</span><span class="p">(</span> <span class="n">rho</span><span class="p">[</span><span class="n">good_rho</span><span class="p">],</span> <span class="n">eta</span><span class="p">[</span><span class="n">good_rho</span><span class="p">],</span> <span class="n">L</span><span class="o">+</span><span class="mi">1</span> <span class="p">)</span>
+        <span class="n">S1</span> <span class="o">=</span> <span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mf">1.0</span><span class="p">)</span><span class="o">/</span><span class="n">rho</span><span class="p">[</span><span class="n">good_rho</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">eta</span><span class="p">[</span><span class="n">good_rho</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">R1</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="n">numpy</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">eta</span><span class="p">[</span><span class="n">good_rho</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="mf">2.0</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">shift</span><span class="p">[</span><span class="n">good_rho</span><span class="p">]</span> <span class="o">=</span> <span class="n">rho</span><span class="p">[</span><span class="n">good_rho</span><span class="p">]</span><span class="o">*</span><span class="p">(</span> <span class="n">S1</span> <span class="o">-</span> <span class="n">R1</span><span class="o">*</span><span class="p">(</span><span class="n">G</span><span class="o">*</span><span class="n">G1</span><span class="o">+</span><span class="n">F</span><span class="o">*</span><span class="n">F1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">F</span><span class="o">*</span><span class="n">F</span><span class="o">+</span><span class="n">G</span><span class="o">*</span><span class="n">G</span><span class="p">)</span> <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">shift</span><span class="p">)):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;WARNING: Shift messed up!  For L=</span><span class="si">%i</span><span class="s2">, (rho,eta,shift)=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">L</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">rho</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span><span class="n">eta</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span><span class="n">shift</span><span class="o">.</span><span class="n">flatten</span><span class="p">())))</span>
+        <span class="k">if</span> <span class="kc">False</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">shift</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">shift</span><span class="p">)]</span><span class="o">=-</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="o">+</span><span class="n">eta</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">shift</span><span class="p">)]</span><span class="o">*</span><span class="n">rho</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">shift</span><span class="p">)]</span><span class="o">/</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">numpy</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">eta</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">shift</span><span class="p">)]</span><span class="o">/</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="mi">2</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">shift</span></div>
+
+<div class="viewcode-block" id="digamma"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.getCoulombWavefunctions.digamma">[docs]</a><span class="k">def</span> <span class="nf">digamma</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple digamma function, tested against A&amp;S tables in chapter 6, up to n=20</span>
+<span class="sd">    :param n: an integer</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">numpy</span><span class="o">.</span><span class="n">euler_gamma</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span> <span class="p">[</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="p">]</span> <span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">_checkRhoAndEta</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check argument type and size</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NE</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="p">(</span><span class="n">rho</span><span class="p">,</span><span class="n">eta</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">array</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="s2">&quot;rho and eta must be numpy float arrays&quot;</span>
+        <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">shape</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">((</span><span class="n">NE</span><span class="p">,),</span> <span class="p">(</span><span class="n">NE</span><span class="p">,</span><span class="mi">1</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;rho and eta must be 1-d arrays with the same shape!&quot;</span><span class="p">)</span>
+
+<span class="c1">#==== Tests ====</span>
+
+<div class="viewcode-block" id="test_getCoulombWavefunctions"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.getCoulombWavefunctions.test_getCoulombWavefunctions">[docs]</a><span class="k">def</span> <span class="nf">test_getCoulombWavefunctions</span><span class="p">():</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">6.0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">21</span><span class="p">):</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot; L =          </span><span class="si">%2i</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">l</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">21</span><span class="p">):</span>
+            <span class="n">eta</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="p">[</span><span class="mf">0.5</span><span class="o">*</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">F</span><span class="p">,</span><span class="n">G</span> <span class="o">=</span> <span class="n">getCoulombWavefunctions</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span><span class="n">eta</span><span class="p">,</span><span class="n">l</span><span class="p">)</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%25.17E</span><span class="s2">&quot;</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">rho</span><span class="p">))</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>   <span class="c1"># print F or G</span>
+        <span class="nb">print</span> <span class="s1">&#39; &#39;</span></div>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">test_getCoulombWavefunctions</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

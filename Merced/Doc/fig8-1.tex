@@ -1,0 +1,57 @@
+% Integration region for Kalbach data
+\begin{center}
+\begin{tikzpicture}
+% the axis
+\draw [thin] (-5, 0) -- (0, 0);
+\draw [thin] (4.8, 0) -- (8.5, 0);
+% energy bin
+\filldraw[thin, fill = gray!10] (4.5, 0) arc (0:180:4.5) --
+  (-2.4, 0) arc (180:0:2.4) -- cycle;
+% data region
+\filldraw[thin, fill = gray!20] (7.8, 0) arc (0:180:3) --
+  (3.4, 0) arc (180:0:1.4) -- cycle;
+% quadrature region
+\filldraw[thick, fill = gray!40] (2.4, 0) arc (0:30.754: 2.4)
+ arc(155.853: 114.16: 3)
+  arc(37.463: 16.920: 4.5)
+  arc(110.700: 180: 1.4) -- cycle;
+% \Vlab'
+  \draw[-{>[scale=2.5,
+          length=5,
+          width=3]}, very thick] (0, 0) -- (3, 1.5);
+%  \draw[->, angle 45, very thick] (0, 0) -- (3, 1.5);
+% \Vtrans
+  \draw[-{>[scale=2.5,
+          length=5,
+          width=3]}, very thick] (0, 0) -- (4.8, 0);
+% \Vcm'
+  \draw[-{>[scale=2.5,
+          length=5,
+          width=3]}, very thick] (4.8, 0) -- (3, 1.5);
+% labels
+ \node at (0, 3.4) { $\calE_h'$};
+ \draw (0, -0.2) -- (0, 0);
+ \node [below] at (0, -0.2) {O};
+ \draw (0.8, 0) arc ( 0: 26.565: 0.8);
+ \node [right] at (0.8, 0.25) {$\theta_{\text{lab}}$};
+ \draw (5.3, 0) arc ( 0: 140.194: 0.5);
+ \node [right] at (5.2, 0.4) {$\theta_{\text{cm}}$};
+ \node [below] at (3.2, -0.1) {$\Vtrans$};
+ \node [above] at (3.75, 1.05) {$\Vcm'$};
+ \node [above] at (1.6, 0.9) {$\Vlab'$};
+ \draw[{<[scale=2, length=3, width=3]}-] (4.6, 1.38560) -- (3.9, 4.8);
+ \node[left] at (3.9, 4.8) {$E'_{\text{cm}} = E'_{\text{cm},j-1}$};
+ \draw[{<[scale=2, length=3, width=3]}-] (5.8, 2.8284) -- (5, 5.5);
+ \node[left] at (5, 5.5) {$E'_{\text{cm}} = E'_{\text{cm},j}$};
+ \draw[{<[scale=2, length=3, width=3]}-] (-1, 4.3875) -- (-2, 5);
+ \node [left] at (-2, 5) {$\Elab' = \Ebin'$};
+ % legend
+ \node [right] at (6.5, 4.1) {$\mucm = \cos \theta_{\text{cm}}$};
+ \node [right] at (6.5, 3.5)  {$\mu_{\text{lab}} = \cos \theta_{\text{lab}}$};
+\end{tikzpicture}
+\caption{Integration region over $\Ecm'$ and $\mucm$ for the outgoing energy bin
+$\calE_h'$ at a fixed incident energy
+for data given at energies $E'_{\text{cm},j-1} \le \Ecm' \le E'_{\text{cm},j}$
+in the center-of-mass frame}
+\label{Fig:boost-regions}
+\end{center} 

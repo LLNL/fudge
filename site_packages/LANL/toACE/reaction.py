@@ -65,24 +65,28 @@
 This module adds the method toACE to the reaction class.
 """
 
-from fudge.gnd.reactions import reaction
+from pqu import PQU as PQUModule
 
-def toACE( self, temperature, EMin, data ) :
+from fudge.gnd.reactions import reaction as reactionModule
 
-    from pqu import PQU
+def toACE( self, temperature, EMin, data, verbose ) :
 
     MT = self.ENDF_MT
+    if( verbose > 1 ) : print '   %s: MT = %d' % ( str( self ), MT )
+
     MTData = {}
     MTData['isFission'] = self.outputChannel.isFission( )
-    if( self.domainMin( ) > EMin ) :
-        MTData['ESZ'] = self.crossSection.toPointwise_withLinearXYs( )
-    else :
-        EMinUnit = PQU.PQU( EMin, self.domainUnit( ) )
-        MTData['ESZ'] = self.heatCrossSection( temperature, EMinUnit, heatBelowThreshold = False, heatAllEDomain = True, interpolationAccuracy = 0.002 )
+    if( self.domainMin > EMin ) :        # Do not heat cross section if it starts above EMin.
+        MTData['ESZ'] = self.crossSection.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-8 )
+    else :                                  # Heat cross section.
+        EMinUnit = PQUModule.PQU( EMin, self.domainUnit )
+        MTData['ESZ'] = self.heatCrossSection( temperature, EMinUnit, heatBelowThreshold = False, 
+                heatAllEDomain = True, interpolationAccuracy = 0.002 )
     MTData['Q'] = self.getQ( 'MeV' )
     MTData['n'] = []
+    MTData['n_fissionDelayed'] = []
     MTData['gamma'] = []
-    for product in self.outputChannel : product.toACE( MTData, MT )
+    self.outputChannel.toACE( MTData, MT, verbose )
     data.append( ( MT, MTData ) )
 
-reaction.reaction.toACE = toACE
+reactionModule.reaction.toACE = toACE

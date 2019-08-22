@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4.4. Fission &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="4.5. Summed Reactions" href="summedReactions.html" />
+    <link rel="prev" title="4.3. Outgoing Distributions" href="outgoingDistributions.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="summedReactions.html" title="4.5. Summed Reactions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="outgoingDistributions.html" title="4.3. Outgoing Distributions"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="diggingDeeper.html" accesskey="U">4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="fission">
+<h1>4.4. Fission<a class="headerlink" href="#fission" title="Permalink to this headline">¶</a></h1>
+<p>While fission is treated as a single reaction in both ENDF and GND, in reality it is composed of many different reactions each of which produces a different set of outgoing particles. Fission poses a special challenge for GND since, unlike most other reactions, we cannot explicitly list all the outgoing products. Instead we list average values for outgoing neutrons and gammas, and ignore the fission fragments (except to give the average energy deposited in them).</p>
+<p>A neutron-induced fission channel generally contains several outgoing products:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">A</span> <span class="n">prompt</span> <span class="n">neutron</span>
+<span class="o">-</span> <span class="n">One</span> <span class="ow">or</span> <span class="n">more</span> <span class="n">delayed</span> <span class="n">neutrons</span><span class="p">,</span> <span class="ow">and</span>
+<span class="o">-</span> <span class="n">Prompt</span> <span class="n">gammas</span>
+</pre></div>
+</div>
+<p>In each case the multiplicity is generally a function of incident energy.</p>
+<div class="section" id="first-second-third-chance">
+<h2>4.4.1. First, second, third chance, ...<a class="headerlink" href="#first-second-third-chance" title="Permalink to this headline">¶</a></h2>
+<p>For most evaluations in major libraries, total fission (MT=18) contains a full description of the cross section,
+product multiplicities and distributions. Additional fission cross sections like first-chance, 2nd-chance, etc.
+are often also listed, but do not contain any description of outgoing products.
+GND (and Fudge) handle these with the <code class="docutils literal"><span class="pre">fissionComponent</span></code> container, which contains a cross section
+and Q-value but not necessarily a list of products.</p>
+</div>
+<div class="section" id="the-cross-section">
+<h2>4.4.2. The cross section<a class="headerlink" href="#the-cross-section" title="Permalink to this headline">¶</a></h2>
+<p>Fission cross sections behave like all other reaction cross sections. For non-threshold fissioners,
+part of the cross section is typically described by resonance parameters, so the cross section requires
+reconstruction.</p>
+</div>
+<div class="section" id="nubar">
+<h2>4.4.3. nubar<a class="headerlink" href="#nubar" title="Permalink to this headline">¶</a></h2>
+<p>The average neutron multiplicity &#8216;nubar&#8217; is stored as the multiplicity of outgoing fission neutrons.
+Nubar is typically separated into two components: &#8216;prompt&#8217;, for neutrons produced during the fission process,
+and &#8216;delayed&#8217; for beta-delayed neutrons emitted by the fission fragments.
+Evaluations typically contain multiple delayed fission neutrons, grouped by the average beta-decay lifetime of
+the parent fission products.  The ENDF-6 format only supports storing a single delayed nubar, so in GND
+we typically see multiple delayed neutrons with multiplicities that link back to the first delayed neutron using
+the <code class="docutils literal"><span class="pre">reference</span></code> multiplicity class.</p>
+</div>
+<div class="section" id="pfns">
+<h2>4.4.4. PFNS<a class="headerlink" href="#pfns" title="Permalink to this headline">¶</a></h2>
+<p>The prompt fission neutron spectrum (PFNS) is stored within the <code class="docutils literal"><span class="pre">distribution</span></code> information for the prompt neutron
+product. All existing evaluations make the assumption that the outgoing angles and energies are uncoupled (or only
+weakly coupled), and can be represented using <code class="docutils literal"><span class="pre">uncorrelated</span></code> energy and angle distributions.
+The angular distribution is typically <code class="docutils literal"><span class="pre">isotropic</span></code> in the laboratory frame.
+The outgoing energy distribution can be stored in several different ways:</p>
+<ul class="simple">
+<li>XYs2d  (i.e. a point-wise P(E&#8217; | E) distribution)</li>
+<li>Watt spectrum</li>
+<li>Simple Maxwellian fission spectrum</li>
+<li>Madland-Nix model</li>
+</ul>
+<p>Some evaluations (notably Th232 in ENDF-VII.1 and ENDF-VIII-beta4) use a double-differential energy-angle distribution
+for the PFNS, with a Legendre expansion given for each combination of incident and outgoing energy.</p>
+</div>
+<div class="section" id="gammas">
+<h2>4.4.5. Gammas<a class="headerlink" href="#gammas" title="Permalink to this headline">¶</a></h2>
+<p>TBD: expand documentation</p>
+</div>
+<div class="section" id="energy-release">
+<h2>4.4.6. Energy release<a class="headerlink" href="#energy-release" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="delayed-neutrons">
+<h2>4.4.7. Delayed neutrons<a class="headerlink" href="#delayed-neutrons" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="fission-product-yields">
+<h2>4.4.8. Fission product yields<a class="headerlink" href="#fission-product-yields" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">4.4. Fission</a><ul>
+<li><a class="reference internal" href="#first-second-third-chance">4.4.1. First, second, third chance, ...</a></li>
+<li><a class="reference internal" href="#the-cross-section">4.4.2. The cross section</a></li>
+<li><a class="reference internal" href="#nubar">4.4.3. nubar</a></li>
+<li><a class="reference internal" href="#pfns">4.4.4. PFNS</a></li>
+<li><a class="reference internal" href="#gammas">4.4.5. Gammas</a></li>
+<li><a class="reference internal" href="#energy-release">4.4.6. Energy release</a></li>
+<li><a class="reference internal" href="#delayed-neutrons">4.4.7. Delayed neutrons</a></li>
+<li><a class="reference internal" href="#fission-product-yields">4.4.8. Fission product yields</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="outgoingDistributions.html"
+                        title="previous chapter">4.3. Outgoing Distributions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="summedReactions.html"
+                        title="next chapter">4.5. Summed Reactions</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/fission.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="summedReactions.html" title="4.5. Summed Reactions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="outgoingDistributions.html" title="4.3. Outgoing Distributions"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="diggingDeeper.html" >4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

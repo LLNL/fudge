@@ -61,7 +61,7 @@
 # 
 # <<END-copyright>>
 
-'''
+"""
 Directory: masses/
 File:      abundance.readme (December 10, 2007)
 ***********************************************
@@ -97,9 +97,9 @@ References
 [1] J.K. Tuli, Nuclear Wallet Cards (NNDC, Brookhaven National Laboratory), 2005.
 
 Dates: Original 10 December, 2007
-'''
+"""
 
-__data = '''
+__data = """
 #      Natural abundances
 #  Z  A  El   abundance  uncert.
 #               [%]       [%]
@@ -391,7 +391,7 @@ __data = '''
   92 234 U    0.005400  0.000500
   92 235 U    0.720400  0.000600
   92 238 U   99.274200  0.001000
-  '''
+  """
   
 def __getAbundanceTuple( line ) :
 

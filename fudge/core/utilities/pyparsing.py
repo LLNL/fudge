@@ -168,7 +168,7 @@ _bslash    = chr(92)
 printables = "".join( [ c for c in string.printable if c not in string.whitespace ] )
 
 class ParseBaseException(Exception):
-    """base exception class for all parsing runtime exceptions"""
+    """Base exception class for all parsing runtime exceptions"""
     # Performance tuning: we construct a *lot* of these, so keep this
     # constructor as small and fast as possible
     def __init__( self, pstr, loc=0, msg=None, elem=None ):
@@ -182,7 +182,7 @@ class ParseBaseException(Exception):
         self.parserElement = elem
 
     def __getattr__( self, aname ):
-        """supported attributes by name are:
+        """Supported attributes by name are:
             - lineno - returns the line number of the exception text
             - col - returns the column number of the exception text
             - line - returns the line containing the exception text
@@ -216,7 +216,7 @@ class ParseBaseException(Exception):
                "markInputLine __str__ __repr__".split()
 
 class ParseException(ParseBaseException):
-    """exception thrown when parse expressions don't match class;
+    """Exception thrown when parse expressions don't match class;
        supported attributes by name are:
         - lineno - returns the line number of the exception text
         - col - returns the column number of the exception text
@@ -225,12 +225,12 @@ class ParseException(ParseBaseException):
     pass
 
 class ParseFatalException(ParseBaseException):
-    """user-throwable exception thrown when inconsistent parse content
+    """User-throwable exception thrown when inconsistent parse content
        is found; stops all parsing immediately"""
     pass
 
 class ParseSyntaxException(ParseFatalException):
-    """just like C{ParseFatalException}, but thrown internally when an
+    """Just like C{ParseFatalException}, but thrown internally when an
        C{ErrorStop} ('-' operator) indicates that parsing is to stop immediately because
        an unbacktrackable syntax error has been found"""
     def __init__(self, pe):
@@ -251,7 +251,7 @@ class ParseSyntaxException(ParseFatalException):
         #~ self.reparseLoc = restartLoc
 
 class RecursiveGrammarException(Exception):
-    """exception thrown by C{validate()} if the grammar could be improperly recursive"""
+    """Exception thrown by C{validate()} if the grammar could be improperly recursive"""
     def __init__( self, parseElementList ):
         self.parseElementTrace = parseElementList
 
@@ -1870,8 +1870,8 @@ class Regex(Token):
 
 
 class QuotedString(Token):
-    """Token for matching strings that are delimited by quoting characters.
-    """
+    """Token for matching strings that are delimited by quoting characters."""
+    
     def __init__( self, quoteChar, escChar=None, escQuote=None, multiline=False, unquoteResults=True, endQuoteChar=None):
         """
            Defined with the following parameters:

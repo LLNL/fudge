@@ -1,0 +1,673 @@
+\chapter{Formulas for double-differential energy-angle data}
+\label{Sec:double-diff-formula}
+This section explains the coding used to treat two representations
+by formula for double-differential energy-angle data in the \xendl\ library,
+the Kalbach-Mann formula and the phase-space model.  The
+Kalbach-Mann model is described first, because it is used so often in \xendl.
+
+\section{The Kalbach-Mann model for double-differential data}
+In the Kalbach-Mann representation \cite{Kalbach} the
+double differential probability density is of the form
+\begin{equation}
+  \pi(\Ecm', \mucm \mid E) =
+  \pi_E( \Ecm' \mid E) \pi_\mu( \mucm \mid \Ecm', E ),
+  \label{Kalbach-prob}
+\end{equation}
+where $E$ is the energy of the incident particle in laboratory
+coordinates and $\Ecm'$ and $\mucm$ are the energy and cosine of
+the outgoing particle in center-of-mass coordinates.
+The values of the probability density $\pi_E( \Ecm' \mid E)$ for outgoing 
+energy $\Ecm'$
+are given as a table with normalization
+$$
+  \int_0^\infty d\Ecm' \, \pi_E( \Ecm' \mid E) = 1.
+$$
+In Eq.~(\ref{Kalbach-prob}) the function
+$\pi_\mu( \mucm \mid \Ecm', E )$ is an exponential in
+$\mucm$ depending on parameters~$a$ and~$r$~\cite{Kalbach},
+\begin{equation}
+  \pi_\mu( \mucm \mid \Ecm', E ) =
+    \frac{1}{C}
+    [ \cosh(a\mucm) + r \sinh(a\mucm)].
+  \label{Kalbach-eta}
+\end{equation}
+The value of $r$ in Eq.~(\ref{Kalbach-eta}) depends on the incident and outgoing energies 
+$E$ and $\Ecm'$ and is given in a data table.  The formula Eq.~(\ref{Kalbach-eta})
+represents a pre-equilibrium model, with $r=0$ representing complete
+equilibrium and $r = 1$ no equilibrium at all.  It is therefore always true
+that
+$$
+  0 \le r \le 1.
+$$
+
+The value of $C$ in Eq.~(\ref{Kalbach-eta}) is chosen to ensure the normalization
+$$
+  \int_{-1}^1 d\mucm \, \pi_\mu( \mucm \mid \Ecm', E ) = 1.
+$$
+That is, take
+$$
+  C = \frac{ 2 \sinh{a}}{a}.
+$$
+
+\subsection{The Kalbach-Mann $a$ parameter}
+The values of the parameter~$a$ in Eq.~(\ref{Kalbach-eta}) may be given
+as a table depending on the incident
+energy $E$ and on $\Ecm'$, the center-of-mass kinetic energy of
+the outgoing particle.  It is more common, however, to use the formula
+for $a$ as a function of $E$ as found in the references \cite{Kalbach} and~\cite{ENDFB}.
+The details are repeated here for the sake of completeness.
+
+{% begin special notation
+\newcommand{\Ealab}{E_{a,\text{lab}}}
+\newcommand{\Eacm}{E_{a,\text{cm}}}
+\newcommand{\EAcm}{E_{A,\text{cm}}}
+\newcommand{\EaAcm}{E_{aA,\text{cm}}}
+\newcommand{\Ebcm}{E_{b,\text{cm}}}
+\newcommand{\EBcm}{E_{B,\text{cm}}}
+\newcommand{\EbBcm}{E_{bB,\text{cm}}}
+Some special notation is used in this subsection.  The reaction is of the form
+\begin{equation}
+  A + a \to C \to B + b,
+ \label{Kalbach-reaction}
+\end{equation}
+where
+\begin{align*}
+  A:\quad &\text{the target with mass $\mtarg$, assumed to be at rest in the laboratory frame,} \\
+  a:\quad &\text{the incident particle with mass $\myi$,} \\
+  C:\quad &\text{the compound nucleus,} \\
+  B:\quad &\text{the residual nucleus with mass $\mres$,} \\
+  b:\quad &\text{the emitted particle with mass $\myo$.}
+\end{align*}
+
+
+Several energies are needed, all measured in MeV,
+\begin{align*}
+  \Ealab:\quad &\text{energy of the incident particle in the laboratory frame,} \\
+  \Eacm:\quad &\text{energy of the incident particle in the center-of-mass frame,} \\
+  \EAcm:\quad &\text{energy of the target in the center-of-mass frame,} \\
+  \EaAcm:\quad &\Eacm + \EAcm = \mtarg \Ealab/( \mtarg + \myi), \\
+  \Ebcm:\quad &\text{energy of the outgoing particle in the center-of-mass frame,} \\
+  \EbBcm:\quad & (\mres + \myo) \Ebcm / \myo.
+\end{align*}
+Note that the quantity $\EbBcm$ is the total kinetic energy of $B$ and $b$ if
+the breakup of $C$ is a discrete 2-body reaction with the excitation level
+of $B$ unspecified.
+
+For a reaction with several outgoing particles, $b$ in Eq.~(\ref{Kalbach-reaction})
+is the particle corresponding to the current data, and $B$ is the residual
+following the emission of $b$ from the compound nucleus~$C$.
+Thus, for the
+$$
+   {}^{78}\text{Kr} (n, np) {}^{77}\text{Br}
+$$
+reaction, one uses
+$$
+   B =  {}^{78}\text{Kr}
+$$
+in the computation of $a(E, \Ebcm)$ with Kalbach-Mann data for the
+outgoing neutron, while
+$$
+   B =  {}^{78}\text{Br}
+$$
+with outgoing proton data.  Analogously, use
+$$
+     B =  {}^{78}\text{Kr}
+$$
+in the computation of $a(E, \Ebcm)$ with Kalbach-Mann neutron data for the
+$$
+   {}^{78}\text{Kr} (n, 2n) {}^{77}\text{Kr}
+$$
+reaction.
+
+For massive incident particles, the value of $a(E, \Ebcm)$ is given 
+by the expression
+\begin{equation}
+  a(E, \Ebcm) = C_1 X_1 + C_2 X_1^3 + C_3 M_a m_b X_3^4
+ \label{Kalbach-a}
+\end{equation}
+with terms explained below.
+
+The coefficients in Eq.~(\ref{Kalbach-a}) are
+$$
+  C_1 = 0.04\,\text{MeV}^{-1}, \quad
+  C_2 = 1.8 \times 10^{-6}\,\text{MeV}^{-3}, \quad
+  C_3 = 6.7 \times 10^{-7} \,\text{MeV}^{-4}.
+$$
+
+The values of $X_1$ and $X_3$ in Eq.~(\ref{Kalbach-a}) depend on
+the energies $S_a$ and $S_b$ of the capture and breakup  reactions
+in Eq.~(\ref{Kalbach-reaction}).  For the target define
+\begin{align*}
+  Z_A: \quad & \text{number of protons in the target nucleus,} \\
+  N_A: \quad & \text{number of neutrons in the target nucleus,} \\
+  A_A: \quad & Z_A + N_A.
+\end{align*}
+Corresponding $Z_C$, $N_C$, and $A_C$ are defined  
+for the compound nucleus~$C$ and
+$Z_B$, $N_B$, and $A_B$ for the residual nucleus~$B$.
+For the capture reaction,
+$S_a$ is taken as
+\begin{multline}
+  S_a = 15.68(A_C - A_A) -
+    28.07\left(
+      \frac{(N_C - Z_C)^2}{A_C} - \frac{(N_A - Z_A)^2}{A_A }
+    \right) - {} \\
+    18.56( A_C^{2/3} - A_A^{2/3}) +
+      33.22\left(
+        \frac{(N_C - Z_C)^2}{A_C^{4/3}} - \frac{(N_A - Z_A)^2}{A_A^{4/3} }
+    \right) - {} \\
+    0.717\left(
+      \frac{Z_C^2}{A_C^{1/3}} - \frac{Z_A^2}{A_A^{1/3}}
+    \right) + 1.211\left(
+      \frac{Z_C^2}{A_C} - \frac{Z_A^2}{A_A}
+    \right) - I_a.
+ \label{def-Sa}
+\end{multline}
+Here, $I_a$ is the breakup energy for the incident particle
+as given in Table~10.1.  The energy $S_b$ corresponding to the second
+reaction in Eq.~(\ref{Kalbach-reaction}) is obtained from Eq.~(\ref{def-Sa})
+with $Z_A$, $N_A$, $A_A$, and $I_a$ replaced, respectively by
+$Z_B$, $N_B$, $A_B$, and $I_b$.
+
+\begin{table}
+\caption{Breakup energies for incident and outgoing particles in MeV}
+$$
+ \vbox{ \offinterlineskip \tabskip = 0.0cm
+  \halign{
+   \mystrut#\hfil  \tabskip = 0.5cm &
+   \hfil#\hfil&
+   \hfil#\hfil&  \tabskip = 0cm
+   \hfil\vrule#\cr
+   \noalign{\hrule}
+   height 12pt depth 6pt& particle&  $I_a$ or $I_b$& \cr
+   \noalign{\hrule}
+   height 12pt& $n$& 0& \cr
+   &$p$& 0& \cr
+   &$d$& 2.22& \cr
+   &$t$& 8.48& \cr
+   &${}^3\text{He}$& 7.72& \cr
+   depth 6pt &$\alpha$& 28.3& \cr
+   \noalign{\hrule}
+  }
+ }
+$$
+\end{table}
+
+The quantities $X_1$ and $X_3$ in Eq.~(\ref{Kalbach-a}) are
+obtained by setting
+\begin{alignat*}{2}
+   \textbf{E}_a &= \EaAcm + S_a, \qquad
+    & \textbf{E}_b &= \EbBcm + S_b, \\
+   E_{t1} &= 130 \text{ MeV}, \qquad
+    & E_{t3} &= 41 \text{ MeV}, \\
+   R_1 &= \min( \textbf{E}_a, E_{t1}), \qquad
+    & R_3 &= \min( \textbf{E}_a, E_{t3}), \\
+   X_1 &= R_1 \textbf{E}_b / \textbf{E}_a, \qquad
+    & X_3 &= R_3 \textbf{E}_b / \textbf{E}_a.
+\end{alignat*}
+
+Finally the values $M_a$ for the incident particle and $m_b$ for the
+outgoing particle in the last term of Eq.~(\ref{Kalbach-a}) are
+given in Table~10.2.  Note that $M_a$ is not defined for incident
+tritons or for incident helium-3 nuclei, so that the Kalbach-Mann
+model is not applicable when the incident energy of such 
+particles is so large that $\textbf{E}_a > E_{t3}$.
+
+\begin{table}
+\caption{Values of $M_a$ and $m_b$ in Eq.~(\ref{Kalbach-a})}
+$$
+ \vbox{ \offinterlineskip \tabskip = 0.0cm
+  \halign{
+   \mystrut#\hfil  \tabskip = 0.5cm &
+   \hfil#\hfil&
+   \hfil#\hfil&
+   \hfil#\hfil&  \tabskip = 0cm
+   \hfil\vrule#\cr
+   \noalign{\hrule}
+   height 12pt depth 6pt& particle&  $M_a$& $m_b$& \cr
+   \noalign{\hrule}
+   height 12pt& $n$& 1& 1/2 &\cr
+   &$p$& 1& 1&\cr
+   &$d$& 1& 1& \cr
+   &$t$& ---& 1& \cr
+   &${}^3\text{He}$& ---& 1&\cr
+   depth 6pt &$\alpha$& 0& 2& \cr
+   \noalign{\hrule}
+  }
+ }
+$$
+\end{table}
+
+\subsection{Photo-nuclear reactions}
+When Kalbach-Mann data are given for photo-nuclear reactions, 
+the parameter $a(E, \Ebcm)$ in Eq.~(\ref{Kalbach-a}) and the
+angular probability density $\pi_\mu( \mucm \mid \Ecm', E )$
+in Eq.~(\ref{Kalbach-eta}) are modified as in the paper~\cite{photo-nuc}.
+
+One begins by computing $a_n(E, \Ebcm)$ in Eq.~(\ref{Kalbach-a}) using a neutron as
+incident particle.  Then, for the incident photon one takes
+\begin{equation}
+  a(E, \Ebcm) = a_n(E, \Ebcm)
+    \sqrt{ \frac{E}{2 m_n} } \,
+    \min\left(
+      4, \max\left(
+        1, \frac{9.3}{\sqrt{\Ebcm}}
+      \right)
+    \right).
+ \label{Kalbach-photo}
+\end{equation}
+Here, $m_n$ is the mass of the neutron in MeV.
+
+For incident photons the angular probability density takes the form
+$$
+  \pi_\mu( \mucm \mid \Ecm', E ) =
+  \frac{1}{2} \left[
+    (1 - r) + \left(
+      \frac{ar}{\sinh(a)}
+    \right) \expon{a \mucm}
+  \right].
+$$
+
+
+\subsection{Interpolation of Kalbach-Mann data}\label{Sec:Kalbach-Mann-interp}
+
+In the \xendl\ library, the Kalbach-Mann data are given
+as a table of the probability density $\pi_E( \Ecm' \mid E)$ of outgoing
+energy~$\Ecm'$ for an incident particle with energy~$E$,
+along with a table of values of the parameter~$r$ in Eq.~(\ref{Kalbach-eta})
+as a function of $E$ and~$\Ecm'$.  It is also permitted to include a
+table of values $a(E,  \Ebcm)$ to be used in place of the expression
+in Eq.~(\ref{Kalbach-a}).
+}% end special notation
+
+Because $\pi_E( \Ecm' \mid E)$ is a probability
+density, it is to be interpolated with respect to $E$ by one of the methods
+of Section~\ref{Sec:2d-interp}.  
+The interpolated values of $r$, however, must 
+maintain the physical constraints that $0 \le r \le 1$,
+so the Kalbach-Mann $r$ parameter is interpolated by the unscaled methods of
+Section~\ref{Sec:Kalbach-r-interp}.  If the values of $a$ are also
+given as a table, they are also interpolated as in Section~\ref{Sec:Kalbach-r-interp}.
+
+For unit-base interpolation the method is as follows.
+The energy probability density
+$\pi_E( \Ecm' \mid E)$ is first mapped to unit base as defined in equations
+Eqs.~(\ref{unit-base-map}) and~(\ref{unitbaseMap}), so that
+\begin{equation}
+  \widehat \pi_E( \widehat \Ecm' \mid E) =
+    ( E'_{\text{cm}, \text{max}} - E'_{\text{cm}, \text{min}} ) 
+     \pi_E( \Ecm' \mid E)
+ \label{Kalb-pi-unit-base}
+\end{equation}
+for $0 \le \widehat \Ecm' \le 1$.
+The scale factor in Eq.~(\ref{Kalb-pi-unit-base}) is chosen so as to 
+normalize the function $\widehat \pi_E( \widehat \Ecm' \mid E) $,
+$$
+  \int_0^1 d\widehat \Ecm' \, \pi_E( \widehat \Ecm' \mid E) = 1.
+$$
+The values of $\widehat \pi_E( \widehat \Ecm' \mid E)$ are
+interpolated linearly with respect to $E$.
+
+For the values of the parameter $r$, the energy
+of the outgoing particle to is mapped $0 \le \widehat \Ecm' \le 1$
+using Eq.~(\ref{Kalb-unit-base}) in the form of
+$$
+  \widehat \Ecm' = \frac{
+  \Ecm' - E'_{\text{cm}, \text{min}} }
+     { E'_{\text{cm}, \text{max}} - E'_{\text{cm}, \text{min}} }.
+$$
+Because of the
+restriction that $0 \le r \le 1$, the parameter $r$ is mapped according to
+\begin{equation}
+  \widetilde r( \widehat \Ecm', E ) = r( \Ecm', E ).
+  \label{map-Kalb-r}
+\end{equation}
+
+With these transformations, the number-preserving integral Eq.~(\ref{Inum}) 
+takes the form
+\begin{multline}
+   \Inum_{gh,\ell} =
+         \int_{\calE_g} dE \, \sigma ( E ) M(E) w(E) \widetilde \phi_\ell(E) 
+       \, \int_{\widehat \Ecm' } d\widehat \Ecm' \,
+           \widehat \pi_E( \widehat \Ecm' \mid E) \\
+        \int_{\mucm} d\mucm \,  P_\ell( \mulab ) \pi_\mu( \mucm \mid \Ecm', E ),
+  \label{Inum-Kalb-corr}
+\end{multline}
+and the energy-preserving integral Eq.~(\ref{Ien}) becomes
+\begin{multline}
+  \Ien_{gh,\ell} =
+        \int_{\calE_g} dE \, \sigma ( E ) M(E) w(E) \widetilde \phi_\ell(E) 
+       \, \int_{\widehat \Ecm' } d\widehat \Ecm' \,
+           \widehat \pi_E( \widehat \Ecm' \mid E) \\
+        \int_{\mucm} d\mucm \,  P_\ell( \mulab ) \pi_\mu( \mucm \mid \Ecm', E ) \Elab' .
+  \label{Ien-Kalb-corr}
+\end{multline}
+The subscripts on $\mu$ serve to emphasize the facts
+that the argument $\mulab$ of the Legendre polynomial
+$P_\ell( \mulab )$ in Eqs.~(\ref{Inum-Kalb-corr}) and (\ref{Ien-Kalb-corr}) is
+the direction cosine of the outgoing particle in laboratory coordinates,
+while the integration variable $\mucm$ is the direction cosine in
+center-of-mass coordinates.
+Specifically, $\Elab' $ depends on $E$ and $\mucm$ according to equation Eq.~(\ref{E_lab}),
+and $\mulab$ is given by Eq.~(\ref{get_mu}).
+
+Because the energy probability density $\pi_E( \Ecm' \mid E)$ data are given
+in the center-of-mass frame, the identification of the region of integration
+over $\widehat \Ecm'$ and~$\mucm$ in Eqs.~(\ref{Inum-Kalb-corr})
+and~(\ref{Ien-Kalb-corr}) involves the geometric considerations
+presented for tabular center-of-mass data in Section~\ref{Sec:boost-geometry}.
+For a given incident energy $E$ in bin $\calE_g$,
+the regions of integration over
+$\widehat \Ecm'$ and $\mucm$ in Eqs.~(\ref{Inum-Kalb-corr}) 
+and~(\ref{Ien-Kalb-corr}) depend on how the domains for data interpolation
+$ \widehat E'_{\text{cm},j-1} \le \widehat \Ecm' \le \widehat E'_{\text{cm},j}$
+ intersect
+the  $\calE_h'$ outgoing laboratory energy bin.   
+The situation for a fixed incident
+energy~$E$ is illustrated in Figure~\ref{Fig:boost-regions}.  
+The half annulus
+$$
+  E'_{\text{cm}, j-1} \le \Ecm' \le  E'_{\text{cm}, j}
+$$
+is derived from the Kalbach-Mann data.  The region of integration 
+over $\mucm$ and $\Ecm'$ for fixed incident energy $E$ is the intersection of
+these two half annuli, and it is shaded dark gray in Figure~\ref{Fig:boost-regions}.
+
+\subsection{The input file for the Kalbach-Mann model}
+The data identifier in Section~\ref{data-model} for the
+Kalbach-Mann model is\\
+  \Input{Process: Kalbach spectrum}{}\\
+and the data are always in the center-of-mass frame\\
+  \Input{Product Frame: CenterOfMass}{}\\
+Currently, only a Newtonian boost to the laboratory frame is
+implemented.
+
+The masses of the particles $a$, $A$, $C$, $b$, and~$B$ in
+the reaction Eq.~(\ref{Kalbach-reaction}) are input in Section~\ref{model-info}
+of the input file\\
+  \Input{Projectile's mass:}{$\myi$} \\
+ \Input{Target's mass:}{$\mtarg$} \\
+ \Input{Compound's mass:}{$m_C$} \\
+ \Input{Product's mass:}{$\myo$} \\
+ \Input{Residual's mass:}{$\mres$}\\
+The units used for these masses are arbitrary, but they must be the
+same for all particles.
+
+The number of protons $Z_A$ and the atomic number $A_A$ of the
+target are needed for the computation of $S_a$ in Eq.~(\ref{def-Sa}).
+This information is entered into the input file as
+$$
+  \textsf{ZA}_A = 1000Z_A + A_A,
+$$
+from which $A_A$, $Z_A$, and the number of neutrons $N_A = A_A - Z_A$
+are easily computed.  Corresponding numbers $\textsf{ZA}_a$ for the projectile and
+$\textsf{ZA}_b$ for the emitted particle are also given.  The numbers $\textsf{ZA}_C$ for
+the compound nucleus and $\textsf{ZA}_B$ for the residual may be calculated
+using
+\begin{align*}
+  \textsf{ZA}_C &= \textsf{ZA}_A + \textsf{ZA}_a,\\
+  \textsf{ZA}_B &= \textsf{ZA}_C - \textsf{ZA}_b.
+\end{align*}
+This section of the input file is therefore\\
+  \Input{Projectile's ZA:}{$\textsf{ZA}_a$} \\
+ \Input{Target's ZA:}{$\textsf{ZA}_A$} \\
+ \Input{Product's ZA:}{$\textsf{ZA}_b$}
+ 
+ The remainder of the input file consists of tables of $\pi_E( \Ecm' \mid E)$
+ and the parameter~$r$ in Eq.~(\ref{Kalbach-eta}) as functions of $E$ and~$\Ecm'$.
+ There may also be a table of values of $a$ to be used in place of the expression
+ Eq.~(\ref{Kalbach-a}).  
+ 
+ The format for the probability density
+ $\pi_E( \Ecm' \mid E)$ is\\
+   \Input{Kalbach probabilities:}{$n = K$}\\
+  \Input{Incident energy interpolation:}{probability interpolation flag}\\
+  \Input{Outgoing energy interpolation:}{list interpolation flag}\\
+followed by $K$ blocks of the form\\
+ \Input{Ein: $E$:}{$n = J$}\\
+with $J$ pairs of values of $\Ecm'$ and~$\pi_E( \Ecm' \mid E)$.
+The flag for interpolation with respect to incident energy $E$ is
+one of those for probability densities in Section~\ref{interp-flags-probability}, 
+while that for the outgoing energy
+is one for simple lists.
+
+The table for the $r$ parameter is of the form\\
+   \Input{Kalbach r parameter:}{$n = K$}\\
+  \Input{Incident energy interpolation:}{unscaled interpolation flag}\\
+  \Input{Outgoing energy interpolation:}{list interpolation flag}\\
+followed by $K$ blocks of the form\\
+ \Input{Ein: $E$:}{$n = J$}\\
+with $J$ pairs of values of $\Ecm'$ and~$r( \Ecm',  E)$.
+The flag for interpolation with respect to incident energy $E$ is
+one of those for unscaled Kalbach-Mann data in Section~\ref{interp-flags-Kalbach-r}, 
+while that for the outgoing energy
+is one for simple lists.
+
+The format for the Kalbach-Mann $a$ parameter is the same as that for $r$,
+with ``r'' replaced by ``a''.  \textit{The tables for $\pi_E( \Ecm' \mid E)$, $r$,
+and~$a$ must be given at the same incident energies, and at each
+incident energy~$E$, the ranges of outgoing energies~$E'$ must also agree.}
+
+An example of the content of Section~\ref{model-info} of the input
+file for Kalbach-Mann data is as follows.  All energies are in MeV.\\
+ \Input{Product Frame: centerOfMass}{}\\
+ \Input{\# masses}{}\\
+  \Input{Projectile's mass: 1.008665}{}\\
+ \Input{Target's mass: 56.935394}{}\\
+ \Input{Compound's mass: 57.933276}{}\\
+ \Input{Product's mass: 1.008665}{}\\
+ \Input{Residual's mass: 56.935394}{}\\
+ \Input{\# ZA numbers}{}\\
+  \Input{Projectile's ZA: 1}{}\\
+ \Input{Target's ZA: 26057}{}\\
+ \Input{Product's ZA: 1}{}\\
+ \Input{\# Kalbach-Mann probability data}{}\\
+ \Input{Kalbach probabilities:  n = 12}{}\\
+ \Input{Incident energy interpolation: lin-lin unitbase}{}\\
+ \Input{Outgoing energy interpolation: flat}{}\\
+ \Input{ Ein: 7.781480e+00:   n = 2}{}\\
+ \Input{ \indent 0.000000e+00   1.000000e+06}{}\\
+ \Input{ \indent 1.000000e-06   0.000000e+00}{}\\
+ \Input{ Ein: 7.800000e+00:   n = 7}{}\\
+ \Input{ \indent 0.000000e+00   7.375605e+00}{}\\
+ \Input{ \indent 1.473426e-03   1.472617e+01}{}\\
+ \Input{ \indent 3.437994e-03   3.676034e+01}{}\\
+ \Input{ \indent 7.367130e-03   5.717426e+01}{}\\
+   \Input{ \indent 1.473426e-02  8.186549e+00}{}\\
+  \Input{ \indent 3.437994e-02  5.948511e+00}{}\\
+  \Input{ \indent 7.367130e-02  1.000000e-30}{}\\
+ \Input{ $\cdots$}{}\\
+ \Input{ Ein: 2.000000e+01:  n = 53}{}\\
+  \Input{ \indent 0.000000e+00  2.063824e-03}{}\\
+  \Input{ \indent 1.473426e-03  3.887721e-03}{}\\
+  \Input{ \indent 3.437994e-03  9.245874e-03}{}\\
+  \Input{ \indent 7.367130e-03  1.805939e-02}{}\\
+  \Input{ \indent 1.473426e-02  3.554576e-02}{}\\
+  \Input{ \indent 3.437994e-02  8.408804e-02}{}\\
+  \Input{ \indent 7.367130e-02  1.261293e-01}{}\\
+  \Input{ \indent }{ $\cdots$}\\
+  \Input{ \indent 1.154184e+01  1.604784e-03}{}\\
+  \Input{ \indent 1.203298e+01  1.000000e-30}{}\\
+ \Input{\# Kalbach-Mann r data}{}\\
+  \Input{Kalbach r parameter:  n = 12}{}\\
+ \Input{Incident energy interpolation: lin-lin unscaledunitbase}{}\\
+ \Input{Outgoing energy interpolation: flat}{}\\
+ \Input{ Ein: 7.781480e+00:   n = 2}{}\\
+ \Input{ \indent 0.000000e+00   0.000000e+00}{}\\
+ \Input{ \indent 1.000000e-06  0.000000e+00}{}\\
+ \Input{ Ein: 7.800000e+00:   n = 7}{}\\
+ \Input{ \indent 0.000000e+00   4.272290e-02}{}\\
+ \Input{ \indent 1.473426e-03   2.992310e-02}{}\\
+ \Input{ \indent 3.437994e-03   1.833870e-02}{}\\
+ \Input{ \indent 7.367130e-03   1.427320e-02}{}\\
+   \Input{ \indent 1.473426e-02  1.829320e-02}{}\\
+  \Input{ \indent 3.437994e-02  1.611740e-02}{}\\
+  \Input{ \indent 7.367130e-02  1.590910e-02}{}\\
+ \Input{ $\cdots$}{}\\
+ \Input{ Ein: 2.000000e+01:  n = 53}{}\\
+  \Input{ \indent 0.000000e+00  7.037570e-02}{}\\
+  \Input{ \indent 1.473426e-03  4.957320e-02}{}\\
+  \Input{ \indent 3.437994e-03  3.056740e-02}{}\\
+  \Input{ \indent 7.367130e-03  2.555550e-02}{}\\
+  \Input{ \indent 1.473426e-02  1.908500e-02}{}\\
+ \Input{ \indent  $\cdots$}{}\\
+ \Input{ \indent 1.154184e+01  9.548000e-01}{}\\
+  \Input{ \indent 1.203298e+01  9.656400e-01}{}
+
+\section{The $n$-body phase space model}
+The $n$-body phase space model gives the probability density for
+the energy of an outgoing particle in center-of-mass coordinates.
+The formula is derived from the volume in phase space occupied
+by the particles, subject to the constraints of conservation
+of energy and momentum.  The model uses Newtonian mechanics.
+
+In the \ENDF\ manual~\cite{ENDFB}
+there are two scenarios for this model: (1) inelastic collision
+followed by break-up of the excited residual, and (2) break-up
+induced by the collision.  In the first case, the $n$-body phase space
+model treats only the particles emitted in the break-up of the excited
+residual, not the one from the initial collision.  The total kinetic energy $\Estar$
+of the outgoing particles treated by the model therefore depends on
+the scenario.
+
+In the case of break-up following an
+inelastic collision, the analysis is in the frame in which the residual from
+the inelastic collision is stationary.  The total kinetic energy of the 
+outgoing particles involved is then
+$$
+  \Estar = Q_{\textrm{res}},
+$$
+where $Q_{\textrm{res}}$ is
+the energy of the break-up of the excited residual.  In this case, the reference
+frame for the model is that in which the residual nucleus is stationary
+after the initial inelastic collision.  The \gettransfer\ 
+code currently does not implement this scenario, because this is
+a 2-step reaction.
+
+For the break-up of a compound nucleus following the collision of a projectile
+with a stationary target in the laboratory frame, the total kinetic energy $\Estar$
+of the outgoing particles in the center-of-mass frame is the sum of two
+components, the $Q$ of the reaction plus the energy of the initial collision in the
+center-of-mass frame.  For an incident
+particle of mass $m_i$ and energy $E$ in the laboratory frame hitting a
+stationary target of mass $\mtarg$, this collision energy in the center-of-mass frame is
+$$
+  \frac{\mtarg E}{\myi + \mtarg}.
+$$
+Consequently, in this scenario the total center-of-mass kinetic energy for all
+outgoing particles is
+\begin{equation}
+  \Estar = Q + \frac{\mtarg E}{\myi + \mtarg}.
+  \label{def-Estar}
+\end{equation}
+
+The details of the $n$-body phase space model are as follows.
+Consider a particular outgoing particle, and suppose that its mass is~$\myo$.
+Then conservation of energy and
+momentum implies that the maximum kinetic energy of this particle
+in the center-of-mass frame is given by
+\begin{equation}
+  \Emax = \frac{(M_t - \myo) \Estar}{M_t},
+  \label{def-Emax}
+\end{equation}
+where $M_t$ is the total mass of the outgoing particles covered by
+the $n$-body phase space model.
+
+Suppose that $n$ is the number of particles resulting from the break-up
+reaction.  For an outgoing particle with mass $\myo$,
+let $\Emax$ be as in Eq.~(\ref{def-Emax}).
+Then in the $n$-body phase space model, the energy probability density 
+that this outgoing particle will have energy $\Ecm'$ with $0 \le \Ecm' \le \Emax$
+is given by
+\begin{equation}
+  \picm(\Ecm' \mid E ) = C_n 
+     \sqrt{\Ecm'}\,
+     (\Emax - \Ecm')^{(3n - 8)/2}.
+  \label{probability}
+\end{equation}
+Note that this probability density is isotropic in the center-of-mass frame.
+Furthermore, the relation Eq.~(\ref{probability}) was derived using Newtonian
+mechanics.
+
+The normalization constant $C_n$ in Eq.~(\ref{probability}) is best
+represented in terms of the beta function
+\begin{equation}
+  B(\alpha, \beta) =
+   \int_0^1 dt \, t^{\alpha - 1} (1 - t)^{\beta - 1} =
+   \frac{\Gamma(\alpha) \Gamma(\beta)}{\Gamma( \alpha + \beta)}.
+  \label{beta-func}
+\end{equation}
+With this notation, it is seen that
+\begin{equation}
+  \frac{1}{C_n} = B\left(\frac{3}{2}, \frac{3n - 6}{2} \right)
+    {\Emax}^{(3n - 5)/2}.
+  \label{norm}
+\end{equation}
+
+\subsection{Geometry of the $n$-body phase space model}
+The construction of Figure~\ref{Fig:boost-regions}
+made use of the fact that the tabular data required the
+consideration of ranges of energy $\Ecm'$ of the outgoing particle
+between the tabulated values,
+\begin{equation}
+  E'_{\text{cm},j-1} \le \Ecm' \le E'_{\text{cm},j}.
+  \label{KalbachEcm}
+\end{equation}
+Here, the limiting values $E'_{\text{cm},j-1}$ and $E'_{\text{cm},j}$
+depend on the energy $E$ of the incident particle according to the
+principles of unit-base interpolation in Eq.~(\ref{Kalb-unit-base}).
+
+For the $n$-body phase space model, however, the range of
+center-of-mass energies of the outgoing particle is
+\begin{equation}
+  0 \le \Ecm' \le \Emax,
+  \label{nBodyEcm}
+\end{equation}
+where $\Emax$ is as in Eq.~(\ref{def-Emax}).  
+That is, for the $n$-body phase space
+the annular ring Eq.~(\ref{KalbachEcm}) in Figure~8.1 is replaced by the
+interior of the semicircle Eq.~(\ref{nBodyEcm}).
+
+\subsection{Input file for the $n$-body phase space model}
+The data identifier in Section~\ref{data-model} for the
+$n$-body phase space model is\\
+  \Input{Process: phase space spectrum}{}\\
+and the data are always in the center-of-mass frame\\
+  \Input{Product Frame: CenterOfMass}{}\\
+Currently, only a Newtonian boost to the laboratory frame is
+implemented.
+
+In the model-dependent Section~\ref{model-info} of the input file,
+the computation of $\Estar$ in Eq.~(\ref{def-Estar}) requires the
+reaction's $Q$ value, as well as the masses $\myi$ of the projectile
+and $\mtarg$ of the target.  The units used for the masses are arbitrary,
+but the same units must be used for all particles.  The $Q$ value must be
+in the same units as the energy bins.  This information is input using
+the commands\\
+ \Input{Q value:}{$Q$} \\
+  \Input{Projectile's mass:}{$\myi$} \\
+ \Input{Target's mass:}{$\mtarg$}
+ 
+For the calculation of $\Emax$ in Eq.~(\ref{def-Emax}), the mass $\myo$
+is needed, along with the total mass $M_t$ of the outgoing particles covered
+by the $n$-body phase space model.  This information is input using\\
+ \Input{Product's mass:}{$\myo$} \\
+ \Input{Total mass:}{$M_t$}\\
+The units used for these masses must be the
+same as is used for the other particles.
+
+Finally, the probability density in Eq.~(\ref{probability}) requires the number
+of particles $n$ in the model, and this is given by\\
+ \Input{Number of particles:}{$n$}
+ 
+A sample Section~\ref{model-info} of the input file for the
+$n$-body phase space model is\\
+ \Input{Product Frame: CenterOfMass}{}\\
+ \Input{Q value: -2.225002}{}\\
+ \Input{Projectile's mass: 1.008665}{}\\
+ \Input{Target's mass: 2.014102}{}\\
+ \Input{Product's mass: 1.008665}{}\\
+ \Input{Total mass: 3.0246030}{}\\
+ \Input{Number of particles: 3}{}
+
+

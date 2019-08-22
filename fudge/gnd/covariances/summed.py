@@ -63,7 +63,6 @@
 
 from xData.ancestry import ancestry
 from xData import link as linkModule
-from fudge.core.math import matrix as gndMatrix
 from pqu import PQU
 
 __metaclass__ = type
@@ -75,12 +74,12 @@ class summedCovariance( ancestry ):
 
     moniker = 'sum'
 
-    def __init__(self, label = None, lowerBound=None, upperBound=None,
-            coefficients=None, pointerList=None):
+    def __init__( self, label, domainMin, domainMax, domainUnit='eV', pointerList=None, coefficients=None ):
         ancestry.__init__( self )
-        self.__label = label
-        self.lowerBound = lowerBound #: lower bound of row/column direction.  (type: PQU)
-        self.upperBound = upperBound #: upper bound of row/column direction.  (type: PQU)
+        self.label = label
+        self.domainMin = domainMin #: lower bound of row/column direction.
+        self.domainMax = domainMax #: upper bound of row/column direction.
+        self.domainUnit = domainUnit
         self.pointerList = pointerList or [] #a list of pointers (type: xData.link.link).  Each pointer has a dictionary with entry "coefficient" to use to weight the covariance referred to
 
     @property
@@ -96,6 +95,14 @@ class summedCovariance( ancestry ):
         self.__label = value
 
     def check( self, info ): return []
+
+    def convertUnits( self, unitMap ):
+
+        if self.domainUnit in unitMap:
+            for bound in ('domainMin','domainMax'):
+                pqu = PQU.PQU( getattr(self, bound), self.domainUnit )
+                newVal = pqu.getValueAs( unitMap[self.domainUnit] )
+                setattr(self, bound, newVal)
     
     def fix( self, **kw ): return []
 
@@ -103,48 +110,72 @@ class summedCovariance( ancestry ):
         self.toCovarianceMatrix().plot( title=title, scalelabel=scalelabel, xlim=xlim, ylim=ylim, xlog=xlog, ylog=ylog )
 
     def getRowBounds(self,unit=None):
-        '''Get the bounds of the row.  If unit is specified, return the bounds in that unit.'''
-        if unit is None: return (self.lowerBound,self.upperBound)
-        else: return (self.lowerBound.getValueAs(unit),self.upperBound.getValueAs(unit))
+        """Get the bounds of the row.  If unit is specified, return the bounds in that unit."""
+        if unit is None:
+            return (self.domainMin, self.domainMax)
+        else:
+            factor = PQU.PQU(1, self.domainUnit).getValueAs(unit)
+            return (self.domainMin * factor, self.domainMax * factor)
     
     def getColumnBounds(self,unit=None):
-        '''Get the bounds of the column.  If unit is specified, return the bounds in that unit.'''
-        if unit is None: return (self.lowerBound,self.upperBound)
-        else: return (self.lowerBound.getValueAs(unit),self.upperBound.getValueAs(unit))
+        """Get the bounds of the column.  If unit is specified, return the bounds in that unit."""
+        if unit is None:
+            return (self.domainMin, self.domainMax)
+        else:
+            factor = PQU.PQU(1, self.domainUnit).getValueAs(unit)
+            return (self.domainMin * factor, self.domainMax * factor)
 
     def toCorrelationMatrix( self ):
         return self.toCovarianceMatrix().toCorrelationMatrix()
 
-    def toCovarianceMatrix( self ): 
-        '''
-        Sum the parts to construct the covariance matrix.  
+    def toCovarianceMatrix( self, label="composed" ):
+        """
+        Sum the parts to construct the covariance matrix.
         Note, each part must be converted to an absolute covariance before summing.
-        '''
+        """
         if len( self.pointerList ) == 1: return self.pointerList[0].link['eval'].toCovarianceMatrix()
         import numpy, copy
         from .mixed import mixedForm
+        from .base import covarianceMatrix
         from xData import values as valuesModule
         from xData import axes as axesModule
         from xData import array as arrayModule
         from xData import gridded as griddedModule
 
-        # utility function to get a component as an absolute matrix over the correct row/column bounds
-        # need special coding if mixed since only need the part of a mixedForm that overlaps with the current 
-        # covariance
-        def __get_abs_cov_mtx( ptr ):
-            c = ptr.link['eval']
-            if isinstance( c, mixedForm ): c=c.shrinkToBounds(self.getRowBounds())
-            return c.toCovarianceMatrix()
-        
-        # set up common data using first element in pointerList
-        firstCovMtx = __get_abs_cov_mtx(self.pointerList[0]) #.link['eval'].toCovarianceMatrix().toAbsolute()
-        commonRowAxis = copy.copy( firstCovMtx.matrix.axes[2] )
-        if firstCovMtx.matrix.axes[1].style=='link': commonColAxis = copy.copy( firstCovMtx.matrix.axes[2] )
-        else:                                        commonColAxis = copy.copy( firstCovMtx.matrix.axes[1] )
-        commonMatrixAxis = copy.copy( firstCovMtx.matrix.axes[0] )
+        # We need all the covariances to be either absolute or relative
+        commonType=None
+        def make_common_type(p):
+            cm = p.link['eval']
+            if isinstance(cm,covarianceMatrix): cm = cm.toCovarianceMatrix()
+            elif isinstance(cm,mixedForm):
+                def inRange(thisBounds, otherBounds):
+                    return otherBounds[0] >= thisBounds[0] and otherBounds[1] <= thisBounds[1]
+                newMixed = mixedForm()
+                for ic, c in enumerate(cm.components):
+                    if c.getRowBounds() != c.getColumnBounds():
+                        raise ValueError("All components must have their row and column covarianceAxes matching.")
+                    c = copy.copy(c)
+                    # prune zero rows/columns covarianceMatrices, just in case
+                    if isinstance(c, covarianceMatrix):
+                        c.removeExtraZeros()
+                        # newMixed.addComponent(c)
+                    elif isinstance(c, mixedForm):
+                        c.makeSafeBounds()
+                    # add sub matrix if it fits
+                    if inRange(self.getRowBounds(), c.getRowBounds()): newMixed.addComponent(c)
+                cm= newMixed.toCovarianceMatrix()
+            if   commonType == 'relative': return cm.toRelative()
+            elif commonType == 'absolute': return cm.toAbsolute()
+            else: return cm
+
+        # Set up common data using first element in pointerList
+        firstCovMtx = make_common_type(self.pointerList[0])
+        commonRowAxis = firstCovMtx.matrix.axes[2].copy([])#FIXME: unresolvedLinks are still unresolved!
+        if firstCovMtx.matrix.axes[1].style=='link': commonColAxis = firstCovMtx.matrix.axes[2].copy([])#FIXME: unresolvedLinks are still unresolved!
+        else:                                        commonColAxis = firstCovMtx.matrix.axes[1].copy([])#FIXME: unresolvedLinks are still unresolved!
+        commonMatrixAxis = firstCovMtx.matrix.axes[0].copy( [] )#FIXME: unresolvedLinks are still unresolved!
         commonType = firstCovMtx.type
-        coefficients = [ p['coefficient'] for p in self.pointerList ]
-        
+
         # We're going to have to merge grids, so we'll need this function to do the dirty work
         def add_values(v1,v2):
             v=set()
@@ -152,33 +183,73 @@ class summedCovariance( ancestry ):
             v.update(v2.values)
             return valuesModule.values(sorted(v))
 
-        # first pass through components is to collect bins to set up the common grid + do assorted checking
+        # First pass through components is to collect bins to set up the common grid + do assorted checking
         for p in self.pointerList[1:]:
-            cc = __get_abs_cov_mtx(p) #.link['eval'].toCovarianceMatrix().toAbsolute() # a little recursion to take care of nested covariances
+            cc = make_common_type( p ) #__get_abs_cov_mtx(p) #.link['eval'].toCovarianceMatrix().toAbsolute() # a little recursion to take care of nested covariances
             if cc.type != commonType: raise ValueError( "Incompatable types in "+str(self.__class__)+": "+str(commonType)+' vs. '+str(cc.type) )
             cc.matrix.axes[0].unit = commonMatrixAxis.unit
             cc.matrix.axes[1].convertToUnit(commonColAxis.unit)
             cc.matrix.axes[2].convertToUnit(commonRowAxis.unit)
-            commonRowAxis._values = add_values(commonRowAxis.values, cc.matrix.axes[2].values)
-            if cc.matrix.axes[1].style=='link': commonColAxis.__values = add_values(commonColAxis.values, cc.matrix.axes[2].values)
-            else:                               commonColAxis.__values = add_values(commonColAxis.values, cc.matrix.axes[1].values)
+            commonRowAxis.values.values = add_values(commonRowAxis.values, cc.matrix.axes[2].values)
+            if cc.matrix.axes[1].style=='link': commonColAxis.values.values = add_values(commonColAxis.values, cc.matrix.axes[2].values)
+            else:                               commonColAxis.values.values = add_values(commonColAxis.values, cc.matrix.axes[1].values)
 
-        # now sum up the components
-        commonMatrix = self.pointerList[0]['coefficient'] * firstCovMtx.group( ( commonRowAxis.values, commonColAxis.values ), ( commonRowAxis.unit, commonColAxis.unit ) ).matrix.array.constructArray()
+        # Now sum up the components
+        commonMatrix = self.pointerList[0]['coefficient'] * firstCovMtx.group( ( commonRowAxis.values.values, commonColAxis.values.values ), ( commonRowAxis.unit, commonColAxis.unit ) ).matrix.array.constructArray()
         for p in self.pointerList[1:]:
-            cc = p.link['eval'].toCovarianceMatrix() # a little recursion to take care of nested covariances
-            commonMatrix += p['coefficient'] * cc.group( ( commonRowAxis.data, commonColAxis.data ), ( commonRowAxis.unit, commonColAxis.unit ) ).matrix.array.constructArray()
+            cc = make_common_type( p ) # a little recursion to take care of nested covariances
+            commonMatrix += p['coefficient'] * cc.group( ( commonRowAxis.values.values, commonColAxis.values.values ), ( commonRowAxis.unit, commonColAxis.unit ) ).matrix.array.constructArray()
         
-        # now create the instance of the resulting covarianceMatrix
-        newAxes=axesModule.axes(
-                labelsUnits={0 : (commonMatrixAxis.label, commonMatrixAxis.unit),
-                             1 : (commonColAxis.label, commonColAxis.unit),
-                             2 : (commonRowAxis.label, commonRowAxis.unit)} )
-        newAxes[0]=commonMatrixAxis
-        newAxes[1]=commonColAxis
-        newAxes[2]=commonRowAxis
-        trigdata = commonMatrix[numpy.tri(commonMatrix.shape[0])==1.0].tolist()[0]
-        return griddedModule.gridded( axes=newAxes, array=arrayModule.full(shape=commonMatrix.shape,data=trigdata,symmetry=arrayModule.symmetryLowerToken) )
+        # Now create the instance of the resulting covarianceMatrix
+        newAxes = axesModule.axes(
+            labelsUnits={0: (commonMatrixAxis.label, commonMatrixAxis.unit),
+                         1: (commonColAxis.label, commonColAxis.unit),
+                         2: (commonRowAxis.label, commonRowAxis.unit)})
+
+        newAxes[2] = axesModule.grid(commonRowAxis.label, commonRowAxis.index, commonRowAxis.unit,
+                                 style=axesModule.boundariesGridToken,
+                                 values=commonRowAxis.values)
+        newAxes[1] = axesModule.grid(commonColAxis.label, commonColAxis.index, commonColAxis.unit,
+                                 style=axesModule.linkGridToken,
+                                 values=linkModule.link(link=commonRowAxis.values, relative=True))
+        newAxes[0] = axesModule.axis(commonMatrixAxis.label, commonMatrixAxis.index, commonMatrixAxis.unit)
+        trigdata = commonMatrix[numpy.tri(commonMatrix.shape[0])==1.0].tolist()
+        gridded= griddedModule.gridded2d( axes=newAxes, array=arrayModule.full(shape=commonMatrix.shape,data=trigdata,symmetry=arrayModule.symmetryLowerToken) )
+        newCov = covarianceMatrix(label=label, type=commonType, matrix=gridded)
+        newCov.setAncestor(self.ancestor)
+        return newCov
+
+    def toAbsolute(self, rowData=None, colData=None):
+        """
+        Rescales self (if it is a relative covariance) using XYs1d rowData and colData
+        to convert self into an absolute covariance matrix.
+
+        :param rowData: an XYs1d instance containing data to rescale covariance in the "row direction"
+        :param colData: an XYs1d instance containing data to rescale covariance in the "col direction"
+
+        .. note::   If the column axis is set to 'mirrorOtherAxis', only rowData is needed.
+                    If neither rowData nor colData are specified, you'd better hope that the covariance is already
+                    absolute because this will throw an error.
+
+        :returns: a copy of self, but rescaled and with the type set to absoluteToken
+        """
+        return self.toCovarianceMatrix().toAbsolute(rowData=rowData, colData=colData)
+
+    def toRelative(self, rowData=None, colData=None):
+        """
+        Rescales self (if it is a absolute covariance) using XYs1d rowData and colData
+        to convert self into a relative covariance matrix.
+
+        :param rowData: an XYs1d instance containing data to rescale covariance in the "row direction"
+        :param colData: an XYs1d instance containing data to rescale covariance in the "col direction"
+
+        .. note::   If the column axis is set to 'mirrorOtherAxis', only rowData is needed.
+                    If neither rowData nor colData are specified, you'd better hope that the covariance is already
+                    relative because this will throw an error.
+
+        :returns: a copy of self, but rescaled and with the type set to relativeToken
+        """
+        return self.toCovarianceMatrix().toRelative(rowData=rowData, colData=colData)
 
     def toXMLList( self, indent = '', **kwargs ) :
         """
@@ -190,11 +261,8 @@ class summedCovariance( ancestry ):
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        xmlString = [ '%s<%s' % ( indent, self.moniker ) ]
-        if self.label is not None: xmlString[0] += ' label="%s"' % self.label
-        lowerBound = self.lowerBound.toString( keepPeriod = False )
-        upperBound = self.upperBound.toString( keepPeriod = False )
-        xmlString[0] += ' lowerBound="%s" upperBound="%s">' % ( lowerBound, upperBound )
+        xmlString = [ '%s<%s label="%s" domainMin="%s" domainMax="%s" domainUnit="%s">' %
+                ( indent, self.moniker, self.label, self.domainMin, self.domainMax, self.domainUnit ) ]
         xmlString.append( indent2 + '<!-- The matrix for this reaction equals the weighted sum of the following matrices: -->' )
         for pointer in self.pointerList:
             xmlString.append( pointer.toXML( indent2, **kwargs ) )
@@ -232,9 +300,9 @@ class summedCovariance( ancestry ):
 
         xPath.append( element.tag )
         label = element.get( "label" )
-        lower = PQU.PQU( element.get("lowerBound") )
-        upper = PQU.PQU( element.get("upperBound") )
-        summed_ = summedCovariance( label = label, lowerBound=lower, upperBound=upper )
+        lower = float( element.get("domainMin") )
+        upper = float( element.get("domainMax") )
+        summed_ = summedCovariance(label=label, domainMin=lower, domainMax=upper, domainUnit=element.get('domainUnit'))
         for summandElement in element:
             link_ = summand.parseXMLNode( summandElement, xPath, linkData )
             link_['coefficient'] = float( link_['coefficient'] )

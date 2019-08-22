@@ -95,6 +95,19 @@ class xParticleList( dict, ancestryModule.ancestry ) :
         else :
             raise Exception( 'Object is not a particle: type = "%s"' % type( particle ) )
 
+    def convertUnits( self, unitMap ) :
+        """
+        unitMap is a dictionary with old/new unit pairs where the old unit is the key (e.g., { 'eV' : 'MeV', 'b' : 'mb' }).
+        """
+
+        for particle in self :
+            if( isinstance( particle, xParticleModule.isotope ) ) :
+                for nuclearLevel in particle :
+                    energy = nuclearLevel.energy
+                    if( isinstance( energy, xParticleModule.undefinedLevel ) ) : energy = energy.level
+                    unit = str( energy.unit )
+                    if( unit in unitMap ) : energy.convertToUnit( unitMap[unit] )
+
     def hasID( self, ID ) :
 
         for particle in self :

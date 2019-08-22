@@ -1,0 +1,410 @@
+{ % localize the newcommands
+\newcommand{\mzerot}{m_{t,0}}
+\newcommand{\mzeroi}{m_{i,0}}
+\newcommand{\Ezerot}{m_t}
+\newcommand{\Ezeroi}{m_i}
+\newcommand{\EzeroR}{m_R}
+\newcommand{\Ezeroe}{m_e}
+\newcommand{\Tlabin}{T_{i,\textrm{lab}}}
+\newcommand{\plabin}{p_{i,\textrm{lab}}}
+\newcommand{\Tlabe}{T_{e,\textrm{lab}}}
+\newcommand{\plabe}{p_{e,\textrm{lab}}}
+\newcommand{\plabea}{p_{e1,\textrm{lab}}}
+\newcommand{\plabeb}{p_{e2,\textrm{lab}}}
+\newcommand{\plabec}{p_{e3,\textrm{lab}}}
+\newcommand{\Tcmi}{T_{i,\textrm{cm}}}
+\newcommand{\Tcmt}{T_{t,\textrm{cm}}}
+\newcommand{\Tcme}{T_{e,\textrm{cm}}}
+\newcommand{\TcmR}{T_{R,\textrm{cm}}}
+\newcommand{\pcmi}{p_{i,\textrm{cm}}}
+\newcommand{\pcme}{p_{e,\textrm{cm}}}
+\newcommand{\pcmea}{p_{e1,\textrm{cm}}}
+\newcommand{\pcmeb}{p_{e2,\textrm{cm}}}
+\newcommand{\pcmec}{p_{e3,\textrm{cm}}}
+%\newcommand{\mucm}{\mu_{\textrm{cm}}}
+%\newcommand{\mulab}{\mu_{\textrm{lab}}}
+
+\chapter{Relativistic 2-body problems}
+\label{Appendix-relativity}
+In this appendix, relativistic 2-body mechanics is examined from the point
+of view of computational physics.  That is, the subtraction
+nearly equal numbers is avoided as much as is possible.
+The analysis starts with a collision of an incident particle with
+a stationary target.  This determines the mapping between
+the laboratory frame and the center-of-mass frame.  
+The appendix closes with a discussion of
+emission after the reaction. 
+
+As is customary in discussions of relativity, the units are
+such that the speed of light has the value~$c = 1$.
+
+\section{Initial collision}
+For this appendix, $E$ is the total energy of
+a system
+and $p$ its total momentum.  Thus, for a particle with rest mass~$m_0$
+and kinetic energy~$T$, it follows that $E = m_0 + T$. 
+\textit{The convention $c = 1$ implies that the data must be such that
+particle rest masses and kinetic energies must be given in the same units.}
+The analysis makes repeated use of the invariance under Lorentz
+transformations of the quantity
+\begin{equation}
+  S_0 = E^2 - p^2.
+  \label{spacetime}
+\end{equation}
+
+If the system is a single particle
+in a frame in which the particle is stationary, then $S_0 = m_0^2$.
+Consequently, for a single particle in
+any frame Eq.~(\ref{spacetime}) takes the form
+\begin{equation}
+  m_0^2 = (m_0 + T)^2 - p^2,
+ \label{spacetime-1}
+\end{equation}
+or
+\begin{equation}
+  p^2  = 2m_0 T + T^2.
+  \label{one-p}
+\end{equation}
+When it is desired to solve Eq.~(\ref{one-p}) for~$T$ corresponding
+to a known value of~$p^2$, it is recommended to use the formula
+\begin{equation}
+  T = \frac{p^2 }
+          {m_0 + \sqrt{ m_0^2 + p^2 }}.
+ \label{good-T}
+\end{equation}
+The relation Eq.~(\ref{good-T}) is computationally more reliable
+than the more obvious solution of the quadratic equation Eq.~(\ref{one-p})
+$$
+  T = -m_0 + \sqrt{ m_0^2 + p^2 }.
+$$
+
+Consider the application of Eq.~(\ref{spacetime}) to the system
+consisting of a moving incident particle and a target 
+at rest in
+the laboratory frame.  Suppose that the incident
+particle has rest mass $\Ezeroi$ and kinetic
+energy $\Tlabin$, and let $\Ezerot$ be the rest mass of the
+target.  Then it follows from Eq.~(\ref{one-p})
+that the initial laboratory-frame momentum is given by
+\begin{equation}
+  \plabin^2  = 2\Ezeroi \Tlabin + \Tlabin^2.
+ \label{p-lab-in}
+\end{equation}
+Consequently, for the system of consisting of the two particles
+in the laboratory frame, the energy-momentum invariant is
+$$
+  S = (\Ezerot + \Ezeroi + \Tlabin)^2 -
+      ( 2\Ezeroi \Tlabin + \Tlabin^2 ),
+$$
+This expression simplifies to
+\begin{equation}
+  S = (\Ezeroi + \Ezerot )^2 + 2\Ezerot \Tlabin.
+  \label{S-lab}
+\end{equation}
+
+The value of $S$ must be the same when this
+system of two particles is considered in the center-of-mass
+frame.  Denote the center-of-mass kinetic energy of
+the incident particle by $\Tcmi$ and its momentum by~$\pcmi$.
+Similarly, let the target have center-of-mass kinetic energy $\Tcmt$, 
+and its momentum is~$-\pcmi$.  The energy-momentum invariant
+for the system is therefore
+\begin{equation}
+  S = (\Ezeroi + \Tcmi + \Ezerot + \Tcmt)^2,
+ \label{spacetime-cm}
+\end{equation}
+the square of the total energy of the system in the center-of-mass frame.
+By using Eq.~(\ref{spacetime-1}) on each of the particles, it
+is possible to rewrite this as
+$$
+  S = \left(
+    \sqrt{\Ezeroi^2 + \pcmi^2 } +
+       \sqrt{\Ezerot^2 + \pcmi^2 }
+   \right)^2.
+$$
+Upon solving this equation for $\pcmi^2$, it is found that
+\begin{equation}
+  \pcmi^2 = \frac{ \left[S - (\Ezeroi^2 + \Ezerot^2)\right]^2 -
+                 4 \Ezeroi^2 \Ezerot^2 }
+                {4 S }.
+  \label{p-cm}
+\end{equation}
+An expression for $\pcmi^2$ in terms of the
+laboratory incident kinetic energy $\Tlabin$ is obtained by substituting
+in Eq.~(\ref{p-cm}) the value of $S$ given by Eq.~(\ref{S-lab}),
+\begin{equation}
+  \pcmi^2 = \frac{\Ezerot^2( 2 \Ezeroi \Tlabin + \Tlabin^2)}
+              {(\Ezerot + \Ezeroi )^2 + 2\Ezerot \Tlabin}.
+  \label{p-cm-1}
+\end{equation}
+It follows from Eq.~(\ref{one-p}) that this equation may also
+be written as
+$$
+  \pcmi^2 = \frac{\Ezerot^2 \plabin^2 }
+                {(\Ezerot + \Ezeroi )^2 + 2\Ezerot \Tlabin}.
+$$
+
+\section{Mapping between frames}
+Consider a coordinate system in which the momentum
+$\plabin$ of the incident particle is in the direction of
+the first spatial axis.  The boost from
+the laboratory to the center-of-mass frame then takes the
+form
+$$
+  (E_{\text{cm}}, p_{\text{cm}})^T = R (E_{\text{lab}}, p_{\text{lab}})^T
+$$
+with the matrix
+\begin{equation}
+   R =
+    \begin{bmatrix}
+     \cosh \chi & -\sinh \chi & 0 & 0 \\
+     -\sinh \chi & \cosh \chi & 0 & 0 \\
+     0  & 0 & 1 & 0 \\
+     0  & 0 & 0 & 1
+  \end{bmatrix}.
+  \label{R-3}
+\end{equation}
+
+Upon applying the rotation Eq.~(\ref{R-3}) to the target,
+it is found that
+$$
+     \begin{bmatrix}
+        \Ezerot + \Tcmt \\
+        -|\pcmi| \\
+        0 \\
+        0
+     \end{bmatrix}
+      = R
+\begin{bmatrix}
+        \Ezerot \\
+           0  \\
+           0 \\
+           0
+     \end{bmatrix}.
+$$
+It follows that
+\begin{equation}
+   \sinh \chi = \frac{|\pcmi|}{\Ezerot}.
+ \label{lab-to-cm}
+\end{equation}
+By using Eq.~(\ref{p-cm-1}), one may conclude that
+\begin{equation}
+  \sinh \chi = \frac{\sqrt{ 2 \Ezeroi \Tlabin + \Tlabin^2}}
+    {\sqrt{( \Ezerot + \Ezeroi )^2 + 2 \Ezerot \Tlabin }}.
+  \label{lab-to-cm-2}
+\end{equation}
+Note that except for incident gammas, $\Tlabin$ is much smaller
+than the rest mass $\Ezeroi$, so that $\chi$ is a
+small, positive number.
+
+In the next section of this appendix, for 2-body problems
+the center-of-mass energy and momentum of the
+emitted particle and residual are determined.  In order to boost these 4-vectors
+to the laboratory frame, one may use the inverse of the matrix $R$ in
+Eq.~(\ref{R-3}), so that
+\begin{equation}
+  (E_{\text{lab}}, p_{\text{lab}})^T = R^{-1}(E_{\text{cm}}, p_{\text{cm}})^T
+ \label{3d-map}
+\end{equation}
+with
+\begin{equation}
+   R^{-1} =
+    \begin{bmatrix}
+     \cosh \chi & \sinh \chi & 0 & 0 \\
+     \sinh \chi & \cosh \chi & 0 & 0 \\
+     0  & 0 & 1 & 0 \\
+     0  & 0 & 0 & 1
+  \end{bmatrix}.
+  \label{R-3-inv}
+\end{equation}
+
+\subsection{Incident photons}
+\label{Sec:photon-in}
+When the incident particle is a photon, the boost from the 
+center-of-mass frame to the laboratory frame must be determined
+relativistically, because the mass of the incident particle is zero
+but its momentum is nonzero.
+
+In this case, Eq.~(\ref{p-lab-in}) simplifies to
+$$
+  | \plabin |  =  \Tlabin,
+$$
+and Eq.~(\ref{lab-to-cm-2}) becomes
+$$
+  \sinh \chi = \frac{ \Tlabin}
+    {\sqrt{ \Ezerot^2 + 2 \Ezerot \Tlabin }}.
+$$
+It follows that
+$$
+  \cosh \chi = \frac{ \Ezerot + \Tlabin}
+    {\sqrt{ \Ezerot^2 + 2 \Ezerot \Tlabin }}.
+$$
+
+
+
+\section{Outgoing particles}
+Denote by $\Ezeroe$ the rest mass of the
+emitted particle and
+$\Tcme$ its kinetic energy in the center-of-mass frame.
+The convention in \xendl\ is that the energy~$Q$ of the reaction
+is specified by the data, and the rest mass  $\EzeroR$ of the residual
+is calculated from
+\begin{equation}
+  \EzeroR = \Ezerot + ( \Ezeroi - \Ezeroe ) - Q.
+ \label{Q-2body}
+\end{equation}
+Let $\TcmR$ be the kinetic energy of the residual in the center-of-mass frame.
+In terms of these variables, the energy-momentum invariant
+for the system is the square of the total energy
+$$
+    S = (\Ezeroe + \Tcme + \EzeroR + \TcmR)^2,
+$$
+with the same value of $S$ as in Eq.~(\ref{spacetime-cm}).
+The argument leading to Eq.~(\ref{p-cm}) shows that the
+momentum~$\pcme$ of the emitted particle in the center-of-mass frame
+has magnitude given by
+\begin{equation}
+  \pcme^2 = \frac{ \left[S - (\EzeroR^2 + \Ezeroe^2)\right]^2 -
+                 4 \EzeroR^2 \Ezeroe^2 }
+                {4 S }.
+  \label{p-cm-e}
+\end{equation}
+
+It is not a good idea to use Eq.~(\ref{p-cm-e}) in a
+computation, because of its subtraction of nearly equal
+numbers.  It is therefore desirable to do some algebraic manipulation
+in order to mitigate this problem as much as possible.
+As a first step, Eq.~(\ref{p-cm-e}) is rewritten in the
+form
+\begin{equation}
+  4 S \pcme^2 = \left[S - (\EzeroR + \Ezeroe)^2\right]
+              \left[S - (\EzeroR - \Ezeroe)^2\right].
+ \label{p-cm-e-1}
+\end{equation}
+In this expression, the subtraction of nearly equal
+numbers is confined to the first factor on the right-hand
+side.  For photon emission the two factors are identical.
+An analysis of photon emission later, because it offers some
+simplifications.
+
+By using the expression for~$S$ in Eq.~(\ref{S-lab}), one
+obtains the relation
+$$
+  S - (\EzeroR + \Ezeroe)^2 =
+  (\Ezerot + \Ezeroi)^2 - (\EzeroR + \Ezeroe)^2  + 2\Ezerot \Tlabin.
+$$
+In terms of the energy $Q$ of the discrete 2-body reaction
+and the parameter
+\begin{equation}
+  M_T = \Ezerot + \EzeroR + \Ezeroi + \Ezeroe,
+ \label{def-M}
+\end{equation}
+it follows that
+$$
+    S - (\EzeroR + \Ezeroe)^2 =
+     M_T Q + 2\Ezerot \Tlabin.
+$$
+Consequently, it is seen that Eq.~(\ref{p-cm-e}) may be
+replaced by
+\begin{equation}
+  \pcme^2 = \frac{ (M_T Q +  2\Ezerot \Tlabin )
+                 ( M_T Q +  2\Ezerot \Tlabin + 4\EzeroR \Ezeroe)}
+                {4 S }.
+  \label{p-cm-e-OK}
+\end{equation}
+
+\textbf{Remark.}
+It is clear from Eq.~(\ref{p-cm-e-OK}) that for endothermic
+reactions ($Q < 0$), the threshold occurs when the incident
+particle has kinetic energy
+$$
+  \Tlabin = \frac{-M_T Q}{2\Ezerot}.
+$$
+
+In Eq.~(\ref{p-cm-e-OK}) there is subtraction of nearly equal
+numbers when the kinetic energy $\Tlabin$ of the incident
+particle is just above the threshold in endothermic reactions.
+That operation is unavoidable in
+the analysis of nuclear reactions. 
+
+Now that $\pcme^2$ has been obtained in Eq.~(\ref{p-cm-e-OK}), one may use
+Eq.~(\ref{good-T}) to determine the kinetic energy of the
+emitted particle in the center-of-mass frame as
+\begin{equation}
+  \Tcme = \frac{\pcme^2 }
+          {\Ezeroe + \sqrt{ \Ezeroe^2 + \pcme^2 }}.
+ \label{T-cm-e}
+\end{equation}
+
+\subsection{The boost to the laboratory frame}
+It is often desired to determine the kinetic energy~$\Tlabe$
+and momentum~$\plabe$ of the emitted particle in the laboratory frame
+for given direction cosine~$\mucm$ in the center-of-mass frame.
+It is possible to use the boost 
+Eq.~(\ref{3d-map}) to determine $\plabe$ as follows.  Recall that
+the form of Eq.~(\ref{3d-map}) is determined by the requirement that
+the first axis of the coordinate system was chosen parallel to~$\plabin$.
+Consequently, one has
+$$
+  \pcmea = \mucm |\pcme|.
+$$
+If the orientation of the coordinate system is such that
+$$
+  \pcmec = 0
+  \quad \textrm{and} \quad
+  \pcmeb \ge 0,
+$$
+then
+$$
+  \pcmeb =  |\pcme| \sqrt{ 1 - \mucm^2}.
+$$
+The momentum components of the boost Eq.~(\ref{3d-map}) then
+take the form
+\begin{equation*}
+\begin{split}
+  \plabea &= (\Ezeroe + \Tcme)\sinh \chi +  \mucm |\pcme| \cosh \chi, \\
+  \plabeb &= |\pcme| \sqrt{ 1 - \mucm^2}, \\
+  \plabec & = 0.\\
+\end{split}
+\end{equation*}
+
+The magnitude of the momentum in the laboratory frame is
+$$
+  |\plabe| = \sqrt{ \plabea^2 + \plabeb^2 + \plabec^2 }.
+$$
+If $|\plabe| = 0$, the direction cosine $\mulab$ in the laboratory
+frame is undetermined.  Otherwise, it is given by
+$$
+  \mulab = \frac{\plabea}{|\plabe|}.
+$$
+The kinetic energy $\Tlabe$ is calculated from $|\plabe|$
+by using Eq.~(\ref{good-T}).
+
+\subsection{Photon emission}
+When the emitted particle is a photon, because $\Ezeroe = 0$,
+Eqs.~(\ref{p-cm-e-OK}) and (\ref{T-cm-e}) take the simpler form
+$$
+  E_{e, \textrm{cm}} = \Tcme = |\pcme| =
+   \frac{ M_T Q +  2\Ezerot \Tlabin }
+                {2 \sqrt{S} }.
+$$
+For given direction cosine~$\mucm$ in the center-of-mass frame,
+the energy component of the boost Eq.~(\ref{3d-map}) gives the
+Doppler shift
+$$
+   E_{e, \textrm{lab}} = E_{e, \textrm{cm}}
+     \left( \cosh \chi + \mucm \sinh \chi \right).
+$$
+The first component of the momentum of the photon in the laboratory
+frame is
+$$
+  \plabea =  E_{e, \textrm{cm}}
+     \left( \sinh \chi + \mucm \cosh \chi \right),
+$$
+so the direction cosine is
+$$
+  \mulab = \frac{\sinh \chi + \mucm \cosh \chi}
+                {\cosh \chi + \mucm \sinh \chi}.
+$$
+
+} % end of this appendix

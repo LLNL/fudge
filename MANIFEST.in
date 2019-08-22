@@ -8,6 +8,10 @@ recursive-include fudge/gnd *.xsd
 recursive-include fudge *.h Makefile
 recursive-include pqu *.py
 recursive-include pqu/doc *.html *.js *.txt *.png *.css
+recursive-include xData *.py
+recursive-include PoPs *.py
+recursive-include PoPs/Test/Answers *.out
 recursive-include numericalFunctions Makefile *.py *.c *.h *.pdf
 recursive-include crossSectionAdjustForHeatedTarget Makefile *.py *.c *.h *.pdf
-recursive-include site_packages Makefile *.py
+recursive-include statusMessageReporting Makefile *.py *.c *.h *.pdf
+recursive-include site_packages Makefile *.py *.xml *.endf *.txt *.dat *.001

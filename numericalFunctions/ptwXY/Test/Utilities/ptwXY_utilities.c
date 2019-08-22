@@ -70,6 +70,26 @@
 
 #include "ptwXY_utilities.h"
 
+static char const *fmtX = " %20.12e";
+static char const *fmtXY = " %20.12e %20.12e";
+
+/*
+********************************************************
+*/
+int nfu_cmpDoubles( double d1, double d2, double espilon ) {
+
+    double diff = d2 - d1, dMax = fabs( d1 );
+
+    if( diff == 0 ) return( 0 );
+    if( fabs( d2 ) > dMax ) dMax = fabs( d2 );
+    if( fabs( diff ) > espilon * dMax ) {
+#if 0
+        double rDiff = diff / dMax;                 /* For debugging. */
+#endif
+        return( 1 );
+    }
+    return( 0 );
+}
 /*
 ********************************************************
 */
@@ -124,4 +144,23 @@ void nfu_printSMRError( statusMessageReporting *smr, char const *file, int line,
 
     smr_write( smr, stderr, 1 );
     exit( EXIT_FAILURE );
+}
+/*
+************************************************************
+*/
+void nfu_printXYDataOnVerbosity( int verbose, ptwXYPoints *data ) {
+
+    if( !verbose ) return;
+    printf( "# length = %d\n", (int) ptwXY_length( NULL, data ) );
+    printf( "# interpolation = %s\n", ptwXY_getInterpolationString( data ) );
+    ptwXY_simplePrint( data, fmtXY );
+}
+/*
+************************************************************
+*/
+void nfu_printXDataOnVerbosity( int verbose, ptwXPoints *data ) {
+
+    if( !verbose ) return;
+    printf( "# length = %d\n", (int) ptwX_length( NULL, data ) );
+    ptwX_simplePrint( NULL, data, fmtX );
 }

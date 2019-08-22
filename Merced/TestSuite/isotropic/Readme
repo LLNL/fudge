@@ -1,0 +1,27 @@
+The data in this directory are for testing the treatment of isotropic
+distributions.  The input files are:
+
+in.Mg24.flat: Data with histograms in outgoing energy.  Its output is
+  out.Mg24.flat.
+
+in.F19.correspondingEn: Data with interpolation in incident energy by
+  cumulative points, histograms in outgoing energy.  Its output is
+  out.F19.correspondingEn.
+
+in.F19.linlin-cumpoints:  Data with interpolation in incident energy by
+  cumulative points, linear-linear in outgoing energy.  Its output is
+  out.F19.linlin-cumpoints.
+
+in.F19.gammas: Data with cumulative points interpolation but having
+  intervals of outgoing energy with zero probability.  The output
+  is out.F19.gammas.
+
+in.Co58uncor.table: Probability densities as a table with linear-linear
+  interpolation.  The output is out.Co58uncor.table.
+
+in.uncorrelated-Li7.cm: Isotropic energy probability density given in center-of-
+  mass coordinates.  The output is out.uncorrelated-Li7.cm.
+
+in.Co59.linlog: Isotropic energy probability density given in the lab
+  frame, with lin-log unitbase interpolation for incident energy.
+  The output file is out.Co59.linlog.

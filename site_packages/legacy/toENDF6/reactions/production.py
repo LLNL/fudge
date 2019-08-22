@@ -61,11 +61,12 @@
 # 
 # <<END-copyright>>
 
-from fudge.core.utilities import brb
-import fudge.gnd.reactions.production as productionModule
+from PoPs import IDs as IDsPoPsModule
 
-import fudge.gnd.reactionData.crossSection as crossSectionModule
-import fudge.gnd.productData.distributions.base as distributionBaseModule
+from fudge.gnd.reactions import production as productionModule
+
+from fudge.gnd.reactionData import crossSection as crossSectionModule
+from fudge.gnd.productData.distributions import base as distributionBaseModule
 
 #
 # production
@@ -78,7 +79,7 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
 # BRB, why is this?
     MF = None
     for product in self.outputChannel :
-        if( product.name == 'gamma' ) :
+        if( product.id == IDsPoPsModule.photon ) :
             if( product.distribution.hasData( ) ) :
                 productMF = 12
                 if( product.getAttribute( 'ENDFconversionFlag' ) == 'MF13' ) : productMF = 13
@@ -86,8 +87,8 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
                 if( MF != productMF ) : raise Exception( 'MF = %s mixed with MF = %s' % ( MF, productMF ) )
     if( MF is not None ) :
         outputChannel = self.outputChannel
-        productName = outputChannel[0].name
-        if( productName != 'gamma' ) : raise Exception( 'production only supported for gamma as product: product is "%s"' % productName )
+        productName = outputChannel[0].id
+        if( productName != IDsPoPsModule.photon ) : raise Exception( 'production only supported for gamma as product: product is "%s"' % productName )
 
         if( MT not in targetInfo['production_gammas'] ) : targetInfo['production_gammas'][MT] = [ MF ]
         if( MF != targetInfo['production_gammas'][MT][0] ) : raise Exception( 'Prior instances were MF = %d, which cannot be mixed with MF = %d' % 

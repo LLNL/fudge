@@ -62,9 +62,9 @@
 # <<END-copyright>>
 
 """
-containers for a particle and a reaction, plus utility to parse in string
+Containers for a particle and a reaction, plus utility to parse in string
 representations to containers:
->>>parseReaction("n + Fe56 -> n[multiplicity:'2'] + (Fe55_s -> gamma)")
+>>> parseReaction("n + Fe56 -> n[multiplicity:'2'] + (Fe55_s -> gamma)")
 """
 
 from pyparsing import *
@@ -72,6 +72,7 @@ from pyparsing import *
 __metaclass__ = type
 
 class particleString:
+
     optionList = ('multiplicity','emissionMode','decayRate')
     specialNames = ( 'gamma', 'e' ) # treat differently
     def __init__(self, symbol, A, excitation=0, opts=None, decaysTo=None):
@@ -99,6 +100,7 @@ class particleString:
         return ret
 
 class reactionString:
+
     def __init__(self, projectile, target, products, info=None):
         self.projectile = projectile
         self.target = target
@@ -112,9 +114,8 @@ class reactionString:
         return ret
 
 def particleParser():
-    """ 
-    parse string of form "Pu239_e2[option1:'value', option2:'value' ... ]" into particle class
-    """
+    """Parse string of form "Pu239_e2[option1:'value', option2:'value' ... ]" into particle class."""
+
     integer = Word(nums).setParseAction( lambda t: int(t[0]) )
     optionDict = (Suppress('[') + delimitedList( Word(alphas)+Suppress(':') +
             Suppress("'")+Word(alphanums+'+-.')+Suppress("'") , delim=",") + 
@@ -136,9 +137,8 @@ def particleParser():
     return particleParser
 
 def reactionParser():
-    """
-    parse reaction of form "n + Fe56 -> n[options...] + (Fe55_u -> gamma)" into reaction class
-    """
+    """ Parse reaction of form "n + Fe56 -> n[options...] + (Fe55_u -> gamma)" into reaction class."""
+
     # reaction string may include one or more decays,
     # of form (Th232 -> He4 + (Ra228 -> He4 + Rd224)).
     # decays may contain subsequent decays, so they are defined recursively:

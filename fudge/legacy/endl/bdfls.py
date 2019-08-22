@@ -118,17 +118,19 @@ class bdfls :
         """Reads in the bdfls file give by template. If self's save is called with name = None,
         then this methods name is used as the output bdfls file's name."""
 
-        if ( template == None ) :
+        if ( template is None ) :
             if ( os.path.exists( "./bdfls" ) ) :
                 template = "./bdfls"
             else :
                 if( 'BDFLSPATH' in os.environ ) :
                     template = os.environ[ 'BDFLSPATH' ]
-                else :
+                elif os.path.exists( _BDFLS_FILE_ ):
                     template = _BDFLS_FILE_
-        if ( not os.path.exists( template ) ) : raise Exception( "\nError in bdfls.__init__: bdfls file does not exist\n%s" % template )
+                else:
+                    template = os.path.split(__file__)[0] + os.sep+ 'bdfls'
+        if ( not os.path.exists( template ) ) : raise IOError( "\n    Error in bdfls.__init__: bdfls file does not exist\n    %s" % template )
         self.name = name
-        if ( name == None ) : self.name = "./" + template.split( "/" )[-1]
+        if ( name is None ) : self.name = "./" + template.split( "/" )[-1]
         self.template = template
         self.g = []
         self.f = []
@@ -180,7 +182,7 @@ class bdfls :
         g.id = id
         g.label = label
         g.name = 'LLNL_gid_%d' % g.id
-        if( pos == None ) :
+        if( pos is None ) :
             self.g.append( g )
         else :
             self.g.insert( pos, g )
@@ -213,7 +215,7 @@ class bdfls :
         f.id = id
         f.label = label
         f.name = 'LLNL_fid_%d' % f.id
-        if( pos == None ) :
+        if( pos is None ) :
             self.f.append( f )
         else :
             self.f.insert( pos, f )
@@ -255,7 +257,7 @@ class bdfls :
             i += 1
 
     def flux( self, id ) :
-        "Returns the flux that matches id."
+        """Returns the flux that matches id."""
 
         if( type( id ) == type( 1 ) ) :
             for f in self.f :
@@ -266,7 +268,7 @@ class bdfls :
         raise Exception( "\nError in bdfls.flux: id does not exist (%s)" % id )
 
     def group( self, id ) :
-        "Returns the group that matches id."
+        """Returns the group that matches id."""
 
         if( type( id ) == type( 1 ) ) :
             for g in self.g :
@@ -277,7 +279,7 @@ class bdfls :
         raise Exception( "\nError in bdfls.group: id does not exist (%s)" % id )
 
     def subGroups( self, id ) :
-        "Returns the sub-group ids for group id."
+        """Returns the sub-group ids for group id."""
 
         subgs = []
         for g in self.g :
@@ -294,8 +296,8 @@ class bdfls :
         for g in self.g :
             if(   sid_ == g.id ) : sid = g
             elif( id_  == g.id ) : id = g
-        if( id == None ) : raise Exception( "isSubGroup: group with id = %d does not exist" )
-        if( sid == None ) : raise Exception( "isSubGroup: sub group with id = %d does not exist" )
+        if( id is None ) : raise Exception( "isSubGroup: group with id = %d does not exist" )
+        if( sid is None ) : raise Exception( "isSubGroup: sub group with id = %d does not exist" )
         i = 0
         n = id.n
         for sg in sid.gb :
@@ -310,7 +312,7 @@ class bdfls :
         return( 1 )
 
     def halflife( self, za ) :
-        "Returns the halflife of the za if in database, else returns None."
+        """Returns the halflife of the za if in database, else returns None."""
 
         if( za == 'gamma' ) : return( 1e50 )
         za_ = targetToZA( za )
@@ -328,7 +330,7 @@ class bdfls :
         return None
 
     def mass( self, za ) :
-        "Returns the mass of the za if in database, else returns None (the mass of a za is for a neutral atom, not the nucleus)."
+        """Returns the mass of the za if in database, else returns None (the mass of a za is for a neutral atom, not the nucleus)."""
 
         if( za == 'gamma' ) : return( 0. )
         za_ = targetToZA( za )
@@ -346,19 +348,19 @@ class bdfls :
         return None
 
     def constant( self, i ) :
-        "Returns the (i+1)^th constant from self's constant list."
+        """Returns the (i+1)^th constant from self's constant list."""
 
         return( self.c[i].value )
 
     def printza( self, za, im = 0, ih = 0 ) :
-        "Prints the za, mass and halflife for za."
+        """Prints the za, mass and halflife for za."""
 
         ( za, m, h ) = self.za( za, im, ih )
-        if ( za == None ) : return
+        if ( za is None ) : return
         sm = 15 * " "
-        if( m != None ) : sm = "%15.8e" % m
+        if( m is not None ) : sm = "%15.8e" % m
         sh = 12 * " "
-        if ( h != None ) : sh = "%12e" % self.h[ih].halflife
+        if ( h is not None ) : sh = "%12e" % self.h[ih].halflife
         print "%6d %s %s" % ( za, sm, sh )
 
     def read( self, name ) :
@@ -367,7 +369,7 @@ class bdfls :
         class fileInfo :
 
             def __init__( self, name ) :
-                "For internal use only."
+                """For internal use only."""
 
                 self.f = open( name, "r" )
                 self.lineNumber = 0
@@ -375,12 +377,12 @@ class bdfls :
                 self.linesRead = []
 
             def close( self ) :
-                "For internal use only."
+                """For internal use only."""
 
                 self.f.close( )
 
             def readline( self ) :
-                "For internal use only."
+                """For internal use only."""
 
                 if( len( self.linesRead ) > 0 ) :
                     self.line = self.linesRead[0]
@@ -396,7 +398,7 @@ class bdfls :
                 self.lineNumber -= 1
 
             def errMsg( self, routine, str ) :
-                "For internal use only."
+                """For internal use only."""
 
                 return( '\nError in %s: %s at line %d\n%s' % ( routine, str, self.lineNumber, self.line ) )
 
@@ -405,11 +407,11 @@ class bdfls :
         self.Source = name
         while 1 :                               # Read the group data.
             g = bdfls_group( f )
-            if ( g.id == None ) : break
+            if ( g.id is None ) : break
             self.g.append( g )
         while 1 :                               # Read the flux data.
             fl = bdfls_flux( f )
-            if ( fl.id == None ) : break
+            if ( fl.id is None ) : break
             self.f.append( fl )
         line = f.readline( )                    # Handle new mass format.
         f.unreadline( line )
@@ -420,29 +422,29 @@ class bdfls :
             self.massFormat = 'Audi2003'
         while 1 :
             m = bdfls_mass( f, format = self.massFormat )
-            if ( m.za == None ) : break
+            if ( m.za is None ) : break
             self.m.append( m )
         while 1 :
             h = bdfls_halflife( f )
-            if ( h.za == None ) : break
+            if ( h.za is None ) : break
             self.h.append( h )
         ( self.nConstants, i ) = bdfls_read_int_label( f, 0, "bdfls.read", "constant", "number of constants" )
         i = self.nConstants
         while 1 :
             c = bdfls_constant( f )
-            if ( c.value == None ) : break
+            if ( c.value is None ) : break
             self.c.append( c )
             i = i - 1
         if ( i != 0 ) : raise Exception( "\nError in bdfls.read: %d unread constants" % i )
         while 1 :
             t = bdfls_temperature( f )
-            if ( t.id == None ) : break
+            if ( t.id is None ) : break
             self.t.append( t )
         ( self.nSubshells, i ) = bdfls_read_int_label( f, 0, "bdfls.read", "subshell", "number of subshell designators" )
         i = self.nSubshells
         while 1 :
             s = bdfls_subshell( f )
-            if ( s.line == None ) : break
+            if ( s.line is None ) : break
             self.s.append( s )
             i = i - 1
         if ( i != 0 ) : raise Exception( "\nError in bdfls.read: %d unread subshells" % i )
@@ -452,7 +454,7 @@ class bdfls :
     def save( self, fileName = None ) :
         """Saves the contents of self to fileName."""
 
-        if ( fileName == None ) : fileName = self.name
+        if ( fileName is None ) : fileName = self.name
         try :
             f = open( fileName, "w" )
         except :
@@ -527,13 +529,13 @@ class bdfls :
             if ( self.h[ih].za == za ) : h = self.h[ih].halflife
             if ( self.h[ih].za >= za ) : break
             ih = ih + 1
-        if ( m == None ) and ( h == None ) : za = None
+        if ( m is None ) and ( h is None ) : za = None
         return ( za, m, h )
 
     def zas( self, ZAMin, ZAMax = None ) :
         """Print za, mass and halflife for all za between ZAMin and ZAMax inclusive."""
 
-        if ( ZAMax == None ) : ZAMax = ZAMin
+        if ( ZAMax is None ) : ZAMax = ZAMin
         im = 0
         lm = len( self.m )
         ih = 0
@@ -571,17 +573,17 @@ class bdfls_group :
             self.read( f )
 
     def __len__( self ) :
-        "Return the number of group boundaries."
+        """Return the number of group boundaries."""
 
         return( len( self.gb ) )
 
     def __getitem__( self, index ) :
-        "Returns the (index - 1)^th boundary"
+        """Returns the (index - 1)^th boundary"""
 
         return( self.gb[index] )
 
     def __repr__( self ) :
-        "Returns a string of the group as it would appear in a bdfls file."
+        """Returns a string of the group as it would appear in a bdfls file."""
 
         s = "%4d %-74s*\n" % ( self.id, self.label )
         if ( len( s ) > 81 ) : s = s[:79] + "*\n"
@@ -606,8 +608,8 @@ xylog meanings::
       2     linear-log
       3     log-log"""
 
-        if ( xLabel == None ) : xLabel = 'Energy (MeV)'
-        if ( yLabel == None ) : yLabel = 'A. U.'
+        if ( xLabel is None ) : xLabel = 'Energy (MeV)'
+        if ( yLabel is None ) : yLabel = 'A. U.'
         dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title )
         f = fudgeFileMisc.fudgeTempFile( )
         for p in self.gb: f.write( "%15.7e 0.1\n%15.7e 10.\n\n" % ( p, p ) )
@@ -620,7 +622,7 @@ xylog meanings::
         """Reads in the next group from a bdfls file. Sets self's id to None if not more groups to read in."""
 
         ( self.id, self.label ) = bdfls_read_int_label( f, 1, "bdfls_group.read", "group", "group id" )
-        if( self.id == None ) : return
+        if( self.id is None ) : return
         self.name = 'LLNL_gid_%d' % self.id
         ( self.n, l ) = bdfls_read_int_label( f, 0, "bdfls_group.read", "group", "number of groups" )
         self.gb = []
@@ -692,8 +694,8 @@ xylog meanings::
       2     linear-log
       3     log-log"""
 
-        if ( xLabel == None ) : xLabel = 'Energy (MeV)'
-        if ( yLabel == None ) : yLabel = 'A. U.'
+        if ( xLabel is None ) : xLabel = 'Energy (MeV)'
+        if ( yLabel is None ) : yLabel = 'A. U.'
         dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title )
         f = fudgeFileMisc.fudgeTempFile( )
         for lGroup in self.EF_l:
@@ -708,7 +710,7 @@ xylog meanings::
         """Reads in the next flux from a bdfls file. Sets self's id to None if no more fluxes to read in."""
 
         ( self.id, self.label ) = bdfls_read_int_label( f, 1, "bdfls_flux.read", "flux", "flux id" )
-        if( self.id == None ) : return
+        if( self.id is None ) : return
         self.name = 'LLNL_fid_%d' % self.id
         ( self.lMax, l ) = bdfls_read_int_label( f, 0, "bdfls_flux.read", "flux", "lMax" )
         self.EF_l = []
@@ -814,7 +816,7 @@ class bdfls_halflife :
     def __repr__( self ) :
         """Returns a string of the za and halflife as they would appear in a bdfls file."""
 
-        if ( self.halflife == None ) :
+        if ( self.halflife is None ) :
             s = "    %6d" % self.za
         else :
             s = "    %6d%12.4e" % ( self.za, self.halflife )
@@ -876,7 +878,7 @@ class bdfls_temperature :
         to None if at end of temerature data."""
 
         ( self.id, self.label ) = bdfls_read_int_label( f, 1, "bdfls_temperature.read", "temperature", "temperature id" )
-        if( self.id == None ) : return
+        if( self.id is None ) : return
         ( self.n, l ) = bdfls_read_int_label( f, 0, "bdfls_temperature.read", "temperature", "number of temperatures" )
         self.ts = []
         i = 0
@@ -947,8 +949,8 @@ def bdfls_read_int_float( f, callingRoutine, Str ) :
 def getDefaultBdfls( name = None, template = None ) :
 
     global default_bdfls
-    if( default_bdfls == None ) :
-        if( name == None ) : name = "bdfls.junk"
+    if( default_bdfls is None ) :
+        if( name is None ) : name = "bdfls.junk"
         default_bdfls = bdfls( name = name, template = template )
     return( default_bdfls )
 

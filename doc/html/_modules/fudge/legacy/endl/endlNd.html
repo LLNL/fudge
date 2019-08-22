@@ -1,0 +1,565 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.endl.endlNd &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.legacy.endl.endlNd</h1><div class="highlight"><pre>
+<span></span># &lt;&lt;BEGIN-copyright&gt;&gt;
+# &lt;&lt;END-copyright&gt;&gt;
+
+&quot;&quot;&quot;
+This module contains the class endlNd which contains methods common to data of any (N) dimension.
+&quot;&quot;&quot;
+import os
+import copy
+import sys
+import time
+
+import bdfls
+import endlmisc
+import endl2
+
+<div class="viewcode-block" id="endlNd"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd">[docs]</a>class endlNd :
+    &quot;&quot;&quot;
+Useful Members (all of these should be accessed via get/set methods)::
+
+    h               The ENDL header for this data.
+    ZA              The ENDL ZA for this data. That is, the target for this file.
+    yi              The ENDL yi-value for this data. That is, the projectile for this file.
+    yo              The ENDL yo-value for this data. That is, the outgoing particle for this file.
+    C               The ENDL C-value for this data.
+    I               The ENDL I-value for this data.
+    S               The ENDL S-value for this data.
+    X1, X2, X3, X4  The X-vales for this data.
+    ELevel          The initial excitation level of the target for this data.
+    Halflife        The halflife of the target.
+    Temperature     The temperature of the target for this data.
+&quot;&quot;&quot;
+
+    def __init__( self, f, I_, yo, C, I, S, h, points, i0 = 0, i1 = 1, i2 = None, i3 = None, bdflsFile = None ) :
+        &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+        if ( I != I_ ) : raise Exception( &quot;\nError in endlI%d.__init__: I = %d != %d&quot; % ( I_, I, I_ ) )
+        if( bdflsFile is None ) : bdflsFile = bdfls.getDefaultBdfls( )
+        self.bdflsFile = bdflsFile
+        self.columns = endlmisc.getNumberOfColumns_( I, &quot;endlNd.__init__&quot; )
+        self.yo = yo
+        self.C = C
+        self.I = I
+        self.S = S
+        self.format = 12
+        if ( f is None ) :                              # Designer data.
+            self.h = copy.deepcopy( h )
+            data = points
+            self.designerData = 1
+        elif ( type( f ) == file ) :    # Otherwise, data must be in an endl formatted file.
+            self.h = [ f.readline( ), &quot;&quot; ]
+            if ( self.h[0] == &quot;&quot; ) : return
+            self.h[1] = f.readline( )
+            if ( self.h[1] == &quot;&quot; ) : raise Exception( &quot;\nError in endlNd.__init__: end-of-file while reading from %s&quot; % f.name )
+            data = readNdEndlData( f, i0, i1, i2, i3 )  # File data.
+            self.designerData = 0
+        else :
+            raise Exception( &quot;\nError from endlNd.__init__: invalid type = %s for f&quot; % type( f ) )
+        if( not( ( self.h[0] == &quot;\n&quot; ) and ( C == 1 ) and ( I == 0 ) ) ) :
+            if( self.yo != int( self.h[0][9:12] ) ) : raise Exception( &quot;\nError in endlNd.__init__: yo in header differs from requested yo\n&quot; + `self.h` )
+            if( self.C  != int( self.h[1][ :2]  ) ) : raise Exception( &quot;\nError in endlNd.__init__: C in header differs from requested C\n&quot; + `self.h` )
+            if( self.I  != int( self.h[1][2:5] ) ) : raise Exception( &quot;\nError in endlNd.__init__: I in header differs from requested I\n&quot; + `self.h` )
+            if( self.S  != int( self.h[1][5:8] ) ) : raise Exception( &quot;\nError in endlNd.__init__: S in header differs from requested S\n&quot; + `self.h` )
+            try :
+                self.ZA = int( self.h[0][:6] )
+                self.yi = int( self.h[0][6:9] )
+                self.Mass = endlmisc.headerString2FunkyDouble( self.h[0],  13, &quot;endlNd.__init__&quot; )
+                if( self.h[0][31] == &#39; &#39; ) :
+                    self.ENDLInterpolation = 0
+                else :
+                    self.ENDLInterpolation = int( self.h[0][31] )
+                self.format = int( self.h[0][32:34] )
+                self.ELevel = endlmisc.headerString2FunkyDouble( self.h[0],  35, &quot;endlNd.__init__&quot; )
+                self.Halflife = endlmisc.headerString2FunkyDouble( self.h[0],  47, &quot;endlNd.__init__&quot; )
+                self.Temperature = endlmisc.headerString2FunkyDouble( self.h[0],  59, &quot;endlNd.__init__&quot; )
+                self.Q = 0.
+            except :
+                endlmisc.printWarning( self.h[0] )
+                endlmisc.printWarning( self.h[1] )
+                raise
+            if ( len( self.h[1] ) &gt;= 20 ) : self.Q = endlmisc.headerString2FunkyDouble( self.h[1],  9, &quot;endlNd.__init__&quot; )
+            self.X1 = 0.
+            if ( len( self.h[1] ) &gt;= 32 ) : self.X1 = endlmisc.headerString2FunkyDouble( self.h[1], 21, &quot;endlNd.__init__&quot; )
+            self.X2 = 0.
+            if ( len( self.h[1] ) &gt;= 44 ) : self.X2 = endlmisc.headerString2FunkyDouble( self.h[1], 33, &quot;endlNd.__init__&quot; )
+            self.X3 = 0.
+            if ( len( self.h[1] ) &gt;= 56 ) : self.X3 = endlmisc.headerString2FunkyDouble( self.h[1], 45, &quot;endlNd.__init__&quot; )
+            self.X4 = 0.
+            if ( len( self.h[1] ) &gt;= 68 ) : self.X4 = endlmisc.headerString2FunkyDouble( self.h[1], 57, &quot;endlNd.__init__&quot; )
+        else :
+            if( not ( self.designerData ) ) : endlmisc.printWarning( &quot;Warning: using old style C = 1, I = 0 header file&quot; )
+            self.ZA = None
+            self.yi = None
+            self.yo = 0
+            self.C = 1
+            self.I = 0
+            self.S = 0
+            self.Mass = None
+            self.ENDLInterpolation = 0
+            self.ELevel = None
+            self.Halflife= None
+            self.Temperature = None
+            self.Q = 0.
+            self.X1 = 0.
+            self.X2 = 0.
+            self.X3 = 0.
+            self.X4 = 0.
+        self.set( data, checkDataType = 0, interpolation = endlmisc.endlToFudgeInterpolation( self.ENDLInterpolation ) )
+
+    def __len__( self ) :
+        &quot;&quot;&quot;Returns the length of data. For 2d data this is the number of data pairs, for 3d data this is the
+        number of unique x values and for 4d data this is the number of unique t values.&quot;&quot;&quot;
+
+        return len( self.data )
+
+    def __repr__( self ) :
+        &quot;&quot;&quot;Returns a string containing yo, C, I, S, X1, X2, X3, X4 and Q. To get a string of the actual data
+        use the toString method for that data.&quot;&quot;&quot;
+
+        return &quot;yo = %2d  C = %3d  I = %3d  S = %3d  X1 = %e  X2 = %e  X3 = %e  X4 = %e  Q = %e&quot; % \
+            ( self.yo, self.C, self.I, self.S, self.X1, self.X2, self.X3, self.X4, self.Q )
+
+<div class="viewcode-block" id="endlNd.checkHeader"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.checkHeader">[docs]</a>    def checkHeader( self, index = None ) :
+        &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+        if( ( index is None ) or ( index == 1 ) ) :
+            if( len( self.h[0] ) &lt; 71 ) :
+                if( self.h[0][-1] == &quot;\n&quot; ) : self.h[0][:-1]
+                self.h[0] = &quot;%-70s\n&quot; % self.h[0]
+        if( ( index is None ) or ( index == 2 ) ) :
+            if( len( self.h[1] ) &lt; 69 ) :
+                if( self.h[1][-1] == &quot;\n&quot; ) : self.h[1][:-1]
+                self.h[1] = &quot;%-68s\n&quot; % self.h[1]</div>
+
+<div class="viewcode-block" id="endlNd.cmpyoCISX1"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.cmpyoCISX1">[docs]</a>    def cmpyoCISX1( self, other, epsX1 ) :
+        &quot;&quot;&quot;Compares yo, C, I, S and X1 values of self to other and returns 1 if they
+    are the same and 0 otherwise. The X1 values can differ by as much as epsX1.&quot;&quot;&quot;
+
+        v1 = 1000 * ( 100 * ( 100 * self.yo + self.C ) + self.I ) + self.S
+        v2 = 1000 * ( 100 * ( 100 * other.yo + other.C ) + other.I ) + other.S
+        if ( v1 &lt; v2 ) :
+            return -1
+        elif ( v1 &gt; v2 ) :
+            return 1
+        else :
+            dX1 = self.X1 - other.X1
+            sX1 = ( abs( self.X1 ) + abs( other.X1 ) ) * abs( epsX1 )
+            if ( abs( dX1 ) &lt;= sX1 ) :
+                return 0
+            elif ( dX1 &lt; 0 ) :
+                return -1
+            else :
+                return 1</div>
+
+<div class="viewcode-block" id="endlNd.compareQXs"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.compareQXs">[docs]</a>    def compareQXs( self, Q, X1, X2, X3, X4 ) :
+        &quot;&quot;&quot;Return -1 if self&#39;s values &lt; (Q, X1, X2, X3, X4), 0 if equal and 1 otherwise.&quot;&quot;&quot;
+
+        if( Q is not None ) :
+            if( self.Q &lt; Q ) : return(  1 )
+            if( self.Q &gt; Q ) : return( -1 )
+        if( self.X1 &lt; X1 ) : return( -1 )
+        if( self.X1 &gt; X1 ) : return(  1 )
+        if( self.X2 &lt; X2 ) : return( -1 )
+        if( self.X2 &gt; X2 ) : return(  1 )
+        if( self.X3 &lt; X3 ) : return( -1 )
+        if( self.X3 &gt; X3 ) : return(  1 )
+        if( self.X4 &lt; X4 ) : return( -1 )
+        if( self.X4 &gt; X4 ) : return(  1 )
+        return( 0 )</div>
+
+<div class="viewcode-block" id="endlNd.determineQandThreshold"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.determineQandThreshold">[docs]</a>    def determineQandThreshold( self, Q = None, specialCases = 0 ) :
+
+        if( ( self.C &lt; 8 ) or ( 49 &lt; self.C &lt; 58 ) ) : return( 0., 0. )
+        if( Q is None ) :
+            Q = endl2.reactionQ( self.yi, self.ZA, self.C, targetELevel = self.getELevel( ), X4 = self.getX4( ), specialCases = specialCases, bdflsFile = self.bdflsFile )
+            if( ( self.ZA == 95241 ) and ( self.C == 46 ) and ( self.Q == 5.48 ) ) : Q += 5.48 - 5.4318 # Special case for endl99
+        if( Q is None ) : Q = self.getQ( )
+        if( self.S in [ 1 ] ) :
+            residualELevel = self.getX1( )
+        else :
+            residualELevel = self.getX4( )
+        threshold = endl2.reactionThreshold( self.yi, self.ZA, self.C, targetELevel = self.getELevel( ), residualELevel = residualELevel, Q = Q,
+            specialCases = specialCases, S = self.S, bdflsFile = self.bdflsFile )
+        return( Q, max( 0., threshold ) )</div>
+
+<div class="viewcode-block" id="endlNd.setQandThreshold"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setQandThreshold">[docs]</a>    def setQandThreshold( self, thresholdCrossSectionIsZero, Q, threshold, fixThresholdMode = None, dThreshold_MeV = 10e-3, 
+            EMin = 0., threshold_MeV_shiftWarning = 0.1 ) :
+
+        self.setQ( Q )
+        if( hasattr( self, &#39;fixThreshold&#39; ) ) : self.fixThreshold( thresholdCrossSectionIsZero, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin,
+            fixThresholdMode = fixThresholdMode, threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )</div>
+
+<div class="viewcode-block" id="endlNd.getDate"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getDate">[docs]</a>    def getDate( self ) :
+        &quot;&quot;&quot;Returns the target&#39;s date.&quot;&quot;&quot;
+
+        return( int( self.h[0][25:31] ) )</div>
+
+<div class="viewcode-block" id="endlNd.getELevel"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getELevel">[docs]</a>    def getELevel( self ) :
+        &quot;&quot;&quot;Returns the target&#39;s excitation level.&quot;&quot;&quot;
+
+        return( self.ELevel )</div>
+
+<div class="viewcode-block" id="endlNd.getENDLInterpolation"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getENDLInterpolation">[docs]</a>    def getENDLInterpolation( self ) :
+        &quot;&quot;&quot;Returns the target&#39;s ENDL interpolation flag. 0 or 2 is lin-lin, 3 is log-lin, 4 is lin-log and 5 is log-log. Also see getInterpolation.&quot;&quot;&quot;
+
+        return( self.ENDLInterpolation )</div>
+
+<div class="viewcode-block" id="endlNd.getInterpolation"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getInterpolation">[docs]</a>    def getInterpolation( self ) :
+        &quot;&quot;&quot;Returns the target&#39;s fudge interpolation flag. 0 is lin-lin, 1 is log-lin, 2 is lin-log and 3 is log-log. Also see getENDLInterpolation.&quot;&quot;&quot;
+
+        return( self.interpolation )</div>
+
+<div class="viewcode-block" id="endlNd.getFormat"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getFormat">[docs]</a>    def getFormat( self ) :
+        &quot;&quot;&quot;Returns the target&#39;s format specifier.&quot;&quot;&quot;
+
+        return( self.format )</div>
+
+<div class="viewcode-block" id="endlNd.getLifetime"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getLifetime">[docs]</a>    def getLifetime( self ) :
+        &quot;&quot;&quot;Deprecated method. Use getHalflife instead.&quot;&quot;&quot;
+
+        endlmisc.printWarning( &#39;getLifetime is a deprecated method. Use getHalflife instead.&#39; )
+        return( self.getHalflife( ) )</div>
+
+<div class="viewcode-block" id="endlNd.getHalflife"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getHalflife">[docs]</a>    def getHalflife( self ) :
+        &quot;&quot;&quot;Returns the target&#39;s halflife.&quot;&quot;&quot;
+
+        return( self.Halflife )</div>
+
+<div class="viewcode-block" id="endlNd.getMass"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getMass">[docs]</a>    def getMass( self ) :
+        &quot;&quot;&quot;Returns the target&#39;s mass.&quot;&quot;&quot;
+
+        return( self.Mass )</div>
+
+<div class="viewcode-block" id="endlNd.getQ"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getQ">[docs]</a>    def getQ( self ) :
+        &quot;&quot;&quot;Returns the Q value for self&#39;s reaction.&quot;&quot;&quot;
+
+        return( self.Q )</div>
+
+<div class="viewcode-block" id="endlNd.getTemperature"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getTemperature">[docs]</a>    def getTemperature( self ) :
+        &quot;&quot;&quot;Returns the taget&#39;s temperature.&quot;&quot;&quot;
+
+        return( self.Temperature )</div>
+
+<div class="viewcode-block" id="endlNd.getX1"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getX1">[docs]</a>    def getX1( self ) :
+        &quot;&quot;&quot;Returns the X1 value for this data.&quot;&quot;&quot;
+
+        return( self.X1 )</div>
+
+<div class="viewcode-block" id="endlNd.getX2"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getX2">[docs]</a>    def getX2( self ) :
+        &quot;&quot;&quot;Returns the X2 value for this data.&quot;&quot;&quot;
+
+        return( self.X2 )</div>
+
+<div class="viewcode-block" id="endlNd.getX3"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getX3">[docs]</a>    def getX3( self ) :
+        &quot;&quot;&quot;Returns the X3 value for this data.&quot;&quot;&quot;
+
+        return( self.X3 )</div>
+
+<div class="viewcode-block" id="endlNd.getX4"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getX4">[docs]</a>    def getX4( self ) :
+        &quot;&quot;&quot;Returns the X4 value for this data.&quot;&quot;&quot;
+
+        return( self.X4 )</div>
+
+<div class="viewcode-block" id="endlNd.getYi"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getYi">[docs]</a>    def getYi( self ) :
+        &quot;&quot;&quot;Returns projectile&#39;s identifier, yi value.&quot;&quot;&quot;
+
+        return( self.yi )</div>
+
+<div class="viewcode-block" id="endlNd.getYo"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getYo">[docs]</a>    def getYo( self ) :
+        &quot;&quot;&quot;Returns the outgoing particle&#39;s identifier, yo value.&quot;&quot;&quot;
+
+        return( self.yo )</div>
+
+<div class="viewcode-block" id="endlNd.getZA"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.getZA">[docs]</a>    def getZA( self ) :
+        &quot;&quot;&quot;Returns the targets ZA value.&quot;&quot;&quot;
+
+        return( self.ZA )</div>
+
+<div class="viewcode-block" id="endlNd.info"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.info">[docs]</a>    def info( self ) :
+        &quot;&quot;&quot;Prints information about self&#39;s data.&quot;&quot;&quot;
+
+        print &quot;C = %2d  I = %3d  S = %3d  X1 = %e  X2 = %e  X3 = %e  X4 = %e  Q = %e&quot; % \
+            ( self.C, self.I, self.S, self.X1, self.X2, self.X3, self.X4, self.Q )
+        print self.h[0], self.h[1],
+        print &quot;Data has %d columns and %d rows&quot; % ( self.columns, len( self.data ) )</div>
+
+<div class="viewcode-block" id="endlNd.save"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.save">[docs]</a>    def save( self, f = None ) :        # ??????
+        &quot;&quot;&quot;Writes header and data to file f where f is a python file type (e.g., sys.stdout).
+    If f is None then writes data to sys.stdout.&quot;&quot;&quot;
+
+        if ( f is None ) : f = sys.stdout
+        f.write( self.h[0] )
+        f.write( self.h[1] )
+        Fmt = None
+        if( self.format != 12 ) :
+            Fmt = &#39;%%%d.%de&#39; % ( self.format, self.format - 7 )
+        s = self.toString( format = Fmt )
+        f.write( s )
+        f.write( &quot;                                                                       1\n&quot; )</div>
+
+<div class="viewcode-block" id="endlNd.setC"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setC">[docs]</a>    def setC( self, C ) :
+        &quot;&quot;&quot;Sets self&#39;s C value and self&#39;s header C value to C.&quot;&quot;&quot;
+
+        self.checkHeader( 2 )
+        self.C = C
+        self.h[1] = &quot;%2d&quot; % C + self.h[1][2:]</div>
+
+<div class="viewcode-block" id="endlNd.setDate"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setDate">[docs]</a>    def setDate( self, date = None ) :
+        &quot;Sets self&#39;s data and self&#39;s header date value to data. If date is None then today&#39;s date is used.&quot;
+
+        if ( date is None ) :
+            date = time.localtime( time.time( ) )
+            date = 10000 * ( date[0] - 2000 ) + 100 * date[1] + date[2]
+        if ( type( date ) == type( &quot;&quot; ) ) :
+            try :
+                date = int( date )
+            except :
+                endlmisc.printWarning( &quot;date cannot be converted to an integer&quot; )
+                raise ValueError
+        if ( type( date ) == type( 1 ) ) and ( date &gt; 0 ) and ( date &lt; 1000000 ) :
+            self.h[0] = &quot;%-25s%6.6d%s&quot; % ( self.h[0][0:25], date, self.h[0][31:] )
+        else :
+            raise Exception( &quot;\nError in setDate: date must be an integer, or a string convertible to an \ninteger, in the range [1, 999999]&quot; )</div>
+
+<div class="viewcode-block" id="endlNd.setELevel"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setELevel">[docs]</a>    def setELevel( self, ELevel ) :
+        &quot;&quot;&quot;Sets self&#39;s ELevel value and self&#39;s header ELevel value to ELevel.&quot;&quot;&quot;
+
+        self.checkHeader( 1 )
+        self.ELevel = ELevel
+        self.h[0] = self.h[0][:35] + endlmisc.headerFunkyDouble2String( ELevel ) + self.h[0][46:]</div>
+
+<div class="viewcode-block" id="endlNd.setFormat"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setFormat">[docs]</a>    def setFormat( self, width ) :
+        &quot;&quot;&quot;Sets self&#39;s format specifier and self&#39;s header format specifier value to width.&quot;&quot;&quot;
+
+        if( ( width &lt; 7 ) or ( width &gt; 99 ) ) : raise Exception( &#39;\nError in endlNd.setFormat: width = %d not in range [7 to 99].&#39; % width )
+        self.checkHeader( 1 )
+        self.format = width
+        self.h[0] = &#39;%s%2d%s&#39; % ( self.h[0][:32], width, self.h[0][34:] )</div>
+
+<div class="viewcode-block" id="endlNd.setI"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setI">[docs]</a>    def setI( self, I ) :
+        &quot;&quot;&quot;Sets self&#39;s I value and self&#39;s header I value to I.&quot;&quot;&quot;
+
+        self.checkHeader( 2 )
+        self.I = I
+        self.h[1] = self.h[1][:2] + &quot;%3d&quot; % I + self.h[1][5:]</div>
+
+<div class="viewcode-block" id="endlNd.setLifetime"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setLifetime">[docs]</a>    def setLifetime( self, Halflife) :
+        &quot;&quot;&quot;Deprecated method. Use setHalflife instead.&quot;&quot;&quot;
+
+        endlmisc.printWarning( &#39;setLifetime is a deprecated method. Use setHalflife instead.&#39; )
+        self.setHalflife( Halflife )</div>
+
+<div class="viewcode-block" id="endlNd.setHalflife"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setHalflife">[docs]</a>    def setHalflife( self, Halflife) :
+        &quot;&quot;&quot;Sets self&#39;s Halflife value and self&#39;s header Halflife value to Halflife.&quot;&quot;&quot;
+
+        self.checkHeader( 1 )
+        self.Halflife = Halflife
+        self.h[0] = self.h[0][:47] + endlmisc.headerFunkyDouble2String( Halflife ) + self.h[0][58:]</div>
+
+<div class="viewcode-block" id="endlNd.setMass"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setMass">[docs]</a>    def setMass( self, Mass ) :
+        &quot;&quot;&quot;Sets self&#39;s Mass value and self&#39;s header Mass value to Mass.&quot;&quot;&quot;
+
+        self.checkHeader( 1 )
+        self.Mass = Mass
+        self.h[0] = self.h[0][:13] + endlmisc.headerFunkyDouble2String( Mass ) + self.h[0][24:]</div>
+
+<div class="viewcode-block" id="endlNd.setQ"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setQ">[docs]</a>    def setQ( self, Q ) :
+        &quot;&quot;&quot;Sets self&#39;s Q value and self&#39;s header Q value to Q.&quot;&quot;&quot;
+
+        self.checkHeader( 2 )
+        self.Q = Q
+        self.h[1] = self.h[1][:9] + endlmisc.headerFunkyDouble2String( Q ) + self.h[1][20:]</div>
+
+<div class="viewcode-block" id="endlNd.setS"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setS">[docs]</a>    def setS( self, S ) :
+        &quot;&quot;&quot;Sets self&#39;s S value and self&#39;s header S value to S.&quot;&quot;&quot;
+
+        self.checkHeader( 2 )
+        self.S = S
+        self.h[1] = self.h[1][:5] + &quot;%3d&quot; % S + self.h[1][8:]</div>
+
+<div class="viewcode-block" id="endlNd.setTemperature"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setTemperature">[docs]</a>    def setTemperature( self, T ) :
+        &quot;&quot;&quot;Sets self&#39;s Temperature value and self&#39;s header Temperature value to T.&quot;&quot;&quot;
+
+        self.checkHeader( 1 )
+        self.Temperature = T
+        self.h[0] = self.h[0][:59] + endlmisc.headerFunkyDouble2String( T ) + self.h[0][70:]</div>
+
+<div class="viewcode-block" id="endlNd.setX1"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setX1">[docs]</a>    def setX1( self, X1 ) :
+        &quot;&quot;&quot;Sets self&#39;s X1 value and self&#39;s header X1 value to X1.&quot;&quot;&quot;
+
+        self.checkHeader( 2 )
+        self.X1 = X1
+        self.h[1] = self.h[1][:21] + endlmisc.headerFunkyDouble2String( X1 ) + self.h[1][32:]</div>
+
+<div class="viewcode-block" id="endlNd.setX2"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setX2">[docs]</a>    def setX2( self, X2 ) :
+        &quot;&quot;&quot;Sets self&#39;s X2 value and self&#39;s header X2 value to X2.&quot;&quot;&quot;
+
+        self.checkHeader( 2 )
+        self.X2 = X2
+        self.h[1] = self.h[1][:33] + endlmisc.headerFunkyDouble2String( X2 ) + self.h[1][44:]</div>
+
+<div class="viewcode-block" id="endlNd.setX3"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setX3">[docs]</a>    def setX3( self, X3 ) :
+        &quot;&quot;&quot;Sets self&#39;s X3 value and self&#39;s header X3 value to X3.&quot;&quot;&quot;
+
+        self.checkHeader( 2 )
+        self.X3 = X3
+        self.h[1] = self.h[1][:45] + endlmisc.headerFunkyDouble2String( X3 ) + self.h[1][56:]</div>
+
+<div class="viewcode-block" id="endlNd.setX4"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setX4">[docs]</a>    def setX4( self, X4 ) :
+        &quot;&quot;&quot;Sets self&#39;s X4 value and self&#39;s header X4 value to X4.&quot;&quot;&quot;
+
+        self.checkHeader( 2 )
+        self.X4 = X4
+        self.h[1] = self.h[1][:57] + endlmisc.headerFunkyDouble2String( X4 ) + self.h[1][68:]</div>
+
+<div class="viewcode-block" id="endlNd.setYi"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setYi">[docs]</a>    def setYi( self, yi ) :
+        &quot;&quot;&quot;Sets self&#39;s yi value and self&#39;s header yi value to yi.  yi must be an integer
+    or a string convertible to an integer.&quot;&quot;&quot;
+
+        iyi = endlmisc.incidentParticleTags( yi )[0]
+        if( ( iyi &lt; 1 ) or ( iyi &gt; 10 ) ) : raise Exception( &quot;\nError in setYi: yi must be in the range [1, 10]&quot; )
+        self.checkHeader( 1 )
+        self.yi = iyi
+        syi = &quot;%3d&quot; % iyi
+        self.h[0] = self.h[0][:6] + syi + self.h[0][9:]</div>
+
+<div class="viewcode-block" id="endlNd.setYo"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setYo">[docs]</a>    def setYo( self, yo ) :
+        &quot;&quot;&quot;Sets self&#39;s yo value and self&#39;s header yo value to yo.  yo must be an integer
+    or a string convertible to an integer.&quot;&quot;&quot;
+
+        iyo = int( yo )
+        if( ( iyo &lt; 0 ) or ( iyo &gt; 19 ) ) : raise Exception( &quot;\nError in setYo: yo must be in the range [0, 19]&quot; )
+        self.checkHeader( 1 )
+        self.yo = iyo
+        syo = &quot;%3d&quot; % iyo
+        self.h[0] = self.h[0][:9] + syo + self.h[0][12:]</div>
+
+<div class="viewcode-block" id="endlNd.setZA"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setZA">[docs]</a>    def setZA( self, ZA ) :
+        &quot;&quot;&quot;Sets self&#39;s ZA value and self&#39;s header ZA value to ZA.  ZA must be an integer
+    or a string convertible to an integer.&quot;&quot;&quot;
+
+        iZA = int( ZA )
+        if( ( iZA &lt; 0 ) or ( iZA &gt; 999999 ) ) : raise Exception( &quot;\nError in setZA: ZA must be in the range [0, 999999]&quot; )
+        self.checkHeader( 1 )
+        self.ZA = iZA
+        sZA = &quot;%6d&quot; % iZA
+        self.h[0] = sZA + self.h[0][6:]</div>
+
+<div class="viewcode-block" id="endlNd.setYiZAYoCIS"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.endlNd.setYiZAYoCIS">[docs]</a>    def setYiZAYoCIS( self, yi = None, ZA = None, yo = None, C = None, I = None, S = None ) :
+        &quot;&quot;&quot;For input parameters that are not None, sets self&#39;s value to input parameter.&quot;&quot;&quot;
+
+        if( yi is not None ) : self.setYi( yi )
+        if( ZA is not None ) : self.setZA( ZA )
+        if( yo is not None ) : self.setYo( yo )
+        if( C  is not None ) : self.setC( C )
+        if( I  is not None ) : self.setI( I )
+        if( S  is not None ) : self.setS( S )</div></div>
+
+<div class="viewcode-block" id="readNdEndlData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlNd.readNdEndlData">[docs]</a>def readNdEndlData( f, i0, i1, i2 = None, i3 = None ) :
+    &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+    data = []
+    while 1 :
+        l = f.readline( )
+        if ( l == &quot;&quot; ) : raise Exception( &quot;\nError: end-of-file while reading from %s&quot; % f.name )
+        if ( l == &quot;                                                                       1\n&quot; ) : break
+        data.append( l )
+    if ( i3 is not None ) : return endlmisc.translate4dStringData( data, i0 = i0, i1 = i1, i2 = i2, i3 = i3 )
+    elif ( i2 is not None ) : return endlmisc.translate3dStringData( data, i0 = i0, i1 = i1, i2 = i2 )
+    else : return endlmisc.translate2dStringData( data, i0 = i0, i1 = i1 )</div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

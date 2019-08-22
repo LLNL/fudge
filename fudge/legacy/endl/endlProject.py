@@ -90,7 +90,7 @@ import endl_Z
 endlProjectList = []
 
 def exit( ) :
-    "Does some house cleaning and then exits python. This is the recommended way to exit fudge."
+    """Does some house cleaning and then exits python. This is the recommended way to exit fudge."""
 
     n = len( endlProjectList ) - 1
     while ( n >= 0 ) :
@@ -99,7 +99,7 @@ def exit( ) :
     sys.exit( )
 
 def ll( ) :
-    "Currently, the same as ls( )."
+    """Currently, the same as ls( )."""
 
     ls( )
 
@@ -110,10 +110,10 @@ def ls( ) :
     for i in endlProjectList : print "   endlProjectList[%d] = %s" % ( j, i.database ); j += 1
 
 def removeProject( p, delWorkDirWhenDone = None ) :
-    "Removes endlProject p from Fudge's internal list and returns None."
+    """Removes endlProject p from Fudge's internal list and returns None."""
 
     if ( type( p ) == types.InstanceType ) and ( p.__class__.__name__ == "endlProject" ) :
-        if ( delWorkDirWhenDone != None ) : p.delWorkDirWhenDone = delWorkDirWhenDone
+        if ( delWorkDirWhenDone is not None ) : p.delWorkDirWhenDone = delWorkDirWhenDone
         r = range( len( endlProjectList ) )
         for i in r :
             if ( p == endlProjectList[i] ) :
@@ -129,12 +129,12 @@ class endlProject :
         """Creates a new endlProject with database as the default database to use when reading ZAs. If bdflsFile is not None, then
         it is the bdfls class instance associated with self."""
 
-        if( yi != None ) :
+        if( yi is not None ) :
             endlmisc.printWarning( 'Argument "yi" for Constructor of endlProject is deprecated, please use argument "projectile" instead.' )
-            if( projectile != None ) : raise Exception( 'Both "yi" and "projectile" argument specified, only use "projectile".' )
+            if( projectile is not None ) : raise Exception( 'Both "yi" and "projectile" argument specified, only use "projectile".' )
             projectile = yi
-        if( database == None ) : database = fudgeDefaults.ENDL_DEFAULT_DATABASE
-        if( bdflsFile == None ) :
+        if( database is None ) : database = fudgeDefaults.ENDL_DEFAULT_DATABASE
+        if( bdflsFile is None ) :
             bdflsFileName = None
             if( os.path.exists( 'bdfls' ) ) : bdflsFileName = './bdfls'    # Else logic handled below.
         else :
@@ -144,11 +144,11 @@ class endlProject :
         dbInDatabaseName, yiInDatabaseName = os.path.split( database )
         if( yiInDatabaseName in [ "yi01", "yi02", "yi03", "yi04", "yi05",  "yi06", "yi07", "yi09" ] ) :
             database = dbInDatabaseName
-            if( ( projectile != None ) and ( yiInDatabaseName != endlmisc.incidentParticleTags( projectile )[1] ) ) :
+            if( ( projectile is not None ) and ( yiInDatabaseName != endlmisc.incidentParticleTags( projectile )[1] ) ) :
                 raise Exception( "\nError in endlProject.__init__: yi in database name and yi differ" )
             projectile = endlmisc.incidentParticleTags( yiInDatabaseName )[5]
         else :
-            if( projectile == None ) : projectile = 'n'
+            if( projectile is None ) : projectile = 'n'
         self.yiTags = endlmisc.incidentParticleTags( projectile )
         self.name = self.yiTags[5]
         ( self.database, Status ) = endlmisc.getFullPath( os.path.join( database, 'ascii' ), fudgeDefaults.ENDL_DATABASE_DIR )
@@ -167,12 +167,12 @@ class endlProject :
             if ( not os.path.exists( self.database ) ) :
                 self.database = None
             else :
-                if( bdflsFileName == None ) :
+                if( bdflsFileName is None ) :
                     bdflsFileName = os.path.join( os.path.dirname( self.database ).split( '/ascii' )[0], 'bdfls' )
                     if( not os.path.exists( bdflsFileName ) ) : bdflsFileName = None
             self.yi = self.yiTags[0]
         self.bdflsFile = bdflsFile
-        if( bdflsFile == None ) : self.bdflsFile = bdfls.getBdflsFile( name = bdflsFileName )   # endlProject relies on bdfls class to search BDFLSPATH 
+        if( bdflsFile is None ) : self.bdflsFile = bdfls.getBdflsFile( name = bdflsFileName )   # endlProject relies on bdfls class to search BDFLSPATH 
         self.bdflsFileName = endlmisc.getAbsPath_withDefaultDBCheck( self.bdflsFile.Source )[0] # and "/usr/gapps/data/nuclear/bdfls", in that order,
         self.mass = 0                                                                           # for the bdfls file.
         yoZA = endl2.yoToZA( self.yiTags[0] )
@@ -187,7 +187,7 @@ class endlProject :
             self.workDir = None
         else :
             if( workDir == '' ) : workDir = self.database
-            if ( workDir == None ) :
+            if ( workDir is None ) :
                 self.workDir = tempfile.mkdtemp( )
             else :
                 self.workDir = workDir
@@ -200,7 +200,7 @@ class endlProject :
         if( not( self.workDir is None ) and cleanWorkDirOfZAs ) : os.system( 'rm -rf %s/za[0-9][0-9][0-9][0-9][0-9][0-9]*' % self.workDir )
         self.zas = []
         self.documentation = None
-        if( self.database != None ) :
+        if( self.database is not None ) :
             documentationFileName = os.path.join( self.database, 'documentation.txt' )
             if( os.path.exists( documentationFileName ) ) : self.documentation = fudgeDocumentationFile.fudgeDocumentationFile( documentationFileName )
         endlProjectList.append( self )
@@ -228,7 +228,7 @@ class endlProject :
 
         
     def __len__( self ) :
-        "Returns the number of ZAs instantiated within self."
+        """Returns the number of ZAs instantiated within self."""
 
         return( len( self.zas ) )
 
@@ -245,7 +245,7 @@ class endlProject :
     def getDocumentation( self ) :
         """Return None if there is not documentation file, otherwise, the text of the documentation file is returned."""
 
-        if( self.documentation == None ) : return( None )
+        if( self.documentation is None ) : return( None )
         return( self.documentation.getText( ) )
 
     def getMass( self ) :
@@ -305,8 +305,8 @@ Valid options are::
 All options can be negated by prepending with 'no_' (e.g., -no_u').
 """
 
-        if( bdflsFile == None ) : bdflsFile = self.bdflsFile.Source
-        if ( self.workDir == None ) :
+        if( bdflsFile is None ) : bdflsFile = self.bdflsFile.Source
+        if ( self.workDir is None ) :
             raise Exception( "\nError in endlProject.process: project does not have a work directory." )
         else :
             if ( not os.path.exists( oldfile ) ) :
@@ -316,7 +316,7 @@ All options can be negated by prepending with 'no_' (e.g., -no_u').
                     if ( os.path.exists( f ) ) : oldfile = f
             if ( not os.path.exists( oldfile ) ) :
                 raise Exception( "\nError in endlProject.process: old file does not exist (%s)" % oldfile )
-            if ( newfile == None ) :
+            if ( newfile is None ) :
                 i = string.rfind( oldfile, "/" ) + 1        # rfind returns -1 if "/" not found. This is great.
                 newfile = oldfile[i:] + ".new"
             endlmisc.processDataBase( self.workDir, oldfile, newfile, options, defines = defines, bdflsFile = bdflsFile, ndfgen = ndfgen,
@@ -330,7 +330,7 @@ All options can be negated by prepending with 'no_' (e.g., -no_u').
             if ( z.sZA == sZA ) :
                 endlmisc.printWarning( "za = %s already present in this endlProject" % sZA )
                 return z
-        if ( database == None ) : database = self.database
+        if ( database is None ) : database = self.database
         z = endlZA.endlZA( ZA, self.yi, database = database, workDir = self.workDir, suffix = suffix, readOnly = self.readOnly, bdflsFile = self.bdflsFile )
         self.zas.append( z )
         return z
@@ -350,7 +350,7 @@ All options can be negated by prepending with 'no_' (e.g., -no_u').
 
         for i in range( len( self.zas ) ) :
             if ( self.zas[i] == target ) :
-                if ( self.zas[i].workDir != None ) : os.system( "rm -rf " + self.zas[i].workDir )
+                if ( self.zas[i].workDir is not None ) : os.system( "rm -rf " + self.zas[i].workDir )
                 del self.zas[i]
                 return
         endlmisc.printWarning( "Warning in endlProject.remove: target = %s is not a part of project" % target.name )
@@ -362,13 +362,13 @@ All options can be negated by prepending with 'no_' (e.g., -no_u').
         sZA = endlmisc.strZASuffix( ZA, suffix )
         for i in range( len( self.zas ) ) :
             if ( self.zas[i].sZA == sZA ) :
-                if ( self.zas[i].workDir != None ) : os.system( "rm -rf " + self.zas[i].workDir )
+                if ( self.zas[i].workDir is not None ) : os.system( "rm -rf " + self.zas[i].workDir )
                 del self.zas[i]
                 return
         endlmisc.printWarning( "Warning in endlProject.removeZA: za = %s not in project" % sZA )
 
     def save( self ) :
-        "Saves all ZAs instantiated within self."
+        """Saves all ZAs instantiated within self."""
 
         for z in self.zas : z.save( )
 
@@ -382,7 +382,7 @@ All options can be negated by prepending with 'no_' (e.g., -no_u').
     def targetList( self, Symbol = None, A = None, suffix = None ) :
         """Returns a list of target sub-directories in self's database matching Symbol, A and suffix."""
 
-        if( self.database == None ) : raise Exception( "No default database defined." )
+        if( self.database is None ) : raise Exception( "No default database defined." )
         targetList = []
         targets = os.listdir( self.database )
         targets.sort( )
@@ -435,17 +435,17 @@ All options can be negated by prepending with 'no_' (e.g., -no_u').
     def ZAList( self, Z = None, A = None, suffix = "" ) :
         """Returns a list of ZA sub-directories in self's database matching Z and A."""
 
-        if( self.database == None ) : raise Exception( "\nError in endlProject.ZAList: no default database defined." )
+        if( self.database is None ) : raise Exception( "\nError in endlProject.ZAList: no default database defined." )
         Zb = 2
         Ze = 2
         ZStr = ""
         Ab = 5
         Ae = 5
         AStr = ""
-        if ( Z != None ) :
+        if ( Z is not None ) :
             ZStr = "%3.3d" % Z
             Ze = 5
-        if ( A != None ) :
+        if ( A is not None ) :
             AStr = "%3.3d" % A
             Ae = 8
         zalist = []

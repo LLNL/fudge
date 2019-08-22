@@ -1,0 +1,247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.gnd.alias &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.gnd.alias</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">import</span> <span class="nn">xData.ancestry</span> <span class="k">as</span> <span class="nn">ancestryModule</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<div class="viewcode-block" id="alias"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.alias.alias">[docs]</a><span class="k">class</span> <span class="nc">alias</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;alias&#39;</span>
+
+<span class="c1"># BRB6 Remove attributes?</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">attributes</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a new alias value and its attributes. The attributes argument must be of instance type dict and all keys and values in</span>
+<span class="sd">        the dictionary must be an instance of str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;key must be a string, not type &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Value must be a string, not type &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span> <span class="n">value</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">attributes</span><span class="p">,</span> <span class="nb">dict</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;attributes must be of type dict not &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span> <span class="n">attributes</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">attributes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value_</span> <span class="ow">in</span> <span class="n">attributes</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;attribute&#39;s key must be an instance of str, not &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">value_</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;The value for attribute &#39;</span><span class="si">%s</span><span class="s2">&#39; must be an instance of str, not &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span>
+                    <span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span> <span class="n">value_</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value_</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;alias -&gt; key=&quot;</span><span class="si">%s</span><span class="s1">&quot; </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">XMLData</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+<span class="c1"># BRB6 Rename value to __value and use @property</span>
+<div class="viewcode-block" id="alias.getValue"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.alias.alias.getValue">[docs]</a>    <span class="k">def</span> <span class="nf">getValue</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the value for self.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="alias.getAttribute"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.alias.alias.getAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">getAttribute</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the value for the attribute name in self.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="alias.getAttributes"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.alias.alias.getAttributes">[docs]</a>    <span class="k">def</span> <span class="nf">getAttributes</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns a copy of self&#39;s attributes.&quot;&quot;&quot;</span>
+
+        <span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span> <span class="n">attributes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">attributes</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="alias.hasAttribute"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.alias.alias.hasAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">hasAttribute</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns True if self has an attribute called name and False otherwise.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="alias.XMLData"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.alias.alias.XMLData">[docs]</a>    <span class="k">def</span> <span class="nf">XMLData</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">s1</span> <span class="o">=</span> <span class="s1">&#39;value=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">s1</span> <span class="o">+=</span> <span class="s1">&#39; </span><span class="si">%s</span><span class="s1">=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="n">value_</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">s1</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="aliases"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.alias.aliases">[docs]</a><span class="k">class</span> <span class="nc">aliases</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="p">,</span> <span class="nb">dict</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;aliases&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s2">&quot;Sets the alias key to value. To set an alias&#39; attributes, use add instead.&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="aliases.add"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.alias.aliases.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">attributes</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is like __setitem__, but allows for attributes to be associated with the alias defined by key/value. The argument attributes</span>
+<span class="sd">        must be a dictionary, and its keys and values must be an instance of str.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<span class="c1"># BRB6, need to test value. I don&#39;t think this is the way add should work. It should just add an existing alias.</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Key must be a string&#39;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s2">&quot;Key &#39;</span><span class="si">%s</span><span class="s2">&#39; already in aliases&quot;</span> <span class="o">%</span> <span class="n">key</span> <span class="p">)</span>
+        <span class="nb">dict</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">alias</span><span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">attributes</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<span class="c1"># BRB6 I think we should remove this method. See prior comment.</span>
+<div class="viewcode-block" id="aliases.addNuclearMetaStable"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.alias.aliases.addNuclearMetaStable">[docs]</a>    <span class="k">def</span> <span class="nf">addNuclearMetaStable</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">isotopeName</span><span class="p">,</span> <span class="n">nuclearLevelName</span><span class="p">,</span> <span class="n">metaStableIndex</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds an alias to the list of aliases with the key &#39;isotopeName_m#&#39; where # is metaStableIndex as an integer, a value </span>
+<span class="sd">        nuclearLevelName and attribute &#39;nuclearMetaStable&#39; with value str( metaStableIndex ).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">try</span> <span class="p">:</span>
+            <span class="n">metaStableIndex</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">metaStableIndex</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;metaStableIndex must be an instance of int or converible to int, it is of type &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span> <span class="n">metaStableIndex</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">nuclearMetaStableName</span><span class="p">(</span> <span class="n">isotopeName</span><span class="p">,</span> <span class="n">metaStableIndex</span> <span class="p">),</span> <span class="n">nuclearLevelName</span><span class="p">,</span> <span class="p">{</span> <span class="s1">&#39;nuclearMetaStable&#39;</span> <span class="p">:</span> <span class="nb">str</span><span class="p">(</span> <span class="n">metaStableIndex</span> <span class="p">)</span> <span class="p">}</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="aliases.getAliasesFor"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.alias.aliases.getAliasesFor">[docs]</a>    <span class="k">def</span> <span class="nf">getAliasesFor</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param value:</span>
+<span class="sd">        :return: list of all aliases that have value &#39;value&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">aliases_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">alias</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">alias</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span> <span class="p">)</span> <span class="o">==</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span> <span class="n">aliases_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">aliases_</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="aliases.toXMLList"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.alias.aliases.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s2">&quot;Returns a type list of XML strings representing self in XML.&quot;</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">]</span>
+<span class="c1"># BRB6 &#39;alias&#39; should not be hardwired. The alias class should have a toXMLList method.</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span> <span class="n">xmlString</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;alias key=&quot;</span><span class="si">%s</span><span class="s1">&quot; </span><span class="si">%s</span><span class="s1">/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">XMLData</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">xmlString</span> <span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="aliases.nuclearMetaStableName"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.alias.aliases.nuclearMetaStableName">[docs]</a>    <span class="k">def</span> <span class="nf">nuclearMetaStableName</span><span class="p">(</span> <span class="n">isotopeName</span><span class="p">,</span> <span class="n">metaStableIndex</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_m</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">isotopeName</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span> <span class="n">metaStableIndex</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<span class="k">if</span><span class="p">(</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">aliases</span><span class="p">(</span> <span class="p">)</span>
+    <span class="n">a</span><span class="p">[</span><span class="s1">&#39;e-&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;e&#39;</span>
+    <span class="n">a</span><span class="p">[</span><span class="s1">&#39;electron&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;e&#39;</span>
+    <span class="n">a</span><span class="p">[</span><span class="s1">&#39;e+&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;e_anti&#39;</span>
+    <span class="n">a</span><span class="p">[</span><span class="s1">&#39;h1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;p&#39;</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">addNuclearMetaStable</span><span class="p">(</span> <span class="s1">&#39;Co58&#39;</span><span class="p">,</span> <span class="s1">&#39;Co58_e1&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">addNuclearMetaStable</span><span class="p">(</span> <span class="s1">&#39;Ag110&#39;</span><span class="p">,</span> <span class="s1">&#39;Ag110_e2&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">addNuclearMetaStable</span><span class="p">(</span> <span class="s1">&#39;Cd115&#39;</span><span class="p">,</span> <span class="s1">&#39;Cd115_e1&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">addNuclearMetaStable</span><span class="p">(</span> <span class="s1">&#39;Te127&#39;</span><span class="p">,</span> <span class="s1">&#39;Te127_e2&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">addNuclearMetaStable</span><span class="p">(</span> <span class="s1">&#39;Te129&#39;</span><span class="p">,</span> <span class="s1">&#39;Te129_e1&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">addNuclearMetaStable</span><span class="p">(</span> <span class="s1">&#39;Pm148&#39;</span><span class="p">,</span> <span class="s1">&#39;Pm148_e2&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">addNuclearMetaStable</span><span class="p">(</span> <span class="s1">&#39;Ho166&#39;</span><span class="p">,</span> <span class="s1">&#39;Ho166_e1&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">addNuclearMetaStable</span><span class="p">(</span> <span class="s1">&#39;Am242&#39;</span><span class="p">,</span> <span class="s1">&#39;Am242_e2&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">addNuclearMetaStable</span><span class="p">(</span> <span class="s1">&#39;Am244&#39;</span><span class="p">,</span> <span class="s1">&#39;Am244_e1&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">addNuclearMetaStable</span><span class="p">(</span> <span class="s1">&#39;Es254&#39;</span><span class="p">,</span> <span class="s1">&#39;Es254_e2&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+    <span class="nb">print</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">a</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="nb">print</span>
+    <span class="nb">print</span> <span class="s1">&#39; ---- aliases for &quot;e&quot; ---- &#39;</span>
+    <span class="nb">print</span> <span class="n">a</span><span class="o">.</span><span class="n">getAliasesFor</span><span class="p">(</span> <span class="s1">&#39;e&#39;</span> <span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

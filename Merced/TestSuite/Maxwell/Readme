@@ -1,0 +1,15 @@
+The data in this subdirectory is for energy probability densities
+for fission neutrons using the Maxwell model.  The input files are
+as follows:
+
+Maxwell-Th233: Use adaptive quadrature as the default.  The output
+  file is out.Maxwell-Th233, and the run time was 0m0.194s.
+
+Maxwell-Th233-Gauss2: Use 2-nd order Gaussian quadrature.  The
+  output file is out.Maxwell-Th233-Gauss2, and the run time was
+  0m0.077s.  Higher-order Gaussian quadrature gave essentially the
+  same answers, and they took a little longer, e.g., 0m0.122s for
+  4-th order Gaussian quadrature.
+
+Maxwell-Th233.fete: The input file derived from running fete on
+  the ENDF data.  The output file is out.Maxwell-Th233.fete.

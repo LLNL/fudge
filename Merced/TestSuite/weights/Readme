@@ -1,0 +1,20 @@
+The files in this subdirectory contain data to test model weights.
+The model weight may be 1/2 for a single neutron in an (n, 2n) reaction.
+Another use of this feature is for multiple interpolation regions.
+In this instance, the model weight would be 1 over a range of incident
+energies and 0 otherwise. 
+
+*** Note that the model weight must be given as a histogram. ***
+
+The test files are:
+
+in.evap-Ar38.half: data for one neutron in an (n, 2n) reaction.  Its
+  output file is out.evap-Ar38.half.
+
+in.lower_in: data with linear-linear interpolation on a range of incident
+  energies.  Its output file is out.lower_in.
+
+in.upper_in: data with linear-log interpolation on a range of incident
+  energies.  Its output file is out.upper_in.
+
+

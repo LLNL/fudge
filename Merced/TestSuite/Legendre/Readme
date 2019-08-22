@@ -1,0 +1,31 @@
+The data in this directory is the traditional I=4 representation
+of energy-angle probability densities as Legendre expansions.
+The get_transfer code gives the user the option of several ways to
+compute the transfer matrix: adaptive quadrature, or Gaussian quadrature 
+of order 2, 4, or 6.  The switch is controlled by having the line:
+Quadrature method: adaptive
+or
+Quadrature method: GaussX, with X = 2, 4, or 6
+in the input file.  This line must appear before the line,
+LEEpPData: n = ??
+
+Versions of the code 278 and earlier also permit the option: 
+Quadrature method: exact.
+This method uses the exact integration as described in the Omega
+manual.
+
+For adaptive quadrature use
+Quadrature method: adaptive
+as in the file in.Legendre-H2.  Its output is out.Legendre-H2.
+
+For Gaussian quadrature use
+Quadrature method: Gauss6
+as in the file in.Legendre-H2.Gauss6.  Its output is out.Legendre-H2.Gauss6.
+
+The code MC_merced uses MonteCarlo quadrature with 100,000 evaluations
+per integral.  For the input file in.Legendre-H2 its output is 
+out.Legendre-H2.MC.
+
+For the exact formula, the input file contains the line,
+Quadrature method: exact
+as in the file Legendre-H2.exact.  Its output is out.Legendre-H2.

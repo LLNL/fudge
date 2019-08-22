@@ -75,17 +75,20 @@ import base as baseModule
 import axes as axesModule
 import uncertainties as uncertaintiesModule
 
+from isclose import isclose
+
 domainEpsilon = 1e-15
 
 class regions( baseModule.xDataFunctional ) :
     """Abstract base class for regions."""
 
     __metaclass__ = abc.ABCMeta
+    ancestryMembers = baseModule.xDataFunctional.ancestryMembers + ( '[regions', )
 
     def __init__( self, axes = None, 
             index = None, valueType = standardsModule.types.float64Token, value = None, label = None ) :
 
-        baseModule.xDataFunctional.__init__( self, self.moniker, self.dimension, axes, index = index, valueType = valueType,
+        baseModule.xDataFunctional.__init__( self, self.moniker, axes, index = index, valueType = valueType,
                 value = value, label = label )
         self.regions = []
 
@@ -93,6 +96,11 @@ class regions( baseModule.xDataFunctional ) :
         """Returns the number of regions in self."""
 
         return( len( self.regions ) )
+
+    @staticmethod
+    @abc.abstractmethod
+    def allowedSubElements( ):
+        pass
 
     def __getitem__( self, index ) :
         """Returns the (i-1)^th region of self."""
@@ -114,17 +122,19 @@ class regions( baseModule.xDataFunctional ) :
             raise TypeError( 'Invalid class for insertion: %s' % region.__class__ )
         n1 = len( self )
         if( not( 0 <= index <= n1 ) ) : raise IndexError( 'Index = %s not in range 0 <= index <= %d' % ( index, n1 ) )
-        region = region.copy( )
         region.setAncestor( self )
+        region.index = index
         if( len( self ) == 0 ) :
             self.regions.append( region )
         else :
             if( index > 0 ) :
-                if( self.regions[index-1].domainMax( ) != region.domainMin( ) ) : raise Exception( "Prior region's domainMax %s != new region's domainMin = %s" \
-                    % ( self.regions[index-1].domainMax( ), region.domainMin( ) ) )
+                if( not( isclose( self.regions[index-1].domainMax, region.domainMin ) ) ) :
+                    raise ValueError( "Prior region's domainMax %s != new region's domainMin = %s" \
+                        % ( self.regions[index-1].domainMax, region.domainMin ) )
             if( index < ( n1 - 1 ) ) :
-                if( self.regions[index+1].domainMin( ) != region.domainMax( ) ) : raise Exception(  "Next region's domainMin %s != new region's domainMax = %s" \
-                    % ( self.regions[index-1].domainMin( ), region.domainMax( ) ) )
+                if( not isclose( self.regions[index+1].domainMin, region.domainMax ) ) :
+                    raise ValueError(  "Next region's domainMin %s != new region's domainMax = %s" \
+                        % ( self.regions[index-1].domainMin, region.domainMax ) )
             if( index == n1 ) :
                 self.regions.append( region )
             else :
@@ -157,21 +167,25 @@ class regions( baseModule.xDataFunctional ) :
             raise TypeError( 'Invalid class for insertion: %s' % region.__class__ )
 
         if( len( self ) > 0 ) :
-            if( region.domainMax( ) != self[0].domainMin( ) ) :
-                raise Exception( "Prepending region's domainMax %s != first region's domainMin = %s" \
-                    % ( region.domainMax( ), self[0].domainMin( ) ) )
-        region = region.copy( )
+            if( not isclose( region.domainMax( ), self[0].domainMin ) ) :
+                raise ValueError( "Prepending region's domainMax %s != first region's domainMin = %s" \
+                    % ( region.domainMax, self[0].domainMin ) )
         region.setAncestor( self )
         self.regions.insert( 0, region )
 
-    def copy( self, index = None, value = None, axes = None ) :
+    def convertUnits( self, unitMap ) :
+
+        factors = self.axes.convertUnits( unitMap )
+        for region in self : region.convertUnits( unitMap )
+        self.fixValuePerUnitChange( factors )
+
+    def copy( self ) :
         # FIXME some of this should probably move to 'returnAsClass' method
 
-        if( index is None ) : index = self.index
-        if( value is None ) : value = self.value
-        if( axes is None ) : axes = self.axes
-        newRegions = self.__class__( axes = axes, index = index,
-                    valueType = self.valueType, value = value, label = self.label )
+        axes = self.axes
+        if( axes is not None ) : axes = axes.copy( )
+        newRegions = self.__class__( axes = axes, index = self.index,
+                    valueType = self.valueType, value = self.value, label = self.label )
         for child in self : newRegions.append( child.copy( ) )
         return( newRegions )
 
@@ -181,7 +195,7 @@ class regions( baseModule.xDataFunctional ) :
         """
 
         for i1, region in enumerate( self ) :
-            domainMin, domainMax = region.domain( )
+            domainMin, domainMax = region.domainMin, region.domainMax
             if( domainMin < domainValue < domainMax ) :
                 r1, r2 = region.splitInTwo( domainValue, epsilon = domainEpsilon )
                 self.regions[i1] = r2
@@ -191,36 +205,77 @@ class regions( baseModule.xDataFunctional ) :
     def domainUnitConversionFactor( self, unitTo ) :
 
         if( unitTo is None ) : return( 1. )
-        return( PQUModule.PQU( '1 ' + self.domainUnit( ) ).getValueAs( unitTo ) )
+        return( PQUModule.PQU( '1 ' + self.domainUnit ).getValueAs( unitTo ) )
 
-    def domainMin( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMin( self ) :
 
-        return( self.regions[0].domainMin( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.regions[0].domainMin )
 
-    def domainMax( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMax( self ) :
 
-        return( self.regions[-1].domainMax( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.regions[-1].domainMax )
 
-    def domain( self, unitTo = None, asPQU = False ) :
-
-        return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
-
+    @property
     def domainUnit( self ) :
 
         return( self.getAxisUnitSafely( self.dimension ) )
 
-    def getValue( self, unitTo ) :
+    def domainSlice( self, domainMin = None, domainMax = None, fill = 1, dullEps = 0. ) :
+        """
+        Returns a new instance with self sliced between ``domainMin`` and ``domainMax``.
+        Result may be a regions container, or it may be XYs, multiD_XYs, etc.
 
-        if( self.value is None ) : return( self.value )
-        return( self.domainUnitConversionFactor( unitTo ) * self.value )
+        :param domainMin:   [optional] the lower x-value of the slice, default is domain minimum of self,
+        :param domainMax:   [optional] the upper x-value of the slice, default is domain maximum of self,
+        :param fill:        [optional] if True, points are added at domainMin and domainMax if they are not in self,
+                                       else only existing points in the range [domainMin, domainMax] are included.
+        :param dullEps:     [optional] (Currently not implemented) the lower and upper points are dulled, default is 0.
+        """
+        if( domainMin is None ) : domainMin = self.domainMin
+        domainMin = max( domainMin, self.domainMin )
+        if( domainMax is None ) : domainMax = self.domainMax
+        domainMax = min( domainMin, self.domainMax )
 
-    def rangeMin( self, unitTo = None, asPQU = False ) :
+        for ridx1, region in enumerate( self ) :
+            if( region.domainMax  > domainMin ) : break
+        for ridx2, region in enumerate( self ) :
+            if( region.domainMax >= domainMax ) : break
 
-        return( min( [ region.rangeMin( unitTo = unitTo, asPQU = asPQU ) for region in self ] ) )
+        if ridx1 == ridx2:  # only one region left after slicing, return as XYs or multiD_XYs
+            return self[ridx1].domainSlice( domainMin=domainMin, domainMax=domainMax, fill=fill, dullEps=dullEps )
+        else:
+            newRegions = self.__class__( axes = self.axes, index=self.index, valueType=self.valueType,
+                value=self.value, label=self.label )
+            newRegions.append( self[ridx1].domainSlice(
+                domainMin=domainMin, domainMax=self[ridx1].domainMax, fill=fill, dullEps=dullEps ) )
+            for idx in range(ridx1+1,ridx2):
+                newRegions.append(self[idx])
+            newRegions.append( self[ridx2].domainSlice(
+                domainMin=self[ridx2].domainMin, domainMax=domainMax, fill=fill, dullEps=dullEps ) )
 
-    def rangeMax( self, unitTo = None, asPQU = False ) :
+            return newRegions
 
-        return( max( [ region.rangeMax( unitTo = unitTo, asPQU = asPQU ) for region in self ] ) )
+    @property
+    def rangeMin( self ) :
+
+        return( min( [ region.rangeMin for region in self ] ) )
+
+    @property
+    def rangeMax( self ) :
+
+        return( max( [ region.rangeMax for region in self ] ) )
+
+    @property
+    def rangeUnit( self ) :
+
+        return( self.getAxisUnitSafely( 0 ) )
+
+    def rangeUnitConversionFactor( self, unitTo ) :
+
+        if( unitTo is None ) : return( 1. )
+        return( PQUModule.PQU( '1 ' + self.rangeUnit ).getValueAs( unitTo ) )
 
     def integrate( self, **limits ):
         """
@@ -297,7 +352,7 @@ class regions( baseModule.xDataFunctional ) :
                     if( subElement.moniker == child.tag ) :
                         subElementClass = subElement
                         break
-                if( subElementClass is None ) : raise Exception( 'unknown sub-element "%s" in element "%s"' % ( child.tag, cls.moniker ) )
+                if( subElementClass is None ) : raise TypeError( 'unknown sub-element "%s" in element "%s"' % ( child.tag, cls.moniker ) )
                 regions.append( subElementClass.parseXMLNode( child, xPath, linkData, axes = axes, **kwargs ) )
 # FIXME, Should set regions.uncertainties in method
         if( uncertainties is not None ) : regions.uncertainties = uncertainties
@@ -316,7 +371,7 @@ class regions1d( regions ) :
         needed so that each has the same number of regions and the region boundaries align.
         """
 
-        if( self.dimension != other.dimension ) : raise Exception( 'self.dimension = %s not equal to other.dimension = %s' % \
+        if( self.dimension != other.dimension ) : raise ValueError( 'self.dimension = %s not equal to other.dimension = %s' % \
                 ( self.dimension, other.dimension ) )
 
         self2 = self.copy( )
@@ -328,27 +383,27 @@ class regions1d( regions ) :
         elif( not( isinstance( other2, regions ) ) ) :
             raise NotImplementedError( 'object of instance "%s" not implemented' % other2.__class__ )
 
-        if(   self2.domainMin( ) < other2.domainMin( ) ) :
+        if(   self2.domainMin < other2.domainMin ) :
             region1 = other2[0].copy( )
-            region1.setData( [ [ self2.domainMin( ), 0 ], [ other2.domainMin( ), 0 ] ] )
+            region1.setData( [ [ self2.domainMin, 0 ], [ other2.domainMin, 0 ] ] )
             other2.prepend( region1 )
-        elif( self2.domainMin( ) > other2.domainMin( ) ) :
+        elif( self2.domainMin > other2.domainMin ) :
             region1 = self2[0].copy( )
-            region1.setData( [ [ other2.domainMin( ), 0 ], [ self2.domainMin( ), 0 ] ] )
+            region1.setData( [ [ other2.domainMin, 0 ], [ self2.domainMin, 0 ] ] )
             self2.prepend( region1 )
 
-        if(   self2.domainMax( ) > other2.domainMax( ) ) :
+        if(   self2.domainMax > other2.domainMax ) :
             region1 = other2[-1].copy( )
-            region1.setData( [ [ other2.domainMax( ), 0 ], [ self2.domainMax( ), 0 ] ] )
+            region1.setData( [ [ other2.domainMax, 0 ], [ self2.domainMax, 0 ] ] )
             other2.append( region1 )
-        elif( self2.domainMax( ) < other2.domainMax( ) ) :
+        elif( self2.domainMax < other2.domainMax ) :
             region1 = self2[-1].copy( )
-            region1.setData( [ [ self2.domainMax( ), 0 ], [ other2.domainMax( ), 0 ] ] )
+            region1.setData( [ [ self2.domainMax, 0 ], [ other2.domainMax, 0 ] ] )
             self2.append( region1 )
 
         boundaries = set( )
-        for region in self2[1:] : boundaries.add( float( region.domainMin( ) ) )
-        for region in other2[1:] : boundaries.add( float( region.domainMin( ) ) )
+        for region in self2[1:] : boundaries.add( region.domainMin )
+        for region in other2[1:] : boundaries.add( region.domainMin )
         boundaries = sorted( boundaries )
 
         count = 0
@@ -360,7 +415,7 @@ class regions1d( regions ) :
                     boundariesToMove.append( [ boundary, priorBoundary ] )
                     boundary = priorBoundary
                     count += 1
-                    if( count > 1 ) : raise Exception( 'more than one boundary within epsilon = %s of %s' % ( epsilon, priorBoundary ) )
+                    if( count > 1 ) : raise ValueError( 'more than one boundary within epsilon = %s of %s' % ( epsilon, priorBoundary ) )
                 else :
                     count = 0
             priorBoundary = boundary
@@ -370,7 +425,7 @@ class regions1d( regions ) :
         def processBoundaries( regions_, boundaries, boundariesToMove ) :
 
             for region in regions_ :
-                domainMin, domainMax = region.domain( )
+                domainMin, domainMax = region.domainMin, region.domainMax
                 for boundary, priorBoundary in boundariesToMove :
                     if(   domainMin == boundary ) :
                         region.tweakDomain( domainMin = priorBoundary, epsilon = epsilon )
@@ -379,7 +434,7 @@ class regions1d( regions ) :
 
             for boundary in boundaries :
                 for region in regions_ :
-                    if( region.domainMin( ) < boundary < region.domainMax( ) ) :
+                    if( region.domainMin < boundary < region.domainMax ) :
                         regions_.splitInTwo( boundary, epsilon = epsilon )
                         break
 
@@ -393,23 +448,29 @@ class regions1d( regions ) :
         """
 
         factor = 1.0 / self.integrate()
-        if( insitu ): copy = self
-        else: copy = self.copy()
+        if( insitu ) :
+            copy = self
+        else :
+            copy = self.copy()
 
-        for region in copy:
-            region *= factor
+        for region in copy : region *= factor
         return( copy )
 
-    def toPointwise_withLinearXYs( self, accuracy, lowerEps, upperEps, removeOverAdjustedPoints = False, axes = None ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
         """
         Converts the regions of self into a single ``XYs.XYs1d`` instance that has 'lin-lin' interpolation. At the
         boundary between two abutting regions, the x-values are the same, which is not allowed for an ``XYs.XYs1d`` instance.
-        The arguments ``lowerEps``, ``upperEps`` are used to smear the x-values at a boundary as follows. Let :math:`(x_l, y_l)` and
+
+        Optional (key-word) arguments:
+        :param accuracy: indicates desired accuracy. Controls how many points are added when switching interpolation
+        :param lowerEps:
+        :param upperEps: These arguments are used to smear the x-values at a boundary as follows. Let :math:`(x_l, y_l)` and
         :math:`(x_u, y_u)` be the abutting points for two abutting regions. If :math:`y_l = y_u` then the point :math:`(x_u, y_u)` is removed.
         Otherwise, if( lowerEps > 0 ) the point :math:`(x_l, y_l)` is moved to :math:`x = x_l * ( 1 - lowerEps )` (or :math:`x = x_l * ( 1 + lowerEps )`
         if :math:`x_l < 0`) and the :math:`y` value is interpolated at :math:`x`. If :math:`x` is less than the x-value of the point below :math:`(x_l, y_l)`
         and ``removeOverAdjustedPoints`` is True then the point :math:`(x_l, y_l)` is removed; otherwise, a raise is executed. Similarly
         for upperEps and the point :math:`(x_u, y_u)`.
+        :param cls: class to return. Defaults to xData.regions.regions1d
         """
 
         def getAdjustedX( x, eps ) :
@@ -422,16 +483,25 @@ class regions1d( regions ) :
                 x_ = x * ( 1. + eps )
             return( x_ )
 
-        if( len( self.regions ) == 0 ) : return( XYsModule.XYs1d( [], axes = self.axes ) )
+        pointwiseClass = self.toLinearXYsClass( )
+        if( len( self.regions ) == 0 ) : return( pointwiseClass( data = [], axes = self.axes ) )
 
-        if( lowerEps < 0. ) : raise Exception( 'lowerEps = %s must >= 0.' % lowerEps )
-        if( upperEps < 0. ) : raise Exception( 'upperEps = %s must >= 0.' % upperEps )
-        if( ( lowerEps == 0. ) and ( upperEps == 0. ) ) : raise Exception( 'lowerEps and upperEps cannot both be 0.' )
+        arguments = self.getArguments( kwargs, { 'accuracy' : XYsModule.defaultAccuracy, 'lowerEps' : 0, 'upperEps' : 0, 
+                'removeOverAdjustedPoints' : False, 'axes' : None } )
+        accuracy = arguments['accuracy']
+        lowerEps = arguments['lowerEps']
+        upperEps = arguments['upperEps']
+        removeOverAdjustedPoints = arguments['removeOverAdjustedPoints']
+        axes = arguments['axes']
 
-        for region in self.regions : accuracy = max( accuracy, region.getAccuracy( ) )
+        if( lowerEps < 0. ) : raise ValueError( 'lowerEps = %s must >= 0.' % lowerEps )
+        if( upperEps < 0. ) : raise ValueError( 'upperEps = %s must >= 0.' % upperEps )
+        if( ( lowerEps == 0. ) and ( upperEps == 0. ) ) : raise ValueError( 'lowerEps and upperEps cannot both be 0.' )
+
         xys = []
         for iRegion, region in enumerate( self.regions ) :
-            _region = region.changeInterpolation( standardsModule.interpolation.linlinToken, accuracy = accuracy, lowerEps = 2 * lowerEps, upperEps = 2 * upperEps )
+            _region = region.changeInterpolation( standardsModule.interpolation.linlinToken, accuracy, 
+                    lowerEps = 2 * lowerEps, upperEps = 2 * upperEps )
             _region = _region.copyDataToXYs( )
             if( iRegion > 0 ) :
                 x12, y12 = xys[-1]
@@ -446,7 +516,7 @@ class regions1d( regions ) :
                             if( removeOverAdjustedPoints ) :
                                 del xys[-1]
                             else :
-                                raise Exception( 'Adjustment at %s makes new x = %s >= prior x = %s; eps = %s' % ( x12, x, x11, lowerEps ) )
+                                raise ValueError( 'Adjustment at %s makes new x = %s >= prior x = %s; eps = %s' % ( x12, x, x11, lowerEps ) )
                         else :
                             xys[-1] = [ x, XYsModule.pointwiseXY_C.interpolatePoint( standardsModule.interpolation.linlinToken, x, x11, y11, x12, y12 ) ]
                     if( upperEps != 0. ) :
@@ -456,12 +526,11 @@ class regions1d( regions ) :
                             if( removeOverAdjustedPoints ) :
                                 del _region[0]
                             else :
-                                raise Exception( 'Adjustment at %s makes new x = %s >= next x = %s; eps = %s' % ( x21, x, x22, upperEps ) )
+                                raise ValueError( 'Adjustment at %s makes new x = %s >= next x = %s; eps = %s' % ( x21, x, x22, upperEps ) )
                         else :
                             _region[0] = [ x, XYsModule.pointwiseXY_C.interpolatePoint( standardsModule.interpolation.linlinToken, x, x21, y21, x22, y22 ) ]
             xys += _region
-        pointwiseClass = self.toLinearXYsClass( )
-        pointwise = pointwiseClass( data = xys, axes = self.axes, accuracy = accuracy, value = self.value ) # FIXME - need more work to insure all parameters are set properly.
+        pointwise = pointwiseClass( data = xys, axes = self.axes, value = self.value ) # FIXME - need more work to insure all parameters are set properly.
         return( pointwise )
 
     def toLinearXYsClass( self ) :

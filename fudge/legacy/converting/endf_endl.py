@@ -61,6 +61,8 @@
 # 
 # <<END-copyright>>
 
+from PoPs import IDs as IDsPoPsModule
+
 from fudge.particles import nuclear
 
 endfMATBases = { 0 :   1,
@@ -127,7 +129,7 @@ class endfMTtoC_ProductList :
         self.residualLevel = residualLevel
         self.reactionLabel = reactionLabel
         self.isFission = isFission
-        self.productCounts = { 'n' : ns, 'H1' : H1s, 'H2' : H2s, 'H3' : H3s, 'He3' : He3s, 'He4' : He4s, 'gamma' : gammas }
+        self.productCounts = { 'n' : ns, 'H1' : H1s, 'H2' : H2s, 'H3' : H3s, 'He3' : He3s, 'He4' : He4s, IDsPoPsModule.photon : gammas }
 
     def __getitem__( self, product ) :
 
@@ -136,7 +138,7 @@ class endfMTtoC_ProductList :
     def __repr__( self ) :
 
         s = ''
-        for p in [ 'n', 'H1', 'H2', 'H3', 'He3', 'He4', 'gamma' ] :
+        for p in [ 'n', 'H1', 'H2', 'H3', 'He3', 'He4', IDsPoPsModule.photon ] :
             if( self.productCounts[p] != 0 ) : s += " %5s = %d:" % ( p, self.productCounts[p] )
         s = "C = %s: isFission = %5s:%s --- %s" % ( self.C, self.isFission != 0, s, self.reactionLabel )
         return( s )
@@ -159,7 +161,7 @@ endfMTtoC_ProductLists = {}
 endfMTtoC_ProductLists[1]   = endfMTtoC_ProductList(  1, "(n,total)" )
 endfMTtoC_ProductLists[2]   = endfMTtoC_ProductList( 10, "(z,elastic)" )
 endfMTtoC_ProductLists[3]   = endfMTtoC_ProductList( 55, "(z,non-elastic)" )
-endfMTtoC_ProductLists[4]   = endfMTtoC_ProductList( 55, "(z,n), redundant", 0, 1, 0, 0, 0, 0, 0, -1 )
+endfMTtoC_ProductLists[4]   = endfMTtoC_ProductList( 11, "(z,n)", 0, 1, 0, 0, 0, 0, 0, -1 )
 endfMTtoC_ProductLists[5]   = endfMTtoC_ProductList(  5, "(z,anything)" )
 endfMTtoC_ProductLists[10]  = endfMTtoC_ProductList( -1, "(z,continuum)" )
 endfMTtoC_ProductLists[11]  = endfMTtoC_ProductList( 32, "(n,2nd)", 0, 2, 0, 1, 0, 0, 0, 0 )
@@ -531,13 +533,15 @@ class ENDLCS_To_ENDFMT :
         return( MT )
 
 def ENDF_MTZAEquation( projectileZA, targetZA, MT ) :
-    """This function returns a python list of length 2. The first element is a list of all outgoing particle ZA's
-    (include the residual) for the reaction of projectileZA + targetZA with ENDF's reaction identifier MT. 
+    """
+    This function returns a python list of length 2. The first element is a list of all outgoing particle ZA's
+    (including the residual) for the reaction of projectileZA + targetZA with ENDF's reaction identifier MT. 
     The second element is a reaction equation for this projectileZA, targetZA and MT. For example
     ENDF_MTZAEquation( 1, 95242, 22 ) returns
         ([1, 2004, 93238], 'n + Am242 -> n + He4 + Np238')
     That is, for a neutron ( projectileZA = 1 ) hitting Am242 ( targetZA = 95242 ) with MT = 22 - ENDF (z,na) reaction - 
-    the outgoing particle ZA's are [1, 2004, 93238] and the reaction equation is 'n + Am242 -> n + He4 + Np238'."""
+    the outgoing particle ZA's are [1, 2004, 93238] and the reaction equation is 'n + Am242 -> n + He4 + Np238'.
+    """
 
     if( ( MT < 0 ) or ( MT > 999 ) or ( MT in [ 1, 3, 5, 10, 18, 19, 20, 21, 27, 38, 101, 151 ] or ( 200 < MT < 600 ) or ( 850 < MT < 875 ) ) ) :
         raise Exception( 'MT = %s is no supported' % MT )
@@ -555,7 +559,7 @@ def ENDF_MTZAEquation( projectileZA, targetZA, MT ) :
     productCountList = []
     adder, equationZA, equation = '', [], '%s + %s ->' % ( nuclear.nucleusNameFromZA( projectileZA ), nuclear.nucleusNameFromZA( targetZA ) )
     for product in productCounts :
-        if( product == 'gamma' ) :
+        if( product == IDsPoPsModule.photon ) :
             productZA = 0
         else :
             productZA = nuclear.getZ_A_suffix_andZAFromName( product )[-1]

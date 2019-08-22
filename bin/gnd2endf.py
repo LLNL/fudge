@@ -66,11 +66,28 @@
 # This script takes a gnd/XML file, reads it in and rewrites it to a file as an ENDF6 file
 # (in the currently directory) with the extension '.endf' added.
 
-import sys, os
+import os
+import argparse
 from fudge.gnd import reactionSuite
+from fudge.gnd.covariances import covarianceSuite
 import site_packages.legacy.toENDF6.toENDF6
 
-for gndFile in sys.argv[1:] :
-    gnd = reactionSuite.readXML( gndFile )
-    with open( os.path.basename( gndFile ) + '.endf', 'w' ) as fout:
-        fout.write( gnd.toENDF6( 'eval', { 'verbosity' : 0 } ) )
+parser = argparse.ArgumentParser("""Translate one or more GND files to ENDF-6.
+Sample use: python gnd2endf.py n-001_H_001.xml n-001_H_002.xml ...
+If file n-001_H_001-cov.xml exists, covariances will automatically be read from it.""")
+parser.add_argument('-l','--lineNumbers', action='store_true', help='Add line numbers')
+parser.add_argument('gnds',nargs="+",help="GND file(s) to translate")
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+
+    for gndFile in args.gnds:
+        gnd = reactionSuite.readXML( gndFile )
+        gndCov = None
+        for extension in ('-cov.xml','-covar.xml'):
+            tmp = gndFile.replace('.xml', extension)
+            if os.path.exists(tmp):
+                gndCov = covarianceSuite.readXML(tmp, reactionSuite=gnd)
+        with open( os.path.basename( gndFile ) + '.endf', 'w' ) as fout:
+            fout.write( gnd.toENDF6( 'eval', flags = { 'verbosity' : 0 }, covarianceSuite=gndCov,
+                lineNumbers = args.lineNumbers ) )

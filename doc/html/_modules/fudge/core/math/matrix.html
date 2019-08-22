@@ -1,0 +1,312 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.core.math.matrix &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.core.math.matrix</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">from</span> <span class="nn">xData.ancestry</span> <span class="k">import</span> <span class="n">ancestry</span>
+
+<span class="n">matrixToken</span> <span class="o">=</span> <span class="s1">&#39;matrix&#39;</span>
+<span class="n">diagonalFormToken</span> <span class="o">=</span> <span class="s1">&#39;diagonal&#39;</span>
+<span class="n">symmetricFormToken</span> <span class="o">=</span> <span class="s1">&#39;symmetric&#39;</span>
+<span class="n">sparse_symmetricFormToken</span> <span class="o">=</span> <span class="s1">&#39;sparse_symmetric&#39;</span>
+<span class="n">asymmetricFormToken</span> <span class="o">=</span> <span class="s1">&#39;asymmetric&#39;</span>
+<span class="n">sparseFormToken</span> <span class="o">=</span> <span class="s1">&#39;sparse_asymmetric&#39;</span>
+
+<div class="viewcode-block" id="matrix"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.matrix.matrix">[docs]</a><span class="k">class</span> <span class="nc">matrix</span><span class="p">(</span> <span class="n">ancestry</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for storing a matrix or two-dimensional array.</span>
+<span class="sd">    This class supports diagonal, symmetric, asymmetric, and sparse matrices.</span>
+<span class="sd">    Matrix data is stored as a list of lists, which is easily converted into a numpy array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="n">matrixToken</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        @data: list-of-lists containing matrix data</span>
+<span class="sd">        @form: diagonal, symmetric, sparse, etc</span>
+<span class="sd">        @precision: number of digits when printing. Necessary only if &#39;pretty&#39; matrix output is desired.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ancestry</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">=</span> <span class="n">form</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">precision</span> <span class="o">=</span> <span class="n">precision</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nrows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ncols</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">form</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">precision</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">matrix</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span> <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Can&#39;t add together matrices with different form/precision&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="matrix.check"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.matrix.matrix.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span> 
+        <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        Run some simple checks on covariance matrices: </span>
+<span class="sd">            * look for negative eigenvals,</span>
+<span class="sd">            * check ratio of smallest/largest eigenvals </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">fudge.gnd</span> <span class="k">import</span> <span class="n">warning</span>
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="ow">in</span> <span class="p">(</span><span class="n">symmetricFormToken</span><span class="p">,</span> <span class="n">diagonalFormToken</span><span class="p">,</span> <span class="n">sparse_symmetricFormToken</span><span class="p">):</span>
+            <span class="kn">import</span> <span class="nn">numpy</span>
+            <span class="n">A</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span>
+            <span class="c1"># Check that the matrix is positive definite</span>
+            <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span> <span class="n">A</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;negativeEigenTolerance&#39;</span><span class="p">]:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">negativeEigenvalues</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">vals</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">min</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="bp">self</span> <span class="p">))</span>
+            <span class="n">minpos</span><span class="p">,</span> <span class="n">maxpos</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">vals</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">]),</span><span class="nb">max</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">vals</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">])</span>
+            <span class="c1"># Check that the condition number of the matrix is reasonable</span>
+            <span class="k">if</span> <span class="n">minpos</span><span class="o">/</span><span class="n">maxpos</span> <span class="o">&lt;</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;eigenvalueRatioTolerance&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">A</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span> 
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">badEigenvalueRatio</span><span class="p">(</span> <span class="n">minpos</span><span class="o">/</span><span class="n">maxpos</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="matrix.fix"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.matrix.matrix.fix">[docs]</a>    <span class="k">def</span> <span class="nf">fix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fix common eigenvalue problems: </span>
+<span class="sd">            * negative eigenvals,</span>
+<span class="sd">            * bad ratio of smallest/largest eigenvals </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="ow">in</span> <span class="p">(</span><span class="n">symmetricFormToken</span><span class="p">,</span><span class="n">diagonalFormToken</span><span class="p">,</span><span class="n">sparse_symmetricFormToken</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;removeSmallEVs&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;removeNegativeEVs&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">numpy</span>
+            <span class="n">A</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span>
+            <span class="c1"># Decompose A for later fixing</span>
+            <span class="n">e</span><span class="p">,</span> <span class="n">O</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span> <span class="n">A</span> <span class="p">)</span> <span class="c1"># stronger and more general than eigh</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="p">[</span> <span class="n">O</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">]</span> <span class="c1"># the eigenvectors are the columns of the orthogonal matrix O</span>
+            <span class="n">B</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span> <span class="n">A</span> <span class="p">)</span>
+            <span class="n">minval</span><span class="p">,</span> <span class="n">maxval</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="n">e</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="n">e</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># min and max eigenvalues</span>
+            <span class="n">ratio</span> <span class="o">=</span> <span class="n">minval</span><span class="o">/</span><span class="n">maxval</span>
+            <span class="n">evTol</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;eigenvalueRatioTolerance&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">maxval</span><span class="p">,</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;eigenvalueAbsoluteTolerance&#39;</span><span class="p">]</span> <span class="p">)</span>
+            <span class="c1"># Now construct B using the good eigenspaces of A</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">):</span>
+                <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="p">(</span> <span class="nb">abs</span><span class="p">(</span> <span class="n">e</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="nb">max</span><span class="p">(</span> <span class="n">evTol</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;negativeEigenTolerance&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">):</span> <span class="c1">#BAD BAD BAD    </span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;WARNING: very bad bad bad eigenvalue = </span><span class="si">%e</span><span class="s2">  for MF/MT=</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;rowENDF_MFMT&#39;</span><span class="p">]))</span>
+                    <span class="k">if</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;removeSmallEVs&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span> <span class="n">e</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span> <span class="o">&lt;</span> <span class="n">evTol</span><span class="p">:</span> <span class="k">continue</span>
+                    <span class="k">if</span> <span class="n">kw</span><span class="p">[</span><span class="s1">&#39;removeNegativeEVs&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">e</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="p">:</span> <span class="k">continue</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">B</span> <span class="o">+=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span> <span class="n">e</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">T</span> <span class="p">)</span>
+                <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="nb">print</span> <span class="n">B</span><span class="p">,</span> <span class="n">e</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="k">raise</span> <span class="n">err</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">B</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">warnings</span></div>
+        
+<div class="viewcode-block" id="matrix.plot"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.matrix.matrix.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">mat</span>
+        <span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="k">import</span> <span class="n">matshow</span><span class="p">,</span> <span class="n">show</span>
+        <span class="n">matshow</span><span class="p">(</span> <span class="n">mat</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="matrix.toXMLList"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.matrix.matrix.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%%</span><span class="s1"> -.</span><span class="si">%d</span><span class="s1">e&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="p">)</span>
+
+        <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span><span class="n">indent</span><span class="o">+</span><span class="s1">&#39;&lt;matrix rows=&quot;</span><span class="si">%s</span><span class="s1">&quot; columns=&quot;</span><span class="si">%s</span><span class="s1">&quot; form=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> 
+                <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nrows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncols</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">)]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span> <span class="p">)</span> <span class="p">:</span> <span class="n">xmlString</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39; precision=&quot;</span><span class="si">%d</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision</span>
+        <span class="n">xmlString</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&gt;&#39;</span>
+        
+        <span class="c1"># for some matrix forms we can save lots of space on xml output:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">==</span> <span class="n">diagonalFormToken</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nrows</span><span class="p">):</span>
+                <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">format</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">row</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">==</span> <span class="n">symmetricFormToken</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nrows</span><span class="p">):</span>
+                <span class="n">nCols</span> <span class="o">=</span> <span class="n">row</span><span class="o">+</span><span class="mi">1</span>
+                <span class="n">template</span> <span class="o">=</span> <span class="n">indent</span><span class="o">+</span><span class="s1">&#39;  &#39;</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">format</span><span class="p">]</span><span class="o">*</span><span class="n">nCols</span><span class="p">)</span>
+                <span class="n">xmlString</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">template</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">row</span><span class="p">][:</span><span class="n">nCols</span><span class="p">])</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">==</span> <span class="n">asymmetricFormToken</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+                <span class="n">template</span> <span class="o">=</span> <span class="n">indent</span><span class="o">+</span><span class="s1">&#39;  &#39;</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">format</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+                <span class="n">xmlString</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">template</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="ow">in</span> <span class="p">(</span><span class="n">sparse_symmetricFormToken</span><span class="p">,</span> <span class="n">sparseFormToken</span><span class="p">):</span>
+            <span class="c1"># sparse matrices: give non-zero elements by listing</span>
+            <span class="c1">#  row column length ...data...</span>
+            <span class="c1"># For example, a diagonal 2x2 matrix would be:</span>
+            <span class="c1">#</span>
+            <span class="c1"># &lt;matrix rows=&quot;2&quot; columns=&quot;2&quot; form=&quot;sparse_symmetric&quot;&gt;</span>
+            <span class="c1">#   0 0 1 0.234</span>
+            <span class="c1">#   1 1 1 0.173</span>
+            <span class="c1"># &lt;/matrix&gt;</span>
+
+            <span class="c1"># the buffer (buf) determines maximum distance between non-zero elements</span>
+            <span class="c1"># before a new index must be given</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="mi">6</span>
+            <span class="n">rows</span><span class="p">,</span><span class="n">cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nrows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncols</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+                <span class="n">rowString</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span> <span class="o">==</span> <span class="n">sparse_symmetricFormToken</span><span class="p">:</span> <span class="n">end</span> <span class="o">=</span> <span class="n">row</span><span class="o">+</span><span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span> <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncols</span>
+                <span class="n">dat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">row</span><span class="p">][:</span><span class="n">end</span><span class="p">]</span>
+                <span class="n">col</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+                <span class="k">while</span> <span class="n">col</span><span class="o">&lt;</span><span class="n">end</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">dat</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+                        <span class="n">stop</span> <span class="o">=</span> <span class="n">col</span><span class="o">+</span><span class="mi">1</span>
+                        <span class="k">while</span> <span class="n">stop</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">dat</span><span class="p">[</span><span class="n">stop</span><span class="p">]</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span> <span class="n">stop</span> <span class="o">+=</span> <span class="mi">1</span>
+                            <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">stop</span><span class="p">:</span><span class="n">stop</span><span class="o">+</span><span class="n">buf</span><span class="p">]):</span>
+                                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">buf</span><span class="p">):</span>
+                                    <span class="k">if</span> <span class="n">stop</span><span class="o">+</span><span class="n">i</span><span class="o">&lt;</span><span class="n">end</span> <span class="ow">and</span> <span class="n">dat</span><span class="p">[</span><span class="n">stop</span><span class="o">+</span><span class="n">i</span><span class="p">]</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span> <span class="n">stop</span> <span class="o">+=</span> <span class="n">i</span>
+                            <span class="k">else</span><span class="p">:</span> <span class="k">break</span>
+                        <span class="n">template</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">format</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">stop</span><span class="o">-</span><span class="n">col</span><span class="p">))</span>
+                        <span class="n">rowString</span> <span class="o">+=</span> <span class="s1">&#39;  </span><span class="si">%i</span><span class="s1"> </span><span class="si">%i</span><span class="s1"> </span><span class="si">%i</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="n">col</span><span class="p">,</span><span class="n">stop</span><span class="o">-</span><span class="n">col</span><span class="p">)</span> <span class="o">+</span> <span class="n">template</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dat</span><span class="p">[</span><span class="n">col</span><span class="p">:</span><span class="n">stop</span><span class="p">])</span>
+                        <span class="n">col</span> <span class="o">=</span> <span class="n">stop</span>
+                    <span class="n">col</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">rowString</span><span class="p">:</span>
+                    <span class="n">xmlString</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indent</span><span class="o">+</span><span class="n">rowString</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Don&#39;t know how to write matrix of form </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">)</span>
+        <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/matrix&gt;&#39;</span>
+        <span class="k">return</span> <span class="n">xmlString</span></div></div>
+
+<div class="viewcode-block" id="parseXMLNode"><a class="viewcode-back" href="../../../../fudge/fudge.core.math.html#fudge.core.math.matrix.parseXMLNode">[docs]</a><span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">mat</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+
+    <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">mat</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">numpy</span>
+    <span class="k">if</span> <span class="n">mat</span><span class="o">.</span><span class="n">text</span><span class="p">:</span> <span class="n">matrixDat</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">mat</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span> <span class="n">matrixDat</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">nRows</span><span class="p">,</span> <span class="n">nCols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">mat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rows&#39;</span><span class="p">)</span> <span class="p">),</span> <span class="nb">int</span><span class="p">(</span> <span class="n">mat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;columns&#39;</span><span class="p">)</span> <span class="p">)</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;form&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">form</span><span class="o">==</span><span class="n">diagonalFormToken</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrixDat</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nRows</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Wrong number of elements for diagonal matrix!&quot;</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span> <span class="n">nRows</span> <span class="p">)</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span> <span class="n">matrixDat</span> <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">form</span><span class="o">==</span><span class="n">symmetricFormToken</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrixDat</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nRows</span> <span class="o">*</span> <span class="p">(</span><span class="n">nCols</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Wrong number of elements for symmetric matrix!&quot;</span><span class="p">)</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nRows</span><span class="p">,</span><span class="n">nCols</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nRows</span><span class="p">):</span>
+            <span class="n">tmp</span><span class="p">[</span><span class="n">i</span><span class="p">,:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrixDat</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">start</span><span class="o">+</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">tmp</span><span class="p">[:</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrixDat</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">start</span><span class="o">+</span><span class="n">i</span><span class="p">]</span>    <span class="c1"># upper-diagonal portion</span>
+            <span class="n">start</span> <span class="o">+=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">form</span><span class="o">==</span><span class="n">asymmetricFormToken</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrixDat</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nRows</span> <span class="o">*</span> <span class="n">nCols</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Wrong number of elements in matrix!&quot;</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">matrixDat</span><span class="p">[</span><span class="n">j</span><span class="o">*</span><span class="n">nCols</span><span class="p">:(</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">nCols</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nRows</span><span class="p">)])</span>
+    <span class="k">elif</span> <span class="n">form</span> <span class="ow">in</span> <span class="p">(</span><span class="n">sparseFormToken</span><span class="p">,</span> <span class="n">sparse_symmetricFormToken</span><span class="p">):</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nRows</span><span class="p">,</span><span class="n">nCols</span><span class="p">))</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">idx</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">matrixDat</span><span class="p">):</span>
+            <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">matrixDat</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">idx</span><span class="o">+</span><span class="mi">3</span><span class="p">])</span>
+            <span class="n">tmp</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">:</span><span class="n">col</span><span class="o">+</span><span class="n">length</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrixDat</span><span class="p">[</span><span class="n">idx</span><span class="o">+</span><span class="mi">3</span><span class="p">:</span> <span class="n">idx</span><span class="o">+</span><span class="mi">3</span><span class="o">+</span><span class="n">length</span><span class="p">]</span>
+            <span class="n">idx</span> <span class="o">+=</span> <span class="mi">3</span><span class="o">+</span><span class="n">length</span>
+        <span class="k">if</span> <span class="n">form</span> <span class="o">==</span> <span class="n">sparse_symmetricFormToken</span><span class="p">:</span>
+            <span class="c1"># symmetrize</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span> <span class="o">+</span> <span class="n">tmp</span><span class="o">.</span><span class="n">T</span> <span class="o">-</span> <span class="n">numpy</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span> <span class="n">tmp</span><span class="o">.</span><span class="n">diagonal</span><span class="p">()</span> <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Don&#39;t know how to read matrix of form </span><span class="si">%s</span><span class="s2">!&quot;</span> <span class="o">%</span> <span class="n">form</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;precision&#39;</span> <span class="ow">in</span> <span class="n">mat</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">precision</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;precision&quot;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">precision</span><span class="o">=</span><span class="kc">None</span>
+
+    <span class="n">matrix_</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">(</span> <span class="n">tmp</span><span class="p">,</span> <span class="n">form</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span> <span class="p">)</span>
+    <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">matrix_</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

@@ -374,7 +374,7 @@ class TestReadC4Point( unittest.TestCase ):
     def setUp( self ): 
         self.a = C4Point( projectile=1, target=40092, targetMetastableState=None, MF=3, MT=1, productMetastableState=None, status='A', cmFlag=None, energy=504400.0, dEnergy=4961.493, data=8.146000, dData=0.404200, cosMuOrLegendreOrder=None, dCosMuOrLegendreOrder=None, eLevelOrHalflife=None, dELevelOrHalflife=None, idOf78=None, reference='L.GREEN,ET.AL. (73)', exforEntry='10225', exforSubEntry=20, multiDimFlag=None )
     def test_a( self ): 
-        txt = '    1 40092   3   1 A  504400.0 4961.493 8.146000 0.404200                                       L.GREEN,ET.AL. (73)      10225 20 '
+        txt = '    1 40092   3   1 A 504400   4961.493 8.146    0.4042                                          L.GREEN,ET.AL. (73)      10225 20 '
         b = readC4Point( txt ) 
         self.assertEqual( self.a, b )
         c = writeC4Point( b )

@@ -62,13 +62,13 @@
 # <<END-copyright>>
 
 SHELL = /bin/ksh
-CFLAGS = -g -O2
-local_CFLAGS = $(CFLAGS) $(STATUSMESSAGEREPORTING_CFLAGS)
+CXXFLAGS = -g -O0
+local_CXXFLAGS = $(CXXFLAGS) $(STATUSMESSAGEREPORTING_CXXFLAGS)
 
 .PHONY: clean realclean
 
 statusMessageReporting.o: statusMessageReporting.c statusMessageReporting.h
-	$(CC) $(local_CFLAGS) -I. -c -o statusMessageReporting.o statusMessageReporting.c
+	$(CXX) $(local_CXXFLAGS) -I. -c -o statusMessageReporting.o statusMessageReporting.c
 
 clean:
 	rm -rf *.o

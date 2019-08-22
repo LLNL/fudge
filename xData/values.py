@@ -61,18 +61,13 @@
 # 
 # <<END-copyright>>
 
-import base as baseModule
-
 __metaclass__ = type
 
-try :
-    from numericalFunctions import pointwiseXY_C as pointwiseXY_CModule
-    floatToShortestString = pointwiseXY_CModule.floatToShortestString
-except :
-    from pqu import PQU as PQUModule
-    floatToShortestString = PQUModule.floatToShortestString
-
+from . import base as baseModule
 from . import standards as standardsModule
+
+from numericalFunctions import pointwiseXY_C as pointwiseXY_CModule
+floatToShortestString = pointwiseXY_CModule.floatToShortestString
 
 class values( baseModule.xDataCoreMembers )  :
 
@@ -111,13 +106,18 @@ class values( baseModule.xDataCoreMembers )  :
 
         return( self.__values[index] )
 
-    def copy( self, untrimZeros = False, label = None ) :
+    def copy( self, untrimZeros = False ) :
 
-        if( label is None ) : label = self.label
+        import copy
+        start = self.start
+        size = self.size
+        _values = copy.copy( self.__values )
         if( ( untrimZeros ) and ( ( self.start != 0 ) or ( self.end != self.size ) ) ) :
-            return( values( self.start * [ 0 ] + self.__values + ( self.size - self.end ) * [ 0 ], self.valueType, sep = self.__sep, label = label ) )
-        else :
-            return( values( self.__values, self.valueType, sep = self.sep, start = self.start, size = self.size, label = label ) )
+            start = 0
+            size = None
+            _values = self.start * [ 0 ] + self.__values + ( self.size - self.end ) * [ 0 ]
+        return( values( _values, self.valueType, sep = self.__sep, start = start, size = size, 
+                label = self.label ) )
 
     __copy__ = copy
     __deepcopy__ = __copy__
@@ -157,12 +157,20 @@ class values( baseModule.xDataCoreMembers )  :
         else :
             checker = int
 
+        length = len( _values )
+        self.__size = self.__start + length
+
         self.__values = [ checker( value ) for value in _values ]
 
     @property
     def valueType( self ) :
 
         return( self.__valueType )
+
+
+    def offsetScaleValues( self, offset, scale ) :
+
+        for i1, value in enumerate(self.__values) : self.__values[i1] = value * scale + offset
 
     def toString( self ) :
 
@@ -174,6 +182,10 @@ class values( baseModule.xDataCoreMembers )  :
         return( '\n'.join( self.toXMLList( indent, **kwargs ) ) )
 
     def toXMLList( self, indent = '', **kwargs ) :
+
+        def intValueFormatter( value, significantDigits = 0 ) :     # Ignores significantDigits.
+
+            return( str( value ) )
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
         valuesPerLine = kwargs.get( 'valuesPerLine', 100 )
@@ -197,6 +209,7 @@ class values( baseModule.xDataCoreMembers )  :
             attributeStr += ' sep = "%s"' % sep
             sep += ' '
         if( self.valueType != standardsModule.types.float64Token ) : attributeStr += ' valueType="%s"' % self.valueType
+        if( self.valueType == standardsModule.types.integer32Token ) : valueFormatter = intValueFormatter
         attributeStr += baseModule.xDataCoreMembers.attributesToXMLAttributeStr( self )
         XMLList = [ '%s<%s length="%d"%s>' % ( indent, self.moniker, len( self.__values ), attributeStr ) ]
         if( outline ) :                     # Logic above guarantees more than 14 elements in self.
@@ -235,12 +248,16 @@ class values( baseModule.xDataCoreMembers )  :
             attrs[key] = attributes[key]( item )
 
         if( element.text is None ) : element.text = ''
+        if attrs['valueType'] == standardsModule.types.integer32Token:
+            if attrs['sep'].isspace(): values1 = map(int, element.text.split())
+            else: values1 = map(int, element.text.split(attrs['sep']))
+        else:
 # BRB: Need to check extraCharacters
-        values1, extraCharacters = listOfDoubles_C.createFromString( element.text, sep = attrs['sep'] )
+            values1, extraCharacters = listOfDoubles_C.createFromString( element.text, sep = attrs['sep'] )
+            values1 = [ value for value in values1 ]
+
         length = attrs.pop( 'length', len( values1 ) )
         if( length != len( values1 ) ) : raise Exception( 'length = %d != len( values1 ) = %d' % ( length, len( values1 ) ) )
-
-        values1 = [ value for value in values1 ]
 
         return( values( values1, **attrs ) )
 

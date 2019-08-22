@@ -1,0 +1,961 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>numericalFunctions Package &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="External Packages used in Fudge" href="../externals.html" />
+    <link rel="prev" title="fudge.vis.matplotlib package" href="fudge.vis.matplotlib.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../externals.html" title="External Packages used in Fudge"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fudge.vis.matplotlib.html" title="fudge.vis.matplotlib package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">fudge Package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="numericalfunctions-package">
+<h1>numericalFunctions Package<a class="headerlink" href="#numericalfunctions-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="specialfunctions-module">
+<h2><code class="xref py py-mod docutils literal"><span class="pre">specialFunctions</span></code> Module<a class="headerlink" href="#specialfunctions-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="legendre-module">
+<h2><code class="xref py py-mod docutils literal"><span class="pre">Legendre</span></code> Module<a class="headerlink" href="#legendre-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-numericalFunctions.lib.pointwiseXY_C">
+<span id="pointwisexy-c-module"></span><h2><code class="xref py py-mod docutils literal"><span class="pre">pointwiseXY_C</span></code> Module<a class="headerlink" href="#module-numericalFunctions.lib.pointwiseXY_C" title="Permalink to this headline">¶</a></h2>
+<p>A module that contains the class pointwiseXY_C.</p>
+<dl class="function">
+<dt id="numericalFunctions.lib.pointwiseXY_C.basicGaussian">
+<code class="descclassname">numericalFunctions.lib.pointwiseXY_C.</code><code class="descname">basicGaussian</code><span class="sig-paren">(</span><em>accuracy</em><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.basicGaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new pointwiseXY_C instance constructed from the following equation</p>
+<blockquote>
+<div>exp( ( x^2 / 2 )</div></blockquote>
+<dl class="docutils">
+<dt>Arguments are:</dt>
+<dd>accuracy        the accuracy of linear interpolation.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="numericalFunctions.lib.pointwiseXY_C.createFromFunction">
+<code class="descclassname">numericalFunctions.lib.pointwiseXY_C.</code><code class="descname">createFromFunction</code><span class="sig-paren">(</span><em>xs</em>, <em>f</em>, <em>parameters</em>, <em>accuracy</em>, <em>biSectionMax</em>, <em>checkForRoots = False</em>, <em>infill = True</em>, <em>saveDivide = True</em><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.createFromFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a pointwiseXY_C instance which represents the function f(x) where f is the second argument and must be a
+function reference. The function f must take two arguments. The first arugment to f is x and the second is the third
+argument to createFromFunction. The function f must return, as a float, the y-value at x. The returned pointwiseXY_C
+instance may contain more points then xs (the first argument) as createFromFunction does infilling. That is, points
+are added recursively between the points in xs until accuracy or biSectionMax is reached.</p>
+<dl class="docutils">
+<dt>Arguments are: ([o] implies optional argument)</dt>
+<dd><p class="first">xs            An ascending list of x-values to use as an initial guess for the refinement of the returned pointwiseXY_C instance.
+f             A function that returns the y-value given an x-value.
+parameters    Any python object which may be needed by f. Passed as the second argument to f.
+accuracy      The accuracy for infilling.
+biSectionMax  The maximum number of bi-sections for infilling.
+checkForRoots [o] If true, and biSectionMax &gt; 0, an additional point is added whenever two consecutive points cross the y-axis</p>
+<blockquote>
+<div>at (or close to) the root (i.e., the y crossing point) (default is False).</div></blockquote>
+<p class="last">infill        [o] Infill value used for the returned pointwiseXY_C instance (default is True).
+safeDivide    [o] SafeDivide value used for the returned pointwiseXY_C instance (default is True).</p>
+</dd>
+</dl>
+<p>Example: Return a pointwise representation of &#8216;x * sin( x**2 )&#8217; in the domain [1, 10].</p>
+<p>import math
+import pointwiseXY_C
+def f( x, args ) :</p>
+<blockquote>
+<div>return( x * math.sin( x * x ) )</div></blockquote>
+<p>xSin_xx = pointwiseXY_C.createFromFunction( ( 1, 10 ), f, None, 1e-3, 12 )</p>
+<p># A better solution may be to input the known zeros of f and force them to be 0., as</p>
+<p>xs = [ 1 ] + [ math.sqrt( i * math.pi ) for i in xrange( 1, int( math.sqrt( 100 / math.pi ) ) ) ] + [ 10 ]
+xSin_xx = pointwiseXY_C.createFromFunction( xs, f, None, 1e-3, 12, checkForRoots = True )</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="numericalFunctions.lib.pointwiseXY_C.createFromString">
+<code class="descclassname">numericalFunctions.lib.pointwiseXY_C.</code><code class="descname">createFromString</code><span class="sig-paren">(</span><em>str</em>, <em>accuracy</em>, <em>biSectionMax</em>, <em>interpolation = 'lin-lin'</em>, <em>infill = True</em>, <em>safeDivide = True</em><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.createFromString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a tuple of two elements. The first element is a pointwiseXY_C instance representing the float values
+translated from &#8216;str&#8217;. The second element is the portion of &#8216;str&#8217; not translated</p>
+<dl class="docutils">
+<dt>Arguments are: ([o] implies optional argument)</dt>
+<dd>str           The containing a list of floats to be converted.
+accuracy      The accuracy for infilling.
+biSectionMax  The maximum number of bi-sections for infilling.
+interpolation [o] the interpolation string (default is &#8216;lin-lin&#8217;).
+infill        [o] Infill value used for the returned pointwiseXY_C instance (default is True).
+safeDivide    [o] SafeDivide value used for the returned pointwiseXY_C instance (default is True).</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="numericalFunctions.lib.pointwiseXY_C.defaultAccuracy">
+<code class="descclassname">numericalFunctions.lib.pointwiseXY_C.</code><code class="descname">defaultAccuracy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.defaultAccuracy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the default accuracy for the __init_ method.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="numericalFunctions.lib.pointwiseXY_C.floatToShortestString">
+<code class="descclassname">numericalFunctions.lib.pointwiseXY_C.</code><code class="descname">floatToShortestString</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.floatToShortestString" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>floatToShortestString( value, significantDigits = 15, trimZeros = True, keepPeriod = False,</dt>
+<dd>favorEFormBy = 0, includeSign = False )</dd>
+</dl>
+<p>Returns the float converted to either the E-form (i.e., &#8216;%e&#8217;) and F-form (i.e., &#8216;%f&#8217;) with significantDigits.
+The form with the shortest string representation of the float value is returned.</p>
+<dl class="docutils">
+<dt>Arguments are:</dt>
+<dd><p class="first">value               the float value to convert to a string,
+significantDigits   The number of significant digits desired. Restricted to the range 0 to 24 inclusive,
+trimZeros           If True, unneeded zeros to the right of &#8216;.&#8217; are removed,
+keepPeriod          If False, &#8216;.&#8217; is removed if there is no digit to its right,
+favorEFormBy        The integer subtracted from the length of the E-form before the form</p>
+<blockquote>
+<div>with the shortest representation is determined,</div></blockquote>
+<dl class="last docutils">
+<dt>includeSign         If True, the returned string will always start with a sign character</dt>
+<dd>(i.e., &#8216;+&#8217; or &#8216;-&#8216;). Otherwise, only negative values will have a sign.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="numericalFunctions.lib.pointwiseXY_C.gaussian">
+<code class="descclassname">numericalFunctions.lib.pointwiseXY_C.</code><code class="descname">gaussian</code><span class="sig-paren">(</span><em>accuracy</em>, <em>domainMin</em>, <em>domainMax</em>, <em>offset = 0.</em>, <em>sigma = 1.</em>, <em>amplitude = 1.</em>, <em>dullEps = False</em><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new pointwiseXY_C instance constructed from the following equation</p>
+<blockquote>
+<div>amplitude * exp( ( ( x - offset ) / sigma )^2 / 2 )        for domainMin &lt;= x &lt;= domainMax</div></blockquote>
+<dl class="docutils">
+<dt>Arguments are:  ([o] implies optional argument)</dt>
+<dd>accuracy        the accuracy of linear interpolation,
+domainMin            the lower x point generated,
+domainMax            the upper x point generated,
+offset     [o]  the x offset of the center of the Gaussian,
+sigma      [o]  width of the Gaussian,
+amplitude  [o]  the Gaussian&#8217;s amplitude,
+dullEps    [o]  currently not used.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="numericalFunctions.lib.pointwiseXY_C.interpolatePoint">
+<code class="descclassname">numericalFunctions.lib.pointwiseXY_C.</code><code class="descname">interpolatePoint</code><span class="sig-paren">(</span><em>interpolation</em>, <em>x</em>, <em>x1</em>, <em>y1</em>, <em>x2</em>, <em>y2</em><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.interpolatePoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns interpolation of x for x1 &lt;= x &lt;= x2 given x1, y1, x2, y2 and interpolation law.
+Arguments are:</p>
+<blockquote>
+<div>interpolation   a string representing the interpolation law (e.g., &#8216;log-lin&#8217;; see constructor&#8217;s docstring),
+x               x point of interpolated y-value,
+x1              lower x-value,
+y1              y(x1),
+x2              upper x-value,
+y2              y(x2).</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="numericalFunctions.lib.pointwiseXY_C.unitbaseInterpolate">
+<code class="descclassname">numericalFunctions.lib.pointwiseXY_C.</code><code class="descname">unitbaseInterpolate</code><span class="sig-paren">(</span><em>x</em>, <em>lw</em>, <em>lXY</em>, <em>uw</em>, <em>uXY</em><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.unitbaseInterpolate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the unitbase interpolation of two XYs objects at w where the axes are labeled (w, x, y).</p>
+<dl class="docutils">
+<dt>Arguments are:</dt>
+<dd><blockquote class="first">
+<div>w           the point between lw and uw to return the unitbase interpolation of lXY and uXY,
+lw          the w point where lXY resides,
+lXY         a pointwiseXY_C instance for a function y(x),
+uw          the w point where uXY resides,
+uXY         a pointwiseXY_C instance for a function y(x),</div></blockquote>
+<p class="last">scaleRange    if True range values are scaled, otherwise they are unchanged.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="pointwisexy-c-pointwisexy-c-class">
+<h2><code class="xref py py-class docutils literal"><span class="pre">pointwiseXY_C.pointwiseXY_C</span></code> Class<a class="headerlink" href="#pointwisexy-c-pointwisexy-c-class" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C">
+<em class="property">class </em><code class="descclassname">numericalFunctions.lib.pointwiseXY_C.</code><code class="descname">pointwiseXY_C</code><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>The pointwiseXY_C class stores and manipulates a list of XY points (i.e., [x, y] pairs).
+Methods to add, substract, multiply and divide a pointwiseXY_C object with a scaler
+(i.e., a number) or other pointwiseXY_C object are provided.</p>
+<p>Constructor:
+pointwiseXY_C( data = [], dataForm = &#8216;xys&#8217;, initialSize = 100, overflowSize = 10, accuracy = defaultAccuracy( ), biSectionMax = 3., interpolation = &#8216;lin-lin&#8217;, infill = True, safeDivide = False, userFlag = 0 )</p>
+<dl class="docutils">
+<dt>Constructor arguments are ([o] implies optional argument):</dt>
+<dd><p class="first">data            [o] the [x_i, y_i] pairs given as described by the dataForm argument,
+dataForm        [o] can be one of three strings (case is ignored) that describes the form of data:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>&#8216;XYs&#8217;      data are a sequence of [x_i, y_i] pairs with x_i ascending (i.e., x_i &lt; x_{i+1})</dt>
+<dd>(e.g., data = [ [ 1, 1 ], [ 2.3, 2 ], [ 3.4, 6 ], [ 5.1, 4.3 ] ])</dd>
+<dt>&#8216;XsAndYs&#8217;  data are given as [xs, ys] where xs the list of x-values and ys the matching list of y-values,</dt>
+<dd>(e.g., data = [ [ 1, 2.3, 3.4, 5.1 ], [ 1, 2, 6, 4.3 ] ]),</dd>
+<dt>&#8216;list&#8217;     data are given as [x_0, y_0, x_1, y_1, ..., x_n, y_n],</dt>
+<dd>(e.g., data = [ 1, 1, 2.3, 2, 3.4, 6, 5.1, 4.3 ]),</dd>
+</dl>
+</div></blockquote>
+<p>initialSize     [o] the initial size of the primary data cache (default = 100),
+overflowSize    [o] the initial size of the secondary (overflow) data cache (default = 10),
+accuracy        [o] the accuracy of the data for the given interpolation (default is value returned by function defaultAccuracy)
+biSectionMax    [o] at times (e.g., multiplication), points may need to be added to maintain the give accuracy. In this case, a region</p>
+<blockquote>
+<div>is continuously divided into two until the accuracy is met or biSectionMax divisions have occurred (default = 3),</div></blockquote>
+<dl class="docutils">
+<dt>interpolation   [o] can be one of the following strings:</dt>
+<dd>&#8216;flat&#8217;              for the domain [x_i,x_{i+1}), the y-value is y_i
+&#8216;lin-lin&#8217;
+&#8216;lin-log&#8217;
+&#8216;log-lin&#8217;
+&#8216;log-log&#8217;
+&#8216;other&#8217;</dd>
+</dl>
+<p class="last">infill          [o] if True, multiplication will continuously divide a region until accuracy or biSectionMax is met (default = True),
+safeDivide      [o] if True, safe division is used (default = False)
+userFlag        [o] an integer (of type C int) used to store a user defined flag. (see getUserFlag and setUserFlag).</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.allocatedSize">
+<code class="descname">allocatedSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.allocatedSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the size of memory allocated in the points region.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.applyFunction">
+<code class="descname">applyFunction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.applyFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new instance which is y(x) = f(y_s(x)) where f is a function of one variable and y_s(x) is self&#8217;s.
+y-value at x. The function f must take two arguments. The first is y_s(x) and the second (not including self)
+is the second argument to applyFunction. The returned object may contain more points then self as applyFunction
+does infilling. That is, points are added recursively between points until accuracy or biSectionMax is reached.</p>
+<dl class="docutils">
+<dt>Arguments are:</dt>
+<dd><p class="first">f             a function that returns the new y(x) given the old y(x),
+parameters    any python object. Passed as the second argument to f,
+accuracy      [o] The accuracy for infilling. If not present, taken from self,
+biSectionMax  [o] The maximum number of bi-sections for infilling. If not present, taken from self.
+checkForRoots [o] If true, and biSectionMax &gt; 0, an addition point is added whenever two consecutive points cross the y-axis</p>
+<blockquote class="last">
+<div>at (or close to) the root (i.e., the y crossing point).</div></blockquote>
+</dd>
+</dl>
+<p>To return f(x), set self&#8217;s y-values to x (i.e., y(x) = x for self).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.areDomainsMutual">
+<code class="descname">areDomainsMutual</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.areDomainsMutual" title="Permalink to this definition">¶</a></dt>
+<dd><p>This routine returns True if self and the first argument have a mutual domain, and false otherwise.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.changeInterpolation">
+<code class="descname">changeInterpolation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.changeInterpolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new instance that is equivalent to self, but with the interpolation changed to interpolation.</p>
+<dl class="docutils">
+<dt>Arguments are: ([o] implies optional argument)</dt>
+<dd>interpolation  [o] the new interpolation (default is &#8216;lin-lin&#8217;),
+accuracy       [o] the accuracy of the conversion from the old to the new interpolation (default is self&#8217;s accuracy),
+lowerEps       [o] for flat to linear, the lower eps,
+upperEps       [o] the flat to linear, the upper eps. lowerEps and upperEps cannot both be 0.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.changeInterpolationIfNeeded">
+<code class="descname">changeInterpolationIfNeeded</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.changeInterpolationIfNeeded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns self if it is one of the allowed interpolations. Otherwise, a new instance is returned that is equivalent to self,
+but with the interpolation changed to the interpolation of the first allowed interpolations.</p>
+<dl class="docutils">
+<dt>Arguments are: ([o] implies optional argument)</dt>
+<dd>allowedInterpolations the list of allowed interpolations,
+accuracy              [o] the accuracy of the conversion from the old to the new interpolation (default is self&#8217;s accuracy),
+lowerEps              [o] for flat to linear, the lower eps,
+upperEps              [o] the flat to linear, the upper eps. lowerEps and upperEps cannot both be 0.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.clip">
+<code class="descname">clip</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.clip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new instance which is the same as self, but with the y-values clipped between rangeMin and rangeMax
+clip may add points, to insure that the return instance has the same shape as self between rangeMin and rangeMax</p>
+<dl class="docutils">
+<dt>Arguments are: ([o] implies optional argument)</dt>
+<dd>rangeMin  [o]   the lower y-value for clipping,
+rangeMax  [o]   the upper y-value for clipping.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.cloneToInterpolation">
+<code class="descname">cloneToInterpolation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.cloneToInterpolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>A clone of self is returned with its interpolation changed, but no points altered or added.
+Arguments are:</p>
+<blockquote>
+<div>interpolation   the interpolation for the cloned instance.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.coalescePoints">
+<code class="descname">coalescePoints</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.coalescePoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves all points in overflow region to points region.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.convolute">
+<code class="descname">convolute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.convolute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new instance which is the convolution of self with the first argument, that must also be a pointwiseXY_C instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a copy of self.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.copyDataToXYs">
+<code class="descname">copyDataToXYs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.copyDataToXYs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a python list of self&#8217;s data as [ x1, y1 ], ... [ xn, yn ] ].</p>
+<dl class="docutils">
+<dt>Arguments are:</dt>
+<dd>xScale [o]  a float to scale all x-values by,
+yScale [o]  a float to scale all y-values by.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.copyDataToXsAndYs">
+<code class="descname">copyDataToXsAndYs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.copyDataToXsAndYs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns python list of length two. The first element is a python list of
+self&#8217;s x-values and the second element is a python list of self&#8217;s y-values.</p>
+<dl class="docutils">
+<dt>Arguments are:</dt>
+<dd>xScale [o]  a float to scale all x-values by,
+yScale [o]  a float to scale all y-values by.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.domain">
+<code class="descname">domain</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.domain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the x-value of the first and last points as a tuple.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.domainGrid">
+<code class="descname">domainGrid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.domainGrid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of x-values for self.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.domainMax">
+<code class="descname">domainMax</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.domainMax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the x-value of the last point.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.domainMin">
+<code class="descname">domainMin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.domainMin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the x-value of the first point.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.domainSlice">
+<code class="descname">domainSlice</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.domainSlice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new instance with self sliced between domainMin and domainMax.</p>
+<dl class="docutils">
+<dt>Arguments are: ([o] implies optional argument)</dt>
+<dd><p class="first">domainMin    [o] the lower x-value of the slice, default is domainMin of self,
+domainMax    [o] the upper x-value of the slice, default is domainMax of self,
+fill    [o] if True, points are added at domainMin and domainMax if they are not in self,</p>
+<blockquote>
+<div>else only existing points in the range [domainMin, domainMax] are included.</div></blockquote>
+<p class="last">dullEps [o] (Currently not implemented) the lower and upper points are dulled, default is 0.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.dullEdges">
+<code class="descname">dullEdges</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.dullEdges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new instance that is a copy of self, except the endpoints are guaranteed to have 0&#8217;s for y-values
+as long as lowerEps and/or upperEps are none zero (see below). The following algorithm is used.</p>
+<p>If lowerEps is zero or the y-value at domainMin is 0, then nothing is added at the lower end. Otherwise, the following is
+done at the lower end.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>If lowerEps is positive, a point &#8216;abs( domainMin * lowerEps )&#8217; above domainMin is added with its interpolated y-value; provided,</dt>
+<dd>this x value is &#8216;abs( domainMin * lowerEps )&#8217; less than the next x-value. In the prior sentence, if domainMin is 0, then
+replace &#8216;abs( domainMin * lowerEps )&#8217; with &#8216;abs( lowerEps )&#8217;. Independent of whether a point is added, domainMin&#8217;s y-value is
+set to 0.</dd>
+<dt>If lowerEps is negative, the logic for adding the point above domainMin for positive lowerEps is followed. In addition, a</dt>
+<dd>point is added &#8216;abs( domainMin * lowerEps )&#8217; below domainMin with a value of zero and the point at domainMin is reset by
+interpolating the new surrounding values. However, if positiveXOnly is True and the point below domainMin would cause
+a negative x-value (and domainMin is not negative) then the logic for positive lowerEps is implemented instead.</dd>
+<dt>The logic for upperEps is similar to lowerEps except, replace domainMin with domainMax, below with above and above with below.</dt>
+<dd>Also positiveXOnly is ignored.</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>Arguments are:</dt>
+<dd>lowerEps       [o] a point (or two if lowerEps is negative) is (are) added a distance domainMin * lowerEps from domainMin,
+upperEps       [o] a point (or two if upperEps is negative) is (are) added a distance domainMax * upperEps from domainMax,
+positiveXOnly  [o] this only applies to lowerEps and only if an added point would be negative when domainMin is non-negative.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the y value at x.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.exp">
+<code class="descname">exp</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.exp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new instance with ts y-values set to exp( a * [self&#8217;s y-values] ). x-values are added to meet required accuaracy.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getAccuracy">
+<code class="descname">getAccuracy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getAccuracy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns self&#8217;s accuracy value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getBiSectionMax">
+<code class="descname">getBiSectionMax</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getBiSectionMax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns self&#8217;s biSectionMax value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getInfill">
+<code class="descname">getInfill</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getInfill" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns self&#8217;s infill flag.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getInterpolation">
+<code class="descname">getInterpolation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getInterpolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns self&#8217;s interpolation as a string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getNFStatus">
+<code class="descname">getNFStatus</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getNFStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns self&#8217;s numerical functions status flag (an integer).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getSafeDivide">
+<code class="descname">getSafeDivide</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getSafeDivide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns self&#8217;s safeDivide flag.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getSecondaryCacheSize">
+<code class="descname">getSecondaryCacheSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getSecondaryCacheSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the size of self&#8217;s secondary cache.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getUserFlag">
+<code class="descname">getUserFlag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getUserFlag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the user flag.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.groupOneFunction">
+<code class="descname">groupOneFunction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.groupOneFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a python list of float values. Each value is the integral of self between two consecutive group boundaries.</p>
+<dl class="docutils">
+<dt>Arguments are:</dt>
+<dd><p class="first">groupBoundaries     the list of group boundaries,
+norm                each value returned can be normalized as directed by one of the following allowed values</p>
+<blockquote class="last">
+<div>None                no normalization is applied,
+&#8216;dx&#8217;                each value is normalized by the width of its interval,
+list                a list of floats, one each for each group which the group is normalized by.</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.groupThreeFunctions">
+<code class="descname">groupThreeFunctions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.groupThreeFunctions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a python list of float values. Each value is the integral of the product of self, f2 and f3 between two consecutive group boundaries.</p>
+<dl class="docutils">
+<dt>Arguments are:</dt>
+<dd><p class="first">f2                  the second pointwiseXY_C function with the integrand being the product of self * f2 * f3
+f3                  the third pointwiseXY_C function with the integrand being the product of self * f2 * f3
+groupBoundaries     the list of group boundaries,
+norm                each value returned can be normalized as directed by one of the following allowed values</p>
+<blockquote class="last">
+<div>None                no normalization is applied,
+&#8216;dx&#8217;                each value is normalized by the width of its interval,
+list                a list of floats, one each for each group which the group is normalized by.</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.groupTwoFunctions">
+<code class="descname">groupTwoFunctions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.groupTwoFunctions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a python list of float values. Each value is the integral of the product of self and f2 between two consecutive group boundaries.</p>
+<dl class="docutils">
+<dt>Arguments are:</dt>
+<dd><p class="first">f2                  the second pointwiseXY_C function with the integrand being the product of self * f2
+groupBoundaries     the list of group boundaries,
+norm                each value returned can be normalized as directed by one of the following allowed values</p>
+<blockquote class="last">
+<div>None                no normalization is applied,
+&#8216;dx&#8217;                each value is normalized by the width of its interval,
+list                a list of floats, one each for each group which the group is normalized by.</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.integrate">
+<code class="descname">integrate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.integrate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns float a value that is the integral of self from domainMin to domainMax.</p>
+<dl class="docutils">
+<dt>Arguments are: ([o] implies optional argument)</dt>
+<dd>domainMin    [o] the lower limit of the integral, default is domainMin of self,
+domainMax    [o] the upper limit of the integral, default is domainMax of self.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.integrateWithFunction">
+<code class="descname">integrateWithFunction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.integrateWithFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a float value that is the integral of self times f(x) for x from domainMin to domainMax (i.e. integral dx self(x) * f(x)). This method uses an adaptive method with a Gauss-Legendre quadrature to calculate the integral to tolerance. The first argument, func, must return the value of f(x) at x. func is called as func( x, parameters ) where parameters is the third argument to this method. The Gauss-Legendre quadrature is exact for any polynomial of degree n for which n &lt; degree where degree is one of the arguments. If recursionLimit is needed by the adaptive method, tolerance will, most likely, not be met.</p>
+<dl class="docutils">
+<dt>Arguments are: ([o] implies optional argument)</dt>
+<dd>func                a python function taking x and parameters as arguments and returning the value f(x),
+tolerance           the desired tolerance for the integral,
+parameters      [o] a python object passed passed to func [defalut=None],
+domainMin            [o] the lower limit of the integral [default is domainMin of self],
+domainMax            [o] the upper limit of the integral [default is domainMax of self],
+degree          [o] the polynomial degree for which the Gauss-Legendre quadrature is exact [default=4],
+recursionLimit  [o] the maximum recursion depth used in the adaptive quadrature [default=10].</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.integrateWithWeight_sqrt_x">
+<code class="descname">integrateWithWeight_sqrt_x</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.integrateWithWeight_sqrt_x" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns float a value that is the integral of self weighted by sqrt( x ) from domainMin to domainMax (i.e. integral dx sqrt( x ) * self(x)).</p>
+<dl class="docutils">
+<dt>Arguments are: ([o] implies optional argument)</dt>
+<dd>domainMin    [o] the lower limit of the integral, default is domainMin of self,
+domainMax    [o] the upper limit of the integral, default is domainMax of self.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.integrateWithWeight_x">
+<code class="descname">integrateWithWeight_x</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.integrateWithWeight_x" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns float a value that is the integral of self weighted by x from domainMin to domainMax (i.e. integral dx x * self(x)).</p>
+<dl class="docutils">
+<dt>Arguments are: ([o] implies optional argument)</dt>
+<dd>domainMin    [o] the lower limit of the integral, default is domainMin of self,
+domainMax    [o] the upper limit of the integral, default is domainMax of self.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.inverse">
+<code class="descname">inverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.inverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new instance with the x- and y-values of self being the y- and x-values of the returned instance, respectively.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.isInterpolationLinear">
+<code class="descname">isInterpolationLinear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.isInterpolationLinear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if self&#8217;s interpolation is &#8216;lin-lin&#8217;, otherwise returns False.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.isInterpolationOther">
+<code class="descname">isInterpolationOther</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.isInterpolationOther" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if self&#8217;s interpolation is &#8216;other&#8217;, otherwise returns False.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.lowerIndexBoundingX">
+<code class="descname">lowerIndexBoundingX</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.lowerIndexBoundingX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the lower index in self that bounds the x-value. -1 is returned if x is outside domain.</p>
+<dl class="docutils">
+<dt>Arguments are:</dt>
+<dd>x       the x-value whose lower bounding index is return.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.mergeClosePoints">
+<code class="descname">mergeClosePoints</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.mergeClosePoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new pointwiseXY_C object whose x values are the union of self and other.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.mutualify">
+<code class="descname">mutualify</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.mutualify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a python list containing two pointwiseXY_C instances that are the mutualification of self and other.
+Mutualification is the act of modifying, if needed, two pointwiseXY_C instances so that their domains are mutual.
+Self and other are not altered.</p>
+<dl class="docutils">
+<dt>Arguments are:</dt>
+<dd>lowerEps1       the lowerEps applied to self if needed, see dullEdges for meaning,
+upperEps1       the upperEps applied to self if needed, see dullEdges for meaning,
+positiveXOnly1  the positiveXOnly applied to self if needed, see dullEdges for meaning,
+other           the second pointwiseXY_C instance to mutualify self with,
+lowerEps2       the lowerEps applied to other if needed, see dullEdges for meaning,
+upperEps2       the upperEps applied to other if needed, see dullEdges for meaning,
+positiveXOnly2  the positiveXOnly applied to other if needed, see dullEdges for meaning,</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.normalize">
+<code class="descname">normalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new instance with the same x-values as self but with the y-values scaled so that the area of the curve is 1.</p>
+<dl class="docutils">
+<dt>Arguments are: ([o] implies optional argument)</dt>
+<dd>insitu  [o] If True, self is normalize and returned. Otherwise, a new instances is created and normalize and self is unchanged.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.overflowAllocatedSize">
+<code class="descname">overflowAllocatedSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.overflowAllocatedSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the size of memory allocated for the overflow region.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.overflowLength">
+<code class="descname">overflowLength</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.overflowLength" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns of number of points in the overflow region.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls Gnuplot, if it exists, to plot self. This is a simple method, mainly for debugging.</p>
+<p>Arguments: None.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.pop">
+<code class="descname">pop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes and returns point at index (default last).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.range">
+<code class="descname">range</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the minimum and maximum y-values in self or 0 if self is empty.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.rangeMax">
+<code class="descname">rangeMax</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.rangeMax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the maximum y-value in self or 0 if self is empty.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.rangeMin">
+<code class="descname">rangeMin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.rangeMin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the minimum y-value in self or 0 if self is empty.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.reallocateOverflowPoints">
+<code class="descname">reallocateOverflowPoints</code><span class="sig-paren">(</span><em>size</em><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.reallocateOverflowPoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjusts the memory allocated for the overflow points to size (the first and only argument).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.reallocatePoints">
+<code class="descname">reallocatePoints</code><span class="sig-paren">(</span><em>size</em>, <em>forceSmaller = True</em><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.reallocatePoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjusts the memory allocated for primary points to the maximum of size and the current length of self.</p>
+<dl class="docutils">
+<dt>Arguments are: ([o] implies optional argument)</dt>
+<dd>size              the desired allocated size of self (actual size will be larger if length is greater than size),
+forceSmaller  [o] if False action is only taken if allocated is significantly greater than size (default is True).</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.runningIntegral">
+<code class="descname">runningIntegral</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.runningIntegral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns, as a python list, the integrals between successive x-values.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.scaleOffsetXAndY">
+<code class="descname">scaleOffsetXAndY</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.scaleOffsetXAndY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new pointwiseXY_C object whose x and y values are scaled and offset.</p>
+<dl class="docutils">
+<dt>Arguments are: ([o] implies optional argument)</dt>
+<dd><blockquote class="first">
+<div>xScale   [o] the scale for the x-axis,
+xOffset  [o] the offset for the x-axis,
+yScale   [o] the scale for the y-axis,
+yOffset  [o] the offset for the y-axis,
+insitu   [o] If True, self is scalled and offset and returned.</div></blockquote>
+<p class="last">Otherwise, a new instances is created and returned, and self is unchanged.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setAccuracy">
+<code class="descname">setAccuracy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setAccuracy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets self&#8217;s accuracy value and returns the actual value set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setBiSectionMax">
+<code class="descname">setBiSectionMax</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setBiSectionMax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets self&#8217;s biSectionMax value and returns the actual value set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setData">
+<code class="descname">setData</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces the data in self with the frist argument. This argument must be a list. Each item of the list must contain two floats, or objects that can be convert to float (e.g., [ [ 1, 2 ], [ 2, 4 ], [ 4, 0.5 ] ]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setDataFromList">
+<code class="descname">setDataFromList</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setDataFromList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces the data in self with the python list given by the first argument.</p>
+<dl class="docutils">
+<dt>Arguments are:</dt>
+<dd>xys      the list of xy-values as a single python list (e.g., [ 1, 2, 4, 3, 5, 6]</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setDataFromXsAndYs">
+<code class="descname">setDataFromXsAndYs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setDataFromXsAndYs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces the data in self with the 2 python lists given by the first 2 arguments.</p>
+<dl class="docutils">
+<dt>Arguments are:</dt>
+<dd>xs      the list of x-values
+ys      the list of y-values</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setInfill">
+<code class="descname">setInfill</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setInfill" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets self&#8217;s infill flag to the first argument.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setSafeDivide">
+<code class="descname">setSafeDivide</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setSafeDivide" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets self&#8217;s safeDivide flag to the first argument.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setSecondaryCacheSize">
+<code class="descname">setSecondaryCacheSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setSecondaryCacheSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the size of self&#8217;s secondary cache to size.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setUserFlag">
+<code class="descname">setUserFlag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setUserFlag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the users flag via the first argument.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setValue">
+<code class="descname">setValue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the y value at x.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.showInteralStructure">
+<code class="descname">showInteralStructure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.showInteralStructure" title="Permalink to this definition">¶</a></dt>
+<dd><p>For debbuging only. Dumps information on internal data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.thicken">
+<code class="descname">thicken</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.thicken" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new instance with denser points than self filled in using self&#8217;s interpolation. The number of points added are determined by the following arguments
+sectionSubdivideMax    maximum number of points to insert between consecutive points (default 1),
+dDomainMax                  minimum dx step (default 0),
+fDomainMax                  minimum fractional step (default 1).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.thin">
+<code class="descname">thin</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.thin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new instance of self thinned to accuracy (i.e., points are removed if possible).</p>
+<dl class="docutils">
+<dt>Arguments are:</dt>
+<dd>accuracy        The accuracy to maintain for the function when thinning.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.thinDomain">
+<code class="descname">thinDomain</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.thinDomain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new instance of self with fractional x-spacing between points of at least
+epsilon. Points are removed if needed. Fractional x-spacing is defined as</p>
+<blockquote>
+<div>( x_{i+1} - x_i ) / ( fabs( x_{i+1} ) - fabs( x_i ) ).</div></blockquote>
+<dl class="docutils">
+<dt>Arguments are:</dt>
+<dd>epsilon      The fraction minimum distance between sequential x-value.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.toString">
+<code class="descname">toString</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.toString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a string representation of self. This method has three keyword parameters:
+pairsPerLine, format and pairSeparator which are defined as,</p>
+<blockquote>
+<div>pairsPerLine    the number of pairs to put on each line
+format          a valid format to convert an (x,y) pair (i.e., two floats) into a string (e.g. format = &#8216; %.3f %12.5e&#8217;)
+pairSeparator   a string to put between every pair (e.g, to put a comma to separate pairs use pairSeparator = &#8216;,&#8217;)</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.trim">
+<code class="descname">trim</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.trim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new instance with excessive 0. y-value points at beginning and end of self removed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.union">
+<code class="descname">union</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.union" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new pointwiseXY_C object whose x values are the union of self and other.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">numericalFunctions Package</a><ul>
+<li><a class="reference internal" href="#specialfunctions-module"><code class="docutils literal"><span class="pre">specialFunctions</span></code> Module</a></li>
+<li><a class="reference internal" href="#legendre-module"><code class="docutils literal"><span class="pre">Legendre</span></code> Module</a></li>
+<li><a class="reference internal" href="#module-numericalFunctions.lib.pointwiseXY_C"><code class="docutils literal"><span class="pre">pointwiseXY_C</span></code> Module</a></li>
+<li><a class="reference internal" href="#pointwisexy-c-pointwisexy-c-class"><code class="docutils literal"><span class="pre">pointwiseXY_C.pointwiseXY_C</span></code> Class</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fudge.vis.matplotlib.html"
+                        title="previous chapter">fudge.vis.matplotlib package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../externals.html"
+                        title="next chapter">External Packages used in Fudge</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/fudge/numericalFunctions.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../externals.html" title="External Packages used in Fudge"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fudge.vis.matplotlib.html" title="fudge.vis.matplotlib package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >fudge Package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

@@ -61,12 +61,13 @@
 # 
 # <<END-copyright>>
 
-import fudge.gnd.productData.distributions.angularEnergy as angularEnergyModule
+from pqu import PQU as PQUModule
+from xData import standards as standardsModule
 
-import site_packages.legacy.toENDF6.gndToENDF6 as gndToENDF6Module
-import site_packages.legacy.toENDF6.endfFormats as endfFormatsModule
-import pqu.PQU as PQUModule
-import xData.standards as standardsModule
+from fudge.gnd.productData.distributions import angularEnergy as angularEnergyModule
+
+from ... import gndToENDF6 as gndToENDF6Module
+from ... import endfFormats as endfFormatsModule
 
 #
 # form
@@ -103,7 +104,7 @@ def toENDF6( self, flags, targetInfo ) :
             numEout = len( entries )
             MF6 += [ endfFormatsModule.endfContLine( 0, mu, 0, 0, 1, numEout ) ]
             MF6 += endfFormatsModule.endfInterpolationList( [ numEout, pdf_of_EpInterpolation ] )
-            xys = entries.copyDataToXYs( xUnitTo = 'eV', yUnitTo = '1/eV' )
+            xys = entries.copyDataToXYs( )
             MF6 += endfFormatsModule.endfNdDataList( xys )
     return( 7, standardsModule.frames.labToken, MF6 )
 

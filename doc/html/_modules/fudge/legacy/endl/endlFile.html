@@ -1,0 +1,389 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.endl.endlFile &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.legacy.endl.endlFile</h1><div class="highlight"><pre>
+<span></span># &lt;&lt;BEGIN-copyright&gt;&gt;
+# &lt;&lt;END-copyright&gt;&gt;
+
+&quot;&quot;&quot;
+This module contains the class endlFile. See class endlFile for usage.
+&quot;&quot;&quot;
+
+import os
+import time
+from fudge.core.utilities import fudgeExceptions
+import bdfls
+import endl2
+import endlIClasses
+import endlmisc
+
+checkQThreshold = True
+
+<div class="viewcode-block" id="endlFile"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlFile.endlFile">[docs]</a>class endlFile :
+    &quot;&quot;&quot;This class holds data that is contained in an ENDL file. (In general, this class should only be instantiated indirectly via methods in endlZA.)
+An ENDL data file can contains one or more related data sets, each specified by a unique set of X1, X2, X3, X4 values, for a specific set of 
+yo, C, I and S values.
+
+As example, for the cross section, I = 0, for inelastic scattering 
+of a neutron, C = 11, the target may be left in different excited states. In ENDL ths cross sections to specific excited state, S = 1, are stored in a file
+named &quot;yo00c11i000s001&quot;, and the data for different excited states are distinguished by different excitation levels, X1-value, for the
+target. When the read method for this class gets the data from this file it creates a new endlI0 object for each data set and addes it
+to the levels member of this class. The number of data sets (i.e., length of levels) is return by the len method for the endlFile object.
+
+No data is read in when the object is instantiated; instead, the read method must be explicitly called.
+
+Useful Members::
+    name        The file&#39;s name.
+    path        The full path, include name, of this file.
+    ZA          The ENDL ZA-value for this file. ZA = 1000 * Z + A.
+    yi          The ENDL yi-value for this file. That is, the projectile for this file.
+    yo          The ENDL yo-value for this file. That is, the outgoing particle for this file.
+    C           The ENDL C-value for this file.
+    I           The ENDL I-value for this file.
+    S           The ENDL S-value for this file.
+    levels      A list of endlI* objects for each data sets in file. This is empty until the method read is called.
+&quot;&quot;&quot;
+
+    def __init__( self, designerFile, name, path, ZA, yi, halflife = None, bdflsFile = None ) :
+        &quot;&quot;&quot;In general, this routine should be used indirectly via endlZA.read( ) or endlZA.addFile( ) and not called directly, 
+        unless you know what you are doing.&quot;&quot;&quot;
+
+        if( bdflsFile is None ) : bdflsFile = bdfls.getDefaultBdfls( )
+        self.bdflsFile = bdflsFile
+        self.designerFile = designerFile
+        self.name = name
+        self.path = path
+        self.ZA = ZA
+        self.yiTags = endlmisc.incidentParticleTags( yi )
+        self.yi = self.yiTags[0]
+        self.yo = int( name[2:4] )
+        self.C = int( name[5:7] )
+        self.I = int( name[8:11] )
+        self.S = int( name[12:15] )
+        self.mode = endlmisc.getmodestring_( self.I, &quot;endlFile.__init__&quot; )
+        self.halflife = halflife                            # Added so uses can input for natural ZA because the halflife is not in the bdfls file.
+        self.levels = []
+
+    def __len__( self ) :
+        &quot;&quot;&quot;Returns the number of levels for self.&quot;&quot;&quot;
+
+        return len( self.levels )
+
+    def __getitem__( self, index ) :
+        &quot;&quot;&quot;Returns the (i-1)^th item from self.levels.&quot;&quot;&quot;
+
+        if( self.levels == [] ) : raise Exception( &quot;File not read in.&quot; )
+        return( self.levels[index] )
+
+    def __repr__( self ) :
+        &quot;&quot;&quot;Returns the string &#39;R# filename&#39; where R is &#39;r&#39; if the data has been read in and is &#39;-&#39; 
+    if it has not been, &#39;#&#39; is the number of columns of data and file name is the name of the
+    file (e.g. &#39;r2 yo00c01i000s000&#39;).&quot;&quot;&quot;
+
+        r = &quot;r&quot;
+        if( self.levels == [] ) : r = &quot;-&quot;
+        return r + self.mode + &quot; &quot; + self.name
+
+<div class="viewcode-block" id="endlFile.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlFile.endlFile.check">[docs]</a>    def check( self, targetParameters, dQ_MeV = 10e-3, dThreshold_MeV = 10e-3, allowZeroE = False, xCloseEps = None, normTolerance = 1e-5,
+        maxAbsFloatValue = None ) :
+        &quot;&quot;&quot;Checks self&#39;s data if it as been read in. This is, it goes through the list levels, calling the
+        appropriate routines to check data.&quot;&quot;&quot;
+
+        suffix = os.path.basename(self.path.rstrip(self.name).rstrip(os.sep))[8:]
+        ErrMsgs = []
+        X1 = X2 = X3 = X4 = None
+        for l in self.levels :
+            if( ( ( self.C == 1 ) and ( self.I == 0 ) ) or ( self.C == 5 ) ) :
+                Threshold = 0.
+                Q = 0.
+            elif( self.C == 6 ) :
+                Threshold = 0.
+                Q = 0.
+            elif( ( endl2.AFromZA( l.ZA ) == 0 ) or ( 99120 &lt;= l.ZA &lt;= 99200 ) or ( self.C == 15 ) or ( self.C &gt;= 50 ) ) :
+                Q = l.getQ( )
+            else :
+                Q = endl2.reactionQ( l.yi, l.ZA, l.C, targetELevel = l.getELevel( ), X4 = l.getX4( ), specialCases = 1, bdflsFile = self.bdflsFile )
+                if( l.S in [ 1 ] ) :
+                    residualELevel = l.getX1( )
+                else :
+                    residualELevel = l.getX4( )
+                Threshold = endl2.reactionThreshold( l.yi, l.ZA, l.C, targetELevel = l.getELevel( ), residualELevel = residualELevel, Q = l.getQ( ), S = self.S,
+                        bdflsFile = self.bdflsFile )
+            r = 1. + self.bdflsFile.mass( self.yi ) / self.bdflsFile.mass( self.ZA )
+            QThreshold = ( -l.getQ( ) ) * r
+            if( QThreshold &lt;= 0. ) : QThreshold = 0.
+            if( targetParameters[&#39;T&#39;] is None ) :
+                targetParameters[&#39;T&#39;] = l.Temperature
+                targetParameters[&#39;ELevel&#39;] = l.ELevel
+                targetParameters[&#39;halflife&#39;] = l.Halflife
+            if( ( targetParameters[&#39;T&#39;] != l.Temperature ) or ( targetParameters[&#39;ELevel&#39;] != l.ELevel ) or ( targetParameters[&#39;halflife&#39;] != l.Halflife ) ) :
+                ErrMsgs.append( endlmisc.endlCheckerObject( suffix = suffix, data = l, message = &#39;target parameters differ&#39; ) )
+            elif( X1 is not None ) :
+                if( ( X1 == l.X1 ) and ( X2 == l.X2 ) and ( X3 == l.X3 ) and ( X4 == l.X4 ) ) :
+                    ErrMsgs.append( endlmisc.endlCheckerObject( suffix = suffix, data = l, message = &#39;duplicate data&#39; ) )
+            X1 = l.X1; X2 = l.X2; X3 = l.X3; X4 = l.X4
+            if( abs( l.getQ( ) - Q ) &gt; dQ_MeV ) :
+                ErrMsgs.append( endlmisc.endlCheckerObject( suffix = suffix, data = l, message = &#39;bad Q: should be %.4e&#39; % Q ) )
+            if( ( self.C != 6 ) and( hasattr( l, &quot;getThresholdsForChecker&quot; ) ) ) :
+                thresholds = l.getThresholdsForChecker( )
+                iT = 0
+                _dThreshold_MeV = dThreshold_MeV
+                for t in thresholds :   # Currently, thresholds is the first min( n, 2 ) Energy points in the data where n is the length of the data.
+                    if( checkQThreshold ) :
+                        if( t + _dThreshold_MeV &lt; QThreshold ) : ErrMsgs.append( endlmisc.endlCheckerObject( suffix = suffix, data = l, \
+                            message = &#39;bad QThreshold: should be %.8e at index = %d instead of %.8e&#39; % ( QThreshold, iT, t ) ) )
+                    else :
+                        if( t + _dThreshold_MeV &lt; Threshold ) : ErrMsgs.append( endlmisc.endlCheckerObject( suffix = suffix, data = l, \
+                            message = &#39;bad threshold: should be %.8e at index = %d instead of %.8e&#39; % ( Threshold, iT, t ) ) )
+                    if( l.I != 4 ) : _dThreshold_MeV = 0.   # The second point must be higher than the threshold else ndfgen may fail.
+                    iT += 1
+            ErrMsgs += l.check( printWarning = False, printErrors = False, allowZeroE = allowZeroE, xCloseEps = xCloseEps, normTolerance = normTolerance, \
+                maxAbsFloatValue = maxAbsFloatValue )
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlFile.setYiZAYoCISs"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlFile.endlFile.setYiZAYoCISs">[docs]</a>    def setYiZAYoCISs( self, yi = None, ZA = None, yo = None, C = None, I = None, S = None ) :
+        &quot;&quot;&quot;Fixes the headers in all of file&#39;s levels to match yo, C, I and S. For input
+        parameters that are None, self&#39;s values are used. Also sets self&#39;s yi and ZA
+        to inputted values if they are other than None.&quot;&quot;&quot;
+
+        if( yi is None ) : yi = self.yi
+        if( ZA is None ) : ZA = self.ZA
+        if( yo is None ) : yo = self.yo
+        if( C  is None ) : C  = self.C
+        if( I  is None ) : I  = self.I
+        if( S  is None ) : S  = self.S
+        self.yi = yi
+        self.ZA = ZA
+        self.yo = yo
+        self.C = C
+        self.I = I
+        self.S = S
+        self.name = &#39;yo%.2dc%.2di%.3ds%.3d&#39; % ( yo, C, I, S )
+        for l in self.levels : l.setYiZAYoCIS( yi = yi, ZA = ZA, yo = yo, C = C, I = I, S = S )</div>
+
+<div class="viewcode-block" id="endlFile.IsyoCIS"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlFile.endlFile.IsyoCIS">[docs]</a>    def IsyoCIS( self, yo = None, C = None, I = None, S = None ) :
+        &quot;&quot;&quot;Returns 1 if self matches yo, C, I and S, and 0 otherwise.  yo may be a single integer or a list of integers and 
+        the same for C, I and S. For example self has yo = 7 and C = 3 then self.IsyoCIS( yo = (5, 6, 7), C=(3,4) ) will return a true.&quot;&quot;&quot;
+
+        if( yo is not None ) :
+            if( ( type( yo ) == type( [] ) ) or ( type( yo ) == type( () ) ) ) :
+                yo2 = yo
+                yo = []
+                for y in yo2 : yo.append( endlmisc.outgoingParticleTags( y )[0] )
+            else :
+                yo = endlmisc.outgoingParticleTags( yo )[0]
+        if ( ( type( yo ) != type( [] ) ) and ( type( yo ) != type( () ) ) ) : yo = ( yo, )
+        if ( ( type(  C ) != type( [] ) ) and ( type(  C ) != type( () ) ) ) :  C = (  C, )
+        if ( ( type(  I ) != type( [] ) ) and ( type(  I ) != type( () ) ) ) :  I = (  I, )
+        if ( ( type(  S ) != type( [] ) ) and ( type(  S ) != type( () ) ) ) :  S = (  S, )
+        if ( ( self.yo in yo ) or ( yo == ( None, ) ) ) and \
+           ( (  self.C in  C ) or (  C == ( None, ) ) ) and \
+           ( (  self.I in  I ) or (  I == ( None, ) ) ) and \
+           ( (  self.S in  S ) or (  S == ( None, ) ) ) : return 1
+        return 0</div>
+
+<div class="viewcode-block" id="endlFile.unreadData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlFile.endlFile.unreadData">[docs]</a>    def unreadData( self, X1 = None, X2 = None, X3 = None, X4 = None, Q = None ) :
+        &quot;&quot;&quot;Removes self&#39;s reference to data matching X1, X2, X3, X4 and Q. Note, the data may still be in the work directory if
+        the file is not saved.&quot;&quot;&quot;
+
+        i = len( self.levels )
+        while( i &gt; 0 ) :
+            i -= 1
+            l = self.levels[i]
+            if ( ( l.X1 == X1 ) or ( X1 is None ) ) and ( ( l.X2 == X2 ) or ( X2 is None ) ) and \
+               ( ( l.X3 == X3 ) or ( X3 is None ) ) and ( ( l.X4 == X4 ) or ( X4 is None ) ) and \
+                ( ( l.Q == Q ) or ( Q is None ) ) :
+                del self.levels[i]</div>
+
+<div class="viewcode-block" id="endlFile.addData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlFile.endlFile.addData">[docs]</a>    def addData( self, data = [], date = None, interpolation = 0, eLevel = 0., temperature = 2.586e-8, Q = None, 
+        X1 = 0., X2 = 0., X3 = 0., X4 = 0., mass = None, halflife = None ) :
+        &quot;&quot;&quot;Adds data to self with the header information provided.&quot;&quot;&quot;
+
+        i = 0
+        for l in self.levels :
+            c = l.compareQXs( Q, X1, X2, X3, X4 )
+            if( c == 0 ) :
+                raise Exception( &quot;\nError in endlFile.addData: data already exist for X1 = %e, X2 = %e, X3 = %e, X4 = %e, Q = %e&quot; % ( X1, X2, X3, X4, l.Q ) )
+            elif ( c &gt; 0 ) :
+                break
+            i += 1
+        if( Q is None ) :
+            Q = 0.
+            if ( len( self.levels ) &gt; 0 ) : Q = self.levels[0].Q
+        if( date is None ) : 
+            date = time.localtime( time.time( ) )
+            date = 10000 * ( date[0] - 2000 ) + 100 * date[1] + date[2]
+        if( type( date ) == type( 1 ) ) : date = &quot;%.6d&quot; % date
+        if( mass is None ) : mass = self.bdflsFile.mass( self.ZA )
+        if( mass is None ) : raise Exception( &quot;\nError in endlFile.addData: bdfls file does not have mass for ZA = %d&quot; % self.ZA )
+        mass = endlmisc.headerFunkyDouble2String( mass )
+        if( halflife is None ) : halflife = self.bdflsFile.halflife( self.ZA )
+        if( halflife is None ) : halflife = self.halflife
+        if( halflife is None ) : raise Exception( &quot;\nError in endlFile.addData: bdfls file does not have halflife for ZA = %d&quot; % self.ZA )
+        halflife = endlmisc.headerFunkyDouble2String( halflife )
+        h = [ &quot;%6d %2d %2d %s %6s%1d12 %s %s %s\n&quot; % ( self.ZA, self.yi, self.yo, mass, date, interpolation, 
+                        endlmisc.headerFunkyDouble2String( eLevel ), halflife, endlmisc.headerFunkyDouble2String( temperature ) ),
+              &quot;%2d%3d%3d %s %s %s %s %s\n&quot; % ( self.C, self.I, self.S, endlmisc.headerFunkyDouble2String( Q ), 
+                        endlmisc.headerFunkyDouble2String( X1), endlmisc.headerFunkyDouble2String( X2), 
+                        endlmisc.headerFunkyDouble2String( X3), endlmisc.headerFunkyDouble2String( X4 ) ) ]
+#
+#  ???? Need to check that data is proper type of data.
+#
+        d = endlIClasses.endlAddIObject( None, self.yo, self.C, self.I, self.S, h, data, bdflsFile = self.bdflsFile )
+        self.levels.insert( i, d )
+        return self.levels[i]</div>
+
+<div class="viewcode-block" id="endlFile.addEndlData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlFile.endlFile.addEndlData">[docs]</a>    def addEndlData( self, endlData, overWrite = 0 ) :
+        &quot;&quot;&quot;Adds the data in the endl object endlData to self. enldData must be of an endlI* class that must match self&#39;s
+        I class. For example, if self is I = 11 data then endlData be must an endlI11 object. Currently, overWrite is not
+        implemented.&quot;&quot;&quot;    # THIS NEEDS WORKD????
+
+        if( ( endlData.I != self.I ) or ( endlData.S != self.S ) or ( endlData.C != self.C ) or ( endlData.yo != self.yo ) ) :
+            raise Exception( &quot;( endlData.I != self.I ) or ( endlData.S != self.S ) or ( endlData.C != self.C ) or ( endlData.yo != self.yo )&quot; )
+        i = 0
+        for l in self.levels :
+            c = l.compareQXs( endlData.Q, endlData.X1, endlData.X2, endlData.X3, endlData.X4 )
+            if( c == 0 ) :
+                raise Exception( &quot;Data already exist for X1 = %e, X2 = %e, X3 = %e, X4 = %e, Q = %e for yo = %d C = %d, I = %d and S =%d&quot; 
+                    % ( l.X1, l.X2, l.X3, l.X4, l.Q, self.yo, self.C, self.I, self.S ) )
+            elif( c &gt; 0 ) :
+                break
+            i += 1
+        points = endlData.copyData( )
+        o = endlIClasses.endlAddIObject( None, endlData.yo, endlData.C, endlData.I, endlData.S, endlData.h, points, bdflsFile = self.bdflsFile )
+        self.levels.insert( i, o )
+        return o</div>
+
+<div class="viewcode-block" id="endlFile.columns"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlFile.endlFile.columns">[docs]</a>    def columns( self ) :
+        &quot;&quot;&quot;Returns the number of data columns for self&#39;s data. For example, for 3d data a 3 is returned.&quot;&quot;&quot;
+
+        return endlmisc.getNumberOfColumns_( self.I, &quot;endlFile.columns&quot; )</div>
+
+<div class="viewcode-block" id="endlFile.info"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlFile.endlFile.info">[docs]</a>    def info( self ) :
+        &quot;&quot;&quot;Prints information about each level in self (i.e., call info for each element of self.levels.&quot;&quot;&quot;
+
+        for i in range( len( self.levels ) ) :
+            print &quot;levels[%d]&quot; % i
+            self.levels[i].info( )
+            print</div>
+
+<div class="viewcode-block" id="endlFile.ls"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlFile.endlFile.ls">[docs]</a>    def ls( self ) :
+        &quot;&quot;&quot;Prints file name, and level information for self.&quot;&quot;&quot;
+
+        print  self.name
+        s = &quot;&quot;
+        for i in range( len( self.levels ) ) : s = s + ( &quot; levels[%d]  %s&quot; % ( i, `self.levels[i]` ) )
+        print s</div>
+
+<div class="viewcode-block" id="endlFile.read"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlFile.endlFile.read">[docs]</a>    def read( self ) :
+        &quot;&quot;&quot;Reads in the data from self&#39;s file.&quot;&quot;&quot;
+
+        if ( not os.path.isfile( self.path ) ) : raise Exception( &quot;\nError in endlFile.read: no such file %s&quot; % self.path )
+        f = open( self.path )
+        level = 1
+        while 1 :
+            d = endlIClasses.endlAddIObject( f, self.yo, self.C, self.I, self.S, None, [], bdflsFile = self.bdflsFile )
+            if ( d.h[0] == &quot;&quot; ) : break
+            slevel = None
+            if( ( self.C == 11 ) and ( self.S == 1 ) ) : slevel = level
+            d.label = endl2.reactionEquations( self.yi, self.ZA, self.C, level = slevel, printQWarning = False )[1]
+            self.levels.append( d )
+            level += 1
+        f.close( )</div>
+
+<div class="viewcode-block" id="endlFile.save"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlFile.endlFile.save">[docs]</a>    def save( self, f ) :
+        &quot;&quot;&quot;Saves data to file f where f is a python file type (e.g., sys.stdout).&quot;&quot;&quot;
+
+        for l in self.levels : l.save( f )</div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

@@ -67,8 +67,6 @@ SHELL = /bin/ksh
 
 subDirs = Src Test lib include Doc _Src Examples
 
-CXX = g++
-
 default: include lib
 
 lib:

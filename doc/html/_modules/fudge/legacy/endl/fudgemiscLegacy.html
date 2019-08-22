@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.endl.fudgemiscLegacy &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.legacy.endl.fudgemiscLegacy</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="k">import</span> <span class="n">brb</span>
+
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="k">import</span> <span class="n">fudgeDefaults</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">endlmisc</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">bdfls</span>
+
+<div class="viewcode-block" id="databaseList"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.fudgemiscLegacy.databaseList">[docs]</a><span class="k">def</span> <span class="nf">databaseList</span><span class="p">(</span> <span class="n">yi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns a list of the default databases. The list can be narrowed to a single incident particle</span>
+<span class="sd">    type if yi is specified. Also, the location where databases are to be searched for can be set with path.</span>
+<span class="sd">    This allows a user to have their own directory containing databases.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">findYis</span><span class="p">(</span> <span class="n">yiPath</span><span class="p">,</span> <span class="n">yi</span><span class="p">,</span> <span class="nb">list</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;For internal use only.&quot;&quot;&quot;</span>
+
+        <span class="n">yis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span> <span class="n">yiPath</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">ls</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span> <span class="n">yiPath</span> <span class="p">)</span>
+            <span class="n">ls</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">ls</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span> <span class="s2">r&quot;yi\d\d$&quot;</span><span class="p">,</span> <span class="n">f</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">yiPath</span><span class="p">,</span> <span class="n">f</span> <span class="p">)</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span> <span class="n">y</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="n">iyi</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">f</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="p">)</span>
+                        <span class="k">if</span><span class="p">(</span> <span class="n">iyi</span> <span class="ow">in</span> <span class="p">[</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span> <span class="p">]</span> <span class="p">)</span> <span class="p">:</span>
+                            <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">yi</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="n">yi</span> <span class="o">==</span> <span class="n">iyi</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">yis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">f</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">yis</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">db</span><span class="p">,</span> <span class="n">yis</span> <span class="p">]</span> <span class="p">)</span>
+
+    <span class="n">listTranslated</span> <span class="o">=</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">yi</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">yi</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">incidentParticleTags</span><span class="p">(</span> <span class="n">yi</span> <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">path</span> <span class="o">=</span> <span class="n">fudgeDefaults</span><span class="o">.</span><span class="n">ENDL_DATABASE_DIR</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span> <span class="n">path</span> <span class="p">)</span>
+    <span class="n">l</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span> <span class="p">)</span>
+    <span class="n">ll</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">l</span> <span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">path</span><span class="p">,</span> <span class="n">db</span> <span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">d</span><span class="p">,</span> <span class="s1">&#39;ascii&#39;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span> <span class="n">a</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">d</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="n">findYis</span><span class="p">(</span> <span class="n">d</span><span class="p">,</span> <span class="n">yi</span><span class="p">,</span> <span class="n">ll</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">listTranslated</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">fudgeDefaults</span><span class="o">.</span><span class="n">TRANSLATED_DATABASE_DIR</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">l</span> <span class="p">:</span>
+            <span class="n">translated</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">fudgeDefaults</span><span class="o">.</span><span class="n">TRANSLATED_DATABASE_DIR</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="s1">&#39;ascii&#39;</span> <span class="p">)</span>
+            <span class="n">findYis</span><span class="p">(</span> <span class="n">translated</span><span class="p">,</span> <span class="n">yi</span><span class="p">,</span> <span class="n">ll</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ll</span></div>
+
+<div class="viewcode-block" id="projectileList"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.fudgemiscLegacy.projectileList">[docs]</a><span class="k">def</span> <span class="nf">projectileList</span><span class="p">(</span> <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns a list of the projectiles in path.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">getYis</span><span class="p">(</span> <span class="n">database</span> <span class="p">)</span> <span class="p">:</span> 
+
+        <span class="n">yis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ls</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span> <span class="n">database</span> <span class="p">)</span>
+        <span class="n">ls</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">ls</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span> <span class="s2">r&quot;yi\d\d$&quot;</span><span class="p">,</span> <span class="n">f</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">database</span><span class="p">,</span> <span class="n">f</span> <span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span> <span class="n">y</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">iyi</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">f</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="p">)</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">iyi</span> <span class="ow">in</span> <span class="p">[</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span> <span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">yis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">f</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">yis</span> <span class="p">)</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">path</span> <span class="o">=</span> <span class="n">fudgeDefaults</span><span class="o">.</span><span class="n">ENDL_DEFAULT_DATABASE</span>
+    <span class="n">database</span><span class="p">,</span> <span class="n">Status</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">getFullPath</span><span class="p">(</span> <span class="n">path</span><span class="p">,</span> <span class="n">fudgeDefaults</span><span class="o">.</span><span class="n">ENDL_DATABASE_DIR</span> <span class="p">)</span>
+    <span class="n">yis</span> <span class="o">=</span> <span class="n">getYis</span><span class="p">(</span> <span class="n">database</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">yis</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">yis</span> <span class="o">=</span> <span class="n">getYis</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">database</span><span class="p">,</span> <span class="s2">&quot;ascii&quot;</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">yis</span></div>
+
+<div class="viewcode-block" id="info"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.fudgemiscLegacy.info">[docs]</a><span class="k">def</span> <span class="nf">info</span><span class="p">(</span> <span class="n">yi</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="mi">2</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;List the default database path and all databases in it. The list of databases is printed with w columns.&quot;&quot;&quot;</span>
+
+    <span class="n">bdflsFile</span> <span class="o">=</span> <span class="n">bdfls</span><span class="o">.</span><span class="n">getDefaultBdfls</span><span class="p">(</span> <span class="p">)</span>
+    <span class="nb">print</span> <span class="s2">&quot;bdfls file =&quot;</span><span class="p">,</span> <span class="n">bdflsFile</span><span class="o">.</span><span class="n">Source</span>
+    <span class="nb">print</span> <span class="s2">&quot;Default database path =&quot;</span><span class="p">,</span> <span class="n">fudgeDefaults</span><span class="o">.</span><span class="n">ENDL_DATABASE_DIR</span>
+    <span class="n">dbs</span> <span class="o">=</span> <span class="n">databaseList</span><span class="p">(</span> <span class="n">yi</span> <span class="o">=</span> <span class="n">yi</span> <span class="p">)</span>
+    <span class="n">lll</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dbs</span> <span class="p">:</span>
+        <span class="k">for</span> <span class="n">yi</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">:</span> <span class="n">lll</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">yi</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">lll</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">brb</span><span class="o">.</span><span class="n">tlist</span><span class="p">(</span> <span class="n">lll</span><span class="p">,</span> <span class="n">w</span> <span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

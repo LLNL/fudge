@@ -1,0 +1,418 @@
+\chapter{Transfer matrices}
+\label{Sec:transfer}
+Deterministic particle transport codes solve a
+discrete version of the Boltzmann equation, and the
+transfer matrix approximates the kernel of the integral
+operator in this equation.
+If $x$ denotes the position,
+$t$ the time, $E'$ the particle energy, $\Omega'$ the
+direction of motion, $v$ the magnitude of the velocity (speed), and
+$n(x, t, E', \Omega')$ the number density, then the
+flux $\phi = vn$ satisfies the Boltzmann 
+equation~\cite{Lewis}
+\begin{equation}
+  \frac{1}{v} \, \partial_t \phi(E', \Omega') +
+  \Omega'\cdot \nabla \phi(E', \Omega') +
+      \rho\sigma_t \phi(E', \Omega') =
+  \frac{\rho}{4\pi}
+   \int_{\Omega} d\Omega \, \int_0^\infty dE \, 
+      \calK(E', \Omega' \cdot \Omega \mid E) \phi(E, \Omega).
+  \label{Boltzmann}
+\end{equation}
+The direction $\Omega'$ is relative to some given 
+``north pole''~$\Omega_0$, and $\rho$ is the density of the material.
+The dependence on $x$ and $t$ is suppressed.
+The first two terms in Eq.~(\ref{Boltzmann}) give the derivative 
+with respect to distance of
+the flux in a coordinate system moving with the particles.
+The parameter
+$\sigma_t$ is the microscopic total cross section, so the term
+$\rho\sigma_t \phi(E', \Omega')$ represents the rate of particle loss
+per particle path length.
+
+The kernel
+$\calK(E', \Omega' \cdot \Omega \mid E)$ in Eq.~(\ref{Boltzmann}) gives the
+rate of production of outgoing particles with energy $E'$ and 
+direction~$\Omega'$ corresponding to incident particles
+at energy $E$ and direction~$\Omega$.
+Here, the energies $E$ and $E'$ and the directions $\Omega$
+and $\Omega'$ are in the laboratory coordinate system.
+From here on,  the notation
+$$
+  \mu = \Omega' \cdot \Omega
+$$
+is used.
+It is significant that the dependence of
+$\calK(E', \mu \mid E)$ on $\mu$
+is axisymmetric, because the orientation of the
+target nucleus is unknown.  The primes are placed where they are in
+Eq.~(\ref{Boltzmann}), because the emphasis in this document is on
+approximation of the right-hand side of the equation.  In that setting, it is
+natural that $E$ denote the energy of the incident particle and $E'$
+the outgoing particle energy.
+
+For a given target,
+the nuclear data in \xendl\ is given reaction by reaction,
+e.g., elastic scattering, neutron capture, fission, etc.
+The transfer matrix approximating $\calK$ is built
+up by summing over the reactions~$r$
+$$
+  \calK = \sum_r \calK_r.
+$$
+The reaction kernels $\calK_r$ themselves are not given in \xendl,
+but their component factors are given instead, namely,
+\begin{enumerate}
+ \item $\sigma_r(E)$: the cross section for the $r$-th reaction,
+ \item  $M_r(E)$: the multiplicity of the outgoing particle,
+ \item $w_r(E)$: the model weight for these data,
+ \item $\pi_r(E', \mu \mid E)$: the double-differential probability
+density of the energy and direction cosine
+for one outgoing particle. 
+\end{enumerate}
+In terms of this notation, $\calK_r$ is the product
+\begin{equation}
+  \calK_r(E', \mu \mid E) = \sigma_r(E) M_r(E) w_r(E) \pi_r(E', \mu \mid E).
+  \label{def_pi}
+\end{equation}
+The multiplicity $M_r(E)$ may be constant, e.g., 1 for elastic scattering
+and 2 for $(n, 2n)$ reactions, but the number of fission neutrons
+depends on the incident energy~$E$.  The default is $M_r(E) = 1$.
+
+\paragraph{Model weight}\label{Sec:model-weight}
+The model weight is usually $w_r(E) = 1$, and that is the
+default.  One exception is that data for a single outgoing neutron in
+an $(n, 2n)$ reaction may have $M_r(E) = 2$ and $w_r(E) = 0.5$.
+The model weight is also used to handle the use of different interpolation
+rules over different ranges of incident energy.  Thus, if the interpolation
+for $E_1 < E < E_2$ is different from that for $E_2 < E < E_3$,
+the data may be split into two sets, one with
+$$
+  w_r(E) = \begin{cases}
+    1 & \text{for $E_1 \le E < E_2$,}\\
+    0 & \text{for $E_2 \le E \le E_3$,}
+  \end{cases}
+$$
+and the other with
+$$
+  w_r(E) = \begin{cases}
+    0 & \text{for $E_1 \le E < E_2$,}\\
+    1 & \text{for $E_2 \le E \le E_3$.}
+  \end{cases}
+$$
+
+The \xendl\ nuclear data consist
+of tables of $\sigma_r(E)$ and $\pi_r(E', \mu \mid E)$ and possibly
+$M_r(E)$ and~$w_r(E)$.
+The data for $\pi_r(E', \mu \mid E)$ take several forms, and
+the various data representations are dealt with individually.
+
+The discretization of Eq.~(\ref{Boltzmann}) is based, first,
+on the specification of a set of energy groups $\{ \calE_g
+\}$ for the incident particles and energy groups $\{ \calE'_h
+\}$ for the emitted particles.  The energy groups for
+neutrons are typically different from those for gammas,
+and yet another set is usually used for charged particles.
+The flux $\phi(E, \Omega)$ inside the integral in
+Eq.~(\ref{Boltzmann}) is discretized according to the energy
+groups of the incident particle, while $\phi(E', \Omega')$
+on the left-hand side of Eq.~(\ref{Boltzmann}) is discretized
+according the the energy groups of the outgoing particles.
+These energy groups are also called energy bins.
+
+According to the normalization for Legendre expansions used in \xendl,
+the angular discretization of $\pi_r$ in Eq.~(\ref{def_pi}) is 
+given by
+$$
+  \pi_r( E', \mu \mid E) =
+   \sum_\ell 
+   \left(
+     \ell + \frac{1}{2}
+   \right)
+   \pi_{r\ell}( E' \mid E) P_\ell( \mu)
+$$
+with $P_\ell( \mu)$ denoting the $\ell$-th Legendre polynomial
+and
+\begin{equation}
+  \pi_{r\ell}( E' \mid E) =
+  \int_{-1}^1 d\mu \, \pi_r( E', \mu \mid E) P_\ell( \mu).
+  \label{def_piell}
+\end{equation}
+
+The flux $\phi(E, \Omega)$ in Eq.~(\ref{Boltzmann}) is expanded 
+into spherical harmonics
+\begin{equation}
+  \phi(E, \Omega) =
+  \sum_{\ell, m}
+    C_{\ell, m} \phi_{\ell, m}(E) Y_{\ell, m} (\Omega)
+ \label{sphHarmonics}
+\end{equation}
+with normalization
+$$
+  C_{\ell, m} = \frac{1}{\int d\Omega \, [Y_{\ell, m} (\Omega)]^2}.
+$$
+
+A discrete approximation to Eq.~(\ref{Boltzmann}) may be obtained
+by expanding $\phi(E, \Omega)$ in spherical harmonics and integrating
+over the outgoing energy group~$\calE'_h$.
+This gives an
+equation for the vector of values
+$$
+  \phi_{\ell, m}(E'_h).
+$$
+Note that $\phi_{\ell, m}(E'_h)$ is a histogram with respect to
+the energy $E'$ of the outgoing particle, constant on each energy
+group~$\calE'_h$.
+Integration of the
+right-hand side of Eq.~(\ref{Boltzmann}) over $\calE'_h$ gives
+\begin{equation}
+  \calI_{h,\ell} = \sum_r
+  \int_0^\infty dE \, \phi_{\ell, 0}(E)
+  \int_{\calE'_h } dE' \, \int_{-1}^1 d\mu \,
+  \calK_r(E', \mu \mid E) P_\ell( \mu ).
+  \label{binnedBoltzmann}
+\end{equation}
+The integral Eq.~(\ref{binnedBoltzmann}) contains only the spherical
+harmonics with $m = 0$, because the kernel $\calK_r$ is axisymmetric.
+
+The unknown flux $\phi$ appears in Eq.~(\ref{Boltzmann})
+both on the left-hand side of the equation and under
+the integral sign.  It is therefore convenient to
+start the calculation using an assumed approximate value of
+$\phi_{\ell, 0}(E)$ in the integral Eq.~(\ref{binnedBoltzmann}), namely,
+\begin{equation}
+  \phi_{\ell, 0}(E) \approx
+    \widetilde\phi_{\ell}(E).
+  \label{approx_phi}
+\end{equation}
+
+Upon inserting Eq.~(\ref{approx_phi}) into Eq.~(\ref{binnedBoltzmann})
+and taking the incident energy groups $\calE_g$ one at a time,
+it is found that Eq.~(\ref{binnedBoltzmann}) may be viewed as the product
+of a matrix with a column vector.  Here, the column vector has the
+components $\phi_{\ell, 0}(E'_h)$, and the components of the matrix
+are given by
+$$
+  \calJ_{g,h,\ell} = \frac{ \calI_{g,h,\ell} }
+       { \int_{\calE_g} dE \, \widetilde \phi_\ell(E) }
+$$
+with
+$$
+    \calI_{g,h,\ell} = \sum_r
+     \int_{\calE_g} dE \, \widetilde \phi_\ell(E) 
+    \int_{\calE'_h } dE' \, \int_\mu d\mu \, 
+     \calK_r(E', \mu \mid E) P_\ell( \mu ).
+$$
+The quantities $\calJ_{g,h,\ell}$ constitute the entries of the \textit{transfer matrix}.
+
+The above discussion gives one way of defining the transfer matrix,
+but the \xndfgen\ code has three
+different representations, depending
+on whether one wants to conserve the number of particles,
+the energy, or both.  Traditionally, conservation of particle 
+number has been used for neutron transport, conservation of energy
+for gammas, and conservation of both energy and number for
+charged particles.  These cases are taken up in turn.
+
+\section{Conservation of particle number}
+With the approximate flux coefficient $\widetilde\phi_\ell$ in Eq.~(\ref{approx_phi})
+and the representation Eq.~(\ref{def_pi}) of the kernel $\calK_r$, the
+$\ell$-th Legendre coefficient of the contributions of energy
+groups $\calE_g$ and $\calE'_h$ to the integral
+in Eq.~(\ref{Boltzmann}) by reaction $r$ is given by
+\begin{equation}
+  \Inum_{r,g,h,\ell} =
+     \int_{\calE_g} dE \, \sigma_r ( E ) M_r(E) w_r(E) \widetilde \phi_\ell(E) 
+    \int_{\calE'_h } dE' \, \int_\mu d\mu \, 
+     P_\ell( \mu )
+     \pi_r(E', \mu \mid E).
+  \label{Inum}
+\end{equation}
+For conservation of particle number the elements of the transfer matrix
+are the sums over all reactions,
+\begin{equation}
+  \calJ_{g,h,\ell} = \frac{ \sum_r \Inum_{r,g,h,\ell} }
+       { \int_{\calE_g} dE \, \widetilde \phi_\ell(E) }.
+  \label{cons_num}
+\end{equation}
+The \gettransfer\ code computes the integrals $\Inum_{r,g,h,\ell}$
+reaction by reaction, and the operation Eq.~(\ref{cons_num}) is performed
+by \xndfgen.
+
+Note that the number-preserving transfer matrices offer a
+simple check.  Because the probability density
+$\pi_r(E', \mu \mid E)$ has the normalization
+$$
+  \int_0^\infty dE' \, \int_{-1}^1 d\mu \, 
+     \pi_r(E', \mu \mid E) = 1,
+$$
+it follows from Eq.~(\ref{Inum}) that
+\begin{equation}
+  \sum_h \Inum_{r,g,h,0} =
+    \int_{\calE_g} dE \, \sigma_r ( E ) M_r(E) w_r(E) \widetilde \phi_0(E).
+  \label{rowSum}
+\end{equation}
+
+\section{Conservation of energy}
+When conservation of energy is desired, the integral
+Eq.~(\ref{Inum}) is modified by insertion of $E'$ as a weight factor
+\begin{equation}
+  \Ien_{r,g,h,\ell} =
+     \int_{\calE_g} dE \, \sigma_r ( E ) M_r(E) w_r(E) \widetilde \phi_\ell(E) 
+    \int_{\calE'_h } dE' \, E' \int_\mu d\mu  \, 
+     P_\ell ( \mu )
+     \pi_r(E', \mu \mid E).
+  \label{Ien}
+\end{equation}
+With the notation that $\overline {E'_h}$ denotes the midpoint of
+energy group $\calE'_h$, the elements of the transfer matrix
+for energy conservation are the sums over all reactions,
+\begin{equation}
+  \widehat \calJ_{g,h,\ell} = \frac{ \sum_r \Ien_{r,g,h,\ell} }
+       { \overline {E'_h} \int_{\calE_g} dE \, \widetilde \phi_\ell(E) }.
+  \label{cons_en}
+\end{equation}
+The computation of $\widehat \calJ_{g,h,\ell}$ in Eq.~(\ref{cons_en})
+is done by \xndfgen\ using the integrals $\Ien_{r,g,h,\ell} $ calculated
+by \gettransfer.
+
+\section{Conservation of both particles and energy}
+The \xndfgen\ code also has an option to combine the 
+integrals $\Inum_{r,g,h,\ell}$ in Eq.~(\ref{Inum}) and $\Ien_{r,g,h,\ell}$ in Eq.~(\ref{Ien})
+so as to construct a transfer matrix which conserves both energy
+and particle number.  Energy conservation may be violated
+in the lowest and highest outgoing energy groups, however.
+The construction is based on the following ideas.
+
+There are two ways to compute the average energy of particles
+in the outgoing energy group~$\calE'_h$.  One such average is the midpoint
+$\overline {E'_h}$ of this group.  Preferably, this value should be
+the same as the average energy
+derived from the the sums over the reactions~$r$ of the
+integrals Eqs.~(\ref{Ien}) and~(\ref{Inum}),
+\begin{equation}
+  \langle E' \rangle_{g,h} =
+  \frac{ \sum_r \Ien_{r,g,h,0}}{ \sum_r \Inum_{r,g,h,0}}.
+  \label{av_E}
+\end{equation}
+This is accomplished, as much as possible, by properly defining
+entries of the transfer matrix corresponding to adjacent outgoing
+energy groups.
+
+For each
+incident energy group $\calE_g$ one iterates through the
+outgoing energy groups~$\calE'_h$.
+Note that the description of this process in
+\cite{Omega} and \cite{ndfgen} assumes that the energy group
+boundaries decrease with increasing index;  the energy
+group boundaries are counted in increasing order here and in \xndfgen.
+
+If $\langle E' \rangle_{g,h} < \overline {E'_h}$ and $\calE'_h$
+is not the lowest energy group, make a fraction of the
+sum
+$$
+\frac{ \sum_r \Ien_{r,g,h,\ell} }
+       { \overline {E'_h} \int_{\calE_g} dE \, \widetilde \phi_\ell(E) }
+$$
+contribute to the transfer matrix element $\calJ_{g,h,\ell}$, and
+make the remainder contribute to~$\calJ_{g,h-1,\ell}$.
+Specifically, it is desired to find $j_{g,h}$
+and $j_{g,h-1}$ which conserve particle number
+$$
+  j_{g,h} + j_{g,h-1} = 
+  \frac{ \sum_r \Inum_{r,g,h,0} }
+       { \int_{\calE_g} dE \, \widetilde \phi_0(E) }
+$$
+as well as average energy
+$$
+  \overline {E'_h}\, j_{g,h} + \overline {E'_{h-1}}\, j_{g,h-1} = 
+    \sum_r \Ien_{r,g,h,0}.
+$$
+Therefore, set
+$$
+  f_{g,h} =
+   \frac{ \langle E' \rangle_{g,h} - \overline {E'_{h-1}} }
+    { \overline {E'_h} - \overline {E'_{h-1}} }.
+$$
+For each Legendre coefficient $\ell$ take as contribution to
+$\calJ_{g,h,\ell}$ the quantity
+$$
+  j_{g,h} = \frac{ f_{g,h} \sum_r \Inum_{r,g,h,\ell} }
+       { \int_{\calE_g} dE \, \widetilde \phi_\ell(E)  },
+$$
+and the contribution to $\calJ_{g,h-1,\ell}$ is
+$$
+  j_{g,h-1} = \frac{ (1 - f_{g,h}) \sum_r \Inum_{r,g,h,\ell} }
+       { \int_{\calE_g} dE \, \widetilde \phi_\ell(E) }.
+$$
+
+If $\langle E' \rangle_{g,h} < \overline {E'_h}$ and $\calE'_h$
+is the lowest energy group, the contribution to $\calJ_{g,h,\ell}$
+is simply
+$$
+  \frac{ \sum_r \Inum_{r,g,h,\ell} }
+       { \int_{\calE_g} dE \, \widetilde \phi_\ell(E) }.
+$$
+This maintains conservation of particle number.
+
+If $\langle E' \rangle_{g,h} > \overline {E'_h}$ and $\calE'_h$
+is not the highest energy group, these data are used to calculate
+contributions to the components $\calJ_{g,h,\ell}$ and $\calJ_{g,h+1,\ell}$
+of the transfer matrix.  Specifically, set
+$$
+  f_{g,h} =
+   \frac{ \overline {E'_{h+1}} - \langle E' \rangle_{g,h} }
+    { \overline {E'_{h+1}} - \overline {E'_h }}.
+$$
+For each Legendre coefficient $\ell$ take as contribution to
+$\calJ_{g,h,\ell}$ the quantity
+$$
+  j_{g,h} = \frac{ f_{g,h} \sum_r \Inum_{r,g,h,\ell} }
+       { \int_{\calE_g} dE \, \widetilde \phi_\ell(E) },
+$$
+and the contribution to $\calJ_{g,h+1,\ell}$ is
+$$
+  j_{g,h+1} = \frac{ (1 - f_{g,h}) \sum_r \Inum_{r,g,h,\ell} }
+       { \int_{\calE_g} dE \, \widetilde \phi_\ell(E) }.
+$$
+
+If $\langle E' \rangle_{g,h} > \overline {E'_h}$ and $\calE'_h$
+is the highest energy group, the contribution to $\calJ_{g,h,\ell}$
+is
+$$
+  \frac{ \sum_r \Inum_{r,g,h,\ell} }
+       { \int_{\calE_g} dE \, \widetilde \phi_\ell(E) }.
+$$
+
+The sum of all of these contributions produces the Legendre
+coefficients $\calJ_{g,h,\ell}$ of a transfer matrix which conserves
+particle number as well as usually conserving energy.
+
+\section{Control of the conservation option}
+The \gettransfer\ code computes the integrals Eq.~(\ref{Inum})
+for the number-preserving transfer matrix or the
+integrals Eq.~(\ref{Ien}) for the energy-preserving transfer matrix
+or both, depending on the value of the \texttt{Conserve}
+input parameter.  See Section~\ref{Sec:conserveFlag}.
+ The default mode is to
+compute both integrals.  The actual construction
+of the transfer matrix is performed by \xndfgen.
+
+\section{Numerical quadrature}
+The integrals Eqs.~(\ref{Inum}) and~(\ref{Ien}) require some sort
+of numerical quadrature, and the multiple integrals are computed as
+a sequence of single integrals.  The quadrature method is a modification of an
+adaptive method proposed by Gander and Gautschi~\cite{Gander}.  The
+main difference is that the Simpson rule
+used in~\cite{Gander} is replaced by a second-order Gaussian quadrature.
+The reason for this change is that in the calculations here,
+one of the limits of integration may be a computed quantity,
+such as a threshold energy.  In such cases, computer arithmetic may
+give rise to attempts to evaluate $\pi_r(E', \mu \mid E)$
+where it makes no sense to do so.
+
+\textbf{Remark.} In the rest of this document the
+subscript~$r$ is omitted from each of the terms in the kernel
+Eq.~(\ref{def_pi}) and from the integrals
+$\Inum_{r,g,h,\ell}$ and $\Ien_{r,g,h,\ell}$, because from now on the discussion will be
+about the treatment of the data, reaction by reaction.
+

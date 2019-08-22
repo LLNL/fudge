@@ -87,19 +87,19 @@ def matrix_from_eigendecomposition( e, v, ndim, doInverse = False, onlyLargeEVs 
     return B
     
 def pruned_matrix_inverse( A, onlyLargeEVs = True, onlyPositiveEV = True, smallEVAbsTol = 1e-10, smallEVRelTol = 1e-6 ):
-    '''Build inverse of :math:`A` \"by hand\", the safe way.   :math:`A` must admit an eigenvalue decomposition.'''
+    """Build inverse of :math:`A` \"by hand\", the safe way.   :math:`A` must admit an eigenvalue decomposition."""
     e, O = numpy.linalg.eig( A )
     v = eigenvectors_from_orthoganal_matrix( O )
     return matrix_from_eigendecomposition( 1.0/e, v, A.shape[0], doInverse=True, onlyLargeEVs = True, onlyPositiveEV = True, smallEVAbsTol = 1e-10, smallEVRelTol = 1e-6 )
             
 def pruned_matrix( A, onlyLargeEVs = True, onlyPositiveEV = True, smallEVAbsTol = 1e-10, smallEVRelTol = 1e-6 ):
-    '''Rebuild :math:`A` \"by hand\", the safe way.   :math:`A` must admit an eigenvalue decomposition.'''
+    """Rebuild :math:`A` \"by hand\", the safe way.   :math:`A` must admit an eigenvalue decomposition."""
     e, O = numpy.linalg.eig( A )
     v = eigenvectors_from_orthoganal_matrix( O )
     return matrix_from_eigendecomposition( e, v, A.shape[0], onlyLargeEVs = True, onlyPositiveEV = True, smallEVAbsTol = 1e-10, smallEVRelTol = 1e-6 )            
 
 def scale_off_diagonals( A, onlyScaleThese = None, scaleFactor = 0.999999 ):
-    '''Sam's trick for getting UNCOR to cooperate: shrink off diagonal elements by some (small) factor'''
+    """Sam's trick for getting UNCOR to cooperate: shrink off diagonal elements by some (small) factor"""
     B = copy.copy( A )
     ndim = B.shape[0]
     for i in range( ndim ):
@@ -205,11 +205,11 @@ def switchSymmetry( mlist, upperToLower = True ):
 
 # ------------------------- covariance matrix checks ------------------------- 
 def check_real_and_finite( A ):
-    '''Checks that all elements in a matrix are read and finite'''
+    """Checks that all elements in a matrix are read and finite"""
     return numpy.all( numpy.isreal(A) ) and numpy.all( numpy.isfinite(A) )
 
 def check_positive_semidefinite( A, warnAll = False, verbose = False ):
-    '''Checks that all elements in a matrix are :math:`\leq 0`'''
+    """Checks that all elements in a matrix are :math:`\leq 0`"""
     success = True
     e, O = numpy.linalg.eig( A )
     for i,x in enumerate( e ):
@@ -223,7 +223,7 @@ def check_positive_semidefinite( A, warnAll = False, verbose = False ):
     return success
         
 def check_symmetric( A, warnAll = False, verbose = False ):
-    '''Checks whether a matrix is symmetric, i.e. :math:`A_{ij} = A_{ji}`'''
+    """Checks whether a matrix is symmetric, i.e. :math:`A_{ij} = A_{ji}`"""
     success = True
     ndim = A.shape[0]
     for i in range( ndim ):
@@ -262,17 +262,16 @@ def check_covariance_element_bounds( A, warnAll = False, verbose = False ):
 
 
 # ------------------------- covariance matrix utilities ------------------------- 
-def covariance_to_correlation( covarianceMatrix, data ): 
+def covariance_to_correlation( matrix ):
     """Convert a covariance matrix to a correlation matrix"""
     diag = numpy.sqrt( matrix.diagonal() )
     corr = matrix / diag / diag[:,numpy.newaxis]
     # now fix diagonal + remove any NaN (from div/0):
     corr[ [range(len(corr)),range(len(corr))] ] = 1.0 # must be exactly 1
     corr[ numpy.isnan(corr) ] = 0
-    # scale by 1000 if desired
     return corr
 
-def correlation_to_covariance( correlationMatrix, data ):  
+def correlation_to_covariance( correlationMatrix, variance ):
     """
     Convert a correlation matrix to a covariance matrix
 
@@ -281,7 +280,7 @@ def correlation_to_covariance( correlationMatrix, data ):
     """
     raise NotImplementedError()
 
-def covariance_to_relative( covarianceMatrix ): 
+def covariance_to_relative( matrix, rsd ):
     """Convert an absolute covariance matrix to a relative covariance matrix"""
     rsd = numpy.array( rsd )
     return matrix * rsd * rsd[:,numpy.newaxis]
@@ -373,7 +372,7 @@ def diff_matrices( matrixOne, matrixTwo, printDiagnostics = True, quiet = True )
 
 # ------------------------- print/plot matrix ------------------------- 
 def print_matrix( M, pretty=True, elementSize=8 ):
-    '''Simple matrix printer, makes little attempt to be pretty, but does print huge matrices'''
+    """Simple matrix printer, makes little attempt to be pretty, but does print huge matrices"""
     for i in range( M.shape[0] ):
         for j in range( M.shape[1] ):
             if pretty: print( '{:.2g}'.format( M[i,j] ).ljust(elementSize), end=' ' )
@@ -392,7 +391,7 @@ def print_eigenvalues( A ):
     print( '\t'.join( [str(x) for x in myEVs] ) )
 
 def plot_matrix( m, title = "a matrix", scaling=None, scalingFloor=0.0 ):
-    '''
+    """
     :param m: a numpy.mat instance
     :param title: a string to use as the plot title
     :param scaling: either None, 'log', or 'asinh'
@@ -405,7 +404,7 @@ def plot_matrix( m, title = "a matrix", scaling=None, scalingFloor=0.0 ):
                         * 'asinh' : each element is scaled as asinh(x).  This exaggerates 
                           scale for values of abs(x)<1.0.
     :param scalingFloor: the minimum value of each element that gets plotted.
-    '''
+    """
     import matplotlib.pyplot as plt
     # Make plot with vertical (default) colorbar
     fig = plt.figure()
@@ -443,7 +442,7 @@ def plot_bad_eigenspaces( A ):
 
 # ------------------------- matrix composition through stacking ------------------------- 
 def stackVertical( l ):
-    '''
+    """
     :param l: a list of numpy matrices, each with same `shape[1]` (i.e. same number of columns).  Elements equal to None are ignored
     
     :returns: a matrix packed as follows ::
@@ -457,11 +456,11 @@ def stackVertical( l ):
             [ l[n-1] ]
 
         where n is the number of non-None elements in l
-    '''
+    """
     return numpy.vstack( filter( lambda x: x is not None, l ) )
         
 def stackHorizontal( l ):
-    '''
+    """
     :param l: a list of numpy matrices, each with same shape[0] (i.e. same number of rows).  Elements equal to None are ignored
     
     A note about numpy.matrix shapes and indexing ::
@@ -475,11 +474,11 @@ def stackHorizontal( l ):
             [  l[0]  | l[1]  | ... | l[n-1] ]
 
         where n is the number of non-None elements in l
-    '''
+    """
     return numpy.hstack( filter( lambda x: x is not None, l ) )
 
 def stackDiagonal( l ):
-    '''
+    """
     :param l: a list of numpy matrices, elements equal to None are ignored
         
     A note about numpy.matrix shapes and indexing ::
@@ -502,7 +501,7 @@ def stackDiagonal( l ):
 
         where n is the number of non-None elements in l
 
-    '''
+    """
     # Determine the size of the final results matrix
     newShape = [ 0, 0 ]
     for m in l: 
@@ -529,7 +528,7 @@ def cglsqrSolve( data, dataUnc = None, dataCov = None, \
                  kernel = None, \
                  prior = None, priorCov = None, \
                  constraintVector = None, constraintMatrix = None ):
-    '''
+    """
     Constrainted Generalized Least-Squares Solver, based on CorAL routines.
     We are minimizing the following ``chi^2`` (assuming Gaussian statistics) ::
     
@@ -922,7 +921,7 @@ def cglsqrSolve( data, dataUnc = None, dataCov = None, \
         [4.386764103176406, 4.035068020722195, 1.0170530818673396, 0.0, 0.0]
             
     The moral is that we'd better know what spaces are constrainted by data and which ones are not!!!
-    '''
+    """
     # Check types of all arguments
     for x in [ data, dataUnc, dataCov, kernel, prior, priorCov, constraintVector, constraintMatrix ]:
         if x is not None and not isinstance( x, numpy.matrixlib.defmatrix.matrix ): raise TypeError( "all arguments must be None or a numpy.mat, got "+str(type(x)))
@@ -1052,7 +1051,6 @@ def get_test_matrix( endfFile = None, MT = None, MF = None ):
 def get_covariances_from_endf( endfFile, MT, MF = 33 ):
 
     from fudge.legacy.converting import endfFileToGND
-    from fudge.processing import processingInfo
 
     rce = endfFileToGND.endfFileToGND( endfFile, toStdOut = False )
     xFileOne, cFileOne = rce['reactionSuite'], rce['covarianceSuite']

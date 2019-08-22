@@ -62,7 +62,8 @@
 # <<END-copyright>>
 
 from fudge.gnd.covariances.summed import summedCovariance
-from .. import endfFormats
+
+from .. import endfFormats as endfFormatsModule
 
 def toENDF6(self, flags, targetInfo, inCovarianceGroup=False):
     endf = []
@@ -71,16 +72,15 @@ def toENDF6(self, flags, targetInfo, inCovarianceGroup=False):
         XMF1,XLFS1,MAT1,NC,NI = 0,0,0,1,0
         rowdat, coldat = targetInfo['dataPointer']
         MT1 = map(int, rowdat['ENDF_MFMT'].split(',')) [1]
-        endf.append( endfFormats.endfHeadLine(XMF1,XLFS1,MAT1,MT1,NC,NI) )
+        endf.append( endfFormatsModule.endfHeadLine(XMF1,XLFS1,MAT1,MT1,NC,NI) )
     # header:
     LTY=0
-    endf.append( endfFormats.endfHeadLine(0,0,0,LTY,0,0) )
+    endf.append( endfFormatsModule.endfHeadLine(0,0,0,LTY,0,0) )
     NCI = len(self.pointerList)
-    endf.append( endfFormats.endfHeadLine(self.lowerBound.getValueAs('eV'),
-        self.upperBound.getValueAs('eV'),0,0, 2*NCI,NCI) )
+    endf.append( endfFormatsModule.endfHeadLine(self.domainMin, self.domainMax, 0, 0, 2*NCI, NCI) )
     mtList = [ map(int, a['ENDF_MFMT'].split(','))[1] for a in self.pointerList]
     coefficients = [a['coefficient'] for a in self.pointerList]
-    endf += endfFormats.endfDataList( [i for j in zip(coefficients,mtList)
+    endf += endfFormatsModule.endfDataList( [i for j in zip(coefficients,mtList)
         for i in j] )
     return endf
 

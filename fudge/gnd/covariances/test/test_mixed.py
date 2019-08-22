@@ -67,12 +67,26 @@
 """
 test fudge/gnd/covariances/
 dbrown, 12/5/2012
+
+Note, the tests below operate on the one and only copy of the covariance data loaded below.  Make sure
+each test only fools with one section otherwise you'll be chasing ghost bugs:
+
+    * run 1: test A changes file, test B depends on results from test A
+
+    * run 2 (different order): test B fails because test A didn't change the files in an "expected" way
+
 """
 
-import unittest, cStringIO, os
+import unittest, os, copy
 from pqu import PQU
 from fudge.gnd.covariances.covarianceSuite import readXML as CovReadXML
 from fudge.gnd.reactionSuite import readXML as RxnReadXML
+from fudge.gnd import covariances
+import xData.axes as axesModule
+import xData.link as linkModule
+import xData.gridded as griddedModule
+import xData.values as valuesModule
+import xData.array as arrayModule
 
 TEST_DATA_PATH, this_filename = os.path.split(__file__)
 FeEvaluation =  RxnReadXML( open(TEST_DATA_PATH+os.sep+'n-026_Fe_056-endfbvii.1.endf.gnd.xml') )
@@ -80,6 +94,7 @@ FeCovariance =  CovReadXML( open(TEST_DATA_PATH+os.sep+'n-026_Fe_056-endfbvii.1.
 
 
 class TestCaseBase( unittest.TestCase ):
+
     def assertXMLListsEqual(self,x1,x2):
         x1List = []
         for line in x1:
@@ -93,98 +108,203 @@ class TestCaseBase( unittest.TestCase ):
 
 
 class Test_mixed( TestCaseBase ):
-    
+
+    def setUp(self):
+        # The COMMARA-2.0 33 group structure
+        self.__groupBoundaries = [
+            1.9640E+07, 1.0000E+07, 6.0653E+06, 3.6788E+06, 2.2313E+06, 1.3534E+06,
+            8.2085E+05, 4.9787E+05, 3.0197E+05, 1.8316E+05, 1.1109E+05, 6.7380E+04,
+            4.0868E+04, 2.4788E+04, 1.5034E+04, 9.1188E+03, 5.5308E+03, 3.3546E+03,
+            2.0347E+03, 1.2341E+03, 7.4852E+02, 4.5400E+02, 3.0433E+02, 1.4863E+02,
+            9.1661E+01, 6.7904E+01, 4.0169E+01, 2.2603E+01, 1.3710E+01, 8.3153E+00,
+            4.0000E+00, 5.4000E-01, 1.0000E-01, 1e-5]
+        self.__groupBoundaries.reverse()
+        self.__groupUnit = 'eV'
+
+        # ...................... example matrix 'a' ......................
+        axes = axesModule.axes(
+            labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'),
+                         2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.grid(axes[2].label, axes[2].index, axes[2].unit,
+                                  style=axesModule.boundariesGridToken,
+                                  values=valuesModule.values([1.0000E-07, 1.1109E-01, 1.3534E+00, 1.9640E+01]))
+        axes[1] = axesModule.grid(axes[1].label, axes[1].index, axes[1].unit,
+                                  style=axesModule.linkGridToken,
+                                  values=linkModule.link(link=axes[2].values, relative=True))
+        myMatrix = arrayModule.full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0], symmetry=arrayModule.symmetryLowerToken)
+        self.a = covariances.covarianceMatrix('eval', matrix=griddedModule.gridded2d(axes, myMatrix),
+                                         type=covariances.tokens.relativeToken)
+
+        # ...................... example matrix 'b' ......................
+        axes = axesModule.axes(
+            labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'),
+                         2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.grid(axes[2].label, axes[2].index, axes[2].unit,
+                                  style=axesModule.boundariesGridToken,
+                                  values=valuesModule.values([1.0e-5, 0.100, 1.0, 20.0]))
+        axes[1] = axesModule.grid(axes[1].label, axes[1].index, axes[1].unit,
+                                  style=axesModule.linkGridToken,
+                                  values=linkModule.link(link=axes[2].values, relative=True))
+        myMatrix = arrayModule.full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0], symmetry=arrayModule.symmetryLowerToken)
+        self.b = covariances.covarianceMatrix('eval', matrix=griddedModule.gridded2d(axes, myMatrix),
+                                         type=covariances.tokens.relativeToken)
+
+        # ...................... example matrix 'c' ......................
+        axes = axesModule.axes(
+            labelsUnits={0: ('matrix_elements', 'b**2'), 1: ('column_energy_bounds', 'MeV'),
+                         2: ('row_energy_bounds', 'MeV')})
+        axes[2] = axesModule.grid(axes[2].label, axes[2].index, axes[2].unit,
+                                  style=axesModule.boundariesGridToken,
+                                  values=valuesModule.values([1.0000E-07, 6.7380E-02, 1.1109E-01, 1.3534E+00]))
+        axes[1] = axesModule.grid(axes[1].label, axes[1].index, axes[1].unit,
+                                  style=axesModule.linkGridToken,
+                                  values=linkModule.link(link=axes[2].values, relative=True))
+        myMatrix = arrayModule.full((3, 3), [4.0, 1.0, 9.0, 0.0, 0.0, 25.0], symmetry=arrayModule.symmetryLowerToken)
+        self.c = covariances.covarianceMatrix('eval', matrix=griddedModule.gridded2d(axes, myMatrix),
+                                         type=covariances.tokens.relativeToken)
+
+        self.abc = covariances.mixed.mixedForm(components=[self.a, self.b, self.c])
+
     def test__getitem__(self):
+        self.maxDiff=None
         self.assertXMLListsEqual(
             FeCovariance[36]['eval'].toXMLList(), '''<mixed label="eval">
-      <covarianceMatrix index="0" type="absolute">
-        <gridded dimension="2">
+      <covarianceMatrix label="0" type="absolute">
+        <gridded2d>
           <axes>
             <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
               <values length="3">1e-5 1.2143e7 2e7</values></grid>
             <grid index="1" label="column_energy_bounds" unit="eV" style="link">
-              <link xlink:href="../grid[@index='2']/values"/></grid>
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit="b**2"/></axes>
           <array shape="3,3" compression="diagonal">
-            <values length="3">0 9e-8 0</values></array></gridded></covarianceMatrix>
-      <covarianceMatrix index="1" type="relative">
-        <gridded dimension="2">
+            <values length="3">0 9e-8 0</values></array></gridded2d></covarianceMatrix>
+      <covarianceMatrix label="1" type="relative">
+        <gridded2d>
           <axes>
             <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
               <values length="3">1e-5 1.2143e7 2e7</values></grid>
             <grid index="1" label="column_energy_bounds" unit="eV" style="link">
-              <link xlink:href="../grid[@index='2']/values"/></grid>
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit=""/></axes>
           <array shape="3,3" compression="diagonal">
-            <values length="3">0 8e-2 0</values></array></gridded></covarianceMatrix>
-      <covarianceMatrix index="2" type="relative">
-        <gridded dimension="2">
+            <values length="3">0 8e-2 0</values></array></gridded2d></covarianceMatrix>
+      <covarianceMatrix label="2" type="relative">
+        <gridded2d>
           <axes>
             <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
               <values length="6">1e-5 1.2143e7 1.3e7 1.45e7 1.75e7 2e7</values></grid>
             <grid index="1" label="column_energy_bounds" unit="eV" style="link">
-              <link xlink:href="../grid[@index='2']/values"/></grid>
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit=""/></axes>
           <array shape="6,6" compression="diagonal">
-            <values length="6">0 0.072 0.072 0.072 0.072 0</values></array></gridded></covarianceMatrix>
-      <covarianceMatrix index="3" type="relative" ENDFconversionFlag="LB=8">
-        <gridded dimension="2">
+            <values length="6">0 0.072 0.072 0.072 0.072 0</values></array></gridded2d></covarianceMatrix>
+      <covarianceMatrix label="3" type="relative" ENDFconversionFlag="LB=8">
+        <gridded2d>
           <axes>
             <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
               <values length="6">1e-5 1.2143e7 1.3e7 1.45e7 1.75e7 2e7</values></grid>
             <grid index="1" label="column_energy_bounds" unit="eV" style="link">
-              <link xlink:href="../grid[@index='2']/values"/></grid>
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit=""/></axes>
           <array shape="6,6" compression="diagonal">
-            <values length="6">0 7.2e-14 1.5335e-14 2.9892e-12 1.9177e-9 0</values></array></gridded></covarianceMatrix></mixed>'''.split('\n') )
+            <values length="6">0 7.2e-14 1.5335e-14 2.9892e-12 1.9177e-9 0</values></array></gridded2d></covarianceMatrix></mixed>'''.split('\n') )
 
     def test__len__(self): 
         self.assertEqual( len(FeCovariance), 40 )
         
-    def test_toXMLList(self):
-        self.assertXMLListsEqual( FeCovariance[36].toXMLList(), '''<section label="36" id="H3 + Mn54_s">
-    <rowData ENDF_MFMT="33,105" xlink:href="/reactionSuite/reactions/reaction[@label='33']/crossSection/regions[@label='eval']"/>
+    def test_toXMLList_11(self):
+        '''This covariance in the Fe56 file is of mixed form and is made of 4 diagonal subspaces.'''
+        self.maxDiff=None
+        self.assertXMLListsEqual( FeCovariance[11].toXMLList(), '''  <section label="n + Fe56_e5">
+    <rowData ENDF_MFMT="33,55" xlink:href="/reactionSuite/reactions/reaction[@label='n + Fe56_e5']/crossSection/XYs1d[@label='eval']"/>
     <mixed label="eval">
-      <covarianceMatrix index="0" type="absolute">
-        <gridded dimension="2">
+      <covarianceMatrix label="0" type="absolute">
+        <gridded2d>
           <axes>
             <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
-              <values length="3">1e-5 1.2143e7 2e7</values></grid>
+              <values length="3">1e-5 3013400 2e7</values></grid>
             <grid index="1" label="column_energy_bounds" unit="eV" style="link">
-              <link xlink:href="../grid[@index='2']/values"/></grid>
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit="b**2"/></axes>
           <array shape="3,3" compression="diagonal">
-            <values length="3">0 9e-8 0</values></array></gridded></covarianceMatrix>
-      <covarianceMatrix index="1" type="relative">
-        <gridded dimension="2">
+            <values length="3">0 2e-6 0</values></array></gridded2d></covarianceMatrix>
+      <covarianceMatrix label="1" type="relative">
+        <gridded2d>
+          <axes>
+            <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
+              <values length="3">1e-5 3013400 2e7</values></grid>
+            <grid index="1" label="column_energy_bounds" unit="eV" style="link">
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
+            <axis index="0" label="matrix_elements" unit=""/></axes>
+          <array shape="3,3" compression="diagonal">
+            <values length="3">0 5e-3 0</values></array></gridded2d></covarianceMatrix>
+      <covarianceMatrix label="2" type="relative">
+        <gridded2d>
+          <axes>
+            <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
+              <values length="8">1e-5 3013400 4e6 5e6 6e6 8e6 1e7 2e7</values></grid>
+            <grid index="1" label="column_energy_bounds" unit="eV" style="link">
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
+            <axis index="0" label="matrix_elements" unit=""/></axes>
+          <array shape="8,8" compression="diagonal">
+            <values length="8">0 4.5e-3 4.5e-3 4.5e-3 4.5e-3 4.5e-3 4.5e-3 0</values></array></gridded2d></covarianceMatrix>
+      <covarianceMatrix label="3" type="relative" ENDFconversionFlag="LB=8">
+        <gridded2d>
+          <axes>
+            <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
+              <values length="8">1e-5 3013400 4e6 5e6 6e6 8e6 1e7 2e7</values></grid>
+            <grid index="1" label="column_energy_bounds" unit="eV" style="link">
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
+            <axis index="0" label="matrix_elements" unit=""/></axes>
+          <array shape="8,8" compression="diagonal">
+            <values length="8">0 3.5972e-6 7.369e-6 3.8185e-6 1.376e-6 1.353e-7 1.1602e-8 0</values></array></gridded2d></covarianceMatrix></mixed></section>'''.split('\n') )
+
+    def test_toXMLList_36(self):
+        self.maxDiff=None
+        self.assertXMLListsEqual( FeCovariance[36].toXMLList(), '''<section label="H3 + Mn54_s">
+    <rowData ENDF_MFMT="33,105" xlink:href="/reactionSuite/reactions/reaction[@label='H3 + Mn54_s']/crossSection/regions1d[@label='eval']"/>
+    <mixed label="eval">
+      <covarianceMatrix label="0" type="absolute">
+        <gridded2d>
           <axes>
             <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
               <values length="3">1e-5 1.2143e7 2e7</values></grid>
             <grid index="1" label="column_energy_bounds" unit="eV" style="link">
-              <link xlink:href="../grid[@index='2']/values"/></grid>
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
+            <axis index="0" label="matrix_elements" unit="b**2"/></axes>
+          <array shape="3,3" compression="diagonal">
+            <values length="3">0 9e-8 0</values></array></gridded2d></covarianceMatrix>
+      <covarianceMatrix label="1" type="relative">
+        <gridded2d>
+          <axes>
+            <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
+              <values length="3">1e-5 1.2143e7 2e7</values></grid>
+            <grid index="1" label="column_energy_bounds" unit="eV" style="link">
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit=""/></axes>
           <array shape="3,3" compression="diagonal">
-            <values length="3">0 8e-2 0</values></array></gridded></covarianceMatrix>
-      <covarianceMatrix index="2" type="relative">
-        <gridded dimension="2">
+            <values length="3">0 8e-2 0</values></array></gridded2d></covarianceMatrix>
+      <covarianceMatrix label="2" type="relative">
+        <gridded2d>
           <axes>
             <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
               <values length="6">1e-5 1.2143e7 1.3e7 1.45e7 1.75e7 2e7</values></grid>
             <grid index="1" label="column_energy_bounds" unit="eV" style="link">
-              <link xlink:href="../grid[@index='2']/values"/></grid>
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit=""/></axes>
           <array shape="6,6" compression="diagonal">
-            <values length="6">0 0.072 0.072 0.072 0.072 0</values></array></gridded></covarianceMatrix>
-      <covarianceMatrix index="3" type="relative" ENDFconversionFlag="LB=8">
-        <gridded dimension="2">
+            <values length="6">0 0.072 0.072 0.072 0.072 0</values></array></gridded2d></covarianceMatrix>
+      <covarianceMatrix label="3" type="relative" ENDFconversionFlag="LB=8">
+        <gridded2d>
           <axes>
             <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
               <values length="6">1e-5 1.2143e7 1.3e7 1.45e7 1.75e7 2e7</values></grid>
             <grid index="1" label="column_energy_bounds" unit="eV" style="link">
-              <link xlink:href="../grid[@index='2']/values"/></grid>
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit=""/></axes>
           <array shape="6,6" compression="diagonal">
-            <values length="6">0 7.2e-14 1.5335e-14 2.9892e-12 1.9177e-9 0</values></array></gridded></covarianceMatrix></mixed></section>'''.split('\n') )
+            <values length="6">0 7.2e-14 1.5335e-14 2.9892e-12 1.9177e-9 0</values></array></gridded2d></covarianceMatrix></mixed></section>'''.split('\n') )
 
     def test_check(self):
         self.assertItemsEqual( FeCovariance[36].check({
@@ -192,99 +312,183 @@ class Test_mixed( TestCaseBase ):
             'negativeEigenTolerance':1e-8,
             'eigenvalueRatioTolerance':1e8}), [] )
 
-    def test_fix(self): pass
-    
-    def test_plot(self):pass
-    
-    def test_addComponent(self): pass
-    
+    def test_addComponent(self):
+        '''Test adding components the two standard ways'''
+        ABC = covariances.mixed.mixedForm()
+        ABC.addComponent(self.a)
+        ABC.addComponent(self.b)
+        ABC.addComponent(self.c)
+        self.assertXMLListsEqual(self.abc.toXMLList(),ABC.toXMLList())
+
+    def test_constructArray(self):
+        self.assertItemsEqual( self.a.matrix.array.constructArray().ravel(), self.abc.components[0].matrix.array.constructArray().ravel() )
+
+    @unittest.skip("FIXME")
+    def test_group(self):
+        '''test grouping fun on a mixedForm'''
+
+        # build the mixed matrix & make sure is kosher
+        self.assertEqual(map(str, self.abc.check(
+            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001})), [])
+        self.assertXMLListsEqual(self.abc.toXMLList(),
+                         """<mixed label="None">
+  <covarianceMatrix label="eval" type="relative">
+    <gridded2d>
+      <axes>
+        <grid index="2" label="row_energy_bounds" unit="MeV" style="boundaries">
+          <values length="4">1e-7 0.11109 1.3534 19.64</values></grid>
+        <grid index="1" label="column_energy_bounds" unit="MeV" style="link">
+          <link xlink:href="../../grid[@index='2']/values"/></grid>
+        <axis index="0" label="matrix_elements" unit="b**2"/></axes>
+      <array shape="3,3" symmetry="lower">
+        <values length="6">4 1 9 0 0 25</values></array></gridded2d></covarianceMatrix>
+  <covarianceMatrix label="eval" type="relative">
+    <gridded2d>
+      <axes>
+        <grid index="2" label="row_energy_bounds" unit="MeV" style="boundaries">
+          <values length="4">1e-5 0.1 1 20</values></grid>
+        <grid index="1" label="column_energy_bounds" unit="MeV" style="link">
+          <link xlink:href="../../grid[@index='2']/values"/></grid>
+        <axis index="0" label="matrix_elements" unit="b**2"/></axes>
+      <array shape="3,3" symmetry="lower">
+        <values length="6">4 1 9 0 0 25</values></array></gridded2d></covarianceMatrix>
+  <covarianceMatrix label="eval" type="relative">
+    <gridded2d>
+      <axes>
+        <grid index="2" label="row_energy_bounds" unit="MeV" style="boundaries">
+          <values length="4">1e-7 0.06738 0.11109 1.3534</values></grid>
+        <grid index="1" label="column_energy_bounds" unit="MeV" style="link">
+          <link xlink:href="../../grid[@index='2']/values"/></grid>
+        <axis index="0" label="matrix_elements" unit="b**2"/></axes>
+      <array shape="3,3" symmetry="lower">
+        <values length="6">4 1 9 0 0 25</values></array></gridded2d></covarianceMatrix></mixed>""".split('\n'))
+
+        abc_c = self.abc.toCovarianceMatrix()
+        self.assertEqual(map(str, abc_c.check(
+            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001})), [])
+        self.assertXMLListsEqual(abc_c.toXMLList(),
+                         """<covarianceMatrix label="composed" type="relative">
+  <gridded2d>
+    <axes>
+      <grid index="2" label="row_energy_bounds" unit="MeV" style="boundaries">
+        <values length="9">1e-7 1e-5 0.06738 0.1 0.11109 1 1.3534 19.64 20</values></grid>
+      <grid index="1" label="column_energy_bounds" unit="MeV" style="link">
+        <link xlink:href="../../grid[@index='2']/values"/></grid>
+      <axis index="0" label="matrix_elements" unit="b**2"/></axes>
+    <array shape="8,8" symmetry="lower">
+      <values length="36">8 8 12 5 9 17 5 6 14 22 1 2 2 10 43 1 1 1 1 34 59 0 0 0 0 0 25 50 0 0 0 0 0 25 25 25</values></array></gridded2d></covarianceMatrix>""".split('\n'))
+
+        self.maxDiff=None
+        g = abc_c.group(groupBoundaries=(self.__groupBoundaries, self.__groupBoundaries),
+                        groupUnit=(self.__groupUnit, self.__groupUnit))
+        g.convertAxesToUnits(('b**2', 'MeV', 'MeV'))
+        self.assertTrue(g.matrix.axes[0].unit, 'MeV')
+        self.assertTrue(g.matrix.axes[1].unit, 'MeV')
+        self.assertTrue(g.matrix.axes[2].unit, 'b**2')
+        self.assertEqual(map(str, g.check(
+            {'checkUncLimits': False, 'negativeEigenTolerance': 0.0001, 'eigenvalueRatioTolerance': 0.0001})), [])
+        if True:
+            self.assertXMLListsEqual(g.toXMLList(),
+                         """<covarianceMatrix label="composed" type="relative">
+  <gridded2d>
+    <axes>
+      <grid index="2" label="row_energy_bounds" unit="MeV" style="boundaries">
+        <values length="4">1e-7 0.11109 1.3534 19.64</values></grid>
+      <grid index="1" label="column_energy_bounds" unit="MeV" style="link">
+        <link xlink:href="../../grid[@index='2']/values"/></grid>
+      <axis index="0" label="matrix_elements" unit="b**2"/></axes>
+    <array shape="33,33" symmetry="lower">
+      <values length="561">2.09046853425614e-31 1.50619069577192e-15 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868
+        10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868
+        10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 1.50619069577192e-15 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 10.8521624451868 3.17404481019479e-16 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 40.6309282309796
+        3.17404481019479e-16 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 40.6309282309796 40.6309282309796 3.17404481019479e-16 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 40.6309282309796 40.6309282309796 40.6309282309796 3.17404481019479e-16 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 40.6309282309796 40.6309282309796 40.6309282309796 40.6309282309796 3.17404481019479e-16 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969 2.28691160987969
+        2.28691160987969 40.6309282309796 40.6309282309796 40.6309282309796 40.6309282309796 40.6309282309796 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 50 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 50 50 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 50 50 50 0 0 0 0
+        0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 50 50 50 50 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 7.11175149519846 50 50 50 50 50</values></array></gridded2d></covarianceMatrix>""".split('\n'))
+        if False:
+            #self.abc.plot(xlog=True, ylog=True, title='abc')
+            #self.abc.plot(xlog=False, ylog=False, title='abc')
+            self.a.plot(title="a")
+            self.b.plot(xlog=True, ylog=True, title='b')
+            self.c.plot(title='c')
+            g.plot(xlog=True, ylog=True, title='abc grouped')
+
     def test_getMatchingComponent_0(self):
         self.assertXMLListsEqual( FeCovariance[33]['eval'].getMatchingComponent(
-                            rowBounds = (PQU.PQU( "1.e-5 eV" ), PQU.PQU( "2.e7 eV" )),
-                            columnBounds = (PQU.PQU( "1.e-5 eV" ), PQU.PQU( "2.e7 eV" ))).toXMLList(), 
-                         [  '<covarianceMatrix index="1" type="relative">',
-                            '<gridded dimension="2">',
+                            rowBounds = (1.e-5, 2.e7),
+                            columnBounds = (1.e-5, 2.e7)).toXMLList(), 
+                         [  '<covarianceMatrix label="1" type="relative">',
+                            '<gridded2d>',
                             '<axes>',
                             '<grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">',
                             '<values length="10">1e-5 8.5e5 2e6 3e6 4e6 5e6 6e6 7e6 1e7 2e7</values></grid>',
                             '<grid index="1" label="column_energy_bounds" unit="eV" style="link">',
-                            '<link xlink:href="../grid[@index=\'2\']/values"/></grid>',
+                            '<link xlink:href="../../grid[@index=\'2\']/values"/></grid>',
                             '<axis index="0" label="matrix_elements" unit=""/></axes>',
                             '<array shape="10,10" compression="diagonal">',
-                            '<values length="10">0 0.0396 0.0891 0.0891 0.0891 0.0891 0.0891 0.0891 0.3782 0</values></array></gridded></covarianceMatrix>'] )
+                            '<values length="10">0 0.0396 0.0891 0.0891 0.0891 0.0891 0.0891 0.0891 0.3782 0</values></array></gridded2d></covarianceMatrix>'] )
 
     def test_getMatchingComponent_0_stripped(self):
         x = FeCovariance[33]['eval'].getMatchingComponent(
-                            rowBounds = (PQU.PQU( "1.e-5 eV" ), PQU.PQU( "2.e7 eV" )),
-                            columnBounds = (PQU.PQU( "1.e-5 eV" ), PQU.PQU( "2.e7 eV" )))
+                            rowBounds = (1.e-5, 2.e7),
+                            columnBounds = (1.e-5 ,2.e7) )
         x.removeExtraZeros()
         self.assertXMLListsEqual( x.toXMLList(),
-                        [  '<covarianceMatrix index="1" type="relative">',
-                            '<gridded dimension="2">',
+                        [  '<covarianceMatrix label="1" type="relative">',
+                            '<gridded2d>',
                             '<axes>',
                             '<grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">',
-                            '<values length="10">1e-5 8.5e5 2e6 3e6 4e6 5e6 6e6 7e6 1e7 2e7</values></grid>',
+                            '<values length="9">8.5e5 2e6 3e6 4e6 5e6 6e6 7e6 1e7 2e7</values></grid>',
                             '<grid index="1" label="column_energy_bounds" unit="eV" style="link">',
-                            '<link xlink:href="../grid[@index=\'2\']/values"/></grid>',
+                            '<link xlink:href="../../grid[@index=\'2\']/values"/></grid>',
                             '<axis index="0" label="matrix_elements" unit=""/></axes>',
                             '<array shape="8,8" symmetry="lower">',
-                            '<values length="36">0.0396 0 0.0891 0 0 0.0891 0 0 0 0.0891 0 0 0 0 0.0891 0 0 0 0 0 0.0891 0 0 0 0 0 0 0.0891 0 0 0 0 0 0 0 0.3782</values></array></gridded></covarianceMatrix>'] )
+                            '<values length="36">0.0396 0 0.0891 0 0 0.0891 0 0 0 0.0891 0 0 0 0 0.0891 0 0 0 0 0 0.0891 0 0 0 0 0 0 0.0891 0 0 0 0 0 0 0 0.3782</values></array></gridded2d></covarianceMatrix>'] )
 
     def test_getMatchingComponent_1(self):
         '''Fails because there is no component of section 1 with such bounds'''
         self.assertRaises(  ValueError,
                             FeCovariance[1]['eval'].getMatchingComponent,
-                            rowBounds = (PQU.PQU( "1.e-5 eV" ), PQU.PQU( "2.e7 eV" )),
-                            columnBounds = (PQU.PQU( "1.e-5 eV" ), PQU.PQU( "2.e7 eV" )) )
+                            rowBounds = (1.e-5, 2.e7),
+                            columnBounds = (1.e-5, 2.e7) )
     
     def test_getMatchingComponent_2(self):
         self.maxDiff=None
         self.assertXMLListsEqual( FeCovariance[1]['eval'].getMatchingComponent(
-                            rowBounds = (PQU.PQU( "1.e-5 eV" ), PQU.PQU( "850636 eV" )),
-                            columnBounds = (PQU.PQU( "1.e-5 eV" ), PQU.PQU( "850636 eV" ))).toXMLList(), 
-                         [  '<covarianceMatrix index="1" type="relative">',
-                            '<gridded dimension="2">',
+                            rowBounds = (1.e-5, 850636),
+                            columnBounds = (1.e-5, 850636) ).toXMLList(), 
+                         [  '<covarianceMatrix label="1" type="relative">',
+                            '<gridded2d>',
                             '<axes>',
                             '<grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">',
                             '<values length="14">1e-5 20 3e2 33830.5 76772 102950 152676 204928 238299 446595 483428 518904 553281 850636</values></grid>',
                             '<grid index="1" label="column_energy_bounds" unit="eV" style="link">',
-                            '<link xlink:href="../grid[@index=\'2\']/values"/></grid>',
+                            '<link xlink:href="../../grid[@index=\'2\']/values"/></grid>',
                             '<axis index="0" label="matrix_elements" unit=""/></axes>',
                             '<array shape="13,13" symmetry="lower">',
-                            '<values length="91">1.6e-3 2.4e-3 3.6e-3 0 0 3.176954e-3 0 0 3.468456e-3 0.01514682 0 0 2.606664e-3 5.691679e-3 8.554986e-3 0 0 2.975089e-3 6.496139e-3 4.882072e-3 0.0111442 0 0 2.995769e-3 6.541293e-3 4.916007e-3 5.610834e-3 0.01129967 0 0 3.582893e-3 7.823286e-3 5.879469e-3 6.710471e-3 6.757115e-3 0.01616281 0 0 3.334617e-3 7.281172e-3 5.472051e-3 6.245469e-3 6.288881e-3 7.521405e-3 0.01400042 0 0 3.325916e-3 7.262173e-3 5.457774e-3 6.229173e-3 6.272472e-3 7.50178e-3 6.981945e-3 0.01392745 0 0 3.059465e-3 6.680374e-3 5.020531e-3 5.730131e-3 5.769962e-3 6.900785e-3 6.422595e-3 6.405837e-3 0.01178528 0 0 3.185348e-3 6.955242e-3 5.227104e-3 5.965901e-3 6.00737e-3 7.184721e-3 6.686857e-3 6.669409e-3 6.135098e-3 0.01277506 0 0 2.919549e-3 6.374865e-3 4.790931e-3 5.468079e-3 5.506088e-3 6.585196e-3 6.128875e-3 6.112884e-3 5.623158e-3 5.854526e-3 0.010732</values></array></gridded></covarianceMatrix>'] )
-    
-    def test_shrinkToBounds(self):
-        self.maxDiff=None
-        self.assertXMLListsEqual(
-            FeCovariance[0]['eval'].shrinkToBounds((PQU.PQU( "862270 eV" ), PQU.PQU( "1.5e7 eV" )),).toXMLList(),
-            ['<mixed>',
-             '  <covarianceMatrix index="1" type="relative">',
-             '    <axes>',
-             '      <axis index="0" label="row_energy_bounds" unit="eV" interpolation="lin,flat" length="6"> 862270 1e6 2e6 5e6 1e7 1.5e7</axis>',
-             '      <axis index="1" label="column_energy_bounds" unit="eV" interpolation="lin,flat" mirror_row_energy_bounds="true"/>',
-             '      <axis index="2" label="matrix_elements" unit=""/></axes>',
-             '    <matrix rows="6" columns="6" form="diagonal" precision="6"> 9.900000e-05  5.564000e-03  1.584000e-03  8.910000e-04  3.960000e-04  3.960000e-04 </matrix></covarianceMatrix></mixed>'])
-    
+                            '<values length="91">1.6e-3 2.4e-3 3.6e-3 0 0 3.176954e-3 0 0 3.468456e-3 0.01514682 0 0 2.606664e-3 5.691679e-3 8.554986e-3 0 0 2.975089e-3 6.496139e-3 4.882072e-3 0.0111442 0 0 2.995769e-3 6.541293e-3 4.916007e-3 5.610834e-3 0.01129967 0 0 3.582893e-3 7.823286e-3 5.879469e-3 6.710471e-3 6.757115e-3 0.01616281 0 0 3.334617e-3 7.281172e-3 5.472051e-3 6.245469e-3 6.288881e-3 7.521405e-3 0.01400042 0 0 3.325916e-3 7.262173e-3 5.457774e-3 6.229173e-3 6.272472e-3 7.50178e-3 6.981945e-3 0.01392745 0 0 3.059465e-3 6.680374e-3 5.020531e-3 5.730131e-3 5.769962e-3 6.900785e-3 6.422595e-3 6.405837e-3 0.01178528 0 0 3.185348e-3 6.955242e-3 5.227104e-3 5.965901e-3 6.00737e-3 7.184721e-3 6.686857e-3 6.669409e-3 6.135098e-3 0.01277506 0 0 2.919549e-3 6.374865e-3 4.790931e-3 5.468079e-3 5.506088e-3 6.585196e-3 6.128875e-3 6.112884e-3 5.623158e-3 5.854526e-3 0.010732</values></array></gridded2d></covarianceMatrix>'] )
+
     def test_makeSafeBounds(self):
+        cc = copy.copy(FeCovariance[0]['eval'])
         self.assertEqual(
-            [c.getRowBounds() for c in FeCovariance[0]['eval'].components],
-            [(PQU.PQU( "1.e-5 eV" ), PQU.PQU( "862270. eV" )), (PQU.PQU( "1.e-5 eV" ), PQU.PQU( "2.e7 eV" ))])
-        FeCovariance[0]['eval'].makeSafeBounds()
+            [c.getRowBounds() for c in cc.components],
+            [(1.e-5, 862270.), (1e-5, 2.e7)] )
+        cc.makeSafeBounds()
         self.assertEqual(
-            [c.getRowBounds() for c in FeCovariance[0]['eval'].components],
-            [(PQU.PQU( "1.e-5 eV" ), PQU.PQU( "862270. eV" )), (PQU.PQU( "862270. eV" ), PQU.PQU( "1.5e7 eV" ))])
+            [c.getRowBounds() for c in cc.components],
+            [(1.e-5, 862270.), (862270., 2.e7)] )
 
     def test_getRowBounds(self):
-        self.assertEqual( FeCovariance[0]['eval'].getRowBounds(),(PQU.PQU( "1.e-5 eV" ), PQU.PQU( "2.e7 eV" )))
-        self.assertEqual( FeCovariance[1]['eval'].getRowBounds(),(PQU.PQU( "1.e-5 eV" ), PQU.PQU( "2.e7 eV" )))
-        self.assertEqual( FeCovariance[2]['eval'].getRowBounds(),(PQU.PQU( "1.e-5 eV" ), PQU.PQU( "2.e7 eV" )))
+        self.assertEqual( FeCovariance[0]['eval'].getRowBounds('eV'),(1.e-5, 2.e7))
+        self.assertEqual( FeCovariance[1]['eval'].getRowBounds('eV'),(1.e-5, 2.e7))
+        self.assertEqual( FeCovariance[2]['eval'].getRowBounds('eV'),(1.e-5, 2.e7))
     
     def test_getColumnBounds(self):
-        self.assertEqual( FeCovariance[0]['eval'].getColumnBounds(),(PQU.PQU( "1.e-5 eV" ), PQU.PQU( "2.e7 eV" )))
-        self.assertEqual( FeCovariance[1]['eval'].getColumnBounds(),(PQU.PQU( "1.e-5 eV" ), PQU.PQU( "2.e7 eV" )))
-        self.assertEqual( FeCovariance[2]['eval'].getColumnBounds(),(PQU.PQU( "1.e-5 eV" ), PQU.PQU( "2.e7 eV" )))
+        self.assertEqual( FeCovariance[0]['eval'].getColumnBounds('eV'),(1.e-5, 2.e7))
+        self.assertEqual( FeCovariance[1]['eval'].getColumnBounds('eV'),(1.e-5, 2.e7))
+        self.assertEqual( FeCovariance[2]['eval'].getColumnBounds('eV'),(1.e-5, 2.e7))
     
-    def test_getUncertaintyVector(self): 
+    @unittest.skip("FIXME")
+    def test_getUncertaintyVector(self):
         self.assertEqual( 
             repr(FeCovariance[0]['eval'].getUncertaintyVector(
                 theData=FeEvaluation.getReaction('elastic').crossSection)),
@@ -352,128 +556,78 @@ class Test_mixed( TestCaseBase ):
    2.00000000e+07   1.98997487e-02
 ''')
         
+    @unittest.skip("FIXME")
     def test_toCovarianceMatrix(self):
-        self.assertXMLListsEqual( FeCovariance[36]['eval'].toCovarianceMatrix().toXMLList(),
-            ['<covarianceMatrix type="relative">',
-             '  <axes>',
-             '    <axis index="0" label="row_energy_bounds" unit="eV" interpolation="lin,flat" length="32"> 1e-5 0.5 20 3e2 1140.04 1751 33830.5 35479.5 53647.5 76772 77931.5 89369 94561 102950 104508 152676 203065 204928 238299 261280 446595 483428 518904 553281 794899 862270 1e6 2e6 5e6 1e7 1.5e7 2e7</axis>',
-             '    <axis index="0" label="row_energy_bounds" unit="eV" interpolation="lin,flat" length="32"> 1e-5 0.5 20 3e2 1140.04 1751 33830.5 35479.5 53647.5 76772 77931.5 89369 94561 102950 104508 152676 203065 204928 238299 261280 446595 483428 518904 553281 794899 862270 1e6 2e6 5e6 1e7 1.5e7 2e7</axis>',
-             '    <axis index="2" label="matrix_elements" unit=""/></axes>',
-             '  <matrix rows="31" columns="31" form="symmetric">',
-             '    0.004521841',
-             '    0.007561844 0.01376479',
-             '    0.008361844 0.01456479 0.01576479',
-             '    0.005961844 0.01216479 0.01216479 0.015341744',
-             '    0.0 0.0 0.0 0.003176954 0.013101309',
-             '    0.0 0.0 0.0 0.003176954 0.009338387 0.018478004',
-             '    0.0 0.0 0.0 0.003468456 0.009629889 0.018769506 0.03044787',
-             '    0.0 0.0 0.0 0.003468456 0.008425108 0.009623028 0.021301392 0.025049085',
-             '    0.0 0.0 0.0 0.003468456 0.007281858 0.008203479 0.019881843 0.018955976 0.021007971',
-             '    0.0 0.0 0.0 0.002606664 0.006420066 0.007341687 0.010426702 0.009500835 0.01155283 0.014416137',
-             '    0.0 0.0 0.0 0.002606664 0.006074221 0.006912258 0.009997273 0.009155375 0.008356475 0.011219782 0.013401227',
-             '    0.0 0.0 0.0 0.002606664 0.007052283 0.008126697 0.011211712 0.010132348 0.00910811 0.011971417 0.011661574 0.016520655',
-             '    0.0 0.0 0.0 0.002606664 0.007977071 0.009274988 0.012360003 0.011056106 0.009818803 0.01268211 0.012307813 0.013366339 0.020179426',
-             '    0.0 0.0 0.0 0.002975089 0.008345496 0.009643413 0.013164463 0.011860566 0.010623263 0.009009196 0.008634899 0.009693425 0.016506512 0.02276864',
-             '    0.0 0.0 0.0 0.002975089 0.008882803 0.010310575 0.013831625 0.012397274 0.01103618 0.009422113 0.009010368 0.010174798 0.011275803 0.017537931 0.02521104',
-             '    0.0 0.0 0.0 0.002995769 0.009381029 0.010924214 0.014469738 0.012919443 0.011448326 0.00982304 0.009378011 0.010636568 0.011826572 0.012521399 0.013212797 0.0277326',
-             '    0.0 0.0 0.0 0.002995769 0.007243324 0.008269871 0.011815395 0.010784119 0.009805513 0.008180227 0.007884188 0.008721396 0.009513002 0.010207829 0.010667755 0.016765365 0.018571368',
-             '    0.0 0.0 0.0 0.003582893 0.007830448 0.008856995 0.013097388 0.012066112 0.011087506 0.009143689 0.00884765 0.009684858 0.010476464 0.011307466 0.011767392 0.01222281 0.014028813 0.023434508',
-             '    0.0 0.0 0.0 0.003334617 0.007582172 0.008608719 0.012555274 0.011523998 0.010545392 0.008736271 0.008440232 0.00927744 0.010069046 0.010842464 0.01130239 0.011754576 0.013560579 0.014793103 0.021272118',
-             '    0.0 0.0 0.0 0.003334617 0.017252577 0.020616257 0.024562812 0.021183632 0.017977032 0.016167911 0.015197887 0.017941161 0.020535021 0.021308439 0.022815479 0.024198321 0.018202461 0.019434985 0.025914 0.09207485',
-             '    0.0 0.0 0.0 0.003325916 0.017519686 0.020950026 0.024886283 0.021440143 0.018170003 0.016365604 0.015376347 0.018173984 0.020819244 0.021590643 0.023127553 0.024536822 0.018422142 0.01965145 0.019131615 0.046792765 0.09512696',
-             '    0.0 0.0 0.0 0.003059465 0.017253235 0.020683575 0.024304484 0.020858344 0.017588204 0.015928361 0.014939104 0.017736741 0.020382001 0.021091601 0.022628511 0.024034312 0.017919632 0.019050455 0.018572265 0.046233415 0.087605347 0.09298479',
-             '    0.0 0.0 0.0 0.003185348 0.017379118 0.020809458 0.024579352 0.021133212 0.017863072 0.016134934 0.015145677 0.017943314 0.020588574 0.021327371 0.022864281 0.02427172 0.01815704 0.019334391 0.018836527 0.046497677 0.087868919 0.087334608 0.09397457',
-             '    0.0 0.0 0.0 0.0 0.01404215 0.01743584 0.01743584 0.01402651 0.0107913 0.0107913 0.009812619 0.01258037 0.01519737 0.01519737 0.01671786 0.01806924 0.01201989 0.01201989 0.01201989 0.03938554 0.04016605 0.04016605 0.04016605 0.07947396',
-             '    0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0',
-             '    0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 9.9e-05',
-             '    0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.005564',
-             '    0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.001584',
-             '    0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.000891',
-             '    0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.000396',
-             '    0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.000396</matrix></covarianceMatrix>'] )
-    
-    def test_toAbsolute(self): 
-        self.assertXMLListsEqual(
-            FeCovariance[0]['eval'].toAbsolute(
-                rowData=FeEvaluation.getReaction('elastic').crossSection.toPointwise_withLinearXYs(1e-8,1e-8)).toXMLList(),
-            ['<mixed>',
-             '  <covarianceMatrix type="absolute">',
-             '    <axes>',
-             '      <axis index="0" label="row_energy_bounds" unit="eV" interpolation="lin,flat" length="25"> 1e-5 0.5 20 3e2 1140.04 1751 33830.5 35479.5 53647.5 76772 77931.5 89369 94561 102950 104508 152676 203065 204928 238299 261280 446595 483428 518904 553281 794899</axis>',
-             '      <axis index="0" label="row_energy_bounds" unit="eV" interpolation="lin,flat" length="25"> 1e-5 0.5 20 3e2 1140.04 1751 33830.5 35479.5 53647.5 76772 77931.5 89369 94561 102950 104508 152676 203065 204928 238299 261280 446595 483428 518904 553281 794899</axis>',
-             '      <axis index="2" label="matrix_elements" unit=""/></axes>',
-             '    <matrix rows="24" columns="24" form="symmetric">',
-             '      0.004521841',
-             '      0.007561844 0.01376479',
-             '      0.008361844 0.01456479 0.01576479',
-             '      0.005961844 0.01216479 0.01216479 0.015341744',
-             '      0.0 0.0 0.0 0.003176954 0.013101309',
-             '      0.0 0.0 0.0 0.003176954 0.009338387 0.018478004',
-             '      0.0 0.0 0.0 0.003468456 0.009629889 0.018769506 0.03044787',
-             '      0.0 0.0 0.0 0.003468456 0.008425108 0.009623028 0.021301392 0.025049085',
-             '      0.0 0.0 0.0 0.003468456 0.007281858 0.008203479 0.019881843 0.018955976 0.021007971',
-             '      0.0 0.0 0.0 0.002606664 0.006420066 0.007341687 0.010426702 0.009500835 0.01155283 0.014416137',
-             '      0.0 0.0 0.0 0.002606664 0.006074221 0.006912258 0.009997273 0.009155375 0.008356475 0.011219782 0.013401227',
-             '      0.0 0.0 0.0 0.002606664 0.007052283 0.008126697 0.011211712 0.010132348 0.00910811 0.011971417 0.011661574 0.016520655',
-             '      0.0 0.0 0.0 0.002606664 0.007977071 0.009274988 0.012360003 0.011056106 0.009818803 0.01268211 0.012307813 0.013366339 0.020179426',
-             '      0.0 0.0 0.0 0.002975089 0.008345496 0.009643413 0.013164463 0.011860566 0.010623263 0.009009196 0.008634899 0.009693425 0.016506512 0.02276864',
-             '      0.0 0.0 0.0 0.002975089 0.008882803 0.010310575 0.013831625 0.012397274 0.01103618 0.009422113 0.009010368 0.010174798 0.011275803 0.017537931 0.02521104',
-             '      0.0 0.0 0.0 0.002995769 0.009381029 0.010924214 0.014469738 0.012919443 0.011448326 0.00982304 0.009378011 0.010636568 0.011826572 0.012521399 0.013212797 0.0277326',
-             '      0.0 0.0 0.0 0.002995769 0.007243324 0.008269871 0.011815395 0.010784119 0.009805513 0.008180227 0.007884188 0.008721396 0.009513002 0.010207829 0.010667755 0.016765365 0.018571368',
-             '      0.0 0.0 0.0 0.003582893 0.007830448 0.008856995 0.013097388 0.012066112 0.011087506 0.009143689 0.00884765 0.009684858 0.010476464 0.011307466 0.011767392 0.01222281 0.014028813 0.023434508',
-             '      0.0 0.0 0.0 0.003334617 0.007582172 0.008608719 0.012555274 0.011523998 0.010545392 0.008736271 0.008440232 0.00927744 0.010069046 0.010842464 0.01130239 0.011754576 0.013560579 0.014793103 0.021272118',
-             '      0.0 0.0 0.0 0.003334617 0.017252577 0.020616257 0.024562812 0.021183632 0.017977032 0.016167911 0.015197887 0.017941161 0.020535021 0.021308439 0.022815479 0.024198321 0.018202461 0.019434985 0.025914 0.09207485',
-             '      0.0 0.0 0.0 0.003325916 0.017519686 0.020950026 0.024886283 0.021440143 0.018170003 0.016365604 0.015376347 0.018173984 0.020819244 0.021590643 0.023127553 0.024536822 0.018422142 0.01965145 0.019131615 0.046792765 0.09512696',
-             '      0.0 0.0 0.0 0.003059465 0.017253235 0.020683575 0.024304484 0.020858344 0.017588204 0.015928361 0.014939104 0.017736741 0.020382001 0.021091601 0.022628511 0.024034312 0.017919632 0.019050455 0.018572265 0.046233415 0.087605347 0.09298479',
-             '      0.0 0.0 0.0 0.003185348 0.017379118 0.020809458 0.024579352 0.021133212 0.017863072 0.016134934 0.015145677 0.017943314 0.020588574 0.021327371 0.022864281 0.02427172 0.01815704 0.019334391 0.018836527 0.046497677 0.087868919 0.087334608 0.09397457',
-             '      0.0 0.0 0.0 0.0 0.01404215 0.01743584 0.01743584 0.01402651 0.0107913 0.0107913 0.009812619 0.01258037 0.01519737 0.01519737 0.01671786 0.01806924 0.01201989 0.01201989 0.01201989 0.03938554 0.04016605 0.04016605 0.04016605 0.07947396</matrix></covarianceMatrix>',
-             '  <covarianceMatrix index="1" type="absolute">',
-             '    <axes>',
-             '      <axis index="0" label="row_energy_bounds" unit="eV" interpolation="lin,flat" length="8"> 1e-5 862270 1e6 2e6 5e6 1e7 1.5e7 2e7</axis>',
-             '      <axis index="1" label="column_energy_bounds" unit="eV" interpolation="lin,flat" mirror_row_energy_bounds="true"/>',
-             '      <axis index="2" label="matrix_elements" unit=""/></axes>',
-             '    <matrix rows="7" columns="7" form="diagonal" precision="6"> 0.000000e+00  9.900000e-05  5.564000e-03  1.584000e-03  8.910000e-04  3.960000e-04  3.960000e-04 </matrix></covarianceMatrix></mixed>'] )
+        self.maxDiff=None
+        # The values below are correct, I checked them by hand (what a pain) DAB 13 Jun 2016
+        self.assertXMLListsEqual(self.abc.toCovarianceMatrix().toXMLList(),"""<covarianceMatrix label="composed" type="relative">
+  <gridded2d>
+    <axes>
+      <grid index="2" label="row_energy_bounds" unit="MeV" style="boundaries">
+        <values length="9">1e-7 1e-5 0.06738 0.1 0.11109 1 1.3534 19.64 20</values></grid>
+      <grid index="1" label="column_energy_bounds" unit="MeV" style="link">
+        <link xlink:href="../../grid[@index='2']/values"/></grid>
+      <axis index="0" label="matrix_elements" unit="b**2"/></axes>
+    <array shape="8,8" symmetry="lower">
+      <values length="36">8 8 12 5 9 17 5 6 14 22 1 2 2 10 43 1 1 1 1 34 59 0 0 0 0 0 25 50 0 0 0 0 0 25 25 25</values></array></gridded2d></covarianceMatrix>""".split('\n'))
+        self.abc.plot()
 
-    def test_toRelative(self): 
-        self.assertXMLListsEqual( FeCovariance[0]['eval'].toRelative().toXMLList(),
-            ['<mixed>',
-             '  <covarianceMatrix type="relative">',
-             '    <axes>',
-             '      <axis index="0" label="row_energy_bounds" unit="eV" interpolation="lin,flat" length="25"> 1e-5 0.5 20 3e2 1140.04 1751 33830.5 35479.5 53647.5 76772 77931.5 89369 94561 102950 104508 152676 203065 204928 238299 261280 446595 483428 518904 553281 794899</axis>',
-             '      <axis index="0" label="row_energy_bounds" unit="eV" interpolation="lin,flat" length="25"> 1e-5 0.5 20 3e2 1140.04 1751 33830.5 35479.5 53647.5 76772 77931.5 89369 94561 102950 104508 152676 203065 204928 238299 261280 446595 483428 518904 553281 794899</axis>',
-             '      <axis index="2" label="matrix_elements" unit=""/></axes>',
-             '    <matrix rows="24" columns="24" form="symmetric">',
-             '      0.004521841',
-             '      0.007561844 0.01376479',
-             '      0.008361844 0.01456479 0.01576479',
-             '      0.005961844 0.01216479 0.01216479 0.015341744',
-             '      0.0 0.0 0.0 0.003176954 0.013101309',
-             '      0.0 0.0 0.0 0.003176954 0.009338387 0.018478004',
-             '      0.0 0.0 0.0 0.003468456 0.009629889 0.018769506 0.03044787',
-             '      0.0 0.0 0.0 0.003468456 0.008425108 0.009623028 0.021301392 0.025049085',
-             '      0.0 0.0 0.0 0.003468456 0.007281858 0.008203479 0.019881843 0.018955976 0.021007971',
-             '      0.0 0.0 0.0 0.002606664 0.006420066 0.007341687 0.010426702 0.009500835 0.01155283 0.014416137',
-             '      0.0 0.0 0.0 0.002606664 0.006074221 0.006912258 0.009997273 0.009155375 0.008356475 0.011219782 0.013401227',
-             '      0.0 0.0 0.0 0.002606664 0.007052283 0.008126697 0.011211712 0.010132348 0.00910811 0.011971417 0.011661574 0.016520655',
-             '      0.0 0.0 0.0 0.002606664 0.007977071 0.009274988 0.012360003 0.011056106 0.009818803 0.01268211 0.012307813 0.013366339 0.020179426',
-             '      0.0 0.0 0.0 0.002975089 0.008345496 0.009643413 0.013164463 0.011860566 0.010623263 0.009009196 0.008634899 0.009693425 0.016506512 0.02276864',
-             '      0.0 0.0 0.0 0.002975089 0.008882803 0.010310575 0.013831625 0.012397274 0.01103618 0.009422113 0.009010368 0.010174798 0.011275803 0.017537931 0.02521104',
-             '      0.0 0.0 0.0 0.002995769 0.009381029 0.010924214 0.014469738 0.012919443 0.011448326 0.00982304 0.009378011 0.010636568 0.011826572 0.012521399 0.013212797 0.0277326',
-             '      0.0 0.0 0.0 0.002995769 0.007243324 0.008269871 0.011815395 0.010784119 0.009805513 0.008180227 0.007884188 0.008721396 0.009513002 0.010207829 0.010667755 0.016765365 0.018571368',
-             '      0.0 0.0 0.0 0.003582893 0.007830448 0.008856995 0.013097388 0.012066112 0.011087506 0.009143689 0.00884765 0.009684858 0.010476464 0.011307466 0.011767392 0.01222281 0.014028813 0.023434508',
-             '      0.0 0.0 0.0 0.003334617 0.007582172 0.008608719 0.012555274 0.011523998 0.010545392 0.008736271 0.008440232 0.00927744 0.010069046 0.010842464 0.01130239 0.011754576 0.013560579 0.014793103 0.021272118',
-             '      0.0 0.0 0.0 0.003334617 0.017252577 0.020616257 0.024562812 0.021183632 0.017977032 0.016167911 0.015197887 0.017941161 0.020535021 0.021308439 0.022815479 0.024198321 0.018202461 0.019434985 0.025914 0.09207485',
-             '      0.0 0.0 0.0 0.003325916 0.017519686 0.020950026 0.024886283 0.021440143 0.018170003 0.016365604 0.015376347 0.018173984 0.020819244 0.021590643 0.023127553 0.024536822 0.018422142 0.01965145 0.019131615 0.046792765 0.09512696',
-             '      0.0 0.0 0.0 0.003059465 0.017253235 0.020683575 0.024304484 0.020858344 0.017588204 0.015928361 0.014939104 0.017736741 0.020382001 0.021091601 0.022628511 0.024034312 0.017919632 0.019050455 0.018572265 0.046233415 0.087605347 0.09298479',
-             '      0.0 0.0 0.0 0.003185348 0.017379118 0.020809458 0.024579352 0.021133212 0.017863072 0.016134934 0.015145677 0.017943314 0.020588574 0.021327371 0.022864281 0.02427172 0.01815704 0.019334391 0.018836527 0.046497677 0.087868919 0.087334608 0.09397457',
-             '      0.0 0.0 0.0 0.0 0.01404215 0.01743584 0.01743584 0.01402651 0.0107913 0.0107913 0.009812619 0.01258037 0.01519737 0.01519737 0.01671786 0.01806924 0.01201989 0.01201989 0.01201989 0.03938554 0.04016605 0.04016605 0.04016605 0.07947396</matrix></covarianceMatrix>',
-             '  <covarianceMatrix index="1" type="relative">',
-             '    <axes>',
-             '      <axis index="0" label="row_energy_bounds" unit="eV" interpolation="lin,flat" length="8"> 1e-5 862270 1e6 2e6 5e6 1e7 1.5e7 2e7</axis>',
-             '      <axis index="1" label="column_energy_bounds" unit="eV" interpolation="lin,flat" mirror_row_energy_bounds="true"/>',
-             '      <axis index="2" label="matrix_elements" unit=""/></axes>',
-             '    <matrix rows="7" columns="7" form="diagonal" precision="6"> 0.000000e+00  9.900000e-05  5.564000e-03  1.584000e-03  8.910000e-04  3.960000e-04  3.960000e-04 </matrix></covarianceMatrix></mixed>'] )
-    
+    @unittest.skip("FIXME")
+    def test_toAbsolute(self):
+        l=FeCovariance[0]['eval'].toAbsolute()
+        self.assertXMLListsEqual(l.toXMLList(),"""<mixed label="eval">
+  <covarianceMatrix label="composed" type="absolute">
+    <gridded2d>
+      <axes>
+        <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
+          <values length="26">1e-5 0.5 20 3e2 1140.04 1751 33830.5 35479.5 53647.5 76772 77931.5 89369 94561 102950 104508 152676 203065 204928 238299 261280 446595 483428 518904 553281 794899 850636</values></grid>
+        <grid index="1" label="row_energy_bounds" unit="eV" style="link">
+          <link xlink:href="../../grid[@index='2']/values"/></grid>
+        <axis index="0" label="matrix_elements" unit="b**2"/></axes>
+      <array shape="25,25" symmetry="lower">
+        <values length="325">4.521841e-3 7.561844e-3 0.01376479 8.361844e-3 0.01456479 0.01576479 5.961844e-3 0.01216479 0.01216479 0.015341744 0 0 0 3.176954e-3 0.013101309 0 0 0 3.176954e-3 9.338387e-3 0.018478004 0 0 0 3.468456e-3 9.629889e-3 0.018769506 0.03044787 0 0 0 3.468456e-3 8.425108e-3 9.623028e-3 0.021301392 0.025049085 0 0 0 3.468456e-3 7.281858e-3 8.203479e-3 0.019881843 0.018955976 0.021007971 0 0 0 2.606664e-3 6.420066e-3 7.341687e-3 0.010426702 9.500835e-3 0.01155283 0.014416137 0 0 0 2.606664e-3 6.074221e-3 6.912258e-3 9.997273e-3 9.155375e-3 8.356475e-3 0.011219782 0.013401227 0 0 0 2.606664e-3 7.052283e-3 8.126697e-3 0.011211712 0.010132348 9.10811e-3 0.011971417 0.011661574 0.016520655 0 0 0 2.606664e-3 7.977071e-3 9.274988e-3 0.012360003 0.011056106 9.818803e-3 0.01268211 0.012307813 0.013366339 0.020179426 0 0 0 2.975089e-3 8.345496e-3 9.643413e-3 0.013164463 0.011860566 0.010623263
+          9.009196e-3 8.634899e-3 9.693425e-3 0.016506512 0.02276864 0 0 0 2.975089e-3 8.882803e-3 0.010310575 0.013831625 0.012397274 0.01103618 9.422113e-3 9.010368e-3 0.010174798 0.011275803 0.017537931 0.02521104 0 0 0 2.995769e-3 9.381029e-3 0.010924214 0.014469738 0.012919443 0.011448326 9.82304e-3 9.378011e-3 0.010636568 0.011826572 0.012521399 0.013212797 0.0277326 0 0 0 2.995769e-3 7.243324e-3 8.269871e-3 0.011815395 0.010784119 9.805513e-3 8.180227e-3 7.884188e-3 8.721396e-3 9.513002e-3 0.010207829 0.010667755 0.016765365 0.018571368 0 0 0 3.582893e-3 7.830448e-3 8.856995e-3 0.013097388 0.012066112 0.011087506 9.143689e-3 8.84765e-3 9.684858e-3 0.010476464 0.011307466 0.011767392 0.01222281 0.014028813 0.023434508 0 0 0 3.334617e-3 7.582172e-3 8.608719e-3 0.012555274 0.011523998 0.010545392 8.736271e-3 8.440232e-3 9.27744e-3 0.010069046 0.010842464 0.01130239 0.011754576 0.013560579 0.014793103 0.021272118 0 0 0 3.334617e-3 0.017252577 0.020616257 0.024562812 0.021183632 0.017977032 0.016167911
+          0.015197887 0.017941161 0.020535021 0.021308439 0.022815479 0.024198321 0.018202461 0.019434985 0.025914 0.09207485 0 0 0 3.325916e-3 0.017519686 0.020950026 0.024886283 0.021440143 0.018170003 0.016365604 0.015376347 0.018173984 0.020819244 0.021590643 0.023127553 0.024536822 0.018422142 0.01965145 0.019131615 0.046792765 0.09512696 0 0 0 3.059465e-3 0.017253235 0.020683575 0.024304484 0.020858344 0.017588204 0.015928361 0.014939104 0.017736741 0.020382001 0.021091601 0.022628511 0.024034312 0.017919632 0.019050455 0.018572265 0.046233415 0.087605347 0.09298479 0 0 0 3.185348e-3 0.017379118 0.020809458 0.024579352 0.021133212 0.017863072 0.016134934 0.015145677 0.017943314 0.020588574 0.021327371 0.022864281 0.02427172 0.01815704 0.019334391 0.018836527 0.046497677 0.087868919 0.087334608 0.09397457 0 0 0 2.919549e-3 0.016961699 0.020355389 0.023810705 0.020401375 0.017166165 0.015582231 0.01460355 0.017371301 0.019988301 0.020665449 0.022185939 0.023575328 0.017525978 0.018605086 0.018148765 0.045514415 0.046278934 0.045789208 0.046020576 0.09020596
+          0 0 0 2.919549e-3 0.017258749 0.020724229 0.024179545 0.020698095 0.017394445 0.015810511 0.014811121 0.017637431 0.020309791 0.020986939 0.022539589 0.023957568 0.017780238 0.018859346 0.018403025 0.046347575 0.047128604 0.046638878 0.046870246 0.05130957 0.0936039</values></array></gridded2d></covarianceMatrix>
+  <covarianceMatrix label="1" type="absolute">
+    <gridded2d>
+      <axes>
+        <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
+          <values length="7">862270 1e6 2e6 5e6 1e7 1.5e7 2e7</values></grid>
+        <grid index="1" label="column_energy_bounds" unit="eV" style="link">
+          <link xlink:href="../../grid[@index='2']/values"/></grid>
+        <axis index="0" label="matrix_elements" unit="b**2"/></axes>
+      <array shape="6,6" symmetry="lower">
+        <values length="21">9.9e-5 0 5.564e-3 0 0 1.584e-3 0 0 0 8.91e-4 0 0 0 0 3.96e-4 0 0 0 0 0 3.96e-4</values></array></gridded2d></covarianceMatrix></mixed>""".split('\n'))
+
+    @unittest.skip("FIXME")
+    def test_toRelative(self):
+        l=FeCovariance[0]['eval'].toRelative()
+        self.assertXMLListsEqual( l.toXMLList(), """<mixed label="eval">
+  <covarianceMatrix label="composed" type="relative">
+    <gridded2d>
+      <axes>
+        <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
+          <values length="26">1e-5 0.5 20 3e2 1140.04 1751 33830.5 35479.5 53647.5 76772 77931.5 89369 94561 102950 104508 152676 203065 204928 238299 261280 446595 483428 518904 553281 794899 850636</values></grid>
+        <grid index="1" label="row_energy_bounds" unit="eV" style="link">
+          <link xlink:href="../../grid[@index='2']/values"/></grid>
+        <axis index="0" label="matrix_elements" unit=""/></axes>
+      <array shape="25,25" symmetry="lower">
+        <values length="325">4.521841e-3 7.561844e-3 0.01376479 8.361844e-3 0.01456479 0.01576479 5.961844e-3 0.01216479 0.01216479 0.015341744 0 0 0 3.176954e-3 0.013101309 0 0 0 3.176954e-3 9.338387e-3 0.018478004 0 0 0 3.468456e-3 9.629889e-3 0.018769506 0.03044787 0 0 0 3.468456e-3 8.425108e-3 9.623028e-3 0.021301392 0.025049085 0 0 0 3.468456e-3 7.281858e-3 8.203479e-3 0.019881843 0.018955976 0.021007971 0 0 0 2.606664e-3 6.420066e-3 7.341687e-3 0.010426702 9.500835e-3 0.01155283 0.014416137 0 0 0 2.606664e-3 6.074221e-3 6.912258e-3 9.997273e-3 9.155375e-3 8.356475e-3 0.011219782 0.013401227 0 0 0 2.606664e-3 7.052283e-3 8.126697e-3 0.011211712 0.010132348 9.10811e-3 0.011971417 0.011661574 0.016520655 0 0 0 2.606664e-3 7.977071e-3 9.274988e-3 0.012360003 0.011056106 9.818803e-3 0.01268211 0.012307813 0.013366339 0.020179426 0 0 0 2.975089e-3 8.345496e-3 9.643413e-3 0.013164463 0.011860566 0.010623263
+          9.009196e-3 8.634899e-3 9.693425e-3 0.016506512 0.02276864 0 0 0 2.975089e-3 8.882803e-3 0.010310575 0.013831625 0.012397274 0.01103618 9.422113e-3 9.010368e-3 0.010174798 0.011275803 0.017537931 0.02521104 0 0 0 2.995769e-3 9.381029e-3 0.010924214 0.014469738 0.012919443 0.011448326 9.82304e-3 9.378011e-3 0.010636568 0.011826572 0.012521399 0.013212797 0.0277326 0 0 0 2.995769e-3 7.243324e-3 8.269871e-3 0.011815395 0.010784119 9.805513e-3 8.180227e-3 7.884188e-3 8.721396e-3 9.513002e-3 0.010207829 0.010667755 0.016765365 0.018571368 0 0 0 3.582893e-3 7.830448e-3 8.856995e-3 0.013097388 0.012066112 0.011087506 9.143689e-3 8.84765e-3 9.684858e-3 0.010476464 0.011307466 0.011767392 0.01222281 0.014028813 0.023434508 0 0 0 3.334617e-3 7.582172e-3 8.608719e-3 0.012555274 0.011523998 0.010545392 8.736271e-3 8.440232e-3 9.27744e-3 0.010069046 0.010842464 0.01130239 0.011754576 0.013560579 0.014793103 0.021272118 0 0 0 3.334617e-3 0.017252577 0.020616257 0.024562812 0.021183632 0.017977032 0.016167911
+          0.015197887 0.017941161 0.020535021 0.021308439 0.022815479 0.024198321 0.018202461 0.019434985 0.025914 0.09207485 0 0 0 3.325916e-3 0.017519686 0.020950026 0.024886283 0.021440143 0.018170003 0.016365604 0.015376347 0.018173984 0.020819244 0.021590643 0.023127553 0.024536822 0.018422142 0.01965145 0.019131615 0.046792765 0.09512696 0 0 0 3.059465e-3 0.017253235 0.020683575 0.024304484 0.020858344 0.017588204 0.015928361 0.014939104 0.017736741 0.020382001 0.021091601 0.022628511 0.024034312 0.017919632 0.019050455 0.018572265 0.046233415 0.087605347 0.09298479 0 0 0 3.185348e-3 0.017379118 0.020809458 0.024579352 0.021133212 0.017863072 0.016134934 0.015145677 0.017943314 0.020588574 0.021327371 0.022864281 0.02427172 0.01815704 0.019334391 0.018836527 0.046497677 0.087868919 0.087334608 0.09397457 0 0 0 2.919549e-3 0.016961699 0.020355389 0.023810705 0.020401375 0.017166165 0.015582231 0.01460355 0.017371301 0.019988301 0.020665449 0.022185939 0.023575328 0.017525978 0.018605086 0.018148765 0.045514415 0.046278934 0.045789208 0.046020576 0.09020596
+          0 0 0 2.919549e-3 0.017258749 0.020724229 0.024179545 0.020698095 0.017394445 0.015810511 0.014811121 0.017637431 0.020309791 0.020986939 0.022539589 0.023957568 0.017780238 0.018859346 0.018403025 0.046347575 0.047128604 0.046638878 0.046870246 0.05130957 0.0936039</values></array></gridded2d></covarianceMatrix>
+  <covarianceMatrix label="1" type="relative">
+    <gridded2d>
+      <axes>
+        <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
+          <values length="7">862270 1e6 2e6 5e6 1e7 1.5e7 2e7</values></grid>
+        <grid index="1" label="column_energy_bounds" unit="eV" style="link">
+          <link xlink:href="../../grid[@index='2']/values"/></grid>
+        <axis index="0" label="matrix_elements" unit=""/></axes>
+      <array shape="6,6" symmetry="lower">
+        <values length="21">9.9e-5 0 5.564e-3 0 0 1.584e-3 0 0 0 8.91e-4 0 0 0 0 3.96e-4 0 0 0 0 0 3.96e-4</values></array></gridded2d></covarianceMatrix></mixed>""".split('\n') )
+
 
 if __name__=="__main__":
     unittest.main()

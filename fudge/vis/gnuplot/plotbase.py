@@ -79,9 +79,9 @@ def minMax( s, _min, _max ) :
     return( options )
 
 def parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title, zMin = None, zMax = None, zLabel = None, tLabel = None, \
-        tScaleLabel = None, xrot = None, zrot = None, delete = True ) :
+        tScaleLabel = None, xrot = None, zrot = None, delete = True, style = None ) :
     """For internal use only."""
-
+    import math
     options = [ ]
     if( delete ) : options = [ "delete" ]
     options += minMax( 'x', xMin, xMax )
@@ -92,6 +92,7 @@ def parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title, zMin = None
     if ( zLabel is not None ) : options += [ 'zLabel', str( zLabel ) ]
     if ( tLabel is not None ) : options += [ 'tLabel', str( tLabel ) ]
     if ( title is not None ) : options += [ 'title', str( title ) ]
+    if ( style is not None ) : options += [ 'style', str( style ) ]
     if ( tScaleLabel is not None ) : options += [ 'tScaleLabel', str( tScaleLabel ) ]
     if ( xrot is not None ) :
         if( type( xrot ) == type( "" ) ) : xrot = float( xrot )

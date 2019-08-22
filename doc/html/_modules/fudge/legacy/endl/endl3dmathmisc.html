@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.endl.endl3dmathmisc &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.legacy.endl.endl3dmathmisc</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains miscellaneous routines for supporting the endl3dmath class from module endl3dmathClasses.</span>
+
+<span class="sd">Module&#39;s global variables::</span>
+
+<span class="sd">    endl3d_repr_xFormat : Default format string used for converting an x-element of the data of an endl3dmath object to a string.</span>
+<span class="sd">    endl3d_repr_yFormat : Default format string used for converting an y-element of the data of an endl3dmath object to a string.</span>
+<span class="sd">    endl3d_repr_zFormat : Default format string used for converting an z-element of the data of an endl3dmath object to a string.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">from</span> <span class="nn">fudge.core</span> <span class="k">import</span> <span class="n">fudgemisc</span>
+<span class="kn">from</span> <span class="nn">fudge.core.math</span> <span class="k">import</span> <span class="n">fudgemath</span>
+<span class="kn">import</span> <span class="nn">endl2dmathClasses</span>
+<span class="kn">import</span> <span class="nn">endl2dmathmisc</span>
+
+<span class="n">endl3d_repr_xFormat</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%14.7e</span><span class="s2">&quot;</span>
+<span class="n">endl3d_repr_yFormat</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%12.5e</span><span class="s2">&quot;</span>
+<span class="n">endl3d_repr_zFormat</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%12.5e</span><span class="s2">&quot;</span>
+<span class="n">noExtrapolation</span> <span class="o">=</span> <span class="s1">&#39;noExtrapolation&#39;</span>
+<span class="n">flatExtrapolation</span> <span class="o">=</span> <span class="s1">&#39;flatExtrapolation&#39;</span>
+
+<div class="viewcode-block" id="get3dmathData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl3dmathmisc.get3dmathData">[docs]</a><span class="k">def</span> <span class="nf">get3dmathData</span><span class="p">(</span> <span class="nb">object</span><span class="p">,</span> <span class="n">callingRoutine</span><span class="p">,</span> <span class="n">msg</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;If object is a python list, then it is returned. Else, if object is a sub-class</span>
+<span class="sd">    of endl3dmath its data is return otherwise a raise is executed.&quot;&quot;&quot;</span>
+
+
+    <span class="k">if</span><span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="nb">object</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="p">[]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">object</span>
+    <span class="k">else</span> <span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">valid3dClassType</span><span class="p">(</span> <span class="nb">object</span><span class="p">,</span> <span class="n">callingRoutine</span><span class="p">,</span> <span class="n">msg</span> <span class="p">)</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="valid3dClassType"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl3dmathmisc.valid3dClassType">[docs]</a><span class="k">def</span> <span class="nf">valid3dClassType</span><span class="p">(</span> <span class="nb">object</span><span class="p">,</span> <span class="n">callingRoutine</span><span class="p">,</span> <span class="n">msg</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the first argument, object, if it is a subclass of the endl3dmath class; else, triggers a raise.&quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">endl3dmathClasses</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="nb">object</span><span class="p">,</span> <span class="n">endl3dmathClasses</span><span class="o">.</span><span class="n">endl3dmath</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="nb">object</span> <span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error in </span><span class="si">%s</span><span class="s2">: invalid type = </span><span class="si">%s</span><span class="s2"> for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">callingRoutine</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span> <span class="nb">object</span> <span class="p">),</span> <span class="n">msg</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="check3dData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl3dmathmisc.check3dData">[docs]</a><span class="k">def</span> <span class="nf">check3dData</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">allowNegativeX</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">allowZeroX</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">allowNegativeY</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">allowSameY</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">allowZeroY</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">positiveZ</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
+    <span class="n">printWarning</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">printErrors</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">xCloseEps</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">maxAbsFloatValue</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Checks that data is a valid structure for endl3dmath data. Triggers a raise if it is not.  Data may be</span>
+<span class="sd">    an instance that is a subclass of endl3dmath or a python list as required by endl3dmath. If allowZeroX is </span>
+<span class="sd">    False, a zero first x value will generate a raise. If allowNegativeX is true than the x data can have negative </span>
+<span class="sd">    values (ENDL 3d-data has projectile energy as the x-data which must always be &gt; 0. ). See endl2dmathmisc.check2dData&#39;s </span>
+<span class="sd">    allowSameX, allowZeroX, positiveY and xCloseEps argument for meaning of allowSameY, allowZeroY, positiveZ and </span>
+<span class="sd">    xCloseEps respectively.  If printErrors is &#39;True&#39; then errors are printed, and if at least one error exist, a </span>
+<span class="sd">    raise will be executed.  printWarning is just passed on to endl2dmathmisc.check2dData.&quot;&quot;&quot;</span>
+
+    <span class="n">points</span> <span class="o">=</span> <span class="n">get3dmathData</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="s2">&quot;check3dData&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span>
+    <span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">xPrior</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mf">0.</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="ow">not</span> <span class="n">allowZeroX</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;check3dData: zero x value at index = 0&#39;</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">printErrors</span> <span class="p">)</span> <span class="p">:</span> <span class="n">fudgemisc</span><span class="o">.</span><span class="n">printWarning</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">fudgemisc</span><span class="o">.</span><span class="n">checkMessagesToString</span><span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">indentation</span> <span class="o">=</span> <span class="s1">&#39;      &#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">elif</span><span class="p">(</span> <span class="p">(</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="ow">not</span> <span class="n">allowNegativeX</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;check3dData: negative x = </span><span class="si">%e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">printErrors</span> <span class="p">)</span> <span class="p">:</span> <span class="n">fudgemisc</span><span class="o">.</span><span class="n">printWarning</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">fudgemisc</span><span class="o">.</span><span class="n">checkMessagesToString</span><span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">indentation</span> <span class="o">=</span> <span class="s1">&#39;      &#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">yz</span> <span class="ow">in</span> <span class="n">points</span> <span class="p">:</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">fudgemath</span><span class="o">.</span><span class="n">isNumber</span><span class="p">(</span> <span class="n">x</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">fudgemath</span><span class="o">.</span><span class="n">checkNumber</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="s2">&quot;check3dData: x[</span><span class="si">%d</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">messages</span> <span class="o">=</span> <span class="n">messages</span><span class="p">,</span> <span class="n">indentation</span> <span class="o">=</span> <span class="s1">&#39;      &#39;</span><span class="p">,</span> <span class="n">printErrors</span> <span class="o">=</span> <span class="n">printErrors</span><span class="p">,</span> \
+                <span class="n">maxAbsFloatValue</span> <span class="o">=</span> <span class="n">maxAbsFloatValue</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;check3dData: x = </span><span class="si">%s</span><span class="s1"> is not a number&#39;</span> <span class="o">%</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">printErrors</span> <span class="p">)</span> <span class="p">:</span> <span class="n">fudgemisc</span><span class="o">.</span><span class="n">printWarning</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">fudgemisc</span><span class="o">.</span><span class="n">checkMessagesToString</span><span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">indentation</span> <span class="o">=</span> <span class="s1">&#39;      &#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">xPrior</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">xPrior</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;check3dData: x value x[</span><span class="si">%d</span><span class="s1">] &gt;= x[</span><span class="si">%d</span><span class="s1">] (</span><span class="si">%e</span><span class="s1"> &gt;= </span><span class="si">%e</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">xPrior</span><span class="p">,</span> <span class="n">x</span> <span class="p">)</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">printErrors</span> <span class="p">)</span> <span class="p">:</span> <span class="n">fudgemisc</span><span class="o">.</span><span class="n">printWarning</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">fudgemisc</span><span class="o">.</span><span class="n">checkMessagesToString</span><span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">indentation</span> <span class="o">=</span> <span class="s1">&#39;      &#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">ne</span><span class="p">,</span> <span class="n">badXIndicies</span><span class="p">,</span> <span class="n">messages2d</span> <span class="o">=</span> <span class="n">endl2dmathmisc</span><span class="o">.</span><span class="n">check2dData</span><span class="p">(</span> <span class="n">yz</span><span class="p">,</span> <span class="n">allowNegativeX</span> <span class="o">=</span> <span class="n">allowNegativeY</span><span class="p">,</span> <span class="n">allowSameX</span> <span class="o">=</span> <span class="n">allowSameY</span><span class="p">,</span> <span class="n">allowZeroX</span> <span class="o">=</span> <span class="n">allowZeroY</span><span class="p">,</span> \
+            <span class="n">positiveY</span> <span class="o">=</span> <span class="n">positiveZ</span><span class="p">,</span> <span class="n">printWarning</span> <span class="o">=</span> <span class="n">printWarning</span><span class="p">,</span> <span class="n">printErrors</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">xCloseEps</span> <span class="o">=</span> <span class="n">xCloseEps</span><span class="p">,</span> <span class="n">maxAbsFloatValue</span> <span class="o">=</span> <span class="n">maxAbsFloatValue</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">messages2d</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;check3dData x value = </span><span class="si">%e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">x</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">s</span><span class="p">,</span> <span class="n">messages2d</span> <span class="p">]</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">printErrors</span> <span class="p">)</span> <span class="p">:</span> <span class="n">fudgemisc</span><span class="o">.</span><span class="n">printWarning</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">fudgemisc</span><span class="o">.</span><span class="n">checkMessagesToString</span><span class="p">(</span> <span class="n">s</span><span class="p">,</span> <span class="n">indentation</span> <span class="o">=</span> <span class="s1">&#39;      &#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">xPrior</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">messages</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="interpolate_XY"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl3dmathmisc.interpolate_XY">[docs]</a><span class="k">def</span> <span class="nf">interpolate_XY</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;For internal use only.&quot;&quot;&quot;</span>
+
+    <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">l</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="mf">0.</span> <span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span><span class="p">(</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">l</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="k">break</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">x</span> <span class="o">==</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">endl2dmathmisc</span><span class="o">.</span><span class="n">interpolate_X</span><span class="p">(</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">y</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">d1</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">d2</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">z1</span> <span class="o">=</span> <span class="n">endl2dmathmisc</span><span class="o">.</span><span class="n">interpolate_X</span><span class="p">(</span> <span class="n">d1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">y</span> <span class="p">)</span>
+            <span class="n">z2</span> <span class="o">=</span> <span class="n">endl2dmathmisc</span><span class="o">.</span><span class="n">interpolate_X</span><span class="p">(</span> <span class="n">d2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">y</span> <span class="p">)</span>
+            <span class="n">x1</span> <span class="o">=</span> <span class="n">d1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">x2</span> <span class="o">=</span> <span class="n">d2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="p">(</span> <span class="n">z1</span> <span class="o">*</span> <span class="p">(</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x</span> <span class="p">)</span> <span class="o">+</span> <span class="n">z2</span> <span class="o">*</span> <span class="p">(</span> <span class="n">x</span> <span class="o">-</span> <span class="n">x1</span> <span class="p">)</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span> <span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">z</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="interpolate3d"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl3dmathmisc.interpolate3d">[docs]</a><span class="k">def</span> <span class="nf">interpolate3d</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">unitBase</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">extrapolation</span> <span class="o">=</span> <span class="n">noExtrapolation</span><span class="p">,</span> <span class="n">endl2dmathObject</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the interpolation of data (an endl3dmath object or suitable data)</span>
+<span class="sd">    at x as a list of [y,z] pairs.  If x is outside the domain of data, then [] </span>
+<span class="sd">    is returned. If x is one of the x-values of data, then its yz-data is returned.</span>
+<span class="sd">    Otherwise, for xl &lt; x &lt; xu where xl and xu are consecutive x-values in data </span>
+<span class="sd">    linear interpolation is performed on the yz data of xl and xu.  If unitBase is </span>
+<span class="sd">    True, then unit base interpolation is performed.&quot;&quot;&quot;</span>
+
+    <span class="n">points</span> <span class="o">=</span> <span class="n">get3dmathData</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="s2">&quot;endl3dmathmisc.interpolate3d&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span>
+    <span class="n">ubiData</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">points</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">extrapolation</span> <span class="o">==</span> <span class="n">flatExtrapolation</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">ubiData</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="p">]</span> <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="p">]</span>
+        <span class="k">elif</span><span class="p">(</span> <span class="n">points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">x</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">extrapolation</span> <span class="o">==</span> <span class="n">flatExtrapolation</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">ubiData</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="p">]</span> <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="p">]</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">x_</span><span class="p">,</span> <span class="n">yz</span> <span class="ow">in</span> <span class="n">points</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">x_</span>  <span class="p">)</span> <span class="p">:</span> <span class="k">break</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">data_u</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">xu</span> <span class="o">=</span> <span class="n">data_u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">data_u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">xu</span> <span class="o">==</span> <span class="n">x</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">u</span> <span class="p">:</span> <span class="n">ubiData</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="p">]</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>                                          <span class="c1"># Note, if xl == xu or i is the last element in data we would not be here.</span>
+                <span class="n">data_l</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">xl</span> <span class="o">=</span> <span class="n">data_l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="n">data_l</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="p">(</span> <span class="n">xu</span> <span class="o">-</span> <span class="n">x</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">xu</span> <span class="o">-</span> <span class="n">xl</span> <span class="p">)</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">-</span> <span class="n">f</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">unitBase</span> <span class="ow">and</span> <span class="p">(</span> <span class="p">(</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span> <span class="n">l</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">unitBase</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">yl</span> <span class="o">=</span> <span class="p">(</span> <span class="n">f</span> <span class="o">*</span> <span class="n">l</span><span class="p">[</span> <span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">g</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span> <span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+                    <span class="n">yu</span> <span class="o">=</span> <span class="p">(</span> <span class="n">f</span> <span class="o">*</span> <span class="n">l</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">g</span> <span class="o">*</span> <span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="p">(</span> <span class="n">yu</span> <span class="o">-</span> <span class="n">yl</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">l</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+                    <span class="n">lp</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">y0</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">l</span> <span class="p">:</span> <span class="n">lp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">s</span> <span class="o">*</span> <span class="p">(</span> <span class="n">y</span> <span class="o">-</span> <span class="n">y0</span> <span class="p">)</span> <span class="o">+</span> <span class="n">yl</span><span class="p">,</span> <span class="n">z</span> <span class="o">/</span> <span class="n">s</span> <span class="p">]</span> <span class="p">)</span>
+                    <span class="n">l</span> <span class="o">=</span> <span class="n">lp</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="p">(</span> <span class="n">yu</span> <span class="o">-</span> <span class="n">yl</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">u</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+                    <span class="n">up</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">y0</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">u</span> <span class="p">:</span> <span class="n">up</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">s</span> <span class="o">*</span> <span class="p">(</span> <span class="n">y</span> <span class="o">-</span> <span class="n">y0</span> <span class="p">)</span> <span class="o">+</span> <span class="n">yl</span><span class="p">,</span> <span class="n">z</span> <span class="o">/</span> <span class="n">s</span> <span class="p">]</span> <span class="p">)</span>
+                    <span class="n">up</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">lp</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>                   <span class="c1"># Make sure the last x values are the same.</span>
+                    <span class="n">u</span> <span class="o">=</span> <span class="n">up</span>
+                <span class="n">l</span> <span class="o">=</span> <span class="n">endl2dmathClasses</span><span class="o">.</span><span class="n">endl2dmath</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="n">l</span><span class="p">,</span> <span class="n">checkDataType</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="n">endl2dmathClasses</span><span class="o">.</span><span class="n">endl2dmath</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="n">u</span><span class="p">,</span> <span class="n">checkDataType</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="n">unitBase</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">l</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">copyData</span><span class="p">(</span> <span class="p">)</span>
+                    <span class="n">u</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copyData</span><span class="p">(</span> <span class="p">)</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">l</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">u</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">l</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="n">v</span> <span class="o">=</span> <span class="p">(</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span> <span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">if</span><span class="p">(</span> <span class="n">v</span> <span class="o">==</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">:</span> <span class="n">v</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">12</span>
+                        <span class="n">u</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[</span> <span class="n">v</span><span class="p">,</span> <span class="mf">0.</span> <span class="p">]</span> <span class="p">)</span>
+                    <span class="k">elif</span><span class="p">(</span> <span class="p">(</span> <span class="n">l</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">u</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">u</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="n">v</span> <span class="o">=</span> <span class="p">(</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span> <span class="p">)</span> <span class="o">*</span> <span class="n">l</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">if</span><span class="p">(</span> <span class="n">v</span> <span class="o">==</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">:</span> <span class="n">v</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">12</span>
+                        <span class="n">l</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[</span> <span class="n">v</span><span class="p">,</span> <span class="mf">0.</span> <span class="p">]</span> <span class="p">)</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">l</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">u</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">l</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="n">v</span> <span class="o">=</span> <span class="p">(</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span> <span class="p">)</span> <span class="o">*</span> <span class="n">l</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">if</span><span class="p">(</span> <span class="n">v</span> <span class="o">==</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">:</span> <span class="n">v</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">12</span>
+                        <span class="n">l</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">v</span><span class="p">,</span> <span class="mf">0.</span> <span class="p">]</span> <span class="p">)</span>
+                    <span class="k">elif</span><span class="p">(</span> <span class="p">(</span> <span class="n">l</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">u</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">u</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="n">v</span> <span class="o">=</span> <span class="p">(</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span> <span class="p">)</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">if</span><span class="p">(</span> <span class="n">v</span> <span class="o">==</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">:</span> <span class="n">v</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">12</span>
+                        <span class="n">u</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">v</span><span class="p">,</span> <span class="mf">0.</span> <span class="p">]</span> <span class="p">)</span>
+                <span class="n">ubiData</span> <span class="o">=</span> <span class="n">f</span> <span class="o">*</span> <span class="n">l</span> <span class="o">+</span> <span class="n">g</span> <span class="o">*</span> <span class="n">u</span>
+                <span class="n">ubiData</span> <span class="o">=</span> <span class="n">ubiData</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">endl2dmathObject</span> <span class="p">)</span> <span class="p">:</span> <span class="n">ubiData</span> <span class="o">=</span> <span class="n">endl2dmathClasses</span><span class="o">.</span><span class="n">endl2dmath</span><span class="p">(</span> <span class="n">ubiData</span> <span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">ubiData</span> <span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

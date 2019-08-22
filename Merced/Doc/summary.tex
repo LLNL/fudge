@@ -1,0 +1,47 @@
+\chapter{Summary}
+\pagenumbering{arabic}
+The \gettransfer\ code is one of the computer programs
+used in the conversion of reaction
+data from the \xendl\ library~\cite{GND} of evaluated nuclear data
+to input for
+deterministic particle transport codes.  This data conversion
+is managed by the \xndfgen\ python script~\cite{xndfgen}, while the
+\gettransfer\ code performs the computation of transfer
+matrices used to approximate
+the kernel in the integral operator of the Boltzmann
+equation.
+
+This document is organized a follows.  Section~\ref{Sec:transfer} explains how the
+transfer matrix is used in the discretization of the Boltzmann
+equation.  Section~\ref{Sec:interpolate} examines the methods used for interpolation
+of data in \xendl.  The remainder of the document is devoted to
+a discussion of the considerations involved in computing 
+transfer matrices based on the various data formats used in the \xendl\ library.
+
+For discrete 2-body reactions, the processing of angular probability
+density data given in the center-of-mass frame is discussed in
+Section~\ref{Sec:2-body}.  The treatment here is Newtonian, with a relativistic
+version presented in Appendix~\ref{Appendix-relativity}.
+
+Section~\ref{Sec:isotropic-lab} discusses the treatment of the data in \xendl\ used for
+isotropic energy probability densities given in the laboratory frame.
+
+Sections \ref{Sec:uncorrelated-lab} through~\ref{Sec:double-diff-formula}
+deal with double-differential, energy-angle
+probability density data.  Uncorrelated energy-angle probability
+density data is presented in Section~\ref{Sec:uncorrelated-lab}.  
+One option for energy-angle probability
+density data is  as coefficients of Legendre expansions.
+This option is discussed in Section~\ref{Sec:Legendre-lab} for data given in the laboratory frame
+and in Section~\ref{Ch:Legendre-cm} for center-of-mass data.  The proof of a mathematical
+detail used in analysis of the boost for such data is given in Appendix~\ref{Sec:Appendix-B}.
+Energy-angle probability densities may also be presented as
+tabulated data as discussed in Section~\ref{Sec:joint-table}.  The final form of
+energy-angle probability density data is in the form of parameters
+of mathematical formulas, and these are taken up in Section~\ref{Sec:double-diff-formula}.
+
+Section~\ref{Sec:gamma-in} deals with special data for incident gammas,
+specifically, coherent scattering and Compton scattering.
+
+Finally, the document closes in Section~\ref{Sec:usage} with instructions on how to run
+\gettransfer, along with an explanation of the input parameters.

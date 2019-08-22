@@ -61,116 +61,278 @@
 # 
 # <<END-copyright>>
 
-from fudge.gnd import baseClasses
-from fudge.gnd import tokens
+"""
+This module contains a special type of Q-value, unique to fission reactions.
+Fission releases energy several different ways (neutrons, gammas, etc.), and it's useful to subdivide the Q-value
+into these different terms.
+"""
 
-import base
+# FIXME this is really a form of Q-value. Should it be defined in Q.py instead?
+
+import xData.ancestry as ancestryModule
+import xData.standards as standardsModule
+import xData.axes as axesModule
+import xData.series1d as series1dModule
+import xData.XYs as XYsModule
+import xData.gridded as griddedModule
+import xData.uncertainties as uncertaintiesModule
 
 __metaclass__ = type
 
-#
-# fissionEnergyReleased forms
-#
-class component( baseClasses.componentBase ) :
-    """FIXME, this class needs major work. Firstly, it should not use baseClasses.componentBase."""
+def defaultAxes( energyUnit ) :
+
+    axes = axesModule.axes( rank = 2 )
+    axes[0] = axesModule.axis( 'energy_out', 0, energyUnit )
+    axes[1] = axesModule.axis( 'energy_in', 1, energyUnit )
+    return( axes )
+
+class polynomial1d( series1dModule.polynomial1d ):
+
+    def __init__( self, coefficients, domainMin, domainMax, lowerIndex = 0, axes = None,
+            index = None, valueType = standardsModule.types.float64Token, value = None, label = None, sep = ' ',
+            coefficientUncertainties = None ):
+
+        series1dModule.polynomial1d.__init__( self, coefficients=coefficients, domainMin=domainMin, domainMax=domainMax,
+            lowerIndex=lowerIndex, axes=axes, index=index, valueType=valueType, value=value, label=label, sep=sep )
+        if coefficientUncertainties is not None:
+            self.uncertainties = uncertaintiesModule.uncertainties( [
+                uncertaintiesModule.uncertainty( functional =
+                    series1dModule.polynomial1d( coefficientUncertainties, domainMin, domainMax, axes=axes ) )
+            ] )
+
+    def processMultiGroup( self, style, tempInfo, indent ) :
+
+        return( self.toPointwise_withLinearXYs( accuracy = 1e-5, upperEps = 1e-8 ).processMultiGroup( style, tempInfo, indent ) )
+
+    def toLinearXYsClass( self ) :
+
+        return( XYs1d )
+
+class XYs1d( XYsModule.XYs1d ) :
+
+    def processMultiGroup( self, style, tempInfo, indent ) :
+
+        from fudge.processing import miscellaneous as miscellaneousModule
+
+        multiGroup = miscellaneousModule.groupFunctionCrossSectionAndFlux( gridded1d, style, tempInfo, self )
+        multiGroup.label = None
+        return( multiGroup )
+
+class gridded1d( griddedModule.gridded1d ) :
+
+    pass
+
+class fissionEnergyReleaseTerm( ancestryModule.ancestry ):
+    """ Base class for all types of fission energy release. """
+
+    ancestryMembers = ( 'data', )
+
+    def __init__( self, data ) :
+
+        ancestryModule.ancestry.__init__( self )
+        self.data = data
+
+    @property
+    def data(self):
+        return self.__data
+
+    @data.setter
+    def data( self, value ) :
+
+        if not isinstance( value, ( XYs1d, polynomial1d, gridded1d ) ) :
+            raise TypeError( 'Invalid class "%s" for fissionEnergyReleaseTerm' % type(value) )
+        value.setAncestor(self)
+        self.__data = value
+
+    def check(self, info):
+        from fudge.gnd import warning
+
+        warnings = []
+        linearized = self.data.toPointwise_withLinearXYs(accuracy=1e-6)
+        if linearized.rangeMin < 0:
+            warnings.append( warning.badFissionEnergyRelease( worstCase=linearized.rangeMin, obj=self) )
+        if not 0.1 < linearized.rangeMax / linearized.rangeMin < 10:
+            warnings.append( warning.badFissionEnergyRelease( worstCase=linearized.rangeMax, obj=self) )
+        return warnings
+
+    def convertUnits( self, unitMap ) :
+        "See documentation for reactionSuite.convertUnits."
+
+        self.data.convertUnits( unitMap )
+
+    def processMultiGroup( self, style, tempInfo, indent ) :
+
+        return( self.__class__( self.data.processMultiGroup( style, tempInfo, indent ) ) )
+
+    def toXMLList( self, indent="", **kwargs ):
+
+        indent2 = indent + kwargs.get('incrementalIndent','  ')
+        xmllist = ['%s<%s>' % (indent, self.moniker)]
+        xmllist += self.data.toXMLList( indent2, **kwargs )
+        xmllist[-1] += '</%s>' % self.moniker
+        return xmllist
+
+    @classmethod
+    def parseXMLNode( cls, element, xPath, linkData ):
+
+        xPath.append( element.tag )
+        dataClass = {
+            XYs1d.moniker: XYs1d,
+            polynomial1d.moniker: polynomial1d,
+            gridded1d.moniker: gridded1d
+        }.get( element[0].tag, None )
+        data = dataClass.parseXMLNode( element[0], xPath, linkData )
+        FERT = cls( data )
+        xPath.pop()
+        return FERT
+
+class promptProductKE( fissionEnergyReleaseTerm ):
+
+    moniker = 'promptProductKE'
+
+class promptNeutronKE( fissionEnergyReleaseTerm ):
+
+    moniker = 'promptNeutronKE'
+
+class delayedNeutronKE( fissionEnergyReleaseTerm ):
+
+    moniker = 'delayedNeutronKE'
+
+class promptGammaEnergy( fissionEnergyReleaseTerm ):
+
+    moniker = 'promptGammaEnergy'
+
+class delayedGammaEnergy( fissionEnergyReleaseTerm ):
+
+    moniker = 'delayedGammaEnergy'
+
+class delayedBetaEnergy( fissionEnergyReleaseTerm ):
+
+    moniker = 'delayedBetaEnergy'
+
+class neutrinoEnergy( fissionEnergyReleaseTerm ):
+
+    moniker = 'neutrinoEnergy'
+
+class nonNeutrinoEnergy( fissionEnergyReleaseTerm ):
+
+    moniker = 'nonNeutrinoEnergy'
+
+class totalEnergy( fissionEnergyReleaseTerm ):
+
+    moniker = 'totalEnergy'
+
+class field:
+    """
+    Descriptor to ensure ancestry is set when adding energy release terms
+    to fissionEnergyReleased class.
+    """
+
+    def __init__(self, Class):
+        self.Class = Class
+        self.fname = '__' + Class.moniker
+
+    def __get__(self, instance, owner):
+        return getattr( instance, self.fname, None )
+
+    def __set__(self, instance, value):
+        if not isinstance( value, self.Class ):
+            raise TypeError( "Incorrect type: expected %s, got %s" % (self.Class.moniker, type(value)) )
+        value.setAncestor(instance)
+        setattr( instance, self.fname, value )
+
+class fissionEnergyReleased( ancestryModule.ancestry ) :
+    """
+    Store average energy released to different types of fission products.
+    (prompt and delayed neutrons, prompt / delayed gammas, betas, neutrinos, etc.)
+    Each term is currently (when translating from ENDF) stored as a polynomial expansion,
+    although we expect to also see XYs1d representations in future evaluations
+    """
 
     moniker = 'fissionEnergyReleased'
 
-    def __init__( self ) :
+    ancestryMembers = ( 'promptProductKE',      'promptNeutronKE',      'delayedNeutronKE', 'promptGammaEnergy',
+                        'delayedGammaEnergy',   'delayedBetaEnergy',    'neutrinoEnergy',   'nonNeutrinoEnergy',
+                        'totalEnergy' )
 
-        baseClasses.componentBase.__init__( self )
+    promptProductKE = field( promptProductKE )
+    promptNeutronKE = field( promptNeutronKE )
+    delayedNeutronKE = field( delayedNeutronKE )
+    promptGammaEnergy = field( promptGammaEnergy )
+    delayedGammaEnergy = field( delayedGammaEnergy )
+    delayedBetaEnergy = field( delayedBetaEnergy )
+    neutrinoEnergy = field( neutrinoEnergy )
+    nonNeutrinoEnergy = field( nonNeutrinoEnergy )
+    totalEnergy = field( totalEnergy )
+
+    def __init__( self, label, **kwargs ) :
+
+        ancestryModule.ancestry.__init__( self )
+        self.label = label
+
+        for key in kwargs.keys() :
+            if key in self.ancestryMembers:
+                setattr( self, key, kwargs.pop( key, None ) )
+        if kwargs:
+            raise TypeError("fissionEnergyReleased received unexpected argument(s): '%s'" % kwargs.keys())
+
+    def __iter__( self ) :
+
+        for term in self.ancestryMembers : yield getattr( self, term )
+
+    def convertUnits( self, unitMap ) :
+        "See documentation for reactionSuite.convertUnits."
+
+        for term in self.ancestryMembers :
+            fwarnings = getattr( self, term ).convertUnits( unitMap )
 
     def check( self, info ) :
 
         from fudge.gnd import warning
         warnings = []
-        for form in self.forms:
-            fwarnings = self.forms[form].check( info )
+        for term in self.ancestryMembers:
+            fwarnings = getattr(self, term).check( info )
             if fwarnings:
-                warnings.append( warning.context('%s:' % form, fwarnings) )
+                warnings.append( warning.context('%s:' % term, fwarnings) )
         return warnings
 
-    @staticmethod
-    def parseXMLNode( FERelement, xPath, linkData ):
-        """Parse <fissionEnergyReleased> from xml."""
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
-        xPath.append( FERelement.tag )
-        fer = component()
-        for form in FERelement:
-            if form.tag==tokens.polynomialFormToken:
-                fer.addForm( polynomial.parseXMLNode( form, xPath, linkData ) )
-        xPath.pop()
-        return fer
+        kwargs = {}
+        for term in self.ancestryMembers :
+            kwargs[term] = getattr( self, term ).processMultiGroup( style, tempInfo, indent )
+        return( fissionEnergyReleased( style.label, **kwargs ) )
 
-class polynomial( baseClasses.formBase ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
 
-    moniker = tokens.polynomialFormToken
+        return( self.promptProductKE.data.toPointwise_withLinearXYs( **kwargs ) )
 
-    labels = [ 'promptProductKE', 'promptNeutronKE', 'delayedNeutronKE', 'promptGammaEnergy', 'delayedGammaEnergy', 'delayedBetaEnergy', 'neutrinoEnergy',
-                'nonNeutrinoEnergy', 'totalEnergy' ]
+    def toXML( self, indent = "", **kwargs ) :
 
-    def __init__( self, label, order, data, energyUnit, hasUncertainties = False ) :
+        return( '\n'.join( self.toXMLList( indent = indent, **kwargs ) ) )
 
-        self.order = order
-        self.data = data
-        self.energyUnit = energyUnit                        # Need to use this in toENDF6.
-        self.hasUncertainties = hasUncertainties
+    def toXMLList( self, indent="", **kwargs ):
 
-        if( label is not None ) :
-            if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must be a string' )
-        self.__label = label
+        indent2 = indent+"  "
+        xmlList = ['%s<%s label="%s">' % ( indent, self.moniker, self.label )]
+        for term in self.ancestryMembers:
+            xmlList += getattr(self, term).toXMLList( indent2, **kwargs )
+        xmlList[-1] += "</%s>" % self.moniker
 
-    def check( self, info ):
-
-        from fudge.gnd import warning
-        from pqu import PQU
-        warnings = []
-        domain = [d.getValueAs( self.energyUnit ) for d in info['crossSectionDomain']]
-        for key in self.data:   # 'totalEnergy', 'nonNeutrinoEnergy', etc
-            coefs = [a[0] for a in self.data[key]]
-            poly = lambda e: sum( [coef * e**i for i,coef in enumerate(coefs)] )
-            for ein in domain:
-                if not 0 < poly(ein) < 4e+8: # 0 MeV -> 400 MeV considered acceptable
-                    warnings.append( warning.badFissionEnergyRelease( key, PQU.PQU(ein,self.energyUnit), 
-                        PQU.PQU(poly(ein),self.energyUnit) ) )
-        return warnings
-
-    @property
-    def label( self ) :
-
-        return( self.__label )
+        return xmlList
 
     @staticmethod
     def parseXMLNode( element, xPath, linkData ):
-        """ translate <polynomial> element from xml """
+        """Parse <fissionEnergyReleased> from xml."""
 
         xPath.append( element.tag )
-        order = int( element.get("order") )
-        hasUncertainties = False
-        dataDict = {}
-        for data in element:
-            coefs = map(float, data.text.split())
-            if len(coefs) == (order+1)*2:
-                hasUncertainties=True
-                coefs = zip( coefs[::2], coefs[1::2] )
-            assert len(coefs) == order+1
-            dataDict[data.tag] = coefs
-        Poly = polynomial( element.get('label'), order, dataDict, element.get('energyUnit'), hasUncertainties )
+        children = {}
+        childClasses = dict( [(Class.moniker, Class) for Class in
+            (   promptProductKE, promptNeutronKE, delayedNeutronKE, promptGammaEnergy,
+                delayedGammaEnergy, delayedBetaEnergy, neutrinoEnergy, nonNeutrinoEnergy,
+                totalEnergy ) ] )
+        for child in element:
+            children[ child.tag ] = childClasses[ child.tag ].parseXMLNode( child, xPath, linkData )
+        fer = fissionEnergyReleased( label = element.get( "label" ), **children )
         xPath.pop()
-        return Poly
-
-    def toXMLList( self, indent = "", **kwargs ) :
-
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
-
-        hasUncertainties = ''
-        if( self.hasUncertainties ) : hasUncertainties = ' hasUncertainties="true"'
-        xmlString = [ '%s<%s label="%s" order="%s" energyUnit="%s"%s>' % ( indent, self.moniker,
-                                                    self.label, self.order, self.energyUnit, hasUncertainties ) ]
-        for label in self.labels :
-            data = ""
-            for d in self.data[label] :
-                for v in d : data += ' %s' % v
-            xmlString.append( '%s<%s>%s</%s>' % ( indent2, label, data, label ) )
-        xmlString[-1] += '</%s>' % self.moniker
-        return( xmlString )
+        return fer

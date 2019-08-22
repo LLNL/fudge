@@ -61,97 +61,92 @@
 # 
 # <<END-copyright>>
 
-import endfFormats as endfFormatsModule
-import gndToENDF6 as gndToENDF6Module
-import fudge.particles.nuclear as nuclear
-from pqu import PQU
-from fudge.legacy.converting import endf_endl
-from fudge.structure import masses
+import textwrap
 
-import fudge
+from PoPs import misc as miscPoPsModule
+from PoPs import IDs as IDsPoPsModule
+from PoPs.quantities import halflife as halflifePoPsModule
+from PoPs.families import gaugeBoson as gaugeBosonPoPsModule
+from PoPs.families import lepton as leptonPoPsModule
+from PoPs.families import nuclearLevel as nuclearLevelPoPsModule
+from PoPs.families import nucleus as nucleusPoPsModule
+from PoPs.groups import isotope as isotopePoPsModule
+from PoPs.groups import chemicalElement as chemicalElementPoPsModule
 
-import resonances as resonancesModule
-import productData.multiplicity as multiplicityModule
+from fudge.particles import nuclear as nuclearModule
+from fudge.legacy.converting import endf_endl as endf_endlModule
+from fudge.legacy.converting import massTracker as massTrackerModule
 
-from fudge.gnd import styles as stylesModule
-import fudge.gnd.reactionSuite as reactionSuiteModule
-import fudge.gnd.covariances.covarianceSuite as covarianceSuiteModule
+from fudge.gnd import documentation as documentationModule
+from fudge.gnd import reactionSuite as reactionSuiteModule
 
-import fudge.processing.processingInfo as processingInfoModule
-
-import xData.XYs as XYsModule
-
-elementalMass = { 1000 : 9.992414e-01,  2000 : 3.968215e+00,  3000 : 6.881371e+00,  4000 : 8.934758e+00,  5000 : 1.071713e+01,
-                  6000 : 1.190782e+01,  7000 : 1.388637e+01,  8000 : 1.586195e+01,  9000 : 1.883519e+01, 10000 : 2.000565e+01,
-                 11000 : 2.279230e+01, 12000 : 2.409620e+01, 13000 : 2.674971e+01, 14000 : 2.784422e+01, 15000 : 3.070771e+01,
-                 16000 : 3.178458e+01, 17000 : 3.514843e+01, 18000 : 3.960482e+01, 19000 : 3.876242e+01, 20000 : 3.973568e+01,
-                 21000 : 4.456969e+01, 22000 : 4.748850e+01, 23000 : 5.050387e+01, 24000 : 5.154932e+01, 25000 : 5.446604e+01,
-                 26000 : 5.536723e+01, 27000 : 5.842692e+01, 28000 : 5.819572e+01, 29000 : 6.300009e+01, 30000 : 6.481834e+01,
-                 31000 : 6.912106e+01, 32000 : 7.196640e+01, 33000 : 7.427797e+01, 34000 : 7.828168e+01, 35000 : 7.921757e+01,
-                 36000 : 8.308009e+01, 37000 : 8.473357e+01, 38000 : 8.686728e+01, 39000 : 8.814213e+01, 40000 : 9.043635e+01,
-                 41000 : 9.210826e+01, 42000 : 9.511580e+01, 43000 : 9.715810e+01, 44000 : 1.002017e+02, 45000 : 1.020210e+02,
-                 46000 : 1.054859e+02, 47000 : 1.069413e+02, 48000 : 1.114443e+02, 49000 : 1.138336e+02, 50000 : 1.176704e+02,
-                 51000 : 1.207041e+02, 52000 : 1.265038e+02, 53000 : 1.258138e+02, 54000 : 1.301720e+02, 55000 : 1.317632e+02,
-                 56000 : 1.361502e+02, 57000 : 1.377117e+02, 58000 : 1.389163e+02, 59000 : 1.396975e+02, 60000 : 1.430009e+02,
-                 61000 : 1.437543e+02, 62000 : 1.491080e+02, 63000 : 1.506545e+02, 64000 : 1.558991e+02, 65000 : 1.575597e+02,
-                 66000 : 1.611040e+02, 67000 : 1.635131e+02, 68000 : 1.658231e+02, 69000 : 1.674827e+02, 70000 : 1.715535e+02,
-                 71000 : 1.734639e+02, 72000 : 1.769566e+02, 73000 : 1.793935e+02, 74000 : 1.822706e+02, 75000 : 1.846073e+02,
-                 76000 : 1.885660e+02, 77000 : 1.905687e+02, 78000 : 1.934140e+02, 79000 : 1.952739e+02, 80000 : 1.988668e+02,
-                 81000 : 2.026143e+02, 82000 : 2.054200e+02, 83000 : 2.071847e+02, 84000 : 2.072045e+02, 85000 : 2.081959e+02,
-                 86000 : 2.200928e+02, 87000 : 2.210843e+02, 88000 : 2.240585e+02, 89000 : 2.250499e+02, 90000 : 2.300446e+02,
-                 91000 : 2.290155e+02, 92000 : 2.359841e+02, 93000 : 2.349640e+02, 94000 : 2.419039e+02, 95000 : 2.409124e+02,
-                 96000 : 2.448781e+02, 97000 : 2.448781e+02, 98000 : 2.488437e+02, 99000 : 2.498351e+02, 100000 : 2.547922e+02 }
+from . import endfFormats as endfFormatsModule
+from . import gndToENDF6 as gndToENDF6Module
+from .productData import multiplicity as multiplicityModule
 
 __metaclass__ = type
 
-def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None ) :
+def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None, useRedsFloatFormat = False,
+             lineNumbers = True, **kwargs ) :
+
+    _useRedsFloatFormat = endfFormatsModule.useRedsFloatFormat
+    endfFormatsModule.useRedsFloatFormat = useRedsFloatFormat
 
     evaluatedStyle = self.styles.getEvaluatedStyle( )
     if( evaluatedStyle is None ) : raise ValueError( 'no evaluation style found' )
 
     if( flags['verbosity'] >= 10 ) : print '%s%s' % ( verbosityIndent, self.inputParticlesToReactionString( suffix = " -->" ) )
     verbosityIndent2 = verbosityIndent + ' ' * ( len( self.inputParticlesToReactionString( suffix = " -->" ) ) + 1 )
-    projectile, target = self.projectile, self.target
-    projectileZA = projectile.getZ_A_SuffixAndZA( )[-1]
+
+    projectileZA = miscPoPsModule.ZA( self.PoPs[self.projectile] )
     IPART = projectileZA
-    if( projectile.name == 'e-' ) : IPART = 11
-    targetZA, MAT = endf_endl.ZAAndMATFromParticleName( target.name )
+    if( self.projectile == 'e-' ) : IPART = 11
+
+    targetZA, MAT = endf_endlModule.ZAAndMATFromParticleName( self.target )
     targetZ, targetA = divmod( targetZA, 1000 )
-    targetInfo = processingInfoModule.tempInfo( )
+
+    targetInfo = {}
+    targetInfo['massTracker'] = massTrackerModule.massTracker()
+    for particle in self.PoPs :
+        if( isinstance( particle, ( gaugeBosonPoPsModule.particle, leptonPoPsModule.particle, isotopePoPsModule.suite ) ) ) : 
+            ZA = miscPoPsModule.ZA( particle )
+            if( isinstance( particle, isotopePoPsModule.suite ) ) :
+                if( particle[0].intIndex != 0 ) : continue
+            if( len( particle.mass ) > 0 ) : targetInfo['massTracker'].addMassAMU( ZA, particle.getMass( 'amu' ) )
+        elif( isinstance( particle, chemicalElementPoPsModule.suite ) ) :
+            ZA = 1000 * particle.Z
+            targetInfo['massTracker'].addMassAMU( ZA, targetInfo['massTracker'].getElementalMassAMU( ZA ) )
+
     targetInfo['style'] = style
     targetInfo['reactionSuite'] = self
     targetInfo['ZA'] = targetZA
-    if( self.particles.hasID( 'n' ) ) :       # Need neutron mass in eV/c**2, but it may not be in the particle list.
-        targetInfo['neutronMass'] = self.getParticle( 'n' ).getMass( 'eV/c**2' )
-    else :
-        neutronAmu = masses.getMassFromZA( 1 )
-        targetInfo['neutronMass'] = PQU.PQU( neutronAmu, 'amu' ).getValueAs('eV/c**2')
-    if( isinstance( target, fudge.gnd.xParticle.element ) ) :
-        targetInfo['mass'] = elementalMass[targetZA]
-    else :
-        targetInfo['mass'] = target.getMass( 'eV/c**2' ) / targetInfo['neutronMass']
 
-    try :
-        targetInfo['LIS'] = target['levelIndex']
-    except :
-        targetInfo['LIS'] = 0
-    targetInfo['metastables'] = []
+    target = self.PoPs[self.target]
+
+    levelIndex = 0
+    levelEnergy_eV = 0
+    if( isinstance( target, nuclearLevelPoPsModule.particle ) ) :      # isomer target
+        levelIndex = target.intIndex
+        levelEnergy_eV = target.energy[0].float( 'eV' )
+    targetInfo['mass'] = targetInfo['massTracker'].getMassAWR( targetZA, levelEnergyInEv = levelEnergy_eV )
+
+    targetInfo['LIS'] = levelIndex
+    targetInfo['metastables'] = {}
     targetInfo['LISO'] = 0
-    for key, alias in self.aliases.items( ) :
-        if( alias.hasAttribute( 'nuclearMetaStable' ) ) :
-            targetInfo['metastables'].append( alias.getValue() )
-            if( alias.getValue() == target.name ) :
-                targetInfo['LISO'] = int( alias.getAttribute( 'nuclearMetaStable' ) )
+    if( levelIndex > 0 ) : targetInfo['LISO'] = 1
+# BRBBRB
+    for alias in self.PoPs.aliases :
+        if( hasattr( alias, 'metaStableIndex' ) ) :
+            targetInfo['metastables'][alias.pid] = alias
     MAT += targetInfo['LISO']
     if( self.MAT is not None ) : MAT = self.MAT
 
-    ITYPE = 0                   # Other ITYPE sublibraries not yet supported. BRB is this still true
+    ITYPE = 0
     for reaction in self.reactions :
         if( 500 <= reaction.ENDF_MT < 573 ) : ITYPE = 3
     targetInfo['crossSectionMF'] = { 0 : 3, 3 : 23 }[ITYPE]
 
     targetInfo['delayedRates'] = []
-    targetInfo['totalDelayedNubar'] = None
     targetInfo['MTs'], targetInfo['MF8'], targetInfo['LRs'] = {}, {}, {}
     endfMFList = { 1 : { 451 : [] }, 2 : {}, 3 : {}, 4 : {}, 5 : {}, 6 : {}, 8 : {}, 9 : {}, 10 : {}, 12 : {}, 13 : {},
             14 : {}, 15 : {}, 23 : {}, 26 : {}, 27 : {}, 31 : {}, 32 : {}, 33 : {}, 34 : {}, 35 : {}, 40 : {} }
@@ -159,6 +154,12 @@ def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None ) 
         self.resonances.toENDF6( endfMFList, flags, targetInfo, verbosityIndent=verbosityIndent2 )
 
     targetInfo['production_gammas'] = {}
+
+    for multiplicitySum in self.sums.multiplicities:
+        if multiplicitySum.ENDF_MT == 452:
+            targetInfo['totalNubar'] = multiplicitySum.multiplicity.evaluated
+        elif multiplicitySum.ENDF_MT == 455:
+            targetInfo['totalDelayedNubar'] = multiplicitySum.multiplicity.evaluated
 
     for reaction in self :
         reaction.toENDF6( endfMFList, flags, targetInfo, verbosityIndent = verbosityIndent2 )
@@ -170,28 +171,27 @@ def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None ) 
             targetInfo['crossSection'] = productionReaction.crossSection[targetInfo['style']]
             gndToENDF6Module.gammasToENDF6_MF12_13( MT, MF, endfMFList, flags, targetInfo, gammas )
 
-    for particle in self.particles :              # gamma decay data.
-        if( isinstance( particle, fudge.gnd.xParticle.isotope ) ) :
-            for level in particle :
-                if( level.gammas ) :                        # non-empty gamma information
-                    for baseMT in [ 50, 600, 650, 700, 750, 800 ] :
-                        residualZA = endf_endl.ENDF_MTZAEquation( projectileZA, targetZA, baseMT )[0][-1]
-                        if( nuclear.nucleusNameFromZA( residualZA ) == particle.name ) : break
-                    level.toENDF6( baseMT, endfMFList, flags, targetInfo )
+    for particle in self.PoPs :
+        if( isinstance( particle, nucleusPoPsModule.particle ) ) :
+            if( len( particle.decayData.decayModes ) > 0 ) :
+                for baseMT in [ 50, 600, 650, 700, 750, 800 ] :
+                    residualZA = endf_endlModule.ENDF_MTZAEquation( projectileZA, targetZA, baseMT )[0][-1]
+                    atomID = particle.findClassInAncestry( isotopePoPsModule.suite ).id
+                    if( nuclearModule.nucleusNameFromZA( residualZA ) == atomID ) : break
+                addDecayGamma( self.PoPs, particle, baseMT, endfMFList, flags, targetInfo )
 
-    MFs = sorted( endfMFList.keys( ) )
-    endfList = []
-
-    totalNubar = None
-    totalDelayedNubar = targetInfo['totalDelayedNubar']
-    if( 455 in endfMFList[5] ) :
+    if 'totalNubar' in targetInfo:
+        multiplicityModule.fissionNeutronsToENDF6( 452, targetInfo['totalNubar'], endfMFList, flags, targetInfo )
+    if 'promptNubar' in targetInfo:
+        multiplicityModule.fissionNeutronsToENDF6( 456, targetInfo['promptNubar'], endfMFList, flags, targetInfo )
+    if 'totalDelayedNubar' in targetInfo:
         MF5MT455s = endfMFList[5][455]
 
         endfMFList[1][455]  = [ endfFormatsModule.endfHeadLine( targetZA, targetInfo['mass'], 0, 2, 0, 0 ) ] # Currently, only LDG = 0, LNU = 2 is supported.
         endfMFList[1][455] += [ endfFormatsModule.endfHeadLine( 0, 0, 0, 0, len( targetInfo['delayedRates'] ), 0 ) ]
         endfMFList[1][455] += endfFormatsModule.endfDataList( targetInfo['delayedRates'] )
 
-        multiplicityModule.fissionNeutronsToENDF6( 455, totalDelayedNubar, endfMFList, flags, targetInfo )
+        multiplicityModule.fissionNeutronsToENDF6( 455, targetInfo['totalDelayedNubar'], endfMFList, flags, targetInfo )
 
         MF5MT455List = [ endfFormatsModule.endfHeadLine( targetZA, targetInfo['mass'], 0, 0, len( MF5MT455s ), 0 ) ]
         for MF5MT455 in MF5MT455s : MF5MT455List += MF5MT455
@@ -199,42 +199,37 @@ def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None ) 
             del endfMFList[5][455]
         else :
             endfMFList[5][455] = MF5MT455List + [ endfFormatsModule.endfSENDLineNumber( ) ]
-    if(   'promptNubar' in targetInfo.dict ) :
-        promptNubar = targetInfo['promptNubar']
-        multiplicityModule.fissionNeutronsToENDF6( 456, promptNubar, endfMFList, flags, targetInfo )
-        totalNubar = promptNubar
-        try :
-            if( not( totalDelayedNubar is None ) ) : totalNubar = totalNubar + totalDelayedNubar
-        except :                                # The following is a kludge for some "bad" data.
-            if( ( totalNubar.domainMax( unitTo = 'MeV' ) == 30. ) and
-                ( totalDelayedNubar.domainMax( unitTo = 'MeV' ) == 20. ) ) :
-                    totalDelayedNubar[-1] = [ totalNubar.domainMax( ), totalDelayedNubar.getValue( totalDelayedNubar.domainMax( ) ) ]
-            totalNubar = totalNubar + totalDelayedNubar
-    elif( 'totalNubar' in targetInfo.dict ) :
-        totalNubar = targetInfo['totalNubar']
-    if( totalNubar is not None ) :
-        multiplicityModule.fissionNeutronsToENDF6( 452, totalNubar, endfMFList, flags, targetInfo )
 
     if( covarianceSuite ) : covarianceSuite.toENDF6( endfMFList, flags, targetInfo )
 
     endfDoc = self.documentation.get( 'endfDoc' )
     if( endfDoc is None ) :
-        docHeader2 = [  ' %2d-%-2s-%3d LLNL       EVAL-OCT03 Unknown' % ( targetZ, fudge.particles.nuclear.elementSymbolFromZ( targetZ ), targetA ),
+        docHeader2 = [  ' %2d-%-2s-%3d LLNL       EVAL-OCT03 Unknown' % ( targetZ, nuclearModule.elementSymbolFromZ( targetZ ), targetA ),
                         '                      DIST-DEC99                       19990101   ',
                         '----ENDL              MATERIAL %4d' % MAT,
                         '-----INCIDENT %s DATA' %
                             { 1 : 'NEUTRON', 1001 : 'PROTON', 1002 : 'DEUTERON', 1003 : 'TRITON', 2003 : 'HELION', 2004 : 'ALPHA' }[projectileZA],
                         '------ENDF-6 FORMAT' ]
         endfDoc = [ 'LLNL ENDL file translated to ENDF6 by FUDGE.', '' ' ************************ C O N T E N T S ***********************' ]
+        endlDoc = self.documentation.get( 'ENDL' ).getLines() 
+        endlDoc2 = [ ]
+        if endlDoc != None: 
+            for line in endlDoc:
+                if 'endep' in line:    # remove text from the line before the ones containing 'endep'
+                    del endlDoc2[-1]
+                    break
+                newline = textwrap.wrap(line,width=66,drop_whitespace=False,subsequent_indent='    ')
+                if len(newline)==0: newline = [' ']   # do not let blank lines disappear altogether
+                endlDoc2 += newline
+            endfDoc = endlDoc2  + endfDoc
     else :
         docHeader2 = []
         endfDoc = endfDoc.getLines( )
 
         # update the documentation, including metadata on first 4 lines:
-    try :
-        self.getReaction( 'fission' )
+    if self.getReaction( 'fission' ) is not None:
         LFI = True
-    except KeyError :
+    else:
         LFI = False
     LRP = -1
     if( self.resonances is not None ) :
@@ -242,12 +237,13 @@ def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None ) 
             LRP = 0
         elif( self.resonances.reconstructCrossSection ) :
             LRP = 1
-        elif( self.resonances.unresolved and not( self.resonances.resolved )
-                and self.resonances.unresolved.tabulatedWidths.forSelfShieldingOnly ) :
+        elif( self.resonances.unresolved and not self.resonances.resolved ) : # self-shielding only
             LRP = 1
         else :
             LRP = 2
-    EMAX = max( [ reaction.crossSection.domainMax( unitTo = 'eV' ) for reaction in self.reactions ] )
+
+    crossSectionScale = self.reactions[0].domainUnitConversionFactor( 'eV' )
+    EMAX = max( [ crossSectionScale * reaction.crossSection.domainMax for reaction in self.reactions ] )
 
     temperature = self.styles[style].temperature.getValueAs( 'K' )
     library = evaluatedStyle.library
@@ -265,18 +261,55 @@ def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None ) 
     NFOR = 6    # ENDF-6 format
     NSUB = 10 * IPART + ITYPE
     LDRV = 0
+
+    NLIB = kwargs.get( 'NLIB', NLIB )
+
     STA = 0
-    if( isinstance( self.target, fudge.gnd.xParticle.nuclearLevel ) or self.target.attributes.get( 'unstable' ) ) : STA = 1
-    if( targetInfo['LISO'] ) : STA = 1
-    levelIndex, level_eV = 0, 0.
-    if( hasattr( self.target, 'getLevelIndex' ) ) : levelIndex, level_eV = self.target.getLevelIndex( ), self.target.getLevelAsFloat( 'eV' )
+    target = self.PoPs[self.target]
+    if( isinstance( target, isotopePoPsModule.suite ) ) :
+        target = target[0]
+        if( len( target.nucleus.halflife ) > 0 ) :
+            if( target.nucleus.halflife[0].value == halflifePoPsModule.UNSTABLE ) : STA = 1
+    if( levelIndex > 0 ) : STA = 1
+
+    projectileMass = targetInfo['massTracker'].getMassAWR( projectileZA, asTarget = False )
     docHeader = [ endfFormatsModule.endfHeadLine( targetZA, targetInfo['mass'], LRP, LFI, NLIB, NMOD ),
-            endfFormatsModule.endfHeadLine( level_eV, STA, levelIndex, targetInfo['LISO'], 0, NFOR ),
-            endfFormatsModule.endfHeadLine( self.projectile.getMass( 'eV/c**2' ) / targetInfo['neutronMass'], EMAX, LREL, 0, NSUB, NVER ),
-            endfFormatsModule.endfHeadLine( temperature, 0, LDRV, 0, len( endfDoc ), -1 ) ]
-    new_doc = fudge.gnd.documentation.documentation( 'endf', '\n'.join( docHeader + docHeader2 + endfDoc ) )
+            endfFormatsModule.endfHeadLine( levelEnergy_eV, STA, levelIndex, targetInfo['LISO'], 0, NFOR ),
+            endfFormatsModule.endfHeadLine( projectileMass, EMAX, LREL, 0, NSUB, NVER ),
+            endfFormatsModule.endfHeadLine( temperature, 0, LDRV, 0, len( docHeader2 + endfDoc ), -1 ) ]
+    new_doc = documentationModule.documentation( 'endf', '\n'.join( docHeader + docHeader2 + endfDoc ) )
     endfMFList[1][451] += endfFormatsModule.toEndfStringList( new_doc )
 
-    return( endfFormatsModule.endfMFListToFinalFile( endfMFList, MAT, lineNumbers = True ) )
+    endfFormatsModule.useRedsFloatFormat = _useRedsFloatFormat
+
+    return( endfFormatsModule.endfMFListToFinalFile( endfMFList, MAT, lineNumbers = lineNumbers ) )
 
 reactionSuiteModule.reactionSuite.toENDF6 = toENDF6
+
+def addDecayGamma( PoPs, particle, baseMT, endfMFList, flags, targetInfo ) :
+
+    MF = 12
+    LP = 0
+    MT = baseMT + particle.intIndex
+    gammaData = []
+    levelEnergy_eV = particle.energy[0].float( 'eV' )
+    for decayMode in particle.decayData.decayModes :
+        IDs = [ product.pid for decay in decayMode.decayPath for product in decay.products ]
+        IDs.remove( IDsPoPsModule.photon )
+        if( len( IDs ) != 1 ) : raise Exception( 'Do not know how to handle this.' )
+        probability = decayMode.probability[0].value
+        finalEnergy_eV = PoPs[IDs[0]].energy[0].float( 'eV' )
+        gammaData.append( [ finalEnergy_eV, probability ] )
+
+    gammaData.sort( reverse = True )
+    nGammas = len( gammaData )
+    LGp = len( gammaData[0] )
+    endfMFList[MF][MT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], 2, LGp - 1, MT - baseMT, 0 ),
+        endfFormatsModule.endfHeadLine( levelEnergy_eV, 0., LP, 0, LGp * nGammas, nGammas ) ]
+
+    endfMFList[MF][MT] += endfFormatsModule.endfNdDataList( gammaData )
+    endfMFList[MF][MT].append( endfFormatsModule.endfSENDLineNumber( ) )
+
+        # Currently, assume all distributions are isotropic
+    endfMFList[14][MT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], 1, 0, nGammas, 0 ) ]
+    endfMFList[14][MT].append( endfFormatsModule.endfSENDLineNumber( ) )

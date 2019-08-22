@@ -78,6 +78,7 @@ __metaclass__ = type
 import base as baseModule
 import link as linkModule
 import XYs as XYsModule
+import series1d as series1dModule
 
 class uncertainties( baseModule.xDataCoreMembers ):
 
@@ -94,7 +95,13 @@ class uncertainties( baseModule.xDataCoreMembers ):
     def __len__(self):
         return len( self.__uncertainties )
 
+    def convertUnits( self, unitMap ) :
+
+        for uncertainty in self.__uncertainties : uncertainty.convertUnits( unitMap )
+
     def toXMLList( self, indent = '', **kwargs ) :
+
+        if len(self) == 0: return( [] )
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
@@ -154,6 +161,10 @@ class uncertainty( baseModule.xDataCoreMembers ):
 
         return self.__functional
 
+    def convertUnits( self, unitMap ) :
+
+        self.__functional.convertUnits( unitMap )
+
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
@@ -185,6 +196,7 @@ class uncertainty( baseModule.xDataCoreMembers ):
         functionalClass = {
             linkModule.link.moniker: linkModule.link,
             XYsModule.XYs1d.moniker: XYsModule.XYs1d,
+            series1dModule.polynomial1d.moniker: series1dModule.polynomial1d,
         }.get( element[0].tag )
         kwargs['functional'] = functionalClass.parseXMLNode( element[0], xPath, linkData )
         uncertainty_ = uncertainty( **kwargs )

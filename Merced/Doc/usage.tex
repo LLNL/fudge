@@ -1,0 +1,448 @@
+\chapter{Usage of \gettransfer}
+\label{Sec:usage}
+The command to run \gettransfer\ is\\
+  \Input{\gettransfer\ [-inputOption]}{InputFile}\\
+The input options are described in Section~\ref{Sec:usage-optional} below.
+Most of them may be specified either in the input file or on the
+command line, and command line options override those given in the
+input file.  For example, to get output with 9 significant figures,
+the command line could be\\
+\Input{getTransferMatrix\ -datafield\_precision 9}{InputFile}\\
+Alternatively, one may insert the line\\
+   \Input{datafield\_precision: 9}{}\\
+into the input file.  Note the presence of the colon in this line.
+The format for identification of data in the input file is\\
+  \Input{data identifier:}{value}
+
+For most types of data, the units of energy are arbitrary, but they
+must be consistent.  In particular, rest masses of particles must
+be in the same units as the energy bins.  As mentioned in the
+individual sections on the data, some models require that
+energies be given in MeV.
+
+\section{Output file}
+The default name of the output file is \texttt{utfil}.  
+It may be changed on the command line with\\
+  \Input{-output}{OutputFile}\\
+It may also be changed with the
+line\\
+  \Input{output:}{OutputFile}\\
+  in the input file.
+
+\section{Form of the input file}
+The first line of the input file must be\\
+  \Input{xndfgenTransferMatrix: version 1.0}{}\\
+This line is followed by information common to all data models.
+The file closes with data specific to the particular data model.
+Blank lines are ignored.
+  
+\subsection{Comments}
+Comments may be included in the input file in either if two forms.\\
+ \Input{Comment:}{This comment is printed to the output file.}\\
+ \Input{\#}{On a line, anything after a pound sign is ignored.}\\
+ For example, the input file usually contains a comment identifying the
+ particles involved in the reaction, e.g.,\\
+   \Input{Comment: n1 + C12 --> n1 + C12 outgoing data for n1}{}
+ 
+\subsection{Parallel computing}
+The \gettransfer\ code may be compiled to run in parallel if
+\textsf{OpenMP} is available on your computer.  In fact, the
+default \textsf{Makefile} uses \textsf{OpenMP}.  Compile with
+\textsf{Makefile\_serial} to obtain serial code.  
+
+For the parallel code, the number of threads is set to $n$ by the
+line\\
+  \Input{num\_threads:}{$n$}\\
+in the input file.  The default is $n = 0$, which causes the computer
+to choose the number of threads.  If the specified $n$ is larger than
+the number of available threads, then the code runs on the threads
+available.
+
+The parallel code may be forced to run in serial mode by
+the command line  option\\
+ \Input{-num\_threads~1} {}\\
+or by inclusion of\\
+ \Input{num\_threads:~1}{}\\
+in the input file.
+
+ \subsection{Interpolation flags} \label{interp-flags}
+The identifiers for the standard interpolation methods
+ given in Section~\ref{Sec:1d-interp} are\\
+    \Input{flat}{for histograms}\\
+   \Input{lin-lin}{for linear-linear}\\
+   \Input{lin-log}{for linear-log}\\
+   \Input{log-lin}{for log-linear}\\
+   \Input{log-log}{for log-log}\\
+The identifiers are incorporated in different ways into the interpolation
+flags for simple lists such as reaction cross sections, for probability densities,
+and for the Kalbach-Mann $r$ and~$a$ parameters.  The complete
+identifiers for the interpolation of the various types of tabulated data are as follows.
+
+\subsubsection{Interpolation flags for simple lists}\label{interp-flags-list}
+ For simple lists of data such as $\{E, M\}$ for particle multiplicity~$M$ at
+ incident energy~$E$, the interpolation flags are\\
+   \Input{Interpolation: }{identifier}\\
+with one of the identifiers above.  For example, the command\\
+   \Input{Interpolation: lin-lin}{}\\
+specifies linear-linear interpolation.
+
+\subsubsection{Interpolation flags for probability densities}\label{interp-flags-probability}
+For probability density tables 
+\begin{equation}
+  \{x, y, \pi(y \mid x) \},
+ \label{xypi-data}
+\end{equation}
+the interpolation
+method with respect to~$x$ as discussed in Section~\ref{Sec:2d-interp}
+is identified by\\
+   \Input{$x$ interpolation:}{identifier interpolation-flag}\\
+where the identifier is one of those for simple lists and the
+interpolation flag here is one of\\
+   \Input{direct }{for direct interpolation with extrapolation}\\
+   \Input{unitbase }{for unit-base interpolation}\\
+   \Input{cumulativepoints }{for interpolation by cumulative points}\\
+Thus, a table of probability densities of outgoing energies $\pi( E' \mid E)$ may
+be marked\\
+   \Input{Incident energy interpolation: lin-lin cumulativepoints}{}\\
+to indicate that interpolation with respect to incident energy~$E$ is to be done
+using linear-linear cumulative points as in Section~\ref{Sec:cumProb}.
+
+The method for interpolation of the data in Eq.~(\ref{xypi-data}) with
+respect to $y$ is specified by\\
+   \Input{$y$ interpolation:}{identifier}\\
+with an identifier as in a simple list.  For example, the command\\
+   \Input{Outgoing energy interpolation: flat}{}\\
+specifies histogram interpolation with respect to the energy of
+the outgoing particle.
+
+\subsubsection{Interpolation flags for unscaled interpolation of
+Kalbach-Mann data}\label{interp-flags-Kalbach-r}
+The methods of interpolation of tables for the Kalbach-Mann 
+parameters $r(E', E)$ and $a(E', E)$ with respect to the energy~$E$
+of the incident particle are discussed in Section~\ref{Sec:Kalbach-r-interp}.
+The options for interpolation flags are\\
+   \Input{Incident energy interpolation:}{identifier \texttt{unscaleddirect}}\\
+   \Input{Incident energy interpolation:}{identifier \texttt{unscaledunitbase}}\\
+   \Input{Incident energy interpolation:}{identifier \texttt{unscaledcumulativepoints}}\\
+where the identifier is one of those for simple lists. 
+For example, the command denoting linear-linear unscaled unit-base interpolation
+with respect to incident energy is\\
+   \Input{Incident energy interpolation: lin-lin unscaledunitbase}{}
+
+The method for interpolation of tables of Kalbach-Mann $r$ and~$a$ parameters
+with respect to outgoing energy~$E$ is specified by\\
+   \Input{Outgoing energy interpolation:}{identifier}\\
+with an identifier as in a simple list.  For example, the comand\\
+   \Input{Outgoing energy interpolation: flat}{}\\
+specifies histogram interpolation with respect to the energy of
+the outgoing particle.
+
+\section{Information used by all data models}
+The following information is required, but the order
+is arbitrary.
+
+\subsection{The data model} \label{data-model}
+Identification of the data model.\\
+  \Input{Process:}{Identifier of the type of data}\\
+These identifiers are specified in the previous sections.
+
+\subsection{Incident energy groups}\label{Ein-bins}
+The boundaries of the incident energy groups.\\
+  \Input{Projectile's group boundaries: n = $n$}{}\\
+This is followed by the $n$ values the incident energy bin
+boundaries.  Thus, in units of eV this section may take the form\\
+  \Input{Projectile's group boundaries: n = 88}{}\\
+  \Input{  1.306800000000e-03  2.090800000000e-02  1.306800000000e-01}{}\\ 
+  \Input{  3.345300000000e-01  1.176100000000e+00  2.090800000000e+00}{}\\
+   \Input{ \indent $\cdots$}{}\\
+  \Input{  2.000000000000e+07 }{}
+
+\subsection{Outgoing energy groups}\label{Eout-bins}
+The boundaries of the outgoing energy groups.\\
+  \Input{Product's group boundaries: n = $n$}{}\\
+This is followed by the $n$ values the outgoing energy bin
+boundaries.  The units must be the same as for the incident
+energy groups.  A sample input given in eV is\\
+  \Input{Product's group boundaries: n = 88}{}\\
+  \Input{  1.306800000000e-03  2.090800000000e-02  1.306800000000e-01}{}\\ 
+  \Input{  3.345300000000e-01  1.176100000000e+00  2.090800000000e+00}{}\\
+   \Input{ \indent $\cdots$}{}\\
+  \Input{  2.000000000000e+07 }{}
+
+\subsection{Frames of reference}\label{Reference-frame}
+The energy $E$ of the incident particle must be given in the laboratory frame,
+as indicated by the command\\
+  \Input{Projectile Frame: lab}{}\\
+For the outgoing particle, the energy $E'$ and direction cosine~$\mu$
+may be given in the laboratory frame with\\
+  \Input{Product Frame: lab}{}\\
+or the center-of-mass frame as\\
+  \Input{Product Frame: CenterOfMass}{}
+
+\subsection{Relativistic kinetics}\label{Sec:relativistic}
+For discrete 2-body reactions, 
+the code may use either Newtonian or relativistic mechanics in its
+computations.  The command to control this option is\\
+  \Input{kinetics: Newtonian}{}\\
+or\\
+  \Input{kinetics: relativistic}{}\\
+The default is \texttt{Newtonian} except when the emitted particle is a gamma.
+
+\subsection{Approximate flux}
+The Legendre coefficients $\widetilde \phi_\ell(E)$ used as weights in
+the integrals Eqs.~(\ref{Inum}) and~(\ref{Ien}).\\
+  \Input{Fluxes: n = $n$}{}\\
+  \Input{Interpolation:}{interpolation flag}\\
+Here, $n$ is the number of incident energies $E$, and
+the interpolation flag is one of those for simple lists, Section~\ref{interp-flags-list}.
+Note that because of the scaling performed in Eqs.~(\ref{cons_num})
+and~(\ref{cons_en}), the units of $\widetilde \phi_\ell(E)$
+are arbitrary, but barns are most common.  The computed transfer matrix is unchanged if
+$\widetilde \phi_\ell(E)$ is multiplied by a constant.
+
+For each incident energy, the input file has a block specifying
+the Legendre coefficients  given as\\
+ \Input{ Ein: $E$:}{  n = $n$}\\
+and $\widetilde \phi_\ell(E)$ for $n = 0$, 1, \ldots , $n - 1$.
+The incident energy $E$ must be in the same units as the
+energy groups.
+The number of Legendre coefficients given here need not be
+consistent with the Legendre order $L$ of the computed transfer
+matrix as specified in Section~\ref{Sec:LegendreOrder}.  
+If $n - 1 < L$, then the {\gettransfer} code sets
+$$
+  \widetilde \phi_\ell(E) = \widetilde \phi_{n - 1}(E)
+  \quad \text{for $\ell = n$, $n+1$, \ldots, $L$.}
+$$
+
+A sample input with $E$ in eV and with all Legendre coefficients
+the same is\\
+  \Input{Fluxes: n = 2}{}\\
+  \Input{Interpolation: lin-lin}{}\\
+  \Input{ Ein: 0:  n = 1}{}\\
+  \Input{  \indent 8.500000000000e+01}{}\\
+  \Input{ Ein: 2.100000000000e+07:  n = 1}{}\\
+  \Input{  \indent 8.500000000000e+01}{}
+
+\subsection{Reaction cross section}
+As explained in Section~\ref{Sec:gamma-in}, the cross sections for coherent photon
+scattering and Compton scattering are computed from the data.
+Reaction cross sections are required for all other data models.\\
+  \Input{Cross section: n = $n$}{}\\
+  \Input{Interpolation:}{interpolation flag}\\
+Here, $n$ is the number of pairs $\{E, \sigma(E)\}$,
+and the interpolation flag is one of those for simple lists,
+Section~\ref{interp-flags-list}.  This is
+followed by $n$ pairs of incident energy~$E$ and reaction cross
+section~$\sigma( E )$.
+
+A sample of such data with energies in MeV is given by\\
+ \Input{Cross section: n = 22}{}\\
+ \Input{Interpolation: lin-lin}{}\\
+  \Input{  \indent  7.78148000e+00  0.00000000e+00}{}\\
+  \Input{  \indent  7.80000000e+00  4.40157000e-04}{}\\
+  \Input{  \indent  8.00000000e+00  1.13781000e-02}{}\\
+  \Input{  \indent  8.50000000e+00  6.96097100e-02}{}\\
+  \Input{  \indent }{ $\cdots$}\\
+  \Input{  \indent  2.00000000e+01  9.17094100e-01}{}
+
+\subsection{Multiplicity}
+The multiplicity of the outgoing particle must be given if it is
+different from~1.  The format is\\
+  \Input{Multiplicity: n = $n$}{}\\
+  \Input{Interpolation:}{interpolation flag}\\
+followed by $n$ pairs $\{E, M(E)\}$.  
+The interpolation flag is one of those for simple lists,
+Section~\ref{interp-flags-list}.  The units of incident energy
+$E$ must be the same as for the energy groups.  
+For example, with $E$ in MeV, an $(n, 2n)$ reaction
+would typically have\\
+  \Input{Multiplicity: n = 2}{}\\
+  \Input{Interpolation:}{flat}\\
+  \Input{0.0    2.0}{}\\
+  \Input{20.0  2.0}{}
+
+
+\subsection{Model weight}
+The model weight $w_r(E)$ is used in the formation of the reaction
+kernel $\calK_r(E', \mu \mid E)$ in Eq.~(\ref{def_pi}) and is
+discussed in Section~\ref{Sec:model-weight}.  Its value
+is usually~1 over the entire range of incident energies in the cross
+section data.  If this is not the case, then the model weight is input as\\
+  \Input{Weight: n = $n$}{}\\
+  \Input{Interpolation: flat}{}\\
+followed by $n$ pairs $\{E, w(E)\}$.   For example, the weight
+$$
+  w(E) = \begin{cases}
+    0 & \text{for $0 \le E < 6$,}\\
+    1 & \text{for $6 \le E \le 20$,}\\
+  \end{cases}
+$$
+may be specified using the input\\
+   \Input{Weight: n = 3}{}\\
+  \Input{Interpolation: flat}{}\\
+  \Input{0.0    0.0}{}\\
+  \Input{6.0    1.0}{}\\
+  \Input{20.0  1.0}{}
+  
+\section{Optional flags, output information}
+\label{Sec:usage-optional}
+The following options control the output of \gettransfer.
+All of them may also be input as command line options.
+
+\subsection{Legendre order of the output}\label{Sec:LegendreOrder}
+The Legendre order of the matrices Eqs.~(\ref{Inum}) and~(\ref{Ien})
+computed by \gettransfer\ is set by the command\\
+  \Input{outputLegendreOrder: n = $L$}{}\\
+The default is $L = 3$.
+
+\subsection{Numerical precision of the output}
+The number of significant figures for the output data is set by\\
+  \Input{datafield\_precision: n = $n$}{}\\
+The default is $n = 8$.
+
+\subsection{Conservation flag}\label{Sec:conserveFlag}
+This flag determines whether the \gettransfer\ code computes integrals
+   Eq.~(\ref{Inum}) for the number-conserving transfer matrix,
+   integrals  Eq.~(\ref{Ien}) for the energy-conserving matrix, or both.
+   The options are\\
+   \Input{Conserve: number}{}\\
+for the integrals Eq.~(\ref{Inum})\\
+   \Input{Conserve: energy}{}\\
+for the integrals Eq.~(\ref{Ien})\\
+   \Input{Conserve: both}{}\\
+for the both integrals.  The default is \texttt{both} for most types of data.
+
+\subsection{Consistency check}
+If the integrals Eq.~(\ref{Inum}) for the number-preserving transfer matrix
+are computed, it is possible to check the consistency as in Eq.~(\ref{rowSum}).
+With the option\\
+  \Input{check\_row\_sum: true}{}\\
+both sides of Eq.~(\ref{rowSum}) are printed, along with their differences
+and relative differences.  This information is not printed if the option is \texttt{false}.
+The default is \texttt{false}.
+
+To scale the integrals Eq.~(\ref{Inum}) so as to enforce the identity
+Eq.~(\ref{rowSum}), use the option\\
+  \Input{scale\_rows: true}{}\\
+In this case, the integrals Eq.~(\ref{Ien}) are also scaled.  The default
+is \texttt{true}, scale the integrals.
+
+\section{Optional inputs, quadrature methods}\label{Sec:QuadratureMethods}
+For the integrals Eqs.~(\ref{Inum}) and~(\ref{Ien}) and their equivalents
+in the center-of-mass frame, the quadrature methods may be set
+by commands of the form\\
+  \Input{\textrm{Variable} quadrature method:}{Method}\\
+The `Variable' in this line is any of the following.\\
+  \Input{Ein}{for integrals with respect to incident energy~$E$,}\\
+  \Input{Eout}{for integrals with respect to outgoing energy~$\Elab'$ or~$\Ecm'$,}\\
+  \Input{mu}{for integrals with respect to direction cosine~$\mulab$ of ~$\mucm$.}\\
+  \Input{-}{Omission of this parameter gives the same quadrature method for all integrals.}\\
+The options for the `Method' in the command to set the quadrature method
+are\\
+  \Input{adaptive}{for adaptive 2nd-order Gaussian quadrature,}\\
+  \Input{square root}{for adaptive 1st-order Gaussian quadrature with weight $\sqrt{1 - \mu}$,}\\
+  \Input{Gauss2}{for non-adaptive 2nd-order Gaussian quadrature,}\\
+  \Input{Gauss4}{for non-adaptive 4th-order Gaussian quadrature,}\\
+  \Input{Gauss6}{for non-adaptive 6th-order Gaussian quadrature.}\\
+The default for most data models is\\
+  \Input{quadrature method: adaptive}{}\\
+to use adaptive 2nd-order Gaussian  quadrature for all integrals.
+The exceptions are\\
+  \Input{mu quadrature method: square root}{}\\
+for the integrals over direction cosine $\mulab$ with data for
+coherent scattering and Compton scattering.  The non-adaptive options
+are primarily used in debugging.
+
+\section{Optional inputs, numerical tolerances}
+The user may reset the tolerances for convergence of the adaptive quadrature
+and for determination of the equality of two floating-point numbers.
+
+\subsection{Convergence of adaptive quadrature}
+The adaptive quadrature routine produces an estimate $\calI$ of
+the integral, along with an estimate $e_\calI$ of the error.  The process of
+successive subdivision stops when
+$$
+  | e_\calI | < \epsilon_a + \epsilon_r | \calI |.
+$$
+The absolute quadrature tolerance is set by the command\\
+  \Input{abs\_quad\_tol:}{$\epsilon_a$}\\
+The default is $\epsilon_a = \texttt{1.0e-8}$.  To set the relative
+quadrature tolerance, use\\
+  \Input{quad\_tol:}{$\epsilon_r$}\\
+The default is $\epsilon_r = \texttt{1.0e-4}$. 
+
+There is also a limit on the total number of intervals used in
+adaptive quadrature\\
+  \Input{max\_divisions: n = $n$}{}\\
+If this limit is exceeded, the adaptive quadrature routine returns
+the current estimate and prints a warning that this result may be
+inaccurate.
+
+\subsection{Near equality of floating-point numbers}
+In comparisons of floating-point numbers $x_1$ and~$x_2$, the code treats 
+them as essentially equal if
+$$
+  | x_1 - x_2 | \le \delta_a + \delta_r \min( | x_1 |, | x_2 | ).
+$$
+Here, the absolute tolerance $\delta_a$ is set by\\
+  \Input{abs\_tol:}{$\delta_a$}\\
+The default value is $\delta_a = \texttt{2.0e-14}$ and is appropriate
+when energies are measured in MeV.  It should be scaled accordingly,
+when other energy units are used.  The relative tolerance
+$\delta_r$ is set using\\
+  \Input{E\_tol:}{$\delta_r$}\\
+The default value is $\delta_r = \texttt{1.0e-9}$.
+
+\section{Physical constants}
+The coding for coherent photon scattering and Compton scattering
+discussed in Section~\ref{Sec:gamma-in} requires the values of several physical
+constants.  These are input as follows.
+
+\subsection{Conversion from $\text{\AA}^{-1}$ to energy}\label{Sec:cm-to-Mev}
+In order to convert the energy of photons from inverse wavelength
+to energy, multiply by $ch$.  This parameter is set by
+the command\\
+  \Input{inverseWaveLengthToEnergyFactor:}{$ch$}.
+
+\subsection{Thompson scattering cross section}\label{Sec:Thompson-xs}
+The Thompson scattering cross section $\sigma_T$ in 
+Eqs.~(\ref{sigma-whole-atom}) and~(\ref{Compton-xs}) is
+set by\\
+  \Input{ThompsonScattering:}{$\sigma_T$}\\
+The default value is $\sigma_T = \texttt{0.6652448}$ barns.
+
+\subsection{Electron rest mass}\label{Sec:electron-mass}
+The rest mass $m_e$ of the electron in Eq.~(\ref{Compton-relative-E}) is
+set by the command\\
+  \Input{electron mass:}{$m_e$}.
+
+\subsection{Neutron rest mass}\label{Sec:neutron-mass}
+The rest mass of the neutron $m_n$ is used in Eq.~(\ref{Kalbach-photo})
+by the Kalbach-Mann model of photo-nuclear reactions.
+Its units are MeV, and its value is set by the command\\
+  \Input{m\_neutron:}{$m_n$}\\
+Its default value is $m_n = \texttt{939.565653471}\,$MeV.
+
+\section{Errors and warning messages}
+These options control the printing of informational messages,
+warnings, and fatal errors.  To set which messages are printed,
+use the command\\
+  \Input{message\_level: n = $n$}{}\\
+The effect of this option is:
+$$
+  \texttt{message\_level} =
+    \begin{cases}
+       0& \text{print all messages},\\
+       1& \text{print only warnings and errors},\\
+       2& \text{print only severe errors; these cause exits anyway}.
+    \end{cases}
+$$
+The default value is 0, print all messages.
+
+It is also possible to turn off all messages with the command\\
+  \Input{skip\_logging:}{\texttt{true}}\\
+The default value is \texttt{false}.
+
+\section{Model-dependent information}\label{model-info}
+The remainder of the input file consists of data required by the model. 

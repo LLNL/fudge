@@ -63,7 +63,7 @@
 
 import math
 
-from pqu import PQU 
+from pqu import PQU as PQUModule
 
 from xData import ancestry as ancestryModule
 from xData import standards as standardsModule
@@ -86,6 +86,13 @@ __metaclass__ = type
 lowerEps = 1e-8
 upperEps = 1e-8
 
+def defaultAxes( energyUnit ) :
+
+    axes = axesModule.axes( rank = 2 )
+    axes[0] = axesModule.axis( baseModule.crossSectionToken, 0, 'b' )
+    axes[1] = axesModule.axis( 'energy_in', 1, energyUnit )
+    return( axes )
+
 #
 # crossSection forms.
 #
@@ -101,7 +108,7 @@ class XYs1d( baseCrossSectionForm, XYsModule.XYs1d ) :
 
         XYsModule.XYs1d.__init__( self, **kwargs )
 
-    def changeInterpolation( self, interpolation, accuracy = None, lowerEps = 0, upperEps = 0, cls = None ) :
+    def changeInterpolation( self, interpolation, accuracy, lowerEps = 0, upperEps = 0, cls = None ) :
 
         def func( x, parameters ) :
 
@@ -126,87 +133,105 @@ class XYs1d( baseCrossSectionForm, XYsModule.XYs1d ) :
         if( self.interpolation == standardsModule.interpolation.chargedParticleToken ) :
             if( interpolation != standardsModule.interpolation.linlinToken ) : raise TypeError( 'Only "%s" interpolation for conversion from %s' %
                     ( standardsModule.interpolation.linlinToken, self.interpolation ) )
-            temp = self.cloneToInterpolation( )
+            temp = self.cloneToInterpolation( interpolation )
             parameters = [ temp, 0, [ None, None, None, None, None, None ] ]
             return( temp.applyFunction( func, parameters, accuracy = accuracy, biSectionMax = -1, checkForRoots = False ) )
 
-        return( XYsModule.XYs1d.changeInterpolation( self, interpolation, accuracy = accuracy, lowerEps = lowerEps,
+        return( XYsModule.XYs1d.changeInterpolation( self, interpolation, accuracy, lowerEps = lowerEps,
                 upperEps = upperEps, cls = cls ) )
 
-    def heat( self, ancestor, temperature, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.002, heatAllPoints = False, 
-            doNotThin = True, heatBelowThreshold = True, heatAllEDomain = True ) :
+    def heat( self, currentTemperature, newTemperature, massRatio, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.002, 
+                heatAllPoints = False, doNotThin = True, heatBelowThreshold = True, heatAllEDomain = True,
+                setThresholdToZero = False ) :
         """
-        Returns a linear version of the cross section heated to 'temperature'. If the current temperature of the cross section
-        is greater than 'temperature' a raise is executed.
+        Returns a linear version of the cross section heated to 'newTemperature'. If the current temperature of the 
+        cross section, given by 'currentTemperature', is greater than 'newTemperature' a raise is executed.
         If lowerlimit is None, it is set to 'oneOverV' except when the reaction is determined to be a threshold reaction, 
         then it is set to 'threshold'. Any cross section with domainMin greater than 2.5e-4 eV is determined to be a
         threshold reaction. If upperlimit is None it is set to 'constant'.
         If heatBelowThreshold is False, then EMin is set to the larger of EMin and self's domainMin.
+
+        The unit of 'currentTemperature' and 'newTemperature' must be the same as the self's domain unit.
 
         For more information on EMin, lowerlimit, upperlimit, interpolationAccuracy, heatAllPoints, doNotThin and heatAllEDomain
         see the module crossSectionAdjustForHeatedTarget.
         """
 
         from crossSectionAdjustForHeatedTarget import heat
-        from pqu import PQU
 
-        styles = ancestor.findAttributeInAncestry( 'styles' )
-        from fudge.core.utilities import brb
-        evaluated = styles.getEvaluatedStyle( )
-        gotT = currentTemperature = evaluated.temperature
-        if( gotT.isTemperature( ) ) : gotT = PQU.PQU( gotT.getValueAs( 'K' ), 'K' ) * PQU.PQU( '1 k' )
-        gotT = gotT.getValueAs( self.domainUnit( ) )
-
-        if( isinstance( temperature, str ) ) : temperature = PQU.PQU( temperature )
-        _temperature = temperature
-        if( temperature.isTemperature( ) ) :
-            _temperature = PQU.PQU( temperature.getValueAs( 'K' ), 'K' ) * PQU.PQU( '1 k' )
-        wantedT = _temperature.getValueAs( self.domainUnit( ) )
-
-        dT = wantedT - gotT
-        if( abs( dT ) <= 1e-2 * wantedT ) : dT = 0.
-        if( dT < 0 ) : raise Exception( 'Current temperature "%s" (%.4e) higher than desired temperature "%s" (%.4e)' % ( currentTemperature, gotT, temperature, wantedT ) ) 
-
-        projectile, target = ancestor.findAttributeInAncestry( 'projectile' ), ancestor.findAttributeInAncestry( 'target' )
-        if( projectile.getMass( 'amu' ) == 0 ) : raise Exception( 'Heating with gamma as projectile not supported.' )
-        massRatio = target.getMass( 'amu' ) / projectile.getMass( 'amu' )
+        dT = newTemperature - currentTemperature
+        if( abs( dT ) <= 1e-2 * newTemperature ) : dT = 0.
+        if( dT < 0 ) : raise Exception( 'Current temperature "%s" (in energy units) higher than desired temperature "%s"' %
+                ( currentTemperature, newTemperature ) ) 
 
         heated = unheated = self
-        if( not( unheated.isInterpolationLinear( ) ) ) : unheated = self.toPointwise_withLinearXYs( lowerEps, upperEps )
+        if( not( unheated.isInterpolationLinear( ) ) ) :
+            unheated = self.toPointwise_withLinearXYs( accuracy = 1e-5, upperEps = upperEps )
         if( ( len( unheated ) > 0 ) and ( dT > 0. ) ) :
-            if( isinstance( EMin, str ) ) : EMin = PQU.PQU( EMin )
-            EMin_ = EMin
-            if( not( isinstance( EMin, float ) ) ) : EMin_ = EMin.getValueAs( self.domainUnit( ) )
-            if( not( heatBelowThreshold ) ) : EMin_ = max( unheated.domainMin( ), EMin_ )
+            if( not( heatBelowThreshold ) ) : EMin = max( unheated.domainMin, EMin )
             if( lowerlimit is None ) :
                 lowerlimit = "oneOverV"
-                domainMin = PQU.PQU( 1e-5, 'eV' ).getValueAs( self.domainUnit( ) )
-                if( domainMin < 0.04 * unheated.domainMin( ) ) : lowerlimit = "threshold"
+# BRB6 Hardwired.
+                domainMin = PQUModule.PQU( 1e-5, 'eV' ).getValueAs( self.domainUnit )
+                if( domainMin < 0.04 * unheated.domainMin ) : lowerlimit = "threshold"
             if( upperlimit is None ) : upperlimit = 'constant'
 
-            heated = heat.crossSectionAdjustForHeatedTarget( massRatio, dT, EMin_, unheated, lowerlimit = lowerlimit,
+            heated = heat.crossSectionAdjustForHeatedTarget( massRatio, dT, EMin, unheated, lowerlimit = lowerlimit,
                 upperlimit = upperlimit, interpolationAccuracy = interpolationAccuracy, heatAllPoints = heatAllPoints, doNotThin = doNotThin,
                 heatAllEDomain = heatAllEDomain )
-        accuracy = max( interpolationAccuracy, self.getAccuracy( ) )
-        return( XYs1d( data = heated, axes = unheated.axes, accuracy = accuracy ) )
+        if( ( unheated[0][1] == 0.0 ) and setThresholdToZero ) : heated[0][1] = 0.0
+        return( XYs1d( data = heated, axes = unheated.axes ) )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
         from fudge.processing import miscellaneous as miscellaneousModule
 
-        if( tempInfo['verbosity'] > 2 ) : print '%sProcessing XYs1d cross section' % indent
+        if( tempInfo['verbosity'] > 2 ) : print '%sMulti-grouping XYs1d cross section' % indent
 
         crossSectionGrouped = miscellaneousModule.groupOneFunctionAndFlux( style, tempInfo, self )
-        return( groupModule.toMultiGroup1d( multiGroup, style, tempInfo, self.axes, crossSectionGrouped ) )
+        return( groupModule.toMultiGroup1d( gridded1d, style, tempInfo, self.axes, crossSectionGrouped ) )
 
-    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
 
-        ptw = XYsModule.XYs1d.toPointwise_withLinearXYs( self, lowerEps = lowerEps, upperEps = upperEps, cls = XYs1d )
+        ptw = XYsModule.XYs1d.toPointwise_withLinearXYs( self, cls = XYs1d, hh = True, **kwargs )
         ptw.label = self.label
         return( ptw )
 
     def toXMLList( self, indent = "", **kwargs ) :
 
+        def dataToString( self, dummy, indent = '', **kwargs ) :
+
+            maxXFormat = "%.17e"
+
+            valuesPerLine = int( kwargs.get( 'valuesPerLine', 100 ) )
+            if( ( valuesPerLine % 2 ) == 1 ) : valuesPerLine += 1
+            xFormat = kwargs.get( "xFormat", "%14.8e" )
+
+            XMLList = []
+            Line = []
+            i1 = 1
+            for value in self :
+                if( ( i1 % 2 ) != 0 ) :
+                    xString = xFormat % value
+                    if( i1 > 1 ) :
+                        if( xString == priorXString ) : 
+                            if( xFormat == maxXFormat ) :
+                                raise ValueError( 'x-value strings identical: "%s" and "%s"' % ( priorXString, xString ) )
+                            kwargs['xFormat'] = maxXFormat
+                            return( dataToString( self, dummy, indent = indent, **kwargs ) )
+                    Line.append( xString )
+                    priorXString = xString
+                else :
+                    Line.append( "%12.6e" % value )
+                if( ( i1 % valuesPerLine ) == 0 ) :
+                    XMLList.append( indent + ' '.join( Line ) )
+                    Line = []
+                i1 += 1
+            if( len( Line ) > 0 ) : XMLList.append( indent + ' '.join( Line ) )
+            return( XMLList )
+
+        kwargs['dataToString'] = dataToString
+        kwargs['dataToStringParent'] = None
         return( XYsModule.XYs1d.toXMLList( self, indent, **kwargs ) )
 
 class regions1d( baseCrossSectionForm, regionsModule.regions1d ) :
@@ -219,27 +244,30 @@ class regions1d( baseCrossSectionForm, regionsModule.regions1d ) :
 
         regionsModule.regions1d.__init__( self, **kwargs )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
-        linear = self.toPointwise_withLinearXYs( 1e-8, 1e-8 )
-        return( linear.processSnMultiGroup( style, tempInfo, indent ) )
+        linear = self.toPointwise_withLinearXYs( accuracy = 1e-5, upperEps = 1e-8 )
+        return( linear.processMultiGroup( style, tempInfo, indent ) )
 
     def toLinearXYsClass( self ) :
 
         return( XYs1d )
 
-    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
 
-        accuracy = 1e-3
-        if( len( self ) > 0 ) : accuracy = self[0].getAccuracy( )
-        xys = regionsModule.regions1d.toPointwise_withLinearXYs( self, accuracy, lowerEps, upperEps )
-        return( XYs1d( data = xys, axes = xys.axes, accuracy = xys.getAccuracy( ) ) )
+        xys = regionsModule.regions1d.toPointwise_withLinearXYs( self, **kwargs )
+        return( XYs1d( data = xys, axes = xys.axes ) )
 
-class multiGroup( baseCrossSectionForm, griddedModule.gridded ) :
+    @staticmethod
+    def allowedSubElements( ) :
+
+        return( ( XYs1d, ) )
+
+class gridded1d( baseCrossSectionForm, griddedModule.gridded1d ) :
 
     def __init__( self, **kwargs ) :
 
-        griddedModule.gridded.__init__( self, **kwargs )
+        griddedModule.gridded1d.__init__( self, **kwargs )
 
 class resonanceLink( linkModule.link ) :
 
@@ -254,11 +282,14 @@ class resonancesWithBackground( baseCrossSectionForm ) :
     """
 
     moniker = tokensModule.resonancesWithBackgroundFormToken
+    ancestryMembers = ( 'tabulatedData', )
 
     def __init__( self, label, tabulatedData, resonanceLink ) :
 
         baseCrossSectionForm.__init__( self )
+
         self.link = resonanceLink
+
         self.tabulatedData = tabulatedData
         self.tabulatedData.attribute = None
         self.tabulatedData.label = None
@@ -268,13 +299,20 @@ class resonancesWithBackground( baseCrossSectionForm ) :
             if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must be a string' )
         self.__label = label
 
-    def domainMin( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMin( self ) :
 
-        return( self.tabulatedData.domainMin( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.tabulatedData.domainMin )
 
-    def domainMax( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMax( self ) :
 
-        return( self.tabulatedData.domainMax( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.tabulatedData.domainMax )
+
+    @property
+    def domainUnit( self ) :
+
+        return( self.tabulatedData.domainUnit )
 
     def findEntity( self, entityName, attribute = None, value = None ):
 
@@ -282,25 +320,32 @@ class resonancesWithBackground( baseCrossSectionForm ) :
             return self.tabulatedData
         return ancestryModule.ancestry.findEntity( self, entityName, attribute, value )
 
-    def domain( self, unitTo = None, asPQU = False ) :
-
-        return( self.tabulatedData.domain( unitTo = unitTo, asPQU = asPQU ) )
-
-    def domainUnit( self ) :
-
-        return( self.tabulatedData.domainUnit( ) )
-
     @property
     def label( self ) :
 
         return( self.__label )
     
-    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+    def convertUnits( self, unitMap ) :
+        "See documentation for reactionSuite.convertUnits."
+
+        self.tabulatedData.convertUnits( unitMap )
+
+# BRB FIXME This is a kludge until we fix production/crossSection/reference
+# For example, see n + U236 in ENDF/B-7.1.
+# <productions>
+#    <production label="0" outputChannel="U235" ENDF_MT="16">
+#      <crossSection>
+#        <reference label="eval" ...
+    def processMultiGroup( self, style, tempInfo, indent ) :
+
+        return( self.getAncestor( ).processMultiGroup( style, tempInfo, indent ) )
+
+    def toPointwise_withLinearXYs( self, **kwargs ) :
 
         _component = self.findClassInAncestry( component )
         reconstructed = _component.getStyleOfClass( stylesModule.crossSectionReconstructed )
         if( reconstructed is not None ) :
-            return( reconstructed.toPointwise_withLinearXYs( lowerEps, upperEps ) )     # Return a copy.
+            return( reconstructed.toPointwise_withLinearXYs( **kwargs ) )     # Return a copy.
         raise Exception( 'resonancesWithBackground cross section has not been reconstructed via reactionSuite.reconstructResonances' )
 
     def toXMLList( self, indent = "", **kwargs ) :
@@ -345,21 +390,25 @@ class reference( linkModule.link, baseCrossSectionForm ) :
         if self.link is None : raise Exception( "Unresolved link!" )
         return self.link
 
-    def domainMin( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMin( self ) :
 
-        return( self.crossSection.domainMin( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.crossSection.domainMin )
 
-    def domainMax( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMax( self ) :
 
-        return( self.crossSection.domainMax( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.crossSection.domainMax )
 
-    def domain( self, unitTo = None, asPQU = False ) :
-
-        return( self.crossSection.domain( unitTo = unitTo, asPQU = asPQU ) )
-
+    @property
     def domainUnit( self ) :
 
-        return( self.crossSection.domainUnit( ) )
+        return( self.crossSection.domainUnit )
+
+    def convertUnits( self, unitMap ) :
+        "See documentation for reactionSuite.convertUnits."
+
+        pass
 
     def getReference( self ) :
 
@@ -368,21 +417,21 @@ class reference( linkModule.link, baseCrossSectionForm ) :
     def setReference( self, crossSection ) :
 
         if( not( isinstance( crossSection, (component, None.__class__) ) ) ) :
-            raise Exception( 'crossSection argument must be a cross section component not type %s' % type( crossSection ) )
+            raise TypeError( 'crossSection argument must be a cross section component not type %s' % type( crossSection ) )
         self.crossSection = crossSection
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
         addToComponent = tempInfo.get( 'addToComponent', None )
         tempInfo['addToComponent'] = False
-        multiGroup = self.crossSection.processSnMultiGroup( style, tempInfo, indent )
+        multiGroup = self.crossSection.processMultiGroup( style, tempInfo, indent )
         tempInfo['addToComponent'] = addToComponent
         if( addToComponent is None ) : del tempInfo['addToComponent']
         return( multiGroup )
 
-    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
 
-        return( self.crossSection.toPointwise_withLinearXYs( lowerEps, upperEps ) )
+        return( self.crossSection.toPointwise_withLinearXYs( **kwargs ) )
 
     def check( self ) :
 
@@ -391,6 +440,11 @@ class reference( linkModule.link, baseCrossSectionForm ) :
         if self.getRootAncestor() != self.getReference().getRootAncestor():
             warnings.append( warning.badCrossSectionReference() )
         return warnings
+
+class CoulombElasticReference( reference ) :
+    """Special type of link: points to dCrossSection_dOmega/CoulombElastic"""
+
+    moniker = "CoulombElasticReference"
 
 class weightedPointwise( baseCrossSectionForm ) :
     """
@@ -414,21 +468,20 @@ class weightedPointwise( baseCrossSectionForm ) :
             if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must be a string' )
         self.__label = label
 
-    def domainMin( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMin( self ) :
 
-        return( self.weights.domainMin( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.weights.domainMin )
 
-    def domainMax( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMax( self ) :
 
-        return( self.weights.domainMax( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.weights.domainMax )
 
-    def domain( self, unitTo = None, asPQU = False ) :
-
-        return( self.weights.domain( unitTo = unitTo, asPQU = asPQU ) )
-
+    @property
     def domainUnit( self ) :
 
-        return( self.crossSection.domainUnit( ) )
+        return( self.crossSection.domainUnit )
 
     def setReference( self, crossSection ):
 
@@ -439,10 +492,10 @@ class weightedPointwise( baseCrossSectionForm ) :
 
         return( self.__label )
     
-    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
 
-        xys = self.crossSection.toPointwise_withLinearXYs( lowerEps, upperEps ) * self.weights
-        return( XYs1d( data = xys, axes = xys.axes, accuracy = xys.getAccuracy( ) ) )
+        xys = self.crossSection.toPointwise_withLinearXYs( **kwargs ) * self.weights
+        return( XYs1d( data = xys, axes = xys.axes ) )
 
     def toXMLList( self, indent = "", **kwargs ) :
 
@@ -465,13 +518,6 @@ class weightedPointwise( baseCrossSectionForm ) :
         if 'unresolvedLinks' in linkData: linkData['unresolvedLinks'].append((xlink, ref))
         return ref
 
-def defaultAxes( energyUnit = 'eV', crossSectionUnit = 'b' ) :
-
-    axes = axesModule.axes( rank = 2 )
-    axes[0] = axesModule.axis( baseModule.crossSectionToken, 0, crossSectionUnit )
-    axes[1] = axesModule.axis( 'energy_in', 1, energyUnit )
-    return( axes )
-
 def chargeParticle_changeInterpolationSubFunction( threshold, x, x1, y1, x2, y2 ) :
 
     B = math.log( x2 * y2 / ( x1 * y1 ) ) / ( 1. / math.sqrt( x1 - threshold ) - 1. / math.sqrt( x2 - threshold ) )
@@ -489,28 +535,27 @@ class component( abstractClassesModule.component ) :
     def __init__( self ) :
 
         abstractClassesModule.component.__init__( self,
-                ( XYs1d, regions1d, multiGroup, resonanceLink, resonancesWithBackground, reference, weightedPointwise ) )
-
-    def domainMin( self, unitTo = None, asPQU = False ) :
-
-        return( self.evaluated.domainMin( unitTo = unitTo, asPQU = asPQU ) )
-
-    def domainMax( self, unitTo = None, asPQU = False ) :
-
-        return( self.evaluated.domainMax( unitTo = unitTo, asPQU = asPQU ) )
+                ( XYs1d, regions1d, gridded1d, resonanceLink, resonancesWithBackground, reference, weightedPointwise ) )
 
     def domainUnitConversionFactor( self, unitTo ) :
 
         if( unitTo is None ) : return( 1. )
-        return( PQU.PQU( '1 ' + self.domainUnit( ) ).getValueAs( unitTo ) )
+        return( PQUModule.PQU( '1 ' + self.domainUnit ).getValueAs( unitTo ) )
 
-    def domain( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMin( self ) :
 
-        return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.evaluated.domainMin )
 
+    @property
+    def domainMax( self ) :
+
+        return( self.evaluated.domainMax )
+
+    @property
     def domainUnit( self ) :
 
-        return( self.evaluated.domainUnit( ) )
+        return( self.evaluated.domainUnit )
 
     def hasLinearForm( self ) :
 
@@ -519,14 +564,39 @@ class component( abstractClassesModule.component ) :
                 if( form.isInterpolationLinear( ) ) : return( form )
         return( None )
 
-    def heat( self, temperature, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.002, 
-            heatAllPoints = False, doNotThin = True, heatBelowThreshold = True, heatAllEDomain = True ) : 
+    def heat( self, style, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.002, 
+            heatAllPoints = False, doNotThin = True, heatBelowThreshold = True, heatAllEDomain = True, setThresholdToZero = False,
+            addToSuite = False ) : 
         """
         Returns the result of self.toPointwise_withLinearXYs( ).heat( ... ). See method XYs1d.heat for more information.
+        If setThresholdToZero is True and self's cross section at the first point is 0., then the heated cross section's
+        first value will also be 0.
         """
 
-        return( self.toPointwise_withLinearXYs( ).heat( self, temperature, EMin, lowerlimit, upperlimit, 
-                interpolationAccuracy, heatAllPoints, doNotThin, heatBelowThreshold, heatAllEDomain ) )
+        styles = self.findAttributeInAncestry( 'styles' )
+        currentstyle = styles[style.derivedFrom]
+        if( not( isinstance( currentstyle, ( stylesModule.evaluated, stylesModule.heated ) ) ) ) :
+            TypeError( 'Form to heat is not heatable form: its style moniker is "%s"' % style.label )
+        currentTemperature = PQUModule.PQU( currentstyle.temperature.getValueAs( 'K' ), 'K' ) * PQUModule.PQU( '1 k' )
+        currentTemperature = currentTemperature.getValueAs( self.domainUnit )
+
+        newTemperature = PQUModule.PQU( style.temperature.getValueAs( 'K' ), 'K' ) * PQUModule.PQU( '1 k' )
+        newTemperature = newTemperature.getValueAs( self.domainUnit )
+
+        reactionSuite = self.getRootAncestor( )
+        projectile = reactionSuite.PoPs[reactionSuite.projectile]
+        projectileMass = projectile.getMass( 'amu' )
+        if( projectileMass == 0 ) : raise ValueError( 'Heating with gamma as projectile not supported.' )
+
+        target = reactionSuite.PoPs[reactionSuite.target]
+        massRatio = target.getMass( 'amu' ) / projectileMass
+
+        linear = self.toPointwise_withLinearXYs( accuracy = 1e-5, upperEps = 1e-8 )
+        heated = linear.heat( currentTemperature, newTemperature, massRatio, EMin, lowerlimit, upperlimit, interpolationAccuracy, 
+                heatAllPoints, doNotThin, heatBelowThreshold, heatAllEDomain, setThresholdToZero = setThresholdToZero )
+        heated.label = style.label
+        if( addToSuite ) : self.add( heated )
+        return( heated )
 
     def check( self, info ) :
         """
@@ -544,62 +614,72 @@ class component( abstractClassesModule.component ) :
         warnings = []
 
         # FIXME: domain is giving incorrect answers for threshold reactions with resonance contributions!
-        lower, upper = self.domain( asPQU = True )
-        thresh = PQU.PQU( 0, 'eV' )
+        lower = PQUModule.PQU( self.domainMin, self.domainUnit )
+        upper = PQUModule.PQU( self.domainMax, self.domainUnit )
+# BRB6 hardwired
+        thresh = PQUModule.PQU( 0, 'eV' )
         if 'Q' in info:
-            thresh = PQU.PQU( -info['Q'] * info['kinematicFactor'], 'eV' )
+            thresh = -info['Q'] * info['kinematicFactor']
+            if not isinstance(info['Q'], PQUModule.PQU): thresh = PQUModule.PQU(thresh, 'eV')
 
             if not info['CoulombChannel']:
                 # if Q is positive, cross section must start at 1e-5 eV
                 # otherwise, cross section threshold must agree with Q-value:
                 if thresh.value>0:
-                    if abs(thresh-lower) > PQU.PQU( info['dThreshold'] ):
+                    if abs(thresh-lower) > PQUModule.PQU( info['dThreshold'] ):
                         warnings.append( warning.threshold_mismatch( lower, thresh, self ) )
-                elif lower != PQU.PQU(1e-5,'eV'):
+                elif lower != PQUModule.PQU(1e-5,'eV'):
                     # ignore 2nd,3rd,4th-chance fission (they have Q>0 but are still threshold reactions):
                     from fudge.gnd import channels
                     parent = self.getAncestor( )
                     if (not hasattr( parent, 'outputChannel' ) or ( parent.outputChannel.getFissionGenre()
                             in (None, channels.fissionGenreTotal, channels.fissionGenreFirstChance) ) ):
-                        warnings.append( warning.threshold_mismatch( lower, PQU.PQU(1e-5, 'eV'), self ) )
+                        warnings.append( warning.threshold_mismatch( lower, PQUModule.PQU(1e-5, 'eV'), self ) )
             else:
                 # charged-particle reaction generally doesn't 'turn on' right at threshold due to Coulomb barrier.
                 # In this case, just ensure the cross section stays zero until at or above threshold:
                 if (lower < thresh):
-                    warnings.append( warning.Coulomb_threshold_mismatch( thresh, lower, self ) )
+                    warnings.append( warning.Coulomb_threshold_mismatch( lower, thresh, self ) )
 
         # cross section must extend up to limit (usually 20 MeV):
-        if upper < PQU.PQU( info['crossSectionEnergyMax'] ):
-            warnings.append( warning.gapInCrossSection( upper, PQU.PQU( info['crossSectionEnergyMax'] ),
+        if upper < PQUModule.PQU( info['crossSectionEnergyMax'] ):
+            warnings.append( warning.gapInCrossSection( upper, PQUModule.PQU( info['crossSectionEnergyMax'] ),
                 self ) )
 
         evaluatedCrossSection = self.evaluated
         if( isinstance( evaluatedCrossSection, resonancesWithBackground ) ) :
             # ensure no gaps between resonance and background:
-            resDomain = info['reactionSuite'].resonances.domain( asPQU = True )
-            bckDomain = evaluatedCrossSection.tabulatedData.domain( asPQU = True )
-            if bckDomain[0] > resDomain[1]:
-                warnings.append( warning.gapInCrossSection(resDomain[1],bckDomain[0], self ) )
-            linearCrossSection = self[info['reconstructedStyle']]
+            resonances = info['reactionSuite'].resonances
+            if resonances.resolved is not None:
+                resDomainMax = resonances.resolved.domainMax
+            if resonances.unresolved is not None and resonances.unresolved.reconstructCrossSection:
+                resDomainMax = resonances.unresolved.domainMax
+            bckDomainMin = evaluatedCrossSection.tabulatedData.domainMin
+            if bckDomainMin > resDomainMax:
+                warnings.append( warning.gapInCrossSection(resDomainMax,bckDomainMin, self ) )
+            linearCrossSection = self[info['reconstructedStyleName']]
 
         elif( isinstance( evaluatedCrossSection, reference )
-                and isinstance( evaluatedCrossSection.link.evaluated, resonancesWithBackground) ):
-            linearCrossSection = evaluatedCrossSection.link[info['reconstructedStyle']]
+            and isinstance( evaluatedCrossSection.link, resonancesWithBackground ) ) :
+                linearCrossSection = evaluatedCrossSection.link.ancestor[info['reconstructedStyleName']]
+
+        elif isinstance( evaluatedCrossSection, CoulombElasticReference ):
+            return warnings     # already checked as part of dCrossSection_dOmega
 
         else:
             # can it be converted to XYs1d linear?
             try:
-                linearCrossSection = evaluatedCrossSection.toPointwise_withLinearXYs(0,1e-8)
+                linearCrossSection = evaluatedCrossSection.toPointwise_withLinearXYs( accuracy = 1e-5, upperEps = 1e-8 )
             except Exception as e:
                 warnings.append( warning.ExceptionRaised( e, self ) )
                 if info['failOnException']: raise
                 return warnings
 
         # test for negative values, and for non-zero cross section at threshold
-        if linearCrossSection.rangeMin() < 0:
+        if( linearCrossSection.rangeMin < 0 ) :
             for i,(en,xsc) in enumerate(linearCrossSection):
                 if xsc < 0:
-                    warnings.append( warning.negativeCrossSection( PQU.PQU(en, linearCrossSection.axes[-1].unit), i, self ) )
+                    warnings.append( warning.negativeCrossSection( PQUModule.PQU(en, linearCrossSection.axes[-1].unit), i, self ) )
 
         if thresh.value>0:
             if linearCrossSection[0][1] != 0:
@@ -625,27 +705,31 @@ class component( abstractClassesModule.component ) :
         """
         import fudge.gnd.covariances.base as covModule
 
-        if( not isinstance( E, PQU.PQU ) ) : raise TypeError( "E must be an PQU.PQU instance")
+        if( not isinstance( E, PQUModule.PQU ) ) : raise TypeError( "E must be an PQUModule.PQU instance")
 
         ptwise = self.hasLinearForm()
-        if ptwise is None: ptwise = self.toPointwise_withLinearXYs(lowerEps=lowerEps, upperEps=upperEps)
+        if ptwise is None: ptwise = self.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
 
-        EinDomainUnit = E.getValueAs( ptwise.domainUnit( ) )
-        if EinDomainUnit < ptwise.domainMin() or EinDomainUnit > ptwise.domainMax(): meanValue = 0.0
+        EinDomainUnit = E.getValueAs( ptwise.domainUnit )
+        if EinDomainUnit < ptwise.domainMin or EinDomainUnit > ptwise.domainMax: meanValue = 0.0
         else: meanValue = ptwise.evaluate( EinDomainUnit )
 
         # We might be done
-        if not useCovariance: return PQU.PQU( meanValue, unit=ptwise.rangeUnit() )
+        if not useCovariance: return PQUModule.PQU( meanValue, unit=ptwise.rangeUnit )
 
         # Get that the covariance goes with the data.
         covariance = self.getMatchingCovariance(covariance,covarianceSuite)
 
-        if covariance is None: return PQU.PQU( meanValue, unit = ptwise.rangeUnit() )
+        if covariance is None: return PQUModule.PQU( meanValue, unit = ptwise.rangeUnit )
         else:
-            return( PQU.PQU(
-                meanValue,
-                unit = ptwise.rangeUnit(),
-                uncertainty = covariance.getUncertaintyVector( self.evaluated, relative = False ).evaluate(EinDomainUnit) ) )
+            try:
+                return( PQUModule.PQU(
+                    meanValue,
+                    unit = ptwise.rangeUnit,
+                    uncertainty = covariance.getUncertaintyVector( self.evaluated, relative = False ).evaluate(EinDomainUnit) ) )
+            except IndexError as err: # FIXME: a kludge until cov routines working again, try it on 27Al(n,tot)
+                print "WARNING: Could not extract uncertianty, got error %s"%str(err)
+                return PQUModule.PQU( meanValue, unit = ptwise.rangeUnit )
 
 #        if covariance is None:
 #            if hasattr(self.evaluated, 'uncertainties') and self.evaluated.uncertainties:
@@ -653,8 +737,8 @@ class component( abstractClassesModule.component ) :
 #                    covariance = self.evaluated.uncertainties[0].data.link['eval']
 #                elif covarianceSuite is not None:
 #                    covariance = self.evaluated.uncertainties[0].data.follow(startNode=covarianceSuite)['eval']
-#                else: return PQU.PQU( meanValue, unit = ptwise.rangeUnit() )
-#            else: return PQU.PQU( meanValue, unit = ptwise.rangeUnit() )
+#                else: return PQUModule.PQU( meanValue, unit = ptwise.rangeUnit() )
+#            else: return PQUModule.PQU( meanValue, unit = ptwise.rangeUnit() )
 #        else:
 #            if covariance is not( isinstance( covariance, covModule.covarianceMatrix ) ):
 #                raise TypeError( 'covariance must be of type covarianceMatrix, got %s'%str(type(covariance)))
@@ -664,11 +748,11 @@ class component( abstractClassesModule.component ) :
 #            uncertainty = covariance.getUncertaintyVector( self.evaluated, relative = False ).evaluate( EinDomainUnit )
 #        except:
 #            print "WARNING: could not get uncertainty in evaluateWithUncertainty for %s" % str(covariance.__class__)
-#            return PQU.PQU( meanValue, unit = ptwise.rangeUnit() )
+#            return PQUModule.PQU( meanValue, unit = ptwise.rangeUnit() )
 #        if uncertainty is None:
 
 #        # We haven't changed units on uncertainty or the meanValue, so we can reconstruct the physical quantity easily.
-#        return( PQU.PQU( meanValue, unit = ptwise.rangeUnit(), uncertainty = uncertainty.evaluate(EinDomainUnit) ) )
+#        return( PQUModule.PQU( meanValue, unit = ptwise.rangeUnit(), uncertainty = uncertainty.evaluate(EinDomainUnit) ) )
 
     def getMatchingCovariance(self, covariance = None, covarianceSuite = None):
         '''
@@ -680,7 +764,7 @@ class component( abstractClassesModule.component ) :
         # Get that the covariance goes with the data.
         if covariance is None:
             if hasattr(self.evaluated, 'uncertainties') and self.evaluated.uncertainties:
-                if hasattr(self.evaluated.uncertainties[0].data,'link'):
+                if hasattr(self.evaluated.uncertainties[0].data,'link') and self.evaluated.uncertainties[0].data.link is not None:
                     covariance = self.evaluated.uncertainties[0].data.link['eval']
                 elif covarianceSuite is not None:
                     covariance = self.evaluated.uncertainties[0].data.follow(startNode=covarianceSuite)['eval']
@@ -739,13 +823,18 @@ class component( abstractClassesModule.component ) :
 
         # Convert the cross section toXYs1d 
         ptwise = self.hasLinearForm()
-        if ptwise is None: ptwise = self.toPointwise_withLinearXYs(lowerEps=lowerEps, upperEps=upperEps)
+        if ptwise is None: ptwise = self.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
 
         # Check domains
-        if domainMin is None: domainMin = PQU.PQU( max( ptwise.domainMin(), f2.domainMin() ), ptwise.domainUnit() )
-        elif not isinstance( domainMin, PQU.PQU ): raise TypeError( "domainMin must be an PQU.PQU instance")
-        if domainMax is None: domainMax = PQU.PQU( min( ptwise.domainMax(), f2.domainMax() ), ptwise.domainUnit() )
-        elif not isinstance( domainMax, PQU.PQU ): raise TypeError( "domainMax must be an PQU.PQU instance")
+        if( domainMin is None ) :
+            domainMin = PQUModule.PQU( max( ptwise.domainMin, f2.domainMin ), ptwise.domainUnit )
+        elif( not isinstance( domainMin, PQUModule.PQU ) ) :
+            raise TypeError( "domainMin must be an PQUModule.PQU instance")
+
+        if( domainMax is None ) :
+            domainMax = PQUModule.PQU( min( ptwise.domainMax, f2.domainMax ), ptwise.domainUnit )
+        elif( not isinstance( domainMax, PQUModule.PQU ) ) :
+            raise TypeError( "domainMax must be an PQUModule.PQU instance")
 
         # Convolve spectrum and self to get mean value
         meanValue = ptwise.integrateTwoFunctions(f2,domainMin,domainMax)
@@ -761,31 +850,16 @@ class component( abstractClassesModule.component ) :
 
         # Get that the covariance goes with the data.
         covariance = self.getMatchingCovariance(covariance,covarianceSuite)
-
-#        # Get that the covariance goes with the data.
-#        import fudge.gnd.covariances.base as covModule
-#        if covariance is None:
-#            if hasattr(self.evaluated, 'uncertainties') and self.evaluated.uncertainties:
-#                if hasattr(self.evaluated.uncertainties[0].data,'link'):
-#                    covariance = self.evaluated.uncertainties[0].data.link
-#                elif covarianceSuite is not None:
-#                    covariance = self.evaluated.uncertainties[0].data.follow(startNode=covarianceSuite)
-#                else: return meanValue
-#            else: return meanValue # already a PQU
-#        else:
-#            if covariance is not( isinstance( covariance, covModule.covarianceMatrix ) ):
-#                raise TypeError( 'covariance must be of type covarianceMatrix, got %s'%str(type(covariance)))
-
         if covariance is None: return meanValue
 
         try:
-            theCovariance = covariance['eval'].toCovarianceMatrix() # may be redundant, but at least we'll get a usable data type
-        except:
-            print "WARNING: could not get covariance in integrateTwoFunctionsWithUncertainty for form %s" % str(covariance['eval'].__class__)
+            theCovariance = covariance.toCovarianceMatrix() # may be redundant, but at least we'll get a usable data type
+        except Exception, err:
+            print "WARNING: could not get covariance in integrateTwoFunctionsWithUncertainty for form %s, got error message '%s'" % (str(covariance.__class__),err)
             return meanValue
 
         # Compute weighting vector from spectrum and possibly the cross section (if covariance is relative)
-        grid = theCovariance.matrix.axes[-1].values
+        grid = theCovariance.matrix.axes[-1].values.values
         gridUnit = theCovariance.matrix.axes[-1].unit
         covGroupBdries = list(grid)
         if theCovariance.type == 'absolute':
@@ -798,13 +872,17 @@ class component( abstractClassesModule.component ) :
         import numpy
         phi = numpy.matrix( phi )
         theArray = theCovariance.matrix.array.constructArray()
-        coco = ( phi * theArray * phi.T )[0,0]
-        if coco < 0.0: print "WARNING: covariance of spectrum integral is %s < 0.0"%str(coco)
-        uncertainty = PQU.PQU( math.sqrt( max( coco, 0.0 ) ), unit=meanValue.unit )
-        if normalize and meanValue.value != 0.0: uncertainty = uncertainty/norm
+        try:
+            coco = ( phi * theArray * phi.T )[0,0]
+            if coco < 0.0: print "WARNING: covariance of spectrum integral is %s < 0.0"%str(coco)
+            uncertainty = PQUModule.PQU( math.sqrt( max( coco, 0.0 ) ), unit=meanValue.unit )
+            if normalize and meanValue.value != 0.0: uncertainty = uncertainty/norm
 
-        # it worked, return result
-        return PQU.PQU( meanValue.value, unit=meanValue.unit, uncertainty=uncertainty.getValueAs(meanValue.unit) )
+            # it worked, return result
+            return PQUModule.PQU( meanValue.value, unit=meanValue.unit, uncertainty=uncertainty.getValueAs(meanValue.unit) )
+        except Exception, err:
+            print "WARNING: could not compute uncertainty in integrateTwoFunctionsWithUncertainty for form %s, got error message '%s'" % (str(covariance.__class__),err)
+            return meanValue
 
 def parseXMLNode( crossSectionElement, xPath, linkData ):
     """
@@ -819,7 +897,9 @@ def parseXMLNode( crossSectionElement, xPath, linkData ):
         formClass = { 
                 XYs1d.moniker                       : XYs1d,
                 regions1d.moniker                   : regions1d,
+                gridded1d.moniker                   : gridded1d,
                 reference.moniker                   : reference,
+                CoulombElasticReference.moniker     : CoulombElasticReference,
                 resonancesWithBackground.moniker    : resonancesWithBackground,
             }.get( form.tag )
         if( formClass is None ) : raise Exception( "unknown cross section form: %s" % form.tag )

@@ -85,6 +85,7 @@ class link( baseModule.xDataCoreMembers ) :
     """
 
     moniker = 'link'
+    ancestryMembers = ( '', )
 
     def __init__( self, link = None, root = None, path = None, label = None, relative = False, **attributes ) :
 
@@ -107,6 +108,14 @@ class link( baseModule.xDataCoreMembers ) :
 
     def __setitem__( self, key, value ):
         self.attributes[key] = value
+
+    def copy( self ):
+        import copy
+
+        if( self.path == None ) : self.updateXPath( )
+        _link = link( link = None, root = self.root, path = self.path, label = self.label, \
+                     relative = self.__relative, **copy.copy(self.attributes) )
+        return( _link )
 
     def updateXPath( self ):
         """ensure the xPath agrees with the linked-to data"""

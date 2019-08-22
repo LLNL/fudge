@@ -69,13 +69,23 @@ Issues:
 """
 
 import time
-from xData import axes, XYs
-from fudge.gnd import tokens
-from fudge.gnd.productData import distributions
-from fudge.legacy.converting import endf_endl
-from pqu import PQU
 
-import angularEnergy, specialMF6
+from fudge.core.utilities import brb
+
+from pqu import PQU as PQUModule
+
+from xData import standards as standardsModule
+from xData import axes as axesModule
+from xData import XYs as XYsModule
+
+from fudge.gnd import tokens as tokensModule
+from fudge.gnd.productData import multiplicity as multiplicityModule
+from fudge.gnd.productData.distributions import angular as angularModule
+from fudge.gnd.productData.distributions import energy as energyModule
+from fudge.legacy.converting import endf_endl as endf_endlModule
+
+from . import angularEnergy as angularEnergyModule
+from . import specialMF6 as specialMF6Module
 
 floatFormat = '%20.12E'
 floatFormat = ' %19.11E'
@@ -89,8 +99,8 @@ def toACE( self, fileName, evaluationId, temperature, productData, addAnnotation
     targetMass = target.getMass( massUnit )
     target2NeutronMass = targetMass / neutronMass
 
-    if( not( isinstance( temperature, PQU.PQU ) ) ) :
-        temperature = PQU.PQU( temperature )
+    if( not( isinstance( temperature, PQUModule.PQU ) ) ) :
+        temperature = PQUModule.PQU( temperature )
 
     if( temperature.isTemperature( ) ) :
         temperature_MeV = temperature.getValueAs( 'MeV / k' )
@@ -100,45 +110,49 @@ def toACE( self, fileName, evaluationId, temperature, productData, addAnnotation
         temperature_K = temperature.getValueAs( 'k * K' )
 
     processingTime = time.localtime( )
-    strRecords = [ "%6d.%.2dc%12.7f %11.5E %.2d/%.2d/%.2d" % ( targetZA, evaluationId, target2NeutronMass, temperature_MeV, processingTime[1],
-        processingTime[2], processingTime[0] ) ]
+    processingTime = [ 2014, 5, 10 ]
+    strRecords = [ "%6d.%.2dc%12.7f %11.5E %.2d/%.2d/%.2d" % ( targetZA, evaluationId, target2NeutronMass, 
+            temperature_MeV, processingTime[1], processingTime[2], processingTime[0] ) ]
 
     nonFissionEnergyDependentNeutronMultiplicities = []
     nonFissionEnergyDependentNeutronMultiplicitiesIndex = 100
 
-    MAT = endf_endl.ZAAndMATFromParticleName( target.name )[1]
+    MAT = endf_endlModule.ZAAndMATFromParticleName( target.name )[1]
     MAT_ID = '  mat %d' % MAT
+    evaluated = self.styles.getEvaluatedStyle( )
     HK = '%2d-%s at %.1fK from %s-%s Fudge.toACE' % \
-        ( targetZ, target.name, temperature_K, self.styles['evaluated'].attributes['library'], self.styles['evaluated'].attributes['version'] )
+            ( targetZ, target.name, temperature_K, evaluated.library, evaluated.version )
     HK = "%-70s" % HK[:70]
     strRecords.append( HK + MAT_ID )
     for i in xrange( 4 ) : strRecords.append( '      0   0.000000      0   0.000000      0   0.000000      0   0.000000' )
 
     NXS = 16 * [ 0 ]
     JXS = 32 * [ 0 ]
-    MRT, NU_prompt, NU_total, LQR, TYP, SigData, neutronAngular, neutronEnergies = [], None, None, [], [], {}, [], []
+    MTR, NU_prompt, NU_total, LQR, TYP, SigData, neutronAngular, neutronEnergies = [], None, None, [], [], {}, [], []
     NXS[2-1] = targetZA
 
     for MT, MTData in productData :
         if( MT == 2 ) :                 # Elastic (MT = 2) must always be present in ACE file.
-            EMin = MTData['ESZ'].domainMin( unitTo = 'MeV' )
+            EMin = MTData['ESZ'].domainUnitConversionFactor( 'MeV' ) * MTData['ESZ'].domainMin
             break
-    totalXSec = XYs.XYs( axes.defaultAxes( labelsUnits = { 0 : ( '', 'MeV' ), 1 : ( '', 'b' ) } ), [], 1e-3 )
-    absorptionXSec = XYs.XYs( axes.defaultAxes( labelsUnits = { 0 : ( '', 'MeV' ), 1 : ( '', 'b' ) } ), [], 1e-3 )
-    sortedMTs = sorted( [ [ MTData[0], i1 ] for i1, MTData in enumerate( productData ) ] ) # Sort MTs like NJOY.
+    axes = axesModule.axes( labelsUnits = { 1 : ( '', 'MeV' ), 0 : ( '', 'b' ) } )
+    totalXSec = XYsModule.XYs1d( data = [], axes = axes, accuracy = 1e-3 )
+    absorptionXSec = XYsModule.XYs1d( data = [], axes = axes, accuracy = 1e-3 )
+    sortedMTs = sorted( [ [ MT_MTData[0], i1 ] for i1, MT_MTData in enumerate( productData ) ] ) # Sort MTs like NJOY.
+    delayedNeutronDatas = []
     for MT, i1 in sortedMTs :
-        MT_, MTData = productData[i1]
+        _MT, MTData = productData[i1]
         XSec = MTData['ESZ']
-        XSec = XSec.convertAxisToUnit( 0, 'MeV' )
-        XSec = XSec.convertAxisToUnit( 1, 'b' )
+        XSec = XSec.convertAxisToUnit( 1, 'MeV' )
+        XSec = XSec.convertAxisToUnit( 0, 'b' )
         neutronDatas = MTData['n']
         multiplicity = 0
         if( MT == 2 ) :
             elasticXSec = XSec
-            if( len( neutronDatas ) > 1 ) : raise Exception( 'Only one type of neutron data is support for the elastic reaction.' )
+            if( len( neutronDatas ) > 1 ) : raise Exception( 'Only one type of neutron data are supported for the elastic reaction.' )
             if( len( neutronDatas ) > 0 ) : neutronAngular.append( ( MT, neutronDatas[0]['angularData'] ) )
         else :
-            MRT.append( MT )
+            MTR.append( MT )
             LQR.append( MTData['Q'] )
             if( XSec[0][0] != 0 ) :
                 if( XSec[0][0] > EMin ) : XSec = XSec.dullEdges( lowerEps = 1e-8 )
@@ -156,49 +170,64 @@ def toACE( self, fileName, evaluationId, temperature, productData, addAnnotation
                 if( MTData['isFission'] ) :
                     neutronMultiplicity = 19
                     totalPresent = False
+                    _neutronDatas = []
                     for neutronData in neutronDatas :
                         product = neutronData['product']
-                        if( ( product.attributes['emissionMode'] == tokens.promptToken ) or ( product.attributes['emissionMode'] == 'total' ) ) :
+                        if( ( product.attributes['emissionMode'] == tokensModule.promptToken ) or ( product.attributes['emissionMode'] == 'total' ) ) :
                             totalPresent = product.attributes['emissionMode'] == 'total'
                             NU_prompt = neutronData['multiplicity']
-                            break
+                            _neutronDatas = []
+                        else :
+                            delayedNeutronDatas.append( neutronData )
+                        neutronDatas = _neutronDatas
                     if( NU_prompt is None ) : raise Exception( 'Missing prompt neutron' )
-                    if( len( neutronDatas ) > 1 ) :
+                    if( len( delayedNeutronDatas ) > 0 ) :
                         if( totalPresent ) : raise Exception( 'Total nu_bar present and delayed neutron data.' )
                         NU_total = NU_prompt
-                        for neutronData in neutronDatas :
+                        for neutronData in delayedNeutronDatas :
                             product = neutronData['product']
                             if( product.attributes['emissionMode'] == 'delayed' ) :
                                 NU_delayed = neutronData['multiplicity']
-                                if( NU_delayed.domainMax( ) < NU_total.domainMax( ) ) : NU_delayed = NU_delayed.dullEdges( upperEps = 1e-8 )
+                                if( NU_delayed.domainMax < NU_total.domainMax ) : NU_delayed = NU_delayed.dullEdges( upperEps = 1e-8 )
                                 NU_total = NU_total + NU_delayed
                 else :
                     if( len( neutronDatas ) == 1 ) :
                         neutronMultiplicity = neutronDatas[0]['multiplicity']
                     else :
-                        neutronMultiplicity, angularData, energyData = specialMF6.neutrons( neutronDatas )
-                    if( not ( isinstance( neutronMultiplicity, int ) ) ) :
+                        neutronMultiplicity, angularData, energyData = specialMF6Module.neutrons( neutronDatas )
+                    if( isinstance( neutronMultiplicity, float ) ) :
+                        if( neutronMultiplicity != int( neutronMultiplicity ) ) :
+                            raise Exception( 'Bad neutronMultiplicity = %e' % neutronMultiplicity )
+                        neutronMultiplicity = int( neutronMultiplicity )
+                    if( not( isinstance( neutronMultiplicity, int ) ) ) :
                         nonFissionEnergyDependentNeutronMultiplicitiesIndex += 1
                         nonFissionEnergyDependentNeutronMultiplicities.append( [ MT, nonFissionEnergyDependentNeutronMultiplicitiesIndex, neutronMultiplicity ] )
                         neutronMultiplicity = nonFissionEnergyDependentNeutronMultiplicitiesIndex
  
-                    if( frame == axes.centerOfMassToken ) : neutronMultiplicity *= -1  # Negative for COM frame.
+                    if( frame == standardsModule.frames.centerOfMassToken ) : neutronMultiplicity *= -1  # Negative for COM frame.
                     if( energyData is None ) :
                         if( 50 <= MT <= 91 ) :
                             energyData = n_nPrimeEnergyData( MT, target2NeutronMass, MTData['Q'] )
                         else :
                             raise 'hell: but first implement energy for MT =' % MT
                     else :
-                        if( isinstance( energyData, distributions.energy.NBodyPhaseSpace ) ) : angularData = None
+                        if( isinstance( energyData, energyModule.NBodyPhaseSpace ) ) : angularData = None
                 neutronAngular.append( ( MT, angularData ) )
-                neutronEnergies.append( [ MT, XSec.xMin( ), XSec.xMax( ), energyData ] )
+                neutronEnergies.append( [ MT, XSec.domainMin, XSec.domainMax, energyData ] )
             TYP.append( neutronMultiplicity )
     totalXSec = elasticXSec + totalXSec
-    annotates, XSS, energyGrid, totalSigma = [], [], [], []
-    for E, sigma in totalXSec :
-        energyGrid.append( E )
-        totalSigma.append( sigma )
 
+    energyGrid, totalSigma = [], []
+    e1s = ""
+    for energy, sigma in totalXSec :
+        e2s = floatFormat % energy
+        if( e1s == e2s ) : continue                     # Remove duplicate energy values.
+        energyGrid.append( energy )
+        totalSigma.append( sigma )
+        e1s = e2s
+
+    annotates, XSS = [], []
+    
 # 1) Add the ESZ block.
     NXS[3-1] = len( energyGrid )
     updateXSSInfo( 'energyGrid', annotates, XSS, energyGrid )
@@ -206,8 +235,8 @@ def toACE( self, fileName, evaluationId, temperature, productData, addAnnotation
     if( len( absorptionXSec ) == 0 ) :
         updateXSSInfo( 'absorption cross section', annotates, XSS, len( energyGrid ) * [ 0. ] )
     else :
-        updateXSSInfo( 'absorption cross section', annotates, XSS, mapEnergyToTotal( totalXSec, absorptionXSec ))
-    updateXSSInfo( 'elastic cross section', annotates, XSS, mapEnergyToTotal( totalXSec, elasticXSec ) )
+        updateXSSInfo( 'absorption cross section', annotates, XSS, mapCrossSectionToGrid( energyGrid, absorptionXSec ))
+    updateXSSInfo( 'elastic cross section', annotates, XSS, mapCrossSectionToGrid( energyGrid, elasticXSec ) )
     averageHeating = len( energyGrid ) * [ 0. ]
     updateXSSInfo( 'average heating', annotates, XSS, averageHeating )
 
@@ -221,10 +250,10 @@ def toACE( self, fileName, evaluationId, temperature, productData, addAnnotation
             NU_total = NU_total.toACE( )
             updateXSSInfo( 'NU(total)', annotates, XSS, NU_total )
 
-# 3) Add the MRT block.
-    NXS[4-1] = len( MRT )
+# 3) Add the MTR block.
+    NXS[4-1] = len( MTR )
     JXS[3-1] = len( XSS ) + 1
-    updateXSSInfo( 'MRT', annotates, XSS, MRT )
+    updateXSSInfo( 'MTR', annotates, XSS, MTR )
 
 # 4) Add the LQR block.
     JXS[4-1] = len( XSS ) + 1
@@ -236,7 +265,8 @@ def toACE( self, fileName, evaluationId, temperature, productData, addAnnotation
 
 # 6 and 7) Add the LSIG and SIG blocks.
     SIG = []
-    for MT, MTData in productData :
+    for MT, i1 in sortedMTs :
+        _MT, MTData = productData[i1]
         if( MT not in [ 2 ] ) : addSigData( MT, SIG, energyGrid, SigData[MT] )
     JXS[6-1] = len( XSS ) + 1
     LSIG = [ 1 ]
@@ -254,13 +284,13 @@ def toACE( self, fileName, evaluationId, temperature, productData, addAnnotation
             LAND.append( -1 )
         elif( angular.isIsotropic( ) ) :
             LAND.append( 0 )
-        elif( isinstance( angular, ( distributions.angular.linear, angularEnergy.angularFor_angularEnergy ) ) ) :
+        elif( isinstance( angular, ( angularModule.XYs2d, angularEnergyModule.angularFor_angularEnergy ) ) ) :
             LAND.append( length + 1 )
             length += 2 * len( angular ) + 1
             energies_in = [ len( angular ) ]
             LCs, Ps = [], []
             for xys in angular :
-                energy_in = PQU.PQU( xys.value, angular.axes[0].getUnit( ) ).getValueAs( 'MeV' )
+                energy_in = PQUModule.PQU( xys.value, angular.axes[2].unit ).getValueAs( 'MeV' )
                 energies_in.append( energy_in )
                 LCs.append( -length - 1 )
                 xys = xys.normalize( )
@@ -286,6 +316,82 @@ def toACE( self, fileName, evaluationId, temperature, productData, addAnnotation
     updateXSSInfo( 'LDLW', annotates, XSS, LDLW )
     JXS[11-1] = len( XSS ) + 1
     for MT, DLW in MT_DLW : updateXSSInfo( 'DLW(MT=%s)' % MT, annotates, XSS, DLW )
+
+# 24, 25, 26 and 27) Added the DNU, BDD, DNEDL and DNED blocks
+
+    if( len( delayedNeutronDatas ) > 0 ) :
+        skipDelayed = False
+        for delayedNeutronData in delayedNeutronDatas :
+            if( delayedNeutronData['energyData'] is None ) : skipDelayed = True
+        if( skipDelayed ) : delayedNeutronDatas = []
+
+    if( len( delayedNeutronDatas ) > 0 ) :
+        delayedFissionNeutrons = []
+        axes = axesModule.axes( labelsUnits = { 1 : ( '', 'MeV' ), 0 : ( '', '' ) } )
+        totolDelayedMultiplicity = XYsModule.XYs1d( data = [], axes = axes, accuracy = 1e-3 )
+        for delayedNeutronData in delayedNeutronDatas :
+            decayRate = 1e-8 * delayedNeutronData['product'].attributes['decayRate'].getValueAs( '1/s' )
+            multiplicity = delayedNeutronData['multiplicity']
+            if( not( isinstance( multiplicity, multiplicityModule.XYs1d ) ) ) : raise Exception( 'fix me' )
+            if( multiplicity.interpolation != standardsModule.interpolation.linlinToken ) : raise Exception( 'fix me' )
+            multiplicity = multiplicity.convertAxisToUnit( 1, 'MeV' )
+            delayedFissionNeutrons.append( [ decayRate, multiplicity ] )
+            totolDelayedMultiplicity += multiplicity
+            
+        energies, multiplicities = [], []
+        for energy, multiplicity in totolDelayedMultiplicity :
+            energies.append( energy )
+            multiplicities.append( multiplicity )
+        DNU = [ 2, 0, len( totolDelayedMultiplicity ) ] + energies + multiplicities
+        JXS[24-1] = len( XSS ) + 1
+        updateXSSInfo( 'DNU', annotates, XSS, DNU )
+
+        BDD = []
+        for decayRate, multiplicity in delayedFissionNeutrons :
+            probability = multiplicity / totolDelayedMultiplicity
+            probability = probability.thin( 1e-3 )
+            energies, probabilities = [], []
+            for energy, _probability in probability :
+                energies.append( energy )
+                probabilities.append( _probability )
+
+            BDD += [ decayRate, 0, len( probability ) ] + energies + probabilities
+        JXS[25-1] = len( XSS ) + 1
+        updateXSSInfo( 'BDD', annotates, XSS, BDD )
+
+        delayedNeutronEnergies = []
+        for delayedNeutronData in delayedNeutronDatas :
+            multiplicity = delayedNeutronData['multiplicity']
+            multiplicity = multiplicity.convertAxisToUnit( 1, 'MeV' )
+            delayedNeutronEnergies.append( [ 18, multiplicity.domainMin, multiplicity.domainMax,
+                    delayedNeutronData['energyData'] ] )
+        LDLW, MT_DLW = processEnergyData( massUnit, neutronMass, delayedNeutronEnergies )
+        JXS[26-1] = len( XSS ) + 1
+        updateXSSInfo( 'DNEDL', annotates, XSS, LDLW )
+        JXS[27-1] = len( XSS ) + 1
+        for MT, DLW in MT_DLW : updateXSSInfo( 'DNED(MT=%s)' % MT, annotates, XSS, DLW )
+
+# 12) GPD block. Not needed.
+
+# 13) MTRP block (gammas).
+
+# 14) LSIGP block (gammas).
+
+# 15) SIGP block (gammas).
+
+# 16) LANDP block (gammas).
+
+# 17) ANDP block (gammas).
+
+# 18) LDLWP block (gammas).
+
+# 19) DLWP block (gammas).
+
+# 20) YP block (gammas).
+
+# 21) FIS block. Not needed.
+
+# 22) UNR block.
 
 # Now fixup the TYP data whose abs( value ) is greater than 100.
     for MT, index, multiplicity in nonFissionEnergyDependentNeutronMultiplicities :
@@ -362,15 +468,15 @@ def XSSToStrings( annotates, XSS, addAnnotation ) :
     if( record ) : strData.append( ''.join( record ) )
     return( strData )
 
-def mapEnergyToTotal( totalXSec, XSec ) :
+def mapCrossSectionToGrid( energyGrid, XSec ) :
 
-    return( [ XSec.getValue( E ) for E, sigma in totalXSec ] )
+    return( [ XSec.evaluate( energy ) for energy in energyGrid ] )
 
 def addSigData( MT, SIG, energyGrid, SigData ) :
 
     lastNonZero, firstNonZero, xSec = 2, -1, []
     for i1, energy in enumerate( energyGrid ) :
-        value = SigData.getValue( energy )
+        value = SigData.evaluate( energy )
         if( value is None ) : value = 0.
         xSec.append( value )
         if( value != 0. ) :
@@ -400,7 +506,7 @@ def processEnergyData( massUnit, neutronMass, energyDatas ) :
         LDLW.append( length + 1 )
         defaultWeight = [ 0, 2, EMin, EMax, 1.0, 1.0 ]
         label = 'MT = %s for product = "neutron"' % MT
-        DLW_ = energyData.toACE( label, length, defaultWeight, massUnit = massUnit, neutronMass = neutronMass )
-        MT_DLW.append( ( MT, DLW_ ) )
-        length += len( DLW_ )
+        _DLW = energyData.toACE( label, length, defaultWeight, massUnit = massUnit, neutronMass = neutronMass )
+        MT_DLW.append( ( MT, _DLW ) )
+        length += len( _DLW )
     return( LDLW, MT_DLW )

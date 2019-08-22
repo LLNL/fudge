@@ -1,0 +1,172 @@
+\chapter{Proof of Assertion~\ref{Sec:assertion8}}
+\label{Sec:Appendix-B}
+It is proved in this appendix that for a Newtonian boost,
+for the function $G_0$ defined in Eq.~(\ref{def-G0}),
+it is true that arcs $\Elab' = \Ebin$ and
+$\Ecm' = \text{const}$ in Figure~\ref{Fig:boost-regions} intersect if and only if
+$G_0( \Ebin, \Ecm', E ) \ge 0$.
+
+The clearest way to prove this assertion is to
+argue four cases directly:
+ \begin{align}
+  G_0( \Ebin',  \Ecm', E ) \ge 0 & \quad \text{and}
+    \quad \Etrans' + \Ecm' \ge \Ebin',
+    \label{first-G0}\\
+  G_0( \Ebin',  \Ecm', E ) \ge 0 & \quad \text{and}
+    \quad \Etrans' + \Ecm' < \Ebin', \\
+  G_0( \Ebin',  \Ecm', E ) < 0 & \quad \text{and}
+    \quad \Etrans' + \Ecm' \ge \Ebin', \\
+   G_0( \Ebin',  \Ecm', E ) < 0 & \quad \text{and}
+    \quad \Etrans' + \Ecm' < \Ebin'.
+ \end{align}
+ In these inequalities $\Etrans'$ is as defined in Eq.~(\ref{E_trans}).
+
+A geometric condition for the intersection of
+the two arcs is presented first.  It is then shown that this geometric condition is equivalent
+to the non-negativity of~$G_0$.  
+
+\section{An equivalent geometric condition}
+The geometric condition is that for given values of $\Ebin'$, $\Ecm'$ and~$E$,
+the arcs $\Elab' = \Ebin'$ and
+$\Ecm' = \text{const}$ in Figure~\ref{Fig:boost-regions} intersect if and only if
+\begin{equation}
+  \left( \sqrt{\Etrans'} - \sqrt{\Ecm'} \right)^2 \le \Ebin' \le
+    \left( \sqrt{\Etrans'} + \sqrt{\Ecm'} \right)^2.
+  \label{Elab-range}
+\end{equation}
+
+For the purposes of this argument, it is
+convenient to use units of mass such that the mass of the outgoing particle
+is $\myo = 2$.  Thus, its speed in the center-of-mass frame is
+$\Vcm' = \sqrt{\Ecm'}$.  The arcs in
+Figure~\ref{Fig:boost-regions} may be viewed either as curves of constant energy or constant speed.  For given
+energy $E$ of the incident particle, the speed $\vtrans = \sqrt{\Etrans'}$ of
+the center of mass is determined.  In terms of the speeds with
+$\vbin' = \sqrt{\Ebin'}$, the condition
+Eq.~(\ref{Elab-range}) is equivalent to
+\begin{equation}
+  \vtrans^2 + {\vcm'}^2 - 2 \vtrans \vcm' \le {\vbin'}^2 \le
+  \vtrans^2 + {\vcm'}^2 + 2 \vtrans \vcm'.
+ \label{Elab-range-speed}
+\end{equation}
+
+For emission in the forward direction, the speed of the outgoing particle
+in the laboratory frame is
+$$
+  \vlab' = \vtrans + \vcm',
+$$
+so that its energy in the laboratory frame is
+$$
+  {\vlab'}^2 = \vtrans^2 + {\vcm'}^2 + 2 \vtrans \vcm'.
+$$
+In backward emission, the speed of the outgoing particle
+in the laboratory frame is
+$$
+  \vlab' = \left| \vtrans - \vcm' \right|,
+$$
+and its energy in the laboratory frame is
+$$
+  {\vlab'}^2 = \vtrans^2 + {\vcm'}^2 - 2 \vtrans \vcm'.
+$$
+It follows that if condition Eq.~(\ref{Elab-range-speed}) is true,
+then there exists a center-of-mass direction cosine $\mucm$ with
+$-1 \le \mucm \le 1$ for which the emitted particle has the
+desired laboratory energy
+$$
+ {\vbin'}^2 =
+  \vtrans^2 + {\vcm'}^2 + 2 \mucm \vtrans \vcm'.
+$$
+The two arcs $\Elab' = \Ebin'$ and $\Ecm' = \text{const}$ intersect at this
+value of~$\mucm$.  It is seen that if the geometric condition Eq.~(\ref{Elab-range})
+is satisfied, then the arcs $\Elab' = \Ebin'$ and $\Ecm' = \text{const}$ 
+do intersect.
+
+It is now shown that if Eq.~(\ref{Elab-range-speed}) is false, then then arcs 
+$\Elab' = \Ebin'$ and $\Ecm' = \text{const}$ do not intersect.
+One way for Eq.~(\ref{Elab-range-speed}) to be false is that
+\begin{equation}
+  \vbin' > \vtrans + \vcm'.
+  \label{big-Elab}
+\end{equation}
+In this case, forward emission has insufficient energy in the laboratory frame,
+and  the arc $\Ecm' = \text{const}$ in Figure~\ref{Fig:boost-regions}
+is entirely enclosed within the arc $\Elab' = \Ebin'$.
+
+If
+\begin{equation}
+   \vbin' < \left| \vtrans - \vcm' \right|,
+ \label{small-Elab}
+\end{equation}
+there are two more ways for Eq.~(\ref{Elab-range-speed}) to be false,
+depending on whether
+\begin{equation}
+  \vcm' < \vtrans
+ \label{small-Vcm}
+\end{equation}
+or
+\begin{equation}
+  \vcm' > \vtrans.
+ \label{small-Vtrans}
+\end{equation}
+
+Under the conditions in Eq.~(\ref{small-Vcm}),
+backward emission in the center-of-mass frame boosts to forward
+emission in the laboratory frame.  The condition Eq.~(\ref{small-Elab})
+implies that 
+$$
+   \vbin' <  \vtrans - \vcm',
+$$
+so that the arc $\Elab' = \Ebin'$ is completely to the left of
+the arc $\Ecm' = \text{const}$ in Figure~\ref{Fig:boost-regions}.  (In fact, one pair of such
+arcs is shown in Figure~\ref{Fig:boost-regions}.)
+
+The final way for Eq.~(\ref{Elab-range-speed}) to be false is that
+conditions Eqs.~(\ref{small-Elab}) and~(\ref{small-Vtrans}) be
+valid.  In this case, backward emission in the center-of-mass
+frame produces backward emission in the laboratory frame with
+$$
+  \vbin' < \vcm' - \vtrans.
+$$
+In this case, the arc $\Elab' = \Ebin'$ is completely contained
+within the arc $\Ecm' = \text{const}$ in Figure~\ref{Fig:boost-regions}.  This finishes the proof
+of the assertion that the arcs $\Elab' = \Ebin'$ and $\Ecm' = \text{const}$ 
+in Figure~\ref{Fig:boost-regions} intersect if ans only if Eq.~(\ref{Elab-range}) is true.
+
+\section{Proof of the assertion}
+
+Consider the case Eq.~(\ref{first-G0}) above.  That is, suppose that
+\begin{equation}
+   G_0( \Ebin',  \Ecm', E ) \ge 0
+ \label{B-G0-positive}
+\end{equation}
+and
+\begin{equation}
+ \Etrans' + \Ecm' \ge \Ebin'.
+ \label{B-Ebin-small}
+\end{equation}
+It is now shown that these two inequalities lead to the geometric
+condition Eq.~(\ref{Elab-range}) for intersection of the two arcs.
+The inequality Eq.~(\ref{B-G0-positive}) may be rewritten in the form
+$$
+  4 \Ecm' \Etrans' - ( \Etrans' + \Ecm' - \Ebin' )^2 \ge 0.
+$$
+Because of the fact that $\Etrans' + \Ecm' - \Ebin' \ge 0$, 
+it is possible to take positive square roots
+to obtain the relation
+$$
+  2 \sqrt{ \Ecm' \Etrans' } \ge \Etrans' + \Ecm' - \Ebin',
+$$
+which may be rearranged as
+$$
+  \Ebin' \ge \left( \sqrt{\Etrans'} - \sqrt{\Ecm'} \right)^2.
+$$
+The first of the inequalities Eq.~(\ref{Elab-range}) is now verified.
+
+The second inequality Eq.~(\ref{Elab-range}) follows trivially
+from the assumption Eq.~(\ref{B-Ebin-small}),
+$$
+  \Ebin' \le \Etrans' + \Ecm' \le
+  \Etrans' + \Ecm' +  2 \sqrt{ \Ecm' \Etrans' }.
+$$
+
+The other three cases may be analyzed in a similar fashion.

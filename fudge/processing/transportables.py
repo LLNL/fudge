@@ -122,6 +122,18 @@ class transportable( ancestryModule.ancestry ) :
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
 
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ) :
+
+        label = element.get('label')
+        xPath.append( '%s[@label="%s"]' % (element.tag,label) )
+        group = groupModule.group.parseXMLNode( element.find(
+            groupModule.group.moniker ), xPath, linkData )
+        conserve = element.get('conserve')
+        xPath.pop()
+        return transportable( label, conserve, group )
+
+
 class transportables( suitesModule.suite ) :
     """
     This class stores a transportable instanse for each particle type.

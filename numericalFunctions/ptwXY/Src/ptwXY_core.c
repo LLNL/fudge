@@ -549,7 +549,7 @@ double ptwXY_getAccuracy( ptwXYPoints *ptwXY ) {
 double ptwXY_setAccuracy( ptwXYPoints *ptwXY, double accuracy ) {
 
     accuracy = ptwXY_limitAccuracy( accuracy );
-    if( accuracy > ptwXY->accuracy ) ptwXY->accuracy = accuracy;
+    ptwXY->accuracy = accuracy;
     return( ptwXY->accuracy );
 }
 /*
@@ -1702,4 +1702,33 @@ static void ptwXY_initialOverflowPoint( ptwXYOverflowPoint *overflowPoint, ptwXY
     overflowPoint->index = -1;
     overflowPoint->point.x = 0.;
     overflowPoint->point.y = 0.;
+}
+/*
+************************************************************
+*/
+char const *ptwXY_interpolationToString( ptwXY_interpolation interpolation ) {
+
+    switch( interpolation ) {
+    case ptwXY_interpolationLinLin : return( linLinInterpolationString );
+    case ptwXY_interpolationLogLin : return( logLinInterpolationString );
+    case ptwXY_interpolationLinLog : return( linLogInterpolationString );
+    case ptwXY_interpolationLogLog : return( logLogInterpolationString );
+    case ptwXY_interpolationFlat :   return( flatInterpolationString );
+    default :
+        break;
+    }
+    return( NULL );
+}
+/*
+************************************************************
+*/
+ptwXY_interpolation ptwXY_stringToInterpolation( char const *interpolationString ) {
+
+    if( strcmp( interpolationString, "" ) == 0 ) return( ptwXY_interpolationLinLin );
+    if( strcmp( interpolationString, linLinInterpolationString ) == 0 ) return( ptwXY_interpolationLinLin );
+    if( strcmp( interpolationString, logLinInterpolationString ) == 0 ) return( ptwXY_interpolationLogLin );
+    if( strcmp( interpolationString, linLogInterpolationString ) == 0 ) return( ptwXY_interpolationLinLog );
+    if( strcmp( interpolationString, logLogInterpolationString ) == 0 ) return( ptwXY_interpolationLogLog );
+    if( strcmp( interpolationString, flatInterpolationString ) == 0 ) return( ptwXY_interpolationFlat );
+    return( ptwXY_interpolationOther );
 }

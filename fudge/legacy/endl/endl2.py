@@ -84,7 +84,7 @@ def CInfo( w = 4 ) :
     i = 1
     while( i <= n ) :
         s = endl_C.endl_CLabel( i )
-        if( s == None ) : s = "----"
+        if( s is None ) : s = "----"
         Cs.append( Fmt % ( i, s ) )
         i += 1
     brb.tylist( Cs, w = w, sep = "  |" )
@@ -97,7 +97,7 @@ def IInfo( ) :
     print "-----------------"
     while( I < 100 ) :
         s = endl_I.endl_ILabel( I )
-        if( s != None ) :
+        if( s is not None ) :
             print "%4d %5d  %s" % ( I, endl_I.endl_IColumns( I ), s )
         I += 1
 
@@ -114,7 +114,7 @@ def yInfo( ) :
     y = 1
     while( 1 ) :
         ls = endl_y.endl_yLabel( y )
-        if( ls == None ) : break
+        if( ls is None ) : break
         ll = endl_y.endl_yLongLabel( y )
         print Fmt % ( y, ls, ll )
         y += 1
@@ -192,7 +192,7 @@ def residualZA_yos_Q( yi_, ZA_, C, targetELevel = 0., X4 = 0, specialCases = 1, 
     the reation, ZA + yi -> ZA' + yo_1 + yo_2 + ... + yo_n + Q,
     would return ( ZA', [ yo_1, yo_2, ..., yo_n ], Q )."""
 
-    if( bdflsFile == None ) :
+    if( bdflsFile is None ) :
         import bdfls
         bdflsFile = bdfls.getDefaultBdfls( )
     import endlmisc
@@ -204,7 +204,7 @@ def residualZA_yos_Q( yi_, ZA_, C, targetELevel = 0., X4 = 0, specialCases = 1, 
         yos = [ 7, 1 ]
     else :
         yos = endl_C.endl_C_yoInfo( C )
-    if ( yos == None ) or ( yos == () ) : return (None, ( ), None) # No such C-value or C-value does is not a reaction (e.g., C=1).
+    if ( yos is None ) or ( yos == () ) : return (None, ( ), None) # No such C-value or C-value does is not a reaction (e.g., C=1).
     if ( yos[0] == -1 ) : return ( ZA, ( yi, ), None )            # yo unknown.
     if ( yos[0] == -2 ) : return ( ZA, ( yi, ), 0. )              # yo = yi.
     if ( yos[0] == -3 ) : return ( None, ( -3, ), None )          # Fission
@@ -263,13 +263,13 @@ def residualZA_yos_Q( yi_, ZA_, C, targetELevel = 0., X4 = 0, specialCases = 1, 
     if( Remove_yi ) : q += bdflsFile.mass( yi )
     for yo in yos_ : q -= bdflsFile.mass( yo )
     ZAm = bdflsFile.mass( ZA )
-    if ( ZAm == None ) :
+    if ( ZAm is None ) :
         if( printQWarning ) : endlmisc.printWarning( "Warning in residualZA_yos_Q: target ZA = %d not in bdfls file (yi = %d, ZA = %d, C = %d)" % \
             ( ZA, yi, ZA, C ) )
         q = None
     else :
         m = bdflsFile.mass( ZAr )                              # Mass of residual.
-        if ( m == None ) : 
+        if ( m is None ) : 
             if( printQWarning ) : endlmisc.printWarning( "Warning in residualZA_yos_Q: could not calculate Q as residual ZA = %d" % ZAr + 
                 " not in bdfls file (yi = %d, ZA = %d, C = %d)" % ( yi, ZA, C ) )
             q = None
@@ -315,7 +315,7 @@ def reactionEquations( yi_, ZA_, C, level = None, specialCases = 1, printQWarnin
         yo_ = None
         syo = ""
         for yo in yos :
-            if ( yo_ == None ) :
+            if ( yo_ is None ) :
                 yo_ = yo
             elif ( yo != yo_ ) :
                 syo += " + "
@@ -328,7 +328,7 @@ def reactionEquations( yi_, ZA_, C, level = None, specialCases = 1, printQWarnin
                 yo_ = yo
             else :
                 n += 1
-        if ( yo_ != None ) :
+        if ( yo_ is not None ) :
             syo += " + "
             if ( n > 1 ) :
                 syo += `n`
@@ -340,15 +340,15 @@ def reactionEquations( yi_, ZA_, C, level = None, specialCases = 1, printQWarnin
                 syo += "'"
                 s2 = s2[:-1] + "'"
         syo = syo[2:]                                       # remove first " +"
-        if ( q == None ) :
+        if ( q is None ) :
             qStr = "?"
         else :
             qStr = "%.8g MeV" % q
-        if( ZA > 99000 ) and ( ZA <= 99200 ) or ( ZAr == None ) :
+        if( ZA > 99000 ) and ( ZA <= 99200 ) or ( ZAr is None ) :
             ZArStr = "?"
         else :
             ZArStr = symbolForYoOrZA( ZAr, ZAOnly = 1, AddNatural = 0, NameASeperator = NameASeperator )
-        if( level != None ) : ZArStr += '[' + str( level ) + ']'
+        if( level is not None ) : ZArStr += '[' + str( level ) + ']'
         s1 += syo + " + " + ZArStr + " + " + qStr
         if ( s2[-1] == " " ) : s2 = s2[:-1]
         s2 += ")" + ZArStr
@@ -361,14 +361,14 @@ def reactionQ( yi, ZA, C, targetELevel = 0., X4 = 0, specialCases = 1, printQWar
     the target is taken to be in its ground state."""
 
     q = residualZA_yos_Q( yi, ZA, C, targetELevel = targetELevel, X4 = X4, specialCases = specialCases, printQWarning = printQWarning, bdflsFile = bdflsFile )
-    if ( q[0] == None ) : return None
+    if ( q[0] is None ) : return None
     return q[2]
 
 def reactionThreshold( yi, ZA, C, targetELevel = 0., residualELevel = 0., Q = None, specialCases = 0, S = None, bdflsFile = None ) :
     """Returns the threshold for this reaction. targetELevel is the excited state of the target
     and residualELevel is the excited state of the residual."""
 
-    if( bdflsFile == None ) :
+    if( bdflsFile is None ) :
         import bdfls
         bdflsFile = bdfls.getDefaultBdfls( )
     QRequired = False
@@ -396,7 +396,7 @@ def reactionThreshold( yi, ZA, C, targetELevel = 0., residualELevel = 0., Q = No
                         C_ = Cp
                         break
         Q = reactionQ( yi, ZA, C_, specialCases = specialCases, bdflsFile = bdflsFile )
-    if( QRequired and ( Q == None ) ) : raise Exception( 'Error from reactionThreshold: user must supply Q for requested ZA = %s or C = %d' % ( `ZA`, C ) )
+    if( QRequired and ( Q is None ) ) : raise Exception( 'Error from reactionThreshold: user must supply Q for requested ZA = %s or C = %d' % ( `ZA`, C ) )
     Threshold = -Q  - targetELevel + residualELevel
     if( Threshold < 0. ) : Threshold = 0.
     r = 1. + bdflsFile.mass( yi ) / bdflsFile.mass( ZA )
@@ -443,10 +443,10 @@ def symOrNameForYoOrZA( yoOrZA, wantName, ASep = "", ZAOnly = 0, AddNatural = 1,
     Z, A = ZandAFromZA( ZA )
     if ( wantName == 0 ) :
         ZStr = endl_Z.endl_ZSymbol( Z )
-        if ( ZStr == None ) : ZStr = "Unk"
+        if ( ZStr is None ) : ZStr = "Unk"
     else : 
         ZStr = endl_Z.endl_ZLabel( Z )
-        if ( ZStr == None ) : ZStr = "Unknown"
+        if ( ZStr is None ) : ZStr = "Unknown"
     if( A == 0 ) :
         if ( AddNatural ) : return ZStr + suffixSeperator + 'natural' + Suffix
         return ZStr
@@ -490,7 +490,7 @@ def reactionQByZAs( incomingZAs, outgoingZAs, bdflsFile = None ) :
     """Returns the Q in MeV for the reaction, that is, the (sum of incoming masses) - (sum of outgoing mass) in MeV.
     Returns None if at least one of the masses is unknown."""
 
-    if( bdflsFile == None ) :
+    if( bdflsFile is None ) :
         import bdfls
         bdflsFile = bdfls.getDefaultBdfls( )
     ZAMultiplicities = {}
@@ -507,7 +507,7 @@ def reactionQByZAs( incomingZAs, outgoingZAs, bdflsFile = None ) :
     ZAs.sort( )
     for ZA in ZAs :
         m = bdflsFile.mass( ZA )
-        if( m == None ) : return( None )
+        if( m is None ) : return( None )
         mass += m * ZAMultiplicities[ZA]
     return( mass * bdflsFile.constant( 4 ) )
 
@@ -530,7 +530,7 @@ def possibleReactions( projectile, target, energy_MeV, maxProducts = 4, bdflsFil
     H_1, H_2, H_3, He_3, He_4 and a residual. The reactions considered are also limited to the 
     number of outgoing products, not including the residual, being no greater than maxProducts."""
 
-    if( bdflsFile == None ) :
+    if( bdflsFile is None ) :
         import bdfls
         bdflsFile = bdfls.getDefaultBdfls( )
     import endlmisc
@@ -569,7 +569,7 @@ def possibleReactions( projectile, target, energy_MeV, maxProducts = 4, bdflsFil
             newProductMass = productMass + mass
             if( not( 1 < residualZA < 1001 ) ) : 
                 residualMass = bdflsFile.mass( residualZA )
-                if( residualMass != None ) : 
+                if( residualMass is not None ) : 
                     if( incidentMass >= ( residualMass + newProductMass ) ) : reactions.append(  newProducts + [ residualZA ] )
             possibleReactions2( residualZA, newProducts, newProductMass, level + 1 )
 

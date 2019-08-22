@@ -102,42 +102,43 @@ class Test_covarianceSuite( TestCaseBase ):
         self.assertIsInstance( self.covSuite, covarianceSuite.covarianceSuite )
         
     def test__getitem__(self):
-        answer = '''<section label="2" id="nonelastic">
-    <rowData ENDF_MFMT="33,3" xlink:href="/reactionSuite/sums/crossSectionSum[@label='1']/crossSection/resonancesWithBackground[@label='eval']/regions"/>
+        answer = """<section label="nonelastic">
+    <rowData ENDF_MFMT="33,3" xlink:href="/reactionSuite/sums/crossSections/crossSectionSum[@label='nonelastic']/crossSection/resonancesWithBackground[@label='eval']/regions1d"/>
     <mixed label="eval">
-      <sum index="0" lowerBound="1e-5 eV" upperBound="862270 eV">
+      <sum label="0" domainMin="1e-05" domainMax="862270.0" domainUnit="eV">
         <!-- The matrix for this reaction equals the weighted sum of the following matrices: -->
-        <summand ENDF_MFMT="33,102" coefficient="1.0" xlink:href="/covarianceSuite/section[@label='33']"/></sum>
-      <covarianceMatrix index="1" type="relative">
-        <gridded dimension="2">
+        <summand ENDF_MFMT="33,102" coefficient="1.0" xlink:href="/covarianceSuite/section[@label='Fe57 + photon']"/></sum>
+      <covarianceMatrix label="1" type="relative">
+        <gridded2d>
           <axes>
             <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
               <values length="4">1e-5 862270 4e6 2e7</values></grid>
             <grid index="1" label="column_energy_bounds" unit="eV" style="link">
-              <link xlink:href="../grid[@index='2']/values"/></grid>
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit=""/></axes>
           <array shape="4,4" compression="diagonal">
-            <values length="4">0 4e-4 9e-4 0</values></array></gridded></covarianceMatrix>
-      <covarianceMatrix index="2" type="relative">
-        <gridded dimension="2">
+            <values length="4">0 4e-4 9e-4 0</values></array></gridded2d></covarianceMatrix>
+      <covarianceMatrix label="2" type="relative">
+        <gridded2d>
           <axes>
             <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
               <values length="9">1e-5 862270 1e6 2e6 4e6 6e6 8e6 1.4e7 2e7</values></grid>
             <grid index="1" label="column_energy_bounds" unit="eV" style="link">
-              <link xlink:href="../grid[@index='2']/values"/></grid>
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit=""/></axes>
           <array shape="9,9" compression="diagonal">
-            <values length="9">0 1.584e-3 0.025344 1.584e-3 1.584e-3 1.584e-3 1.584e-3 1.584e-3 0</values></array></gridded></covarianceMatrix>
-      <covarianceMatrix index="3" type="relative" ENDFconversionFlag="LB=8">
-        <gridded dimension="2">
+            <values length="9">0 1.584e-3 0.025344 1.584e-3 1.584e-3 1.584e-3 1.584e-3 1.584e-3 0</values></array></gridded2d></covarianceMatrix>
+      <covarianceMatrix label="3" type="relative" ENDFconversionFlag="LB=8">
+        <gridded2d>
           <axes>
             <grid index="2" label="row_energy_bounds" unit="eV" style="boundaries">
               <values length="9">1e-5 862270 1e6 2e6 4e6 6e6 8e6 1.4e7 2e7</values></grid>
             <grid index="1" label="column_energy_bounds" unit="eV" style="link">
-              <link xlink:href="../grid[@index='2']/values"/></grid>
+              <link xlink:href="../../grid[@index='2']/values"/></grid>
             <axis index="0" label="matrix_elements" unit=""/></axes>
           <array shape="9,9" compression="diagonal">
-            <values length="9">0 4.84e-10 1.357e-5 9.8057e-6 2.6915e-5 3.3173e-5 3.2769e-5 3.0954e-5 0</values></array></gridded></covarianceMatrix></mixed></section>'''.split('\n')
+            <values length="9">0 4.84e-10 1.357e-5 9.8057e-6 2.6915e-5 3.3173e-5 3.2769e-5 3.0954e-5 0</values></array></gridded2d></covarianceMatrix></mixed></section>""".split('\n')
+        self.maxDiff = None
         self.assertXMLListsEqual( self.covSuite[2].toXMLList(), answer )
 
     def test__len__(self):

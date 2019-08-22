@@ -104,7 +104,7 @@ Useful Members::
         """In general, this routine should be used indirectly via endlZA.read( ) or endlZA.addFile( ) and not called directly, 
         unless you know what you are doing."""
 
-        if( bdflsFile == None ) : bdflsFile = bdfls.getDefaultBdfls( )
+        if( bdflsFile is None ) : bdflsFile = bdfls.getDefaultBdfls( )
         self.bdflsFile = bdflsFile
         self.designerFile = designerFile
         self.name = name
@@ -121,12 +121,12 @@ Useful Members::
         self.levels = []
 
     def __len__( self ) :
-        "Returns the number of levels for self."
+        """Returns the number of levels for self."""
 
         return len( self.levels )
 
     def __getitem__( self, index ) :
-        "Returns the (i-1)^th item from self.levels."
+        """Returns the (i-1)^th item from self.levels."""
 
         if( self.levels == [] ) : raise Exception( "File not read in." )
         return( self.levels[index] )
@@ -168,13 +168,13 @@ Useful Members::
             r = 1. + self.bdflsFile.mass( self.yi ) / self.bdflsFile.mass( self.ZA )
             QThreshold = ( -l.getQ( ) ) * r
             if( QThreshold <= 0. ) : QThreshold = 0.
-            if( targetParameters['T'] == None ) :
+            if( targetParameters['T'] is None ) :
                 targetParameters['T'] = l.Temperature
                 targetParameters['ELevel'] = l.ELevel
                 targetParameters['halflife'] = l.Halflife
             if( ( targetParameters['T'] != l.Temperature ) or ( targetParameters['ELevel'] != l.ELevel ) or ( targetParameters['halflife'] != l.Halflife ) ) :
                 ErrMsgs.append( endlmisc.endlCheckerObject( suffix = suffix, data = l, message = 'target parameters differ' ) )
-            elif( X1 != None ) :
+            elif( X1 is not None ) :
                 if( ( X1 == l.X1 ) and ( X2 == l.X2 ) and ( X3 == l.X3 ) and ( X4 == l.X4 ) ) :
                     ErrMsgs.append( endlmisc.endlCheckerObject( suffix = suffix, data = l, message = 'duplicate data' ) )
             X1 = l.X1; X2 = l.X2; X3 = l.X3; X4 = l.X4
@@ -202,12 +202,12 @@ Useful Members::
         parameters that are None, self's values are used. Also sets self's yi and ZA
         to inputted values if they are other than None."""
 
-        if( yi == None ) : yi = self.yi
-        if( ZA == None ) : ZA = self.ZA
-        if( yo == None ) : yo = self.yo
-        if( C  == None ) : C  = self.C
-        if( I  == None ) : I  = self.I
-        if( S  == None ) : S  = self.S
+        if( yi is None ) : yi = self.yi
+        if( ZA is None ) : ZA = self.ZA
+        if( yo is None ) : yo = self.yo
+        if( C  is None ) : C  = self.C
+        if( I  is None ) : I  = self.I
+        if( S  is None ) : S  = self.S
         self.yi = yi
         self.ZA = ZA
         self.yo = yo
@@ -221,7 +221,7 @@ Useful Members::
         """Returns 1 if self matches yo, C, I and S, and 0 otherwise.  yo may be a single integer or a list of integers and 
         the same for C, I and S. For example self has yo = 7 and C = 3 then self.IsyoCIS( yo = (5, 6, 7), C=(3,4) ) will return a true."""
 
-        if( yo != None ) :
+        if( yo is not None ) :
             if( ( type( yo ) == type( [] ) ) or ( type( yo ) == type( () ) ) ) :
                 yo2 = yo
                 yo = []
@@ -246,9 +246,9 @@ Useful Members::
         while( i > 0 ) :
             i -= 1
             l = self.levels[i]
-            if ( ( l.X1 == X1 ) or ( X1 == None ) ) and ( ( l.X2 == X2 ) or ( X2 == None ) ) and \
-               ( ( l.X3 == X3 ) or ( X3 == None ) ) and ( ( l.X4 == X4 ) or ( X4 == None ) ) and \
-                ( ( l.Q == Q ) or ( Q == None ) ) :
+            if ( ( l.X1 == X1 ) or ( X1 is None ) ) and ( ( l.X2 == X2 ) or ( X2 is None ) ) and \
+               ( ( l.X3 == X3 ) or ( X3 is None ) ) and ( ( l.X4 == X4 ) or ( X4 is None ) ) and \
+                ( ( l.Q == Q ) or ( Q is None ) ) :
                 del self.levels[i]
 
     def addData( self, data = [], date = None, interpolation = 0, eLevel = 0., temperature = 2.586e-8, Q = None, 
@@ -263,19 +263,19 @@ Useful Members::
             elif ( c > 0 ) :
                 break
             i += 1
-        if( Q == None ) :
+        if( Q is None ) :
             Q = 0.
             if ( len( self.levels ) > 0 ) : Q = self.levels[0].Q
-        if( date == None ) : 
+        if( date is None ) : 
             date = time.localtime( time.time( ) )
             date = 10000 * ( date[0] - 2000 ) + 100 * date[1] + date[2]
         if( type( date ) == type( 1 ) ) : date = "%.6d" % date
-        if( mass == None ) : mass = self.bdflsFile.mass( self.ZA )
-        if( mass == None ) : raise Exception( "\nError in endlFile.addData: bdfls file does not have mass for ZA = %d" % self.ZA )
+        if( mass is None ) : mass = self.bdflsFile.mass( self.ZA )
+        if( mass is None ) : raise Exception( "\nError in endlFile.addData: bdfls file does not have mass for ZA = %d" % self.ZA )
         mass = endlmisc.headerFunkyDouble2String( mass )
-        if( halflife == None ) : halflife = self.bdflsFile.halflife( self.ZA )
-        if( halflife == None ) : halflife = self.halflife
-        if( halflife == None ) : raise Exception( "\nError in endlFile.addData: bdfls file does not have halflife for ZA = %d" % self.ZA )
+        if( halflife is None ) : halflife = self.bdflsFile.halflife( self.ZA )
+        if( halflife is None ) : halflife = self.halflife
+        if( halflife is None ) : raise Exception( "\nError in endlFile.addData: bdfls file does not have halflife for ZA = %d" % self.ZA )
         halflife = endlmisc.headerFunkyDouble2String( halflife )
         h = [ "%6d %2d %2d %s %6s%1d12 %s %s %s\n" % ( self.ZA, self.yi, self.yo, mass, date, interpolation, 
                         endlmisc.headerFunkyDouble2String( eLevel ), halflife, endlmisc.headerFunkyDouble2String( temperature ) ),
@@ -311,12 +311,12 @@ Useful Members::
         return o
 
     def columns( self ) :
-        "Returns the number of data columns for self's data. For example, for 3d data a 3 is returned."
+        """Returns the number of data columns for self's data. For example, for 3d data a 3 is returned."""
 
         return endlmisc.getNumberOfColumns_( self.I, "endlFile.columns" )
 
     def info( self ) :
-        "Prints information about each level in self (i.e., call info for each element of self.levels."
+        """Prints information about each level in self (i.e., call info for each element of self.levels."""
 
         for i in range( len( self.levels ) ) :
             print "levels[%d]" % i
@@ -324,7 +324,7 @@ Useful Members::
             print
 
     def ls( self ) :
-        "Prints file name, and level information for self."
+        """Prints file name, and level information for self."""
 
         print  self.name
         s = ""
@@ -332,7 +332,7 @@ Useful Members::
         print s
 
     def read( self ) :
-        "Reads in the data from self's file."
+        """Reads in the data from self's file."""
 
         if ( not os.path.isfile( self.path ) ) : raise Exception( "\nError in endlFile.read: no such file %s" % self.path )
         f = open( self.path )

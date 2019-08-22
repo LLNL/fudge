@@ -63,57 +63,113 @@
 
 from xData import ancestry as ancestryModule
 from xData import link as linkModule
+from xData import array as arrayModule
+from fudge.gnd import suites as suitesModule
 from fudge.core.math import matrix as gndMatrix
 
 __metaclass__ = type
 
-class inputParameter( ancestryModule.ancestry ):
+class parameterLink( linkModule.link ):
     """
-    For use within a modelParameterCovariance: the rows/columns of that matrix each correspond to one input
-    model parameter. Parameters must each be inputParameter or multipleInputParameter instances.
+    Establishes a link between one or more rows of a parameterCovariance and corresponding parameter(s).
+    Supports linking to specific parameters inside a table or list.
+
+    For example, if we have a 2x4 table
+      |A B C D|
+      |E F G H|
+    and wish to give a 4x4 covariance matrix for elements in the 2nd and 4th column of the table, we can create
+    a parameterLink pointing to the table, with
+    'matrixStartIndex=0',  'nParameters=4',  'parameterStartIndex=1',  'parameterStride=2'.
+
+    The corresponding covariance matrix rows would then correspond to 'B, D, F, H'.
     """
 
-    moniker = 'inputParameter'
+    moniker = 'parameterLink'
 
-    def __init__(self, name, path, unit=None):
-        ancestryModule.ancestry.__init__( self )
-        self.name = name #: just a Python str
-        self.path = path #: a fudge.gnd.link 
-        self.unit = unit #: an acceptable PQU unit
+    def __init__( self, label, link, nParameters=1, matrixStartIndex=0, parameterStartIndex=0, parameterStride=1, **kwargs ):
+        """
+        :param label:               unique label for this parameter link
+        :param link:                reference to parameter, table or list
+        :param nParameters:         number of parameters linked to
+        :param matrixStartIndex:    row of the covariance matrix corresponding to the start of this batch of parameters
+        :param parameterStartIndex: for skipping one or more parameters at the start of a table or list
+        :param parameterStride:     for stepping over parameters. Stride must be an integer
+        :return:
+        """
+        linkModule.link.__init__( self, link=link, **kwargs )
+        self.label = label
+        self.nParameters = int(nParameters)
+        self.matrixStartIndex = int(matrixStartIndex)
+        self.parameterStartIndex = int(parameterStartIndex)
+        self.parameterStride = int(parameterStride)
 
     def toXMLList( self, indent = '', **kwargs ) :
 
-        if self.unit: unit = ' unit="%s"' % self.unit
-        else: unit = ''
-        return [ '%s<parameter name="%s"%s xlink:href="%s"/>' % ( indent, self.name, unit, self.path.toXLink() ) ]
+        self.updateXPath()
+        attrString = ' label="%s" xlink:href="%s"' % (self.label, self.path)
+        if self.nParameters != 1: attrString += ' nParameters="%d"' % self.nParameters
+        if self.matrixStartIndex != 0: attrString += ' matrixStartIndex="%d"' % self.matrixStartIndex
+        if self.parameterStartIndex != 0: attrString += ' parameterStartIndex="%d"' % self.parameterStartIndex
+        if self.parameterStride != 1: attrString += ' parameterStride="%d"' % self.parameterStride
+        return [ '%s<%s%s/>' % ( indent, self.moniker, attrString ) ]
 
-class modelParameterCovariance( ancestryModule.ancestry ):
+
+class parameters( suitesModule.suite ):
+
+    moniker = 'parameters'
+
+    def __init__( self ):
+        suitesModule.suite.__init__( self, allowedClasses = (parameterLink, loopOverResonanceParameters) )
+
+    @property
+    def nParameters(self):
+        return sum( [link.nParameters for link in self] )
+
+
+class parameterCovariance( ancestryModule.ancestry ):   # FIXME should inherit from 'form' in abstractBaseClasses
     """ 
-    Express covariance between input parameters for a model 
+    Store covariances (or correlations, depending on 'type') between model parameters
     """
 
-    moniker = 'modelParameterCovariance'
+    moniker = 'parameterCovariance'
 
-    def __init__(self, label=None, inputParameters=None, matrix=None, type=None, **kwargs):
+    def __init__( self, label, matrix, parameters_=None, type='relativeCovariance', ENDFconversionFlags='' ):
+        """
+
+        :param label:
+        :param type:        'relativeCovariance', 'absoluteCovariance' or 'correlation'
+        :param parameters_: list of parameterLinks that relate rows/columns to parameters
+        :param matrix:      xData.array instance containing the covariance or correlation
+        :return:
+        """
 
         ancestryModule.ancestry.__init__( self )
-        self.label = label #: a str
-        self.inputParameters = inputParameters #: list of inputParameter instances to relate rows/columns to parameters 
-        for param in self.inputParameters: param.setAncestor( self )
-        self.matrix = matrix #: the actual fudge.core.math.matrix instance with the covariance
-        #self.matrix.setAncestor( self )
-        self.type = type  #: dunno, got to ask Caleb or Bret
-        self.tag = 'modelParameterCovariance' #: usually 'modelParameterCovariance'
-        self.attributes = kwargs #: a Python dict
-        
-    def check( self, info ): 
+        self.label = label
+        self.type = type
+        if parameters_ is not None:
+            self.parameters = parameters_
+        else:
+            self.parameters = parameters()
+        self.parameters.setAncestor( self )
+        matrix.setAncestor( self )
+        self.matrix = matrix
+        self.ENDFconversionFlags = ENDFconversionFlags
+
+    def check( self, info ):
         from fudge.gnd import warning
         warnings = []
 
+        if self.parameters.nParameters != self.matrix.nrows:
+            warnings.append( "need real warning here" ) # FIXME
         matrixWarnings = self.matrix.check( info )
         if matrixWarnings:
             warnings.append( warning.context("Model parameter covariances", matrixWarnings ) )
         return warnings
+
+    def convertUnits( self, unitMap ):
+
+        #raise NotImplementedError()
+        pass
     
     def fix( self, **kw ): 
         '''assemble some useful info, to be handed down to children's fix() functions'''
@@ -127,21 +183,28 @@ class modelParameterCovariance( ancestryModule.ancestry ):
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        attrStr = ''.join( [' %s="%s"' % (key, self.attributes[key]) for key in self.attributes
-            if bool(self.attributes[key]) ] )
-        xmllist = [indent+( '<%s label="%s" type="%s" %s>' % (self.tag, self.label, self.type, attrStr) )]
-        xmllist.extend( [indent+'  <inputParameters>',
-            indent2+'<!-- Each row of this matrix corresponds to a model parameter. Parameters may be listed singly,',
-            indent2+'  as for scattering radii, or in the case of resonance parameters they may be given all together.',
-            indent2+'  In that case, rows of the matrix correspond to a loop over parameters for each resonance,',
-            indent2+'  with resonances sorted by energy. -->'] )
-        for inputParam in self.inputParameters: xmllist += inputParam.toXMLList( indent2, **kwargs )
-        xmllist[-1] += '</inputParameters>'
+        attrs = ''
+        if self.ENDFconversionFlags: attrs = ' ENDFconversionFlags="%s"' % self.ENDFconversionFlags
+        xmllist = [ '%s<%s label="%s" type="%s"%s>' %
+                    (indent, self.moniker, self.label, self.type, attrs) ]
+        xmllist += self.parameters.toXMLList( indent2, **kwargs )
         xmllist += self.matrix.toXMLList( indent2, **kwargs )
-        xmllist[-1] += ('</%s>' % self.tag)
+        xmllist[-1] += ('</%s>' % self.moniker)
         return xmllist
 
-class loopOverResonanceParameters( linkModule.link ):
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ):
+
+        xPath.append( element.tag )
+        matrix_ = arrayModule.full.parseXMLNode( element.find( arrayModule.full.moniker ), xPath, linkData )
+        PC = parameterCovariance(element.get('label'), matrix_, type=element.get('type'),
+            ENDFconversionFlags=element.get('ENDFconversionFlags',''))
+        PC.parameters.parseXMLNode( element.find( parameters.moniker ), xPath, linkData )
+        xPath.pop()
+        return PC
+
+
+class loopOverResonanceParameters( linkModule.link ):       # FIXME get rid of this, replace with parameterLink
     """ 
     For resonance region covariances, we need a compact way to express many model inputs.
     Simplest is to specify a loop over the resonances 
@@ -170,7 +233,8 @@ class loopOverResonanceParameters( linkModule.link ):
 
         return LORPs
 
-class resonanceParameterCovariance( modelParameterCovariance ):
+
+class resonanceParameterCovariance( parameterCovariance ):      # FIXME get rid of this, replace with parameterCovariance
     """
     In the resonance region, covariances are given between resonance parameters (energy and widths).
     Generally, the dimension of the matrix is 3*(number of resonances) for light targets, and 4*(nres)
@@ -180,10 +244,10 @@ class resonanceParameterCovariance( modelParameterCovariance ):
     have room to list the uncertainty (variance) on the scattering radius. 
     """
 
-    def __init__(self, label=None, inputParameters=None, matrix=None, type=None, **kwargs):
-        modelParameterCovariance.__init__(self, label, inputParameters, matrix, type)
+    def __init__(self, label=None, matrix=None, inputParameters=None, type=None, ENDFconversionFlags=''):
+        parameterCovariance.__init__(self, label, matrix, inputParameters, type)
         self.tag = 'resonanceParameterCovariance' #: usually set to 'resonanceParameterCovariance'
-        self.attributes = kwargs #: a Python dict
+        self.ENDFconversionFlags = ENDFconversionFlags
 
     @staticmethod
     def parseXMLNode( element, xPath, linkData ):
@@ -197,6 +261,6 @@ class resonanceParameterCovariance( modelParameterCovariance ):
             elif param.tag=='parameter': pass
             params.append(param)
         Matrix = gndMatrix.parseXMLNode( element[1], xPath, linkData )
-        RPCs = resonanceParameterCovariance( inputParameters=params, matrix=Matrix, **dict(element.items()) )
+        RPCs = resonanceParameterCovariance( matrix=Matrix, inputParameters=params, **dict(element.items()) )
         xPath.pop()
         return RPCs

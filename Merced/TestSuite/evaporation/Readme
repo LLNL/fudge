@@ -1,0 +1,18 @@
+The files in this subdirectory contain data for energy probability
+density given as the evaporation model.  Three quadrature schemes
+are used, as illustrated by the input files:
+
+in.evap-Ar38: The default uses adaptive quadrature for both incident energy
+  and outgoing energy.  Its output file is out.evap-Ar38, and its run
+  time is 0m0.056s.
+
+in.evap-Ar38-Gauss6: The same data but with 6-th order Gaussian quadrature.
+  Its output file is out.evap-Ar38-Gauss6, and its run time is 0m0.047s.
+  We also tried 4-th order Gaussian quadrature but found its accuracy
+  insufficient at low incident energies.
+
+evap-Ar38-interpolate: For this data the integrals over outgoing energy
+  are done separately, and their values are interpolated when integrating
+  over incident energy.  We had thought that this approach might be faster,
+  but it isn't.  The output file is out.evap-Ar38-interpolate.  This
+  method is deprecated.

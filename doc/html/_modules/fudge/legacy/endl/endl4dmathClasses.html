@@ -1,0 +1,378 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.endl.endl4dmathClasses &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.legacy.endl.endl4dmathClasses</h1><div class="highlight"><pre>
+<span></span># &lt;&lt;BEGIN-copyright&gt;&gt;
+# &lt;&lt;END-copyright&gt;&gt;
+
+&quot;&quot;&quot;
+This module contains the endl4dmath class. Also see the supporting module endl4dmathmisc.py.
+&quot;&quot;&quot;
+
+import os
+
+from fudge.core import fudgemisc
+from fudge.core.utilities import fudgeFileMisc, subprocessing
+from fudge.vis.gnuplot import plotbase
+import endl1dmathClasses
+import endl3dmathmisc
+import endl4dmathmisc
+
+__metaclass__ = type
+
+<div class="viewcode-block" id="endl4dmath"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl4dmathClasses.endl4dmath">[docs]</a>class endl4dmath :
+    &quot;&quot;&quot;
+This class is designed to support operations on a list of 4-column number data that may be useful to scientists.
+(A number is an integer or a float.) In this documenation the four columns are referred to as t, x, y and z.
+The data is to be stored as a python list of [ t, xyz-data-for-t ], where xyz-data-for-t is a list of
+[ x, yz-data-for-x ] and yz-data-for-x is a list of [ y, z ] data. For example, consider the 4 column data::
+
+ 1 1 1 1
+ 1 1 2 2
+ 1 1 3 1
+ 1 2 1 1
+ 1 2 2 0
+ 1 2 4 0
+ 3 1 1 1
+ 3 1 2 3
+ 4 2 2 0
+ 4 2 3 1
+ 4 2 4 2
+
+For this data there are 3 different t-values.  The length of this data is 3, for the 3 different t-values.
+The first t-value has the data::
+
+ 1 1 1
+ 1 2 2
+ 1 3 1
+ 2 1 1
+ 2 2 0
+ 2 4 0
+
+for which there are 2 x values, and the first having the data::
+ 1 1
+ 2 2 
+ 3 1 
+
+All this data is stored using python lists as ::
+
+ [ [ 1, [ [ 1, [ [ 1, 1 ],
+                 [ 2, 2 ],
+                 [ 3, 1 ]
+               ]
+          ],
+          [ 2, [ [ 1, 1 ],
+                 [ 2, 0 ],
+                 [ 4, 0 ]
+               ]
+          ]
+        ]
+   ]
+   [ 3, [ [ 1, [ [ 1, 1 ],
+                 [ 2, 3 ]
+               ]
+          ]
+        ]
+   ]
+   [ 4, [ [ 2, [ [ 2, 0 ],
+                 [ 3, 1 ],
+                 [ 4, 2 ]
+               ]
+          ]
+        ]
+   ]
+ ]
+
+Note, the xyz data is store like the data in an endl3dmath class. That is, endl3dmath data looks like a list of [ t, 3d-data ].
+However, the 3d part is not an endl3dmath class but is structured like the data in an endl3dmath class. Thus, to plot
+the xyz data for the (i+1)^th t-value of an endl4dmath instance fourD, create an endl3dmath object of the data as endl3dmath( fourD.data[i][1] )
+and use the endl3dmath plot method.
+
+Members ::
+        data        | A python list of numbers.
+        columns     | This is always 4 as this is 1d data.
+        tLabel      | Labelled used as the t-Label when plotting.
+        xLabel      | Labelled used as the x-Label when plotting.
+        yLabel      | Labelled used as the y-Label when plotting.
+        zLabel      | Labelled used as the z-Label when plotting.
+&quot;&quot;&quot;
+
+    def __init__(self, data, checkDataType = False, tLabel = None, xLabel = None, yLabel = None, 
+        zLabel = None, label = &quot;unknown&quot;, interpolation = 0, template = None ) :
+        &quot;&quot;&quot;Creates an endl4dmath instance. Data must be of type list[ number, list[ number, list[ number, number ] ] ].
+        The default plotting labels can be set with tLabel, xLabel, yLabel and zLabel.&quot;&quot;&quot;
+
+        if( interpolation != 0 ) : raise Exception( &quot;\nError in endl4dmath.__init__: Bad interpolation value = %s&quot; % `interpolation` )
+        self.interpolation = interpolation
+        self.data = endl4dmathmisc.get4dmathData( data, &quot;endl4dmath.__init__&quot;, &quot;data&quot; )
+        if ( template is not None ) : endl4dmathmisc.valid4dClassType( template, &quot;endl4dmath.__init__&quot;, &quot;template&quot; )
+        self.columns = 4
+        self.tLabel = tLabel
+        if ( ( template is not None ) and ( tLabel is None ) ) : self.tLabel = template.tLabel
+        self.xLabel = xLabel
+        if ( ( template is not None ) and ( xLabel is None ) ) : self.xLabel = template.xLabel
+        self.yLabel = yLabel
+        if ( ( template is not None ) and ( yLabel is None ) ) : self.yLabel = template.yLabel
+        self.zLabel = zLabel
+        if ( ( template is not None ) and ( zLabel is None ) ) : self.zLabel = template.zLabel
+        self.label = label
+        if(   self.interpolation == 0 ) :
+            self.xInterpolation = &#39;linear,linear,linear,linear&#39;
+        else :
+            raise Exception( &#39;Unsupported interpolation = %d for 4d data&#39; % self.interpolation )
+
+    def __getitem__( self, txy ) :
+        &quot;&quot;&quot;Returns self&#39;s z value evaluated at txy = (t, x, y). If t (x or y) is outside the range of self&#39;s t (x or y) domain then 0. is returned.&quot;&quot;&quot;
+
+        t = txy[0]
+        x = txy[1]
+        y = txy[2]
+        l = len( self.data )
+        if( l &lt; 1 ) : return( 0. )
+        z = 0.
+        if( self.data[0][0] &lt;= t &lt;= self.data[-1][0] ) :
+            i = 0
+            while( i &lt; l ) :
+                if( t &lt;= self.data[i][0] ) : break
+                i += 1
+            if( t == self.data[i][0] ) :
+                z = endl3dmathmisc.interpolate_XY( self.data[i][1], x, y )
+            else :
+                d1 = self.data[i-1]
+                d2 = self.data[i]
+                z1 = endl3dmathmisc.interpolate_XY( d1[1], x, y )
+                z2 = endl3dmathmisc.interpolate_XY( d2[1], x, y )
+                t1 = d1[0]
+                t2 = d2[0]
+                z = ( z1 * ( t2 - t ) + z2 * ( t - t1 ) ) / ( t2 - t1 )
+        return( z )
+
+    def __len__( self ) :                                   # class endl4dmath
+        &quot;&quot;&quot;Returns the number of items in the top list of self (i.e., the number of t-values).&quot;&quot;&quot;
+
+        return len( self.data )
+
+    def __repr__( self ) :                                  # class endl4dmath
+        &quot;&quot;&quot;Returns a printable string of the data in self. This method uses endl4dmathmisc.endl4d_repr_tFormat, 
+        endl4dmathmisc.endl4d_repr_xFormat, endl4dmathmisc.endl4d_repr_yFormat and endl4dmathmisc.endl4d_repr_zFormat
+        to convert each point to a string.&quot;&quot;&quot;
+
+        strData = endl4dmathmisc.string4dData( self.data )
+        return( &#39;\n&#39;.join( strData ) + &#39;\n&#39; )
+
+<div class="viewcode-block" id="endl4dmath.copyData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl4dmathClasses.endl4dmath.copyData">[docs]</a>    def copyData( self ) :
+        &quot;&quot;&quot;Returns an endl4dmath instance that is a copy, and not a reference, of self.&quot;&quot;&quot;
+
+        d4 = []
+        for t_xyz in self.data :
+            d3 = []
+            for x_yz in t_xyz[1] :
+                d2 = []
+                for yz in x_yz[1] : d2.append( [ yz[0], yz[1] ] )
+                d3.append( [ x_yz[0], d2 ] )
+            d4.append( [ t_xyz[0], d3 ] )
+        return endl4dmath( d4, checkDataType = 0, template = self )</div>
+
+<div class="viewcode-block" id="endl4dmath.getDimensions"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl4dmathClasses.endl4dmath.getDimensions">[docs]</a>    def getDimensions( self ) :
+        &quot;&quot;&quot;Returns the dimensions (4 for endl4dmath) for this type of data.&quot;&quot;&quot;
+
+        return( 4 )</div>
+
+    @property
+    def dimension( self ) :
+
+        return( self.getDimensions( ) )
+
+<div class="viewcode-block" id="endl4dmath.toString"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl4dmathClasses.endl4dmath.toString">[docs]</a>    def toString( self, format = None ) :
+        &quot;&quot;&quot;Returns the string returned by the endl4dmath&#39;s __repr__ function. This can be useful when endl4dmath is used as a base class.&quot;&quot;&quot;
+
+        endl4d_repr_tFormat = endl4dmathmisc.endl4d_repr_tFormat
+        endl4d_repr_xFormat = endl4dmathmisc.endl4d_repr_xFormat
+        endl4d_repr_yFormat = endl4dmathmisc.endl4d_repr_yFormat
+        endl4d_repr_zFormat = endl4dmathmisc.endl4d_repr_zFormat
+        if( format is not None ) :
+            endl4dmathmisc.endl4d_repr_tFormat = format
+            endl4dmathmisc.endl4d_repr_xFormat = format
+            endl4dmathmisc.endl4d_repr_yFormat = format
+            endl4dmathmisc.endl4d_repr_zFormat = format
+        s = endl4dmath.__repr__( self )
+        endl4dmathmisc.endl4d_repr_tFormat = endl4d_repr_tFormat
+        endl4dmathmisc.endl4d_repr_xFormat = endl4d_repr_xFormat
+        endl4dmathmisc.endl4d_repr_yFormat = endl4d_repr_yFormat
+        endl4dmathmisc.endl4d_repr_zFormat = endl4d_repr_zFormat
+        return( s )</div>
+
+<div class="viewcode-block" id="endl4dmath.toStringWithPrefixSuffix"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl4dmathClasses.endl4dmath.toStringWithPrefixSuffix">[docs]</a>    def toStringWithPrefixSuffix( self, Prefix = &quot;&quot;, Suffix = &quot;&quot; ) :
+        &quot;&quot;&quot;Returns a printable string of the data in self with Prefix and Suffix append to each line.
+        See __repr__ to change the output format.&quot;&quot;&quot;
+
+        ssyz = &quot;%%s %%s %s %s&quot; % ( endl4dmathmisc.endl4d_repr_yFormat, endl4dmathmisc.endl4d_repr_zFormat )
+        stxyz = []
+        for t_etal in self.data :
+            t = endl4dmathmisc.endl4d_repr_tFormat % t_etal[0]
+            for x_etal in t_etal[1] :
+                x = endl4dmathmisc.endl4d_repr_xFormat % x_etal[0]
+                for etal in x_etal[1] : stxyz.append( ssyz % ( t, x, etal[0], etal[1] ) )
+        return fudgemisc.stringWithPrefixSuffix( stxyz, Prefix, Suffix )</div>
+
+<div class="viewcode-block" id="endl4dmath.ls"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl4dmathClasses.endl4dmath.ls">[docs]</a>    def ls( self ) :                                        # class endl4dmath
+        &quot;&quot;&quot;Prints the number of items in the top list of self and then the number of items in each item of the top list.&quot;&quot;&quot;
+
+        print &quot;list of %d lists of len (&quot; %len( self.data ),
+        c = &quot;&quot;
+        s = &quot;&quot;
+        for i in self.data :
+            s += &quot;%s%d&quot; % ( c, len( i[1] ) )
+            c = &quot;, &quot;
+        print s, &quot;)&quot;</div>
+
+<div class="viewcode-block" id="endl4dmath.ll"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl4dmathClasses.endl4dmath.ll">[docs]</a>    def ll( self ) :                                        # class endl4dmath
+        &quot;&quot;&quot;Same as __repr__( ).&quot;&quot;&quot;
+
+        print endl4dmath.__repr__( self )</div>
+
+<div class="viewcode-block" id="endl4dmath.plot"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl4dmathClasses.endl4dmath.plot">[docs]</a>    def plot( self, xMin = None, xMax = None, yMin = None, yMax = None, zMin = None, zMax = None, xyzlog = 0, \
+        tLabel = None, xLabel = None, yLabel = None, zLabel = None, title = None, tScaleLabel = None, \
+        xrot = None, zrot = None, style = None ) :                        # class endl4dmath
+        &quot;&quot;&quot;
+        Plots the data.
+
+        xyzlog values and meaning are ::
+
+            xyzlog   plot-type for x-y-z axis
+           -----------------------------------
+              0     linear-linear-linear
+              1     log-linear-linear
+              2     linear-log-linear
+              3     log-log-linear
+              4     linear-linear-log
+              5     log-linear-log
+              6     linear-log-log
+              7     log-log-log
+        &quot;&quot;&quot;
+
+        if ( tLabel is None ) and ( self.tLabel is not None ) : tLabel = self.tLabel
+        if ( xLabel is None ) and ( self.xLabel is not None ) : xLabel = self.xLabel
+        if ( yLabel is None ) and ( self.yLabel is not None ) : yLabel = self.yLabel
+        if ( zLabel is None ) and ( self.zLabel is not None ) : zLabel = self.zLabel
+
+        dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title, zMin = zMin, zMax = zMax, \
+            zLabel = zLabel, tLabel = tLabel, tScaleLabel = tScaleLabel, xrot = xrot, zrot = zrot, style = style )
+        f = fudgeFileMisc.fudgeTempFile( )
+        format = fudgemisc.getFormat( self )
+        f.write( endl4dmath.toString( self, format = format ) )
+        f.close( )
+        p = os.path.join( __file__.split( &#39;/fudge/legacy/&#39; )[0], &quot;fudge&quot;, &quot;vis&quot;, &quot;gnuplot&quot;, &quot;endl4dplot.py&quot; )
+        s = [ &#39;python&#39;, p, &#39;xyzlog&#39;, str( xyzlog ) ] + dt + [ f.getName( ) ]
+        subprocessing.spawn( s )</div>
+
+<div class="viewcode-block" id="endl4dmath.tArray"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl4dmathClasses.endl4dmath.tArray">[docs]</a>    def tArray( self ) :
+        &quot;&quot;&quot;Returns an endl1dmath instances of the t values in self.&quot;&quot;&quot;
+
+        ta = []
+        for t, xyz in self.data : ta.append( t )
+        return endl1dmathClasses.endl1dmath( ta )</div>
+
+<div class="viewcode-block" id="endl4dmath.tMax"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl4dmathClasses.endl4dmath.tMax">[docs]</a>    def tMax( self ) :
+        &quot;&quot;&quot;Returns the maximum t value of self if self contains data, otherwise it returns None.&quot;&quot;&quot;
+
+        if ( len( self.data ) &gt; 0 ) : return self.data[-1][0]
+        return None</div>
+
+<div class="viewcode-block" id="endl4dmath.tMin"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl4dmathClasses.endl4dmath.tMin">[docs]</a>    def tMin( self ) :
+        &quot;&quot;&quot;Returns the minimum t value of self if self contains data, otherwise it returns None.&quot;&quot;&quot;
+
+        if ( len( self.data ) &gt; 0 ) : return self.data[0][0]
+        return None</div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

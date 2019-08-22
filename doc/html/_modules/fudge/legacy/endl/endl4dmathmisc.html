@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.endl.endl4dmathmisc &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.legacy.endl.endl4dmathmisc</h1><div class="highlight"><pre>
+<span></span># &lt;&lt;BEGIN-copyright&gt;&gt;
+# &lt;&lt;END-copyright&gt;&gt;
+
+&quot;&quot;&quot;
+This module contains miscellaneous routines for supporting the endl4dmath class from module endl4dmathClasses.
+
+Module&#39;s global variables::
+
+    endl4d_repr_tFormat : Default format string used for converting an t-element of the data of an endl4dmath object to a string.
+    endl4d_repr_xFormat : Default format string used for converting an x-element of the data of an endl4dmath object to a string.
+    endl4d_repr_yFormat : Default format string used for converting an y-element of the data of an endl4dmath object to a string.
+    endl4d_repr_zFormat : Default format string used for converting an z-element of the data of an endl4dmath object to a string.
+&quot;&quot;&quot;
+
+import os
+import types
+
+from fudge.core import fudgemisc
+from fudge.core.utilities import fudgeFileMisc, subprocessing
+from fudge.core.math import fudgemath
+import endl4dmathClasses
+
+endl4d_repr_tFormat = &quot;%14.7e&quot;
+endl4d_repr_xFormat = &quot;%12.5e&quot;
+endl4d_repr_yFormat = &quot;%12.5e&quot;
+endl4d_repr_zFormat = &quot;%12.5e&quot;
+
+<div class="viewcode-block" id="get4dmathData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl4dmathmisc.get4dmathData">[docs]</a>def get4dmathData( object, callingRoutine, msg ) :
+    &quot;&quot;&quot;If object is a python list, then it is returned. Else, if object is a sub-class
+    of endl4dmath its data is return otherwise a raise is executed.&quot;&quot;&quot;
+
+    if( type( object ) == type( [] ) ) :
+        data = object
+    else :
+        data = valid4dClassType( object, callingRoutine, msg ).data
+    return( data )</div>
+
+<div class="viewcode-block" id="valid4dClassType"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl4dmathmisc.valid4dClassType">[docs]</a>def valid4dClassType( object, callingRoutine, msg ) :
+    &quot;&quot;&quot;Returns the first argument, object, if it is a subclass of the endl4dmath class; else, triggers a raise.&quot;&quot;&quot;
+
+    if( isinstance( object, endl4dmathClasses.endl4dmath ) ) : return( object )
+    raise Exception( &quot;\nError in %s: invalid type = %s for %s&quot; % ( callingRoutine, type( object ), msg ) )</div>
+
+<div class="viewcode-block" id="check4dData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl4dmathmisc.check4dData">[docs]</a>def check4dData( data, allowNegativeT = False, allowZeroT = True, allowNegativeX = False, allowZeroX = True, allowSameY = False, allowNegativeY = False,
+    allowZeroY = True, positiveZ = False, printWarning = True, printErrors = True, xCloseEps = None, maxAbsFloatValue = None ) :
+    &quot;&quot;&quot;Checks that data is a valid structure for endl4dmath data. Triggers a raise if it is not.  Data may be
+    an instance that is a subclass of endl4dmath or a python list as required by endl4dmath. If allowZeroT is False, 
+    a zero first t value will generate a raise.If allowNegativeT is true than the t data can have negative values 
+    (many ENDL 4d-data have projectile energy as the t-data which must always be positive). For meanings of 
+    allowNegativeX, allowZeroX, allowSameY, allowNegativeY, allowZeroY, positiveZ and xCloseEps see endl3dmathmisc.check3dData.
+    If printErrors is &#39;True&#39; then errors are printed, and if at least one error exist, a raise will be executed.  
+    printWarning is just passed on to endl3dmathmisc.check3dData.&quot;&quot;&quot;
+
+    import endl3dmathmisc
+    points = get4dmathData( data, &quot;check4dData&quot;, &quot;&quot; )
+    messages = []
+    tPrior = None
+    if( ( points[0][0] &lt; 0. ) and ( not allowNegativeT ) ) :
+        s = &#39;check4dData: zero x value at index = 0&#39;
+        messages.append( s )
+        if( printErrors ) : fudgemisc.printWarning( &#39;\n&#39;.join( fudgemisc.checkMessagesToString( s, indentation = &#39;    &#39; ) ) )
+    elif( ( points[0][0] &lt; 0. ) and ( not allowNegativeT ) ) :
+        s = &#39;check4dData: negative t = %e&#39; % points[0][0]
+        messages.append( s )
+        if( printErrors ) : fudgemisc.printWarning( &#39;\n&#39;.join( fudgemisc.checkMessagesToString( s, indentation = &#39;    &#39; ) ) )
+    i = 0
+    for t, xyz in points :
+        fudgemath.checkNumber( t, &quot;check4dData: t[%d]&quot; % i, messages = messages, indentation = &#39;    &#39;, printErrors = printErrors, \
+            maxAbsFloatValue = maxAbsFloatValue )
+        if( tPrior is not None ) :
+            if( t &lt;= tPrior ) :
+                s = &#39;check4dData: t value t[%d] &gt;= t[%d] (%e &gt;= %e)&#39; % ( i-1, i, tPrior, t )
+                messages.append( s )
+                if( printErrors ) : fudgemisc.printWarning( &#39;\n&#39;.join( fudgemisc.checkMessagesToString( s, indentation = &#39;    &#39; ) ) )
+        tPrior = t
+        messages3d = endl3dmathmisc.check3dData( xyz, allowNegativeX = allowNegativeX, allowZeroX = allowZeroX, allowSameY = allowSameY, 
+            allowNegativeY = allowNegativeY, allowZeroY = allowZeroY, positiveZ = positiveZ, printWarning = printWarning, printErrors = False, 
+            xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages3d ) &gt; 0 ) :
+            s = &#39;check4dData: t value = %e&#39; % t
+            messages.append( [ s, messages3d ] )
+            if( printErrors ) : fudgemisc.printWarning( &#39;\n&#39;.join( fudgemisc.checkMessagesToString( [ messages[-1] ], indentation = &#39;    &#39; ) ) )
+        i += 1
+    if( printErrors and len( messages ) &gt; 0 ) : raise Exception( &#39;      bad 4d data&#39; )
+    return( messages )</div>
+
+<div class="viewcode-block" id="plot3dFrom4d"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl4dmathmisc.plot3dFrom4d">[docs]</a>def plot3dFrom4d( data, i, options, xyzlog = 0 ) :
+    &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+    ly_etal = data[i][1]
+    f = fudgeFileMisc.fudgeTempFile( )
+    for y_etal in ly_etal :
+        y = &quot;%15.7e&quot; % y_etal[0]
+        for etal in y_etal[1] : f.write( &quot;%s %14.6e %14.6e\n&quot; % ( y, etal[0], etal[1] ) )
+    f.close( )
+    p = os.path.join( __file__.split( &#39;/fudge/core/&#39; )[0], &quot;fudge&quot;, &quot;vis&quot;, &quot;gnuplot&quot;, &quot;endl3dplot.py&quot; )
+    s = [ &quot;python&quot;, p, &#39;xyzlog&#39;, str( xyzlog ) ] + options + [ f.getName( ) ]
+    subprocessing.spawn( s )</div>
+
+<div class="viewcode-block" id="string4dData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl4dmathmisc.string4dData">[docs]</a>def string4dData( d, i0 = 0, i1 = 1, i2 = 2, i3 = 3, fmt0 = None, fmt1 = None, fmt2 = None, fmt3 = None ) :
+    &quot;&quot;&quot;Returns a list of strings for data d.  D must be list[ number, list[ number, list[ number, number ] ] ].&quot;&quot;&quot;
+
+    i = [ i0, i1, i2, i3 ]
+    i.sort( )
+    if ( i[0] != 0 ) or ( i[1] != 1 ) or ( i[2] != 2 ) or ( i[3] != 3 ) :
+        raise Exception( &quot;\nError in string4dData: %s&quot; % &quot;Invalid i0 = %s, i1 = %s, i2 = %s, and/or i3 = %s&quot; % (`i0`,`i1`,`i2`,`i3`) )
+    if( fmt0 is None ) : fmt0 = endl4d_repr_tFormat
+    if( fmt1 is None ) : fmt1 = endl4d_repr_xFormat
+    if( fmt2 is None ) : fmt2 = endl4d_repr_yFormat
+    if( fmt3 is None ) : fmt3 = endl4d_repr_zFormat
+    fmt = [ fmt0, fmt1, fmt2, fmt3 ]
+    s = []
+    sa = [ &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot; ]
+    for d0 in d :
+        sa[i0] = fmt[i0] % d0[0]
+        for d1 in d0[1] :
+            sa[i1] = fmt[i1] % d1[0]
+            for d2 in d1[1] :
+                sa[i2] = fmt[i2] % d2[0]
+                sa[i3] = fmt[i3] % d2[1]
+                s.append( &#39; &#39;.join( sa ) )
+    return s</div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

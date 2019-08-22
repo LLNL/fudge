@@ -61,8 +61,9 @@
 # 
 # <<END-copyright>>
 
-from fudge.gnd.covariances.mixed import mixedForm
-from .. import endfFormats
+from fudge.gnd.covariances.mixed import mixedForm as mixedFormModule
+
+from .. import endfFormats as endfFormatsModule
 
 def toENDF6(self, flags, targetInfo):
     endf = []
@@ -72,9 +73,9 @@ def toENDF6(self, flags, targetInfo):
     rowdat, coldat = targetInfo['dataPointer']
     MF, MT1 = map(int, rowdat['ENDF_MFMT'].split(','))
     if MF in (31,33):
-        endf.append( endfFormats.endfHeadLine(XMF1,XLFS1,MAT1,MT1,NC,NI) )
+        endf.append( endfFormatsModule.endfHeadLine(XMF1,XLFS1,MAT1,MT1,NC,NI) )
     for cov in self.components:
         endf += cov.toENDF6(flags, targetInfo, inCovarianceGroup=True)
     return endf
 
-mixedForm.toENDF6 = toENDF6
+mixedFormModule.toENDF6 = toENDF6

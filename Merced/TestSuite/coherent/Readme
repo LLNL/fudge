@@ -1,0 +1,20 @@
+The data in this subdirectory are taken from the EPDL library,
+and it is for coherent photon scattering.  In the FormFactorData
+we have kept the units of the first variable as 1/cm (reciprocal
+wavelength).  In order to convert this to MeV, the get_transfer code
+multiplies this by 2*pi*c*hbar.
+
+Note that the input files do not contain cross sections; these
+are derived from the FormFactorData and are printed in the output.
+
+The input files are:
+
+in.coherent: Use the default adaptive quadrature with weight
+  $\sqrt{ 1 - \mu }$. These data are from ENDL and have no anomalous
+  factors.  The output is out.coherent.
+
+in.coherent.Gauss2: Use 2nd-order Gaussian quadrature.  The output is
+  out.coherent.Gauss2.
+
+in.oxygen: data from ENDF which do have anomalous factor data.  The
+  output is out.oxygen.

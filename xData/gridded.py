@@ -63,6 +63,8 @@
 
 __metaclass__ = type
 
+import abc
+
 import standards as standardsModule
 import base as baseModule
 import axes as axesModule
@@ -70,7 +72,7 @@ import array as arrayModule
 
 class gridded( baseModule.xDataFunctional ) :
 
-    moniker = 'gridded'
+    ancestryMembers = baseModule.xDataFunctional.ancestryMembers + ( 'array', )
 
     def __init__( self, axes, array,
             index = None, valueType = standardsModule.types.float64Token, value = None, label = None ) :
@@ -80,11 +82,13 @@ class gridded( baseModule.xDataFunctional ) :
                 if( not( isinstance( axis, axesModule.axis ) ) ) : raise Exception( 'dependent axis must not have a grid' )
             else :
                 if( not( isinstance( axis, axesModule.grid ) ) ) : raise Exception( 'independent axis must have a grid' )
-        if( not( isinstance( array, arrayModule.arrayBase ) ) ) : raise TypeError( 'array not value type' )
+        if( not( isinstance( array, arrayModule.arrayBase ) ) ) : raise TypeError( 'array not an array instance' )
 
-        baseModule.xDataFunctional.__init__( self, self.moniker, len( array ), axes, index = index, valueType = valueType,
+        baseModule.xDataFunctional.__init__( self, self.moniker, axes, index = index, valueType = valueType,
                 value = value, label = label )
 
+        if( self.dimension != len( array ) ) : ValueError( 'self.dimension = %d != len( array ) = %d' % 
+                ( self.dimension, len( array ) ) )
         self.array = array
         self.array.setAncestor( self )
 
@@ -113,8 +117,8 @@ class gridded( baseModule.xDataFunctional ) :
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         attributeStr = baseModule.xDataFunctional.attributesToXMLAttributeStr( self )
-        XMLList = [ '%s<%s dimension="%s"%s>' % ( indent, self.moniker, self.dimension, attributeStr ) ]
-        XMLList += self.axes.toXMLList( indent2, **kwargs )
+        XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributeStr ) ]
+        if( self.axes is not None ) : XMLList += self.axes.toXMLList( indent2, **kwargs )
         XMLList += self.array.toXMLList( indent2, **kwargs )
         XMLList[-1] += '</%s>' % self.moniker
         return( XMLList )
@@ -130,6 +134,21 @@ class gridded( baseModule.xDataFunctional ) :
         array = arrayModule.arrayBase.parseXMLNode( element[1], xPath, linkData )
         index = int( element.get('index') ) if 'index' in element.keys() else None
         value = float( element.get('value') ) if 'value' in element.keys() else None
-        Grid = gridded( axes, array, index=index, value=value, label=element.get('label') )
+        Grid = cls( axes=axes, array=array, index=index, value=value, label=element.get('label') )
         xPath.pop( )
         return Grid
+
+class gridded1d( gridded ) :
+
+    moniker = 'gridded1d'
+    dimension = 1
+
+class gridded2d( gridded ) :
+
+    moniker = 'gridded2d'
+    dimension = 2
+
+class gridded3d( gridded ) :
+
+    moniker = 'gridded3d'
+    dimension = 3

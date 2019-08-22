@@ -65,10 +65,11 @@
 This module adds the method toACE to the reactionSuite class.
 """
 
-from fudge.gnd import reactionSuite
+from fudge.gnd import reactionSuite as reactionSuiteModule
 
-def toACE( self, fileName, evaluationId, temperature, addAnnotation = False ) :
-    """Produce an ACE file with data from self.
+def toACE( self, fileName, evaluationId, temperature, addAnnotation = False, verbose = 0 ) :
+    """
+    Produce an ACE file with data from self.
 
     :param str fileName: path to save resulting ACE file
     :param int evaluationId:  evaluation identifier, 2 digits max.
@@ -82,9 +83,10 @@ def toACE( self, fileName, evaluationId, temperature, addAnnotation = False ) :
 
     from . import gndToACE
 
+    if( verbose > 0 ) : print self.inputParticlesToReactionString( )
     data = []
-    EMin = min( [ reaction.domainMin( ) for reaction in self ] )
-    for reaction in self : reaction.toACE( temperature, EMin, data )
+    EMin = min( [ reaction.domainMin for reaction in self.reactions ] )
+    for reaction in self.reactions : reaction.toACE( temperature, EMin, data, verbose )
     gndToACE.toACE( self, fileName, evaluationId, temperature, data, addAnnotation = addAnnotation )
 
-reactionSuite.reactionSuite.toACE = toACE
+reactionSuiteModule.reactionSuite.toACE = toACE

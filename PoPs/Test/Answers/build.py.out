@@ -1,0 +1,83 @@
+<PoPs name="test" version="1.2.3" format="PoPs 0.1">
+  <aliases>
+    <particle id="electron" pid="e-"/>
+    <particle id="e+" pid="e-_anti"/>
+    <particle id="positron" pid="e-_anti"/></aliases>
+  <leptons>
+    <lepton id="e-" generation="electronic">
+      <mass>
+        <double label="default" value="0.0005485801" unit="amu"/></mass>
+      <spin>
+        <fraction label="default" value="1/2" unit="hbar"/></spin>
+      <parity>
+        <integer label="default" value="1"/></parity>
+      <charge>
+        <integer label="default" value="-1" unit="e"/></charge>
+      <halflife>
+        <string label="default" value="stable" unit="s"/></halflife></lepton>
+    <lepton id="e-_anti" generation="electronic">
+      <mass>
+        <double label="default" value="0.0005485801" unit="amu"/></mass>
+      <spin>
+        <fraction label="default" value="1/2" unit="hbar"/></spin>
+      <parity>
+        <integer label="default" value="-1"/></parity>
+      <charge>
+        <integer label="default" value="1" unit="e"/></charge>
+      <halflife>
+        <string label="default" value="stable" unit="s"/></halflife></lepton>
+    <lepton id="mu" generation="muonic">
+      <mass>
+        <double label="default" value="0.1134289267" unit="amu"/></mass>
+      <spin>
+        <fraction label="default" value="1/2" unit="hbar"/></spin>
+      <parity>
+        <integer label="default" value="1"/></parity>
+      <charge>
+        <integer label="default" value="-1" unit="e"/></charge>
+      <halflife>
+        <double label="default" value="2.1969811e-06" unit="s"/></halflife></lepton></leptons>
+  <baryons>
+    <baryon id="n">
+      <mass>
+        <double label="default" value="1.00866491588" unit="amu"/></mass>
+      <spin>
+        <fraction label="default" value="1/2" unit="hbar"/></spin>
+      <parity>
+        <integer label="default" value="1"/></parity>
+      <charge>
+        <integer label="default" value="0" unit="e"/></charge>
+      <halflife>
+        <double label="default" value="881.0" unit="s"/></halflife></baryon>
+    <baryon id="p">
+      <mass>
+        <double label="default" value="1.00727646681" unit="amu"/></mass>
+      <spin>
+        <fraction label="default" value="1/2" unit="hbar"/></spin>
+      <parity>
+        <integer label="default" value="1"/></parity>
+      <charge>
+        <integer label="default" value="1" unit="e"/></charge>
+      <halflife>
+        <string label="default" value="stable" unit="s"/></halflife></baryon></baryons>
+  <chemicalElements>
+    <chemicalElement id="O" Z="8" name="Oxygen">
+      <isotope id="O16" A="16">
+        <nuclearLevel id="O16_e0">
+          <mass>
+            <double label="default" value="15.994913988" unit="amu"/></mass>
+          <charge>
+            <integer label="default" value="0" unit="e"/></charge>
+          <nucleus id="o16_e0" index="0">
+            <charge>
+              <integer label="default" value="8" unit="e"/></charge>
+            <energy>
+              <double label="default" value="0.0" unit="eV"/></energy></nucleus></nuclearLevel>
+        <nuclearLevel id="O16_e3">
+          <charge>
+            <integer label="default" value="0" unit="e"/></charge>
+          <nucleus id="o16_e3" index="3">
+            <charge>
+              <integer label="default" value="8" unit="e"/></charge>
+            <energy>
+              <double label="default" value="6917100.0" unit="eV"/></energy></nucleus></nuclearLevel></isotope></chemicalElement></chemicalElements></PoPs>

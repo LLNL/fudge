@@ -60,6 +60,7 @@
 # product endorsement purposes.
 # 
 # <<END-copyright>>
+PYTHON=python
 
 .PHONY: default clean realclean
 
@@ -71,4 +72,24 @@ clean:
 realclean: clean
 
 sdist:
-	python setup.py sdist
+	$(PYTHON) setup.py sdist
+
+FUDGETESTFILES = \
+    BNL/inter/__init__.py \
+    BNL/inter/consts.py \
+    BNL/inter/datatables.py \
+    BNL/inter/html.py \
+    BNL/inter/metrics.py \
+    BNL/inter/report.py \
+    BNL/plot_evaluation/plotstyles.py \
+    BNL/pprint.py \
+    BNL/gnd_utils.py \
+    BNL/endf_utils.py \
+    BNL/test/__init__.py \
+    BNL/c4.py
+
+rebuild-test-data:
+	cd BNL/inter/testData/; python rebuild_test_data.py
+
+check: rebuild-test-data
+	for testFile in $(FUDGETESTFILES); do echo ; echo ======================================================================= ; echo \>\>\> TESTING $$testFile ; echo =======================================================================; echo ; python $$testFile; done

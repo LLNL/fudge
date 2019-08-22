@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>2. Checking ENDF or GND files &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3. Navigating" href="navigating.html" />
+    <link rel="prev" title="1. Basic translating between ENDF and GND" href="translating.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="navigating.html" title="3. Navigating"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="translating.html" title="1. Basic translating between ENDF and GND"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">The Fudge Tutorial</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="checking-endf-or-gnd-files">
+<h1>2. Checking ENDF or GND files<a class="headerlink" href="#checking-endf-or-gnd-files" title="Permalink to this headline">¶</a></h1>
+<p>Let&#8217;s face it.  ENDF evaluations often have mistakes and bugs.  Fortunately <cite>fudge</cite> comes
+armed with a large number of pre-made checks.  Running them is as simple as running the
+<code class="docutils literal"><span class="pre">check()</span></code> member function on any fudge class instance.  The quickest way to test an
+evaluation and its covariance is just to run the main <code class="docutils literal"><span class="pre">check()</span></code> function of either an
+instance of <code class="docutils literal"><span class="pre">reactionSuite</span></code> or <code class="docutils literal"><span class="pre">covarianceSuite</span></code>.  <code class="docutils literal"><span class="pre">Fudge</span></code> will then recursively descend
+through the instances and check every data member.</p>
+<div class="section" id="checking-reactionsuite-instances">
+<h2>2.1. Checking <code class="docutils literal"><span class="pre">reactionSuite</span></code> instances<a class="headerlink" href="#checking-reactionsuite-instances" title="Permalink to this headline">¶</a></h2>
+<p>Using the <code class="docutils literal"><span class="pre">myEval</span></code> and <code class="docutils literal"><span class="pre">myCov</span></code> instances from the previous tutorial, we find:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">myEval</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
+<span class="go">n + H1</span>
+<span class="go">H2 + photon</span>
+<span class="go">&lt;fudge.gnd.warning.context object at 0x101cb6190&gt;</span>
+</pre></div>
+</div>
+<p>Hmm... This doesn&#8217;t look so helpful.  This is because <code class="docutils literal"><span class="pre">fudge</span></code> understand the hierarchy
+and categorizes the errors and warnings accordingly.  Try this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">myEval</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
+<span class="go">ReactionSuite: n + H1</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 3.975% at 1000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 11.792% at 1200000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 17.839% at 1400000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 22.677% at 1600000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 26.645% at 1800000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 29.961% at 2000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 32.778% at 2200000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 35.199% at 2400000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 37.305% at 2600000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 39.151% at 2800000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 40.784% at 3000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 42.238% at 3200000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 43.540% at 3400000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 44.713% at 3600000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 45.774% at 3800000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 46.738% at 4000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 47.618% at 4200000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 48.424% at 4400000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 49.164% at 4600000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 49.845% at 4800000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 50.475% at 5000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 51.855% at 5500000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 53.007% at 6000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 53.979% at 6500000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 54.807% at 7000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 55.514% at 7500000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 56.123% at 8000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 56.647% at 8500000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 57.099% at 9000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 57.489% at 9500000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 57.824% at 10000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 58.111% at 10500000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 58.354% at 11000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 58.559% at 11500000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 58.728% at 12000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 58.865% at 12500000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 58.973% at 13000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 59.053% at 13500000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 59.107% at 14000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 59.138% at 14500000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 59.146% at 15000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 59.133% at 15500000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 59.101% at 16000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 59.049% at 16500000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 58.980% at 17000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 58.894% at 17500000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 58.792% at 18000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 58.674% at 18500000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 58.542% at 19000000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 58.396% at 19500000.0</span>
+<span class="go">WARNING: Wick&#39;s limit too low by 58.236% at 20000000.0</span>
+<span class="go">reaction label 1: H2 + gamma</span>
+<span class="go">    WARNING: Calculated and tabulated Q-values disagree: 2735357.48694634 eV vs 2224631 eV!</span>
+</pre></div>
+</div>
+<p>Much more useful.  In fact, you can loop over the warnings to look for specific ones:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">myEval</span><span class="o">.</span><span class="n">check</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="s1">&#39;Q-value&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span> <span class="n">w</span> <span class="p">):</span> <span class="nb">print</span> <span class="n">w</span>
+<span class="gp">...</span>
+<span class="go">reaction label 1: H2 + gamma</span>
+<span class="go">    WARNING: Calculated and tabulated Q-values disagree: 2735357.48694634 eV vs 2224631 eV!</span>
+</pre></div>
+</div>
+<p>In other words, the tabulated Q-value for the capture reaction (MT 102) is inconsistent with the
+value calculated from incident and outgoing particle masses.
+Note, you don&#8217;t just get the warning or error, you get the entire context in which it occurred.
+This is very useful for bug tracking. In the example above, we can tell that the problem is in the capture
+reaction by looking at the list of outgoing particles: &#8216;H2 + gamma&#8217;.</p>
+</div>
+<div class="section" id="checking-covariancesuite-instances">
+<h2>2.2. Checking <code class="docutils literal"><span class="pre">covarianceSuite</span></code> instances<a class="headerlink" href="#checking-covariancesuite-instances" title="Permalink to this headline">¶</a></h2>
+<p>The covariances have <code class="docutils literal"><span class="pre">check()</span></code> functions too and they find all sorts of stuff:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">myCov</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
+<span class="go">CovarianceSuite: n + H1</span>
+<span class="go">    Section: H2 + gamma</span>
+<span class="go">        Form covarianceMatrix:</span>
+<span class="go">            WARNING: Ratio of smallest/largest eigenvalue (2.359558e-10) is too small</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="setting-up-a-checker-script">
+<h2>2.3. Setting up a checker script<a class="headerlink" href="#setting-up-a-checker-script" title="Permalink to this headline">¶</a></h2>
+<p>We will set up a script to use <code class="docutils literal"><span class="pre">fudge</span></code> to check ENDF files.  I&#8217;ll leave to you to figure out how
+to do the same with GND files (if you do, remember to load both the evaluation and the covariance!).</p>
+<p>This is what I came up with (download it <a class="reference download internal" href="../_downloads/checkendf.py" download=""><code class="xref download docutils literal"><span class="pre">here</span></code></a>):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#! /usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">fudge.legacy.converting.endfFileToGND</span> <span class="k">import</span> <span class="n">endfFileToGND</span>
+
+<span class="c1"># Process command line options</span>
+<span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Check an ENDF file&#39;</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;inFile&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The ENDF file you want to translate and check.&#39;</span> <span class="p">)</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+<span class="c1"># Now translate</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">endfFileToGND</span><span class="p">(</span> <span class="n">args</span><span class="o">.</span><span class="n">inFile</span><span class="p">,</span> <span class="n">toStdOut</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">skipBadData</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
+<span class="n">myEval</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span>
+<span class="n">myCov</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;covarianceSuite&#39;</span><span class="p">]</span>
+<span class="nb">print</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+
+<span class="c1"># Check the evaluation</span>
+<span class="nb">print</span> <span class="s2">&quot;Checking evaluation for &quot;</span><span class="o">+</span><span class="n">args</span><span class="o">.</span><span class="n">inFile</span>
+<span class="nb">print</span> <span class="s2">&quot;------------------------------------------------&quot;</span>
+<span class="nb">print</span> <span class="n">myEval</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
+
+<span class="nb">print</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+<span class="c1"># Check the covariance</span>
+<span class="nb">print</span> <span class="s2">&quot;Checking covariances for &quot;</span><span class="o">+</span><span class="n">args</span><span class="o">.</span><span class="n">inFile</span>
+<span class="nb">print</span> <span class="s2">&quot;------------------------------------------------&quot;</span>
+<span class="nb">print</span> <span class="n">myCov</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Try it out!</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">2. Checking ENDF or GND files</a><ul>
+<li><a class="reference internal" href="#checking-reactionsuite-instances">2.1. Checking <code class="docutils literal"><span class="pre">reactionSuite</span></code> instances</a></li>
+<li><a class="reference internal" href="#checking-covariancesuite-instances">2.2. Checking <code class="docutils literal"><span class="pre">covarianceSuite</span></code> instances</a></li>
+<li><a class="reference internal" href="#setting-up-a-checker-script">2.3. Setting up a checker script</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="translating.html"
+                        title="previous chapter">1. Basic translating between ENDF and GND</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="navigating.html"
+                        title="next chapter">3. Navigating</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/checking.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="navigating.html" title="3. Navigating"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="translating.html" title="1. Basic translating between ENDF and GND"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

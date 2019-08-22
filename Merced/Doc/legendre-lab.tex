@@ -1,0 +1,222 @@
+\chapter{Legendre expansions of energy-angle probability densities
+in the laboratory frame}
+\label{Sec:Legendre-lab}
+Another representation of joint energy-angle probability densities
+$\pi(E', \mu \mid E)$ in \xendl\ is as a table of the Legendre 
+coefficients $\pi_\ell(E' \mid E)$ in the expansion
+\begin{equation}
+  \pi( E', \mu \mid E) = \sum_\ell
+  \left(
+    \ell + \frac{1}{2}
+  \right)
+  \pi_\ell( E' \mid E) P_\ell( \mu ).
+ \label{piLegendre}
+\end{equation}
+Here, $E$ denotes the energy of the incident particle in the
+laboratory frame.  For the outgoing particle, the energy $E'$ and 
+direction cosine $\mu$ may be given in either center-of-mass or laboratory
+coordinates.  The treatment of laboratory-frame data is discussed in this section, 
+center-of-mass data in the next.  Data given in the laboratory frame is
+much easier to deal with because no boost is involved.
+
+This type of data is ordered according to
+\begin{equation}
+\{ E, \{ E', \{ \pi_\ell(E' \mid E) \} \} \}.
+ \label{ENDF-I4}
+\end{equation}
+All of the data for the lowest incident energy $E$
+is given first, ordered according to outgoing energy~$E'$.  For
+given values of $E$ and $E'$, the data consist of Legendre coefficients
+$\pi_\ell(E', \mid E)$.  Note that for this data format, the number
+of Legendre coefficients may vary, depending on the energies $E$ and~$E'$.
+
+The {\gettransfer} code also handles data for Legendre expansions of
+energy-angle probability densities in the {\ENDL} format~\cite{Omega},
+\begin{equation}
+\{ \ell, \{ E, \{ E', \pi_\ell(E', \mid E) \} \} \}.
+ \label{ENDL-I4}
+\end{equation}
+That is, the $\ell = 0$ data are given first, ordered according to
+incident energy~$E$.  The data then consist of pairs
+$\{ E', \pi_\ell(E', \mid E) \}$ for given $\ell$ and $E$.
+%This data format is deprecated, however.
+
+\section{Computation of the transfer matrices for data in the laboratory frame}
+The calculation of the transfer
+matrices for laboratory-frame data proceeds as follows.
+In terms of $\pi_\ell(\Elab'   \mid E)$,
+the integral Eq.~(\ref{Inum}) for the number-preserving transfer matrix
+takes the form
+\begin{equation}
+   \Inum_{g,h,\ell} =
+     \int_{\calE_g} dE \, \sigma ( E ) M(E) w(E) \widetilde \phi_\ell(E)
+   \int_{\calE_h' } d\Elab'   \, \pi_\ell(\Elab'   \mid E),
+ \label{InumI4}
+\end{equation}
+and Eq.~(\ref{Ien}) for the energy-preserving transfer matrix becomes
+\begin{equation}
+   \Ien_{g,h,\ell} =
+     \int_{\calE_g} dE \, \sigma ( E ) M(E) w(E) \widetilde \phi_\ell(E) 
+     \int_{\calE_h' } d\Elab'   \, \pi_\ell(\Elab'   \mid E) \Elab'  .
+ \label{IenI4}
+\end{equation}
+
+Computation of the integrals Eqs.~(\ref{InumI4}) and~(\ref{IenI4})
+depends on the type of interpolation used with respect to the
+energy $E$ of the incident particle, and the procedures are
+exactly the same as for integration in Eqs.~(\ref{InumI4-0}) 
+and~(\ref{IenI4-0}) of the isotropic energy probability densities
+$\pi_0(\Elab'   \mid E)$.  Thus, if unit-base interpolation is to
+be used for $\pi_\ell(\Elab'   \mid E)$, then the map Eq.~(\ref{unitbaseMap})
+converts 
+the integrals Eqs.~(\ref{InumI4}) and~(\ref{IenI4}) to the form
+\begin{equation}
+   \Inum_{g,h,\ell} =
+     \int_{\calE_g} dE \, \sigma ( E ) M(E) w(E) \widetilde \phi_\ell(E) 
+   \int_{\widehat\calE_h' } d\widehat \Elab'   \,
+     \widehat\pi_\ell(\widehat \Elab'   \mid E)
+ \label{InumhatI4}
+\end{equation}
+and
+\begin{equation}
+   \Ien_{g,h,\ell} =
+     \int_{\calE_g} dE \, \sigma ( E ) M(E) w(E) \widetilde \phi_\ell(E) 
+   \int_{\widehat\calE_h' } d\widehat \Elab'   \,
+     \widehat\pi_\ell(\widehat \Elab'   \mid E) \Elab'  .
+ \label{IenhatI4}
+\end{equation}
+In these intergrals $\widehat\calE_h'$ denotes result of mapping the 
+outgoing energy bin $\calE_h'$ with the transformation Eq.~(\ref{unitbaseMap}).
+Furthermore, $\Elab'  $ in Eq.~(\ref{IenhatI4}) is to be obtained from $\widehat \Elab'  $
+using the inverse unit-base mapping Eq.~(\ref{unitbaseInvert}).
+
+The geometrical considerations involved in integrating 
+Eqs.~(\ref{InumhatI4}) and~(\ref{IenhatI4}) over the incident energy bin~$\calE_g$
+and the mapped outgoing energy bin~$\widehat\calE_h'$ are illustrated
+in Figure~\ref{Fig:unit-base-region}.
+
+\section{Form of the input file for Legendre coefficient data in the laboratory frame}
+These data may be input in either of two forms, the format 
+in Eq.~(\ref{ENDF-I4}) from \ENDF\ with all Legendre
+coefficients given together at each incident energy $E$ and outgoing energy~$E'$
+or that  in Eq.~(\ref{ENDL-I4}) with
+one Legendre order at a time.
+For both formats, all energies must be in the same units as the energy groups.
+
+\subsection{Input of all Legendre coefficients together}\label{Sec:ENDF-I4-data}
+For energy-angle tables in the standard format of Eq.~(\ref{ENDF-I4}), 
+the Section~\ref{data-model} line in the input
+file to identify the data is\\
+      \Input{Process: Legendre energy-angle data}{}\\
+and the model-dependent data in Section~\ref{model-info} consists of the
+Legendre coefficients $\pi_\ell(E' \mid E)$ in Eq.~(\ref{ENDF-I4}) at incident energies~$E$
+and outgoing energies~$E'$.
+
+The format for the Legendre coefficient data in
+Section~\ref{model-info} given at $K$ values of $E$ is\\
+  \Input{Product Frame: lab}{}\\
+  \Input{Legendre data by incident energy:}{$n = K$}\\
+  \Input{Incident energy interpolation:}{probability interpolation flag}\\
+  \Input{Outgoing energy interpolation:}{list interpolation flag}\\
+where the interpolation flag for incident energy is one for probability density
+tables as in Section~\ref{interp-flags-probability}, and that for outgoing energy 
+is for a simple list.
+These lines are followed by $K$ sections of the form\\
+  \Input{ Ein: $E$:}{\texttt{n = $J_k$}}\\
+for $J_k$ outgoing energies $E$.  For each value of $E$ there is
+data\\
+  \Input{  Eout: $E'$:}{\texttt{n = $L$}}\\
+with Legendre coefficients $\pi_\ell(E' \mid E)$ for $\ell = 0$, 1, \ldots\ , $L - 1$.
+
+An example of these data with energies in MeV is\\
+  \Input{Legendre data by incident energy:  n = 26}{}\\
+   \Input{Incident energy interpolation: lin-lin cumulativepoints}{}\\
+  \Input{Outgoing energy interpolation: flat}{}\\
+   \Input{Ein: 1.140200e+01:  n = 2}{}\\
+  \Input{  Eout: 0.000000e+00:  n = 5}{}\\
+ \Input{ \indent  1.000000e+11}{}\\
+ \Input{ \indent  0.000000e+00}{}\\
+ \Input{ \indent  0.000000e+00}{}\\
+   \Input{ \indent  0.000000e+00}{}\\
+   \Input{ \indent  0.000000e+00}{}\\
+    \Input{ Eout: 1.000000e-11:  n = 5}{}\\
+   \Input{ \indent  0.000000e+00}{}\\
+   \Input{ \indent  0.000000e+00}{}\\
+   \Input{ \indent  0.000000e+00}{}\\
+   \Input{ \indent  0.000000e+00}{}\\
+   \Input{ \indent  0.000000e+00}{}\\
+\Input{}{$\cdots$}\\
+   \Input{Ein: 2.000000e+01:  n = 27}{}\\
+    \Input{ Eout: 0.000000e+00:  n = 5}{}\\
+   \Input{ \indent  4.179200e-02}{}\\
+   \Input{ \indent  0.000000e+00}{}\\
+   \Input{ \indent  4.179200e-06}{}\\
+   \Input{ \indent  0.000000e+00}{}\\
+   \Input{ \indent  3.395500e-07}{}\\
+ \Input{ \indent}{ etc.}
+ 
+ \subsection{Input of one Legendre coefficient at a time}\label{sec:ENDL-I4}
+For data given one Legendre coefficient at a time as in Eq.~(\ref{ENDL-I4}),
+the line in Section~\ref{data-model} of the input
+file identifying the data is\\
+      \Input{Process: Legendre EEpP data transfer matrix}{}\\
+The first lines in the data for Section~\ref{model-info} are\\
+  \Input{Product Frame: lab}{}\\
+ \Input{LEEpPData:}{$n = L$}\\
+where $L$ is the number of Legendre coefficients, one greater than the
+order of the Legendre expansion.  The interpolation flags as
+in Section~\ref{interp-flags-probability} are\\
+   \Input{Incident energy interpolation:}{probability interpolation flag}\\
+  \Input{Outgoing energy interpolation:}{list interpolation flag}\\
+The interpolation flag for incident energy is one for probability density
+tables as in Section~\ref{interp-flags-probability}, and that for outgoing energy 
+is for a simple list.
+
+The data are then given in $L$ sections, each of the form\\
+   \Input{ order: l = $\ell$:}{\texttt{n = $K$}}\\
+where $K$ is the number of incident energies.
+For each incident energy $E'$ there is a block of data\\
+    \Input{ Ein:}{$E$: \quad \texttt{n = $J_k$}}\\
+for $J_k$ pairs of values of outgoing energy $E'$ and
+Legendre coefficient $\pi_\ell(E' \mid E)$.  For energies measured in MeV,
+these data may look like\\
+  \Input{LEEpPData: n = 4}{}\\
+  \Input{Incident energy interpolation: lin-lin unitbase}{}\\
+  \Input{Outgoing energy interpolation: lin-lin}{}\\
+  \Input{order: l = 0: n = 10}{}\\
+   \Input{Ein:  3.350000000000e+00 : n = 3}{}\\
+  \Input{ \indent   3.716500000000e-01   0.000000000000e+00}{}\\
+  \Input{ \indent   3.716800000000e-01   2.857140000000e+04}{}\\
+  \Input{ \indent   3.717200000000e-01   0.000000000000e+00}{}\\
+  \Input{Ein:  4.460200000000e+00 : n = 2}{}\\
+  \Input{ \indent   1.238900000000e-01   1.008970000000e+00}{}\\
+   \Input{ \indent  1.115000000000e+00   1.008970000000e+00}{}\\
+ \Input{$\cdots$}{}\\
+  \Input{Ein:  2.000000000000e+01 : n = 2}{}\\
+     \Input{ \indent  1.699600000000e-02  1.232820000000e-01}{}\\
+     \Input{ \indent  8.128500000000e+00  1.232820000000e-01}{}\\
+   \Input{order: l = 1: n = 10}{}\\
+    \Input{Ein:  3.350000000000e+00 : n = 3}{}\\
+     \Input{ \indent  3.716500000000e-01  0.000000000000e+00}{}\\
+     \Input{ \indent  3.716800000000e-01  2.690500000000e+04}{}\\
+     \Input{ \indent  3.717200000000e-01  0.000000000000e+00}{}\\
+\Input{$\cdots$}{}\\
+    \Input{order:l = 3: n = 10}{}\\
+    \Input{Ein:  3.350000000000e+00 : n = 3}{}\\
+     \Input{ \indent  3.716500000000e-01  0.000000000000e+00}{}\\
+     \Input{ \indent  3.716800000000e-01  2.690500000000e+04}{}\\
+     \Input{ \indent  3.717200000000e-01  0.000000000000e+00}{}\\
+\Input{$\cdots$}{}\\
+  \Input{Ein:  2.000000000000e+01 : n = 28}{}\\
+     \Input{ \indent  1.699600000000e-02  1.172400000000e-01}{}\\
+     \Input{ \indent  3.283800000000e-02 -8.646000000000e-03}{}\\
+     \Input{ \indent  4.868100000000e-02 -3.589400000000e-02}{}\\
+     \Input{ \indent  6.452400000000e-02 -4.528500000000e-02}{}\\
+     \Input{ \indent  8.036700000000e-02 -4.921500000000e-02}{}\\
+     \Input{ \indent  1.120500000000e-01 -5.186400000000e-02}{}\\
+    \Input{ \indent }{$\cdots$}\\
+    \Input{ \indent  7.082900000000e+00  7.783200000000e-02}{}\\
+     \Input{ \indent  8.128500000000e+00  1.172400000000e-01}{}
+
+ 
+ 

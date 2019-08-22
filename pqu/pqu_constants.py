@@ -61,17 +61,17 @@
 # 
 # <<END-copyright>>
 
-# Values from CODATA 2010.
+# Values from CODATA 2014.
 c = '299792458. * m / s'                  # speed of light (exact)
 mu0 = '4.e-7 * pi * N / A**2'             # permeability of vacuum
-Grav = '6.67384e-11 * m**3 / kg / s**2'   # gravitational constant
-hplanck = '6.6260693e-34 * J * s'         # Planck constant
-e = '1.60217653e-19 * C'                  # elementary charge
-me = '9.1093826e-31 * kg'                 # electron mass
-mp = '1.67262171e-27 * kg'                # proton mass
-Nav = '6.0221415e23 / mol'                # Avogadro number
-k = '1.3806505e-23 * J / K'               # Boltzmann constant
-amu = '1.66053886e-27 * kg'               # atomic mass unit
+Grav = '6.67408e-11 * m**3 / kg / s**2'   # gravitational constant
+hplanck = '6.626070040e-34 * J * s'         # Planck constant
+e = '1.6021766208e-19 * C'                  # elementary charge
+me = '9.10938356e-31 * kg'                 # electron mass
+mp = '1.672621898e-27 * kg'                # proton mass
+Nav = '6.022140857e23 / mol'                # Avogadro number
+k = '1.38064852e-23 * J / K'               # Boltzmann constant
+amu = '1.660539040e-27 * kg'               # atomic mass unit
 
 # Values from various other places.
 tsp = '4.92892159375 * ml'                # teaspoon

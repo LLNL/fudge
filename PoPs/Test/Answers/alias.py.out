@@ -1,0 +1,49 @@
+    e- True
+    e-_anti True
+    e+ True
+    e+_anti False
+    tau-_anti False
+
+========== photon and some aliases ==========
+    photon True
+    gamma False
+    x-ray False
+Now add gamma and x-ray
+    photon True
+    gamma True
+    x-ray True
+
+========== getting items ==========
+    photon: photon --> None
+    gamma: gamma --> photon
+        mass 0. amu: spin 1. hbar: parity 1.: charge 0. e: halflife stable
+    x-ray: x-ray --> photon
+
+ ---- positron ----
+<aliases>
+  <metaStable id="Am242_m1" pid="Am242_e2" metaStableIndex="1"/>
+  <particle id="electron" pid="e-"/>
+  <particle id="e+" pid="e-_anti"/>
+  <particle id="positron" pid="e-_anti"/>
+  <particle id="gamma" pid="photon"/>
+  <particle id="x-ray" pid="gamma"/>
+  <particle id="b+" pid="e-_anti"/></aliases>
+    e-: e- --> None
+        mass 5.4857990907e-4 amu: spin 0.5 hbar: parity 1.: charge -1. e: halflife stable: isAnti False
+    e-_anti: e-_anti --> None
+        mass 5.4857990907e-4 amu: spin 0.5 hbar: parity -1.: charge 1. e: halflife stable: isAnti True
+    positron: positron --> e-_anti
+        mass 5.4857990907e-4 amu: spin 0.5 hbar: parity -1.: charge 1. e: halflife stable: isAnti True
+    b+: b+ --> e-_anti
+        mass 5.4857990907e-4 amu: spin 0.5 hbar: parity -1.: charge 1. e: halflife stable: isAnti True
+
+========== meta stables ==========
+has Am True
+has Am242 True
+has Am242_e0 True
+has Am242_e1 True
+has Am242_e2 True
+has Am242_m1 True
+hasAlias Am242_m1 True
+    Am242_m1: Am242_m1 --> Am242_e2
+        spin 5. hbar: parity -1.: halflife 141. yr: isAnti False: energy 48.6 keV

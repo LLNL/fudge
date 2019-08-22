@@ -74,7 +74,7 @@ import re
 from fudge import fudgeDefaults
 
 def copyEndlHeader( Desc, Src ) :
-    "This needs to be documented."
+    """This needs to be documented."""
 
     if( not hasattr( Src, "h" ) ) :
         raise Exception( "\nError from copyEndlHeader: Source does not have a header" )
@@ -99,7 +99,7 @@ def incidentParticleTags( yi ) :
 
     yis = [ [ 0, "yi00", "u",  "unknown",  "unknown", "unknown"  ], [ 1, "yi01", "n",   "neutron",  "n",   "n"      ],
             [ 2, "yi02", "p",  "proton",   "H1",     "H1"      ], [ 3, "yi03", "d",   "deuteron", "H2",   "H2"      ],
-            [ 4, "yi04", "t",  "triton",   "H3",     "H3"      ], [ 5, "yi05", "He3", "helium3",  "He3",  "He3"     ],
+            [ 4, "yi04", "t",  "triton",   "H3",     "H3"      ], [ 5, "yi05", "h", "helium3",  "He3",  "He3"     ],
             [ 6, "yi06", "a",  "alpha",    "He",      "He4"     ], [ 7, "yi07", "g",   "gamma",    "gamma", "gamma"    ],
             [ 8, "yi08", "e+", "positron", "b+",      "positron" ], [ 9, "yi09", "e-",  "electron", "b-",    "electron" ] ]
     for y in yis :
@@ -139,11 +139,11 @@ def intZASuffix( ZA_ii ) :
             if ( len( ZA_i ) > 8 ) and ( ZA_i[8] != "/" ) : Suffix = ZA_i[8:]
     elif ( type( ZA_i ) == type( 1 ) ) :
         ZA = int( ZA_i )
-    if( ZA == None ) : raise Exception( "\nError in intZA: invalid ZA = %s" % `ZA_i` )
+    if( ZA is None ) : raise Exception( "\nError in intZA: invalid ZA = %s" % `ZA_i` )
     return ( ZA, Suffix ) 
 
 def intZA( ZA_i ) :
-    "Returns the ZA part of intZASuffix( ZA_i )."
+    """Returns the ZA part of intZASuffix( ZA_i )."""
 
     return intZASuffix( ZA_i )[0]
 
@@ -165,9 +165,9 @@ def strZASuffix( ZA, suffix = "" ) :
     return strZA
 
 def getmodestring_( I, callingRoutine ) :
-    "For internal use only."
+    """For internal use only."""
 
-    if ( I in [ 0, 7, 9, 10, 11, 12, 13, 80, 89, 90, 91, 92, 941, 942, 951 ] ) :
+    if ( I in [ 0, 7, 9, 10, 11, 12, 13, 30, 32, 80, 89, 90, 91, 92, 941, 942, 951 ] ) :
         s = "2"
     elif ( I in [ 1, 21, 22, 81, 84, 952 ] ) :
         s = "3"
@@ -178,7 +178,7 @@ def getmodestring_( I, callingRoutine ) :
     return s
 
 def getNumberOfColumns_( I, callingRoutine ) :
-    "For internal use only."
+    """For internal use only."""
 
     return int( getmodestring_( I, callingRoutine )[0] )
 
@@ -188,19 +188,19 @@ def processDataBase( database, oldFile, newFile, options = "", defines = [], bdf
     ndfgenFile = ""
     mcfgenFile = ""
     endepFile = ""
-    if( bdflsFile != None ) :
+    if( bdflsFile is not None ) :
         bdflsName = os.path.join( database, 'bdfls' )
         if( os.path.exists( bdflsName ) ) :
             if( not os.path.islink( bdflsName ) ) : raise Exception( '\nError in processDataBase: bdfls file already exists.' )
             os.system( 'rm -f ' + bdflsName )
         os.system( 'ln -s %s %s' % ( os.path.realpath( bdflsFile ), bdflsName ) )
-    if( ndfgen != None ) :
+    if( ndfgen is not None ) :
         if( not os.path.exists( ndfgen ) ) : raise Exception( 'Error in processDataBase: ndfgen does not exists at %s.' % ndfgen )
         ndfgenFile = ' -ndfgen %s' % os.path.realpath( ndfgen )
-    if( mcfgen != None ) :
+    if( mcfgen is not None ) :
         if( not os.path.exists( mcfgen ) ) : raise Exception( 'Error in processDataBase: mcfgen does not exists at %s.' % mcfgen )
         mcfgenFile = ' -mcfgen %s' % os.path.realpath( mcfgen )
-    if( endep != None ) :
+    if( endep is not None ) :
         if( not os.path.exists( endep ) ) : raise Exception( 'Error in processDataBase: endep does not exists at %s.' % endep )
         endepFile = ' -endep %s' % os.path.realpath( endep )
     ds = ""
@@ -220,7 +220,7 @@ def processDataBase( database, oldFile, newFile, options = "", defines = [], bdf
     if( status != 0 ) : raise Exception( "\nError in processDataBase: endlmod.com failed" )
 
 def headerFunkyDouble2String( d ) :
-    "For internal use only."
+    """For internal use only."""
 
     nines = 9.999                       # Must be less than 15 nines otherwise log10 may not return as excepted.
     maxValue, abs_d = nines * 1e10, abs( d )
@@ -242,7 +242,7 @@ def headerFunkyDouble2String( d ) :
     return s
 
 def headerString2FunkyDouble( s, i, callingRoutine, newMethod = True ) :
-    "For internal use only."
+    """For internal use only."""
 
     if( newMethod ) :
         fd = s[i:i+11]
@@ -280,7 +280,7 @@ def headerString2FunkyDouble( s, i, callingRoutine, newMethod = True ) :
     return( d )
 
 def getFullPath( file, path = None ) :
-    "For internal use only."
+    """For internal use only."""
 
     if ( type( file ) != type( "" ) ) : raise Exception( "\nError in getFullPath: file name is not a string" )
     if ( len( file ) < 1 ) : raise Exception( "\nError in getFullPath: file name is an empty string" )
@@ -290,7 +290,7 @@ def getFullPath( file, path = None ) :
         f = os.path.expanduser( file )
     elif ( os.path.exists( file ) ) :
         f = os.path.abspath( file )
-    elif ( ( file[:2] != "./" ) and ( path != None ) ) :
+    elif ( ( file[:2] != "./" ) and ( path is not None ) ) :
         if ( type( path ) != type( "" ) ) : raise Exception( "\nError in getFullPath: path name is not a string" )
         if ( len( path ) < 1 ) : raise Exception( "\nError in getFullPath: path name is an empty string" )
         f = os.path.join( path, file )
@@ -323,18 +323,18 @@ def appendyiDirIfNeeded( path, yi ) :
     return path
 
 def validZADirectoryName_( name ) :
-    "For internal use only."
+    """For internal use only."""
 
     if ( ( re.match( r"za\d\d\d\d\d\d$", name ) ) or ( re.match( r"za\d\d\d\d\d\dm", name ) ) ) : return 1
     return 0
 
 def check_mapMuEpToGrid( data ) :
-    "For internal use only."
+    """For internal use only."""
 
     E = None
     for d in data.data :
         if ( E != d[0] ) :
-            if ( E != None ) :  print "E =", E, "  Sum =", s / 2.
+            if ( E is not None ) :  print "E =", E, "  Sum =", s / 2.
             E = d[0]
             Ep2 = d[1]
             P2 = d[2]
@@ -345,17 +345,17 @@ def check_mapMuEpToGrid( data ) :
             P1 = P2
             P2 = d[2]
             s += ( P2 + P1 ) * ( Ep2 - Ep1 )
-    if ( E != None ) : print "E =", E, "  Sum =", s / 2.
+    if ( E is not None ) : print "E =", E, "  Sum =", s / 2.
 
 def simplifyDataLine( l, n, callingRoutine, comment ) :
-    "For internal use only."
+    """For internal use only."""
 
     ls = string.split( l, comment )[0]
     ls = string.replace( ls, ",", " " )
     ls = string.replace( ls, "\t", " " )
     if ( ls == "" ) : return None
     v = string.split( ls )
-    if( ( n != None ) and ( len( v ) != n ) ) :
+    if( ( n is not None ) and ( len( v ) != n ) ) :
         raise Exception( "\nError in %s: line has %d values, expected %d\n%s" % ( callingRoutine, len( v ), n, l ) )
     return v
 
@@ -367,7 +367,7 @@ def getFormat( self ) :
 
     try :
         format = self.getFormat( )
-        if( ( format == None ) or ( type( format ) == type( '' ) ) ) : return( format )
+        if( ( format is None ) or ( type( format ) == type( '' ) ) ) : return( format )
         if( format == 12 ) :
             format = None
         else :
@@ -400,8 +400,8 @@ else a raise is issued.  The x-component is column i0."""
     n = None
     for l in ls :
         sl = simplifyDataLine( l, n, "translate1dStringData", comment )
-        if( sl != None ) :
-            if( n == None ) : n = len( sl )
+        if( sl is not None ) :
+            if( n is None ) : n = len( sl )
             d1.append( float( sl[i0] ) )
     return d1
 
@@ -436,8 +436,8 @@ y-component is column i1 (i0 and i1 can only be 0 or 1)."""
     for l in ls :
         if ( ConvertDs ) : l = re.sub( r'[D]', 'E', l )
         sl = simplifyDataLine( l, 2, "translate2dStringData", comment )
-        if( sl != None ) : 
-            if( n == None ) : n = len( sl )
+        if( sl is not None ) : 
+            if( n is None ) : n = len( sl )
             d2.append( [ float( sl[i0] ), float( sl[i1] ) ] )
     return d2
 
@@ -467,11 +467,11 @@ the z-component is column i2 (i0, i1 and i2 can only be 0, 1 or 2)."""
     for d in data :
         x = d[i0]
         if ( x != x0 ) :
-            if ( x0 != None ) : d3.append( [ x0, d2 ] )
+            if ( x0 is not None ) : d3.append( [ x0, d2 ] )
             d2 = []
             x0 = x
         d2.append( [ d[i1], d[i2] ] )
-    if ( x0 != None ) : d3.append( [ x, d2 ] )
+    if ( x0 is not None ) : d3.append( [ x, d2 ] )
     return d3
 
 def translate3dStringData( ls, comment = "#", i0 = 0, i1 = 1, i2 = 2 ) :
@@ -493,15 +493,15 @@ is column i1 and the z-component is column i2 (i0, i1 and i2 can only be 0, 1 or
     n = None
     for l in ls :
         sl = simplifyDataLine( l, 3, "translate3dStringData", comment )
-        if( sl != None ) :
-            if( n == None ) : n = len( sl )
+        if( sl is not None ) :
+            if( n is None ) : n = len( sl )
             x = float( sl[i0] )
             if ( x != x0 ) :
-                if ( x0 != None ) : d3.append( [ x0, d2 ] )
+                if ( x0 is not None ) : d3.append( [ x0, d2 ] )
                 d2 = []
                 x0 = x
             d2.append( [ float( sl[i1] ), float( sl[i2] ) ] )
-    if ( x0 != None ) : d3.append( [ x, d2 ] )
+    if ( x0 is not None ) : d3.append( [ x, d2 ] )
     return d3
 
 def print3dData( d, i0 = 0, i1 = 1, i2 = 2, fmt0 = None, fmt1 = None, fmt2 = None ) :
@@ -518,9 +518,9 @@ def string3dData( d, i0 = 0, i1 = 1, i2 = 2, fmt0 = None, fmt1 = None, fmt2 = No
     i.sort( )
     if ( i[0] != 0 ) or ( i[1] != 1 ) or ( i[2] != 2 ) :
         raise Exception( "\nError in endlmisc.string3dData: Invalid i0 = %s, i1 = %s and/or i2 = %s value(s)" % ( `i0`, `i1`, `i2` ) )
-    if( fmt0 == None ) : fmt0 = endl3dmathmisc.endl3d_repr_xFormat
-    if( fmt1 == None ) : fmt1 = endl3dmathmisc.endl3d_repr_yFormat
-    if( fmt2 == None ) : fmt2 = endl3dmathmisc.endl3d_repr_zFormat
+    if( fmt0 is None ) : fmt0 = endl3dmathmisc.endl3d_repr_xFormat
+    if( fmt1 is None ) : fmt1 = endl3dmathmisc.endl3d_repr_yFormat
+    if( fmt2 is None ) : fmt2 = endl3dmathmisc.endl3d_repr_zFormat
     fmt = [ fmt0, fmt1, fmt2 ]
     s = []
     sa = [ "", "", "" ]
@@ -562,8 +562,8 @@ z-component is column i2 and the zz-component is column i3
         x = d[i0]
         y = d[i1]
         if ( x != x0 ) :
-            if ( y0 != None ) : d3.append( [ y0, d2 ] )
-            if ( x0 != None ) : d4.append( [ x0, d3 ] )
+            if ( y0 is not None ) : d3.append( [ y0, d2 ] )
+            if ( x0 is not None ) : d4.append( [ x0, d3 ] )
             d2 = []
             d3 = []
             x0 = x
@@ -573,8 +573,8 @@ z-component is column i2 and the zz-component is column i3
             d2 = []
             y0 = y
         d2.append( [ d[i2], d[i3] ] )
-    if ( y0 != None ) : d3.append( [ y0, d2 ] )
-    if ( x0 != None ) : d4.append( [ x0, d3 ] )
+    if ( y0 is not None ) : d3.append( [ y0, d2 ] )
+    if ( x0 is not None ) : d4.append( [ x0, d3 ] )
     return d4
 
 def translate4dStringData( ls, comment = "#", i0 = 0, i1 = 1, i2 = 2, i3 = 3 ) :
@@ -600,13 +600,13 @@ is column i1, the z-component is column i2 and the zz-component is column i3
     n = None
     for l in ls :
         sl = simplifyDataLine( l, 4, "translate4dStringData", comment )
-        if( sl != None ) :
-            if( n == None ) : n = len( sl )
+        if( sl is not None ) :
+            if( n is None ) : n = len( sl )
             x = float( sl[i0] )
             y = float( sl[i1] )
             if ( x != x0 ) :
-                if ( y0 != None ) : d3.append( [ y0, d2 ] )
-                if ( x0 != None ) : d4.append( [ x0, d3 ] )
+                if ( y0 is not None ) : d3.append( [ y0, d2 ] )
+                if ( x0 is not None ) : d4.append( [ x0, d3 ] )
                 d2 = []
                 d3 = []
                 x0 = x
@@ -616,8 +616,8 @@ is column i1, the z-component is column i2 and the zz-component is column i3
                 d2 = []
                 y0 = y
             d2.append( [ float( sl[i2] ), float( sl[i3] ) ] )
-    if ( y0 != None ) : d3.append( [ y0, d2 ] )
-    if ( x0 != None ) : d4.append( [ x0, d3 ] )
+    if ( y0 is not None ) : d3.append( [ y0, d2 ] )
+    if ( x0 is not None ) : d4.append( [ x0, d3 ] )
     return d4
 
 def print4dData( d, i0 = 0, i1 = 1, i2 = 2, i3 = 3, fmt0 = None, fmt1 = None, fmt2 = None, fmt3 = None ) :
@@ -634,10 +634,10 @@ def string4dData( d, i0 = 0, i1 = 1, i2 = 2, i3 = 3, fmt0 = None, fmt1 = None, f
     i.sort( )
     if ( i[0] != 0 ) or ( i[1] != 1 ) or ( i[2] != 2 ) or ( i[3] != 3 ) :
         raise Exception( "\nError in endlmisc.string4dData: %s" % "Invalid i0 = %s, i1 = %s, i2 = %s, and/or i3 = %s" % (`i0`,`i1`,`i2`,`i3`) )
-    if( fmt0 == None ) : fmt0 = endl4dmathmisc.endl4d_repr_tFormat
-    if( fmt1 == None ) : fmt1 = endl4dmathmisc.endl4d_repr_xFormat
-    if( fmt2 == None ) : fmt2 = endl4dmathmisc.endl4d_repr_yFormat
-    if( fmt3 == None ) : fmt3 = endl4dmathmisc.endl4d_repr_zFormat
+    if( fmt0 is None ) : fmt0 = endl4dmathmisc.endl4d_repr_tFormat
+    if( fmt1 is None ) : fmt1 = endl4dmathmisc.endl4d_repr_xFormat
+    if( fmt2 is None ) : fmt2 = endl4dmathmisc.endl4d_repr_yFormat
+    if( fmt3 is None ) : fmt3 = endl4dmathmisc.endl4d_repr_zFormat
     fmt = [ fmt0, fmt1, fmt2, fmt3 ]
     s = []
     sa = [ "", "", "", "" ]
@@ -652,7 +652,7 @@ def string4dData( d, i0 = 0, i1 = 1, i2 = 2, i3 = 3, fmt0 = None, fmt1 = None, f
     return s
 
 def stringWithPrefixSuffix( list, Prefix = "", Suffix = "" ) :
-    "For internal use only."
+    """For internal use only."""
 
     PS = "\n"
     if( len( list ) > 0 ) :
@@ -684,7 +684,7 @@ class endlCheckerObject :
         self.Q = Q
         self.message = message
         self.indentation = '  '
-        if( data != None ) :
+        if( data is not None ) :
             self.yi = data.yi
             self.ZA = data.ZA
             self.yo = data.yo
@@ -775,8 +775,8 @@ class endlCheckerObject :
             s = str( s )
             return( s )
 
-        if( indentation == None ) : indentation = self.indentation
-        if( subIndentation == None ) : subIndentation = self.indentation
+        if( indentation is None ) : indentation = self.indentation
+        if( subIndentation is None ) : subIndentation = self.indentation
         s = []
         if( self.message != '' ) :
             yi = toInt( self.yi, -2 )

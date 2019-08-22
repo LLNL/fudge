@@ -65,28 +65,35 @@
 This module adds the method toACE to the classes in the fudge.gnd.productData.distributions.angularEnergy module.
 """
 
-from xData import axes, XYs, W_XYs
-from fudge.gnd.productData.distributions import angularEnergy
+from xData import standards as standardsModule
+from xData import axes as axesModule
+from xData import XYs as XYsModule
+from xData import multiD_XYs as multiD_XYsModule
 
+from fudge.gnd.productData.distributions import angularEnergy as angularEnergyModule
 
-class angularFor_angularEnergy( W_XYs.W_XYs ) :
+class angularFor_angularEnergy( multiD_XYsModule.XYs2d ) :
 
-    def __init__( self, angularEnergy_ ) :
+    def __init__( self, angularEnergy ) :
 
-        self.productFrame = angularEnergy_.getProductFrame( )
-        axes_ = axes.defaultAxes( 3 )
-        axes_[0] = angularEnergy_.axes[0]
-        axes_[1] = angularEnergy_.axes[1]
-        axes_[2] = axes.axis( "P(mu|energy_in)", 2, "" )
-        W_XYs.W_XYs.__init__( self, axes_ )
+        self.__productFrame = angularEnergy.productFrame
+        axes = axesModule.defaultAxes( 3 )
+        axes2d[2] = angularEnergy.axes[2]
+        axes2d[1] = angularEnergy.axes[1]
+        axes2d[0] = axesModule.axis( "P(mu|energy_in)", 0, "" )
+        axes1d = XYsModule.XYs1d.defaultAxes( )
+        axes1d[0] = axes2d[0]
+        axes1d[1] = axes2d[1]
+        multiD_XYsModule.XYs2d.__init__( self, axes = axes2d )
 
-        for w_xys in angularEnergy_ :
-            P_mu = [ [ xys.value, xys.integrate( ) ] for xys in w_xys ]
-            self.append( XYs.XYs( XYs.XYs.defaultAxes( ), P_mu, 1e-3, value = w_xys.value ) )
+        for P_EpGivenMu in angularEnergy :
+            P_mu = [ [ xys.value, xys.integrate( ) ] for xys in P_EpGivenMu ]
+            self.append( XYsModule.XYs1d( data = P_mu, axes = axes1d, accuracy = 1e-3, value = P_EpGivenMu.value ) )
 
-    def getProductFrame( self ) :
+    @property
+    def productFrame( self ) :
 
-        return( self.productFrame )
+        return( self.__productFrame )
 
     def isIsotropic( self ) :
 
@@ -98,28 +105,28 @@ def toACE( self, label, offset, weight, **kwargs ) :
     e_inFactor, e_outFactor = self.domainUnitConversionFactor( 'MeV' ), self.axes[2].unitConversionFactor( 'MeV' )
 
     INTE = -1
-    independent, dependent, qualifier = self.axes[0].interpolation.getInterpolationTokens( )
-    if( dependent == axes.flatToken ) :
+    interpolation = self.interpolation
+    if( interpolation == standardsModule.interpolation.flatToken ) :
         INTE = 1
-    elif( independent == dependent == axes.linearToken ) :
+    elif( interpolation == standardsModule.interpolation.linearToken ) :
         INTE = 2
-    if( INTE == -1 ) : raise Exception( 'Interpolation "%s, %s" not supported for incident energy' % ( independent, dependent ) )
+    if( INTE == -1 ) : raise Exception( 'Interpolation "%s" not supported for incident energy' % interpolation )
 
     INTMU = -1
-    independent, dependent, qualifier = self.axes[1].interpolation.getInterpolationTokens( )
-    if( dependent == axes.flatToken ) :
+    interpolation = self[0].interpolation
+    if( interpolation == standardsModule.interpolation.flatToken ) :
         INTMU = 1
-    elif( independent == dependent == axes.linearToken ) :
+    elif( interpolation == standardsModule.interpolation.linlinToken ) :
         INTMU = 2
-    if( INTMU == -1 ) : raise Exception( 'Interpolation "%s, %s" not supported for outgoing energy' % ( independent, dependent ) )
+    if( INTMU == -1 ) : raise Exception( 'Interpolation "%s" not supported for outgoing energy' % interpolation )
 
     INTEP = -1
-    independent, dependent, qualifier = self.axes[1].interpolation.getInterpolationTokens( )
-    if( dependent == axes.flatToken ) :
+    interpolation = self[0][0].interpolation
+    if( interpolation == standardsModule.interpolation.flatToken ) :
         INTEP = 1
-    elif( independent == dependent == axes.linearToken ) :
+    elif( interpolation == standardsModule.interpolation.linearToken ) :
         INTEP = 2
-    if( INTEP == -1 ) : raise Exception( 'Interpolation "%s, %s" not supported for outgoing energy' % ( independent, dependent ) )
+    if( INTEP == -1 ) : raise Exception( 'Interpolation "%s" not supported for outgoing energy' % interpolation )
 
     NE, e_ins, Ls, MuData = len( self ), [], [], []
     offset += len( header ) + 3 + 1 + 2 * NE + 1        # header length plus NR, NE, Es, Ls, (1-based).
@@ -129,11 +136,11 @@ def toACE( self, label, offset, weight, **kwargs ) :
 
         NMU, XMU, LMU, EpPData = len( w_xys ), [], [], []
         offset_LC = Ls[-1] + 1 + 2 * NMU
-        for i1, xys_ in enumerate( w_xys ) :
-            XMU.append( xys_.value )
+        for i1, _xys in enumerate( w_xys ) :
+            XMU.append( _xys.value )
             LMU.append( offset_LC + len( EpPData ) )
 
-            xys = xys_.normalize( )
+            xys = _xys.normalize( )
             cdfOfEps = xys.runningIntegral( )
             cdfOfEps[-1] = 1.
             Eps, pdfOfEps = [], []
@@ -145,4 +152,4 @@ def toACE( self, label, offset, weight, **kwargs ) :
 
     return( header + [ 1, NE, INTE, NE ] + e_ins + Ls + MuData )
 
-angularEnergy.pointwise.toACE = toACE
+angularEnergyModule.XYs3d.toACE = toACE

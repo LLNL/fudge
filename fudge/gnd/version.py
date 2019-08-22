@@ -64,5 +64,5 @@
 """Define the version number for GND (not the same as the Fudge version number)."""
 
 GND_MAJORVERSION = 1
-GND_MINORVERSION = 7
+GND_MINORVERSION = 8
 GND_VERSION = "GND %s.%s" % ( GND_MAJORVERSION, GND_MINORVERSION )

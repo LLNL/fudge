@@ -1,0 +1,2043 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.endl.endlIClasses &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.legacy.endl.endlIClasses</h1><div class="highlight"><pre>
+<span></span># &lt;&lt;BEGIN-copyright&gt;&gt;
+# &lt;&lt;END-copyright&gt;&gt;
+
+&quot;&quot;&quot;
+This module contains all the classes for the various types of ENDL I data.
+&quot;&quot;&quot;
+
+import copy
+
+import endl2dmathClasses, endl2dmathmisc, endl3dmathClasses, endl3dmathmisc, endl4dmathClasses, endl4dmathmisc
+import endlmath
+from fudge.core.utilities import fudgeExceptions
+from fudge.vis.gnuplot import plotbase
+import endlIClassesParameters
+import endlNd
+import endlmisc
+import endlParameters
+from endl2 import yoToZA
+
+normCheckTolerance = 1e-5
+fixThresholdMode_None = endlIClassesParameters.fixThresholdMode_None
+fixThresholdMode_RaiseOnly = endlIClassesParameters.fixThresholdMode_RaiseOnly
+fixThresholdMode_All = endlIClassesParameters.fixThresholdMode_All
+fixThreshold_deltaFunctionEpsilon = 1e-4
+
+<div class="viewcode-block" id="endlAddIObject"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlAddIObject">[docs]</a>def endlAddIObject( f, yo, C, I, S, h, points, bdflsFile = None ) :
+    &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+    if   ( I ==   0 ) : return endlI0( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==   7 ) : return endlI7( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==   9 ) : return endlI9( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==  10 ) : return endlI10( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==  11 ) : return endlI11( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==  12 ) : return endlI12( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==  13 ) : return endlI13( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==  20 ) : return endlI20( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==  80 ) : return endlI80( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==  89 ) : return endlI89( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==  90 ) : return endlI90( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==  91 ) : return endlI91( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==  92 ) : return endlI92( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I == 941 ) : return endlI941( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I == 942 ) : return endlI942( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==   1 ) : return endlI1( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==  21 ) : return endlI21( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==  22 ) : return endlI22( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==  81 ) : return endlI81( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==  84 ) : return endlI84( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==   3 ) : return endlI3( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    elif ( I ==   4 ) : return endlI4( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+    else : raise Exception( &quot;\nError in endlIClasses.endlAddIObject: I = %d not supported&quot; % I )</div>
+
+<div class="viewcode-block" id="endlI0"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI0">[docs]</a>class endlI0( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
+    &quot;&quot;&quot;This class is for the I = 0 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI0 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
+
+        self.name = &#39;crossSection&#39;
+        endlNd.endlNd.__init__( self, f, 0, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+        self.variablesUnits = &#39;energy_in[MeV];cross_section[barn]&#39;
+
+<div class="viewcode-block" id="endlI0.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI0.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Calls the endl2dmathmisc.check2dData function and returns a list of endlCheckerObject instances.
+        See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        n, dummy, messages2d = endl2dmathmisc.check2dData( self.data, allowZeroX = allowZeroE, positiveY = True, printWarning = printWarning, \
+            printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages2d ) &gt; 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI0.fixThreshold"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI0.fixThreshold">[docs]</a>    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+        &quot;&quot;&quot;Calls endlIClasses.fixThresholdFor2d to fix threshold.&quot;&quot;&quot;
+
+        fixThresholdFor2d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, 0., EMin = EMin, fixThresholdMode = fixThresholdMode, 
+            threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )</div>
+
+<div class="viewcode-block" id="endlI0.getEMin_EMinNext"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI0.getEMin_EMinNext">[docs]</a>    def getEMin_EMinNext( self ) :
+        &quot;&quot;&quot;Gets the first two Energy values from self&#39;s data. None is return for any absent value.&quot;&quot;&quot;
+
+        EMin = self.xMin( )
+        EMinNext = None
+        if( len( self.data ) &gt; 1 ) : EMinNext = self.data[1][0]
+        return( EMin, EMinNext )</div>
+
+<div class="viewcode-block" id="endlI0.getThresholdsForChecker"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI0.getThresholdsForChecker">[docs]</a>    def getThresholdsForChecker( self ) :
+        &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+        return( getThresholdsForChecker2d( self ) )</div>
+
+<div class="viewcode-block" id="endlI0.heat"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI0.heat">[docs]</a>    def heat( self, T, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.002, heatAllPoints = False, doNotThin = True, EMin = 1e-11, 
+        heatBelowThreshold = True, removeClosePoints = True, heatAllEDomain = True ) :
+        &quot;&quot;&quot;Calls crossSectionAdjustForHeatedTarget with self&#39;s data. Returns an endl2dmath
+    instance. See module crossSectionAdjustForHeatedTarget for more details.&quot;&quot;&quot;
+
+        TData = self.getTemperature( )
+        if( TData &gt; T ) : raise Exception( &quot;\nError in endlI0.heat: temperature  = %e must be greater than data&#39;s temperature = %e&quot; % ( T, TData ) )
+        unheated = self.copyData( )
+        unheated.trim( )
+        dT = T - TData
+        if( ( len( self ) &gt; 1 ) and ( dT &gt; 0. ) ) :
+            massRatio = self.bdflsFile.mass( self.ZA ) / self.bdflsFile.mass( self.yi )
+            if( lowerlimit is None ) :
+                lowerlimit = &quot;oneOverV&quot;
+                if( self.C == 10 ) : lowerlimit = &quot;constant&quot;
+                elif ( unheated.xMin( ) &gt; 1e-8 ) : lowerlimit = &quot;threshold&quot;
+            if( upperlimit is None ) : upperlimit = &#39;constant&#39;
+            if( not heatBelowThreshold ) : EMin = max( unheated.data[0][0], EMin )
+            from crossSectionAdjustForHeatedTarget import heat as heatModule
+            d  = heatModule.crossSectionAdjustForHeatedTarget( massRatio, dT, EMin, unheated.data, lowerlimit = lowerlimit, \
+                upperlimit = upperlimit, interpolationAccuracy = interpolationAccuracy, heatAllPoints = heatAllPoints, doNotThin = doNotThin,
+                heatAllEDomain = heatAllEDomain )
+            heated = endl2dmathClasses.endl2dmath( d )
+            if( removeClosePoints ) : heated.removeClosePoints( )
+        else :
+            heated = unheated
+        I0 = endlI0( None, self.yo, self.C, self.I, self.S, self.h, heated, bdflsFile = self.bdflsFile )
+        if( dT &lt; 0 ) : 
+            I0.setTemperature( TData )
+        else :
+            I0.setTemperature( T )
+        return( I0 )</div>
+
+<div class="viewcode-block" id="endlI0.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI0.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;cross section (barn)&quot;, interpolation = 0 ) :
+
+        endl2dmathClasses.endl2dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, interpolation = interpolation )</div>
+
+<div class="viewcode-block" id="endlI0.toZAsFrame"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI0.toZAsFrame">[docs]</a>    def toZAsFrame( self, newProjectileMass, newTargetMass, halflife, bdflsFile, ELevel = 0. ) :
+
+        newI0, r = toZAsFrameMisc( endlI0, self, newProjectileMass, newTargetMass, ELevel, halflife, bdflsFile, True )
+        return( [ newI0 ] )</div></div>
+
+<div class="viewcode-block" id="endlI7"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI7">[docs]</a>class endlI7( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
+    &quot;&quot;&quot;This class is for the I = 7 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI7 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
+
+        self.name = &#39;multiplicity&#39;
+        endlNd.endlNd.__init__( self, f, 7, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+        self.variablesUnits = &#39;energy_in[MeV];multiplicity&#39;
+
+<div class="viewcode-block" id="endlI7.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI7.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Calls the endl2dmathmisc.check2dData function and returns a list of endlCheckerObject instances.
+        See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        n, dummy, messages2d = endl2dmathmisc.check2dData( self.data, allowZeroX = allowZeroE, positiveY = True, printWarning = printWarning, \
+            printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages2d ) &gt; 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI7.fixThreshold"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI7.fixThreshold">[docs]</a>    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+        &quot;&quot;&quot;Calls endlIClasses.fixThresholdFor2d to fix threshold.&quot;&quot;&quot;
+
+        fixThresholdFor2d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, None, EMin = EMin, fixThresholdMode = fixThresholdMode, 
+            threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )</div>
+
+<div class="viewcode-block" id="endlI7.getEMin_EMinNext"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI7.getEMin_EMinNext">[docs]</a>    def getEMin_EMinNext( self ) :
+        &quot;&quot;&quot;Gets the first two Energy values from self&#39;s data. None is return for any absent value.&quot;&quot;&quot;
+
+        EMin = self.xMin( )
+        EMinNext = None
+        if( len( self.data ) &gt; 1 ) : EMinNext = self.data[1][0]
+        return( EMin, EMinNext )</div>
+
+<div class="viewcode-block" id="endlI7.getThresholdsForChecker"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI7.getThresholdsForChecker">[docs]</a>    def getThresholdsForChecker( self ) :
+        &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+        return( getThresholdsForChecker2d( self ) )</div>
+
+<div class="viewcode-block" id="endlI7.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI7.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;nu_bar&quot;, interpolation = 0 ) :
+
+        endl2dmathClasses.endl2dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI9"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI9">[docs]</a>class endlI9( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
+    &quot;&quot;&quot;This class is for the I = 9 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI9 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
+
+        self.name = &#39;multiplicity&#39;
+        endlNd.endlNd.__init__( self, f, 9, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+        self.variablesUnits = &#39;energy_in[MeV];multiplicity&#39;
+
+<div class="viewcode-block" id="endlI9.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI9.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Calls the endl2dmathmisc.check2dData function and returns a list of endlCheckerObject instances.
+        See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        n, dummy, messages2d = endl2dmathmisc.check2dData( self.data, allowZeroX = allowZeroE, positiveY = True, printWarning = printWarning, \
+            printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages2d ) &gt; 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI9.fixThreshold"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI9.fixThreshold">[docs]</a>    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+        &quot;&quot;&quot;Calls endlIClasses.fixThresholdFor2d to fix threshold.&quot;&quot;&quot;
+
+        fixThresholdFor2d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, None, EMin = EMin, fixThresholdMode = fixThresholdMode,
+            threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )</div>
+
+<div class="viewcode-block" id="endlI9.getEMin_EMinNext"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI9.getEMin_EMinNext">[docs]</a>    def getEMin_EMinNext( self ) :
+        &quot;&quot;&quot;Gets the first two Energy values from self&#39;s data. None is return for any absent value.&quot;&quot;&quot;
+
+        EMin = self.xMin( )
+        EMinNext = None
+        if( len( self.data ) &gt; 1 ) : EMinNext = self.data[1][0]
+        return( EMin, EMinNext )</div>
+
+<div class="viewcode-block" id="endlI9.getThresholdsForChecker"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI9.getThresholdsForChecker">[docs]</a>    def getThresholdsForChecker( self ) :
+        &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+        return( getThresholdsForChecker2d( self ) )</div>
+
+<div class="viewcode-block" id="endlI9.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI9.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;multiplicity&quot;, interpolation = 0 ) :
+
+        endl2dmathClasses.endl2dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, interpolation = interpolation )</div>
+
+
+<div class="viewcode-block" id="endlI9.toZAsFrame"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI9.toZAsFrame">[docs]</a>    def toZAsFrame( self, newProjectileMass, newTargetMass, halflife, bdflsFile, ELevel = 0. ) :
+
+        newI9, r = toZAsFrameMisc( endlI9, self, newProjectileMass, newTargetMass, ELevel, halflife, bdflsFile, True )
+        return( [ newI9 ] )</div></div>
+
+<div class="viewcode-block" id="endlI10"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI10">[docs]</a>class endlI10( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
+    &quot;&quot;&quot;This class is for the I = 10 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI10 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
+
+        from fudge import gnd
+
+        self.name = gnd.productData.energyDeposition.component.moniker
+        endlNd.endlNd.__init__( self, f, 10, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+        self.variablesUnits = &#39;energy_in[MeV];energy_deposition[MeV]&#39;
+
+<div class="viewcode-block" id="endlI10.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI10.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Calls the endl2dmathmisc.check2dData function and returns a list of endlCheckerObject instances.
+        See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        n, dummy, messages2d = endl2dmathmisc.check2dData( self.data, allowZeroX = allowZeroE, positiveY = True, printWarning = printWarning, \
+            printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages2d ) &gt; 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI10.fixThreshold"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI10.fixThreshold">[docs]</a>    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+        &quot;&quot;&quot;Calls endlIClasses.fixThresholdFor2d to fix threshold.&quot;&quot;&quot;
+
+        fixThresholdFor2d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, None, EMin = EMin, fixThresholdMode = fixThresholdMode,
+            threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )</div>
+
+<div class="viewcode-block" id="endlI10.getEMin_EMinNext"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI10.getEMin_EMinNext">[docs]</a>    def getEMin_EMinNext( self ) :
+        &quot;&quot;&quot;Gets the first two Energy values from self&#39;s data. None is return for any absent value.&quot;&quot;&quot;
+
+        EMin = self.xMin( )
+        EMinNext = None
+        if( len( self.data ) &gt; 1 ) : EMinNext = self.data[1][0]
+        return( EMin, EMinNext )</div>
+
+<div class="viewcode-block" id="endlI10.getThresholdsForChecker"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI10.getThresholdsForChecker">[docs]</a>    def getThresholdsForChecker( self ) :
+        &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+        return( getThresholdsForChecker2d( self ) )</div>
+
+<div class="viewcode-block" id="endlI10.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI10.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;E to yo (MeV)&quot;, interpolation = 0 ) :
+
+        endl2dmathClasses.endl2dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI11"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI11">[docs]</a>class endlI11( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
+    &quot;&quot;&quot;This class is for the I = 11 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI11 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
+
+        from fudge import gnd
+
+        self.name = gnd.productData.energyDeposition.component.moniker
+        endlNd.endlNd.__init__( self, f, 11, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+        self.variablesUnits = &#39;energy_in[MeV];energy_deposition[MeV]&#39;
+
+<div class="viewcode-block" id="endlI11.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI11.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Calls the endl2dmathmisc.check2dData function and returns a list of endlCheckerObject instances.
+        See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        n, dummy, messages2d = endl2dmathmisc.check2dData( self.data, allowZeroX = allowZeroE, positiveY = True, printWarning = printWarning, \
+            printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages2d ) &gt; 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI11.fixThreshold"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI11.fixThreshold">[docs]</a>    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+        &quot;&quot;&quot;Calls endlIClasses.fixThresholdFor2d to fix threshold.&quot;&quot;&quot;
+
+        fixThresholdFor2d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, None, EMin = EMin, fixThresholdMode = fixThresholdMode,
+            threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )</div>
+
+<div class="viewcode-block" id="endlI11.getEMin_EMinNext"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI11.getEMin_EMinNext">[docs]</a>    def getEMin_EMinNext( self ) :
+        &quot;&quot;&quot;Gets the first two Energy values from self&#39;s data. None is return for any absent value.&quot;&quot;&quot;
+
+        EMin = self.xMin( )
+        EMinNext = None
+        if( len( self.data ) &gt; 1 ) : EMinNext = self.data[1][0]
+        return( EMin, EMinNext )</div>
+
+<div class="viewcode-block" id="endlI11.getThresholdsForChecker"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI11.getThresholdsForChecker">[docs]</a>    def getThresholdsForChecker( self ) :
+        &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+        return( getThresholdsForChecker2d( self ) )</div>
+
+<div class="viewcode-block" id="endlI11.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI11.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;E to res. (MeV)&quot;, interpolation = 0 ) :
+
+        endl2dmathClasses.endl2dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI12"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI12">[docs]</a>class endlI12( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
+    &quot;&quot;&quot;This class is for the I = 12, Q(E), data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI12 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
+
+        self.name = &#39;energyDependentQ&#39;
+        endlNd.endlNd.__init__( self, f, 12, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+        self.variablesUnits = &#39;energy_in[MeV];Q[MeV]&#39;
+
+<div class="viewcode-block" id="endlI12.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI12.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Calls the endl2dmathmisc.check2dData function and returns a list of endlCheckerObject instances.
+        See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        n, dummy, messages2d = endl2dmathmisc.check2dData( self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+            printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages2d ) &gt; 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI12.fixThreshold"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI12.fixThreshold">[docs]</a>    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+        &quot;&quot;&quot;Calls endlIClasses.fixThresholdFor2d to fix threshold.&quot;&quot;&quot;
+
+        fixThresholdFor2d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, None, EMin = EMin, fixThresholdMode = fixThresholdMode,
+            threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )</div>
+
+<div class="viewcode-block" id="endlI12.getEMin_EMinNext"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI12.getEMin_EMinNext">[docs]</a>    def getEMin_EMinNext( self ) :
+        &quot;&quot;&quot;Gets the first two Energy values from self&#39;s data. None is return for any absent value.&quot;&quot;&quot;
+
+        EMin = self.xMin( )
+        EMinNext = None
+        if( len( self.data ) &gt; 1 ) : EMinNext = self.data[1][0]
+        return( EMin, EMinNext )</div>
+
+<div class="viewcode-block" id="endlI12.getThresholdsForChecker"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI12.getThresholdsForChecker">[docs]</a>    def getThresholdsForChecker( self ) :
+        &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+        return( getThresholdsForChecker2d( self ) )</div>
+
+<div class="viewcode-block" id="endlI12.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI12.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;Q (MeV)&quot;, interpolation = 0 ) :
+
+        endl2dmathClasses.endl2dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI13"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI13">[docs]</a>class endlI13( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
+    &quot;&quot;&quot;This class is for the I = 13 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI13 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
+
+        from fudge import gnd
+
+        self.name = gnd.productData.momentumDeposition.component.moniker
+        endlNd.endlNd.__init__( self, f, 13, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+        self.variablesUnits = &#39;energy_in[MeV];momentum_deposition[MeV/c]&#39;
+
+<div class="viewcode-block" id="endlI13.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI13.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Calls the endl2dmathmisc.check2dData function and returns a list of endlCheckerObject instances.
+        See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        n, dummy, messages2d = endl2dmathmisc.check2dData( self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+            printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages2d ) &gt; 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI13.fixThreshold"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI13.fixThreshold">[docs]</a>    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+        &quot;&quot;&quot;Calls endlIClasses.fixThresholdFor2d to fix threshold.&quot;&quot;&quot;
+
+        fixThresholdFor2d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, None, EMin = EMin, fixThresholdMode = fixThresholdMode,
+            threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )</div>
+
+<div class="viewcode-block" id="endlI13.getEMin_EMinNext"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI13.getEMin_EMinNext">[docs]</a>    def getEMin_EMinNext( self ) :
+        &quot;&quot;&quot;Gets the first two Energy values from self&#39;s data. None is return for any absent value.&quot;&quot;&quot;
+
+        EMin = self.xMin( )
+        EMinNext = None
+        if( len( self.data ) &gt; 1 ) : EMinNext = self.data[1][0]
+        return( EMin, EMinNext )</div>
+
+<div class="viewcode-block" id="endlI13.getThresholdsForChecker"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI13.getThresholdsForChecker">[docs]</a>    def getThresholdsForChecker( self ) :
+        &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+        return( getThresholdsForChecker2d( self ) )</div>
+
+<div class="viewcode-block" id="endlI13.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI13.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;momentum (MeV/c)&quot;, interpolation = 0 ) :
+
+        endl2dmathClasses.endl2dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI80"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI80">[docs]</a>class endlI80( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
+    &quot;&quot;&quot;This class is for the I = 80 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI80 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
+
+        self.name = &#39;&#39;
+        endlNd.endlNd.__init__( self, f, 80, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+
+<div class="viewcode-block" id="endlI80.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI80.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Calls the endl2dmathmisc.check2dData function and returns a list of endlCheckerObject instances.
+        See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        n, dummy, messages2d = endl2dmathmisc.check2dData( self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+            printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages2d ) &gt; 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI80.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI80.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;T ave&#39;d rates (barn * cm/sh)&quot;, interpolation = 0 ) :
+
+        endl2dmathClasses.endl2dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI89"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI89">[docs]</a>class endlI89( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
+    &quot;&quot;&quot;This class is for the I = 89 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI89 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
+
+        self.name = &#39;&#39;
+        endlNd.endlNd.__init__( self, f, 89, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+
+<div class="viewcode-block" id="endlI89.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI89.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Calls the endl2dmathmisc.check2dData function and returns a list of endlCheckerObject instances.
+        See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        n, dummy, messages2d = endl2dmathmisc.check2dData( self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+            printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages2d ) &gt; 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI89.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI89.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;multiplicity tn&quot;, interpolation = 0 ) :
+
+        endl2dmathClasses.endl2dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI90"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI90">[docs]</a>class endlI90( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
+    &quot;&quot;&quot;This class is for the I = 90 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI90 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
+
+        self.name = &#39;&#39;
+        endlNd.endlNd.__init__( self, f, 90, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+
+<div class="viewcode-block" id="endlI90.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI90.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Calls the endl2dmathmisc.check2dData function and returns a list of endlCheckerObject instances.
+        See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        n, dummy, messages2d = endl2dmathmisc.check2dData( self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+            printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages2d ) &gt; 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI90.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI90.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;T ave&#39;d E to yo (MeV)&quot;, interpolation = 0 ) :
+
+        endl2dmathClasses.endl2dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI91"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI91">[docs]</a>class endlI91( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
+    &quot;&quot;&quot;This class is for the I = 91 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI91 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
+
+        self.name = &#39;&#39;
+        endlNd.endlNd.__init__( self, f, 91, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+
+<div class="viewcode-block" id="endlI91.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI91.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Calls the endl2dmathmisc.check2dData function and returns a list of endlCheckerObject instances.
+        See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        n, dummy, messages2d = endl2dmathmisc.check2dData( self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+            printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages2d ) &gt; 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI91.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI91.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;T ave&#39;d E to res. (MeV)&quot;, interpolation = 0 ) :
+
+        endl2dmathClasses.endl2dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI92"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI92">[docs]</a>class endlI92( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
+    &quot;&quot;&quot;This class is for the I = 92 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI92 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
+
+        self.name = &#39;&#39;
+        endlNd.endlNd.__init__( self, f, 92, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+
+<div class="viewcode-block" id="endlI92.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI92.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Calls the endl2dmathmisc.check2dData function and returns a list of endlCheckerObject instances.
+        See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        n, dummy, messages2d = endl2dmathmisc.check2dData( self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+            printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages2d ) &gt; 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI92.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI92.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;T (MeV)&quot;, yLabel = &quot;T ave&#39;d total E (MeV)&quot;, interpolation = 0 ) :
+
+        endl2dmathClasses.endl2dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI941"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI941">[docs]</a>class endlI941( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
+    &quot;&quot;&quot;This class is for the I = 941 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI941 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
+
+        from fudge import gnd
+
+        self.name = &#39;pointwise&#39;
+        endlNd.endlNd.__init__( self, f, 941, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+        self.variablesUnits = &#39;energy_in[MeV];form_factor&#39;
+
+<div class="viewcode-block" id="endlI941.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI941.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = True, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Calls the endl2dmathmisc.check2dData function and returns a list of endlCheckerObject instances.
+        See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        n, dummy, messages2d = endl2dmathmisc.check2dData( self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+            printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages2d ) &gt; 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI941.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI941.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;form factor&quot;, interpolation = 0 ) :
+
+        endl2dmathClasses.endl2dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, interpolation = interpolation )</div>
+
+<div class="viewcode-block" id="endlI941.toInterpolation"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI941.toInterpolation">[docs]</a>    def toInterpolation( self, interpolation, accuracy, diSectionMax = 3 ) :
+
+        data = self
+        if( ( interpolation == 0 ) and ( self.interpolation == 3 ) and ( len( self ) &gt; 0 ) ) :
+            x, y = self.data[0]
+            if( ( x == 0 ) or ( y == 0 ) ) :
+                data = endlI941( None, self.yo, self.C, self.I, self.S, self.h, self.data )
+                data.data = data.data[1:]
+        newData = endl2dmathClasses.endl2dmath.toInterpolation( data, interpolation, accuracy, diSectionMax = diSectionMax )
+        if( data != self ) : newData.data.insert( 0, [ x, y ] )
+        return( newData )</div></div>
+
+<div class="viewcode-block" id="endlI942"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI942">[docs]</a>class endlI942( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
+    &quot;&quot;&quot;This class is for the I = 942 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI942 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
+
+        from fudge import gnd
+
+        self.name = &#39;pointwise&#39;
+        endlNd.endlNd.__init__( self, f, 942, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+        self.variablesUnits = &#39;energy_in[MeV];scattering_function&#39;
+
+<div class="viewcode-block" id="endlI942.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI942.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = True, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Calls the endl2dmathmisc.check2dData function and returns a list of endlCheckerObject instances.
+        See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        n, dummy, messages2d = endl2dmathmisc.check2dData( self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+            printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages2d ) &gt; 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI942.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI942.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;scattering function&quot;, interpolation = 0 ) :
+
+        endl2dmathClasses.endl2dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, interpolation = interpolation )</div>
+
+<div class="viewcode-block" id="endlI942.toInterpolation"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI942.toInterpolation">[docs]</a>    def toInterpolation( self, interpolation, accuracy, diSectionMax = 3 ) :
+
+        data = self
+        if( ( interpolation == 0 ) and ( self.interpolation == 3 ) and ( len( self ) &gt; 0 ) ) :
+            x, y = self.data[0]
+            if( ( x == 0 ) or ( y == 0 ) ) :
+                data = endlI942( None, self.yo, self.C, self.I, self.S, self.h, self.data )
+                data.data = data.data[1:]
+        newData = endl2dmathClasses.endl2dmath.toInterpolation( data, interpolation, accuracy, diSectionMax = diSectionMax )
+        if( data != self ) : newData.data.insert( 0, [ x, y ] )
+        return( newData )</div></div>
+
+<div class="viewcode-block" id="endlI951"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI951">[docs]</a>class endlI951( endlNd.endlNd, endl2dmathClasses.endl2dmath ) : # Special I = 951 for NADS (i.e., sigma * v)
+    &quot;&quot;&quot;This class is for the I = 951 data. Special I value for NADS.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI951 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure.&quot;&quot;&quot;
+
+        self.name = &#39;&#39;
+        endlNd.endlNd.__init__( self, f, 951, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+
+<div class="viewcode-block" id="endlI951.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI951.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Calls the endl2dmathmisc.check2dData function and returns a list of endlCheckerObject instances.
+        See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        n, dummy, messages2d = endl2dmathmisc.check2dData( self.data, allowZeroX = allowZeroE, positiveY = False, printWarning = printWarning, \
+            printErrors = printErrors, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages2d ) &gt; 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI951.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI951.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;cross section * v (barn * cm/sec)&quot;, interpolation = 0 ) :
+
+        endl2dmathClasses.endl2dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI1"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI1">[docs]</a>class endlI1( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
+    &quot;&quot;&quot;This class is for the I = 1 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI1 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl3dmath class data structure.&quot;&quot;&quot;
+
+        from fudge import gnd
+
+        self.name = &#39;pointwise&#39;
+        endlNd.endlNd.__init__( self, f, 1, yo, C, I, S, h, points, i2 = 2, bdflsFile = bdflsFile )
+        self.variablesUnits = &#39;energy_in[MeV];mu;P(mu|energy_in)&#39;
+
+<div class="viewcode-block" id="endlI1.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI1.check">[docs]</a>    def check( self, normTolerance = 1e-5, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;
+        Checks to see that the data is consistance with I = 1 data and returns a list of 
+        endlCheckerObject instances. Also, calls the endl3dmathmisc.check3dData function. 
+        See endl3dmathmisc.check3dData for meaning of printWarning and printErrors.
+        &quot;&quot;&quot;
+
+        normTolerance = max( normTolerance, normCheckTolerance )
+        ErrMsgs = []
+        messages = []
+        d2 = endlmath.ZSum( self.data )
+        for E, y in d2.data :
+            if( abs( 1. - y ) &gt; normTolerance ) : messages.append( &#39;endlI1.check: bad normalize = %.8e for E = %e&#39; % ( y, E ) )
+        messages += endl3dmathmisc.check3dData( self.data, allowNegativeX = False, allowZeroX = allowZeroE, allowNegativeY = True, allowZeroY = True, \
+            positiveZ = False, printWarning = False, printErrors = False, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        for E, muP in self.data :
+            if( muP[0][0] &lt; -1. ) : messages.append( &#39;endlI1.check: mu = %.8e &lt; -1 for E = %e&#39; % ( muP[0][0], E ) )
+            if( muP[-1][0] &gt; 1. ) : messages.append( &#39;endlI1.check: mu = %.8e &gt; 1 for E = %e&#39; % ( muP[-1][0], E ) )
+        messages += self.checkMus( True )
+        if( len( messages ) &gt; 0 ) : ErrMsgs = [ endlmisc.endlCheckerObject( data = self, message = messages ) ]
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI1.checkMus"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI1.checkMus">[docs]</a>    def checkMus( self, internal = False ) :
+        &quot;&quot;&quot;
+        This method checks that the mu values are reasonable. For two-body reactions, the mu domain must range from -1 to 1.
+        For other data, the first mu value must starts at -1 if above threshold and must be greater than -1 if at (near) threshold.
+        &quot;&quot;&quot;
+
+        import math
+
+        messages, yo = [], self.yo
+        if( yo &gt; 9 ) : yo -= 10
+
+        if( ( self.C == 10 ) or ( self.S == 1 ) ) :        # Two-body.
+            for e_in, muPs in self.data :
+                if( ( muPs[0][0] != -1 ) or ( muPs[-1][0] != 1 ) ) :
+                    messages.append( &#39;endlI1.checkMus: for two-body, mu domain invalid: domain is %.5f for %.5f for E = %e&#39; % ( muPs[0][0], muPs[-1][0], e_in ) )
+        else :
+            if( yo == 7 ) : return( [] )
+
+            projectileMass, targetMass, productMass = self.bdflsFile.mass( self.yi ), self.bdflsFile.mass( self.ZA ), self.bdflsFile.mass( yo )
+            compoundMass = projectileMass + targetMass
+            Q = self.getQ( )
+
+            for i1, e_muPs in enumerate( self.data ) :
+                e_in, muPs = e_muPs
+                uMax2 = 2 * ( e_in * targetMass / compoundMass + Q ) / productMass  # maximum speed of product squared in COM frame.
+                vCOM2 = 2 * projectileMass * e_in / compoundMass**2                 # speed of COM squared.
+                atThreshold = ( i1 == 0 ) and ( Q &lt; 0 )
+                if( atThreshold ) :
+                    if( muPs[0][0] == -1 ) : messages.append( &#39;endlI1.checkMus: need delta function in mu, mu = -1 for E = %e&#39; % ( e_in ) )
+                else :
+                    if( uMax2 &gt;= vCOM2 ) :
+                        if( muPs[0][0] &gt; -1 ) : messages.append( &#39;endlI1.checkMus: mu range too short, mu = %.5e &gt; -1 for E = %e&#39; % ( muPs[0][0], e_in ) )
+                    else :
+                        if( muPs[0][0] == -1 ) : messages.append( &#39;endlI1.checkMus: need delta function, mu = %.8e == -1 for E = %e&#39; % ( muPs[0][0], e_in ) )
+        if( not( internal ) ) :
+            if( len( messages ) &gt; 0 ) : messages = [ endlmisc.endlCheckerObject( data = self, message = messages ) ]
+        return( messages )</div>
+
+<div class="viewcode-block" id="endlI1.fixThreshold"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI1.fixThreshold">[docs]</a>    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+        &quot;&quot;&quot;Calls endlIClasses.fixThresholdFor3d to fix threshold.&quot;&quot;&quot;
+
+        fixThresholdFor3d( self, thresholdCrossSectionIsZero, self.I, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
+            threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )</div>
+
+<div class="viewcode-block" id="endlI1.getEMin_EMinNext"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI1.getEMin_EMinNext">[docs]</a>    def getEMin_EMinNext( self ) :
+        &quot;&quot;&quot;Gets the first two Energy values from self&#39;s data. None is return for any absent value.&quot;&quot;&quot;
+
+        EMin = self.xMin( )
+        EMinNext = None
+        if( len( self.data ) &gt; 1 ) : EMinNext = self.data[1][0]
+        return( EMin, EMinNext )</div>
+
+<div class="viewcode-block" id="endlI1.getThresholdsForChecker"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI1.getThresholdsForChecker">[docs]</a>    def getThresholdsForChecker( self ) :
+        &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+        if( len( self ) &gt; 1 ) : return [ self.data[0][0], self.data[1][0] ]
+        if( len( self ) &gt; 0 ) : return [ self.data[0][0] ]
+        return []</div>
+
+<div class="viewcode-block" id="endlI1.getEData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI1.getEData">[docs]</a>    def getEData( self, E ) :
+        &quot;&quot;&quot;Returns an endl2dmath object for the data at incident energy E. If E is outside the
+        domain of the data, then None is returned.  If the requested E is not a point in the data 
+        then linear interpolation is performed. &quot;&quot;&quot;
+
+        EmuP = self.data
+        if( EmuP is None ) : return( None )
+        nE = len( EmuP )
+        if( nE == 0 ) : return( None )
+        if( ( E &lt; EmuP[0][0] ) or ( E &gt; EmuP[-1][0] ) ) : return( None )
+        EPrior = None
+        muPPrior = None
+        for E_, muP_ in self.data :
+            if( E_ &gt;= E ) :
+                muP = []
+                if( E_ == E ) :
+                    for mu, P in muP_ : muP.append( [ mu, P ] )
+                    return( endl2dmathClasses.endl2dmath( muP ) )
+                return( ( ( E - EPrior ) * endl2dmathClasses.endl2dmath( muP_ ) + ( E_ - E ) * endl2dmathClasses.endl2dmath( muPPrior ) ) / ( E_ - EPrior ) )
+            EPrior = E_
+            muPPrior = muP_</div>
+
+<div class="viewcode-block" id="endlI1.normalize"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI1.normalize">[docs]</a>    def normalize( self ) :
+        &quot;&quot;&quot;Normalizes the data so that the integral P(E, mu ) dmu = 1.&quot;&quot;&quot;
+
+        d2 = endlmath.ZSum( self.data )
+        i = 0
+        for x_zy in self.data :
+            s = d2.data[i][1]
+            if( s != 0. ) :
+                for yz in x_zy[1] : yz[1] = yz[1] / s
+            i += 1</div>
+
+<div class="viewcode-block" id="endlI1.runningMuSum"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI1.runningMuSum">[docs]</a>    def runningMuSum( self ) :
+        &quot;&quot;&quot;Does a running sum of the mu data, returning an endl3dmath object of the results.&quot;&quot;&quot;
+
+        d3 = endlmath.runningZSum( self.data, xLabel = self.xLabel, yLabel = self.yLabel, zLabel = &quot;running Sum of P( E, mu ) vs mu&quot; )
+        return d3</div>
+
+<div class="viewcode-block" id="endlI1.setEData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI1.setEData">[docs]</a>    def setEData( self, E, muP ) :
+        &quot;&quot;&quot;This method adds muP at E. If E is in self than its distribution is over-written; otherwise, a new E is added.&quot;&quot;&quot;
+
+        i = 0
+        muP_ = endl2dmathmisc.get2dmathData( muP, &quot;setEData&quot;, &quot;what ever&quot; ) 
+        muP = []
+        for mu, P in muP_ : muP.append( [ mu, P ] )
+        for E_, muP_ in self.data :
+            if( E &lt;= E_ ) : break
+            i += 1
+        if( i &lt; len( self ) ) :
+            if( self.data[i][0] == E ) :
+                self.data[i][1] = muP
+            else :
+                self.data.insert( i, [ E, muP ] )
+        else :
+            self.data.append( [ E, muP ] )</div>
+
+<div class="viewcode-block" id="endlI1.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI1.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;mu&quot;, zLabel = &quot;pdf(E,mu) vs mu&quot;, interpolation = 0  ) :
+
+        endl3dmathClasses.endl3dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, zLabel = zLabel
+            , interpolation = interpolation )</div>
+
+<div class="viewcode-block" id="endlI1.toZAsFrame"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI1.toZAsFrame">[docs]</a>    def toZAsFrame( self, newProjectileMass, newTargetMass, halflife, bdflsFile, ELevel = 0. ) :
+
+        newI1, r = toZAsFrameMisc( endlI1, self, newProjectileMass, newTargetMass, ELevel, halflife, bdflsFile, True )
+        return( [ newI1 ] )</div></div>
+
+<div class="viewcode-block" id="endlI21"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI21">[docs]</a>class endlI21( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
+    &quot;&quot;&quot;This class is for the I = 21 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI21 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl3dmath class data structure.&quot;&quot;&quot;
+
+        from fudge import gnd
+
+        self.name = &#39;&#39;
+        self.form = &#39;pointwise&#39;
+        endlNd.endlNd.__init__( self, f, 21, yo, C, I, S, h, points, i2 = 2, bdflsFile = bdflsFile )
+
+<div class="viewcode-block" id="endlI21.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI21.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Checks to see that the data is consistance with I = 21 data and returns a list of 
+        endlCheckerObject instances. Also, calls the endl3dmathmisc.check3dData function. 
+        See endl3dmathmisc.check3dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        messages = endl3dmathmisc.check3dData( self.data, allowNegativeX = False, allowZeroX = allowZeroE, allowNegativeY = False, positiveZ = False, \
+            printWarning = False, printErrors = False, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages ) &gt; 0 ) : ErrMsgs = [ endlmisc.endlCheckerObject( data = self, message = messages ) ]
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI21.fixThreshold"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI21.fixThreshold">[docs]</a>    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+        &quot;&quot;&quot;Calls endlIClasses.fixThresholdFor3d to fix threshold.&quot;&quot;&quot;
+
+        fixThresholdFor3d( self, thresholdCrossSectionIsZero, self.I, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
+            threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )</div>
+
+<div class="viewcode-block" id="endlI21.getEMin_EMinNext"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI21.getEMin_EMinNext">[docs]</a>    def getEMin_EMinNext( self ) :
+        &quot;&quot;&quot;Gets the first two Energy values from self&#39;s data. None is return for any absent value.&quot;&quot;&quot;
+
+        EMin = self.xMin( )
+        EMinNext = None
+        if( len( self.data ) &gt; 1 ) : EMinNext = self.data[1][0]
+        return( EMin, EMinNext )</div>
+
+<div class="viewcode-block" id="endlI21.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI21.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;E&#39; (MeV)&quot;, zLabel = &quot;pdf(E,E&#39;) vs E&#39; (1/MeV)&quot;, interpolation = 0 ) :
+
+        endl3dmathClasses.endl3dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, zLabel = zLabel,
+            interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI22"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI22">[docs]</a>class endlI22( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
+    &quot;&quot;&quot;This class is for the I = 22 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI22 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl3dmath class data structure.&quot;&quot;&quot;
+
+        self.name = &#39;&#39;
+        endlNd.endlNd.__init__( self, f, 22, yo, C, I, S, h, points, i2 = 2, bdflsFile = bdflsFile )
+
+<div class="viewcode-block" id="endlI22.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI22.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Checks to see that the data is consistance with I = 22 data and returns a list of 
+        endlCheckerObject instances. Also, calls the endl3dmathmisc.check3dData function. 
+        See endl3dmathmisc.check3dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        messages = endl3dmathmisc.check3dData( self.data, allowNegativeX = False, allowZeroX = allowZeroE, allowNegativeY = False, positiveZ = False, \
+            printWarning = False, printErrors = False, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        for E, muP in self.data :
+            if( muP[0][0] &lt; 0. ) : messages.append( &#39;endlI22.check: 1 - mu = %.8e &lt; 0 for E = %e&#39; % ( muP[0][0], E ) )
+            if( muP[-1][0] &gt; 2. ) : messages.append( &#39;endlI22.check: 1 - mu = %.8e &gt; 2 for E = %e&#39; % ( muP[0][0], E ) )
+        if( len( messages ) &gt; 0 ) : ErrMsgs = [ endlmisc.endlCheckerObject( data = self, message = messages ) ]
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI22.fixThreshold"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI22.fixThreshold">[docs]</a>    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+        &quot;&quot;&quot;Calls endlIClasses.fixThresholdFor3d to fix threshold.&quot;&quot;&quot;
+
+        fixThresholdFor3d( self, thresholdCrossSectionIsZero, self.I, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
+            threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )</div>
+
+<div class="viewcode-block" id="endlI22.getEMin_EMinNext"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI22.getEMin_EMinNext">[docs]</a>    def getEMin_EMinNext( self ) :
+        &quot;&quot;&quot;Gets the first two Energy values from self&#39;s data. None is return for any absent value.&quot;&quot;&quot;
+
+        EMin = self.xMin( )
+        EMinNext = None
+        if( len( self.data ) &gt; 1 ) : EMinNext = self.data[1][0]
+        return( EMin, EMinNext )</div>
+
+<div class="viewcode-block" id="endlI22.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI22.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;x = 1 - mu&quot;, zLabel = &quot;pdf(E,x) vs x&quot;, interpolation = 0 ) :
+
+        endl3dmathClasses.endl3dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, zLabel = zLabel, 
+            interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI81"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI81">[docs]</a>class endlI81( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
+    &quot;&quot;&quot;This class is for the I = 81 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI81 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl3dmath class data structure.&quot;&quot;&quot;
+
+        self.name = &#39;&#39;
+        endlNd.endlNd.__init__( self, f, 81, yo, C, I, S, h, points, i2 = 2, bdflsFile = bdflsFile )
+
+<div class="viewcode-block" id="endlI81.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI81.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Checks to see that the data is consistance with I = 81 data and returns a list of 
+        endlCheckerObject instances. Also, calls the endl3dmathmisc.check3dData function. 
+        See endl3dmathmisc.check3dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        messages = endl3dmathmisc.check3dData( self.data, allowNegativeX = False, allowZeroX = False, allowNegativeY = False, allowZeroY = allowZeroE, \
+            positiveZ = False, printWarning = False, printErrors = False, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages ) &gt; 0 ) : ErrMsgs = [ endlmisc.endlCheckerObject( data = self, message = messages ) ]
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI81.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI81.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;T (MeV)&quot;, yLabel = &quot;E (MeV)&quot;, zLabel = &quot;cross section (T,E)&quot;, interpolation = 0 ) :
+
+        endl3dmathClasses.endl3dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, zLabel = zLabel,
+            interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI84"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI84">[docs]</a>class endlI84( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
+    &quot;&quot;&quot;This class is for the I = 84 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI84 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl3dmath class data structure.&quot;&quot;&quot;
+
+        self.name = &#39;&#39;
+        endlNd.endlNd.__init__( self, f, 84, yo, C, I, S, h, points, i2 = 2, bdflsFile = bdflsFile )
+
+<div class="viewcode-block" id="endlI84.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI84.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Checks to see that the data is consistance with I = 84 data and returns a list of 
+        endlCheckerObject instances. Also, calls the endl3dmathmisc.check3dData function. 
+        See endl3dmathmisc.check3dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        messages = endl3dmathmisc.check3dData( self.data, allowNegativeX = False, allowZeroX = False, allowNegativeY = False, positiveZ = False, \
+            printWarning = False, printErrors = False, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages ) &gt; 0 ) : ErrMsgs = [ endlmisc.endlCheckerObject( data = self, message = messages ) ]
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI84.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI84.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;E&#39; (MeV)&quot;, zLabel = &quot;f(T,E&#39;)&quot;, interpolation = 0 ) :
+
+        endl3dmathClasses.endl3dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, zLabel = zLabel,
+            interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI952"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI952">[docs]</a>class endlI952( endlNd.endlNd, endl3dmathClasses.endl3dmath ) : # Special I = 952 for NADS (i.e., total P(E,E&#39;) )
+    &quot;&quot;&quot;This class is for the I = 952 data. Special I value for NADS.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI952 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl3dmath class data structure.&quot;&quot;&quot;
+
+        self.name = &#39;&#39;
+        endlNd.endlNd.__init__( self, f, 952, yo, C, I, S, h, points, bdflsFile = bdflsFile )
+
+<div class="viewcode-block" id="endlI952.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI952.check">[docs]</a>    def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Checks to see that the data is consistance with I = 952 data and returns a list of 
+        endlCheckerObject instances. Also, calls the endl3dmathmisc.check3dData function. 
+        See endl3dmathmisc.check3dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        ErrMsgs = []
+        messages = endl3dmathmisc.check3dData( self.data, allowNegativeX = False, allowNegativeY = False, positiveZ = False, printWarning = False, \
+            printErrors = False, xCloseEps = xCloseEps, maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages ) &gt; 0 ) : ErrMsgs = [ endlmisc.endlCheckerObject( data = self, message = messages ) ]
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI952.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI952.set">[docs]</a>    def set( self, data, checkDataType = 0, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;E&#39; (MeV)&quot;, zLabel = &quot;P(E,E&#39;)&quot;, interpolation = 0 ) :
+
+        endl3dmathClasses.endl3dmath.__init__( self, data, checkDataType = checkDataType, xLabel = xLabel, yLabel = yLabel, zLabel = zLabel,
+            interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI3"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3">[docs]</a>class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
+    &quot;&quot;&quot;This class is for the I = 3 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI3 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl4dmath class data structure.&quot;&quot;&quot;
+
+        from fudge import gnd
+
+        self.name = &#39;pointwise&#39;
+        endlNd.endlNd.__init__( self, f, 3, yo, C, I, S, h, points, i2 = 2, i3 = 3, bdflsFile = bdflsFile )
+        self.xInterpolation = &#39;linear,linear,unitbase:x:linear,unitbase:y:linear&#39;
+        self.variablesUnits = &#39;energy_in[MeV];mu;energy_out[MeV];pdf(energy_out|mu,energy_in)&#39;
+
+<div class="viewcode-block" id="endlI3.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.check">[docs]</a>    def check( self, normTolerance = 1e-5, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Checks to see that the data is consistance with I = 3 data and returns a list of
+        endlCheckerObject instances. Also, calls the endl4dmathmisc.check4dData function.
+        See endl4dmathmisc.check4dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        normTolerance = max( normTolerance, normCheckTolerance )
+        ErrMsgs = []
+        messages = []
+        Q = self.getQ( )
+        if( len( self ) &lt; 2 ) : messages.append( &#39;endlI3.check: (E, mu, Ep, P) data len = %d &lt; 2&#39; % len( self ) )
+        for E, muEpP in self.data :
+            if( len( muEpP ) &lt; 2 ) : messages.append( &#39;endlI3.check: (mu, Ep, P) data len = %d &lt; 2 for E = %e&#39; % ( len( muEpP ), E ) )
+            for mu, EpP in muEpP :
+                if( len( EpP ) &lt; 2 ) : messages.append( &#39;endlI3.check: Ep, P len = %d &lt; 2 for E = %e and mu = %e&#39; % ( len( EpP ), E, mu ) )
+                if( ( self.C &gt;= 50 ) and ( self.C &lt; 58 ) ) : continue
+                if( EpP[-1][0] &gt; E + Q ) : messages.append( &quot;endlI3.check: E&#39; = %.8e &gt; E + Q = %e for E = %e, mu = %e&quot; % \
+                    ( EpP[-1][0], E + Q, E, mu ) )
+            d2 = endlmath.ZSum( muEpP )
+            for mu, y in d2.data :
+                if( abs( 1. - y ) &gt; normTolerance ) : messages.append( &#39;endlI3.check: bad normalize = %.8e for E = %e and mu = %e&#39; % ( y, E, mu ) )
+        messages += endl4dmathmisc.check4dData( self.data, allowNegativeT = False, allowZeroT = allowZeroE, allowNegativeX = True, allowZeroX = True, \
+            allowNegativeY = False, positiveZ = False, printWarning = printWarning, printErrors = printErrors, xCloseEps = xCloseEps, \
+            maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages ) &gt; 0 ) : ErrMsgs = [ endlmisc.endlCheckerObject( data = self, message = messages ) ]
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI3.copyData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.copyData">[docs]</a>    def copyData( self ) :
+        &quot;&quot;&quot;Returns an endlI3 instance - that is a copy, and not a reference - of self.&quot;&quot;&quot;
+
+        return endlI3( None, self.yo, self.C, self.I, self.S, self.h, endl4dmathClasses.endl4dmath.copyData( self ) )</div>
+
+<div class="viewcode-block" id="endlI3.fixThreshold"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.fixThreshold">[docs]</a>    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+        &quot;&quot;&quot;Calls endlIClasses.fixThresholdFor4d to fix threshold.&quot;&quot;&quot;
+
+        fixThresholdFor4d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
+            threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )</div>
+
+<div class="viewcode-block" id="endlI3.getMuEpPAtE"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.getMuEpPAtE">[docs]</a>    def getMuEpPAtE( self, E, extrapolation = endl3dmathmisc.noExtrapolation ) :
+        &quot;&quot;&quot;Returns an endl3dmath object of P&#39;( mu, E&#39; ) = P( E, mu, E&#39; ).
+    E is compare to the incident energies in self and is considered to be a match if the
+    difference is less than relEps. Also see muEpP.&quot;&quot;&quot;
+
+        MuEpP, i, n = None, 0, len( self.data )
+        if( n == 0 ) : return( MuEpP )
+        while( i &lt; n ) :
+            if( E == self.data[i][0] ) :
+                MuEpP = self.data[i][1]
+                break
+            elif( E &lt; self.data[i][0] ) :
+                if( i == 0 ) :
+                    if( extrapolation == endl3dmathmisc.flatExtrapolation ) : MuEpP = self.data[i][1]
+                else :
+                    E1, MuEpP1 = self.data[i-1]
+                    E2, MuEpP2 = self.data[i]
+                    MuEpP1 = endl3dmathClasses.endl3dmath( MuEpP1, checkDataType = 0 )
+                    MuEpP2 = endl3dmathClasses.endl3dmath( MuEpP2, checkDataType = 0 )
+                    f = ( E2 - E ) / ( E2 - E1 )
+                    g = 1 - f
+                    mu1Min, mu1Max = MuEpP1.data[0][0], MuEpP1.data[-1][0]
+                    mu2Min, mu2Max = MuEpP2.data[0][0], MuEpP2.data[-1][0]
+                    muMin = max( -1., mu1Min + g * ( mu2Min - mu1Min ) )        # We are going to use unit-base interpolation of mu.
+                    muMax = min(  1., mu1Max + g * ( mu2Max - mu1Max ) )        # However, must be careful to handle case where mu ranges from
+                    dMu1 = ( mu1Max - mu1Min )                                  # -1 to 1 inclusively.
+                    mus = [ muMax * ( ( mu1Max - mu ) / dMu1 ) + muMin * ( ( mu - mu1Min ) / dMu1 ) for mu, EpP in MuEpP1.data ]
+                    dMu2 = ( mu2Max - mu2Min )
+                    for mu, EpP in MuEpP2.data :
+                        doIt = True
+                        mup = muMax * ( ( mu2Max - mu ) / dMu2 ) + muMin * ( ( mu - mu2Min ) / dMu2 )
+                        for m in mus :
+                            if( abs( m - mup ) &lt; 1e-14 ) : doIt = False
+                        if( doIt ) : mus.append( mup )
+                    mus.sort( )
+                    if( mus[0] &lt; -1 ) :
+                        while( mus[0] &lt; -1 ) : del mus[0]
+                        mus.insert( 0, -1 )
+                    if( mus[-1] &gt; 1 ) :
+                        while( mus[-1] &gt; 1 ) : del mus[-1]
+                        mus.append( 1 )
+                    MuEpP = []
+                    dMu = muMax - muMin
+                    for mu in mus :
+                        mu1 = mu1Min * ( ( muMax - mu ) / dMu ) + mu1Max * ( ( mu - muMin ) / dMu )
+                        mu2 = mu2Min * ( ( muMax - mu ) / dMu ) + mu2Max * ( ( mu - muMin ) / dMu )
+                        d = f * MuEpP1.getAtX( mu1, unitBase = True, endl2dmathObject = True ) \
+                            + g * MuEpP2.getAtX( mu2, unitBase = True, endl2dmathObject = True )
+                        MuEpP.append( [ mu, d.data ] )
+                break
+            i += 1
+        if( ( i == n ) and ( extrapolation == endl3dmathmisc.flatExtrapolation ) ) : MuEpP = self.data[-1][1]
+        if( not( MuEpP is None ) ) : MuEpP = endl3dmathClasses.endl3dmath( MuEpP, checkDataType = 0, xLabel = &quot;mu&quot;,
+            yLabel = &quot;E&#39;&quot;, zLabel = &quot;P(mu,E&#39;) per E&#39; (1/MeV)&quot; )
+        return( MuEpP )</div>
+
+<div class="viewcode-block" id="endlI3.getEMin_EMinNext"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.getEMin_EMinNext">[docs]</a>    def getEMin_EMinNext( self ) :
+        &quot;&quot;&quot;Gets the first two Energy values from self&#39;s data. None is return for any absent value.&quot;&quot;&quot;
+
+        EMin = self.tMin( )
+        EMinNext = None
+        if( len( self.data ) &gt; 1 ) : EMinNext = self.data[1][0]
+        return( EMin, EMinNext )</div>
+
+<div class="viewcode-block" id="endlI3.getThresholdsForChecker"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.getThresholdsForChecker">[docs]</a>    def getThresholdsForChecker( self ) :
+        &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+        if( len( self ) &gt; 1 ) : return [ self.data[0][0], self.data[1][0] ]
+        if( len( self ) &gt; 0 ) : return [ self.data[0][0] ]
+        return []</div>
+
+<div class="viewcode-block" id="endlI3.E"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.E">[docs]</a>    def E( self, i ) :
+        &quot;&quot;&quot;Returns the (i+1)^th incident energy value as a float or None if i is out-of-range.&quot;&quot;&quot;
+
+        if ( i &lt; len( self.data ) ) : return float( self.data[i][0] )
+        return None</div>
+
+<div class="viewcode-block" id="endlI3.EIndexMu"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.EIndexMu">[docs]</a>    def EIndexMu( self, iE, mu, unitBase = True ) :
+        &quot;&quot;&quot;Returns an endl2dmath object that is the interpolation of self&#39;s data at mu for energy index iE.&quot;&quot;&quot;
+
+        if( ( iE &lt; 0 ) or ( iE &gt;= len( self.data ) ) ) :
+            raise Exception( &#39;\nError in endlI3.EIndexMu: energy index iE = %d out of range.&#39; % len( self.data ) )
+        MuEpP = self.data[iE][1]
+        if(   mu &lt;= MuEpP[0][0] ) :
+            data = MuEpP[0][1]
+        elif( mu &gt;= MuEpP[-1][0] ) :
+            data = MuEpP[-1][1]
+        else :
+            data = endl3dmathmisc.interpolate3d( mu, MuEpP, unitBase = unitBase )
+        return( endl2dmathClasses.endl2dmath( data ) )</div>
+
+<div class="viewcode-block" id="endlI3.EMax"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.EMax">[docs]</a>    def EMax( self ) :
+        &quot;&quot;&quot;Returns the last incident energy value for self. Returns None if data is empty.&quot;&quot;&quot;
+
+        return( self.tMax( ) )</div>
+
+<div class="viewcode-block" id="endlI3.EMin"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.EMin">[docs]</a>    def EMin( self ) :
+        &quot;&quot;&quot;Returns the first incident energy value for self. Returns None if data is empty.&quot;&quot;&quot;
+
+        return( self.tMin( ) )</div>
+
+<div class="viewcode-block" id="endlI3.muEpP"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.muEpP">[docs]</a>    def muEpP( self, E, relEps = 1e-5 ) :
+        &quot;&quot;&quot;Returns an endl3dmath object of P&#39;( mu, E&#39; ) = P( E, mu, E&#39; ).
+    E is compare to the incident energies in self and is considered to be a match if the
+    difference is less than relEps. Also see getMuEpPAtE.&quot;&quot;&quot;
+
+        n = len( self.data )
+        for i in range( n ) :
+            if ( abs( self.data[i][0] - E ) &lt;= relEps ) :       # ???? needs interpolation.
+                return endl3dmathClasses.endl3dmath( self.data[i][1], checkDataType = 0, xLabel = &quot;mu&quot;,
+                    yLabel = &quot;E&#39;&quot;, zLabel = &quot;P(mu,E&#39;) per E&#39; (1/MeV)&quot; )
+        return None</div>
+
+<div class="viewcode-block" id="endlI3.mapMuEpPToGrid"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.mapMuEpPToGrid">[docs]</a>    def mapMuEpPToGrid( self, E, relEps = 1e-5 ) :
+        &quot;&quot;&quot;P( E = E, mu, E&#39; ) with mu, and E&#39; mapped to a grid determine from
+    the mu and E&#39; points.  Returns a endl3dmath object of list[ u, list[ E&#39;, P( u, E&#39; ) ] ].
+    See muEpP( ) for meaning of relEps.&quot;&quot;&quot;
+
+        def trim( d ) :
+
+            d.sort( )
+            a = []
+            e = None
+            for i in d :
+                if ( i != e ) :
+                    a.append( i )
+                    e = i
+            return( a )
+
+        d3i = self.muEpP( E, relEps )                       # Get 3-d data (u, E&#39;, P).
+        if ( d3i is None ) : return None
+        EpGrid = []                                         # All E&#39; points.
+        EpL = []                                            # Lower E&#39; end point of data for all u.
+        EpU = []                                            # Upper E&#39; end point of data for all u.
+        for u_etal in d3i.data :
+            if ( u_etal[1][0][1]  != 0. ) : EpL.append( u_etal[1][0][0] )
+            if ( u_etal[1][-1][1] != 0. ) : EpU.append( u_etal[1][-1][0] )
+            for etal in u_etal[1] : EpGrid.append( etal[0] )
+        EpGrid = trim( EpGrid )                             # Sort and remove redundant Ep points.
+        EpLU = []                                           # Additional E points to add to make end-points go to 0.
+        EpL = trim( EpL )                                   # Sort and remove redundant EpL points.
+        EpL = EpL[1:]                                       # Do not need the lowest global E point.
+        i = 1
+        for Ep in EpL :
+            while ( EpGrid[i] &lt; Ep ) : i += 1
+            if ( ( Ep - EpGrid[i-1] ) &gt; 10 * endlParameters.endlEpsx * Ep ) : EpLU.append( Ep * ( 1 - endlParameters.endlEpsx ) )
+        EpU = trim( EpU )
+        EpU = EpU[:-1]
+        EpU.reverse( )
+        i = len( EpGrid ) - 2
+        for Ep in EpU :
+            while ( EpGrid[i] &gt; Ep ) : i -= 1
+            if ( ( EpGrid[i+1] - Ep ) &gt; 10 * endlParameters.endlEpsx * Ep ) : EpLU.append( Ep * ( 1 + endlParameters.endlEpsx ) )
+        if ( EpLU != [] ) : EpGrid = EpGrid + EpLU
+        EpGrid = trim( EpGrid )
+        d3o = []
+        for u_etal in d3i.data :                            # Loop over all u.
+            d2 = []
+            E1 = None
+            etal = u_etal[1]
+            i = 0
+            EP = etal[i]
+            for E in EpGrid :                               # Loop over E&#39; grid.
+                P = 0.
+                if ( E == EP[0] ) :                         # E&#39; is a Grid energy.
+                    E1 = E
+                    P1 = EP[1]
+                    P = P1
+                    i += 1
+                    if ( i &lt; len( etal ) ) :
+                        EP = etal[i]
+                    else :
+                        E1 = None
+                elif ( E1 is not None ) :                       # Interpolate.
+                    P = ( EP[1] * ( E - E1 ) + P1 * ( EP[0] - E ) ) / ( EP[0] - E1 )
+                d2.append( [ E, P ] )
+            d3o.append( [ u_etal[0], d2 ] )
+        return endl3dmathClasses.endl3dmath( d3o, checkDataType = 0, xLabel = &quot;mu&quot;, yLabel = &quot;E&#39;&quot;, zLabel = &quot;Probability&quot; )</div>
+
+<div class="viewcode-block" id="endlI3.normalize"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.normalize">[docs]</a>    def normalize( self ) :
+        &quot;&quot;&quot;Normalizes the data so that the integral P(E, mu, E&#39;) dE&#39; = 1.&quot;&quot;&quot;
+
+        for E_Data in self.data :                   # Loop for each E.
+            for mu_Data in E_Data[1] :              # Loop for each mu.
+                s = 0
+                Ep0 = None
+                for Data in mu_Data[1] :            # Loop for each E&#39;.
+                    Ep1 = Data[0]
+                    C1 = Data[1]
+                    if ( Ep0 is not None ) : s += ( Ep1 - Ep0 ) * ( C1 + C0 )
+                    Ep0 = Ep1
+                    C0 = C1
+                s /= 2.
+                for Data in mu_Data[1] :
+                    if( s != 0. ) : Data[1] /= s    # Loop for each E&#39;.</div>
+
+<div class="viewcode-block" id="endlI3.convertToI4"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.convertToI4">[docs]</a>    def convertToI4( self, i1=None, lmax=0 ):
+        &quot;&quot;&quot;Converts the self and the I=1 data given as an argument to an endlI4 instance where the new object has Legendre orders 0, 1, ..., lmax&quot;&quot;&quot;
+
+        from xData import series1d as seriesModule
+
+        # Set up the I=4 file, especially the header crap
+        dummy = endlI3( None, self.yo, self.C, self.I, self.S, self.h, [] )
+        dummy.setI( 4 )
+        i4 = endlI4( None, self.yo, self.C, 4, self.S, dummy.h, [] )
+        endlmisc.copyEndlHeader( i4, self )
+
+        # Loop through l&#39;s expanding the product of the I=1 and I=3 files into Legendre polynomials
+        for l in range( 0, lmax+1 ):
+            thisLTerm = endl3dmathClasses.endl3dmath()
+            legPoly = endl2dmathmisc.convertFunctionToLinLin( lambda x: ( 2 * l + 1 ) * seriesModule.Legendre( l, x ), -1.0, 1.0, 1e-4 )
+            for iE in range( len ( self.data ) ):
+                E = self.E( iE )
+                i1_muP = endl2dmathClasses.endl2dmath( data = i1.data[ iE ][1] ) 
+                i3_muEpP = self.muEpP( E, relEps = 1e-5 )
+                # collect list of Ep values
+                EpList = []
+                for muEpPpair in i3_muEpP.data: EpList += filter( lambda x: x not in EpList, [ EpP[0] for EpP in muEpPpair[1] ] )
+                EpList.sort()
+                # Integrate in mu for each Ep value
+                EpP = []
+                for Ep in EpList :
+                    i3_muP = endl2dmathClasses.endl2dmath( data = [ [ x, i3_muEpP.getValue( x, Ep ) ] for x in i3_muEpP.xArray() ] )
+                    P = i1_muP.integrateThreeFunctions( i3_muP, legPoly, -1., 1. )
+                    EpP.append( [ Ep, P ] )
+                thisLTerm.data.append( [ E, EpP ] )
+            i4.setlData( l, thisLTerm )    
+        return i4</div>
+
+<div class="viewcode-block" id="endlI3.reduceToEEpP"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.reduceToEEpP">[docs]</a>    def reduceToEEpP( self ) :
+        &quot;&quot;&quot;Integrates the mu dimension, returning an endl3dmath object of list[ E, list[ E&#39;, P( E, E&#39; ) ] ].&quot;&quot;&quot;
+
+        d3 = []
+        for e_etal in self.data :
+            d = self.mapMuEpPToGrid( e_etal[0], relEps = 1e-14 )
+            u = None
+            for u_etal in d.data :
+                if ( u is None ) :
+                    d3p = []
+                    for etal in u_etal[1] : d3p.append( [ etal[0], etal[1], 0. ] )
+                else :
+                    i = 0
+                    for etal in u_etal[1] :
+                        dd = d3p[i]
+                        dd[2] = dd[2] + ( etal[1] + dd[1] ) * ( u_etal[0] - u )
+                        dd[1] = etal[1]
+                        i = i + 1
+                u = u_etal[0]
+            d2 = []
+            for d in d3p : d2.append( [ d[0], d[2] / 2. ] )
+            d3.append( [ e_etal[0], d2 ] )
+        return endl3dmathClasses.endl3dmath( d3, checkDataType = 0, xLabel = &quot;E&quot;, yLabel = &quot;E&#39;&quot;, zLabel = &quot;Probability&quot; )</div>
+
+<div class="viewcode-block" id="endlI3.reduceToEMuP"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.reduceToEMuP">[docs]</a>    def reduceToEMuP( self, normalize = False ) :                          # class endlI3
+        &quot;&quot;&quot;Integrates the E&#39; dimension, returning an unnormalized (normalize = False) or normalized (normalize = True) endlI1 object.&quot;&quot;&quot;
+
+        d3 = []
+        for e_etal in self.data :
+            d2 = []
+            for u_etal in e_etal[1] :
+                Ep1 = None
+                for etal in u_etal[1] :
+                    if ( Ep1 is None ) :
+                        s = 0
+                    else :
+                        s += ( etal[1] + P1 ) * ( etal[0] - Ep1 )
+                    Ep1 = etal[0]
+                    P1 = etal[1]
+                d2.append( [ u_etal[0], s / 2. ] )
+            d3.append( [ e_etal[0], d2 ] )
+        dummy = endlI3( None, self.yo, self.C, self.I, self.S, self.h, [] )
+        dummy.setI( 1 )
+        I1 = endlI1( None, self.yo, self.C, 1, self.S, dummy.h, d3 )
+        endlmisc.copyEndlHeader( I1, self )
+        if( normalize ) : I1.normalize( )
+        return I1</div>
+
+<div class="viewcode-block" id="endlI3.runningEpSum"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.runningEpSum">[docs]</a>    def runningEpSum( self ) :
+        &quot;&quot;&quot;Does a running sum of the E&#39; data, returning an endl4dmath object of the results.&quot;&quot;&quot;
+
+        d4 = []
+        for E_uEpP in self.data :
+            d3 = []
+            for u_EpP in E_uEpP[1] :
+                d3.append( [ u_EpP[0], endlmath.runningYSum( u_EpP[1] ).data ] )
+            d4.append( [ E_uEpP[0], d3 ] )
+        return endl4dmathClasses.endl4dmath( d4, tLabel = self.tLabel, xLabel = self.xLabel, yLabel = self.yLabel,
+            zLabel = &quot;running Sum of P( E, mu, E&#39; ) vs E&#39;&quot; )</div>
+
+<div class="viewcode-block" id="endlI3.plot"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.plot">[docs]</a>    def plot( self, E = None, xMin = None, xMax = None, yMin = None, yMax = None, zMin = None, zMax = None, \
+        xyzlog = 0, tLabel = None, xLabel = None, yLabel = None, zLabel = None, title = None, style = None, \
+        xrot = None, zrot = None ) :                                                                # class endlI3
+        &quot;&quot;&quot;Plots the data.  If E = None uses 4d plotting otherwise uses 3d plotting for the requested E.
+
+xyzlog values and meaning::
+    xyzlog   plot-type for x-y-z axis
+   -----------------------------------
+      0     linear-linear-linear
+      1     log-linear-linear
+      2     linear-log-linear
+      3     log-log-linear
+      4     linear-linear-log
+      5     log-linear-log
+      6     linear-log-log
+      7     log-log-log&quot;&quot;&quot;
+
+        if ( tLabel is None ) and ( self.tLabel is not None ) : tLabel = self.tLabel
+        if ( xLabel is None ) and ( self.xLabel is not None ) : xLabel = self.xLabel
+        if ( yLabel is None ) and ( self.yLabel is not None ) : yLabel = self.yLabel
+        if ( zLabel is None ) and ( self.zLabel is not None ) : zLabel = self.zLabel
+
+        if ( E is not None ) :
+            iE = None
+            i = -1
+            for E_xyz in self.data :
+                i += 1
+                if ( abs( E - E_xyz[0] ) &lt; E * 1e-8 ) : iE = i
+            if ( iE is None ) : raise Exception( &quot;\nError in endlI3.plot: E value not found&quot; )
+            dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title, \
+                zMin = zMin, zMax = zMax, zLabel = zLabel, xrot = xrot, zrot = zrot, style = style )
+            endl4dmathmisc.plot3dFrom4d( self.data, iE, dt, xyzlog = xyzlog )
+        else :
+            endl4dmathClasses.endl4dmath.plot( self, xMin = xMin, xMax = xMax, yMin = yMin, yMax = yMax, zMin = zMin, zMax = zMax, xyzlog = xyzlog, \
+                tLabel = tLabel, xLabel = xLabel, yLabel = yLabel, title = title, style = style, tScaleLabel = &quot;Incident Energy&quot;, xrot = xrot, zrot = zrot )</div>
+
+<div class="viewcode-block" id="endlI3.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI3.set">[docs]</a>    def set( self, data, checkDataType = 0, tLabel = &quot;E (MeV)&quot;, xLabel = &quot;mu&quot;, yLabel = &quot;E&#39; (MeV)&quot;, zLabel = &quot;pdf(E,mu,E&#39;) vs E&#39; (1/MeV)&quot;, interpolation = 0 ) :
+
+        endl4dmathClasses.endl4dmath.__init__( self, data, checkDataType = checkDataType, tLabel = tLabel, xLabel = xLabel, yLabel = yLabel, zLabel = zLabel,
+            interpolation = interpolation )</div></div>
+
+<div class="viewcode-block" id="endlI4"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4">[docs]</a>class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
+    &quot;&quot;&quot;This class is for the I = 4 data.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI4 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl4dmath class data structure.&quot;&quot;&quot;
+
+        from fudge import gnd
+
+        self.name = &#39;pointwise&#39;
+        endlNd.endlNd.__init__( self, f, 4, yo, C, I, S, h, points, i0 = 2, i1 = 0, i2 = 1, i3 = 3, bdflsFile = bdflsFile )
+        self.xInterpolation = &#39;none,linear,unitbase:x:linear,unitbase:y:linear&#39;
+        self.variablesUnits = &#39;l;energy_in[MeV];energy_out[MeV];C_l(energy_out|energy_in)&#39;
+
+<div class="viewcode-block" id="endlI4.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.check">[docs]</a>    def check( self, normTolerance = 1e-5, printWarning = False, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Checks to see that the data is consistance with I = 4 data and returns a list of
+        endlCheckerObject instances. Also, calls the endl4dmathmisc.check4dData function.
+        See endl4dmathmisc.check4dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        normTolerance = max( normTolerance, normCheckTolerance )
+        ErrMsgs = []
+        messages = []
+        Q = self.getQ( )
+        for l, EEpP in self.data :
+            if( len( EEpP ) &lt; 2 ) : messages.append( &#39;endlI4.check: (E, Ep, P) data len = %d &lt; 2 for l = %d&#39; % ( len( EEpP ), l ) )
+            for E, EpP in EEpP :
+                if( len( EpP ) &lt; 2 ) : messages.append( &#39;endlI4.check: Ep, P len = %d &lt; 2 for l = %d and E = %e&#39; % ( len( EpP ), l, E ) )
+                if( ( self.C &gt;= 50 ) and ( self.C &lt; 58 ) ) : continue
+                if( EpP[-1][0] &gt; E + Q ) : messages.append( &quot;endlI4.check: E&#39; = %.8e &gt; E + Q = %e for l = %.0f, E = %e&quot; % \
+                    ( EpP[-1][0], E + Q, l, E ) )
+        d2 = endlmath.ZSum( self.data[0][1] )
+        for E, y in d2.data :
+            if( abs( 1. - y ) &gt; normTolerance ) : messages.append( &#39;endlI4.check: bad normalize = %.8e for l = 0 and E = %e&#39; % ( y, E ) )
+        messages += endl4dmathmisc.check4dData( self.data, allowNegativeT = False, allowZeroT = False, allowNegativeX = False, allowZeroX = allowZeroE, \
+            allowNegativeY = False, positiveZ = False, printWarning = printWarning, printErrors = printErrors, xCloseEps = xCloseEps, \
+            maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages ) &gt; 0 ) : ErrMsgs = [ endlmisc.endlCheckerObject( data = self, message = messages ) ]
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI4.convertToI1I3"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.convertToI1I3">[docs]</a>    def convertToI1I3( self, nMu = 21, lMax = None ) :
+        &quot;&quot;&quot;This methods converts the I = 4 data into the endl I = 1 and I = 3 data using nMu equally spaced mu values.
+        This method calls convertToUI3. The returned value is the tuple (I1, I3).&quot;&quot;&quot;
+
+        I3 = self.convertToUI3( nMu = nMu, lMax = lMax )
+        I1Data = []
+        for E, muEpP in I3.data :
+            I1MuP = []
+            for mu, EpP in muEpP :
+                I1MuP.append( [ mu, endlmath.YSum( EpP ) ] )
+            I1Data.append( [ E, I1MuP ] )
+        dummy = endlI4( None, self.yo, self.C, self.I, self.S, self.h, [] )
+        dummy.setI( 1 )
+        I1 = endlI1( None, self.yo, self.C, 1, self.S, dummy.h, I1Data )
+        I1.normalize( )
+        I3.normalize( )
+        return( I1, I3 )</div>
+
+<div class="viewcode-block" id="endlI4.convertToUI3"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.convertToUI3">[docs]</a>    def convertToUI3( self, nMu = 21, lMax = None ) :
+        &quot;&quot;&quot;This methods converts the I = 4 data into unnormalized I = 3 data using nMu equally spaced mu 
+        values.  Note that the data is not normalized; hence, the normalized method should be called on the
+        returned object. This method will only convert up to Legendre order l = min( lMax, series1d.maxLegendreOrder ) 
+        of self&#39;s data.&quot;&quot;&quot;
+
+        from xData import series1d as seriesModule
+
+        if( lMax is None ) : lMax = seriesModule.maxLegendreOrder
+        lMax = max( 0, min( lMax, seriesModule.maxLegendreOrder ) )
+            
+        I3Data = []
+        if ( len( self ) == 1 ) :
+            mu_EpP = []
+            for E_EpP in self.data[0][1] :
+                EpPm1 = []
+                EpPp1 = []
+                for EpP in E_EpP[1] :
+                    EpPm1.append( [ EpP[0], EpP[1] ] )
+                    EpPp1.append( [ EpP[0], EpP[1] ] )
+                I3Data.append( [ E_EpP[0], [ [ -1., EpPm1 ], [ 1., EpPp1 ] ] ] )
+        else :
+            EArray = []                                 # Array of incident energies
+            for E, EpP in self.data[0][1] : EArray.append( E )
+            for l, EEpP in self.data :                   # Check that all l&#39;s have the same incident energies
+                if ( len( EEpP ) != len( EArray ) ) :
+                    raise Exception( &quot;\nError in endlI4.convertToUI3: incident energies do not align&quot; )
+                i = 0
+                for E, EpP in EEpP :
+                    if ( E != EArray[i] ) : raise Exception( &quot;\nError in endlI4.convertToUI3: incident energies do not align (l = %d)&quot; % l )
+                    i += 1
+            muArray = []                                # Array of mus
+            rMu = range( nMu )
+            s = 2. / ( nMu - 1 )
+            for iu in rMu : muArray.append( -1. + s * iu )
+            muArray[nMu - 1] = 1.
+            l_LArray = []
+            for l, EEpP in self.data :
+                if( l &gt; lMax ) : break
+                LArray = []
+                for mu in muArray : LArray.append( seriesModule.Legendre( l, mu ) )
+                l_LArray.append( LArray )
+            iE = -1
+            for E in EArray :
+                iE += 1
+                Ep_Array = []                           # Construct E&#39; grid for E.
+                for l, EEpP in self.data :
+                    if( l &gt; lMax ) : break
+                    for Ep, P in EEpP[iE][1] :
+                        if ( Ep not in Ep_Array ) : Ep_Array.append( Ep )
+                Ep_Array.sort( )
+                mu_EpP = []                             # Construct mu, [ E&#39;, P ] grid
+                for mu in muArray :
+                    EpP = []
+                    for Ep in Ep_Array : EpP.append( [ Ep, 0. ] )
+                    mu_EpP.append( [ mu, EpP ] )
+                iEp = -1
+                for Ep in Ep_Array :
+                    iEp += 1
+                    il = -1
+                    for l, EEpP in self.data :
+                        if( l &gt; lMax ) : break
+                        il += 1
+                        iEpP = 0
+                        EpP_ = EEpP[iE][1]
+                        for EpP in EpP_ :
+                            if ( Ep &lt;= EpP[0] ) : break
+                            iEpP += 1
+                        if ( Ep == EpP_[iEpP][0] ) :
+                            P = EpP_[iEpP][1]
+                        else :
+                            P = ( EpP_[iEpP-1][1] * ( EpP_[iEpP][0]  - Ep ) + EpP_[iEpP][1] * ( Ep - EpP_[iEpP-1][0] ) ) / \
+                                ( EpP_[iEpP][0] - EpP_[iEpP-1][0] )
+                        for iu in rMu : mu_EpP[iu][1][iEp][1] += P * l_LArray[il][iu]
+                I3Data.append( [ E, mu_EpP ] )
+        dummy = endlI4( None, self.yo, self.C, self.I, self.S, self.h, [] )
+        dummy.setI( 3 )
+        I3 = endlI3( None, self.yo, self.C, 3, self.S, dummy.h, I3Data )
+        endlmisc.copyEndlHeader( I3, self )
+        return I3</div>
+
+<div class="viewcode-block" id="endlI4.copyData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.copyData">[docs]</a>    def copyData( self ) :
+        &quot;&quot;&quot;Returns an endlI4 instance that is a copy, and not a reference, of self.&quot;&quot;&quot;
+
+        return endlI4( None, self.yo, self.C, self.I, self.S, self.h, endl4dmathClasses.endl4dmath.copyData( self ) )</div>
+
+<div class="viewcode-block" id="endlI4.EMax"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.EMax">[docs]</a>    def EMax( self ) :
+        &quot;&quot;&quot;Returns the last incident energy value for self. Returns None if data is empty.&quot;&quot;&quot;
+
+        EMax = None
+        for l, EEpP in self.data :
+            if( EMax is None ) :
+                if( len( EEpP ) &gt; 0 ) : EMax = EEpP[0][0]
+            else :
+                if( len( EEpP ) &gt; 0 ) : EMax = max( EMax, EEpP[0][0] )
+        return( EMax )</div>
+
+<div class="viewcode-block" id="endlI4.EMin"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.EMin">[docs]</a>    def EMin( self ) :
+        &quot;&quot;&quot;Returns the first incident energy value for self. Returns None if data is empty.&quot;&quot;&quot;
+
+        EMin = None
+        for l, EEpP in self.data :
+            if( EMin is None ) :
+                if( len( EEpP ) &gt; 0 ) : EMin = EEpP[0][0]
+            else :
+                if( len( EEpP ) &gt; 0 ) : EMin = min( EMin, EEpP[0][0] )
+        return( EMin )</div>
+
+<div class="viewcode-block" id="endlI4.fixThreshold"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.fixThreshold">[docs]</a>    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+        &quot;&quot;&quot;Calls endlIClasses.fixThresholdFor3d to fix threshold for each l-order data.&quot;&quot;&quot;
+
+        for l, EEpP in self.data :
+            d = endl3dmathClasses.endl3dmath( data = EEpP, checkDataType = 0 )
+            fixThresholdFor3d( d, thresholdCrossSectionIsZero, self.I, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, realSelf = self, fixThresholdMode = fixThresholdMode,
+                threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )</div>
+
+<div class="viewcode-block" id="endlI4.getEMin_EMinNext"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.getEMin_EMinNext">[docs]</a>    def getEMin_EMinNext( self ) :
+        &quot;&quot;&quot;Gets the first two Energy values from self&#39;s data. None is return for any absent value.&quot;&quot;&quot;
+
+        EMin = None
+        EMinNext = None
+        for l, EEpP in self.data :
+            n = len( EEpP )
+            if( n &gt; 0 ) :
+                EMin_ = EEpP[0][0]
+                if( ( EMin is None ) or ( EMin_ &lt; EMin ) ) : EMin = EMin_
+                if( n &gt; 1 ) :
+                    EMinNext_ = EEpP[1][0]
+                    if( ( EMinNext is None ) or ( EMinNext_ &lt; EMinNext ) ) : EMinNext = EMinNext_
+        return( EMin, EMinNext )</div>
+
+<div class="viewcode-block" id="endlI4.getlData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.getlData">[docs]</a>    def getlData( self, l ) :
+        &quot;&quot;&quot;Returns an endl3dmath object for the data at Legendre order l. If l is outside the domain of the data, then None is returned.&quot;&quot;&quot;
+
+        for l_, EEpP in self.data :
+            if( l_ == l ) : 
+                label = &#39;l = %d&#39; % l
+                if( hasattr, self, &#39;label&#39; ) : label = self.label + &#39; for l = %d&#39; % l
+                return( endl3dmathClasses.endl3dmath( EEpP, xLabel = self.xLabel, yLabel = self.yLabel, zLabel = self.zLabel, label = label ) )
+        return( None )</div>
+
+<div class="viewcode-block" id="endlI4.getl_EData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.getl_EData">[docs]</a>    def getl_EData( self, l, E, unitBase = True ) :
+        &quot;&quot;&quot;Returns an endl2dmath object for the data at Legendre order l and incident energy E. If l or E is outside the
+        domain of the data, then None is returned.  If the requested E is not a point in the data then linear interpolation 
+        is performed. If unitBase is true, the Ep, P(l,E,Ep) data are unit based linear interpolated.&quot;&quot;&quot;
+
+        EEpP = self.getlData( l ).data
+        if( EEpP is None ) : return( None )
+        nE = len( EEpP )
+        if( nE == 0 ) : return( None )
+        if( ( E &lt; EEpP[0][0] ) or ( E &gt; EEpP[-1][0] ) ) : return( None )
+        return( endl2dmathClasses.endl2dmath( endl3dmathmisc.interpolate3d( E, EEpP, unitBase = unitBase ), xLabel = self.yLabel, yLabel = self.zLabel ) )</div>
+
+<div class="viewcode-block" id="endlI4.setlData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.setlData">[docs]</a>    def setlData( self, l, EEpP ) :
+        &quot;&quot;&quot;Set data for Legendre order l to EEpP. EEpP can be an endl3dmath object or a suitable python list. The l-value
+        must be an existing l-value or one greater than the current maximum l-value.&quot;&quot;&quot;
+
+        data = endl3dmathmisc.get3dmathData( EEpP, &#39;endlI4.setlData&#39;, &#39;EEpP&#39; )
+        nl = len( self.data )
+        if( ( l &lt; 0 ) or ( l &gt; nl ) ) : raise Exception( &#39;\nError in endlI4.setlData: l = %d must be between 0 to lMax + 1 (= %d) inclusive.&#39; % ( l, nl ) )
+        if( l == nl ) :                         # Adding the next l order.
+            self.data.append( [ l, data ] )
+        else :
+            for i in xrange( nl ) :
+                if( l == self.data[i][0] ) :
+                    self.data[i][1] = data
+                    return</div>
+
+<div class="viewcode-block" id="endlI4.setl_EData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.setl_EData">[docs]</a>    def setl_EData( self, l, E, EpP ) :
+        &quot;&quot;&quot;Set data for Legendre order l and incident energy E to EpP. EpP can be an endl2dmath object or a suitable python list.
+        The l-value must be an existing l-value or one greater than the current maximum l-value.&quot;&quot;&quot;
+
+        data = endl2dmathmisc.get2dmathData( EpP, &#39;endlI4.setl_EData&#39;, &#39;EpP&#39; )
+        nl = len( self.data )
+        if( ( l &lt; 0 ) or ( l &gt; nl ) ) : raise Exception( &#39;\nError in endlI4.setl_EData: l = %d must be between 0 to lMax + 1 (= %d) inclusive.&#39; % ( l, nl ) )
+        if( l == nl ) :
+            self.data.append( [ l, [ [ E, data ] ] ] )
+        else :
+            for l_, EEpP in self.data :
+                if( l == l_ ) :
+                    nE = len( EEpP )
+                    if( nE == 0 ) :
+                        EEpP.append( [ E, data ] )
+                    elif( E &lt; EEpP[0][0] ) :
+                        EEpP.insert( 0, [ E, data ] )
+                    elif( E &gt; EEpP[-1][0] ) :
+                        EEpP.append( [ E, data ] )
+                    else :
+                        for i in xrange( nE ) :
+                            if( E &lt;= EEpP[i][0] ) : break
+                        if( E == EEpP[i][0] ) :
+                            EEpP[i][1] = data
+                        else :
+                            EEpP.insert( i, [ E, data ] )
+                    return</div>
+
+<div class="viewcode-block" id="endlI4.getThresholdsForChecker"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.getThresholdsForChecker">[docs]</a>    def getThresholdsForChecker( self ) :
+        &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+        thresholds = []
+        for l, EAndOthers in self.data :
+            if( len( EAndOthers ) &gt; 0 ) : thresholds.append( EAndOthers[0][0] )
+        return thresholds</div>
+
+<div class="viewcode-block" id="endlI4.l"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.l">[docs]</a>    def l( self, i ) :
+        &quot;&quot;&quot;Returns the (i+1)^th Legendre l-value (e.g., self.l( 0 ) returns the first l-value) or None if i is out-of-range.&quot;&quot;&quot;
+
+        if ( i &lt; len( self.data ) ) : return self.data[i][0]
+        return None</div>
+
+<div class="viewcode-block" id="endlI4.normalize"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.normalize">[docs]</a>    def normalize( self, doL_0_Only = True ) :
+        &quot;&quot;&quot;Normalizes the l = 0 data so that the integral P(l = 0, E, E&#39;) dE&#39; = 1. If doL_0_Only is true, then only the
+        l = 0 component is normalizes. Otherwise, the l = 0 sum is used to normalize all orders. The return value the tuple
+        (n0, nm) where n0 (nm) is the number of sum that are zero (negative).&quot;&quot;&quot;
+
+        n0 = 0
+        nm = 0
+        if ( self.data[0][0] == 0 ) :
+            iE = -1
+            for d0 in self.data[0][1] :         # Loop for each E.
+                iE += 1
+                s = 0
+                Ep0 = None
+                for d1 in d0[1] :               # Loop for each E&#39;.
+                    Ep1 = d1[0]
+                    C1 = d1[1]
+                    if ( Ep0 is not None ) : s += ( Ep1 - Ep0 ) * ( C1 + C0 )
+                    Ep0 = Ep1
+                    C0 = C1
+                s /= 2.
+                if( s == 0. ) :
+                    n0 += 1
+                    s = 1.
+                elif( s &lt; 0. ) :
+                    nm += 1
+                for d1 in d0[1] : d1[1] /= s    # Loop for each E&#39;.
+                if( not doL_0_Only ) :
+                    for l, EEpP in self.data :
+                        if( l == 0 ) : continue
+                        EpP = EEpP[iE][1]               # Note, index of iE and E not checked. 
+                        for d1 in EpP : d1[1] /= s      # Loop for each E&#39;.
+        return( n0, nm )</div>
+
+<div class="viewcode-block" id="endlI4.plot"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.plot">[docs]</a>    def plot( self, l = None, xMin = None, xMax = None, yMin = None, yMax = None, zMin = None, zMax = None, \
+        xyzlog = 0, tLabel = None, xLabel = None, yLabel = None, zLabel = None, title = None, \
+        xrot = None, zrot = None ) :
+        &quot;&quot;&quot;Plots the data for Legendre order l.
+
+xyzlog values and meaning::
+    xyzlog   plot-type for x-y-z axis
+   -----------------------------------
+      0     linear-linear-linear
+      1     log-linear-linear
+      2     linear-log-linear
+      3     log-log-linear
+      4     linear-linear-log
+      5     log-linear-log
+      6     linear-log-log
+      7     log-log-log&quot;&quot;&quot;
+
+        if ( tLabel is None ) and ( self.tLabel is not None ) : tLabel = self.tLabel
+        if ( xLabel is None ) and ( self.xLabel is not None ) : xLabel = self.xLabel
+        if ( yLabel is None ) and ( self.yLabel is not None ) : yLabel = self.yLabel
+        if ( zLabel is None ) and ( self.zLabel is not None ) : zLabel = self.zLabel
+
+        if ( l is not None ) :
+            dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title, \
+                zMin = zMin, zMax = zMax, zLabel = zLabel, xrot = xrot, zrot = zrot )
+            endl4dmathmisc.plot3dFrom4d( self.data, l, dt, xyzlog = xyzlog )
+        else :
+            endl4dmathClasses.endl4dmath.plot( self, xMin = xMin, xMax = xMax, yMin = yMin, yMax = yMax, zMin = zMin, zMax = zMax, \
+                xyzlog = xyzlog, tLabel = tLabel, xLabel = xLabel, yLabel = yLabel, title = title, tScaleLabel = &quot;&#39;l order&#39;&quot;, \
+                xrot = xrot, zrot = zrot )</div>
+
+<div class="viewcode-block" id="endlI4.reduceToEEpP"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.reduceToEEpP">[docs]</a>    def reduceToEEpP( self ) :
+        &quot;&quot;&quot;reduceToEEpP( )\n    Returns the l = 0 term as an endl3dmath object of list[ E, list[ E&#39;, P( E, E&#39; ) ] ].
+    Note, the l = 0 term is P( E, E&#39; ).&quot;&quot;&quot;
+
+        return endl3dmathClasses.endl3dmath( self.data[0][1], checkDataType = 0, xLabel = &quot;E&quot;,
+            yLabel = &quot;E&#39;&quot;, zLabel = &quot;Probability( E, E&#39; )&quot; )</div>
+
+<div class="viewcode-block" id="endlI4.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.set">[docs]</a>    def set( self, data, checkDataType = 0, tLabel = &quot;l&quot;, xLabel = &quot;E (MeV)&quot;, yLabel = &quot;E&#39; (MeV)&quot;, zLabel = &quot;Legendre coef. C_l(E,E&#39;) vs E&#39; (1/MeV)&quot;,
+        interpolation = 0 ) :
+
+        endl4dmathClasses.endl4dmath.__init__( self, data, checkDataType = checkDataType, tLabel = tLabel, xLabel = xLabel, yLabel = yLabel, zLabel = zLabel,
+            interpolation = interpolation )</div>
+
+<div class="viewcode-block" id="endlI4.toString"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.toString">[docs]</a>    def toString( self, format = None ) :
+        &quot;&quot;&quot;Returns a string with the data in the order (E, E&#39;, l, P) as required by ENDL.&quot;&quot;&quot;
+
+        s = &#39;\n&#39;.join( endlmisc.string4dData( self.data, i0 = 2, i1 = 0, i2 = 1, i3 = 3, fmt0 = format, fmt1 = format, fmt2 = format, fmt3 = format ) )
+        return( s + &#39;\n&#39; )</div>
+
+<div class="viewcode-block" id="endlI4.toZAsFrame"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI4.toZAsFrame">[docs]</a>    def toZAsFrame( self, newProjectileMass, newTargetMass, halflife, bdflsFile, ELevel = 0. ) :
+
+        newI4, r = toZAsFrameMisc( endlI4, self, newProjectileMass, newTargetMass, ELevel, halflife, bdflsFile, False )
+        for l, EEpP_ in newI4.data :
+            for EEpP in EEpP_ : EEpP[0] *= r
+        return( [ newI4 ] )</div></div>
+
+<div class="viewcode-block" id="endlI20"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI20">[docs]</a>class endlI20( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
+    &quot;&quot;&quot;This class is for the I = 20 data. I 20 data is unresolved resonance probability table data which
+    has four columns. These columns are 1) s incident energy, 2) Temperature, 3) probability and 
+    4) cross section.&quot;&quot;&quot;
+
+    def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
+        &quot;&quot;&quot;Constructor for the endlI20 class.  See the module endlNd.py for the meanings of
+        f, yo, C, I, S and h. Points must be a valid endl4dmath class data structure.&quot;&quot;&quot;
+
+        self.name = &#39;URRProbabilityTable&#39;
+        endlNd.endlNd.__init__( self, f, 20, yo, C, I, S, h, points, i0 = 0, i1 = 1, i2 = 2, i3 = 3, bdflsFile = bdflsFile )
+        self.variablesUnits = &#39;energy_in[MeV];temperature[keV];probability;cross_section[barn]&#39;
+
+<div class="viewcode-block" id="endlI20.check"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI20.check">[docs]</a>    def check( self, normTolerance = 1e-4, printWarning = False, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
+        &quot;&quot;&quot;Checks to see that the data is consistance with I = 20 data and returns a list of
+        endlCheckerObject instances. Also, calls the endl4dmathmisc.check4dData function.
+        See endl4dmathmisc.check4dData for meaning of printWarning and printErrors.&quot;&quot;&quot;
+
+        normTolerance = max( normTolerance, normCheckTolerance )
+        ErrMsgs = []
+        messages = []
+        for E, TPXsec in self.data :
+            if( len( TPXsec ) &lt; 1 ) : messages.append( &#39;endlI20.check: (T, P, Xsec) data len = %d &lt; 1 for E = %e&#39; % ( len( EPXsec ), E ) )
+            for T, PXsec in TPXsec :
+                if( len( PXsec ) &lt; 1 ) : 
+                    messages.append( &#39;endlI20.check: (P, Xsec) len = %d &lt; 1 for E = %e and T = %e&#39; % ( len( PXsec ), E, T ) )
+                else :
+                    if( PXsec[0][0] &lt; 0 ) : messages.append( &#39;endlI20.check: bad normalize = %.8e for E = %e and T = %e&#39; % ( PXsec[0][0], E, T ) )
+                    PPrior = 0.
+                    sum = 0
+                    for P, Xsec in PXsec :
+                        if( Xsec &lt; 0 ) : messages.append( &#39;endlI20.check: negative cross section = %e for E = %e and T = %e&#39; % ( Xsec, E, T ) )
+                        if( PPrior &gt; P ) : messages.append( &#39;endlI20.check: bad cdf (p[i-1] = %e &gt; p[i] = %e for E = %e and T = %e&#39; % ( PPrior, P, E, T ) )
+                        sum += ( P - PPrior ) * Xsec
+                        PPrior = P
+                    if( abs(P-1) &gt; normTolerance ) : messages.append( &#39;endlI20.check: bad probability normalization = %e for E = %e and T = %e&#39; % ( P, E, T ) )
+                    if( ( sum != 0 ) and ( abs(sum-1) &gt; normTolerance ) ) : 
+                        messages.append( &#39;endlI20.check: bad normalization = %e for E = %e and T = %e&#39; % ( sum, E, T ) )
+        messages += endl4dmathmisc.check4dData( self.data, allowNegativeT = False, allowZeroT = allowZeroE, allowNegativeX = False, allowZeroX = True, \
+            allowSameY = True, allowNegativeY = False, positiveZ = True, printWarning = printWarning, printErrors = printErrors, xCloseEps = xCloseEps, \
+            maxAbsFloatValue = maxAbsFloatValue )
+        if( len( messages ) &gt; 0 ) : ErrMsgs = [ endlmisc.endlCheckerObject( data = self, message = messages ) ]
+        return( ErrMsgs )</div>
+
+<div class="viewcode-block" id="endlI20.copyData"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI20.copyData">[docs]</a>    def copyData( self ) :
+        &quot;&quot;&quot;Returns an endlI20 instance that is a copy, and not a reference, of self.&quot;&quot;&quot;
+
+        return endlI20( None, self.yo, self.C, self.I, self.S, self.h, endl4dmathClasses.endl4dmath.copyData( self ) )</div>
+
+<div class="viewcode-block" id="endlI20.normalize"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI20.normalize">[docs]</a>    def normalize( self ) :
+        &quot;&quot;&quot;Normalizes the data so that the cdf&#39;s are 1.&quot;&quot;&quot;
+
+        for E, TPXsec in self.data :
+            for T, PXsecs in TPXsec :
+                n = 1. / PXsec[-1][0]
+                for PXsec in PXsecs : PXsec[0] /= n
+                n = 0
+                for P, Xsec in PXsecs : n += P * Xsec 
+                if( n != 0 ) :
+                    for PXsec in PXsecs : PXsec[1] /= n</div>
+
+<div class="viewcode-block" id="endlI20.set"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI20.set">[docs]</a>    def set( self, data, checkDataType = 0, tLabel = &quot;E (MeV)&quot;, xLabel = &quot;Temperature (keV)&quot;, yLabel = &quot;probability&quot;, zLabel = &quot;cross section (barn)&quot;,
+        interpolation = 0 ) :
+
+        endl4dmathClasses.endl4dmath.__init__( self, data, checkDataType = checkDataType, tLabel = tLabel, xLabel = xLabel, yLabel = yLabel, zLabel = zLabel,
+            interpolation = interpolation )
+        self.numberOfEnergies = 0
+        self.numberOfTemperatures = 0
+        self.numberOfProbabilities = 0
+        if( len( data ) &gt; 0 ) :
+            self.numberOfEnergies = len( self )
+            self.numberOfTemperatures = len( self.data[0][1] )
+            self.numberOfProbabilities = len( self.data[0][1][0][1] )</div>
+
+<div class="viewcode-block" id="endlI20.toString"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.endlI20.toString">[docs]</a>    def toString( self, format = None ) :
+        &quot;&quot;&quot;Returns a string with the data in the order (E, T, P, Xsec) as required by ENDL.&quot;&quot;&quot;
+
+        s = &#39;\n&#39;.join( endlmisc.string4dData( self.data, i0 = 0, i1 = 1, i2 = 2, i3 = 3, fmt0 = format, fmt1 = format, fmt2 = format, fmt3 = format ) )
+        return( s + &#39;\n&#39; )</div></div>
+
+<div class="viewcode-block" id="getThresholdsForChecker2d"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.getThresholdsForChecker2d">[docs]</a>def getThresholdsForChecker2d( self ) :
+
+    if( len( self ) &gt; 1 ) : return [ self.data[0][0], self.data[1][0] ]
+    if( len( self ) &gt; 0 ) : return [ self.data[0][0] ]
+    return []</div>
+
+<div class="viewcode-block" id="fixThresholdTest"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.fixThresholdTest">[docs]</a>def fixThresholdTest( threshold, dThreshold_MeV, EMin, EMin_, fixThresholdMode ) :
+
+    if( fixThresholdMode is None ) : fixThresholdMode = fixThresholdMode_RaiseOnly
+    if( fixThresholdMode == fixThresholdMode_None ) :
+        return( False )
+    elif( fixThresholdMode == fixThresholdMode_RaiseOnly ) :
+        fixThreshold = threshold - EMin_ &gt; dThreshold_MeV
+    else :
+        fixThreshold = abs( threshold - EMin_ ) &gt; dThreshold_MeV
+    if( fixThreshold or ( EMin_ &lt; EMin ) ) : return( True )
+    return( False )</div>
+
+<div class="viewcode-block" id="fixThresholdFor2d"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.fixThresholdFor2d">[docs]</a>def fixThresholdFor2d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, thresholdValue, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, 
+        threshold_MeV_shiftWarning = 0.1 ) :
+
+    if( len( self ) == 0 ) : return
+    if( EMin &gt; threshold ) : threshold = EMin
+    EMin_ = self.xMin( )
+    if( fixThresholdTest( threshold, dThreshold_MeV, EMin, EMin_, fixThresholdMode ) ) :
+        dE = threshold - EMin_
+        if( abs( dE ) &gt; threshold_MeV_shiftWarning ) :
+            endlmisc.printWarning( &#39;    2d: Moving threshold %e by %e for ZA = %d, %s&#39; % ( self.data[0][0], dE, self.ZA, `self` ) )
+        if( dE &lt; 0 ) :
+            if( not( thresholdCrossSectionIsZero ) ) :
+                endlmisc.printWarning( &#39;    Warning 2d: adding point at threshold where prior cross section was not 0: %s&#39; % `self` )
+            if( thresholdValue is None ) : thresholdValue = self.data[0][1]
+            self.data.insert( 0, [ threshold, thresholdValue ] )
+        else :
+            ELast = EMin_ + 1.                                 # Make sure the first point is always done.
+            for Ey in self.data :
+                if( Ey[0] &gt; ELast ) : break
+                Ey[0] += dE
+                ELast = Ey[0]</div>
+
+<div class="viewcode-block" id="fixThresholdFor3d"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.fixThresholdFor3d">[docs]</a>def fixThresholdFor3d( self, thresholdCrossSectionIsZero, I, threshold, dThreshold_MeV, EMin = 0., realSelf = None, fixThresholdMode = fixThresholdMode_RaiseOnly,
+        threshold_MeV_shiftWarning = 0.1 ) :
+
+    if( len( self ) == 0 ) : return
+    if( EMin &gt; threshold ) : threshold = EMin
+    EMin_ = self.xMin( )
+    if( fixThresholdTest( threshold, dThreshold_MeV, EMin, EMin_, fixThresholdMode ) ) :
+        self_ = self
+        if( realSelf is not None ) : self_ = realSelf
+        dE = threshold - EMin_
+        if( abs( dE ) &gt; threshold_MeV_shiftWarning ) :
+            endlmisc.printWarning( &#39;    3d: Moving threshold %e by %e for ZA = %d, %s&#39; % ( self.data[0][0], dE, self_.ZA, `self_` ) )
+        if( dE &gt; 0. ) :                                     # Move lower data up.
+            ELast = EMin_ + 1.                              # Make sure the first point is always done.
+            EyzPrepend = None
+            for Eyz in self.data :
+                if( Eyz[0] &gt; ELast ) : break
+                Eyz[0] += dE
+                ELast = Eyz[0]
+            if( EyzPrepend is not None ) : self.data.insert( 0, EyzPrepend )
+        else :                                              # Create point at threshold.
+            if( not( thresholdCrossSectionIsZero ) ) :
+                endlmisc.printWarning( &#39;    Warning 3d: adding point at threshold where prior cross section was not 0: %s&#39; % `self_` )
+            delta = fixThreshold_deltaFunctionEpsilon
+            if( I == 1 ) :
+                if( ( self_.C == 10 ) or ( self_.S == 1 ) ) :
+                    endlmisc.printWarning( &#39;    3d: Adding isotropic at threshold for com data: %s&#39; % `self_` )
+                    self.data.insert( 0, [ threshold, [ [ -1, 0.5 ], [ 1.0, 0.5 ] ] ] )
+                else :
+                    endlmisc.printWarning( &#39;    3d: Adding forward peaked delta function at threshold: %s&#39; % `self_` )
+                    self.data.insert( 0, [ threshold, [ [ 1 - delta, 0.0 ], [ 1.0, 2 / delta ] ] ] )
+            else :
+                if( I in [ 21, 22 ] ) :
+                    endlmisc.printWarning( &#39;    3d: I = %d data not support by fixThresholdFor3d: ZA = %d: %s&#39; % ( I, self_.ZA, `self_` ) )
+                else :
+                    endlmisc.printWarning( &#39;    3d: Creating data at threshold %e for I = %d data&#39; % ( threshold, I ) )
+                    self.data.insert( 0, [ threshold, [ [ delta, 2 / delta ], [ 2 * delta, 0.0 ] ] ] )</div>
+
+<div class="viewcode-block" id="fixThresholdFor4d"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.fixThresholdFor4d">[docs]</a>def fixThresholdFor4d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+
+    if( len( self ) == 0 ) : return
+    if( EMin &gt; threshold ) : threshold = EMin
+    EMin_ = self.EMin( )
+    if( fixThresholdTest( threshold, dThreshold_MeV, EMin, EMin_, fixThresholdMode ) ) :
+        dE = threshold - EMin_
+        if( abs( dE ) &gt; threshold_MeV_shiftWarning ) :
+            endlmisc.printWarning( &#39;    4d: Moving threshold %e by %e for ZA = %d, %s&#39; % ( self.data[0][0], dE, self.ZA, `self` ) )
+        if( dE &gt; 0 ) :                                      # Move lower data up.
+            ELast = EMin_ + 1.                              # Make sure the first point is always done.
+            for Exyz in self.data :
+                if( Exyz[0] &gt; ELast ) : break
+                Exyz[0] += dE
+                ELast = Exyz[0]
+        else :                                              # Create point at threshold.
+            if( not( thresholdCrossSectionIsZero ) ) :
+                endlmisc.printWarning( &#39;    Warning 4d: adding point at threshold where prior cross section was not 0: %s&#39; % `self` )
+            delta = fixThreshold_deltaFunctionEpsilon
+            if( self.I == 3 ) :
+                yo = self.yo
+                if( yo &gt; 9 ) : yo -= 10
+                mass1, mass2, mass3 = self.bdflsFile.mass( self.yi ), self.bdflsFile.mass( self.ZA ), self.bdflsFile.mass( yo )
+                EpLab = mass1 * mass3 * threshold / ( mass1 + mass2 )**2
+                if( EpLab - delta &lt; 0 ) :
+                    EpP = [ [ 0.0, 2 / delta ], [ delta, 0 ] ]
+                else :
+                    EpP = [ [ EpLab - delta, 0.0 ],
+                            [         EpLab, 1 / delta ],
+                            [ EpLab + delta, 0.0 ] ]
+                self.data.insert( 0, [ threshold, [ [ 1 - delta, EpP ],
+                                                    [       1.0, EpP ] ] ] )
+            else :
+                endlmisc.printWarning( &#39;    4d: Creating data at threshold not supported for %s&#39; % `self` )</div>
+
+<div class="viewcode-block" id="I1sToCommonGrids"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.I1sToCommonGrids">[docs]</a>def I1sToCommonGrids( I1List, muGridPerE = True ) :
+    &quot;&quot;&quot;This routine takes a list of I = 1 data and puts their E and mu data onto a common grid. Note, this function may add
+    points for which integral( d_mu P(E,mu) ) = 0 and not 1 (that is, the normalization method may fail).&quot;&quot;&quot;
+
+    Es = []
+    muGrids = {}
+    muMasterGrid = []
+    for I1 in I1List :
+        for E, muP in I1.data :
+            if( E not in Es ) :
+                Es.append( E )
+                muGrids[E] = []
+            muGrid = muGrids[E]
+            for mu, P in muP :
+                if( mu not in muGrid ) : muGrid.append( mu )
+                if( mu not in muMasterGrid ) : muMasterGrid.append( mu )
+    Es.sort( )
+    for E in Es : muGrids[E].sort( )
+    muMasterGrid.sort( )
+    thisMuGrid = muMasterGrid
+    for I1 in I1List :
+        EMin, EMax = I1.xMin( ), I1.xMax( )
+        if( ( EMin is None ) or ( EMax is None ) ) : raise Exception( &#39;I = 1 data does not contain at least two energy points: %s&#39; % `I1` )
+        for E in Es :
+            if( muGridPerE ) : thisMuGrid = muGrids[E]
+            if( EMin &lt;= E &lt;= EMax ) : 
+                muP = endl2dmathClasses.endl2dmath( I1.getEData( E ) )
+            else :
+                muP = endl2dmathClasses.endl2dmath( [ [ thisMuGrid[0], 0 ], [ thisMuGrid[-1], 0 ] ] )
+            for mu in thisMuGrid : muP.setValue( mu, muP.getValue( mu ) )
+            I1.setEData( E, muP )</div>
+
+<div class="viewcode-block" id="toZAsFrameMisc"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlIClasses.toZAsFrameMisc">[docs]</a>def toZAsFrameMisc( endlI, old, newProjectileMass, newTargetMass, ELevel, halflife, bdflsFile, firstParameterEIn ) :
+
+    import endl2
+    h = copy.deepcopy( old.h )
+    new = endlI( None, old.yo, old.C, old.I, old.S, h, points = old.copyData( ), bdflsFile = bdflsFile ) 
+    new.setZA( endl2.yoToZA( old.getYi( ) ) )
+    new.setYi( endl2.ZAToYo( old.getZA( ) ) )
+    new.setMass( newTargetMass )
+    new.setELevel( ELevel )
+    new.setHalflife( halflife )
+    new.setX1( 0. )
+    r = newProjectileMass / newTargetMass
+    if( firstParameterEIn ) :
+        for xy in new.data : xy[0] *= r
+    return( new, r )</div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

@@ -195,7 +195,7 @@ static nfu_status ptwXY_createFromFunctionZeroCrossing( statusMessageReporting *
         double x2, double y2, ptwXY_createFromFunction_callback func, void *argList, double eps ) {
 
     int i;
-    double x, y;
+    double x = 0, y;        /* Initialize x so some compilers do not complain. */
     nfu_status status;
 
     for( i = 0; i < 16; i++ ) {
@@ -340,7 +340,7 @@ ptwXYPoints *ptwXY_fromString( statusMessageReporting *smr, char const *str, cha
         return( NULL );
     }
     if( ( numberConverted % 2 ) == 0 ) {
-        ptwXY = ptwXY_create( NULL, interpolation, interpolationString, biSectionMax, accuracy, numberConverted, 10, numberConverted / 2, doublePtr, 0 ); }
+        ptwXY = ptwXY_create( NULL, interpolation, interpolationString, biSectionMax, accuracy, numberConverted / 2, 10, numberConverted / 2, doublePtr, 0 ); }
     else {
         smr_setReportError2( smr, nfu_SMR_libraryID, nfu_oddNumberOfValues, "Odd number = %d of float for ptwXY.", (int) numberConverted );
     }

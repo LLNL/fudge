@@ -63,8 +63,8 @@
 
 SHELL = /bin/ksh
 
-STATUSMESSAGEREPORTING_CFLAGS = -g -O0
-local_CFLAGS = $(CFLAGS) -I./ -I../../Src $(STATUSMESSAGEREPORTING_CFLAGS)
+STATUSMESSAGEREPORTING_CXXFLAGS = -g -O0
+local_CXXFLAGS = $(CXXFLAGS) -I./ -I../../Src $(STATUSMESSAGEREPORTING_CXXFLAGS)
 
 .PHONY: all check clean realclean
 
@@ -79,13 +79,13 @@ check: default
 	echo
 
 example: example.c checkMathSMR.o mathSMR.o
-	$(CC) $(local_CFLAGS) -o example example.c checkMathSMR.c mathSMR.o ../../Src/statusMessageReporting.o -lm
+	$(CXX) $(local_CXXFLAGS) -o example example.c checkMathSMR.c mathSMR.o ../../Src/statusMessageReporting.o -lm
 
 checkMathSMR.o: checkMathSMR.c
-	$(CC) $(local_CFLAGS) -c -o checkMathSMR.o checkMathSMR.c
+	$(CXX) $(local_CXXFLAGS) -c -o checkMathSMR.o checkMathSMR.c
 
 mathSMR.o: mathSMR.c
-	$(CC) $(local_CFLAGS) -c -o mathSMR.o mathSMR.c
+	$(CXX) $(local_CXXFLAGS) -c -o mathSMR.o mathSMR.c
 
 clean:
 	rm -f example *.o

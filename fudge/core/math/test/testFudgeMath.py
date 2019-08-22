@@ -78,25 +78,25 @@ __metaclass__ = type
 class testLegendre(unittest.TestCase):
 
     def test0(self): 
-        '''Simple test, just check a couple of values for n = 0,1,2'''
+        """Simple test, just check a couple of values for n = 0,1,2"""
         self.assertEqual( Legendre( 0, 0.0 ), 1.0 )
         self.assertEqual( Legendre( 1, 1.0 ), 1.0 )
         self.assertEqual( Legendre( 2, 1.0 ), 1.0 )
         self.assertEqual( Legendre( 1, -1.0 ), -1.0 )
         
     def test1(self):
-        '''Check that all odd order polynomials evaluate to zero at the origin'''
+        """Check that all odd order polynomials evaluate to zero at the origin"""
         for n in range( 50 ):
             self.assertEqual( Legendre( 2*n+1, 0.0 ), 0.0 )
         
     def test2(self): 
-        '''Check that all odd order polynomials are in fact odd and even ones are in fact even'''
+        """Check that all odd order polynomials are in fact odd and even ones are in fact even"""
         for n in range( 50 ):
             self.assertEqual( Legendre( 2*n+1, 0.5 ), -Legendre( 2*n+1, -0.5 ) )
             self.assertEqual( Legendre( 2*n, 0.5 ), Legendre( 2*n, -0.5 ) )
 
     def test3(self): 
-        '''Check some more values, these are taken from Abramowitz and Stegun, 8.15 Example 1'''
+        """Check some more values, these are taken from Abramowitz and Stegun, 8.15 Example 1"""
         self.assertEqual( Legendre( 0, 0.3141592654 ), 1.0 )
         self.assertEqual( Legendre( 1, 0.3141592654 ), 0.3141592654 )
         self.assertAlmostEqual( Legendre( 2, 0.3141592654 ), -0.3519559340 )
@@ -117,12 +117,12 @@ class testLegendre(unittest.TestCase):
         self.assertAlmostEqual( Legendre( 8, 2.6, False ), 78402.55522, 4 )
 
     def test4(self): 
-        '''Check range testing of parameters'''
+        """Check range testing of parameters"""
         self.assertRaises( ValueError, Legendre, n=-1, mu=0.0 )
         self.assertRaises( ValueError, Legendre, n=1, mu=10.0 )
         
     def test5(self): 
-        '''Check recursion relation'''
+        """Check recursion relation"""
         def lhs( n, x ): return (n+1)*Legendre(n+1,x)
         def rhs( n, x ): return (2*n+1)*x*Legendre(n,x) - n*Legendre(n-1,x)
         for n in range( 1, 50 ):

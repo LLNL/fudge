@@ -1,0 +1,18 @@
+The data in this subdirectory is traditional ENDL I=3 double-differential
+energy-angle probability densities for outgoing particles.  The code first
+converts the data to ENDF Legendre expansions of the energy-angle probability
+densities, and this is done using Gaussian quadrature.  The "Quadrature method"
+in the input files refers to how the ENDF Legendre expansions are integrated
+over the energy bins.  
+
+*** Warning: because the code first converts the data to Legendre    ***
+*** expansions, interpolation between different values of the cosine ***
+*** is necessarily direct.                                    ***
+
+The input files are as follows:
+
+in.doubleDiff-Fe57: Uses the default adaptive quadrature.  The output file is
+  out.doubleDiff-Fe57.
+
+in.doubleDiff-Fe57.Gauss4: Uses 4th-order Gaussian quadrature.  The output file is
+  out.doubleDiff-Fe57.Gauss4.

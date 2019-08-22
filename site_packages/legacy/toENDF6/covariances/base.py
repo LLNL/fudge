@@ -61,12 +61,13 @@
 # 
 # <<END-copyright>>
 
-from fudge.gnd.covariances.base import covarianceMatrix
-from fudge.core.math import linearAlgebra
-
-from .. import endfFormats
 from xData import array as arrayModule
 from xData import axes as axesModule
+
+from fudge.gnd.covariances.base import covarianceMatrix as covarianceMatrixModule
+from fudge.core.math import linearAlgebra as linearAlgebraModule
+
+from .. import endfFormats as endfFormatsModule
 
 def toENDF6(self, flags, targetInfo, inCovarianceGroup=False):
 
@@ -80,7 +81,7 @@ def toENDF6(self, flags, targetInfo, inCovarianceGroup=False):
         if coldat:
             MF1, MT1 = map(int, coldat['ENDF_MFMT'].split(','))
         if MF in (31,33):
-            endf.append( endfFormats.endfHeadLine(XMF1,XLFS1,MAT1,MT1,NC,NI) )
+            endf.append( endfFormatsModule.endfHeadLine(XMF1,XLFS1,MAT1,MT1,NC,NI) )
     # header for matrix:
     rows,cols = self.matrix.array.shape
     if isinstance( self.matrix.array, arrayModule.diagonal ):
@@ -95,7 +96,7 @@ def toENDF6(self, flags, targetInfo, inCovarianceGroup=False):
             LS = 1; LB = 5; NT = (rows+1) + rows*(rows+1)/2; NP = rows+1
             arrayData = list( self.matrix.array.values )
             if self.matrix.array.symmetry == arrayModule.symmetryLowerToken:
-                arrayData = linearAlgebra.switchSymmetry( arrayData, upperToLower=False )
+                arrayData = linearAlgebraModule.switchSymmetry( arrayData, upperToLower=False )
             matrixData = list(self.matrix.axes[2].values) + arrayData
         elif self.matrix.axes[1].style == axesModule.linkGridToken:
             LS = 0; LB = 5; NT = (rows+1) + rows*cols; NP = rows+1
@@ -112,10 +113,10 @@ def toENDF6(self, flags, targetInfo, inCovarianceGroup=False):
         if LS: LB = 7
         else:
             raise Exception ("Unknown spectrum (MF35) covariance format")
-        endf.append( endfFormats.endfHeadLine( E1,E2,LS,LB,NT,NP ) )
+        endf.append( endfFormatsModule.endfHeadLine( E1,E2,LS,LB,NT,NP ) )
     else:
-        endf.append( endfFormats.endfHeadLine( 0,0,LS,LB,NT,NP ) )
-    endf += endfFormats.endfDataList( matrixData )
+        endf.append( endfFormatsModule.endfHeadLine( 0,0,LS,LB,NT,NP ) )
+    endf += endfFormatsModule.endfDataList( matrixData )
     return endf
 
-covarianceMatrix.toENDF6 = toENDF6
+covarianceMatrixModule.toENDF6 = toENDF6

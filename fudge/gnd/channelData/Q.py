@@ -64,16 +64,22 @@
 from pqu import PQU as PQUModule
 
 from xData import axes as axesModule
+from xData import constant as constantModule
 from xData import XYs as XYsModule
 from xData import gridded as griddedModule
 
-from fudge.processing import group as groupModule
-
-from fudge.gnd import miscellaneous as miscellaneousModule
 from fudge.gnd import abstractClasses as abstractClassesModule
-from fudge.gnd import tokens as tokensModule
+from . import fissionEnergyReleased as fissionEnergyReleasedModule
 
 __metaclass__ = type
+
+def defaultAxes( energyUnit ) :
+
+    axes = axesModule.axes( )
+# BRB6 make 'energy_in' a token
+    axes[1] = axesModule.axis( 'energy_in', 0, energyUnit )
+    axes[0] = axesModule.axis( component.moniker, 1, energyUnit )
+    return( axes )
 
 #
 # Q forms
@@ -82,85 +88,21 @@ class baseQForm( abstractClassesModule.form ) :
 
     pass
 
-class constant( baseQForm ) :
+class constant1d( baseQForm, constantModule.constant1d ) :
 
-    moniker = 'constant'
+    def __init__( self, Q, domainMin, domainMax, axes, label = None ) :
 
-    def __init__( self, label, Q ) :
-        """
-        Q can be a string, convertible to a PQU , or a PQU. The Q must have units of energy.
-        """
+        baseQForm.__init__( self )
+        constantModule.constant1d.__init__( self, Q, domainMin, domainMax, axes = axes, label = label )
 
-        Q_ = Q
-        if( isinstance( Q_, str ) ) :
-            try :
-                Q_ = PQUModule.PQU( Q_ )
-            except :
-                raise Exception( "Could not convert '%s' to PQU" % Q_ )
-        if( isinstance( Q_, component ) ) : Q_ = Q_.getEvaluated( )
-        if( isinstance( Q_, constant ) ) : Q_ = Q_.Q
-        if( not( isinstance( Q_, PQUModule.PQU ) ) ) : raise TypeError( "Invalid type for Q: type = '%s'" % brb.getType( Q ) )
-        if( not( Q_.isEnergy( ) ) ) : raise ValueError( "Q must have units of energy, entered Q was '%s'" % Q )
-        self.Q = Q_
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
-        if( label is not None ) :
-            if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must be a string' )
-        self.__label = label
+        return( self.toPointwise_withLinearXYs( accuracy = 1e-5, upperEps = 1e-8 ).processMultiGroup( style, tempInfo, indent ) )
 
-    def domainMin( self, unitTo = None, asPQU = False ) :
-
-        from fudge.gnd.reactions import base as reactionsBaseModule
-
-        return( self.findClassInAncestry( reactionsBaseModule.base_reaction ).domainMin( unitTo = unitTo, asPQU = asPQU ) )
-
-    def domainMax( self, unitTo = None, asPQU = False ) :
-
-        from fudge.gnd.reactions import base as reactionsBaseModule
-
-        return( self.findClassInAncestry( reactionsBaseModule.base_reaction ).domainMax( unitTo = unitTo, asPQU = asPQU ) )
-
-    def domain( self, unitTo = None, asPQU = False ) :
-
-        return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
-
-    def domainUnit( self ) :
-
-        from fudge.gnd.reactions import base as reactionsBaseModule
-
-        return( self.findClassInAncestry( reactionsBaseModule.base_reaction ).domainUnit( ) )
-
-    def getValue( self, E, unit ) :
-
-        return( self.Q.getValueAs( unit ) )
-
-    @property
-    def label( self ) :
-
-        return( self.__label )
-
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
-
-        return( self.toPointwise_withLinearXYs( 1e-8, 1e-8 ).processSnMultiGroup( style, tempInfo, indent ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
-
-        attributeStr = ''
-        if( self.label is not None ) : attributeStr += ' label="%s"' % self.label
-        return( [ '%s<%s%s value="%s"/>' % ( indent, self.moniker, attributeStr, self.Q ) ] )
-
-    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
         """This method returns the Q-value as linear-linear XYs1d data which spans self's domain."""
 
-        axes = XYs1d.defaultAxes( energyUnit = self.domainUnit( ), QUnit = self.Q.getUnitSymbol( ) )
-        return( XYs1d( data = [ [ self.domainMin( ), self.Q.getValue( ) ], [ self.domainMax( ), self.Q.getValue( ) ] ], axes = axes, accuracy = 1e-12 ) )
-
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ):
-
-        xPath.append( element.tag )
-        Q = constant( element.get( 'label' ), element.get( 'value' ) )
-        xPath.pop( )
-        return( Q )
+        return( XYs1d( data = [ [ self.domainMin, self.constant ], [ self.domainMax, self.constant ] ], axes = self.axes ) )
 
 class XYs1d( baseQForm, XYsModule.XYs1d ) :
 
@@ -171,29 +113,17 @@ class XYs1d( baseQForm, XYsModule.XYs1d ) :
         baseQForm.__init__( self )
         XYsModule.XYs1d.__init__( self, **kwargs )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
         from fudge.processing import miscellaneous as miscellaneousModule
 
-        indent2 = indent + tempInfo['incrementalIndent']
-        verbosity = tempInfo['verbosity']
+        return( miscellaneousModule.groupFunctionCrossSectionAndFlux( gridded1d, style, tempInfo, self ) )
 
-        QGrouped = miscellaneousModule.groupOneFunctionAndFlux( style, tempInfo, self )
-        return( groupModule.toMultiGroup1d( multiGroup, style, tempInfo, self.axes, QGrouped ) )
-
-    @staticmethod
-    def defaultAxes( energyUnit = 'eV', QUnit = 'eV' ) :
-
-        axes = axesModule.axes( )
-        axes[0] = axesModule.axis( 'energy_in', 0, energyUnit )
-        axes[1] = axesModule.axis( component.moniker, 1, QUnit )
-        return( axes )
-
-class multiGroup( baseQForm, griddedModule.gridded ) :
+class gridded1d( baseQForm, griddedModule.gridded1d ) :
 
     def __init__( self, **kwargs ) :
 
-        griddedModule.gridded.__init__( self, **kwargs )
+        griddedModule.gridded1d.__init__( self, **kwargs )
 #
 # Q component
 #
@@ -204,22 +134,35 @@ class component( abstractClassesModule.component ) :
     def __init__( self ) :
 
         abstractClassesModule.component.__init__( self,
-                ( constant, XYs1d, multiGroup ) )
+                ( constant1d, XYs1d, gridded1d, fissionEnergyReleasedModule.fissionEnergyReleased ) )
 
-    def getConstantAs( self, unit ) :
+    def getConstantAs( self, unit ) :   # FIXME: Remove?
 
         for form in self :
-            if( isinstance( form, constant ) ) : return( form.getValue( 0, unit ) )
-        raise ValueError( 'Q-value is not a contant' )
+            if( isinstance( form, constant1d ) ) :
+                return( PQUModule.PQU( form.constant, form.axes[0].unit ).getValueAs( unit ) )
+            elif( isinstance( form, fissionEnergyReleasedModule.fissionEnergyReleased ) ) :
+                return( PQUModule.PQU( form.nonNeutrinoEnergy.data.evaluate( 0 ) ) )
+        raise ValueError( 'Q-value is not a constant' )
 
-    def getValue( self, E, unit ) :
+    def getConstant( self ):
 
-        return( self.getEvaluated( ).getValue( E, unit ) )
+        for form in self :
+            if( isinstance( form, constant1d ) ) :
+                return form.constant
+            elif( isinstance( form, fissionEnergyReleasedModule.fissionEnergyReleased ) ) :
+                return form.nonNeutrinoEnergy.data.evaluate( 0 )
+        raise ValueError( 'Q-value is not a constant' )
+
+    def evaluate( self, E ) :
+
+        return( self.getEvaluated( ).evaluate( E ) )
 
 def parseXMLNode( QElement, xPath, linkData ):
     """
     Reads an xml <Q> element into fudge, including all child forms
     """
+    from .fissionEnergyReleased import fissionEnergyReleased
 
     xPath.append( QElement.tag )
     kwargs = {}     # In case we need special interpolation rules for Q, see gnd/reactionData/crossSection.py
@@ -227,9 +170,10 @@ def parseXMLNode( QElement, xPath, linkData ):
     Q = component( )
     for form in QElement :
         formClass = {
-                constant.moniker        : constant,
-                XYs1d.moniker           : XYs1d,
-                multiGroup.moniker      : multiGroup
+                constant1d.moniker     : constant1d,
+                XYs1d.moniker          : XYs1d,
+                gridded1d.moniker      : gridded1d,
+                fissionEnergyReleased.moniker : fissionEnergyReleased
             }.get( form.tag )
         if( formClass is None ) : raise Exception( "unknown Q form: %s" % form.tag )
         newForm = formClass.parseXMLNode( form, xPath, linkData, **kwargs )

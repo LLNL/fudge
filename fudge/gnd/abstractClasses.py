@@ -62,15 +62,18 @@
 # <<END-copyright>>
 
 import sys
+import abc
 
 from xData import ancestry as ancestryModule
 
 from . import suites as suitesModule
-from fudge.core.math import fudge2dGrouping as fudge2dGroupingModule
+from . import styles as stylesModule
 
 __metaclass__ = type
 
 class component( suitesModule.suite ) :
+
+    __metaclass__ = abc.ABCMeta
 
     def __init__( self, allowedClasses ) :
 
@@ -78,17 +81,22 @@ class component( suitesModule.suite ) :
 
     @property
     def evaluated( self ) :
-        if not hasattr(self.getRootAncestor(),'styles'): return self['eval'] # a hack to deal with orphaned components that are not part of a full reactionSuite
+        if not hasattr(self.getRootAncestor(),'styles'):
+            return self[0] # a hack to deal with orphaned components that are not part of a full reactionSuite
         evaluated = self.getRootAncestor( ).styles.getEvaluatedStyle( )
         return( self[evaluated.label] )
+
+    def keys( self ):
+
+        return [form.label for form in self]
 
     def getStylesOfClass( self, cls ) :
 
         styles = self.getRootAncestor( ).styles.getStylesOfClass( cls )
         formList = []
-        for form in self :
+        for _form in self :
             for style in styles :
-                if( form.label == style.label ) : formList.append( form.label )
+                if( _form.label == style.label ) : formList.append( _form.label )
         return( formList )
 
     def getStyleOfClass( self, cls ) :
@@ -97,26 +105,44 @@ class component( suitesModule.suite ) :
         if( style is not None ) : style = self[style.label]
         return( style )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMC( self, style, tempInfo, indent = '' ) :
+
+        indent2 = indent + tempInfo['incrementalIndent']
+        addToComponent = tempInfo.get( 'addToComponent', True )
+
+        _form = style.findFormMatchingDerivedStyle( self )
+        try :
+            MC = _form.processMC( style, tempInfo, indent2 )
+        except :
+            print '==== form = %s failed' % _form.moniker
+            raise
+        if( addToComponent and ( MC is not None ) ) : self.add( MC )
+
+    def processMultiGroup( self, style, tempInfo, indent ) :
+
+        def styleFilter( style ) :
+
+            if( isinstance( style, stylesModule.MC ) ) : return( False )
+            return( True )
 
         indent2 = indent + tempInfo['incrementalIndent']
         verbosity = tempInfo['verbosity']
         addToComponent = tempInfo.get( 'addToComponent', True )
 
-        form = style.findFormMatchingDerivedStyles( self )
-        if( form is None ) :
+        _form = style.findFormMatchingDerivedStyle( self, styleFilter )
+        if( _form is None ) :
 #            if( verbosity ) : print '%sWARNING: no form found for component %s' % ( indent, self.moniker )
             return( None )
         try :
-            multiGroup = form.processSnMultiGroup( style, tempInfo, indent2 )
+            multiGroup = _form.processMultiGroup( style, tempInfo, indent2 )
         except :
-            sys.stderr.write( 'form = %s\n' % form.moniker )
+            sys.stderr.write( 'form = %s: %s\n' % ( _form.moniker, self ) )
             raise
 
         if( addToComponent and ( multiGroup is not None ) ) : self.add( multiGroup )
         return( multiGroup )
 
-    def toPointwise_withLinearXYs( self, lowerEps = 1.e-8, upperEps = 1.e-8 ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
         """
         This method calls the toPointwise_withLinearXYs method for the evaluated style and returns a "lin-lin" pointwise representation of it.
 
@@ -124,26 +150,31 @@ class component( suitesModule.suite ) :
         @:param upperEps: upper epsilon for converting discontinuities to monotonic function
         """
 
-        return( self.evaluated.toPointwise_withLinearXYs( lowerEps, upperEps ) )
+        return( self.evaluated.toPointwise_withLinearXYs( **kwargs ) )
+
+    def check( self, info ):
+
+        from fudge.gnd import warning
+        warnings = []
+
+        for form in self:
+            formWarnings = form.check( info )
+            if formWarnings:
+                warnings.append( warning.context('form "%s":' % form.label, formWarnings) )
+
+        return warnings
 
 class form( ancestryModule.ancestry ) :
     """
     This is the base class which is used as a form base class for channelData, reactionData and productData form classes.
     """
 
+    __metaclass__ = abc.ABCMeta
+
     def getComponentsClass( self ) :
 
         return( sys.modules[self.__module__].component )
 
-class multiGroup( form, fudge2dGroupingModule.groupedData ) :
-    """This is the base class which is used as a form grouped base class for channelData, reactionData and productData form classes."""
+    def toXML( self, indent = '', **kwargs ) :
 
-    def __init__( self, label, axes_, groupData ) :
-
-        fudge2dGroupingModule.groupedData.__init__( self, groupData, axes_ )
-        self.__label = label
-
-    @property
-    def label( self ) :
-
-        return( self.__label )
+        return( '\n'.join( self.toXMLList( indent = indent, **kwargs ) ) )

@@ -127,6 +127,7 @@ static int loop( statusMessageReporting *smr, int n1, double *xys, nfu_status *s
     for( i1 = ptwXY_interpolationLinLin; i1 <= ptwXY_interpolationLogLog; ++i1 ) {
         p1->interpolation = (ptwXY_interpolation) i1;
         p2 = ptwXY_toOtherInterpolation( smr, p1, ptwXY_interpolationLinLin, accuracy );
+        ptwXY_free( p2 );
         report = smr_firstReport( smr );
         if( report == NULL ) {
             status = nfu_Okay; }

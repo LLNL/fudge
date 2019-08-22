@@ -65,72 +65,70 @@
 This module adds the method toACE to the classes in the fudge.gnd.product module.
 """
 
-from fudge.gnd import product
-from fudge.gnd.productData import distributions
-from xData import axes
-import angularEnergy
+from fudge.core.utilities import brb
 
-def toACE( self, MTData, MT ) :
+from xData import standards as standardsModule
 
-    from fudge.gnd.productData import distributions
-    from fudge.gnd.productData.distributions import angular
+from fudge.gnd import product as productModule
 
-    name = self.name
-    if( name in [ 'n', 'gamma' ] ) :
+from fudge.gnd.productData.distributions import unspecified as unspecifiedModule
+from fudge.gnd.productData.distributions import unknown as unknownModule
+from fudge.gnd.productData.distributions import angular as angularModule
+from fudge.gnd.productData.distributions import uncorrelated as uncorrelatedModule
+from fudge.gnd.productData.distributions import angularEnergy as angularEnergyModule
+from fudge.gnd.productData.distributions import energyAngular as energyAngularModule
+from fudge.gnd.productData.distributions import KalbachMann as KalbachMannModule
+
+from . import angularEnergy
+
+def toACE( self, MTData, MT, verbose ) :
+
+    if( verbose > 2 ) : print '        %s: label = %s' % ( self.name, self.label )
+    if( self.name in [ 'n', 'gamma' ] ) :
         if( self.multiplicity.isConstant( ) ) :
-            multiplicity = self.multiplicity.getValue( 0 )
+            multiplicity = self.multiplicity.evaluate( 0 )
         else :
-            multiplicity = self.multiplicity.getNativeData( )
+            multiplicity = self.multiplicity.evaluated
+
     if( self.name == 'n' ) :
-        nativeDataToken = self.distributions.getNativeDataToken( )
         angularForm, energyData = None, None
-        if( ( MT == 18 ) and ( nativeDataToken == distributions.base.unspecifiedComponentToken ) ) :
+        evaluated = self.distribution.evaluated
+        if( ( MT == 18 ) and isinstance( evaluated, ( unspecifiedModule.form, unknownModule.form ) ) ) :
             pass
         else :
-            nativeData = self.distributions.getNativeData( )
-            if( nativeDataToken == distributions.base.angularComponentToken ) :
-                angularForm = nativeData
-            elif( nativeDataToken == distributions.base.uncorrelatedComponentToken ) :
-                angularForm = nativeData.angularComponent.getNativeData( )
-                energyData = nativeData.energyComponent.getNativeData( )
-            elif( nativeDataToken == distributions.base.energyAngularComponentToken ) :
-                if( isinstance( nativeData, distributions.energyAngular.KalbachMann ) ) :
-                    energyData = nativeData
-                else :
-                    raise Exception( '%s is not implemented' % nativeDataToken )
-            elif( nativeDataToken == distributions.base.LegendreComponentToken ) :
-                accuracy = 1e-3
-                if( nativeData.axes[1].isFlat( qualifierOk = True ) ) : accuracy = 1e-6
-                energyData = nativeData.toPointwise_withLinearXYs( accuracy )
-            elif( nativeDataToken == distributions.base.angularEnergyComponentToken ) :
-                angularForm = angularEnergy.angularFor_angularEnergy( nativeData )
-                energyData = nativeData
+            if( isinstance( evaluated, angularModule.twoBodyForm ) ) :
+                angularForm = evaluated.angularSubform
+            elif( isinstance( evaluated, uncorrelatedModule.form ) ) :
+                angularForm = evaluated.angularSubform.data
+                energyData = evaluated.energySubform.data
+            elif( isinstance( evaluated, energyAngularModule.form ) ) :
+                energyData = evaluated.energyAngularSubform
+            elif( isinstance( evaluated, KalbachMannModule.form ) ) :
+                energyData = evaluated
+            elif( isinstance( evaluated, angularEnergyModule.form ) ) :
+                angularForm = angularEnergy.angularFor_angularEnergy( evaluated )
+                energyData = evaluated
             else :
-                print 'token', self.distributions.getNativeDataToken( )
-                raise Exception( 'Unsupported nativeData = %s' % nativeData )
+                raise Exception( 'Unsupported distribution form = %s' % evaluated.moniker )
 
         if( angularForm is None ) :
             angularData = angularForm
-        elif( isinstance( angularForm, distributions.angularEnergy.pointwise ) ) :
+        elif( isinstance( angularForm, angularEnergyModule.XYs3d ) ) :
             angularData = angularForm
-        elif( isinstance( angularForm, angular.isotropic ) ) :
+        elif( isinstance( angularForm, angularModule.isotropic ) ) :
             angularData = angularForm
         elif( isinstance( angularForm, angularEnergy.angularFor_angularEnergy ) ) :
             angularData = angularForm
-        elif( isinstance( angularForm, ( angular.pointwise, angular.linear, angular.piecewise, angular.LegendrePointwise,
-                angular.LegendrePiecewise, angular.mixedRanges ) ) ) :
-            angularData = angularForm.toPointwise_withLinearXYs( accuracy = 1e-4 )
+        elif( isinstance( angularForm, angularModule.subform ) ) :
+            angularData = angularForm.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-6 )
         else :
-            from fudge.core.utilities import brb
             brb.objectoutline( angularForm )
             raise Exception( "angular form '%s' not supported" % angularForm.moniker )
 
-        frame = axes.labToken
-        if( angularData is not None ) :
-            frame = angularData.getProductFrame( )
-        else :
-            if( energyData is not None ) : frame = energyData.getProductFrame( )
+        frame = evaluated.productFrame
         MTData['n'].append( { 'product' : self, 'frame' : frame, 'multiplicity' : multiplicity, 
             'angularData' : angularData, 'energyData' : energyData } )
 
-product.product.toACE = toACE
+        if( 'decayRate' in self.attributes ) : MTData['n_fissionDelayed'].append( self )
+
+productModule.product.toACE = toACE

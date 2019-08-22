@@ -72,7 +72,6 @@ from xData import axes as axesModule
 from xData import XYs as XYsModule
 
 from fudge.gnd.productData import energyDeposition as energyDepositionModule
-from fudge.gnd.productData import momentumDeposition as momentumDepositionModule
 
 __metaclass__ = type
 
@@ -80,17 +79,16 @@ def calculateDepositionEnergyFromEpP( E, EpP ) :
     "EpP is a list of [ E', P(E') ]"
 
     axes = axesModule.axes( )
-    axes[0] = axesModule.axis( 'a', 0, EpP.axes[0].getUnit( ) )
-    axes[1] = axesModule.axis( 'b', 1, EpP.axes[0].getUnit( ) )
-    Ep = XYsModule.XYs1d( data = [ [ EpP[0][0], EpP[0][0] ], [ EpP[-1][0], EpP[-1][0] ] ], axes = axes, accuracy = 1e-12 )
+    axes[0] = axesModule.axis( 'a', 0, EpP.axes[0].unit )
+    axes[1] = axesModule.axis( 'b', 1, EpP.axes[1].unit )
+    Ep = XYsModule.XYs1d( data = [ [ EpP[0][0], EpP[0][0] ], [ EpP[-1][0], EpP[-1][0] ] ], axes = axes )
     return( float( EpP.integrateTwoFunctions( Ep ) ) )
 
-def calculateDepositionEnergyFromAngular_angularEnergy( processInfo, derivedStyles, angular, energy, multiplicity, 
+def calculateDepositionEnergyFromAngular_angularEnergy( style, angular, energy, multiplicity, 
         doingGammaMomentum = False, accuracy = 1e-6 ) :
 
-    raise 'FIXME'
-    energyUnit = energy.axes[0].getUnit( )
-    energyPrimeUnit = energy.axes[2].getUnit( )
+    energyUnit = energy.axes[0].unit
+    energyPrimeUnit = energy.axes[2].unit
     momentumDepositionUnit = energyPrimeUnit + '/c'
 
     sqrtP6 = 0.77459666924148337704 / 2.      # sqrt( 0.6 ) / 2
@@ -105,25 +103,25 @@ def calculateDepositionEnergyFromAngular_angularEnergy( processInfo, derivedStyl
             Ep2 = muEpP.integrateWithWeight_x( )
             if( indexMu != 0 ) :
                 muMid = 0.5 * ( mu1 + mu2 )
-                EpMid = muEpPs.interpolateAtW( muMid, unitBase = True ).integrateWithWeight_x( )
+                EpMid = muEpPs.interpolateAtValue( muMid, unitBase = True ).integrateWithWeight_x( )
                 if( doingGammaMomentum ) :
                     dMu = sqrtP6 * ( mu2 - mu1 )
                     muG1 = muMid - dMu
-                    muEpG1 = muG1 * muEpPs.interpolateAtW( muG1, unitBase = True ).integrateWithWeight_x( )
+                    muEpG1 = muG1 * muEpPs.interpolateAtValue( muG1, unitBase = True ).integrateWithWeight_x( )
                     muG2 = muMid + dMu
-                    muEpG2 = muG2 * muEpPs.interpolateAtW( muG2, unitBase = True ).integrateWithWeight_x( )
+                    muEpG2 = muG2 * muEpPs.interpolateAtValue( muG2, unitBase = True ).integrateWithWeight_x( )
                     sum += ( mu2 - mu1 ) * ( 5. * ( muEpG1 + muEpG2 ) + 8. * muMid * EpMid )
                 else :
                     sum += 3. * ( mu2 - mu1 ) * ( P1 * Ep1 + 2 * ( P1 + P2 ) * EpMid + P2 * Ep2 )   # 3 due to 18 instead of 6 below.
             P1 = P2
             mu1 = mu2
             Ep1 = Ep2
-        depEnergy.append( [ E, multiplicity.getValue( E ) * sum / 18. ] )
+        depEnergy.append( [ E, multiplicity.evaluate( E ) * sum / 18. ] )
 
     if( doingGammaMomentum ) : return( depEnergy )
 
-    axes = energyDepositionModule.XYs1d.defaultAxes( energyUnit = energyUnit, energyDepositionUnit = energyUnit )
-    return( energyDepositionModule.XYs1d( data = depEnergy, axes = axes, label = processInfo.style.label, accuracy = accuracy ) )
+    axes = energyDepositionModule.defaultAxes( energyUnit = energyUnit )
+    return( energyDepositionModule.XYs1d( data = depEnergy, axes = axes, label = style.label ) )
 
 def GaussQuadrature2( function, parameters, a, b ) :
 

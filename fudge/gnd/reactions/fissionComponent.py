@@ -78,10 +78,10 @@ class fissionComponent( baseModule.base_reaction ) :
 
     moniker = 'fissionComponent'
 
-    def __init__( self, outputChannel, label, ENDF_MT, documentation = None, date = None ) :
+    def __init__( self, outputChannel, ENDF_MT, documentation = None, label = None, process = None, EFL = None ) :
         """Creates a new reaction object of type outputChannel (that is, use 2-body outputChannel for 2-body reaction)."""
 
-        baseModule.base_reaction.__init__( self, label, outputChannel, ENDF_MT, documentation, date = date )
+        baseModule.base_reaction.__init__( self, outputChannel, ENDF_MT, documentation, label = label, process = process )
 
     def isBasicReaction( self ) :
 

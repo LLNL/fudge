@@ -69,7 +69,8 @@ class alias :
 
     moniker = 'alias'
 
-    def __init__( self, key, value, attributes = {} ) :
+# BRB6 Remove attributes?
+    def __init__( self, key, value, attributes = None ) :
         """
         Creates a new alias value and its attributes. The attributes argument must be of instance type dict and all keys and values in
         the dictionary must be an instance of str.
@@ -81,17 +82,18 @@ class alias :
         self.key = key
         self.value = value
         self.attributes = {}
-        for key, value_ in attributes.items( ) :
-            if( not( isinstance( key, str ) ) ) : raise TypeError( "attribute's key must be an instance of str, not '%s'", type( key ) )
-            if( not( isinstance( value_, str ) ) ) : raise TypeError( "The value for attribute '%s' must be an instance of str, not '%s'" %
-                ( key, type( value_ ) ) )
-            self.attributes[key] = value_
-        self.attributes = attributes
+        if attributes is not None:
+            for key, value_ in attributes.items( ) :
+                if( not( isinstance( key, str ) ) ) : raise TypeError( "attribute's key must be an instance of str, not '%s'", type( key ) )
+                if( not( isinstance( value_, str ) ) ) : raise TypeError( "The value for attribute '%s' must be an instance of str, not '%s'" %
+                    ( key, type( value_ ) ) )
+                self.attributes[key] = value_
 
     def __str__( self ) :
 
         return( 'alias -> key="%s" %s' % ( self.key, self.XMLData( ) ) )
 
+# BRB6 Rename value to __value and use @property
     def getValue( self ) :
         """Returns the value for self."""
 
@@ -124,6 +126,7 @@ class alias :
 class aliases( ancestryModule.ancestry, dict ) :
 
     moniker = 'aliases'
+    ancestryMembers = ( '', )
 
     def __init__( self ) :
 
@@ -134,16 +137,18 @@ class aliases( ancestryModule.ancestry, dict ) :
 
         self.add( key, value )
 
-    def add( self, key, value, attributes = {} ) :
+    def add( self, key, value, attributes = None ) :
         """
         This is like __setitem__, but allows for attributes to be associated with the alias defined by key/value. The argument attributes
         must be a dictionary, and its keys and values must be an instance of str.
         """
 
+# BRB6, need to test value. I don't think this is the way add should work. It should just add an existing alias.
         if( not( isinstance( key, str ) ) ) : raise Exception( 'Key must be a string' )
         if( key in self ) : raise Exception( "Key '%s' already in aliases" % key )
         dict.__setitem__( self, key, alias( key, value, attributes ) )
 
+# BRB6 I think we should remove this method. See prior comment.
     def addNuclearMetaStable( self, isotopeName, nuclearLevelName, metaStableIndex ) :
         """
         Adds an alias to the list of aliases with the key 'isotopeName_m#' where # is metaStableIndex as an integer, a value 
@@ -157,7 +162,10 @@ class aliases( ancestryModule.ancestry, dict ) :
         self.add( self.nuclearMetaStableName( isotopeName, metaStableIndex ), nuclearLevelName, { 'nuclearMetaStable' : str( metaStableIndex ) } )
 
     def getAliasesFor( self, value ) :
-        """Returns a list of all aliases that have value value."""
+        """
+        :param value:
+        :return: list of all aliases that have value 'value'
+        """
 
         aliases_ = []
         for key, alias in self.items( ) :
@@ -172,6 +180,7 @@ class aliases( ancestryModule.ancestry, dict ) :
         xmlString = []
         if( len( self ) ) :
             xmlString = [ '%s<%s>' % ( indent, self.moniker ) ]
+# BRB6 'alias' should not be hardwired. The alias class should have a toXMLList method.
             for key in sorted( self ) : xmlString.append( '%s<alias key="%s" %s/>' % ( indent2, key, self[key].XMLData( ) ) )
             xmlString[-1] += '</%s>' % self.moniker
         return( xmlString )

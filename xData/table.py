@@ -75,7 +75,7 @@ class table( ancestryModule.ancestry ):
         self.columns = columns or []
         self.data = data or []
         if not all( [len(d)==self.nColumns for d in self.data] ):
-            raise Exception, ("Data is the wrong shape for a table with %i columns!" % self.nColumns)
+            raise ValueError("Data is the wrong shape for a table with %i columns!" % self.nColumns)
 
     @property
     def nColumns(self): return len(self.columns)
@@ -97,7 +97,7 @@ class table( ancestryModule.ancestry ):
 
     def addRow( self, dataRow ):
         if not len(dataRow) == self.nColumns:
-            raise Exception, ("New row has %i columns, should have %i!" % (len(dataRow),self.nColumns))
+            raise ValueError("New row has %i columns, should have %i!" % (len(dataRow),self.nColumns))
         self.data.append( dataRow )
 
     def addColumn( self, columnHeader, index=None ):
@@ -110,15 +110,20 @@ class table( ancestryModule.ancestry ):
             [row.append(0) for row in self.data]
         for idx, col in enumerate(self.columns): col.index = idx
 
-    def getColumn( self, columnName, units=None ):
+    def getColumn( self, columnNameOrIndex, unit=None ):
         """ get data from one column, identified by the column 'name' attribute.
-        Convert results to unit if units are specified """
-        column = [a for a in self.columns if a.name==columnName]
-        if not column: return None
-        if len(column) > 1: raise Exception("Column named '%s' is not unique!" % columnName)
-        index = self.columns.index( column[0] )
-        if units:
-            cf = PQUModule.PQU(1, column[0].units).convertToUnit( units ).getValue()
+        Convert results to desired unit if specified """
+        if isinstance(columnNameOrIndex, int):
+            index = columnNameOrIndex
+            column = self.columns[index]
+        else:
+            column = [a for a in self.columns if a.name==columnNameOrIndex]
+            if not column: return None
+            if len(column) > 1: raise ValueError("Column named '%s' is not unique!" % columnNameOrIndex)
+            column = column[0]
+            index = self.columns.index( column )
+        if unit:
+            cf = PQUModule.PQU(1, column.unit).convertToUnit( unit ).getValue()
             return [cf * v for v in self[:,index]]
         return self[:,index]
 
@@ -132,24 +137,10 @@ class table( ancestryModule.ancestry ):
         [row.pop(index) for row in self.data]
         for idx, col in enumerate(self.columns): col.index = idx
 
-    def toXMLList( self, indent = '', **kwargs ) :
-
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
-        indent3 = indent2 + kwargs.get( 'incrementalIndent', '  ' )
+    def toStringList(self, indent='',**kwargs):
         addHeader = kwargs.get( 'addHeader', True )
+        addHeaderUnit = kwargs.get( 'addHeaderUnit', False )
         outline = kwargs.get( 'outline', False )
-        if len(self.data) < 10: outline = False
-
-        xml = ['%s<%s rows="%i" columns="%i">' % (indent,self.moniker,self.nRows,self.nColumns)]
-        xml.append( '%s<columnHeaders>' % (indent2) )
-        for column in self.columns: xml += column.toXMLList( indent3 )
-        xml[-1] += '</columnHeaders>'
-
-        if not self.data:
-            xml.append( '%s<data/></%s>' % (indent2, self.moniker) )
-            return xml
-
-        xml.append( '%s<data>' % (indent2) )
         columnWidths = [0] * self.nColumns
         for col in range(self.nColumns):
             columnDat = [row[col] for row in self.data if not isinstance(row[col], blank)]
@@ -174,6 +165,14 @@ class table( ancestryModule.ancestry ):
 
             header = ['%s<!--' % (' '*(len(indent)-1)) + ' | '.join([('%%%is'%columnWidths[i]) % nameList[i]
                 for i in range(self.nColumns)]) + '  -->'   for nameList in names]
+            xml = header
+
+        if addHeaderUnit:
+            """ put column unit at the top of the table """
+            unit = [str(col.unit) for col in self.columns]
+            lengths = [len(u) for u in unit]
+            columnWidths = [max(columnWidths[i],lengths[i]) for i in range(self.nColumns)]
+            header = ['%s<!--' % (' ' * (len(indent) - 1)) + ' | '.join( [('%s'%u).rjust(columnWidths[i]) for i,u in enumerate(unit) ] ) + '  -->']
             xml += header
 
         template = ['%s' % (indent + ' ')] + ['%%%is' % l for l in columnWidths]
@@ -188,6 +187,25 @@ class table( ancestryModule.ancestry ):
             xml += [('   '.join(template) % tuple( map(toString, dataRow))).rstrip() for dataRow in self.data[-3:]]
         else:
             xml += [('   '.join(template) % tuple( map(toString, dataRow))).rstrip() for dataRow in self.data]
+        return xml
+
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent3 = indent2 + kwargs.get( 'incrementalIndent', '  ' )
+        if len(self.data) < 10: outline = False
+
+        xml = ['%s<%s rows="%i" columns="%i">' % (indent,self.moniker,self.nRows,self.nColumns)]
+        xml.append( '%s<columnHeaders>' % (indent2) )
+        for column in self.columns: xml += column.toXMLList( indent3 )
+        xml[-1] += '</columnHeaders>'
+
+        if not self.data:
+            xml.append( '%s<data/></%s>' % (indent2, self.moniker) )
+            return xml
+
+        xml.append( '%s<data>' % (indent2) )
+        xml+=self.toStringList(indent=indent3,kwargs=kwargs)
         xml[-1] += '</data></%s>' % self.moniker
         return xml
 
@@ -227,24 +245,18 @@ class table( ancestryModule.ancestry ):
 
 class columnHeader:
     """ defines one column in a table """
-    def __init__( self, index, name, units=None, **kwargs ):
+    def __init__( self, index, name, unit ):
         self.index = index
         self.name = name
-        self.units = units
-        self.attributes = kwargs
+        self.unit = unit
 
-    def __getitem__(self, key): return self.attributes[key]
-
-    def __setitem__(self, key, value): self.attributes[key] = value
+    def __str__(self): return '%s (%s)'%(self.name,self.unit)
 
     def toXMLList( self, indent = '', **kwargs ) :
 
-        xmlStr = '%s<column index="%d" name="%s"' % ( indent, self.index, self.name )
-        if self.units: xmlStr += ' units="%s"' % self.units
-        for key in sorted(self.attributes):
-            if self.attributes[key] is not None: xmlStr += ' %s="%s"' % (key,self.attributes[key])
-        xmlStr += '/>'
+        xmlStr = '%s<column index="%d" name="%s" unit="%s"/>' % ( indent, self.index, self.name, self.unit )
         return [xmlStr]
+
 
 class blank:
     """ Blank table entry, to indicate missing data """

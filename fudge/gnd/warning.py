@@ -82,7 +82,7 @@ cmattoon, Jan 2012
 __metaclass__ = type
 
 class context:
-    """ 
+    """
     Store warnings in context. This class contains location information (reactionSuite, reaction, etc)
     plus a nested list of warnings or other context instances
     """
@@ -106,7 +106,7 @@ class context:
 
     def filter(self, include=None, exclude=None):
         """Filter warning list to only include (or exclude) specific classes of warning. For example:
-        
+
             >>> newWarnings = warnings.filter( exclude=[warning.energyImbalance, warning.Q_mismatch] )
 
         Note that if both 'include' and 'exclude' lists are provided, exclude is ignored."""
@@ -117,7 +117,7 @@ class context:
             if isinstance( warning, context ):
                 newContext = warning.filter( include, exclude )
                 if newContext: newWarningList.append( newContext )
-            elif include is not None: 
+            elif include is not None:
                 if warning.__class__ in include:
                     newWarningList.append( warning )
             else: # exclude is not None:
@@ -127,7 +127,7 @@ class context:
 
     def flatten(self):
         """From a nested hierarchy of warnings, get back a flat list for easier searching:
-        
+
             >>> w = reactionSuite.check()
             >>> warningList = w.flatten()"""
 
@@ -146,7 +146,7 @@ class context:
             s += warning.toStringList( indent+dIndent )
         return s
 
-class warning:
+class warning( BaseException ):
     """
     General warning class. Contains link to problem object,
     xpath in case the object leaves memory,
@@ -182,14 +182,92 @@ class NotImplemented( warning ):
     def __eq__(self, other):
         return (self.form == other.form and self.xpath == other.xpath)
 
-class FissionProductsNotImplemented( warning ):
-    def __init__(self, obj=None):
+class UnorthodoxParticleNotImplemented( warning):
+    def __init__(self, particleId, obj=None):
         warning.__init__(self, obj)
+        self.particleId = particleId
 
     def __str__(self):
-        return "Checking not yet implemented for legacy fission product data"
+        return "Checking not yet implemented for unorthodox particle '%s'" % self.particleId
+
+    def __eq__(self, other):
+        return (self.particleId == other.particleId)
 
 # resonance region:
+
+class badScatteringRadius( warning ):
+    def __init__(self, factor=3.0, gotAP=None, expectedAP=None, L=None, E=None ):
+        self.factor=factor
+        self.gotAP=gotAP
+        self.expectedAP=expectedAP
+        self.L=L
+        self.E=E
+
+    def __str__(self):
+        direction = 'high'
+        if self.gotAP<self.expectedAP: direction = 'low'
+        s="Scattering radius (%s) at least a factor of %s too %s compared to expectations (%s)"%(map(str,(self.gotAP,self.factor,direction,self.expectedAP)))
+        if self.L is not None: s+=" for L=%i"%self.L
+        if self.E is not None: s+=" for E=%s"%str(self.E)
+        return s
+
+class badSpinStatisticalWeights( warning ):
+    def __init__(self, L, gJ, expectedgJ, reaction=None):
+        self.L=L
+        self.gJ=gJ
+        self.expectedgJ=expectedgJ
+        self.reaction=reaction
+
+    def __str__(self):
+        direction = 'many'
+        if self.gJ<self.expectedgJ: direction = 'few'
+        s="The spin statical weights for L=%i sums to %s, but should sum to %s.  You have too %s channels "%(self.L, str(self.gJ), str(self.expectedgJ), direction)
+        if self.reaction is not None:
+            s+='for reaction '+self.reaction
+        return s
+
+class invalidAngularMomentaCombination( warning ):
+    def __init__(self,L,S,J,name):
+        self.L=L
+        self.S=S
+        self.J=J
+        self.name=name
+
+    def __str__(self):
+        return 'Invalid angular momenta combination: cannot couple L = %s and S = %s up to J = %s for channel "%s"' % (str(self.L),str(self.S),str(self.J),self.name)
+
+class missingResonanceChannel( warning ):
+    def __init__(self,L,S,J,name):
+        self.L=L
+        self.S=S
+        self.J=J
+        self.name=name
+
+    def __str__(self):
+        return 'Missing a channel with angular momenta combination L = %s, J = %s and S = %s for "%s"' % (str(self.L),str(self.J),str(self.S),self.name)
+
+class invalidSpinCombination( warning ):
+    def __init__(self,Ia,Ib,S,name):
+        self.Ia=Ia
+        self.Ib=Ib
+        self.S=S
+        self.name=name
+
+    def __str__(self):
+        return 'Invalid spin combination: cannot couple Ia = %s and Ib = %s up to S = %s for channel "%s"' % (str(self.Ia),str(self.Ib),str(self.S),self.name)
+
+class potentialScatteringNotConverged( warning ):
+    def __init__(self, L, E, fom, fomTarget):
+        self.L=L
+        self.E=E
+        self.fom=fom
+        self.fomTarget=fomTarget
+
+    def __str__(self):
+        s="Potential scattering hasn't converged by L=%i at E=%s eV, xs[%i]/xs[0]=%s > %s"%\
+          (self.L,str(self.E),self.L,str(100.*self.fom)+'%',str(100.*self.fomTarget)+'%')
+        return s
+
 
 class RRmultipleRegions( warning ):
     def __init__(self, obj=None):
@@ -236,29 +314,12 @@ class URRinsufficientEnergyGrid( warning ):
     def __eq__(self, other):
         return (self.Lval == other.Lval and self.Jval == other.Jval and self.eLow == other.eLow and self.eHigh == other.eHigh)
 
-# particle list:
-
-class discreteLevelsOutOfOrder( warning ):
-    def __init__(self, lidx, obj=None):
-        warning.__init__(self, obj)
-        self.lidx = lidx
+class unresolvedLink( warning ):
+    def __init__(self,link):
+        self.link=link
 
     def __str__(self):
-        return "Discrete level %i is out of order" % self.lidx
-
-    def __eq__(self, other):
-        return (self.lidx == other.lidx)
-
-class unnormalizedGammas( warning ):
-    def __init__(self, branchingSum, obj=None):
-        warning.__init__(self, obj)
-        self.branchingSum = branchingSum
-
-    def __str__(self):
-        return "Gamma branching = %s, should be 1.0!" % (self.branchingSum)
-
-    def __eq__(self, other):
-        return (self.xpath == other.xpath and self.branchingSum == other.branchingSum)
+        return "Unresolved link to %s" % (str(self.link))
 
 # reaction objects:
 
@@ -289,6 +350,17 @@ class Q_mismatch( warning ):
 
     def __eq__(self, other):
         return (self.xpath == other.xpath and self.Qcalc == other.Qcalc and self.Qactual == other.Qactual)
+
+class badFissionEnergyRelease( warning ):
+    def __init__(self, worstCase, obj=None):
+        warning.__init__(self, obj)
+        self.worstCase = worstCase
+
+    def __str__(self):
+        return "Fission energy release seems unphysical. Worst case: %s" % (self.worstCase)
+
+    def __eq__(self, other):
+        return (self.xpath == other.xpath and self.worstCase == other.worstCase)
 
 class threshold_mismatch( warning ):
     def __init__(self, threshold, thresholdCalc, obj=None):
@@ -415,20 +487,6 @@ class domain_mismatch( warning ):
         return (self.xpath == other.xpath and self.lowBound == other.lowBound
                 and self.highBound == other.highBound)
 
-class badFissionEnergyRelease( warning ):
-    def __init__(self, key, energy, val, obj=None):
-        warning.__init__(self, obj)
-        self.key = key
-        self.energy = energy
-        self.val = val
-
-    def __str__(self):
-        return "Unphysical %s fission energy release: %s at incident energy %s" % (self.key, self.val, self.energy)
-
-    def __eq__(self, other):
-        return (self.xpath == other.xpath and self.key == other.key and self.val == other.val
-                and self.energy == other.energy)
-
 class missingDistribution( warning ):
     def __init__(self, productName, obj=None):
         warning.__init__(self, obj)
@@ -481,6 +539,10 @@ class uncorrelatedFramesMismatch( warning ):
     def __eq__(self, other):
         return (self.xpath == other.xpath and self.angleFrame == other.angleFrame
                 and self.energyFrame == other.energyFrame)
+
+class flatIncidentEnergyInterpolation( warning ):
+    def __str__(self):
+        return ("For distributions, flat interpolation along incident energy is unphysical!")
 
 class energyDistributionBadU( warning ):
     def __str__(self):
@@ -591,6 +653,25 @@ class extraOutgoingEnergy( warning ):
     def __eq__(self, other):
         return (self.xpath == other.xpath and self.energy_in == other.energy_in)
 
+class missingCoulombIdenticalParticlesFlag( warning ):
+    def __init__(self, obj=None):
+        warning.__init__(self, obj)
+
+    def __str__(self):
+        return "Need 'identicalParticles=\"true\"' when target==projectile"
+
+class incorrectCoulombIdenticalParticlesFlag( warning ):
+    def __init__(self, projectile, target, obj=None):
+        warning.__init__(self, obj)
+        self.projectile = projectile
+        self.target = target
+
+    def __str__(self):
+        return "dCrossSection_dOmega claims that target (%s) & projectile (%s) are identical!" % (self.target, self.projectile)
+
+    def __eq__(self, other):
+        return (self.target == other.target and self.projectile == other.projectile)
+
 class energyImbalance( warning ):
     def __init__(self, energy_in, index, availableEnergy, deposition_per_product, obj=None):
         warning.__init__(self, obj)
@@ -666,15 +747,22 @@ class EnergyDepositionExceptionRaised( ExceptionRaised ):
     def __str__(self):
         return ("Exception raised when calculating energy deposition: %s" % self.Exception_String)
 
+class SkippedCoulombElasticEnergyDeposition( warning ):
+    def __str__(self):
+        return ("Energy/momentum deposition cannot be computed for Coulomb elastic reactions")
+
 ### covarianceSuite warnings: ###
 
 class cyclicDependency( warning ):
     def __init__(self, cycle, obj=None):
         warning.__init__(self, obj)
-        self.cycle = cycle
+        self.cycle = tuple(cycle)
 
     def __str__(self):
-        return ("Cyclic dependency in summed covariances for sections %s and %s" % tuple(self.cycle))
+        if len(self.cycle) == 2:
+            return ("Cyclic dependency in summed covariances for sections %s and %s" % self.cycle)
+        else:
+            return ("Cyclic dependency in summed covariances for section %s" % self.cycle)
 
     def __eq__(self, other):
         return (self.xpath == other.xpath and self.cycle == other.cycle)

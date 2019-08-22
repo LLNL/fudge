@@ -63,7 +63,10 @@
 
 from . import reactionSuite
 from . import reaction
+from . import production
+from . import channels
 from . import product
+from . import multiplicity
 from . import energy
 from . import energyAngular
-from . import multiplicity
+from . import KalbachMann

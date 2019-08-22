@@ -91,6 +91,9 @@
 from fudge.core.utilities import brb
 
 import pqu.PQU as PQUModule
+
+from PoPs import IDs as IDsPoPsModule
+
 import xData.standards as standardsModule
 import fudge.legacy.converting.toGNDMisc as toGNDMiscModule
 
@@ -124,8 +127,8 @@ def readMF27( info, MT, MF27Datas, label, warningList ) :
     axes = photonScatteringModule.scatteringFactor.defaultAxes( label, energyUnit = energyUnit )
     dataLine, TAB1, MF27s = endfFileToGNDMisc.getTAB1Regions( 1, MF27Data, axes = axes, allowInterpolation6 = True, logFile = info.logs )
     if( len( MF27s ) == 1 ) :
-        if( MT == 504 ) : return( photonScatteringModule.incoherent.XYs1d( data = MF27s[0], axes = axes, accuracy = 1e-3 ) )
-        data = photonScatteringModule.scatteringFactor.XYs1d( data = MF27s[0], axes = axes, accuracy = 1e-3 )
+        if( MT == 504 ) : return( photonScatteringModule.incoherent.XYs1d( data = MF27s[0], axes = axes ) )
+        data = photonScatteringModule.scatteringFactor.XYs1d( data = MF27s[0], axes = axes )
     else :
         if( MT == 504 ) :
             data = photonScatteringModule.incoherent.regions1d( axes = axes )
@@ -172,13 +175,13 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
         MTData = MTDatas[MT]
 
         info.logs.write( '    %3d %s' % ( MT, sorted( MTData.keys( ) ) ) )
-        EPE, EFL, crossSection, breakupProducts = readMF3( info, MT, MTData[23], warningList )
+        EPE, EFL, crossSection, LR, breakupProducts = readMF3( info, MT, MTData[23], warningList )
         del MTData[23]
 
         isTwoBody, productList = MT == 526, []
         undefinedLevelInfo = { 'ZA' : None, 'level' : 0, 'levelIndex' : None, 'count' : 0 }
         if( 26 in MTData ) :
-            isTwoBody = readMF6( MT, info, MTData[26], productList, warningList, undefinedLevelInfo, isTwoBody )
+            isTwoBody = readMF6( MT, info, MTData[26], productList, warningList, undefinedLevelInfo, isTwoBody, crossSection )
             del MTData[26]
 
         addTargetAsResidual = True
@@ -191,10 +194,10 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
             process = None
         if( MT in [ 502, 504, 522 ] ) :
             outputChannel = channelsModule.twoBodyOutputChannel( process = process )
-            outputChannel.Q.add( toGNDMiscModule.returnConstantQ( info.style, 0 ) )
+            outputChannel.Q.add( toGNDMiscModule.returnConstantQ( info.style, 0, crossSection ) )
             if( MT in [ 502 , 504 ] ) :
                 product = toGNDMiscModule.getTypeNameGamma( info, 0 )
-                product = toGNDMiscModule.newGNDParticle( info, product )
+                product = toGNDMiscModule.newGNDParticle( info, product, crossSection )
                 outputChannel.products.add( outputChannel.products.uniqueLabel( product ) )
                 if( MT == 502 ) :
                     formFactor = readMF27( info, MT, MTData, 'coherent scattering function', warningList )
@@ -209,12 +212,12 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
                 outputChannel = channelsModule.twoBodyOutputChannel( process = process )
             else :
                 outputChannel = channelsModule.NBodyOutputChannel( process = process )
-            outputChannel.Q.add( toGNDMiscModule.returnConstantQ( info.style, 0 ) )
+            outputChannel.Q.add( toGNDMiscModule.returnConstantQ( info.style, 0, crossSection ) )
             productsNeeded = [ 'e-' ]
-            if( MT == 527 ) : productsNeeded.insert( 0, 'gamma' )
+            if( MT == 527 ) : productsNeeded.insert( 0, IDsPoPsModule.photon )
         else :
             outputChannel = channelsModule.NBodyOutputChannel( process = process )
-            outputChannel.Q.add( toGNDMiscModule.returnConstantQ( info.style, EPE ) )
+            outputChannel.Q.add( toGNDMiscModule.returnConstantQ( info.style, EPE, crossSection ) )
             if( MT in MT_AtomicConfigurations ) :
                 productsNeeded = [ 'e-' ]
             elif( MT in [ 515, 517 ] ) :
@@ -229,19 +232,19 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
                 if( name == product.name ) : break
                 product = None
             if( product is None ) :
-                product = toGNDMiscModule.getTypeNameGamma( info, { "gamma" : 0, "e+" : 8, "e-" : 9 }[name] )
-                product = toGNDMiscModule.newGNDParticle( info, product )
+                product = toGNDMiscModule.getTypeNameGamma( info, { "photon" : 0, "e+" : 8, "e-" : 9 }[name] )
+                product = toGNDMiscModule.newGNDParticle( info, product, crossSection )
             outputChannel.products.add( outputChannel.products.uniqueLabel( product ) )
-        if( ( MT >= 534 ) and ( reactionSuite.projectile.name == 'e-' ) ) :
+        if( ( MT >= 534 ) and ( reactionSuite.projectile == 'e-' ) ) :
             product = toGNDMiscModule.getTypeNameGamma( info, 9 )
-            product = toGNDMiscModule.newGNDParticle( info, product )
+            product = toGNDMiscModule.newGNDParticle( info, product, crossSection )
             outputChannel.products.add( outputChannel.products.uniqueLabel( product ) )
 
         if( addTargetAsResidual ) :
             elementSymbol = nuclearModule.elementSymbolFromZ( info.targetZA / 1000 )
             if( MT >= 534 ) : elementSymbol += '{%s}' % MT_AtomicConfigurations[MT]
             element = xParticleModule.element( elementSymbol )
-            residual = toGNDMiscModule.newGNDParticle( info, element )
+            residual = toGNDMiscModule.newGNDParticle( info, element, crossSection )
             outputChannel.products.add( outputChannel.products.uniqueLabel( residual ) )
 
         if( len( MTData ) > 0 ) : raise Exception( 'Untranslated MF data: MFs = %s' % MTData.keys( ) )
@@ -252,11 +255,10 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
             continue
 
         EFL = PQUModule.PQU( PQUModule.pqu_float.surmiseSignificantDigits( EFL ), 'eV' )
-        reaction = reactionModule.reaction( outputChannel, "%s" % iChannel, ENDF_MT = MT, date = info.Date, EFL = EFL )
+        reaction = reactionModule.reaction( outputChannel, ENDF_MT = MT, EFL = EFL )
         reaction.crossSection.add( crossSection )
 
         reactionSuite.reactions.add( reaction )
-        iChannel += 1
 
         info.logs.write( '\n' )
         for warning in warningList : info.logs.write( "       WARNING: %s\n" % warning, stderrWriting = True )
@@ -271,9 +273,9 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
             for reaction in reactionSuite :
                 if( reaction.ENDF_MT in summandMTs ) :
                     summands.append( sumsModule.add( link = reaction.crossSection ) )
-            summedCrossSection = sumsModule.crossSectionSum( name=photonSumLabels[MT], label=str(iChannel), ENDF_MT=MT,
-                    summands = sumsModule.listOfSummands( summandList=summands ), crossSection=crossSection, date = info.Date )
+            summedCrossSection = sumsModule.crossSectionSum( label=photonSumLabels[MT], ENDF_MT=MT,
+                    summands = sumsModule.listOfSummands( summandList=summands ), crossSection=crossSection )
             Q = outputChannel.Q[info.style]
             if( Q is not None ) : summedCrossSection.Q.add( Q )
-            reactionSuite.sums.add( summedCrossSection )
+            reactionSuite.sums.crossSections.add( summedCrossSection )
             iChannel += 1

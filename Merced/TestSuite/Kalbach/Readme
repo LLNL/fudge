@@ -1,0 +1,30 @@
+The data in this subdirectory are for Kalbach-Mann parameters
+for energy-angle probability densities for incomplete equilibrium
+reactions.  
+
+**Note**: The ENDF files for these data always specify that the
+interpolation with respect to incident energy be direct linear-linear,
+even thought this makes no sense physically.  The mcnp manual
+says that the outgoing energy probability densities are to be
+interpolated unit base, and that is our default.  For the sake of
+comparison, we implemented direct linear-linear interpolation of the
+incident energy in the input file: Kalbach-Fe57.direct.
+
+The input files are:
+
+in.Kalbach-Fe57: Integrate using adaptive quadrature.  The output file
+  is out.Kalbach-Fe57.  The output file from the Monte Carlo code
+  is out.Kalbach-Fe57.MC.
+
+in.Kalbach-Fe57.Gauss6: Integrate using 6th-order Gaussian quadrature.
+  The output file is out.Kalbach-Fe57.Gauss6.
+
+in.Kalbach-Fe57.direct: This file specifies linear-linear direct interpolation
+  with respect to incident energy.  The output using adaptive quadrature
+  is out.Kalbach-Fe57.direct and with Monte Carlo quadrature it is
+  out.Kalbach-Fe57.direct.MC.
+
+in.Kr78Kalbach: Most Kalbach data specify that interpolation with respect
+  to outgoing energy be histogram.  This file uses linear-linear interpolation.
+
+in.gamma_in: A sample of photonuclear data.  Its output is out.gamma_in.

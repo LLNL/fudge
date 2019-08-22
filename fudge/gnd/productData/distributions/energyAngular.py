@@ -78,12 +78,18 @@ import xData.XYs as XYsModule
 import xData.multiD_XYs as multiD_XYsModule
 import xData.regions as regionsModule
 
-from fudge.gnd.productData import energyDeposition as energyDepositionModule
-from fudge.gnd.productData import momentumDeposition as momentumDepositionModule
-
 from . import base as baseModule
 
 __metaclass__ = type
+
+def defaultAxes( energyUnit ) :
+
+    axes = axesModule.axes( rank = 4 )
+    axes[0] = axesModule.axis( 'P(energy_out,mu|energy_in)', 0, '1/' + energyUnit )
+    axes[1] = axesModule.axis( 'mu', 1, '' )
+    axes[2] = axesModule.axis( 'energy_out', 2, energyUnit )
+    axes[3] = axesModule.axis( 'energy_in', 3, energyUnit )
+    return( axes )
 
 class XYs1d( XYsModule.XYs1d ) :    # FIXME: BRB, Should this class inherit from angular.XYs1d?
 
@@ -91,7 +97,7 @@ class XYs1d( XYsModule.XYs1d ) :    # FIXME: BRB, Should this class inherit from
 
         allowedInterpolations = [ standardsModule.interpolation.linlinToken,
                                   standardsModule.interpolation.flatToken ]
-        xys = self.changeInterpolationIfNeeded( allowedInterpolations = allowedInterpolations )
+        xys = self.changeInterpolationIfNeeded( allowedInterpolations, XYsModule.defaultAccuracy )
         return( xys.integrateWithWeight_x( ) )
 
 class Legendre( series1dModule.LegendreSeries ) :
@@ -137,14 +143,10 @@ class XYs3d( subform, multiD_XYsModule.XYs3d ) :
 
         verbosity = kwargs.get( 'verbosity', 0 )
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
-        energyUnit = kwargs['incidentEnergyUnit']
-        momentumDepositionUnit = energyUnit + '/c'
-        massUnit = energyUnit + '/c**2'
         multiplicity = kwargs['multiplicity']
-        reactionSuite = kwargs['reactionSuite']
-        projectileMass = reactionSuite.projectile.getMass( massUnit )
-        targetMass = reactionSuite.target.getMass( massUnit )
-        productMass = kwargs['product'].getMass( massUnit )
+        projectileMass = kwargs['projectileMass']
+        targetMass = kwargs['targetMass']
+        productMass = kwargs['productMass']
         energyAccuracy = kwargs['energyAccuracy']
         momentumAccuracy = kwargs['momentumAccuracy']
         productFrame = kwargs['productFrame']
@@ -158,11 +160,11 @@ class XYs3d( subform, multiD_XYsModule.XYs3d ) :
         if( productFrame == standardsModule.frames.labToken ) :
             for pdfOfEpMuAtE in self :
                 energy = pdfOfEpMuAtE.value
-                aveEnergy.append( [ energy, multiplicity.getValue( energy ) * pdfOfEpMuAtE.averageEnergy( ) ] )
+                aveEnergy.append( [ energy, multiplicity.evaluate( energy ) * pdfOfEpMuAtE.averageEnergy( ) ] )
 
             for pdfOfEpMuAtE in self :
                 energy = pdfOfEpMuAtE.value
-                momemtum = multiplicity.getValue( energy ) * pdfOfEpMuAtE.averageForwardMomentum( sqrt_2_ProductMass )
+                momemtum = multiplicity.evaluate( energy ) * pdfOfEpMuAtE.averageForwardMomentum( sqrt_2_ProductMass )
                 if( momemtum < 1e-12 ) : momemtum = 0.          # This should be less arbitrary????????
                 aveMomentum.append( [ energy, momemtum ] )
 
@@ -174,13 +176,13 @@ class XYs3d( subform, multiD_XYsModule.XYs3d ) :
                 EpCOM = pdfOfEpMuAtE.averageEnergy( )
                 ppCOM = pdfOfEpMuAtE.averageForwardMomentum( sqrt_2_ProductMass )
                 productLabEnergy = 0.5 * productMass * vCOM * vCOM + EpCOM + vCOM * ppCOM
-                aveEnergy.append( [ energy, multiplicity.getValue( energy ) * productLabEnergy ] )
+                aveEnergy.append( [ energy, multiplicity.evaluate( energy ) * productLabEnergy ] )
 
             for pdfOfEpMuAtE in self :
                 energy = pdfOfEpMuAtE.value
                 vCOM = const1 * math.sqrt( energy )
                 productLabForwardMomentum = productMass * vCOM + pdfOfEpMuAtE.averageForwardMomentum( sqrt_2_ProductMass )
-                aveMomentum.append( [ energy, multiplicity.getValue( energy ) * productLabForwardMomentum ] )
+                aveMomentum.append( [ energy, multiplicity.evaluate( energy ) * productLabForwardMomentum ] )
 
         return( [ aveEnergy ], [ aveMomentum ] )
 
@@ -193,12 +195,11 @@ class XYs3d( subform, multiD_XYsModule.XYs3d ) :
         axes[1] = self.axes[-1]
 
         for index, energy_in in enumerate(self):
-            integral = float( XYsModule.XYs1d( [ ( eout.value, eout.coefficients[0] ) for eout in energy_in ],
-                    axes = axes, accuracy = 0.001 ).integrate( ) )
+            integral = float( XYsModule.XYs1d( [ ( eout.value, eout.coefficients[0] ) for eout in energy_in ], axes = axes ).integrate( ) )
             if abs(integral-1.0) > info['normTolerance']:
                 warnings.append( warning.unnormalizedDistribution( PQU.PQU(energy_in.value,axes[0].unit),
                     index, integral, self.toXLink() ) )
-            minProb = min( [xy.toPointwise_withLinearXYs( 0.001 ).rangeMin() for xy in energy_in] )
+            minProb = min( [xy.toPointwise_withLinearXYs( accuracy = XYsModule.defaultAccuracy, upperEps = 1e-8 ).rangeMin for xy in energy_in] )
             if minProb < 0:
                 warnings.append( warning.negativeProbability( PQU.PQU(energy_in.value,axes[0].unit),
                     value = minProb, obj = energy_in ) )
@@ -221,7 +222,7 @@ class XYs3d( subform, multiD_XYsModule.XYs3d ) :
             for muEpPs in E_MuEpPs : muEpPs.setData( muEpPs / sum )
         return( n )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
         from fudge.processing import group as groupModule
         from fudge.processing.deterministic import transferMatrices as transferMatricesModule
@@ -235,24 +236,37 @@ class XYs3d( subform, multiD_XYsModule.XYs3d ) :
 
         return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
 
-    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
 
-        return( multiD_XYsModule.XYs3d.toPointwise_withLinearXYs( self, accuracy, lowerEps = lowerEps, upperEps = upperEps, cls = XYs3d ) )
+        return( multiD_XYsModule.XYs3d.toPointwise_withLinearXYs( self, cls = XYs3d, **kwargs ) )
+
+    def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
+
+        from . import energy as energyModule
+        from . import energyAngularMC as energyAngularMCModule
+
+        energy = energyModule.XYs2d( axes = self.axes )
+        for PofMuGivenEp in self :
+            data = energyModule.XYs1d( [ [ PofMu.value, PofMu.integrate( ) ] for PofMu in PofMuGivenEp ] )
+            energy.append( energyModule.xs_pdf_cdf1d.fromXYs( energyModule.XYs1d( data ), 
+                    value = PofMuGivenEp.value ) )
+
+        xys3d = energyAngularMCModule.XYs3d( axes = self.axes )
+        for PofMuGivenEp in self :
+            xys2d = energyAngularMCModule.XYs2d( value = PofMuGivenEp.value )
+            for PofMu in PofMuGivenEp :
+                _PofMu = PofMu
+                if( isinstance( PofMu, Legendre ) ) :
+                    if( PofMu[0] == 0 ) : _PofMu = XYs1d( [ [ -1, 0.5 ], [ 1, 0.5 ] ] )
+                    _PofMu = _PofMu.toPointwise_withLinearXYs( accuracy = XYsModule.defaultAccuracy, upperEps = 1e-8 )
+                xys2d.append( energyAngularMCModule.xs_pdf_cdf1d.fromXYs( _PofMu, PofMu.value ) )
+            xys3d.append( xys2d )
+        return( energyAngularMCModule.energy( energy ), energyAngularMCModule.energyAngular( xys3d ) )
 
     @staticmethod
     def allowedSubElements( ) :
 
         return( ( XYs2d, ) )
-
-    @staticmethod
-    def defaultAxes( energyUnit = 'eV', energy_outUnit = 'eV', probabilityUnit = '1/eV' ) :
-
-        axes = axesModule.axes( rank = 4 )
-        axes[0] = axesModule.axis( 'P(mu,energy_out|energy_in)', 0, probabilityUnit )
-        axes[1] = axesModule.axis( 'mu', 1, '' )
-        axes[2] = axesModule.axis( 'energy_out', 2, energy_outUnit )
-        axes[3] = axesModule.axis( 'energy_in', 3, energyUnit )
-        return( axes )
 
 class regions3d( subform, regionsModule.regions3d ) :
 
@@ -276,7 +290,7 @@ class regions3d( subform, regionsModule.regions3d ) :
         for region in n : region.normalize( insitu = True )
         return( n )
 
-    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
 
         raise Exception( 'Not implemented' )
 
@@ -289,11 +303,11 @@ class form( baseModule.form ) :
 
     moniker = 'energyAngular'
     subformAttributes = ( 'energyAngularSubform', )
+    ancestryMembers = subformAttributes
 
-    def __init__( self, label, productFrame, energyAngularSubform, makeCopy = True ) :
+    def __init__( self, label, productFrame, energyAngularSubform ) :
 
         if( not( isinstance( energyAngularSubform, subform ) ) ) : raise TypeError( 'instance is not an energyAngular subform' )
-        if( makeCopy ) : energyAngularSubform = energyAngularSubform.copy( )
         baseModule.form.__init__( self, label, productFrame, ( energyAngularSubform, ) )
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
@@ -301,10 +315,17 @@ class form( baseModule.form ) :
         kwargs['productFrame'] = self.productFrame
         return( self.energyAngularSubform.calculateAverageProductData( style, indent = indent, **kwargs ) )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMC( self, style, tempInfo, indent ) :
+
+        from . import energyAngularMC as energyAngularMCModule
+
+        energy, energyAngular = self.energyAngularSubform.to_xs_pdf_cdf1d( style, tempInfo, indent )
+        return( energyAngularMCModule.form( style.label, self.productFrame, energy, energyAngular ) )
+
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
         tempInfo['productFrame'] = self.productFrame
-        return( self.energyAngularSubform.processSnMultiGroup( style, tempInfo, indent ) )
+        return( self.energyAngularSubform.processMultiGroup( style, tempInfo, indent ) )
 
     @staticmethod
     def parseXMLNode( element, xPath, linkData ):

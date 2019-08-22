@@ -61,6 +61,11 @@
 # 
 # <<END-copyright>>
 
+from pqu import PQU as PQUModule
+
+from PoPs import misc as miscPoPsModule
+from PoPs import IDs as IDsPoPsModule
+
 import xData.ancestry as ancestryModule
 
 import fudge
@@ -68,31 +73,61 @@ from fudge.core.utilities import fudgeExceptions
 
 from .. import channels as channelsModule
 from ..reactionData import crossSection as crossSectionModule
+from ..differentialCrossSection import dCrossSection_dOmega as dCrossSection_dOmegaModule
+from ..reactionData import availableEnergy as availableEnergyModule
+from ..reactionData import availableMomentum as availableMomentumModule
 
 __metaclass__ = type
 
 class base_reaction( ancestryModule.ancestry ) :
     """Base class for all types of reaction."""
 
-    def __init__( self, label, outputChannel, ENDF_MT, documentation = None, date = None, EFL = None ) :
+    ancestryMembers = ( 'crossSection', 'dCrossSection_dOmega', 'outputChannel' )
+
+    def __init__( self, outputChannel, ENDF_MT, documentation = None, EFL = None, label = None, process = None ) :
 
         ancestryModule.ancestry.__init__( self )
-        self.setLabel( label )
+        self.__label = label
 
-        self.crossSection = crossSectionModule.component( )
-        self.crossSection.setAncestor( self )
+        self.__crossSection = crossSectionModule.component( )
+        self.__crossSection.setAncestor( self )
+
+        self.__dCrossSection_dOmega = dCrossSection_dOmegaModule.component( )
+        self.__dCrossSection_dOmega.setAncestor( self )
 
         if( not isinstance( outputChannel, channelsModule.channel ) ) :
             raise fudgeExceptions.FUDGE_Exception( 'ouputChannel not instance of channel class.' )
         self.outputChannel = outputChannel
         self.outputChannel.setAncestor( self )
 
-        self.date = date
         self.EFL = EFL
         self.ENDF_MT = int( ENDF_MT )
-        self.__process = None
+        self.__process = process
         self.documentation = {}
         if( not( documentation is None ) ) : self.addDocumentation( documentation )
+
+    @property
+    def crossSection( self ) :
+
+        return( self.__crossSection )
+
+    @property
+    def dCrossSection_dOmega( self ) :
+
+        return( self.__dCrossSection_dOmega )
+
+    @property
+    def label( self ) :
+        """Returns the reaction's label."""
+
+        if( self.__label is None ) : self.updateLabel( )
+        return( self.__label )
+
+    def updateLabel( self ) :
+        """Sets the reaction's label from outputChannel products."""
+
+        self.__label = str( self.outputChannel )
+        if( self.process is not None ) : self.__label += ' [%s]' % self.process
 
     @property
     def process( self ) :
@@ -110,7 +145,7 @@ class base_reaction( ancestryModule.ancestry ) :
         """
         This method is usually not called directly. Use reactionSuite.check() instead.
 
-        Checks cross section and outputChannel. Checks include:
+        Checks cross section and outputChannel (and differential cross sections if available). Checks include:
           do Z/A balance? do Q-value and thresholds agree?
           Does cross section domain agree with each product distribution/multiplicity domain?
           Does energy balance?
@@ -120,17 +155,28 @@ class base_reaction( ancestryModule.ancestry ) :
         """
 
         from fudge.gnd import warning
-        from pqu import PQU
         from . import production as productionModule
-        from ..productData.distributions.angular import CoulombDepositionNotSupported
+        from ..differentialCrossSection.CoulombElastic import CoulombDepositionNotSupported
         warnings = []
 
+        reactionSuite = self.getRootAncestor( )
+
+        def particleZA( particleID ) :
+
+            particle = reactionSuite.PoPs[particleID]
+            return( miscPoPsModule.ZA( particle ) )
+
         try:
+# BRB6 hardwired
             info['Q'] = self.getQ('eV')
         except ValueError:
             pass
-        cpcount = sum( [prod.particle.getZ_A_SuffixAndZA()[0]>0 for prod in self.outputChannel] )
+        cpcount = sum( [ ( particleZA( prod.id ) / 1000 ) > 0 for prod in self.outputChannel ] )
         info['CoulombOutputChannel'] = cpcount > 1
+
+        differentialCrossSectionWarnings = self.dCrossSection_dOmega.check( info )
+        if differentialCrossSectionWarnings:
+            warnings.append( warning.context("dCrossSection_dOmega:", differentialCrossSectionWarnings) )
 
         crossSectionWarnings = self.crossSection.check( info )
         if crossSectionWarnings:
@@ -143,36 +189,39 @@ class base_reaction( ancestryModule.ancestry ) :
             return warnings             # otherwise continue to check outputs
 
         # compare calculated and listed Q-values:
-        try:
-            Q = self.getQ('eV')
-            Qcalc = info['availableEnergy_eV']
-            for prod in self.outputChannel:
-                try:
-                    Qcalc -= prod.getMass('eV/c**2') * prod.multiplicity.getConstant()
-                except Exception:   # multiplicity is not constant
-                    if( prod.name == 'gamma' ) : continue
-                    raise ValueError, "Non-constant multiplicity"
-            if abs(Q-Qcalc) > PQU.PQU(info['dQ']).getValueAs('eV'):
-                warnings.append( warning.Q_mismatch( PQU.PQU(Qcalc,'eV'), PQU.PQU(Q,'eV'), self ) )
-        except ValueError:
-            pass    # this test only works if multiplicity and Q are both constant for all non-gamma products
+        if not isinstance(self, productionModule.production): # can't reliably compute Q for production reactions
+            try:
+                Q = self.getQ('eV')
+                Qcalc = info['availableEnergy_eV']
+                for prod in self.outputChannel:
+                    try:
+                        Qcalc -= prod.getMass('eV/c**2') * prod.multiplicity.getConstant()
+                    except Exception:   # multiplicity is not constant
+                        if( prod.id == IDsPoPsModule.photon ) : continue
+                        raise ValueError, "Non-constant multiplicity"
+                if abs(Q-Qcalc) > PQUModule.PQU(info['dQ']).getValueAs('eV'):
+                    warnings.append( warning.Q_mismatch( PQUModule.PQU(Qcalc,'eV'), PQUModule.PQU(Q,'eV'), self ) )
+            except ValueError:
+                pass    # this test only works if multiplicity and Q are both constant for all non-gamma products
 
         if not (isinstance( self.outputChannel, channelsModule.sumOfRemainingOutputChannels ) or
                     self.outputChannel.isFission( ) or isinstance( self, productionModule.production ) ) :
             # check that ZA balances:
             ZAsum = 0
             for product in self.outputChannel:
-                if( product.name == 'gamma' ) : continue
-                ZAsum += product.particle.getZ_A_SuffixAndZA()[3] * product.multiplicity.getConstant()
+                if( product.id == IDsPoPsModule.photon ) : continue
+                ZAsum += particleZA( product.id ) * product.multiplicity.getConstant()
             if ZAsum != info['compoundZA']:
                 warnings.append( warning.ZAbalanceWarning( self ) )
 
-        if self.outputChannel.fissionEnergyReleased is not None:
-            info['crossSectionDomain'] = self.crossSection.domain(asPQU=True)
-            FERwarnings = self.outputChannel.fissionEnergyReleased.check( info )
-            if FERwarnings:
-                warnings.append( warning.context("fissionEnergyReleased:", FERwarnings) )
-            del info['crossSectionDomain']
+        if self.outputChannel.isFission():
+            from fudge.gnd.channelData.fissionEnergyReleased import fissionEnergyReleased
+            if isinstance(self.outputChannel.Q.evaluated, fissionEnergyReleased):
+                info['crossSectionDomain'] = self.crossSection.domainMin, self.crossSection.domainMax
+                FERwarnings = self.outputChannel.Q.evaluated.check( info )
+                if FERwarnings:
+                    warnings.append( warning.context("fissionEnergyReleased:", FERwarnings) )
+                del info['crossSectionDomain']
 
         # disabling for now: only complain if distributions are missing for transportables:
         """
@@ -183,7 +232,7 @@ class base_reaction( ancestryModule.ancestry ) :
             warnings.append( warning.noDistributions( self ) )
             return warnings """
 
-        info['crossSectionDomain'] = self.crossSection.domain()
+        info['crossSectionDomain'] = self.crossSection.domainMin, self.crossSection.domainMax
         info['isTwoBody'] = isinstance( self.outputChannel, channelsModule.twoBodyOutputChannel )
 
         for product in self.outputChannel:
@@ -202,7 +251,7 @@ class base_reaction( ancestryModule.ancestry ) :
             try:
                 self.calculateAverageProductData( style=info['averageProductDataStyle'], **info['averageProductDataArgs'] )
             except CoulombDepositionNotSupported, e:
-                warnings.append( warning.EnergyDepositionExceptionRaised( str(e), self ) )
+                warnings.append( warning.SkippedCoulombElasticEnergyDeposition( self ) )
             except Exception, e:
                 warnings.append( warning.EnergyDepositionExceptionRaised( str(e), self ) )
                 if info['failOnException']: raise
@@ -223,9 +272,10 @@ class base_reaction( ancestryModule.ancestry ) :
                 if energyDep:
                     totalEDep = energyDep[0][1]
                     for idx in range(1,len(energyDep)):
-                        if totalEDep.domain() != energyDep[idx][1].domain():
+                        if(     ( totalEDep.domainMin != energyDep[idx][1].domainMin ) or
+                                ( totalEDep.domainMax != energyDep[idx][1].domainMax ) ) :
                             upperEps = 0
-                            if totalEDep.domainMax() != energyDep[idx][1].domainMax():
+                            if totalEDep.domainMax != energyDep[idx][1].domainMax:
                                 upperEps = 1e-8
                             try:
                                 totalEDep, energyDep[idx][1] = totalEDep.mutualify(
@@ -255,27 +305,29 @@ class base_reaction( ancestryModule.ancestry ) :
                     # fission products aren't listed (so far, anyway), so about 85% of available energy should be missing:
                     for i,(ein,edep) in enumerate(totalEDep):
                         if edep > abs((ein + Qsum) * info['fissionEnergyBalanceLimit']):
-                            edepWarnings.append( warning.fissionEnergyImbalance( PQU.PQU(ein, totalEDep.axes[0].unit),
+                            edepWarnings.append( warning.fissionEnergyImbalance( PQUModule.PQU(ein, totalEDep.axes[0].unit),
                                 i, ein+Qsum, energyDepositedPerProduct(energyDep, ein), self ) )
                 elif len(products) == len(energyDep):
                     # have full energy dep. data for all products, so we can rigorously check energy balance:
                     for i,(ein,edep) in enumerate(totalEDep):
                         if ( abs(edep - (ein+Qsum)) > abs((ein+Qsum) * info['dEnergyBalanceRelative'])
-                                and abs(edep - (ein+Qsum)) > info['dEnergyBalanceAbsolute'] ):
-                            edepWarnings.append( warning.energyImbalance( PQU.PQU(ein, totalEDep.axes[0].unit),
+                                and abs(edep - (ein+Qsum)) > PQUModule.PQU( info['dEnergyBalanceAbsolute'] )
+                                    .getValueAs(totalEDep.axes[0].unit) ):
+                            edepWarnings.append( warning.energyImbalance( PQUModule.PQU(ein, totalEDep.axes[0].unit),
                                 i, ein+Qsum, energyDepositedPerProduct(energyDep, ein), self ) )
                 else:
                     # missing some products, so just check that outgoing energy doesn't exceed incoming:
                     for i,(ein,edep) in enumerate(totalEDep):
                         if ( (edep - (ein+Qsum)) > ((ein+Qsum) * info['dEnergyBalanceRelative'])
-                                and (edep - (ein+Qsum)) > info['dEnergyBalanceAbsolute'] ):
-                            edepWarnings.append( warning.energyImbalance( PQU.PQU(ein, totalEDep.axes[0].unit),
+                                and (edep - (ein+Qsum)) > PQUModule.PQU( info['dEnergyBalanceAbsolute'] )
+                                    .getValueAs(totalEDep.axes[0].unit) ):
+                            edepWarnings.append( warning.energyImbalance( PQUModule.PQU(ein, totalEDep.axes[0].unit),
                                 i, ein+Qsum, energyDepositedPerProduct(energyDep, ein), self ) )
 
                 if edepWarnings:
                     context = "Energy balance"
                     if decay: context += " (after decay)"
-                    context += " for products: " + ', '.join( [prod.particle.name for prod in products] )
+                    context += " for products: " + ', '.join( [prod.id for prod in products] )
                     warnings.append( warning.context( context, edepWarnings ) )
 
                 # now recursively check decay products, if any:
@@ -283,13 +335,13 @@ class base_reaction( ancestryModule.ancestry ) :
                     if currentProd.outputChannel is not None:
                         checkProductsForEnergyBalance(
                                 products[:pidx] + [p for p in currentProd.outputChannel] + products[pidx+1:],
-                                Qs + [currentProd.outputChannel.getConstantQAs('eV')],
+                                Qs + [currentProd.outputChannel.Q.getConstant()],
                                 decay = True, fission = False        # FIXME what about spontaneous fission decay?
                                 )
                 # end of helper function checkProductsForEnergyBalance
 
             try:
-                Q = self.getQ('eV')
+                Q = self.outputChannel.Q.getConstant()
                 checkProductsForEnergyBalance( products = [p1 for p1 in self.outputChannel], Qs = [Q],
                         fission = self.outputChannel.isFission(), decay=False )
             except ValueError:
@@ -297,25 +349,31 @@ class base_reaction( ancestryModule.ancestry ) :
 
         return warnings
 
+    @property
+    def domainMin( self ) :
+
+        return( self.crossSection.domainMin )
+
+    @property
+    def domainMax( self ) :
+
+        return( self.crossSection.domainMax )
+
+    @property
+    def domainUnit( self ) :
+
+        return( self.crossSection.domainUnit )
+
     def domainUnitConversionFactor( self, unitTo ) :
 
         return( self.crossSection.domainUnitConversionFactor( unitTo ) )
 
-    def domainMin( self, unitTo = None, asPQU = False ) :
+    def convertUnits( self, unitMap ) :
+        "See documentation for reactionSuite.convertUnits."
 
-        return( self.crossSection.domainMin( unitTo = unitTo, asPQU = asPQU ) )
-
-    def domainMax( self, unitTo = None, asPQU = False ) :
-
-        return( self.crossSection.domainMax( unitTo = unitTo, asPQU = asPQU ) )
-
-    def domain( self, unitTo = None, asPQU = False ) :
-
-        return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
-
-    def domainUnit( self ) :
-
-        return( self.crossSection.domainUnit( ) )
+        self.crossSection.convertUnits( unitMap )
+        self.dCrossSection_dOmega.convertUnits( unitMap )
+        self.outputChannel.convertUnits( unitMap )
 
     def getENDL_CS_ENDF_MT( self ) :
         """
@@ -329,15 +387,16 @@ class base_reaction( ancestryModule.ancestry ) :
         C, S = endf_endl.getCSFromMT( MT )
         return( { 'C' : C, 'S' : S, 'MT' : MT } )
 
-    def getLabel( self ) :
-        """Returns the reaction's label."""
+    def heatCrossSection( self, temperature, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.002, heatAllPoints = False,
+        doNotThin = True, heatBelowThreshold = True, heatAllEDomain = True, setThresholdToZero = False ) :
 
-        return( self.label )
-    
-    def setLabel( self, label ) :
-        """Sets the reaction's label."""
+        if (len(self.dCrossSection_dOmega) > 0):
+            print " Skipping dCrossSection_dOmega reaction"
+            return
 
-        self.label = label
+        crossSection = self.crossSection.heat( temperature, EMin, lowerlimit, upperlimit, interpolationAccuracy, heatAllPoints, doNotThin,
+                heatBelowThreshold, heatAllEDomain, setThresholdToZero = setThresholdToZero, addToSuite = True )
+        return( crossSection )
 
     def addDocumentation( self, documentation ) :
 
@@ -370,47 +429,76 @@ class base_reaction( ancestryModule.ancestry ) :
         verbosity = kwargs['verbosity']
         indent2 = indent + kwargs['incrementalIndent']
 
-        if( isinstance( self.outputChannel, fudge.gnd.channels.sumOfRemainingOutputChannels ) ) : return    # BRB FIXME - Why is this?
-        if( verbosity > 0 ) : print '%s%s' % ( indent, self.outputChannel.toString( simpleString = True ) )
+        skippingMessage = ''
+        if( len( self.dCrossSection_dOmega ) > 0 ) : skippingMessage = ': Skipping dCrossSection_dOmega reaction'
+        if( verbosity > 0 ) : print '%s%s%s' % ( indent, self.outputChannel.toString( simpleString = True ), skippingMessage )
+        if( len( self.dCrossSection_dOmega ) > 0 ) : return
 
         kwargs['reaction'] = self
-        kwargs['EMin'], kwargs['EMax'] = self.domain( )
-        kwargs['incidentEnergyUnit'] = self.crossSection.domainUnit( )
+        kwargs['EMin'] = self.domainMin
+        kwargs['EMax'] = self.domainMax
         self.outputChannel.calculateAverageProductData( style, indent2, **kwargs )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+        if( hasattr( self, 'availableEnergy' ) ) :
+            axes = availableEnergyModule.defaultAxes( self.domainUnit )
+            QToPointwiseLinear = self.outputChannel.QToPointwiseLinear( final = True )
+            availableEnergy = availableEnergyModule.XYs1d( data = [ [ QToPointwiseLinear.domainMin, QToPointwiseLinear.domainMin ], [ self.domainMax, self.domainMax ] ], axes = axes )
+            availableEnergy += QToPointwiseLinear
+            self.availableEnergy.add( availableEnergyModule.XYs1d( data = availableEnergy, axes = axes, label = style.label ) )
+        if( hasattr( self, 'availableMomentum' ) ) :
+            massInE = kwargs['projectileMass']
+            availableMomentum = availableMomentumModule.calculateMomentumPoints( style, massInE, self.domainMin, self.domainMax, self.domainUnit )
+            self.availableMomentum.add( availableMomentum )
 
-        from fudge.gnd import xParticle
-        from . import reaction as reactionModule
-
-        tempInfo['workFile'].append( 'c%s' % self.label )
+    def processMC( self, style, tempInfo, indent = '', incrementalIndent = '  ' ) :
 
         indent2 = indent + tempInfo['incrementalIndent']
         verbosity = tempInfo['verbosity']
-        status = 0
 
-        reactionSuite = tempInfo['reactionSuite']
-        projectileName = reactionSuite.projectile.name
-        targetName = reactionSuite.target.name
+        skippingMessage = ''
+        if( len( self.dCrossSection_dOmega ) > 0 ) : skippingMessage = ': Skipping dCrossSection_dOmega reaction'
+        if( verbosity > 0 ) : print '%s%s%s' % ( indent, self.outputChannel.toString( simpleString = True ), skippingMessage )
+        if (len(self.dCrossSection_dOmega) > 0): return
+
+        self.outputChannel.processMC( style, tempInfo, indent2 )
+
+    def processMultiGroup( self, style, tempInfo, indent ) :
+
+        from . import reaction as reactionModule
+
+        tempInfo['workFile'].append( 'r%s' % tempInfo['reactionIndex'] )
+
+        indent2 = indent + tempInfo['incrementalIndent']
+        verbosity = tempInfo['verbosity']
+
+        skippingMessage = ''
+        if( len( self.dCrossSection_dOmega ) > 0 ) : skippingMessage = ': Skipping dCrossSection_dOmega reaction'
+        if( verbosity > 0 ) : print '%s%s%s' % ( indent, self.outputChannel.toString( simpleString = True ), skippingMessage )
+        if( len( self.dCrossSection_dOmega ) > 0 ) : return
 
         tempInfo['reaction'] = self
-        if( verbosity > 0 ) : print '%s%s' % ( indent, self.outputChannel.toString( simpleString = True ) )
-
         norm = tempInfo['groupedFlux']
         tempInfo['groupedFlux'] = None
-        tempInfo['crossSection'] = self.crossSection
-        tempInfo['multiGroupCrossSection'] = self.crossSection.processSnMultiGroup( style, tempInfo, indent2 )
+        crossSection = style.findFormMatchingDerivedStyle( self.crossSection )
+# BRB FIXME The next line is a kludge, see note on crossSection.resonancesWithBackground.processMultiGroup.
+        if( isinstance( crossSection, crossSectionModule.reference ) ) :
+            crossSection = crossSection.crossSection
+        if( isinstance( crossSection, crossSectionModule.resonancesWithBackground ) ) :
+            crossSection = crossSection.getAncestor( )['recon']
+        if( not( isinstance( crossSection, crossSectionModule.XYs1d ) ) ) :
+            crossSection = crossSection.toPointwise_withLinearXYs( accuracy = 1e-5, upperEps = 1e-8 )
+        tempInfo['crossSection'] = crossSection
+        tempInfo['multiGroupCrossSection'] = self.crossSection.processMultiGroup( style, tempInfo, indent2 )
         self.crossSection.remove( style.label )
         tempInfo['groupedFlux'] = norm
-        self.crossSection.processSnMultiGroup( style, tempInfo, indent2 )
+        self.crossSection.processMultiGroup( style, tempInfo, indent2 )
 
         if( isinstance( self, reactionModule.reaction ) ) :
-            self.availableEnergy.processSnMultiGroup( style, tempInfo, indent2 )
-            self.availableMomentum.processSnMultiGroup( style, tempInfo, indent2 )
-        status += self.outputChannel.processSnMultiGroup( style, tempInfo, indent2 )
+            self.availableEnergy.processMultiGroup( style, tempInfo, indent2 )
+            self.availableMomentum.processMultiGroup( style, tempInfo, indent2 )
+        self.outputChannel.processMultiGroup( style, tempInfo, indent2 )
 
         del tempInfo['workFile'][-1]
-        return( status )
 
     def toXMLList( self, indent = '', **kwargs ) :
 
@@ -420,24 +508,28 @@ class base_reaction( ancestryModule.ancestry ) :
 
         attributeString = ""
         if( self.EFL is not None ) : attributeString += ' EFL="%s"' % self.EFL
-        if( self.date is not None ) : attributeString += ' date="%s"' % self.date
         if( self.process is not None ) : attributeString += ' process="%s"' % self.process
         attributeString += ' ENDF_MT="%s"' % self.ENDF_MT
 
         xmlString = [ '%s<%s label="%s"' % ( indent, self.moniker, self.label ) ]
-        xmlString[-1] += ' outputChannel="%s"' % self.outputChannel
         fissionGenre = self.outputChannel.getFissionGenre( )
         if fissionGenre is not None: attributeString += ' fissionGenre="%s"' % fissionGenre
 
         xmlString[-1] += attributeString + '>'
 
         if self.documentation:
+# BRB6 What is this
             xmlString.append( '%s<documentations>' % indent2 )
             for doc in self.documentation: xmlString += self.documentation[doc].toXMLList( indent3, **kwargs )
             xmlString[-1] += '</documentations>'
 
+        xmlString += self.dCrossSection_dOmega.toXMLList( indent2, **kwargs )
         xmlString += self.crossSection.toXMLList( indent2, **kwargs )
         xmlString += self.outputChannel.toXMLList( indent2, **kwargs )
+
+# BRB6 hardwired
+        if( hasattr( self, 'availableEnergy' ) ) : xmlString += self.availableEnergy.toXMLList( indent2, **kwargs )
+        if( hasattr( self, 'availableMomentum' ) ) : xmlString += self.availableMomentum.toXMLList( indent2, **kwargs )
 
         xmlString[-1] += '</%s>' % self.moniker
         return xmlString
@@ -454,18 +546,30 @@ class base_reaction( ancestryModule.ancestry ) :
         outputChannel = fudge.gnd.channels.parseXMLNode( element.find( 'outputChannel' ), xPath, linkData )
         outputChannel.fissionGenre = element.get( 'fissionGenre' )
 
-        reac = cls( outputChannel=outputChannel, label=element.get('label'), ENDF_MT=int(element.get('ENDF_MT')),
-                date=element.get('date') )
+        EFL = element.get( 'EFL', None )
+        if( EFL is not None ) : EFL = PQUModule.PQU( EFL )
+        reaction = cls( outputChannel = outputChannel, label = element.get( 'label' ), ENDF_MT = int( element.get('ENDF_MT') ), EFL = EFL )
         if element.get('process'):
-            reac.process = element.get('process')
-        for crossSection in crossSectionComponent : reac.crossSection.add( crossSection )
+            reaction.process = element.get('process')
+        for crossSection in crossSectionComponent : reaction.crossSection.add( crossSection )
 
         if( element.find( 'documentations' ) ) :
             for doc in element.find( 'documentations' ) :
-                reac.addDocumentation( fudge.gnd.documentation.documentation.parseXMLNode( doc, xPath, linkData ) )
+                reaction.addDocumentation( fudge.gnd.documentation.documentation.parseXMLNode( doc, xPath, linkData ) )
+
+        if( element.find( 'dCrossSection_dOmega' ) ) :
+            reaction.dCrossSection_dOmega.parseXMLNode( element.find( 'dCrossSection_dOmega' ), xPath, linkData )
+
+        if( element.find( availableEnergyModule.component.moniker ) ) :
+            reaction.availableEnergy = availableEnergyModule.parseXMLNode(
+                element.find( availableEnergyModule.component.moniker ), xPath, linkData )
+
+        if( element.find( availableMomentumModule.component.moniker ) ) :
+            reaction.availableMomentum = availableMomentumModule.parseXMLNode(
+                element.find( availableMomentumModule.component.moniker ), xPath, linkData )
 
         xPath.pop( )
-        return( reac )
+        return( reaction )
 
 def isGNDReaction( o ) :
     """Returns True if o is an instance of base_reaction or of a subclass thereof. """

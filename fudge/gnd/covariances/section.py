@@ -96,13 +96,12 @@ class section( suites.suite ):
 
     moniker = 'section'
 
-    def __init__(self, label=None, id=None, rowData=None, columnData=None):
+    def __init__(self, label, rowData=None, columnData=None):
         """ each section needs a unique id, pointers to the central values (row and column),
         and one or more forms """
 
         suites.suite.__init__( self, [covarianceMatrix, mixedForm, summedCovariance, LegendreOrderCovarianceForm] )
         self.label = label #: a str label that gets used on plots, etc.
-        self.id = id #: a str identifier, useful for resolving links
         self.rowData = rowData #: xData.link.link pointing to the corresponding data for the covariance row
         self.columnData = columnData #: xData.link.link pointing to the corresponding data for the covariance column
 
@@ -134,7 +133,7 @@ class section( suites.suite ):
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        xmlString = [indent+'<%s label="%s" id="%s"' % (self.moniker, self.label, self.id)]
+        xmlString = [indent+'<%s label="%s"' % (self.moniker, self.label)]
         if self.columnData is not None: xmlString[0] += ' crossTerm="true"'
         xmlString[0] += '>'
         for dataPointer in ('rowData','columnData'):
@@ -149,14 +148,14 @@ class section( suites.suite ):
     def parseXMLNode( cls, element, xPath, linkData ):
         """Translate <section> element from xml."""
 
-        xPath.append( '%s[@id="%s"]' % (element.tag, element.get('id') ) )
+        xPath.append( '%s[@label="%s"]' % (element.tag, element.get('label') ) )
         linkData['typeConversion'] = {'incidentEnergyLowerBound':PQUModule.PQU, 'incidentEnergyUpperBound':PQUModule.PQU}
         rowData_ = rowData.parseXMLNode( element[0], xPath, linkData )
         columnData_ = None
         if element[1].tag=="columnData":
             columnData_ = columnData.parseXMLNode( element[1], xPath, linkData )
         del linkData['typeConversion']
-        section_ = section( element.get('label'), element.get('id'), rowData_, columnData_ )
+        section_ = section( element.get('label'), rowData_, columnData_ )
         start = 2 if (columnData_ is not None) else 1
         for form in element[start:]:
             formClass = {
@@ -179,45 +178,6 @@ class columnData( linkModule.link ):
 
     moniker = 'columnData'
 
-class reactionSum( ancestry ):
-    """ 
-    A single covariance matrix is often given for a sum (or 'lump') of several reaction channels.
-    Define the sum here, then in the covariance <section>, refer to this summed reaction   
-    """
-
-    moniker = 'reactionSum'
-
-    def __init__(self, id=None, reactions=None, ENDF_MFMT=None):
-
-        ancestry.__init__( self )
-        self.id = id #: an identifier str
-        self.reactions = reactions or [] #: a list of xData.link.link's that point to the reactions that are lumped together
-        self.ENDF_MFMT = ENDF_MFMT #: the ENDF MF & MT values, a tuple of form (MF, MT)
-
-    def toXMLList( self, indent = '', **kwargs ) :
-
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
-
-        xmlString = [ '%s<reactionSum id="%s" ENDF_MFMT="%d,%d">' % ( indent, self.id, self.ENDF_MFMT[0], self.ENDF_MFMT[1] ) ]
-        for ch in self.reactions:
-            xmlString.append( ch.toXML( indent2, **kwargs ) )
-        xmlString[-1] += '</reactionSum>'
-        return xmlString
-
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ):
-        """Translate <reactionSum> element from xml."""
-
-        xPath.append( '%s[@id="%s"]' % (element.tag, element.get('id') )  )
-        rsum = reactionSum( **dict(element.items()) )
-        rsum.ENDF_MFMT = map(int, rsum.ENDF_MFMT.split(','))
-        for child in element:
-            link_ = rowData.parseXMLNode( child, xPath, linkData )
-            linkData['unresolvedLinks'].append( link_ )
-            rsum.reactions.append( link_ )
-        xPath.pop()
-        return rsum
-
 class externalReaction( ancestry ):
     """ 
     Covariance may relate this target with another material ('cross-material covariance'). In this case,
@@ -226,24 +186,25 @@ class externalReaction( ancestry ):
 
     moniker = 'externalReaction'
 
-    def __init__(self, id=None, target=None, ENDF_MFMT=None):
+    def __init__(self, label, projectile, target, ENDF_MFMT=None):
 
         ancestry.__init__( self )
-        self.id = id #: an identifier str
-        self.target=target #: the name of the target isotope/evaluation
-        self.ENDF_MFMT = ENDF_MFMT #: the ENDF MF & MT values, a tuple of form (MF, MT) 
+        self.label = label          #: an identifier str
+        self.projectile = projectile
+        self.target = target
+        self.ENDF_MFMT = ENDF_MFMT  #: the ENDF MF & MT values, a tuple of form (MF, MT) 
 
     def toXMLList( self, indent = '', **kwargs ) :
 
-        xmlString = [ '%s<externalReaction id="%s" target="%s" ENDF_MFMT="%d,%d"/>' % \
-                ( indent, self.id, self.target, self.ENDF_MFMT[0], self.ENDF_MFMT[1] ) ]
+        xmlString = [ '%s<externalReaction label="%s" projectile="%s" target="%s" ENDF_MFMT="%d,%d"/>' % \
+                ( indent, self.label, self.projectile, self.target, self.ENDF_MFMT[0], self.ENDF_MFMT[1] ) ]
         return xmlString
 
     @staticmethod
     def parseXMLNode( element, xPath, linkData ):
         """Translate <externalReaction> element from xml."""
 
-        xPath.append( '%s[@id="%s"]' % (element.tag, element.get('id') ) )
+        xPath.append( '%s[@label="%s"]' % (element.tag, element.get('label') ) )
         exReac = externalReaction( **dict(element.items()) )
         exReac.ENDF_MFMT = map(int, exReac.ENDF_MFMT.split(','))
         xPath.pop()

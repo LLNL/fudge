@@ -1,0 +1,441 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.core.utilities.brb &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.core.utilities.brb</h1><div class="highlight"><pre>
+<span></span># &lt;&lt;BEGIN-copyright&gt;&gt;
+# &lt;&lt;END-copyright&gt;&gt;
+
+&quot;&quot;&quot;
+This module contains a set of functions that are hopefully useful when using python.
+&quot;&quot;&quot;
+import sys
+import os
+import re
+import types
+import glob
+
+<div class="viewcode-block" id="uniquify"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.uniquify">[docs]</a>def uniquify(seq):
+    &quot;&quot;&quot;
+    Fast implimentation of a function to strip out non-unique entries in a Python list, but preserving list order.
+    Usage:
+        &gt;&gt;&gt; print uniquify( [1,4,2,4,7,2,1,1,1,&#39;s&#39;,&#39;a&#39;,0.1] ) 
+            [1, 4, 2, 7, &#39;s&#39;, &#39;a&#39;, 0.10000000000000001]
+    &quot;&quot;&quot;
+    seen = set()
+    seen_add = seen.add
+    return [ x for x in seq if x not in seen and not seen_add(x)] </div>
+
+<div class="viewcode-block" id="banner"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.banner">[docs]</a>def banner( s, justification = &#39;c&#39; ):
+    &quot;&quot;&quot;A flower-box ascii banner generator.  The input string can have line feeds.  Each line will get centered in the box.&quot;&quot;&quot;
+
+    if( justification not in [ &#39;l&#39;, &#39;c&#39;, &#39;r&#39; ] ) : raise Exception( &#39;Invalid justification = &quot;%s&quot;, must be &quot;l&quot;, &quot;c&quot;, &quot;r&quot;&#39; % justification )
+    ss = s.split( &#39;\n&#39;)
+    m = 0
+    for l in ss: m = max( m, len( l ) )
+    ans = &#39;+-&#39; + m*&#39;-&#39; + &#39;-+\n&#39;
+    if(   justification == &#39;l&#39; ) :
+        for l in ss: ans += &#39;| &#39; + l.ljust( m ) + &#39; |\n&#39;
+    elif( justification == &#39;c&#39; ) :
+        for l in ss: ans += &#39;| &#39; + l.center( m ) + &#39; |\n&#39;
+    else :
+        for l in ss: ans += &#39;| &#39; + l.rjust( m ) + &#39; |\n&#39;
+    ans += &#39;+-&#39; + m*&#39;-&#39; + &#39;-+&#39;
+    return ans</div>
+
+# Small banner, with wings
+<div class="viewcode-block" id="winged_banner"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.winged_banner">[docs]</a>def winged_banner( x, wingsize=10 ):
+    return wingsize*&#39;*&#39;+&#39; &#39;+x.replace( &#39;\n&#39;, &#39;; &#39; )+&#39; &#39;+wingsize*&#39;*&#39;</div>
+
+<div class="viewcode-block" id="Pause"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.Pause">[docs]</a>def Pause( Prompt = &quot;Enter &lt;RET&gt; to continue : &quot;, ExtraStr = &quot;&quot; ) :
+    &quot;&quot;&quot;Prompts and waits for user to enter a line. The line is returned. ExtraStr is added to the prompt string.&quot;&quot;&quot;
+
+    if( ExtraStr != &quot;&quot; ) : Prompt = Prompt + &quot;(%s)&quot; % ExtraStr
+    try :
+        s = raw_input( Prompt )
+    except EOFError :
+        print
+        s = None
+    except :
+        raise
+    return( s )</div>
+
+<div class="viewcode-block" id="tlist"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.tlist">[docs]</a>def tlist( l, w = 5, sep = None, rightJustify = 0 ) :
+    &quot;&quot;&quot;Calls tylist with arguments passed.&quot;&quot;&quot;
+
+    tylist( l, w, sep = sep, rightJustify = rightJustify )</div>
+
+<div class="viewcode-block" id="txlist"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.txlist">[docs]</a>def txlist( l, w = 5, sep = None, rightJustify = 0 ) :
+    &quot;&quot;&quot;Prints the list given by the first argument in a tabled format. The purpose of this 
+    function is to print a python list in a more readable format. The number of items from list
+    printed per line is set by w.  The argument sep, if not None, is printed as a separator
+    between each item on a line. The items are left justified unless the argument rightJustify
+    is true. This function prints each w consecutive items horizontally. Also see tylist.&quot;&quot;&quot;
+
+    if ( w &lt; 0 ) : w = 1
+    s = tlistMaxLen( l, rightJustify )
+    if s == &quot;&quot; :
+        ll = []
+        for i in l : ll.append( `i` )
+        s = tlistMaxLen( ll, rightJustify )
+    else :
+        ll = l
+    Counter = 0
+    for i in ll :
+        print s % i,
+        Counter = Counter + 1
+        if( Counter == w ) :
+            Counter = 0
+            print &quot;&quot;
+        else :
+            if( sep is not None ) : print sep,
+    if( Counter &gt; 0 ) : print &quot;&quot;</div>
+
+<div class="viewcode-block" id="tylist"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.tylist">[docs]</a>def tylist( l, w = 5, sep = None, rightJustify = 0 ) :
+    &quot;&quot;&quot;Prints the list given by the first argument in a tabled format. The purpose of this 
+    function is to print a python list in a more readable format. The number of items from list
+    printed per line is set by w.  The argument sep, if not None, is printed as a separator
+    between each item on a line. The items are left justified unless the argument rightJustify
+    is true. This function prints each consecutive item vertically while maintaining w columns. 
+    Also see txlist.&quot;&quot;&quot;
+
+    if ( w &lt; 0 ) : w = 1
+    s = tlistMaxLen( l, rightJustify )
+    if s == &quot;&quot; :
+        ll = []
+        for i in l : ll.append( `i` )
+        s = tlistMaxLen( ll, rightJustify )
+    else :
+        ll = l
+    r = ( len( ll ) + w - 1 ) / w
+    for ir in range( r ) :
+        iw = 0
+        for i in range( ir, len( ll ), r ) :
+            print s % ll[ i ],
+            iw += 1
+            if( ( sep is not None ) and ( iw &lt; w ) ) : print sep,
+        print &quot;&quot;</div>
+
+<div class="viewcode-block" id="tlistMaxLen"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.tlistMaxLen">[docs]</a>def tlistMaxLen( l, rightJustify ) :
+    &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+    MaxLen = 2
+    for i in l : 
+        if ( type( i ) == type( 1 ) ) : MaxLen = max( MaxLen, 8 )
+        elif ( type( i ) == type( &quot;&quot; ) ) : MaxLen = max( MaxLen, len( i ) + 1 )
+        else : return &quot;&quot;
+    justify = &quot;-&quot;
+    if( rightJustify ) : justify = &quot;&quot;
+    return &quot;%%%s%ds&quot; % ( justify, MaxLen )</div>
+
+<div class="viewcode-block" id="tdir"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.tdir">[docs]</a>def tdir( a = None, w = 5, pattern = None, wpattern = None ) :
+    &quot;&quot;&quot;This function is an attempt at improving the output of python&#39;s dir function. It uses
+    tlist to print the output in a more readable format. The argument w is passed to tlist.
+    The argument pattern, if not None, is used to restrict the items displayed to those that match it.
+    Pattern can be any pattern understood by the re module (e.g., to display all items
+    containing the two consecutive letters &quot;2d&quot; set pattern to &quot;.*2d.*&quot;). If pattern is None
+    and wpattern is NOT None then pattern is set to &quot;.*&quot; + wpattern + &quot;.*&quot;.&quot;&quot;&quot;
+
+    if( ( pattern is None ) and ( wpattern is not None ) ) : pattern = &quot;.*&quot; + wpattern + &quot;.*&quot;
+    if( ( ( type( a ) == type( [] ) ) or ( type( a ) == type( () ) ) ) and ( len( a ) &gt; 0 ) ) :
+        l = a
+    elif ( type( a ) == type( {} ) ) :
+        l = a.keys( )
+    else :
+        l = dir( a )
+    if( pattern is not None ) :
+        m = []
+        p = re.compile( pattern )
+        for i in l :
+            if( p.match( i ) ) : m.append( i )
+        l = m
+    tlist( l, w )</div>
+
+<div class="viewcode-block" id="doc"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.doc">[docs]</a>def doc( a ) :
+    &quot;&quot;&quot;This function simply executes &quot;print a.__doc__&quot; where &quot;a&quot; is the argument.&quot;&quot;&quot;
+
+    print a.__doc__</div>
+
+<div class="viewcode-block" id="docmethods"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.docmethods">[docs]</a>def docmethods( o, Full = 1 ) :
+    &quot;&quot;&quot;This function attempts to print all methods and their documentation contained in the first argument.&quot;&quot;&quot;
+
+    def docmethods2( o, typeslist ) :
+        for i in dir( o ) :
+            a = getattr( o, i )
+            if ( type( a ) in typeslist ) :
+                print &quot;\n------------------ %-30s ------------------&quot; % i
+                print a.__doc__
+
+    typeslist = [ types.FunctionType, types.MethodType, types.UnboundMethodType ]
+    if ( Full &gt; 0 ) : typeslist.append( types.ModuleType )
+    if ( Full &gt; 5 ) :
+        typeslist.append( types.BuiltinFunctionType )
+        typeslist.append( types.BuiltinMethodType )
+    if   ( type( o ) == types.InstanceType ) : docmethods2( o.__class__, typeslist )    # Instance of a class.
+    elif ( type( o ) == types.ClassType ) : docmethods2( o, typeslist )                 # Class
+    elif ( type( o ) == types.ModuleType ) : docmethods2( o, typeslist )                # Function</div>
+
+<div class="viewcode-block" id="py"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.py">[docs]</a>def py( depth = 1, start = 0 ) :
+    &quot;&quot;&quot;This routine prints all python scripts in sys.path[start:start+depth] in a nice format.&quot;&quot;&quot;
+
+    Counter = 0
+    for d in sys.path :
+        if ( not d == &quot;&quot; ) :
+            if( Counter &gt;= start ) :
+                print &quot;\n&quot;, d
+                p = os.path.join( d, &quot;*.py&quot; )
+                fs = glob.glob( p )
+                l = []
+                for f in fs : l.append( os.path.split( f )[1] )
+                txlist( l )
+            Counter = Counter + 1
+            if( Counter == ( start + depth ) ) : return</div>
+
+<div class="viewcode-block" id="objectoutline"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectoutline">[docs]</a>def objectoutline( o, MaxLevel = 1, Full = 1 ) :
+    &quot;&quot;&quot;This routine attempts to print the objects - methods, members and possible other things - that are a part
+    of the first argument. It will recursively traverse each object found down to level MaxLevel.&quot;&quot;&quot;
+
+    objectoutline2( o, MaxLevel, 0, &quot;&quot;, Full )</div>
+
+<div class="viewcode-block" id="objectoutline2"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectoutline2">[docs]</a>def objectoutline2( o, MaxLevel, level, name, Full ) :
+    &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+    if( type( name ) != type( &quot;&quot; ) ) : name = str( name )
+    if ( level == ( MaxLevel + 1 ) ) : return
+    DoNextLevel = not ( level == MaxLevel )
+    nextlevel = level + 1
+    sm = &quot; &quot; * ( 4 * level )
+    s = sm
+    isInstance = ( type( o ) == types.InstanceType )
+    if( hasattr( o, &#39;__class__&#39; ) ) : isInstance |= ( type( o ) == o.__class__ )    # New style class instance.
+    
+    try :
+        if ( name != &quot;&quot; ) : s = s + name + &quot;: &quot;
+    except :
+        print &#39;&lt;%s&gt; &lt;%s&gt;, %s, %s&#39; % ( `s`, `name`, `type( s )`, `type( name )` )
+        raise
+
+    if ( type( o ) == types.ModuleType ) :                    # Function
+        print &quot;%smethod %s&quot; % ( s, o.__name__ )
+        for i in dir( o ) : objectoutline2( getattr( o, i ), MaxLevel, nextlevel, i, Full )
+    elif ( type( o ) == type( [] ) ) :                          # List of objects
+        print &quot;%slist of len %d&quot; % ( s, len( o ) )
+        if ( ( Full ) and ( CheckListForSameTypeOfObjects( o, [] ) ) ) :
+            if ( DoNextLevel ) :
+                for i in o : objectoutline2( i, MaxLevel, nextlevel, &quot;&quot;, Full )
+        else :
+            if ( o != [] ) : objectoutline2( o[0], MaxLevel, nextlevel, &quot;&quot;, Full )
+    elif ( type( o ) == type( () ) ) :                          # Tuple of objects
+        print &quot;%stuple of len %d&quot; % ( s, len( o ) )
+        if ( Full ) :
+            if ( DoNextLevel ) :
+                for i in o : objectoutline2( i, MaxLevel, nextlevel, &quot;&quot;, Full )
+        else :
+            if ( o != () ) : objectoutline2( o[0], MaxLevel, nextlevel, &quot;&quot;, Full )
+    elif ( type( o ) == type( {} ) ) :                          # Dictionary
+        print &quot;%sdictionary of %d items&quot; % ( s, len( dir( o ) ) )
+        for i in o.keys( ) : objectoutline2( o[i], MaxLevel, nextlevel, i, Full )
+    elif( ( type( o ) == types.ClassType ) or ( type( o ) == types.TypeType ) ) :                     # Class old and new style
+        print &quot;%sclass %s&quot; % ( s, o.__name__ )
+        if ( DoNextLevel ) :
+            if ( len( o.__bases__ ) &gt; 0 ) :
+                print &quot;%s  -- base(s) --&quot; % sm
+                for i in o.__bases__ : objectoutline2( i, MaxLevel, nextlevel, i.__name__, Full )
+            print &quot;%s  -- methods --&quot; % sm
+            for i in dir( o ) : objectoutline2( getattr( o, i ), MaxLevel, nextlevel, i, Full )
+        else :
+            if ( len( o.__bases__ ) &gt; 0 ) :
+                print &quot;%s  -- base(s) --&quot; % sm
+                for i in o.__bases__ : objectoutline2ClassesOnly( i, nextlevel, i.__name__ )
+    elif( type( o ) == type( 1 ) ) or ( type( o ) == type( 1. ) ) or ( type( o ) == type( &quot;&quot; ) ) or ( type( o ) == type( u&quot;&quot; ) ) or ( type( o ) == type( True ) ) :
+        print &quot;%s%s = %s&quot; % ( s, `type( o )`, `o` )
+    elif( isFunctionLike( o ) ) :
+        print &quot;%s %s&quot; % ( s, o.__class__.__name__ )
+    elif( isInstance ) :                  # Instance of a class.
+        print &quot;%sinstance of class %s&quot; % ( s, o.__class__.__name__ )
+        if ( DoNextLevel ) :
+#            if ( len( o.__class__.__bases__ ) &gt; 0 ) :
+#                print &quot;%s  -- bases --&quot; % sm
+#                for i in o.__class__.__bases__ : objectoutline2( i, MaxLevel, nextlevel, i.__name__, Full )
+            print &quot;%s  -- member --&quot; % sm
+            for i in dir( o ) : 
+                obj = get_dict_attr( o, i )
+                if( not( isFunctionLike( obj ) ) ) : objectoutline2( obj, MaxLevel, nextlevel, i, Full )
+            print &quot;%s  -- methods --&quot; % sm
+            for i in dir( o ) :
+                if( isFunctionLike( get_dict_attr( o, i ) ) ) : objectoutline2( get_dict_attr( o, i ), MaxLevel, nextlevel, i, Full )
+    else :                                                      # Integer, Float, etc...
+        print &quot;%s%s&quot; % ( s, `type( o )` )</div>
+
+<div class="viewcode-block" id="isFunctionLike"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.isFunctionLike">[docs]</a>def isFunctionLike( obj ) :
+
+    if( type( obj ) == types.BuiltinFunctionType ) : return( True )
+    if( type( obj ) == types.BuiltinMethodType ) : return( True )
+    if( type( obj ) == types.FunctionType ) : return( True )
+    if( type( obj ) == types.GeneratorType ) : return( True )
+    if( type( obj ) == types.LambdaType ) : return( True )
+    if( type( obj ) == types.MethodType ) : return( True )
+    if( type( obj ) == types.UnboundMethodType ) : return( True )
+    return( False )</div>
+
+<div class="viewcode-block" id="get_dict_attr"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.get_dict_attr">[docs]</a>def get_dict_attr( obj, attr ) :
+    for obj in [ obj ] + obj.__class__.mro( ) :
+        if( attr in obj.__dict__ ) : return( obj.__dict__[attr] )
+    raise AttributeError</div>
+
+<div class="viewcode-block" id="objectoutline2ClassesOnly"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectoutline2ClassesOnly">[docs]</a>def objectoutline2ClassesOnly( o, level, name ) :
+    &quot;&quot;&quot;For internal use only!&quot;&quot;&quot;
+
+    sm = &quot; &quot; * ( 4 * level )
+    if( ( type( o ) == types.ClassType ) or ( type( o ) == types.TypeType ) ) :                     # Class old and new style
+        print &quot;%sclass %s&quot; % ( sm, o.__name__ )
+        if ( len( o.__bases__ ) &gt; 0 ) :
+            if( len( o.__bases__[0].__bases__ ) == 0 ) : return
+            print &quot;%s  -- base(s) --&quot; % sm
+            for subo in o.__bases__ : objectoutline2ClassesOnly( subo, level + 1, subo.__name__ )</div>
+
+<div class="viewcode-block" id="CheckListForSameTypeOfObjects"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.CheckListForSameTypeOfObjects">[docs]</a>def CheckListForSameTypeOfObjects( l, e ) :
+    &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+    if( l == e ) : return 0
+    t = type( l[0] )
+    for i in l :
+        if ( t != type( i ) ) : return 1
+    return 0</div>
+
+<div class="viewcode-block" id="objectvalues"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectvalues">[docs]</a>def objectvalues( o ) :
+    &quot;&quot;&quot;Prints a list of all objects return by dir( o ) and their data (or object type) where &quot;o&quot; 
+    is the first argument.&quot;&quot;&quot;
+
+    if ( type( o ) == types.InstanceType ) :                  # Instance of a class.
+        print &quot;class %s&quot; % o.__class__.__name__
+        print &quot;  -- member --&quot;
+        for i in dir( o ) : objectvalues2( getattr( o, i ), i )
+    else :
+        objectvalues2( o, &quot;&quot; )</div>
+
+<div class="viewcode-block" id="objectvalues2"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.objectvalues2">[docs]</a>def objectvalues2( o, name ) :
+    &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+    if   ( type( o ) == types.InstanceType ) :                  # Instance of a class.
+        return
+    elif ( type( o ) == types.ModuleType ) :                    # Function
+        return
+    if ( type( o ) == type( [] ) ) :                            # List of objects
+        print &quot;  %s: list of len %d&quot; % ( name, len( o ) )
+    elif ( type( o ) == type( () ) ) :                          # Tuple of objects
+        print &quot;  %s: tuple of len %d&quot; % ( name, len( o ) )
+    elif ( type( o ) == type( {} ) ) :                          # Dictionary
+        print &quot;  %s dictionary of %d items&quot; % ( name, len( dir( o ) ) )
+        for i in o.keys( ) : print &quot;    %s = %s&quot; % ( i, o[i] )
+    elif ( type( o ) == types.ClassType ) :                     # Class
+        return
+    else :                                                      # Integer, Float, etc...
+        print &quot;  %s: %s = %s&quot; % ( name, `type( o )`, `o` )</div>
+
+<div class="viewcode-block" id="getType"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.getType">[docs]</a>def getType( o ) :
+
+    try :
+        return( &quot;%s %s&quot; % ( str( o.im_class ), str( o.im_func ) ) )
+    except :
+        try :
+            return( str( o.__class__ ) )
+        except :
+            return( type( o ) )</div>
+
+<div class="viewcode-block" id="limitObjectToString"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.brb.limitObjectToString">[docs]</a>def limitObjectToString( object ) :
+
+    if( isinstance( object, str ) ) :
+        s1 = object
+    else :
+        s1 = repr( object )
+    if( len( s1 ) &gt; 64 ) : s1 = s1[:61] + &#39;...&#39;
+    return( s1 )</div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

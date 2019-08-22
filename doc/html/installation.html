@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installation &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Reporting Bugs" href="reporting-bugs.html" />
+    <link rel="prev" title="Downloading" href="downloading.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="reporting-bugs.html" title="Reporting Bugs"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="downloading.html" title="Downloading"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="installation">
+<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>Fudge is designed to be simple to install and use. For basic use the package only requires
+Python (versions 2.6-2.7, not version 3.0 and higher).  Python 2.7 is likely already present
+on all unix-based systems (if in doubt, try entering &#8220;python&#8221; on the command-line),
+and is available for all platforms at <a class="reference external" href="http://www.python.org/getit/">http://www.python.org/getit/</a>.</p>
+<div class="section" id="to-install-the-package">
+<h2>To install the package:<a class="headerlink" href="#to-install-the-package" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Obtain the current version (available online at <a class="reference external" href="https://ndclx4.bnl.gov/gf/project/gnd/">https://ndclx4.bnl.gov/gf/project/gnd/</a> or <a class="reference external" href="ftp://gdo-nuclear.ucllnl.org/">ftp://gdo-nuclear.ucllnl.org/</a>),
+and place it on your system.</p>
+</li>
+<li><p class="first">To unzip the package, type</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>$tar -xvf fudge-4.2.2.tar.gz
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">The unzipped directory is named &#8216;fudge-4.2.2&#8217;. Navigate into the new directory, and type</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>$make
+</pre></div>
+</div>
+</div></blockquote>
+<p>and (following step is only required for generating multi-group processed libraries):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$make merced
+</pre></div>
+</div>
+</li>
+<li><p class="first">You are now set to use Fudge! For advanced use, see the optional components below.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="optional-extra-python-packages">
+<h2>[Optional] Extra python packages<a class="headerlink" href="#optional-extra-python-packages" title="Permalink to this headline">¶</a></h2>
+<p>For more advanced use, Fudge depends on these additional, optional packages:</p>
+<ul class="simple">
+<li>gnuplot and Gnuplot.py (for plotting, <a class="reference external" href="http://gnuplot-py.sourceforge.net">http://gnuplot-py.sourceforge.net</a>)</li>
+<li>matplotlib (alternate style of plotting, <a class="reference external" href="http://matplotlib.sourceforge.net">http://matplotlib.sourceforge.net</a>)</li>
+<li>numpy (for some advanced features including checking and manipulating covariance matrices, <a class="reference external" href="http://numpy.scipy.org">http://numpy.scipy.org</a>)</li>
+</ul>
+</div>
+<div class="section" id="optional-setting-environment-variables">
+<h2>[Optional] Setting Environment Variables<a class="headerlink" href="#optional-setting-environment-variables" title="Permalink to this headline">¶</a></h2>
+<p>For general use of the fudge package, some changes should be made to your
+computer&#8217;s environment. The following lines make the required change.
+Note that &lt;path_to_fudge&gt; indicates the path to
+the directory containing the Fudge README.txt file:</p>
+<ul>
+<li><p class="first">On unix with bash, ksh, etc, put this line in the .bashrc or equivalent:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>$export PYTHONPATH=$PYTHONPATH:&lt;path_to_fudge&gt;
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">On csh, tcsh or similar, do:</p>
+<blockquote>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>$setenv PYTHONPATH $PYTHONPATH:&lt;path_to_fudge&gt;
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p class="first">On Windows, the environment variable should be added to the registry
+(see for example <a class="reference external" href="http://www.support.tabs3.com/main/R10463.htm">http://www.support.tabs3.com/main/R10463.htm</a>)</p>
+</li>
+</ul>
+</div>
+<div class="section" id="more-information-on-building-extensions">
+<h2>More information on building Extensions<a class="headerlink" href="#more-information-on-building-extensions" title="Permalink to this headline">¶</a></h2>
+<p>Fudge is primarily written in python, which is easily portable across many different
+systems. Some advanced features of fudge (computationally intensive tasks) are however
+implemented in C/C++ or fortran, and must be compiled before use. To build these extensions,
+use the Makefile included in the main Fudge directory:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ make
+</pre></div>
+</div>
+<p>An additional package called Merced must also be compiled before using Fudge to generate transfer matrices
+for deterministic transport.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ make merced
+</pre></div>
+</div>
+<p>Merced uses OpenMP threading. Some users may run into a &#8216;missing omp.h&#8217; error when compiling Merced (in particular
+on OS X where the default C++ compiler does not support OpenMP). If so, we recommend installing the g++-mp-4.9
+compiler instead (available via MacPorts) and compiling with that:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ make merced CXX=g++-mp-4.9
+</pre></div>
+</div>
+<p>If you encounter other trouble with installing, building extensions or setting environment
+variables, please let us know (email: <a class="reference external" href="mailto:mattoon1&#37;&#52;&#48;llnl&#46;gov">mattoon1<span>&#64;</span>llnl<span>&#46;</span>gov</a>).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#to-install-the-package">To install the package:</a></li>
+<li><a class="reference internal" href="#optional-extra-python-packages">[Optional] Extra python packages</a></li>
+<li><a class="reference internal" href="#optional-setting-environment-variables">[Optional] Setting Environment Variables</a></li>
+<li><a class="reference internal" href="#more-information-on-building-extensions">More information on building Extensions</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="downloading.html"
+                        title="previous chapter">Downloading</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="reporting-bugs.html"
+                        title="next chapter">Reporting Bugs</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/installation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="reporting-bugs.html" title="Reporting Bugs"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="downloading.html" title="Downloading"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+This subdirectory deals with discrete 2-body reactions with data in
+the form of Legendre coefficients of the angular probability density.
+
+In the input file you must provide the Q value and the rest masses of 
+the incident particle, the target, and the emitted particle, and these
+must be in the same units as the energy bins.  You may also provide
+the rest mass of the residual, but this is not used.  You will get a
+warning message if the calculated rest mass of the residual differs
+too much from the one you provide.
+
+The computation is done with Newtonian mechanics if the input file
+contains the line
+kinetics: Newtonian
+To specify relativistic mechanics, include the line
+kinetics: relativistic
+You get Newtonian mechanics if this command is omitted.
+
+The input files are as follows:
+
+in.Legendre2Body-Si28: Do the integration using Newtonian kinetics and 
+  the default adaptive quadrature.  Its output is out.Legendre2Body-Si28.
+
+in.Legendre2Body-Si28-Gauss6: Do the integration using Newtonian kinetics and 
+  Gaussian quadrature of order 6.  The output is out.Legendre2Body-Si28-Gauss6
+  and is essentially the same as the default output.
+
+in.Legendre2Body-Si28.rel: Do the integration using relativistic kinetics and 
+  the default adaptive quadrature.  Its output is out.Legendre2Body-Si28.rel.
+
+in.Lu175.linlog: This file calls for interpolation of the Legendre coefficients
+  linearly with respect to the logarithm of the incident energy.  Use Newtonian
+  mechanics.  The output file is out.Lu175.linlog.
+
+in.Lu175.linlin: The same data as Lu175.linlog but with linear-linear interpolation.
+  For the sake of comparison.  Use Newtonian mechanics.  The output file is
+  out.Lu175.linlin.
+
+in.Lu175.linlog.rel: This file calls for interpolation of the Legendre coefficients
+  linearly with respect to the logarithm of the incident energy.  Use relativistic
+  mechanics.  The output file is out.Lu175.linlog.rel.
+
+in.Ag110m: This file is for inelastic scattering with a positive Q value, and.
+  it uses Newtonian mechanics.  The output file is out.Ag110m.
+
+in.Ag110m.rel: This file is for inelastic scattering with a positive Q value, and.
+  it uses relativistic mechanics.  The output file is out.Ag110m.rel.
+
+in.DD: This file for D + D -> T + p is special in that the outgoing triton is
+  so heavy that zero velocity in the lab frame is possible with Q > 0.
+  The kinetics is Newtonian.
+
+in.DD.rel: the relativistic version of the DD file.

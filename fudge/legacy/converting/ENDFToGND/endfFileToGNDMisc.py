@@ -68,7 +68,6 @@ import xData.axes as axesModule
 import xData.XYs as XYsModule
 import xData.regions as regionsModule
 
-ENDF_Accuracy = 1e-3
 FUDGE_EPS = 1e-8
 
 def parseENDFByMT_MF( fileName, stripMATMFMTCount = True, logFile = sys.stderr ) :
@@ -255,12 +254,12 @@ def getENDFDate( date ) :
             month = { "JAN" : '01', "FEB" : '02', "MAR" : '03', "APR" : '04', "MAY" : '05', "JUN" : '06',
                 "JUL" : '07', "AUG" : '08', "SEP" : '09', "OCT" : '10', "NOV" : '11', "DEC" : '12' }[sMonth.upper( )]
         except :
-            raise Exception( 'Bad evaluation date: could not convert month = "%s to integer for %s' % ( sMonth, date ) )
+            raise Exception( 'Bad evaluation date: could not convert month = "%s" to integer for "%s". See option --ignoreBadDate' % ( sMonth, date ) )
         try :
             year = 1900 + int( date[8:10] )
             if( year < 1950 ) : year += 100
         except :
-            raise Exception( 'Bad evaluation date: could not convert year = "%s for %s" to integer' % date )
+            raise Exception( 'Bad evaluation date: could not convert year = "%s" to integer for "%s". See option --ignoreBadDate' % ( date[8:10], date ) )
         day = '01'
         date = '%s-%s-%s' % ( year, month, day )
     return( date )
@@ -380,6 +379,12 @@ def getTAB1Regions( startLine, dataLines, allowInterpolation6 = False, logFile =
         if( not( ( len( TAB1['interpolationInfo'] ) == 1 ) and ( TAB1['interpolationInfo'][0][1] == 1 ) and ( interpolationRegions[0][1] == 2 ) ) ) :
             logFile.write( ' reduced regions from %s to %s' % ( len( TAB1['interpolationInfo'] ), len( interpolationRegions ) ) )
 
+    if (data[-2][0] == data[-1][0] and data[-1][1] == 0):               # discontinuity at final outgoing energy used to drop spectrum to 0
+        if (interpolation == 1):
+            data.pop(-2)                                                # flat interpolation: omit 2nd-to-last point
+        else:
+            data[-1][0] *= 1.000000001                                  # lin-lin interpolation: blur edge of discontinuity
+
     n1, regions = 0, []
     for interpolationInfo in interpolationRegions :
         n2, interpolation = interpolationInfo
@@ -410,7 +415,7 @@ def getTAB1Regions( startLine, dataLines, allowInterpolation6 = False, logFile =
                 if( i3 < n3 ) : x2, y2 = regionData[i3]
             value = None
             if( dimension > 1 ) : value = TAB1['C2']
-            regions.append( cls( data = regionData[:i3], accuracy = ENDF_Accuracy, value = value,
+            regions.append( cls( data = regionData[:i3], value = value,
                     interpolation = ENDFInterpolationToGND1d( interpolation ), axes = axes ) )
             regionData = regionData[i3:]
             for i3 in xrange( 1, len( regionData ) ) :

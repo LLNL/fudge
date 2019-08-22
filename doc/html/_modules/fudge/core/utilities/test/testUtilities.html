@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.core.utilities.test.testUtilities &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.core.utilities.test.testUtilities</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># encoding: utf-8</span>
+
+<span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">test fudge/core/utilities</span>
+<span class="sd">cmattoon, 3/24/2011</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">fudge.core</span> <span class="k">import</span> <span class="n">utilities</span>
+
+<div class="viewcode-block" id="brb_test"><a class="viewcode-back" href="../../../../../fudge/fudge.core.utilities.test.html#fudge.core.utilities.test.testUtilities.brb_test">[docs]</a><span class="k">class</span> <span class="nc">brb_test</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="brb_test.setUp"><a class="viewcode-back" href="../../../../../fudge/fudge.core.utilities.test.html#fudge.core.utilities.test.testUtilities.brb_test.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">brb</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">brb</span></div>
+    
+<div class="viewcode-block" id="brb_test.test1"><a class="viewcode-back" href="../../../../../fudge/fudge.core.utilities.test.html#fudge.core.utilities.test.testUtilities.brb_test.test1">[docs]</a>    <span class="k">def</span> <span class="nf">test1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># ???</span>
+        <span class="k">pass</span></div></div>
+
+<div class="viewcode-block" id="testReactionStrings"><a class="viewcode-back" href="../../../../../fudge/fudge.core.utilities.test.html#fudge.core.utilities.test.testUtilities.testReactionStrings">[docs]</a><span class="k">class</span> <span class="nc">testReactionStrings</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="testReactionStrings.setUp"><a class="viewcode-back" href="../../../../../fudge/fudge.core.utilities.test.html#fudge.core.utilities.test.testUtilities.testReactionStrings.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">RS</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">reactionStrings</span></div>
+    
+<div class="viewcode-block" id="testReactionStrings.test1"><a class="viewcode-back" href="../../../../../fudge/fudge.core.utilities.test.html#fudge.core.utilities.test.testUtilities.testReactionStrings.test1">[docs]</a>    <span class="k">def</span> <span class="nf">test1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">reac</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;n + Th232 -&gt; Th233 + gamma&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;n + Th232 -&gt; n + (Th232_e2 -&gt; He4 + (Ra228 -&gt; He4 + Rn224))&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;H2 + H3 -&gt; n + He4&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;n + C11 -&gt; (C12 -&gt; He4 + (Be8 -&gt; He4[multiplicity:&#39;2&#39;]))&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;n + Fe56 -&gt; n + Fe56 [compound]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;gamma + Pu239 -&gt; n[multiplicity:&#39;energyDependent&#39;, decayRate:&#39;1.45210000e-02&#39;] + Pu238&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;n + Cl35 -&gt; n + Cl35_s&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;n + Pu239 -&gt; n[multiplicity:&#39;energyDependent&#39;, emissionMode:&#39;prompt&#39;] + n[multiplicity:&#39;energyDependent&#39;, emissionMode:&#39;delayed&#39;, decayRate:&#39;1.32710000e-02&#39;] + n[multiplicity:&#39;energyDependent&#39;, emissionMode:&#39;delayed&#39;, decayRate:&#39;3.08810000e-02&#39;] + n[multiplicity:&#39;energyDependent&#39;, emissionMode:&#39;delayed&#39;, decayRate:&#39;1.13370000e-01&#39;] + n[multiplicity:&#39;energyDependent&#39;, emissionMode:&#39;delayed&#39;, decayRate:&#39;2.92500000e-01&#39;] + n[multiplicity:&#39;energyDependent&#39;, emissionMode:&#39;delayed&#39;, decayRate:&#39;8.57490000e-01&#39;] + n[multiplicity:&#39;energyDependent&#39;, emissionMode:&#39;delayed&#39;, decayRate:&#39;2.72970000e+00&#39;] + gamma[multiplicity:&#39;energyDependent&#39;] [total fission]&quot;</span>
+            <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">reac</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RS</span><span class="o">.</span><span class="n">parseReaction</span><span class="p">(</span><span class="n">reac</span><span class="p">))</span> <span class="p">)</span></div>
+    
+<div class="viewcode-block" id="testReactionStrings.test2"><a class="viewcode-back" href="../../../../../fudge/fudge.core.utilities.test.html#fudge.core.utilities.test.testUtilities.testReactionStrings.test2">[docs]</a>    <span class="k">def</span> <span class="nf">test2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># should handle extra spaces, etc:</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;H2+Rb87  -&gt;n[multiplicity: &#39;energyDependent&#39;][fake string]&quot;</span>
+        <span class="n">parsed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RS</span><span class="o">.</span><span class="n">parseReaction</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span><span class="n">parsed</span><span class="o">.</span><span class="n">target</span><span class="p">),</span> <span class="s2">&quot;Rb87&quot;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">parsed</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="s2">&quot;fake string&quot;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="nb">str</span><span class="p">(</span><span class="n">parsed</span><span class="p">),</span> <span class="s2">&quot;H2 + Rb87 -&gt; n[multiplicity:&#39;energyDependent&#39;] [fake string]&quot;</span> <span class="p">)</span>
+        <span class="k">pass</span></div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../../index.html">
+              <img class="logo" src="../../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

@@ -1,9 +1,9 @@
-from fudge.core.utilities import fudgeZA
+from fudge.particles.nuclear import elementSymbolFromZ
 
 # Crack the isotope name to get the ZA
 def getZAFromGNDName( name ):
     sym, A, m = getSymAFromGNDName( name )   
-    Z = fudgeZA.SymbolToZ( sym )
+    Z = elementSymbolFromZ( sym )
     return Z*1000+int(A)
 
 # Crack the isotope name to get the A & symbol

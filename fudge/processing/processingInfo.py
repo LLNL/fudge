@@ -67,6 +67,8 @@ conserveParticle = 'conserveParticle'
 conserveEnergy = 'conserveEnergy'
 conserveParticleAndEnergy = 'conserveParticleAndEnergy'
 
+from PoPs import IDs as IDsPoPsModule
+
 from fudge.gnd import styles as stylesModule
 from fudge.gnd import reactionSuite as reactionSuiteModule
 
@@ -193,7 +195,7 @@ class processInfo :
 
     def addParticle( self, particle ) :
 
-        self['particles'][particle.name]  = particle
+        self['particles'][particle.id]  = particle
 
     def getParticleGroups( self, name ) :
 
@@ -253,7 +255,7 @@ class processInfoLLNL( processInfo ) :
             if( particle == target.projectile.name ) : lMax_ = lMax
             conservationFlag = conserveParticleAndEnergy
             if( particle == 'n' ) : conservationFlag = conserveParticle
-            if( particle == 'gamma' ) : conservationFlag = conserveEnergy
+            if( particle == IDsPoPsModule.photon ) : conservationFlag = conserveEnergy
             particles[particle] = processInfoParticle( particle, groups[particle], lMax_, conservationFlag )
         processInfo.__init__( self, target, particles, flux = flux, logFile = logFile, verbosity = verbosity )
         self['workDir'] = 'xndfgen.work'

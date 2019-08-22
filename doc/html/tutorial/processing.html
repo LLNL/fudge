@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5. Processing GND files &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="6. Other Fudge Examples" href="other-examples.html" />
+    <link rel="prev" title="4.8. Fudge idiosyncrasies" href="fudgeisms.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="other-examples.html" title="6. Other Fudge Examples"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fudgeisms.html" title="4.8. Fudge idiosyncrasies"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">The Fudge Tutorial</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="processing-gnd-files">
+<h1>5. Processing GND files<a class="headerlink" href="#processing-gnd-files" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal"><span class="pre">processProtare</span></code> script (in fudge/bin/processProtare.py) is the main driver for processing
+nuclear data evaluations. This script can be used to reconstruct resonances (if necessary),
+heat reaction cross sections to various temperatures, generate group-averaged cross sections and transfer matrices,
+and generate average product energy and momentum deposition data.</p>
+<p>The name <code class="docutils literal"><span class="pre">processProtare</span></code> includes the short-hand &#8216;ProTarE&#8217;, which stands for &#8220;Projectile, Target and Evaluation&#8221;.
+Each GND <code class="docutils literal"><span class="pre">reactionSuite</span></code> contains this combination: an evaluation of all reactions involving a combination of
+projectile and target.</p>
+<p>Processed data generated during processProtare are stored internally in Fudge data structures, and once processing
+is complete the resulting file is written back out as a GND/XML file.</p>
+<div class="section" id="options-for-processing">
+<h2>5.1. Options for processing<a class="headerlink" href="#options-for-processing" title="Permalink to this headline">¶</a></h2>
+<p>processProtare supports many command-line options. Perhaps the most useful is the &#8216;-h&#8217; or &#8216;&#8211;help&#8217; option:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&gt;</span><span class="n">python</span> <span class="n">processProtare</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">h</span>
+<span class="n">usage</span><span class="p">:</span> <span class="n">processProtare</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">tag</span> <span class="n">TAG</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">o</span> <span class="n">OUTPUT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">writeConvertedUnits</span><span class="p">]</span>
+                         <span class="p">[</span><span class="o">--</span><span class="n">energyUnit</span> <span class="n">ENERGYUNIT</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="n">TEMPERATURES</span><span class="p">]</span>
+                         <span class="p">[</span><span class="o">--</span><span class="n">temperatureUnit</span> <span class="n">TEMPERATUREUNIT</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">bdfls</span> <span class="n">BDFLS</span><span class="p">]</span>
+                         <span class="p">[</span><span class="o">--</span><span class="n">fluxID</span> <span class="n">FLUXID</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="n">GID</span><span class="p">]</span>
+                         <span class="p">[</span><span class="o">--</span><span class="n">legendreMax</span> <span class="n">LEGENDREMAX</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">mg</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">mc</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">up</span><span class="p">]</span>
+                         <span class="p">[</span><span class="o">--</span><span class="n">reconstruct</span> <span class="p">{</span><span class="nb">all</span><span class="p">,</span><span class="n">crossSection</span><span class="p">,</span><span class="n">angular</span><span class="p">}]</span>
+                         <span class="p">[</span><span class="o">--</span><span class="n">threads</span> <span class="n">THREADS</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">v</span><span class="p">]</span>
+                         <span class="p">[</span><span class="o">--</span><span class="n">reconAccuracy</span> <span class="n">RECONACCURACY</span><span class="p">]</span>
+                         <span class="p">[</span><span class="o">--</span><span class="n">prefixMultiGroup</span> <span class="n">PREFIXMULTIGROUP</span><span class="p">]</span>
+                         <span class="p">[</span><span class="o">--</span><span class="n">prefixMonteCarlo</span> <span class="n">PREFIXMONTECARLO</span><span class="p">]</span>
+                         <span class="p">[</span><span class="o">--</span><span class="n">prefixUpscatter</span> <span class="n">PREFIXUPSCATTER</span><span class="p">]</span>
+                         <span class="p">[</span><span class="o">--</span><span class="n">prefixHeated</span> <span class="n">PREFIXHEATED</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">prefixAep</span> <span class="n">PREFIXAEP</span><span class="p">]</span>
+                         <span class="p">[</span><span class="o">--</span><span class="n">prefixEval</span> <span class="n">PREFIXEVAL</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">prefixRecon</span> <span class="n">PREFIXRECON</span><span class="p">]</span>
+                         <span class="n">gnd</span>
+
+<span class="n">Processes</span> <span class="nb">all</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">GND</span> <span class="n">file</span><span class="o">.</span>
+
+<span class="n">positional</span> <span class="n">arguments</span><span class="p">:</span>
+  <span class="n">gnd</span>                   <span class="n">gnd</span> <span class="n">file</span> <span class="n">to</span> <span class="n">process</span>
+
+<span class="n">optional</span> <span class="n">arguments</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>            <span class="n">show</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="ow">and</span> <span class="n">exit</span>
+  <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="sample-usage">
+<h2>5.2. Sample usage<a class="headerlink" href="#sample-usage" title="Permalink to this headline">¶</a></h2>
+<p>processProtare takes a GND file as input. It also currently requires a LLNL-specific file called &#8216;bdfls&#8217;, which contains a database of
+group boundaries and fluxes.</p>
+<p>After translating an ENDF file into GND, you can do simple processing by:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">python</span> <span class="n">processProtare</span><span class="o">.</span><span class="n">py</span> <span class="n">GND_file_name</span><span class="o">.</span><span class="n">xml</span> <span class="o">--</span><span class="n">bdfls</span> <span class="o">&lt;</span><span class="n">path_to_fudge</span><span class="o">&gt;/</span><span class="n">fudge</span><span class="o">/</span><span class="n">legacy</span><span class="o">/</span><span class="n">endl</span><span class="o">/</span><span class="n">bdfls</span>
+</pre></div>
+</div>
+<p>This performs basic processing: Doppler-broadens cross sections to 300 K (2.586e-8 MeV/k) and computes average
+energy and momentum deposited into reaction products. It writes a new processed file with the extension &#8221;.proc.xml&#8221; (i.e., if
+the original file was named n-001_H_001.xml, this will output n-001_H_001.proc.xml).
+This processing adds two new &#8216;style&#8217; elements to the GND file: <code class="docutils literal"><span class="pre">heated</span></code> corresponding to the Doppler broadening, and <code class="docutils literal"><span class="pre">averageProductData</span></code>
+corresponding to the energy/momentum calculations.</p>
+<p>Below are some examples of more advanced processing options.</p>
+<p>Heating cross sections to multiple temperatures:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">python</span> <span class="n">processProtare</span><span class="o">.</span><span class="n">py</span> <span class="n">GND_file_name</span><span class="o">.</span><span class="n">xml</span> <span class="o">--</span><span class="n">bdfls</span> <span class="o">&lt;</span><span class="n">path_to_fudge</span><span class="o">&gt;/</span><span class="n">fudge</span><span class="o">/</span><span class="n">legacy</span><span class="o">/</span><span class="n">endl</span><span class="o">/</span><span class="n">bdfls</span> <span class="o">-</span><span class="n">t</span> <span class="mi">300</span> <span class="o">-</span><span class="n">t</span> <span class="mi">600</span> <span class="o">-</span><span class="n">t</span> <span class="mi">900</span>
+        <span class="o">--</span><span class="n">temperatureUnit</span> <span class="n">K</span>
+</pre></div>
+</div>
+<p>Using eV instead of the default MeV for energies:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">python</span> <span class="n">processProtare</span><span class="o">.</span><span class="n">py</span> <span class="n">GND_file_name</span><span class="o">.</span><span class="n">xml</span> <span class="o">--</span><span class="n">bdfls</span> <span class="o">&lt;</span><span class="n">path_to_fudge</span><span class="o">&gt;/</span><span class="n">fudge</span><span class="o">/</span><span class="n">legacy</span><span class="o">/</span><span class="n">endl</span><span class="o">/</span><span class="n">bdfls</span> <span class="o">--</span><span class="n">energyUnit</span> <span class="n">eV</span>
+</pre></div>
+</div>
+<p>Heating to two temperatures and generating cumulative distribution functions (CDFs) for faster sampling in Monte Carlo transport codes:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">python</span> <span class="n">processProtare</span><span class="o">.</span><span class="n">py</span> <span class="n">GND_file_name</span><span class="o">.</span><span class="n">xml</span> <span class="o">--</span><span class="n">bdfls</span> <span class="o">&lt;</span><span class="n">path_to_fudge</span><span class="o">&gt;/</span><span class="n">fudge</span><span class="o">/</span><span class="n">legacy</span><span class="o">/</span><span class="n">endl</span><span class="o">/</span><span class="n">bdfls</span> <span class="o">-</span><span class="n">t</span> <span class="mi">300</span> <span class="o">-</span><span class="n">t</span> <span class="mi">600</span>
+        <span class="o">--</span><span class="n">temperatureUnit</span> <span class="n">K</span> <span class="o">--</span><span class="n">energyUnit</span> <span class="n">eV</span> <span class="o">-</span><span class="n">mc</span>
+</pre></div>
+</div>
+<p>Generating multi-group cross sections and transfer matrices (requires that Merced be compiled):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">python</span> <span class="n">processProtare</span><span class="o">.</span><span class="n">py</span> <span class="n">GND_file_name</span><span class="o">.</span><span class="n">xml</span> <span class="o">--</span><span class="n">bdfls</span> <span class="o">&lt;</span><span class="n">path_to_fudge</span><span class="o">&gt;/</span><span class="n">fudge</span><span class="o">/</span><span class="n">legacy</span><span class="o">/</span><span class="n">endl</span><span class="o">/</span><span class="n">bdfls</span> <span class="o">-</span><span class="n">t</span> <span class="mi">300</span> <span class="o">-</span><span class="n">t</span> <span class="mi">600</span>
+        <span class="o">--</span><span class="n">temperatureUnit</span> <span class="n">K</span> <span class="o">--</span><span class="n">energyUnit</span> <span class="n">eV</span> <span class="o">-</span><span class="n">mg</span>
+</pre></div>
+</div>
+<p>By default, processProtare uses LLNL&#8217;s 230-group energy boundaries for neutrons,
+41 groups for photons and 64 groups for light charged particles. Other groups may be selected using the -g option.
+For example, to select LLNL&#8217;s 87-group structure (gid 4) for neutrons:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">python</span> <span class="n">processProtare</span><span class="o">.</span><span class="n">py</span> <span class="n">GND_file_name</span><span class="o">.</span><span class="n">xml</span> <span class="o">--</span><span class="n">bdfls</span> <span class="o">&lt;</span><span class="n">path_to_fudge</span><span class="o">&gt;/</span><span class="n">fudge</span><span class="o">/</span><span class="n">legacy</span><span class="o">/</span><span class="n">endl</span><span class="o">/</span><span class="n">bdfls</span> <span class="o">-</span><span class="n">t</span> <span class="mi">300</span> <span class="o">-</span><span class="n">t</span> <span class="mi">600</span>
+        <span class="o">--</span><span class="n">temperatureUnit</span> <span class="n">K</span> <span class="o">--</span><span class="n">energyUnit</span> <span class="n">eV</span> <span class="o">-</span><span class="n">mg</span> <span class="o">-</span><span class="n">g</span> <span class="n">n</span><span class="o">=</span><span class="n">LLNL_gid_4</span>
+</pre></div>
+</div>
+<p>Group boundaries are currently defined inside the bdfls file, although we plan to update that to a more user-friendly format soon.</p>
+</div>
+<div class="section" id="to-do-list">
+<h2>5.3. To-do list<a class="headerlink" href="#to-do-list" title="Permalink to this headline">¶</a></h2>
+<p>processProtare is not yet complete. Some functionality yet to be implemented:</p>
+<ul class="simple">
+<li>thermal upscattering corrections for elastic transfer matrices</li>
+<li>processing thermal neutron scattering data including S(alpha,beta)</li>
+<li>generating probability tables from unresolved resonance parameters</li>
+<li>reconstructing detailed angular distributions from resonance parameters</li>
+<li>processing covariances</li>
+<li>and likely other features</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5. Processing GND files</a><ul>
+<li><a class="reference internal" href="#options-for-processing">5.1. Options for processing</a></li>
+<li><a class="reference internal" href="#sample-usage">5.2. Sample usage</a></li>
+<li><a class="reference internal" href="#to-do-list">5.3. To-do list</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="fudgeisms.html"
+                        title="previous chapter">4.8. <code class="docutils literal"><span class="pre">Fudge</span></code> idiosyncrasies</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="other-examples.html"
+                        title="next chapter">6. Other Fudge Examples</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/processing.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="other-examples.html" title="6. Other Fudge Examples"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fudgeisms.html" title="4.8. Fudge idiosyncrasies"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

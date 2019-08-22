@@ -85,19 +85,26 @@ class form( linkModule.link, baseModule.form ) :
         if self.link is None: raise Exception("Unresolved link!")
         return self.link
 
+    @property
+    def productFrame( self ): return self.referenceInstance.productFrame
+
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
-        raise 'FIXME - this is not correct, need to invert angular data for example.'
         return( self.referenceInstance.calculateAverageProductData( style, indent = indent, **kwargs ) )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def convertUnits( self, unitMap ) :
+        "See documentation for reactionSuite.convertUnits."
 
-        raise Exception( 'need to implement' )
+        pass
 
-#    def process( self, processInfo, tempInfo, verbosityIndent ) :
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
-        return( self.referenceInstance.process( processInfo, tempInfo, verbosityIndent, addToDistribution = False ) )
+        return( self.referenceInstance.processMultiGroup( style, tempInfo, indent ) )
 
-    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
 
-        return( self.referenceInstance.toPointwise_withLinearXYs( accuracy, lowerEps, upperEps ) )
+        return( self.referenceInstance.toPointwise_withLinearXYs( **kwargs ) )
+
+class CoulombElasticReferenceForm( form ) :
+
+    moniker = 'CoulombElasticReference'

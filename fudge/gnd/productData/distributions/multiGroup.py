@@ -85,25 +85,12 @@ class subform( baseModule.subform ) :
 
         baseModule.subform.__init__( self )
 
-class multiGroup( subform, griddedModule.gridded ) :
+class gridded3d( subform, griddedModule.gridded3d ) :
 
     def __init__( self, **kwargs ) :
 
         subform.__init__( self )
-        griddedModule.gridded.__init__( self, **kwargs )
-
-    @classmethod
-    def parseXMLNode( cls, element, xPath, linkData ):
-
-        xPath.append( element.tag )
-        axes = axesModule.parseXMLNode( element[0], xPath )
-        frame = element.get( 'productFrame' )
-        transferMatrices = []
-        for lvalue in element[1:]:
-            transferMatrices.append( matrix.parseXMLNode( lvalue[0], xPath, linkData ) )
-        GB = cls( axes, transferMatrices, frame )
-        xPath.pop()
-        return GB
+        griddedModule.gridded3d.__init__( self, **kwargs )
 
     @staticmethod
     def dataToString( values, self, indent = '', **kwargs ) :
@@ -131,15 +118,16 @@ class form( baseModule.form ) :
         baseModule.form.__init__( self, label, productFrame, ( multiGroupSubform, ) )
 
     @staticmethod
-    def parseXMLNode( LegendreElement, xPath, linkData ) :
+    def parseXMLNode( element, xPath, linkData ) :
 
-        xPath.append( LegendreElement.tag )
-        subformElement = LegendreElement[0]
+        xPath.append( element.tag )
+
+        subformElement = element[0]
         subformClass = {
-                LLNLPointwise.moniker : LLNLPointwise,
+                gridded3d.moniker : gridded3d,
             }.get( subformElement.tag )
-        if( subformClass is None ) : raise Exception( "unknown Legendre subform: %s" % subformElement.tag )
-        LegendreSubForm = subformClass.parseXMLNode( subformElement, xPath, linkData )
-        LegendreComponent = component( LegendreElement.get( 'label' ), LegendreElement.get( 'productFrame' ), LegendreSubform )
+        if( subformClass is None ) : raise Exception( "unknown gridded3d subform: %s" % subformElement.tag )
+        SubForm = subformClass.parseXMLNode( subformElement, xPath, linkData )
+
         xPath.pop( )
-        return( LegendreComponent )
+        return form( element.get( 'label' ), element.get( 'productFrame' ), SubForm )

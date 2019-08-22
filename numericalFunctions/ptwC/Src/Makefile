@@ -65,7 +65,7 @@ NUMERICALFUNCTIONS_PATH = ../..
 
 CFLAGS = -g -O0 -Wall
 localCFLAGS = $(CFLAGS) $(NFUCFLAGS) -I$(SMR_PATH)/include
-objects = nf_utilities.o nf_stringToDoubles.o
+objects = nf_utilities.o nf_stringToInt32s.o nf_stringToDoubles.o
 
 .PHONY: default clean realclean
 
@@ -76,6 +76,9 @@ libnf_utilities.a: $(objects)
 
 nf_utilities.o: nf_utilities.c nf_utilities.h
 	$(CC) $(localCFLAGS) -c -o nf_utilities.o nf_utilities.c
+
+nf_stringToInt32s.o: nf_stringToInt32s.c nf_utilities.h
+	$(CC) $(localCFLAGS) -c -o nf_stringToInt32s.o nf_stringToInt32s.c
 
 nf_stringToDoubles.o: nf_stringToDoubles.c nf_utilities.h
 	$(CC) $(localCFLAGS) -c -o nf_stringToDoubles.o nf_stringToDoubles.c

@@ -76,6 +76,7 @@ def setStringMember( self, memberName, value ) :
     if( not( isinstance( value, str ) ) ) : TypeError( 'value for member %s is not a string' % memberName )
     exec( 'self.%s = "%s"' % ( memberName, value ) )
 
+# BRB6 this is not used.
 def find_gndPath( reactionSuite, gndPath ) :
 
     def find_gndPath2( parent, paths, gndPath ) :
@@ -105,23 +106,3 @@ def floatToString( f, precision = 12 ) :
     if( ( e < 0 ) and ( ( len( p ) - 2 - e ) > precision ) ) : s = t3
     if( len( t3 ) <= len( s ) ) : s = t3
     return( s )
-
-def makeGrouped( self, processInfo, tempInfo, data, normType = 'groupedCrossSectionNorm' ) :
-
-    from fudge.processing import miscellaneous
-
-    projectile, target = processInfo.getProjectileName( ), processInfo.getTargetName( )
-    norm = tempInfo[normType]
-    crossSection = tempInfo['crossSection']
-    label, unit = data.axes[1].label, data.axes[1].unit
-    axes_ = crossSection.axes.copy( )
-    if( normType == 'groupedFlux' ) :
-        axes_[1].label = "%s %s" % ( label,  axes_[1].label )
-        axes_[1].unit = "%s %s" % ( unit,  axes_[1].unit )
-    else :
-        axes_[1].label = "%s" % label
-        axes_[1].unit = "%s" % unit
-    independent, dependent, qualifier = axes_[0].interpolation.getInterpolationTokens( )
-    axes_[0].interpolation = axes.interpolationXY( independent, standardsModule.interpolation.flatToken )
-    grouped = miscellaneous.groupTwoFunctionsAndFlux( projectile, processInfo, crossSection, data, norm = norm )
-    return( axes_, grouped )

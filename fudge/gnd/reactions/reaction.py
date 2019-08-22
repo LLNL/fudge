@@ -83,8 +83,9 @@ class reaction( baseModule.base_reaction ) :
     """This is the class for a normal gnd reaction."""
 
     moniker = 'reaction'
+    ancestryMembers = baseModule.base_reaction.ancestryMembers + ( 'availableEnergy', 'availableMomentum' )
 
-    def __init__( self, outputChannel, label, ENDF_MT, documentation = None, date = None, EFL = None ) :
+    def __init__( self, outputChannel, ENDF_MT, documentation = None, EFL = None, label = None, process = None ) :
         """
         Creates a new reaction object. Reaction is two-body or uncorrelated-body, depending on
         the outputChannel type. This class is only meant to be used for 'distinct' reactions (distinct reactions
@@ -92,7 +93,7 @@ class reaction( baseModule.base_reaction ) :
         To store a sum over these distinct reactions, use the product class.
         """
 
-        baseModule.base_reaction.__init__( self, label, outputChannel, ENDF_MT, documentation, date = date, EFL = EFL )
+        baseModule.base_reaction.__init__( self, outputChannel, ENDF_MT, documentation, EFL = EFL, label = label, process = process )
 
         self.availableEnergy = availableEnergyModule.component( )
         self.availableEnergy.setAncestor( self )
@@ -123,74 +124,16 @@ class reaction( baseModule.base_reaction ) :
 
         return( str( self.outputChannel ) )
 
-    def getQ( self, unit, final = True, groundStateQ = False ) :        # ????? unit for Q is needed, badly.
-        """
-        Returns the Q-value for this input/output channel. It will be converted to a float if possible, 
-        otherwise a string value is returned.
-        """
-
-        def getLevel( particle, unit ) :
-
-            if( hasattr( particle, 'getLevelAsFloat' ) ) : return( particle.getLevelAsFloat( unit = unit ) )
-            return( 0. )
-
-        def getFinalProductsLevelMultiplicity( particle, final ) :
-            """Returns a list of [ productName, multiplicity ] for the final products of particle."""
-
-            if( ( final == False ) or ( particle.outputChannel is None ) ) :
-                if( particle.particle.name == 'gamma' ) :
-                    pms = [ [ particle, 0., 0. ] ]
-                else :
-                    pms = [ [ particle, particle.multiplicity.getConstant( ), getLevel( particle, unit ) ] ]
-            else :
-                pms = []
-                for product in particle.outputChannel :
-                    pms += getFinalProductsLevelMultiplicity( product, final )
-            return( pms )
-
-        return( self.outputChannel.getConstantQAs( unit, final = final ) )
-        Q = self.Q
-        if( not( Q is None ) ) :
-                if( isinstance( Q, PQU.PQU ) ) :
-                    Q = Q.getValueAs( unit )
-                else :
-                    pass                                        # ????? This needs work. For example, check for energy dependent Q.
-        else :
-            pm = {}
-            for particle in [ self.getReactionSuite( ).projectile, self.getReactionSuite( ).target ] :
-                if( particle.name not in pm ) : pm[particle.name] = [ particle, 0, 0. ]
-                pm[particle.name][1] += 1
-                pm[particle.name][2] += getLevel( particle, unit )
-            for particle in self.outputChannel :
-                pms = getFinalProductsLevelMultiplicity( particle, final = final )
-                for p, m, level in pms :
-                    if( p.particle.name not in pm ) : pm[p.particle.name] = [ p, 0, 0. ]
-                    pm[p.particle.name][1] -= m
-                    pm[p.particle.name][2] -= level
-            Q = 0.
-            levelQ = 0.
-            try :
-                for p in pm :
-                    Q += pm[p][1] * pm[p][0].getMass( 'MeV/c**2' )  # Unit 'MeV' should not be hard-wired.
-                    levelQ += pm[p][2]
-            except :
-                print p, pm[p]
-                raise
-            if( groundStateQ ) : levelQ = 0.
-            Q = Q + levelQ
-        return( Q )
-
     def getThreshold( self, unit ) :
 
         Q = self.getQ( unit = unit, final = False )
         if( Q >= 0. ) : return( 0. )
-        return( -Q * ( 1. + self.getReactionSuite( ).projectile.getMass( 'amu' ) / self.getReactionSuite( ).target.getMass( 'amu' ) ) )
-
-    def heatCrossSection( self, temperature, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.002, heatAllPoints = False, 
-        doNotThin = True, heatBelowThreshold = True, heatAllEDomain = True ) :
-
-        return( self.crossSection.heat( temperature, EMin, lowerlimit, upperlimit, interpolationAccuracy, heatAllPoints, doNotThin, 
-            heatBelowThreshold, heatAllEDomain ) )
+        reactionSuite = self.getReactionSuite( )
+        projectile = reactionSuite.PoPs[reactionSuite.projectile]
+        projectileMass = projectile.mass[0].float( 'amu' )
+        target = reactionSuite.PoPs[reactionSuite.target]
+        targetMass = target.mass[0].float( 'amu' )
+        return( -Q * ( 1. + projectileMass / targetMass ) )
 
     def isBasicReaction( self ) :
 

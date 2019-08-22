@@ -94,7 +94,8 @@ def compare_plot( xsc1, xsc2, title="comparison plot", legend1="first file", leg
     reldiff_plot = plot2d.DataSet2d( relative_diff, legend="percent difference" )
 
     xAxisSettings = plot2d.AxisSettings( label="", isLog=True )
-    yAxisSettings = plot2d.AxisSettings( label="Cross Section (barn)", isLog=True )
+    yUnit = args.yUnit or 'barn'
+    yAxisSettings = plot2d.AxisSettings( label="Cross Section (%s)" % yUnit, isLog=True )
 
     fig = plt.figure( figsize=(10,8) )
     fig.subplots_adjust( top=0.88, bottom=0.12, wspace=0.4 )
@@ -106,7 +107,8 @@ def compare_plot( xsc1, xsc2, title="comparison plot", legend1="first file", leg
     plt.setp( ax1.get_label(), visible=False )
 
     # also plot the relative difference (needs different y-axis):
-    xAxisSettings = plot2d.AxisSettings( label="$E_n$ (eV)", isLog=True )
+    xUnit = args.xUnit or 'eV'
+    xAxisSettings = plot2d.AxisSettings( label="$E_n$ (%s)" % xUnit, isLog=True )
     yAxisSettings = plot2d.AxisSettings( label="% diff" )
 
     ax2 = subplot2grid((4,1), (3,0), sharex=ax1)
@@ -157,18 +159,20 @@ def process_args():
             help="legend location: 'ul', 'ur', 'll' or 'lr'" )
     parser.add_argument( "-T", "--title", default=None,
             help="specify plot title" )
+    parser.add_argument( "--xUnit", type=str, help="Convert x-axes to this unit (e.g. MeV)" )
+    parser.add_argument( "--yUnit", type=str, help="Convert y-axes to this unit (e.g. mb)" )
     parser.add_argument( "-S", "--summed", action='store_true', default=False,
             help="For a single evaluation, compare a summed cross section (e.g. total, inelastic) with the sum of its parts. Only one input file needed" )
     return parser.parse_args()
 
 if __name__ == '__main__':
-    from fudge.gnd import reactionSuite as reactionSuiteModule, sums as sumsModule
+    from fudge.gnd import reactionSuite as reactionSuiteModule, sums as sumsModule, styles as stylesModule
     from fudge.gnd.reactionData import crossSection
     from fudge.legacy.converting import endfFileToGND
 
     args = process_args()
 
-    reconstructedStyle = 'tmp_reconstructed'
+    reconstructedStyleName = 'tmp_reconstructed'
 
     def getReactionSuite( filename, singleMTOnly = None ):
         try:
@@ -184,7 +188,7 @@ if __name__ == '__main__':
         return RS
 
     def getXS( reactionSuite, MT, sumsOnly = False ):
-        allReacs = [reac for reac in reactionSuite.sums if isinstance(reac, sumsModule.crossSectionSum)]
+        allReacs = list( reactionSuite.sums.crossSections )
         if not sumsOnly:
             allReacs += list(reactionSuite.reactions)
         reac = [r for r in allReacs if r.ENDF_MT == MT]
@@ -192,32 +196,31 @@ if __name__ == '__main__':
             print "Couldn't find unique reaction for MT%d in %s" % (MT,reactionSuite.originalFile)
         xsc = reac[0].crossSection
         if isinstance( xsc.evaluated, crossSection.resonancesWithBackground ):
-            reactionSuite.reconstructResonances( styleName=reconstructedStyle, accuracy=args.tolerance )
-            pwxs = xsc[ reconstructedStyle ]
+            evalStyle = reactionSuite.styles.getEvaluatedStyle()
+            reconstructedStyle = stylesModule.crossSectionReconstructed( reconstructedStyleName, derivedFrom=evalStyle.label )
+            reactionSuite.reconstructResonances( reconstructedStyle, accuracy=args.tolerance )
+            pwxs = xsc[ reconstructedStyleName ]
         else:
-            try:
-                pwxs = xsc.toPointwise_withLinearXYs( 1e-08 )
-            except:
-                pwxs = xsc.toPointwise_withLinearXYs( 1e-10, 1e-10 )
+            pwxs = xsc.toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = 1e-8 )
         return pwxs.convertAxisToUnit(1,'eV').convertAxisToUnit(0,'b')
 
     if args.summed:
         RS = getReactionSuite( args.file1 )
         xs1 = getXS(RS, args.mt, sumsOnly = True)
-        summedReac = [r for r in (RS.sums) if isinstance(r, sumsModule.crossSectionSum) and int( r.ENDF_MT ) == args.mt]
+        summedReac = [r for r in (RS.sums) if isinstance(r, sumsModule.crossSections) and int( r.ENDF_MT ) == args.mt]
         if len(summedReac) != 1:
             print "Couldn't find unique summed reaction for MT%d in %s" % (args.mt,RS.originalFile)
             sys.exit(1)
         summedReac = summedReac[0]
-        if reconstructedStyle in summedReac.summands[0].link:
-            summedXsc = summedReac.summands[0].link[ reconstructedStyle ]
+        if reconstructedStyleName in summedReac.summands[0].link:
+            summedXsc = summedReac.summands[0].link[ reconstructedStyleName ]
         else:
-            summedXsc = summedReac.summands[0].link.toPointwise_withLinearXYs( 1e-08 )
+            summedXsc = summedReac.summands[0].link.toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = 1e-8 )
         for summand in summedReac.summands[1:]:
-            if reconstructedStyle in summand.link:
-                newXsc = summand.link[ reconstructedStyle ]
+            if reconstructedStyleName in summand.link:
+                newXsc = summand.link[ reconstructedStyleName ]
             else:
-                newXsc = summand.link.toPointwise_withLinearXYs( 1e-08 )
+                newXsc = summand.link.toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = 1e-8 )
             summedXsc, newXsc = summedXsc.mutualify( 1e-8,1e-8,0, newXsc, 1e-8,1e-8,0 )
             summedXsc += newXsc
         xs2 = summedXsc
@@ -228,6 +231,13 @@ if __name__ == '__main__':
         rs2 = getReactionSuite(args.file2, singleMTOnly=args.mt)
         xs2 = getXS( rs2, args.mt )
         l1,l2 = args.file1, args.file2
+
+    if args.xUnit:
+        for xs in (xs1,xs2):
+            xs.convertUnits( {xs.axes[1].unit: args.xUnit } )
+    if args.yUnit:
+        for xs in (xs1,xs2):
+            xs.convertUnits( {xs.axes[0].unit: args.yUnit } )
 
     if args.legend: l1,l2 = args.legend
     if args.title: title = args.title

@@ -97,7 +97,7 @@ for l in newLines :
         l = END66Characters + l[66:]
     if( int( l[72:75] ) == 0 ) :
         l = END66Characters + l[66:]
-    elif( l[71:75] != '1451' ) :
+    elif( l[70:75] not in (' 1451','32151') ) :
         if( l.find( '.' ) < 0 ) :
             s = l[:66].rstrip( )
             if( len( s ) < 56 ) :

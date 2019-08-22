@@ -82,8 +82,6 @@
 
     Members of an XYs1d instance of interest to most are:
 
-        :accuracy:        see the base class :py:class:`numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C`,
-        :biSectionMax:    see the base class :py:class:`numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C`,
         :infill:          see the base class :py:class:`numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C`,
         :axes:            Description of the x and y data attributes (e.g., label, units).
 
@@ -99,6 +97,8 @@ Notes:
 
 __metaclass__ = type
 
+import math
+
 import base as baseModule
 import axes as axesModule
 import values as valuesModule
@@ -113,12 +113,11 @@ xAxisIndex = 1
 yAxisIndex = 0
 domainEpsilon = 1e-15
 
-def return_pointwiseXY_AsXYs( self, C, units = {}, index = None, value = None, axes = None, template = None ) :
+def return_pointwiseXY_AsXYs( self, C, units = {}, index = None, value = None, axes = None ) :
 
     if( index is None ) : index = self.index
     if( axes is None ) : axes = self.axes
-    c = XYs1d( C, accuracy = 0.001, axes = axes, biSectionMax = 4, infill = 1, safeDivide = 0, 
-            index = index, value = value )
+    c = XYs1d( C, axes = axes, infill = True, safeDivide = False, index = index, value = value )
     if( c.axes is not None ) :
         for k in units : c.axes[k].unit = units[k]
     return( c )
@@ -174,17 +173,17 @@ def allow_XYsWithSameUnits_orNumberWithSameUnit( self, other ) :
 class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
 
     moniker = 'XYs1d'
+    dimension = 1
     mutableYUnit = True     # For __imul__ and __idiv__.
 
-    def __init__( self, data = [], dataForm = "xys", interpolation = standardsModule.interpolation.linlinToken, axes = None,
+    def __init__( self, data, dataForm = "xys", interpolation = standardsModule.interpolation.linlinToken, axes = None,
             index = None, valueType = standardsModule.types.float64Token, value = None, label = None, 
-            sep = ' ', accuracy = defaultAccuracy,
-            initialSize = 10, overflowSize = 10, biSectionMax = 6, infill = True, safeDivide = False ) :
+            sep = ' ', initialSize = 10, overflowSize = 10, infill = True, safeDivide = False ) :
         """
         Constructor for XYs1d class. dataForm can be 'xys', 'xsandys' or 'list'.
         """
 
-        baseModule.xDataFunctional.__init__( self, self.moniker, 1, axes, index = index, valueType = valueType,
+        baseModule.xDataFunctional.__init__( self, self.moniker, axes, index = index, valueType = valueType,
                 value = value, label = label )
 
         if( not( isinstance( interpolation, str ) ) ) : raise TypeError( 'interpolation must be a string' )
@@ -195,7 +194,7 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
 
         initialSize = max( initialSize, len( data ) )
         pointwiseXY.__init__( self, data = data, dataForm = dataForm, initialSize = initialSize, overflowSize = overflowSize,
-            accuracy = accuracy, biSectionMax = biSectionMax, interpolation = interpolation, infill = infill, 
+            accuracy = defaultAccuracy, biSectionMax = 16, interpolation = interpolation, infill = infill, 
             safeDivide = safeDivide )
 
     def __abs__( self ) :
@@ -279,24 +278,9 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         if( otherUnit1 != '' ) : self.axes[yAxisIndex].unit = baseModule.processUnits( self.axes[yAxisIndex].unit, otherUnit1, '/' )
         return( self )
 
-    def getitem_units( self, index ) :
-
-        x, y = pointwiseXY.__getitem__( self, index )
-        xUnit = self.getAxisUnitSafely( xAxisIndex )
-        yUnit = self.getAxisUnitSafely( yAxisIndex )
-        return( PQU.PQU( x, xUnit, checkOrder = False ), PQU.PQU( y, xUnit, checkOrder = False ) )
-
     def __setitem__( self, index, xy ) :
 
         if( len( xy ) != 2 ) : raise ValueError( 'right-hand-side must be list of length 2 not %s' % len( xy ) )
-        pointwiseXY.__setitem__( self, index, xy )
-
-    def setitem_units( self, index, xy ) :
-
-        if( len( xy ) != 2 ) : raise ValueError( 'right-hand-side must be list of length 2 not length %s' % len( xy ) )
-        xUnit = self.getAxisUnitSafely( xAxisIndex )
-        yUnit = self.getAxisUnitSafely( yAxisIndex )
-        xy = [ getValueAsAxis( xUnit, xy[0] ), getValueAsAxis( yUnit, xy[1] ) ]
         pointwiseXY.__setitem__( self, index, xy )
 
     def __getslice__( self, index1, index2 ) :
@@ -338,18 +322,18 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
 
         return( self.returnAsClass( self, pointwiseXY.applyFunction( self, f, parameters, accuracy = accuracy, biSectionMax = biSectionMax, checkForRoots = checkForRoots ) ) )
 
-    def changeInterpolation( self, interpolation, accuracy = None, lowerEps = 0, upperEps = 0, cls = None ) :
+    def changeInterpolation( self, interpolation, accuracy, lowerEps = 0, upperEps = 0, cls = None ) :
 
         if( interpolation != standardsModule.interpolation.linlinToken ) : raise ValueError( 'Only "%s" interpolation currently supported: not %s' %
                 ( standardsModule.interpolation.linlinToken, interpolation ) )
-        if( accuracy is None ) : accuracy = self.getAccuracy( )
-        c1 = pointwiseXY.changeInterpolation( self, interpolation = interpolation, accuracy = accuracy, lowerEps = lowerEps, upperEps = upperEps )
+        c1 = pointwiseXY.changeInterpolation( self, interpolation = interpolation, accuracy = accuracy, lowerEps = lowerEps, 
+                upperEps = upperEps )
         axes = self.axes
-        c1 = return_pointwiseXY_AsXYs( self, c1, axes = axes, template = self, value = self.value )
+        c1 = return_pointwiseXY_AsXYs( self, c1, axes = axes, value = self.value )
         if( cls is None  ) : cls = self
         return( cls.returnAsClass( self, c1, axes = axes, interpolation = interpolation ) )
 
-    def changeInterpolationIfNeeded( self, allowedInterpolations, accuracy = None, lowerEps = 0, upperEps = 0, cls = None ) :
+    def changeInterpolationIfNeeded( self, allowedInterpolations, accuracy, lowerEps = 0, upperEps = 0, cls = None ) :
         """
         If self's interpolation is one in list of allowedInterpolations, self is returned unchaged. Otherwise
         the returned instances is self's data converted to the interpolation allowedInterpolations[0].
@@ -359,19 +343,28 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
             if( interpolation == self.interpolation ) : return( self )
         return( self.changeInterpolation( allowedInterpolations[0], accuracy = accuracy, lowerEps = lowerEps, upperEps = upperEps, cls = cls ) )
 
+    def cloneToInterpolation( self, interpolation ) :
+
+        c1 = pointwiseXY.cloneToInterpolation( self, interpolation )
+        return( self.__class__.returnAsClass( self, c1, axes = self.axes, interpolation = interpolation ) )
+
+    def convertUnits( self, unitMap ) :
+        """
+        unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
+        """
+
+        if( self.axes is None ) : print self.toXLink( )
+        factors = self.axes.convertUnits( unitMap )
+        if( factors[:2] != [ 1., 1. ] ) : self.scaleOffsetXAndY( xScale = factors[1], yScale = factors[0], insitu = True )
+        self.fixValuePerUnitChange( factors )
+
     def clip( self, rangeMin = None, rangeMax = None ) :
 
-        if( rangeMin is None ) : rangeMin = self.rangeMin( )
-        if( rangeMax is None ) : rangeMax = self.rangeMax( )
+        if( rangeMin is None ) : rangeMin = self.rangeMin
+        if( rangeMax is None ) : rangeMax = self.rangeMax
         return( self.returnAsClass( self, pointwiseXY.clip( self, rangeMin, rangeMax ) ) )
 
-    def clip_units( self, rangeMin = None, rangeMax = None ) :
-
-        unit = self.getAxisUnitSafely( yAxisIndex )
-        rangeMin, rangeMax = baseModule.getDomainLimits( self, rangeMin, rangeMax, unit )
-        return( self.returnAsClass( self, pointwiseXY.clip( self, rangeMin, rangeMax ) ) )
-
-    def commonXGrid( self, others ) :
+    def commonDomainGrid( self, others ) :
         """
         This method returns copies of self and others that are mapped to the same X-grid. That is, a union is made
         of all the x-values for self and others and all XYs1d-type instances are mapped to it. Others must be
@@ -379,12 +372,12 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         """
 
 # BRB
-        domainMin, domainMax = self.domain( )      # Need to check units. Currently union is raising if not the same.
+        domainMin = self.domainMin                  # Need to check units. Currently union is raising if not the same.
         grid = self
         for i1, other in enumerate( others ) :
-            domainMinO, _domainMaxO = other.domain( )
+            domainMinO = other.domainMin
             if( domainMin != domainMinO ) :
-		raise Exception( "domainMin = %e != other's domainMin = %e for other index = %d" % ( domainMin, domainMinO, i1 ) )
+                raise Exception( "domainMin = %e != other's domainMin = %e for other index = %d" % ( domainMin, domainMinO, i1 ) )
             grid = grid.union( other, fillWithSelf = False )
         return( [ o1.union( grid, fillWithSelf = True ) for o1 in [ self ] + others ] )
 
@@ -398,58 +391,31 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         for xy in self :
             xy[xyIndex] *= factor
             data.append( xy )
-        n = return_pointwiseXY_AsXYs( self, data, units = { index : newUnit }, template = self )
+        n = return_pointwiseXY_AsXYs( self, data, units = { index : newUnit } )
         return( self.returnAsClass( self, n, axes = n.axes ) )
 
-    def copy( self, index = None, value = None, axes = None ) :
+    def copy( self ) :
 
         xys = pointwiseXY.copy( self )
-        if( axes is None ) : axes = self.axes
-        return( self.returnAsClass( self, xys, index = index, value = value, axes = axes ) )
+        axes = self.axes
+        if( axes is not None ) : axes = axes.copy( )
+        return( self.returnAsClass( self, xys, index = self.index, value = self.value, axes = axes ) )
 
     __copy__ = copy
     __deepcopy__ = __copy__
 
-    def copyDataToXYs( self, xUnitTo = None, yUnitTo = None ) :
+    def copyDataToNestedLists( self ) :
 
-        xScale, yScale = 1.0, 1.0
-        if( xUnitTo is not None ) : xScale = PQU.PQU( '1 ' + self.axes[xAxisIndex].unit ).getValueAs( xUnitTo )
-        if( yUnitTo is not None ) : yScale = PQU.PQU( '1 ' + self.axes[yAxisIndex].unit ).getValueAs( yUnitTo )
-        return( pointwiseXY.copyDataToXYs( self, xScale = xScale, yScale = yScale ) )
-
-    def copyDataToNestedLists( self, *units ) :
-
-        xUnitTo, yUnitTo = None, None
-        if( len( units ) > 0 ) : xUnitTo = units[0]
-        if( len( units ) > 1 ) : yUnitTo = units[1]
-        return( self.copyDataToXYs( xUnitTo = xUnitTo, yUnitTo = yUnitTo ) )
+        return( self.copyDataToXYs( ) )
 
     def dullEdges( self, lowerEps = 0., upperEps = 0., positiveXOnly = 0 ) :
 
         d = pointwiseXY.dullEdges( self, lowerEps = lowerEps, upperEps = upperEps, positiveXOnly = positiveXOnly );
         return( self.returnAsClass( self, d ) )
 
-    def getValue_units( self, x ) :
+    def evaluate( self, x ) :
 
-        x = PQU.PQU( x, checkOrder = False ).getValueAs( self.axes[xAxisIndex].unit )
-        return( PQU.PQU( pointwiseXY.evaluate( self, x ), self.axes[yAxisIndex].unit, checkOrder = False ) )
-
-    def getValue( self ) :
-
-        return( self.value )
-
-    def evaluate( self, x, unitTo = None ) :
-
-        y = pointwiseXY.evaluate( self, x )
-        if( unitTo is None ) : return( y )
-        unit = self.getAxisUnitSafely( yAxisIndex )
-        return( PQU.PQU( y, unit, checkOrder = False ).getValueAs( unitTo ) )
-
-    def setValue_units( self, x, y ) :
-
-        x = PQU.PQU( x, checkOrder = False ).getValueAs( self.axes[xAxisIndex].unit )
-        y = PQU.PQU( y, checkOrder = False ).getValueAs( self.axes[yAxisIndex].unit )
-        pointwiseXY.setValue( self, x, y )
+        return( pointwiseXY.evaluate( self, x ) )
 
     def mutualify( self, lowerEps1, upperEps1, positiveXOnly1, other, lowerEps2, upperEps2, positiveXOnly2 ) :
         '''
@@ -474,14 +440,52 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         .. note:: Need unit for dDomainMax.
         """
 
-# BRB: unit for dDomainMax
-
         t = pointwiseXY.thicken( self, sectionSubdivideMax = sectionSubdivideMax, dDomainMax = dDomainMax, fDomainMax = fDomainMax )
         return( self.returnAsClass( self, t ) )
 
     def thin( self, accuracy ) :
 
         return( self.returnAsClass( self, pointwiseXY.thin( self, accuracy ) ) )
+
+    def thinToNumberOfPoints( self, maximumNumber, numberFraction = 0.95 ) :
+        """
+        Returns a tuple containing an accuracy and a new instance of self that hopefully has no more than 
+        maximumNumber points.  The returned accuracy is the one passed to the thin method that obtained the 
+        returned XYs1d instance.  No thinning is performed if the number of points in self is less than 6.
+        A scan of accuracies is performed until the number of points is between minimumNumber and maximumNumber.
+        minimumNumber is calculated as int( maximumNumber * numberFraction ) with the restriction that
+        minimumNumber must be at least 2 less than maximumNumber. numberFraction is limited to be
+        between 0.75 and 0.98. If accuracy is negative, self length is not greater than maximumNumber
+        and a copy of self is returned as the XYs1d instance.
+
+        Note, there is no guarantee that the returned instance will have less than maximumNumber points.
+        The caller should check the returned instance's length.  For example, if self contains y-values 
+        that oscillate between 1 and -1, no thinning is possible.
+        """
+
+        if( ( len( self ) > maximumNumber ) and ( len( self ) > 5 ) ) :
+            numberFraction = min( .98, max( 0.75, numberFraction ) )
+            minimumNumber = int( numberFraction * maximumNumber )
+            if( minimumNumber > ( maximumNumber - 2 ) ) : minimumNumber = maximumNumber - 2
+
+            accuracyMin = 1e-12
+            accuracyMax = 1
+
+            minSelf = self.thin( accuracyMin )
+            maxSelf = self.thin( accuracyMax )
+            for i1 in range( 10 ) :
+                accuracyMid = math.sqrt( accuracyMin * accuracyMax )
+                midSelf = self.thin( accuracyMid )
+                if( len( midSelf ) < maximumNumber ) :
+                    if( len( midSelf ) > minimumNumber ) : break
+                    accuracyMax = accuracyMid
+                else :
+                    accuracyMin = accuracyMid
+        else :
+            accuracyMid = -1
+            midSelf = self.copy( )
+
+        return( accuracyMid, self.returnAsClass( self, midSelf ) )
 
     def trim( self ) :
 
@@ -493,47 +497,50 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         t = pointwiseXY.union( self, other, fillWithSelf = fillWithSelf, trim = trim  )
         return( self.returnAsClass( self, t ) )
 
-    def domainUnitConversionFactor( self, unitTo ) :
+    @property
+    def domainMin( self ) :
 
-        if( unitTo is None ) : return( 1. )
-        return( PQU.PQU( '1 ' + self.domainUnit( ) ).getValueAs( unitTo ) )
+        return( pointwiseXY.domainMin( self ) )
 
-    def domainMin( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMax( self ) :
 
-        unit = self.getAxisUnitSafely( xAxisIndex )
-        return( PQU.valueOrPQ( pointwiseXY.domainMin( self ), unitFrom = unit, unitTo = unitTo, asPQU = asPQU, checkOrder = False ) )
+        return( pointwiseXY.domainMax( self ) )
 
-    def domainMax( self, unitTo = None, asPQU = False ) :
-
-        unit = self.getAxisUnitSafely( xAxisIndex )
-        return( PQU.valueOrPQ( pointwiseXY.domainMax( self ), unitFrom = unit, unitTo = unitTo, asPQU = asPQU, checkOrder = False ) )
-
-    def domain( self, unitTo = None, asPQU = False ) :
-
-        return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
-
-    def domainGrid( self, unitTo = None ) :
-
-        scale = self.domainUnitConversionFactor( unitTo )
-        return( pointwiseXY.domainGrid( self, scale ) )
-
+    @property
     def domainUnit( self ) :
 
         return( self.getAxisUnitSafely( xAxisIndex ) )
 
-    def rangeMin( self, unitTo = None, asPQU = False ) :
+    def domainUnitConversionFactor( self, unitTo ) :
 
-        unit = self.getAxisUnitSafely( yAxisIndex )
-        return( PQU.valueOrPQ( pointwiseXY.rangeMin( self ), unitFrom = unit, unitTo = unitTo, asPQU = asPQU, checkOrder = False ) )
+        if( unitTo is None ) : return( 1. )
+        return( PQU.PQU( '1 ' + self.domainUnit ).getValueAs( unitTo ) )
 
-    def rangeMax( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainGrid( self ) :
 
-        unit = self.getAxisUnitSafely( yAxisIndex )
-        return( PQU.valueOrPQ( pointwiseXY.rangeMax( self ), unitFrom = unit, unitTo = unitTo, asPQU = asPQU, checkOrder = False ) )
+        return( pointwiseXY.domainGrid( self, 1 ) )
 
+    @property
+    def rangeMin( self ) :
+
+        return( pointwiseXY.rangeMin( self ) )
+
+    @property
+    def rangeMax( self ) :
+
+        return( pointwiseXY.rangeMax( self ) )
+
+    @property
     def rangeUnit( self ) :
 
         return( self.getAxisUnitSafely( yAxisIndex ) )
+
+    def rangeUnitConversionFactor( self, unitTo ) :
+
+        if( unitTo is None ) : return( 1. )
+        return( PQU.PQU( '1 ' + self.rangeUnit ).getValueAs( unitTo ) )
 
     def domainSlice( self, domainMin = None, domainMax = None, fill = 1, dullEps = 0. ) :
         '''
@@ -546,20 +553,10 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         :param dullEps:     [optional] (Currently not implemented) the lower and upper points are dulled, default is 0.
         '''
 
-        if( domainMin is None ) : domainMin = self.domainMin( )
-        if( domainMax is None ) : domainMax = self.domainMax( )
+        if( domainMin is None ) : domainMin = self.domainMin
+        if( domainMax is None ) : domainMax = self.domainMax
         s = pointwiseXY.domainSlice( self, domainMin = domainMin, domainMax = domainMax, fill = fill, dullEps = dullEps )
         return( self.returnAsClass( self, s ) )
-
-    def domainSlice_units( self, domainMin = None, domainMax = None, fill = 1, dullEps = 0. ) :
-        """
-        Same as domainSlice, only domainMin and domainMax must be PQU's.
-        """
-
-        unit = self.getAxisUnitSafely( xAxisIndex )
-        domainMin, domainMax = baseModule.getDomainLimits( self, domainMin, domainMax, unit )
-        slice = pointwiseXY.domainSlice( self, domainMin = domainMin, domainMax = domainMax, fill = fill, dullEps = dullEps )
-        return( self.returnAsClass( self, slice ) )
 
     def __mod__( self, other ) : raise NotImplementedError( 'Currently, mod is not implemented' )
 
@@ -614,53 +611,54 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         Historical note: the word group comes from deterministic neutron transport (e.g., transport used to simulate nuclear reactors).
         """
 
-        accuracy, yUnit = self.getAccuracy( ), PQU.PQU( 1, self.getAxisUnitSafely( yAxisIndex ) )
+        yUnit = PQU.PQU( 1, self.getAxisUnitSafely( yAxisIndex ) )
         if( f2 is None ) :
             if( f3 is None ) : 
                 grouped = self.groupOneFunction( xs, norm = norm )
             else :
                 grouped = self.groupTwoFunctions( xs, f3, norm = norm )
                 yUnit = yUnit * PQU.PQU( 1,  f3.getAxisUnitSafely( yAxisIndex ) )
-                accuracy = max( accuracy, f3.getAccuracy( ) )
         else :
             yUnit = yUnit * PQU.PQU( 1, f2.getAxisUnitSafely( yAxisIndex ) )
-            accuracy = max( accuracy, f2.getAccuracy( ) )
             if( f3 is None ) :
                 grouped = self.groupTwoFunctions( xs, f2, norm = norm )
             else :
                 grouped = self.groupThreeFunctions( xs, f2, f3, norm = norm )
                 yUnit = yUnit * PQU.PQU( 1, f3.getAxisUnitSafely( yAxisIndex ) )
-                accuracy = max( accuracy, f3.getAccuracy( ) )
         if( norm is None ) :
             yUnit = PQU.PQU( 1, self.getAxisUnitSafely( xAxisIndex ) ) * yUnit
         elif( norm != 'dx' ) :
             pass                    # Need to add units to norm. That is, norm, grouped and xs should be an instance of Ys.
         if( asXYs ) :
             grouped.append( grouped[-1] )
+# BRB: FIXME, the next line probably had indicies reversed.
             axes = axesModule.axes( labelsUnits = { 0 : [ self.axes[xAxisIndex].label, self.axes[xAxisIndex].unit ], 1 : [ "", yUnit.getUnitSymbol( ) ] } )
-            grouped = XYs1d( [ xs, grouped ], dataForm = 'xsandys', accuracy = accuracy, 
+            grouped = XYs1d( [ xs, grouped ], dataForm = 'xsandys', 
                 interpolation = standardsModule.interpolation.flatToken, axes = axes )
         return( grouped )
 
     def groupOneFunction( self, xs, norm = None ) :
         '''.. note:: Need unit of xs.'''
 
-        if type(xs)==list: boundaries = xs
-        else:              boundaries = xs.values.values
+        if type(xs)==list:          boundaries = xs
+        elif type(xs.values)==list: boundaries = xs.values
+        else:                       boundaries = xs.values.values
         return( pointwiseXY.groupOneFunction( self, boundaries, norm = norm ) )
 
     def groupTwoFunctions( self, xs, f2, norm = None ) :
         '''.. note:: Need unit of xs.'''
 
-        if type(xs)==list: boundaries = xs
-        else:              boundaries = xs.values.values
+        if type(xs)==list:          boundaries = xs
+        elif type(xs.values)==list: boundaries = xs.values
+        else:                       boundaries = xs.values.values
         return( pointwiseXY.groupTwoFunctions( self, boundaries, f2, norm = norm ) )
 
     def groupThreeFunctions( self, xs, f2, f3, norm = None ) :
         '''.. note:: Need unit of xs.'''
 
-        if type(xs)==list: boundaries = xs
-        else:              boundaries = xs.values.values
+        if type(xs)==list:          boundaries = xs
+        elif type(xs.values)==list: boundaries = xs.values
+        else:                       boundaries = xs.values.values
         return( pointwiseXY.groupThreeFunctions( self, boundaries, f2, f3, norm = norm ) )
 
     def integrate( self, domainMin = None, domainMax = None ) :
@@ -675,8 +673,8 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
 
         unit = self.getAxisUnitSafely( xAxisIndex )
         domainMin, domainMax = baseModule.getDomainLimits( self, domainMin, domainMax, unit )
-        domainMin = max( domainMin, self.domainMin( ) )
-        domainMax = min( domainMax, self.domainMax( ) )
+        domainMin = max( domainMin, self.domainMin )
+        domainMax = min( domainMax, self.domainMax )
         return( PQU.PQU( pointwiseXY.integrate( self, domainMin = domainMin, domainMax = domainMax ), 
                 baseModule.processUnits( unit, self.getAxisUnitSafely( yAxisIndex ), '*' ), checkOrder = False ) )
 
@@ -692,12 +690,12 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
 
 # BRB: I think this is just a running sum and may be implemented already. Needs units.
         myAxes = self.axes
-        myData = [ [ self.domainMin( ), 0.0 ] ]
+        myData = [ [ self.domainMin, 0.0 ] ]
         for i in range( len( self ) - 1 ):
             domainMin = self[i][0]
             domainMax = self[i+1][0]
             myData.append( [ domainMax, myData[-1][1]+pointwiseXY.integrate( self, domainMin = domainMin, domainMax = domainMax ) ] )
-        return XYs1d( myAxes, myData, 1e-6 )
+        return XYs1d( myData, axes = myAxes )
 
     def integrateTwoFunctions( self, f2, domainMin = None, domainMax = None ) :
         """
@@ -714,8 +712,8 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
             f2 = f2.copy( )
             f2.convertAxisToUnit( xAxisIndex, unit )
         domainMin, domainMax = baseModule.getDomainLimits( self, domainMin, domainMax, unit )
-        domainMin = max( domainMin, self.domainMin( ), f2.domainMin( ) )
-        domainMax = min( domainMax, self.domainMax( ), f2.domainMax( ) )
+        domainMin = max( domainMin, self.domainMin, f2.domainMin )
+        domainMax = min( domainMax, self.domainMax, f2.domainMax )
         return( PQU.PQU( pointwiseXY.groupTwoFunctions( self, [ domainMin, domainMax ], f2 )[0],
                 baseModule.processUnits( baseModule.processUnits( unit, self.axes[yAxisIndex].unit, '*' ), f2.axes[yAxisIndex].unit, '*' ), checkOrder = False ) )
 
@@ -738,8 +736,8 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
             f3 = f3.copy( )
             f3.convertAxisToUnit( xAxisIndex, unit )
         domainMin, domainMax = baseModule.getDomainLimits( self, domainMin, domainMax, unit )
-        domainMin = max( domainMin, self.domainMin( ), f2.domainMin( ), f3.domainMin( ) )
-        domainMax = min( domainMax, self.domainMax( ), f2.domainMax( ), f3.domainMax( ) )
+        domainMin = max( domainMin, self.domainMin, f2.domainMin, f3.domainMin )
+        domainMax = min( domainMax, self.domainMax, f2.domainMax, f3.domainMax )
         return( pointwiseXY.groupThreeFunctions( self, [ domainMin, domainMax ], f2, f3 )[0] )
 
     def scaleDependent( self, value, insitu = False ) :
@@ -755,15 +753,30 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         domain or two XYs1d instances.
         """
 
-        domainMin, domainMax = self.domain( )
+        domainMin, domainMax = self.domainMin, self.domainMax
         if( domainValue <= ( 1 + epsilon ) * domainMin ) : return( None )
         if( domainValue >= ( 1 - epsilon ) * domainMax ) : return( None )
         return( self.domainSlice( domainMax = domainValue ), self.domainSlice( domainMin = domainValue ) )
 
-    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0, cls = None ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        Returns a new instance, converted to lin-lin interpolation with added points to maintain desired accuracy.
 
-        if( accuracy is None ) : accuracy = self.getAccuracy( )
-        return( self.changeInterpolation( standardsModule.interpolation.linlinToken, accuracy = accuracy, lowerEps = lowerEps, upperEps = upperEps, cls = cls ) )
+        Optional (key-word) arguments:
+        :param accuracy: desired accuracy. Controls how many points are added when switching interpolation
+        :param lowerEps: has no effect, kept for compatibility with regions1d.toPointwise_withLinearXYs
+        :param upperEps: has no effect, kept for compatibility with regions1d.toPointwise_withLinearXYs
+        :param cls: class to return. Defaults to xData.XYs.XYs1d
+        :return:
+        """
+
+        arguments = self.getArguments( kwargs, { 'accuracy' : defaultAccuracy, 'lowerEps' : 0, 'upperEps' : 0, 'cls' : None } )
+        accuracy = arguments['accuracy']
+        lowerEps = arguments['lowerEps']
+        upperEps = arguments['upperEps']
+        cls = arguments['cls']
+        return( self.changeInterpolation( standardsModule.interpolation.linlinToken, accuracy, lowerEps = lowerEps, 
+                upperEps = upperEps, cls = cls ) )
 
     def toXMLList( self, indent = '', **kwargs ) :
 
@@ -774,8 +787,6 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         if( oneLine ) : indent2 = ''
 
         attributeStr = baseModule.xDataFunctional.attributesToXMLAttributeStr( self )
-        accuracy = self.getAccuracy( )
-        if( accuracy != defaultAccuracy ) : attributeStr += ' accuracy="%s"' % accuracy
         if( self.interpolation != standardsModule.interpolation.linlinToken ) : attributeStr += ' interpolation="%s"' % self.interpolation
 
         XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributeStr ) ] 
@@ -822,10 +833,10 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
             xLabel = self.axes[xAxisIndex].plotLabel( )
             yLabel = self.axes[yAxisIndex].plotLabel( )
 
-        domainMin = getUnitlessNumber( domainMin, xUnit, self.domainMin( ) )
-        domainMax = getUnitlessNumber( domainMax, xUnit, self.domainMax( ) )
-        rangeMin = getUnitlessNumber( rangeMin, yUnit, self.rangeMin( ) )
-        rangeMax = getUnitlessNumber( rangeMax, yUnit, self.rangeMax( ) )
+        domainMin = getUnitlessNumber( domainMin, xUnit, self.domainMin )
+        domainMax = getUnitlessNumber( domainMax, xUnit, self.domainMax )
+        rangeMin = getUnitlessNumber( rangeMin, yUnit, self.rangeMin )
+        rangeMax = getUnitlessNumber( rangeMax, yUnit, self.rangeMax )
 
         dt = plotbase.parsePlotOptions( domainMin, domainMax, rangeMin, rangeMax, xLabel, yLabel, title )
         f = fudgeFileMisc.fudgeTempFile( )
@@ -850,8 +861,8 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         if( value is None ) : value = self.value
         if( axes is None ) : axes = self.axes
         if( interpolation is None ) : interpolation = self.interpolation
-        return( cls( data = other, accuracy = other.getAccuracy( ), interpolation = interpolation, axes = axes, 
-                overflowSize = 10, biSectionMax = other.getBiSectionMax( ), infill = other.getInfill( ), 
+        return( cls( data = other, interpolation = interpolation, axes = axes, 
+                overflowSize = 10, infill = other.getInfill( ), 
                 safeDivide = other.getSafeDivide( ), index = index, value = value ) )
 
     @classmethod
@@ -862,9 +873,9 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
 
         xPath.append( xDataElement.tag )
 
-        attrs = { 'accuracy' : defaultAccuracy, 'interpolation' : standardsModule.interpolation.linlinToken, 'label' : None, 'index' : None, 'value' : None, 
-                'biSectionMax' : 6 }
-        attributes = { 'accuracy' : float, 'interpolation' : str, 'label' : str, 'index' : int, 'value' : float }
+        attrs = { 'interpolation' : standardsModule.interpolation.linlinToken, 'label' : None, 
+                'index' : None, 'value' : None }
+        attributes = { 'interpolation' : str, 'label' : str, 'index' : int, 'value' : float }
         for key, item in xDataElement.items( ) :
             if( key not in attributes ) : raise TypeError( 'Invalid attribute "%s"' % key )
             attrs[key] = attributes[key]( item )
@@ -903,10 +914,8 @@ class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
         See pointwiseXY_C.createFromFunction for all other arguments.
         """
 
-        import math
         xys = pointwiseXY_C.createFromFunction( Xs, func, parameters, accuracy, biSectionMax, checkForRoots = checkForRoots, infill = infill, safeDivide = safeDivide )
-        biSectionMax = max( 0, biSectionMax - math.log( len( xys ) / len( Xs ) ) / math.log( 2 ) )
-        return( cls( data = xys, axes = axes, accuracy = accuracy, infill = infill, safeDivide = safeDivide ) )
+        return( cls( data = xys, axes = axes, infill = infill, safeDivide = safeDivide ) )
 
     @staticmethod
     def defaultAxes( labelsUnits = None ) :

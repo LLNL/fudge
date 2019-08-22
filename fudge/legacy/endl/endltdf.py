@@ -71,7 +71,7 @@ import endl_Z
 def processTDF_Reaction( target, C, S = None, X1 = None, X2 = None, X3 = None, X4 = None, Q = None, outputFile = 'tdfgen.out', workDir = None,
         bdflsFile = None ) :
 
-    if( bdflsFile == None ) : bdflsFile = bdfls.getDefaultBdfls( )
+    if( bdflsFile is None ) : bdflsFile = bdfls.getDefaultBdfls( )
     AMUToMeV = bdflsFile.constant( 4 )
     xsec = target.findData( C = C, I = 0, S = S, X1 = X1, X2 = X2, X3 = X3, X4 = X4, Q = Q )
 

@@ -76,10 +76,10 @@ import unittest
 class MatrixTests( unittest.TestCase ):
 
     def assertMatrixEqual( self, a, b ):
-        '''The numpy "==" operator is a universal function, so it operates on each element in the matrices.
+        """The numpy "==" operator is a universal function, so it operates on each element in the matrices.
         The result is another matrix whose elements are all a[i,j] == b[i,j].
         You need to call the .all() function to check that all elements evaluated to "True"
-        Or, could just use array_equal()...'''
+        Or, could just use array_equal()..."""
         #return self.assertTrue( ( a == b ).all() )
         return self.assertTrue( array_equal( a, b ) )
     
@@ -87,22 +87,22 @@ class MatrixTests( unittest.TestCase ):
         return self.assertTrue( allclose( a, b, rtol=rtol, atol=atol ) )
     
     def assertMatrixTrue( self, a ):
-        '''You need to call the .all() function to check that all elements evaluated to "True"'''
+        """You need to call the .all() function to check that all elements evaluated to "True" """
         return self.assertTrue( a.all() )
 
 
 
 # --------- basic tests -----------
 class BasicLinearAlgebraTests( MatrixTests ):
-    '''Very basic matrix tests'''
+    """Very basic matrix tests"""
     
     def test_transpose( self ):
-        '''Transpose'''
+        """Transpose"""
         x = mat([[1, 0, 0],[1, 0, 0],[0, 0, 0]])
         self.assertMatrixEqual( x.T, mat([[1, 1, 0],[0, 0, 0],[0, 0, 0]]) )
 
     def test_inner_products(self):
-        '''Inner product test'''
+        """Inner product test"""
         x = mat( [1,0,0])
         # * test
         self.assertEqual( x*x.T, [[1]] )
@@ -110,14 +110,14 @@ class BasicLinearAlgebraTests( MatrixTests ):
         self.assertEqual( dot(x,x.T), [[1]] )
 
     def test_outer_product(self):
-        '''Outer product test'''
+        """Outer product test"""
         x = mat( [1,0,0])
         # outer product test
         if False: print( outer(x,x.T) == mat([[1, 0, 0],[0, 0, 0],[0, 0, 0]]) )
         self.assertMatrixEqual( outer(x,x.T), mat([[1, 0, 0],[0, 0, 0],[0, 0, 0]]) )
 
     def test_matrix_addition( self ):
-        '''Addition test'''
+        """Addition test"""
         x = mat( [[1,0,0],[0,0,0],[0,0,0]])
         y = mat( [[0,0,0],[0,1,0],[0,0,0]])
         z = zeros_like( x )
@@ -128,7 +128,7 @@ class BasicLinearAlgebraTests( MatrixTests ):
 
 # --------- matrix composition tests -----------
 class MatrixCompositionTests( MatrixTests ):
-    '''Very basic matrix tests'''
+    """Very basic matrix tests"""
     
     def setUp( self ):
         self.a = mat([[ 1. ,  0.1,  0.1], [ 0.1,  1. ,  0.1], [ 0.1,  0.1,  1. ]])
@@ -138,18 +138,18 @@ class MatrixCompositionTests( MatrixTests ):
         self.e = mat([[5, 6], [7, 8]])
     
     def test_stackH( self ):
-        '''Testing horizontal stacking'''
+        """Testing horizontal stacking"""
         self.assertMatrixEqual( stackHorizontal( [ self.a, self.b, self.c ] ), 
             mat([[ 1.0,  0.1,  0.1,  0.,  0.,  0.,  0.,  0.,  0.],
                  [ 0.1,  1.0,  0.1,  0.,  0.,  0.,  0.,  0.,  0.],
                  [ 0.1,  0.1,  1.0,  0.,  0.,  0.,  0.,  0.,  0.]]) )
 
     def test_stackV( self ):
-        '''Testing vertical stacking'''
+        """Testing vertical stacking"""
         self.assertMatrixEqual( stackVertical( [ self.d, self.e, self.c, self.d, self.e ] ), mat( [[ 1.,  2.], [ 3.,  4.], [ 5.,  6.], [ 7.,  8.], [ 1.,  2.], [ 3.,  4.], [ 5.,  6.], [ 7.,  8.]] ) )
 
     def test_stackD( self ):
-        '''Testing diagonal stacking'''
+        """Testing diagonal stacking"""
         self.assertMatrixEqual( stackDiagonal( [ self.d, self.e, self.a ] ), mat( [[ 1.,   2.,   0.,   0.,   0.,   0.,   0. ], [ 3.,   4.,   0.,   0.,   0.,   0.,   0. ], [ 0.,   0.,   5.,   6.,   0.,   0.,   0. ], [ 0.,   0.,   7.,   8.,   0.,   0.,   0. ], [ 0.,   0.,   0.,   0.,   1.,   0.1,  0.1], [ 0.,   0.,   0.,   0.,   0.1,  1.,   0.1], [ 0.,   0.,   0.,   0.,   0.1,  0.1,  1. ]]) )
 
 # --------- CGLSQR tests -----------
@@ -237,7 +237,7 @@ class EigendecompositionTests:
     """
 
     def test_eigenmodes_are_really_eigenmodes( self ):
-        '''Check that A * v[i] = e[i] * v[i]'''
+        """Check that A * v[i] = e[i] * v[i]"""
         for i in range( self.ndim ):
             self.assertMatrixAlmostEqual( dot( self.A, self.v[i].T ), self.e[i] * self.v[i].T )
 
@@ -249,11 +249,11 @@ class EigendecompositionTests:
                 self.assertAlmostEqual( ( self.v[i] * self.v[j].T )[0,0], 0.0 )
 
     def test_eigenvector_normalization( self ):
-        '''Eigenvector normalization test:'''
+        """Eigenvector normalization test:"""
         for i in range( self.ndim ): self.assertAlmostEqual( ( self.v[i] * self.v[i].T )[0,0], 1.0 )
 
     def test_eigenvector_orthonormality( self ):
-        '''Check that eigenvectors are orthonormal, better get back identity matrix here'''
+        """Check that eigenvectors are orthonormal, better get back identity matrix here"""
         self.assertMatrixAlmostEqual( self.O.T * self.O, identity( self.ndim ) )
         self.assertMatrixAlmostEqual( self.O * self.O.T, identity( self.ndim ) )
         I = zeros_like( self.A )
@@ -261,25 +261,25 @@ class EigendecompositionTests:
         self.assertMatrixAlmostEqual( I, identity( self.ndim ) )    
     
     def test_reconstruct_matrix_from_eigendecomposition( self ):
-        '''Try to reconstruct the matrix using the eigenvalue decomposition'''
+        """Try to reconstruct the matrix using the eigenvalue decomposition"""
         B = self.O * diag( self.e ) * self.O.T
         self.assertMatrixAlmostEqual( self.A, B ) 
 
     def test_construct_matrixinverse_from_eigendecomposition( self ):
-        '''Try to construct the matrix inverse using the eigenvalue decomposition'''
+        """Try to construct the matrix inverse using the eigenvalue decomposition"""
         B = self.O * diag( 1.0/self.e ) * self.O.T
         self.assertMatrixAlmostEqual( self.A * B, identity( self.ndim ) ) 
         self.assertMatrixAlmostEqual( B * self.A, identity( self.ndim ) ) 
  
     @unittest.expectedFailure
     def test_construct_matrixinverse_by_pruning( self ):
-        '''Try to construct the matrix inverse using the PRUNED eigenvalue decomposition'''
+        """Try to construct the matrix inverse using the PRUNED eigenvalue decomposition"""
         with numpy.errstate(divide='ignore'):
             B = pruned_matrix_inverse( self.A )
         self.assertMatrixAlmostEqual( B * self.A, identity( self.ndim ), rtol=1e-05, atol=1e-08 ) 
         
     def test_construct_matrix_by_pruning( self ): 
-        '''Try to reconstruct the matix using the PRUNED eigenvalue decomposition'''
+        """Try to reconstruct the matix using the PRUNED eigenvalue decomposition"""
         B = pruned_matrix( self.A )
         self.assertMatrixAlmostEqual( self.A, B, rtol=1e-04, atol=1e-06 )
     
@@ -322,23 +322,23 @@ class EigendecompositionTests_allShouldFail( EigendecompositionTests ):
 # --------- Specific Covariance Test Cases -----------
 
 class BoringCovarianceTests( Eigendecomposition_base, EigendecompositionTests ):
-    '''boring, a diagonal matrix'''
+    """Boring, a diagonal matrix"""
     def setUpMtx( self ): self.A = mat( [[1.,0.,0.],[0.,2.,0.],[0.,0.,3.]] )
 
 class SomeOffDiagonalCovarianceTests( Eigendecomposition_base, EigendecompositionTests ):
-    '''some off-diagonal-ness'''
+    """Some off-diagonal-ness"""
     def setUpMtx( self ): self.A = mat( [[1.,1.,0.],[1.,2.,0.],[0.,0.,3.]] )
 
 class LotsOffDiagonalCovarianceTests( Eigendecomposition_base, EigendecompositionTests ):
-    '''lots of off-diagonal'''
+    """Lots of off-diagonal"""
     def setUpMtx( self ): self.A = mat( [[1.,1.,1.],[1.,2.,1.],[1.,1.,3.]] )
 
 class ZeroSubspaceCovarianceTests( Eigendecomposition_base, EigendecompositionTests_allShouldFail ):
-    '''zeros? it still works!, but has negative eigenvalues'''
+    """Zeros? it still works!, but has negative eigenvalues"""
     def setUpMtx( self ): self.A = mat( [[0.,0.,1.],[0.,2.,1.],[1.,1.,3.]] ) 
 
 class AllCorrelatedCovarianceTests( Eigendecomposition_base, EigendecompositionTests ):
-    '''pathological, all correlated, legal, but NOT INVERTIBLE'''
+    """Pathological, all correlated, legal, but NOT INVERTIBLE"""
     def setUpMtx( self ): self.A = mat( [[1.,1.,1.],[1.,1.,1.],[1.,1.,1.]] ) 
 
     @unittest.expectedFailure
@@ -354,7 +354,7 @@ class AllCorrelatedCovarianceTests( Eigendecomposition_base, EigendecompositionT
         super(self).test_eigenvector_orthonormality()
 
 class AlmostAllCorrelatedCovarianceTests( Eigendecomposition_base, EigendecompositionTests ):
-    '''pathological, all correlated, legal, but NOT INVERTIBLE'''
+    """Pathological, all correlated, legal, but NOT INVERTIBLE"""
     def setUpMtx( self ): self.A = mat( [[1.,1.,1.],[1.,1.,1.],[1.,1.,1.0001]] ) 
 
     @unittest.expectedFailure
@@ -363,15 +363,15 @@ class AlmostAllCorrelatedCovarianceTests( Eigendecomposition_base, Eigendecompos
 
 
 class OnDiagonalBarelyPathologicalCovarianceTests( Eigendecomposition_base, EigendecompositionTests_allShouldFail ):
-    '''pathological, all correlated, barely illegal and very much not invertible'''
+    """Pathological, all correlated, barely illegal and very much not invertible"""
     def setUpMtx( self ): self.A = mat( [[1.,1.,1.],[1.,1.,1.],[1.,1.,0.9999]] ) 
 
 class OffDiagonalBarelyPathologicalCovarianceTests( Eigendecomposition_base, EigendecompositionTests_allShouldFail ):
-    '''pathological, all correlated, barely illegal and very much not invertible, and slightly off-diagonal'''
+    """Pathological, all correlated, barely illegal and very much not invertible, and slightly off-diagonal"""
     def setUpMtx( self ): self.A = mat( [[1.,1.,1.],[1.,1.,1.00001],[1.,1.,0.9999]] )  
 
 class IllegalCovarianceTest( Eigendecomposition_base, EigendecompositionTests_allShouldFail ): 
-    '''
+    """
     A bad matrix for testing:
 
         Eigensystem for A.  It is OK using numpy.linalg.eig, but not (apparently) with numpy.linalg.eigh, I checked against mathematica:
@@ -388,7 +388,7 @@ class IllegalCovarianceTest( Eigendecomposition_base, EigendecompositionTests_al
         >>>   [ 0.74009445  0.23384422 -0.63053714]]
     
     However, note that this A is not a valid covariance as the off-diagonal elements are bigger than the on-diagonal ones.
-    '''
+    """
     def setUpMtx( self ): self.A = mat( [[1.,2.,3.],[1.,2.,1.],[3.,2.,1.]] )
 
     @unittest.expectedFailure
@@ -400,7 +400,7 @@ class IllegalCovarianceTest( Eigendecomposition_base, EigendecompositionTests_al
         super(self).test_construct_matrixinverse_from_eigendecomposition()
 
 class RealCovarianceTests( Eigendecomposition_base, EigendecompositionTests ):
-    '''real covariance for testing, H(n,tot) cs cov.'''
+    """Real covariance for testing, H(n,tot) cs cov."""
     def setUpMtx( self ):
         self.A = mat([
          [  8.77542100e-06,   1.38848800e-05,   2.79801400e-05,   3.88661200e-05,

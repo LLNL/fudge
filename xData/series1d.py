@@ -64,6 +64,7 @@
 __metaclass__ = type
 
 import abc
+import math
 
 from pqu import PQU as PQUModule
 
@@ -72,12 +73,14 @@ import standards as standardsModule
 import values as valuesModule
 import axes as axesModule
 import XYs as XYsModule
+import uncertainties as uncertaintiesModule
 
-try :
-    from numericalFunctions import Legendre as Legendre_C
-    maxLegendreOrder = Legendre_C.maxMaxOrder( )
-except :
-    maxLegendreOrder = 64
+from numericalFunctions import pointwiseXY_C as pointwiseXY_CModule
+floatToShortestString = pointwiseXY_CModule.floatToShortestString
+
+from numericalFunctions import Legendre as Legendre_C
+maxLegendreOrder = Legendre_C.maxMaxOrder( )
+
 
 def Legendre( n, mu, checkXRange = True ) :
     """
@@ -99,23 +102,22 @@ def Legendre( n, mu, checkXRange = True ) :
         n_ = n_p1
     return( Pnp1 )
 
+
 class series( baseModule.xDataFunctional ) :
     """
-    This class stores and manipulates an angular pdf (i.e. pdf(mu) where mu is the cos of the angle) 
-    represented as Legendre coefficients. The pdf and Legendre coefficients are related by
-
-        pdf(mu) = Sum_over_l_of ( l + 0.5 ) * C_l * P_l(mu)
-
-    where the sum is from l = 0 to lMax, lMax is the highest Legendre coefficients in the instance, C_l 
-    is the Legendre coefficient for Legendre order l and P_l(mu) is the Legendre polynomial of order l.
+    This class is the base class for storing a 1d function as a polynomial series. The function store the 
+    polynomial coefficients and has methods for manipulations of the coefficients that are generic to
+    all polynomial series (e.g., simple polynomial, Legendre).
     """
 
+    dimension = 1
     __metaclass__ = abc.ABCMeta
+    ancestryMembers = baseModule.xDataFunctional.ancestryMembers # + ( 'coefficients', )
 
     def __init__( self, coefficients, domainMin, domainMax, lowerIndex = 0, axes = None,
             index = None, valueType = standardsModule.types.float64Token, value = None, label = None, sep = ' ' ) :
 
-        baseModule.xDataFunctional.__init__( self, self.moniker, 1, axes, index = index, valueType = valueType,
+        baseModule.xDataFunctional.__init__( self, self.moniker, axes, index = index, valueType = valueType,
                 value = value, label = label )
 
         if( not( isinstance( sep, str ) ) ) : raise TypeError( 'sep must be a str instance' )
@@ -154,7 +156,7 @@ class series( baseModule.xDataFunctional ) :
             c_ls = self.copy( )
             for l, c_l in enumerate( c_ls ) : c_ls.coefficients[l] += other
         except :
-            self.checkSameSeriesType( other )
+            self.checkSameSeriesType( other, 'add' )
             c_l1, c_l2 = self, other
             if( len( self ) < len( other ) ) : c_l1, c_l2 = other, self
             c_ls = c_l1.copy( )
@@ -169,7 +171,7 @@ class series( baseModule.xDataFunctional ) :
             c_ls = self.copy( )
             for l, c_l in enumerate( c_ls ) : c_ls.coefficients[l] -= other
         except :
-            self.checkSameSeriesType( other )
+            self.checkSameSeriesType( other, 'subtract' )
             c_l1, c_l2 = self.coefficients, other.coefficients
             if( len( self ) < len( other ) ) : c_l1, c_l2 = c_l2, c_l1
             c_ls = c_l1.copy( )
@@ -191,22 +193,49 @@ class series( baseModule.xDataFunctional ) :
 
         return( ' '.join( [ "%g" % c_l for c_l in self.coefficients ] ) )
 
-    def checkSameSeriesType( self, other ) :
+    def evaluate(self, x):
+        """Override this in derived classes if you have a faster approach"""
+        total = 0.0
+        for i,c in enumerate(self.coefficients):
+            total += c * self.evaluateBasisFunction(x,i)
+        return total
+
+    def evaluateBasisFunction(self, x, i):
+        raise NotImplementedError("Implement in derived classes")
+
+    def checkSameSeriesType( self, other, operator ) :
 
         if( not( isinstance( other, series ) ) ) : raise TypeError( 'other of type "%s"' % type( other ) )
         if( self.moniker != other.moniker ) : raise TypeError( 'Cannot %s series %s to series %s' % ( operator, self.moniker, other.moniker ) )
 
-    def copy( self, data = None, index = None, value = None ) :
+    def convertUnits( self, unitMap ) :
+        """
+        unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
+        """
+
+        if( self.axes is None ) : print self.toXLink( )
+        factors = self.axes.convertUnits( unitMap )
+        if( factors[:2] !=[ 1., 1. ] ) :
+            self.__domainMin *= factors[1]
+            self.__domainMax *= factors[1]
+            for l, c_l in enumerate( self ) : self[l] *= factors[0]
+            factor = math.pow( factors[1], -self.__lowerIndex )
+            for l, c_l in enumerate( self ) :
+                if( ( l + self.__lowerIndex ) == 0 ) : factor = 1
+                self[l] *= factor
+                factor *= 1 / factors[1]
+        self.fixValuePerUnitChange( factors )
+
+        if( self.uncertainties ) : self.uncertainties.convertUnits( unitMap )
+
+    def copy( self ) :
         """
         Creates a new series that is a copy of self. The new 
         instance's index and value members are changes if index or value arguments are not None 
         respectively.
         """
 
-        if( data is None ) : data = self.coefficients
-        if( index is None ) : index = self.index
-        if( value is None ) : value = self.value
-        return( self.returnAsClass( self, data, index = index, value = value ) )
+        return( self.returnAsClass( self, self.coefficients, index = self.index, value = self.value ) )
 
     __copy__ = copy
     __deepcopy__ = __copy__
@@ -220,11 +249,6 @@ class series( baseModule.xDataFunctional ) :
     def domainMax( self ) :
 
         return( self.__domainMax )
-
-    @property
-    def domain( self ) :
-
-        return( self.domainMin, self.domainMax )
 
     @property
     def lowerIndex( self ) :
@@ -244,7 +268,7 @@ class series( baseModule.xDataFunctional ) :
     def domainUnitConversionFactor( self, unitTo ) :
 
         if( unitTo is None ) : return( 1. )
-        return( PQUModule.PQU( '1 ' + self.domainUnit( ) ).getValueAs( unitTo ) )
+        return( PQUModule.PQU( '1 ' + self.domainUnit ).getValueAs( unitTo ) )
 
     def getCoefficientSafely( self, l ) :
         """
@@ -269,11 +293,11 @@ class series( baseModule.xDataFunctional ) :
 
         self.coefficients = data
 
-    def rangeMin( self, unitTo = None, asPQU = False ) :
+    def rangeMin( self, unitTo = None ) :
 
         raise NotImplementedError( )
 
-    def rangeMax( self, unitTo = None, asPQU = False ) :
+    def rangeMax( self, unitTo = None ) :
 
         raise NotImplementedError( )
 
@@ -294,18 +318,28 @@ class series( baseModule.xDataFunctional ) :
         """
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        valueFormatter = kwargs.get( 'valueFormatter', floatToShortestString )
+        significantDigits = kwargs.get( 'significantDigits', 15 )
 
         attributesStr = baseModule.xDataFunctional.attributesToXMLAttributeStr( self )
-        if( None in self.fixedDomain( ) ) : attributesStr += ' domainMin="%s" domainMax="%s"' % ( self.domainMin, self.domainMax )
+        if( None in self.fixedDomain( ) ) : attributesStr += ' domainMin="%s" domainMax="%s"' % (
+                valueFormatter( self.domainMin, significantDigits = significantDigits ),
+                valueFormatter( self.domainMax, significantDigits = significantDigits ) )
         if( self.lowerIndex != 0 ) : attributesStr += ' lowerIndex="%s"' % self.lowerIndex
 
         # FIXME: converting self.coefficients to values for printing. Should it be stored as values in the first place?
         coefs = valuesModule.values( self.coefficients, valueType = self.valueType, sep = self.__sep )
 
-        XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributesStr ) ]
+        XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributesStr) ]
         if( self.isPrimaryXData( ) and ( self.axes is not None ) ) :
             XMLList += self.axes.toXMLList( indent2, **kwargs )
             XMLList += coefs.toXMLList( indent2, **kwargs )
+            if self.uncertainties:
+                XMLList.append( "%s<uncertainties>" % indent2 )
+                indent3 = indent2 + kwargs.get( 'incrementalIndent', '  ' )
+                for uncertainty in self.uncertainties:
+                    XMLList += uncertainty.toXMLList( indent3, **kwargs )
+                XMLList[-1] += "</uncertainties>"
             XMLList[-1] += '</%s>' % self.moniker
             return XMLList
         else:
@@ -331,14 +365,18 @@ class series( baseModule.xDataFunctional ) :
         attrs = { 'label' : None, 'index' : None, 'value' : None, 'domainMin' : domainMin, 'domainMax' : domainMax, 'lowerIndex' : 0 }
         attributes = { 'label' : str, 'index' : int, 'value' : float, 'domainMin' : float, 'domainMax' : float, 'lowerIndex' : int }
         if xDataElement.find('axes') is not None:
-            attrs['axes'] = axesModule.axes.parseXMLNode( xDataElement.find('axes'), xPath, linkData )
+            axes = axesModule.axes.parseXMLNode( xDataElement.find('axes'), xPath, linkData )
         for key, item in xDataElement.items( ) :
+            if( key == 'axes' ) : continue
             if( key not in attributes ) : raise TypeError( 'Invalid attribute "%s"' % key )
             attrs[key] = attributes[key]( item )
         if( attrs['domainMin'] == None ) : raise ValueError( 'missing attribute "domainMin"' )
         if( attrs['domainMax'] == None ) : raise ValueError( 'missing attribute "domainMax"' )
         coefficients = map( float, xDataElement.find('values').text.split() )
-        series = cls( coefficients = coefficients, **attrs )
+        series = cls( coefficients = coefficients, axes = axes, **attrs )
+        uncertElement = xDataElement.find(uncertaintiesModule.uncertainties.moniker)
+        if uncertElement is not None:
+            series.uncertainties = uncertaintiesModule.uncertainties.parseXMLNode(uncertElement, xPath, linkData)
         xPath.pop( )
         return( series )
 
@@ -354,12 +392,28 @@ class series( baseModule.xDataFunctional ) :
 
         return( None, None )
 
+
 class LegendreSeries( series ) :
+    """
+    This class represent a Legendre series for a function f(mu) as:
+
+    ..math::
+
+        f(\mu) = \sum_L ( l + 0.5 ) * C_l * P_l(\mu)
+
+    so
+    ..math::
+        C_l=\int_{-1}^1 d\mu P_l(\mu) f(\mu)
+
+    where the sum is from l = 0 to lMax, lMax is the highest Legendre coefficients in the instance, C_l
+    is the Legendre coefficient for Legendre order l and P_l(mu) is the Legendre polynomial of order l.
+    This class stores the Legendre coefficients C_l.
+    """
 
     moniker = 'Legendre'
     dimension = 1
 
-    def __init__( self, coefficients = [], domainMin = -1, domainMax = 1, lowerIndex = 0, axes = None,
+    def __init__( self, coefficients, domainMin = -1, domainMax = 1, lowerIndex = 0, axes = None,
             index = None, valueType = standardsModule.types.float64Token, value = None, label = None, sep = ' ' ) :
 
         if( lowerIndex != 0 ) : raise ValueError( 'lowerIndex = %s must be 0' )
@@ -373,6 +427,9 @@ class LegendreSeries( series ) :
         P = 0.
         for l, c_l in enumerate( self.coefficients ) : P += ( l + 0.5 ) * c_l * Legendre( l, mu, checkXRange = False ) 
         return( P )
+
+    def evaluateBasisFunction(self, mu, l):
+        return ( l + 0.5 ) * Legendre( l, mu, checkXRange = False )
 
     def isIsotropic( self ) :
         """Returns True if self is isotropic."""
@@ -397,11 +454,15 @@ class LegendreSeries( series ) :
 
         return( XYsModule.XYs1d )
 
-    def toPointwise_withLinearXYs( self, accuracy, biSectionMax = 16, **kwargs ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
         """
         This method constructs the pdf(mu) versus mu and returns it as a XYs1d instance. The accuracy of the 
         reconstruction (hence the number of points in the returned XYs1d) is determined by the accuracy argument.
         """
+
+        arguments = self.getArguments( kwargs, { 'accuracy' : 1e-3, 'biSectionMax' : 16 } )
+        accuracy = arguments['accuracy']
+        biSectionMax = arguments['biSectionMax']
 
         if( accuracy < 1e-6 ) : accuracy = 1e-6
         if( accuracy > 0.1 ) : accuracy = 0.1
@@ -420,7 +481,7 @@ class LegendreSeries( series ) :
         axes[0] = axesModule.axis( 'P(mu)', 0, unit )
         axes[1] = axesModule.axis( 'mu', 1, '' )
         Pclass = self.toLinearXYsClass()
-        P = Pclass( P, accuracy = accuracy, axes = axes )
+        P = Pclass( P, axes = axes )
         return( P.thin( accuracy = accuracy ) )
 
     @staticmethod
@@ -428,15 +489,15 @@ class LegendreSeries( series ) :
 
         return( -1, 1 )
 
+
 class polynomial1d( series ) :
 
     moniker = 'polynomial1d'
     dimension = 1
 
-    def __init__( self, coefficients = [], domainMin = None, domainMax = None, lowerIndex = 0, axes = None,
+    def __init__( self, coefficients, domainMin, domainMax, lowerIndex = 0, axes = None,
             index = None, valueType = standardsModule.types.float64Token, value = None, label = None, sep = ' ' ) :
 
-        if( ( domainMin is None ) or ( domainMax is None ) ) : raise ValueError( 'need domain min,max data' )
         series.__init__( self, coefficients, domainMin, domainMax, lowerIndex = lowerIndex, axes = axes, index = index, 
                 valueType = valueType, value = value, label = label, sep = sep )
 
@@ -447,16 +508,23 @@ class polynomial1d( series ) :
         for c_l in reversed( self.coefficients ) : P = c_l  + x * P
         return( P )
 
+    def evaluateBasisFunction(self, x, i):
+        return pow(x,i)
+
     def toLinearXYsClass( self ) :
 
         return( XYsModule.XYs1d )
 
-    def toPointwise_withLinearXYs( self, accuracy, biSectionMax = 16, **kwargs ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
         """
         This method constructs the y(x) versus x and returns it as a XYs1d instance. The accuracy of the 
         reconstruction (hence the number of points in the returned XYs1d) is determined by the accuracy argument.
         Currently, accuracy is not implemented.
         """
+
+        arguments = self.getArguments( kwargs, { 'accuracy' : 1e-3, 'biSectionMax' : 16 } )
+        accuracy = arguments['accuracy']
+        biSectionMax = arguments['biSectionMax']
 
         if( accuracy < 1e-6 ) : accuracy = 1e-6
         if( accuracy > 0.1 ) : accuracy = 0.1
@@ -468,8 +536,58 @@ class polynomial1d( series ) :
         axes = axesModule.axes( )
         yUnit = self.getAxisUnitSafely( 0 )
         xUnit = self.getAxisUnitSafely( 1 )
-        axes[0] = axesModule.axis( 'y(x)', 0, yUnit )
-        axes[1] = axesModule.axis( 'x', 1, xUnit )
+        axes[0] = axesModule.axis( 'y(x)', 0, yUnit )       # FIXME
+        axes[1] = axesModule.axis( 'x', 1, xUnit )          # FIXME
         Pclass = self.toLinearXYsClass()
-        P = Pclass( P, accuracy = accuracy, axes = axes )
+        P = Pclass( P, axes = axes )
         return( P.thin( accuracy = accuracy ) )
+
+class linearSpline1d( series ) :
+    """
+    This class is a simple linear spline.  It basically wraps the XYs1d class.
+    Linear interpolation uses the linear spline or the "hat" basis.  The first basis function looks like this::
+        |\
+        | \
+        |  \
+        ----
+    The second basis function looks like this::
+          /\
+         /  \
+        /    \
+        ------
+    and so on.  Together y(x) = \sum_i B_i(x) y_i such that y_i = y(x_i)
+    """
+
+    moniker = 'linearSpline1d'
+    dimension = 1
+
+    def __init__( self, xdata, ydata, axes,
+            index = None, valueType = standardsModule.types.float64Token, value = None, label = None, sep = ' ' ) :
+        if len(xdata) != len(ydata): raise ValueError("Number of x and y values not equal")
+
+        series.__init__( self, ydata, xdata[0], xdata[-1], lowerIndex = 0, axes = axes, index = index,
+                valueType = valueType, value = value, label = label, sep = sep )
+
+        self.axes=axes
+        self.basis = XYsModule.XYs1d(axes=self.axes, data=zip(xdata,ydata), interpolation=standardsModule.interpolation.linlinToken)
+
+    def evaluateBasisFunction(self, x, i):
+
+        self.basis[i] = (self.basis[i][0], 1.0)
+        result=self.basis.evaluate(x)
+        self.basis[i] = (self.basis[i][0], 0.0)
+        return result
+
+    def toLinearXYsClass( self ) :
+
+        return( XYsModule.XYs1d )
+
+    def toPointwise_withLinearXYs( self, **kwargs ) :
+        """
+        This method constructs the y(x) versus x and returns it as a XYs1d instance. Basically we just copy the basis
+        function widget and put the y values back.
+        """
+        result = self.basis.copy()
+        for i,c in enumerate(self.coefficients):
+            result[i]=(result[i][0],c)
+        return result

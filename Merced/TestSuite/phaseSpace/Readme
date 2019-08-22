@@ -1,0 +1,20 @@
+The data in this subdirectory is for parameters for the N-body phase
+space model.  The input files are:
+
+in.phaseSpace-H2: With default adaptive quadrature the output is
+  out.phaseSpace-H2, and the run time is 0m6.423s.  Note that for
+  the default value of quad_tol = 0.0001 the row sums agree with the
+  integral of the cross section to only 4 to 6 in 10^4, so you may want
+  to tighten this tolerance.  The integrand is a square root.  For Monte Carlo
+  quadrature using MC_transfer the output is out.phaseSpace-H2.MC with
+  nummontecarlo set to 100000.
+
+phaseSpace-H2.Gauss6: This file specifies 6th-order Gaussian quadrature.
+  The output file is out.phaseSpace-H2.Gauss6.
+  The worst discrepancy is in the lowest relevant bin, and it is 0.1%. 
+
+phaseSpace-H2.tight: This file sets the relative error in the
+  adaptive quadrature quad_tol = 1.0e-6 and the absolute error to
+  abs_quad_tol = 1.0e-10.  The output is out.phaseSpace-H2.tight.
+  In this case the row sums agree with the
+  integral of the cross section to 1 in 10^5,

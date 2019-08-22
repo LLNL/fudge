@@ -104,7 +104,7 @@ def plot_matrix( matrix, energyBoundariesX=None, energyBoundariesY=None, title="
         lowY, highY = energyBoundariesY[0], energyBoundariesY[-1]
     else:
         lowX = lowY = 0
-        highX, highY = matrix.shape
+        highX, highY = matrix.shape[::-1]
 
     pyplot.xlim( lowX, highX )
     if switchY: # switch y-axis: put low energy at top
@@ -124,6 +124,8 @@ def plot_matrix( matrix, energyBoundariesX=None, energyBoundariesY=None, title="
     # z-axis log scale?
     if zlog: zopts = {'norm': LogNorm( vmin=vmin, vmax=vmax ) }
     else: zopts = {'vmin':vmin, 'vmax':vmax }
+
+#    zopts['interpolation'] = 'none' # cleaner plot
 
     # color map:
     zopts['cmap'] = colorMap

@@ -110,6 +110,7 @@ class text( baseModule.xDataCoreMembers ) :
 
     def copy( self ) :
 
+            # No need to copy text has it is immutable.
         return( text( self.text, self.encoding, self.markup, allowedEncodings = [ self.encoding ] ) )
 
     __copy__ = copy

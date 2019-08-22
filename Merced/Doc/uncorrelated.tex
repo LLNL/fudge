@@ -1,0 +1,152 @@
+\chapter{Uncorrelated energy-angle probability densities}
+\label{Sec:uncorrelated-lab}
+The simplest form of joint energy-angle probability density data in
+\xendl\ is as tables of uncorrelated dependence on outgoing energy
+$\Elab'  $ and direction cosine~$\mulab  $,
+\begin{equation}
+  \pi(\Elab'  , \mulab   \mid E) =
+  \pi_\mu(\mulab   \mid E)\pi_E(\Elab'   \mid E).
+   \label{uncorrelated}
+\end{equation}
+The case of data given in the laboratory coordinate system is discussed here.
+Data of the form 
+$$
+ \pi(\Ecm'  , \mucm   \mid E) =
+  \pi_\mu(\mucm   \mid E)\pi_E(\Ecm'   \mid E)
+$$
+in the center-of-mass frame
+with $\pi_\mu(\mucm   \mid E)$ represented as Legendre coefficients
+are converted into Legendre expansions Eq.~(\ref{pi-Legendre-cm}) and 
+are processed as described in Section~\ref{Ch:Legendre-cm}.
+
+The tables for Eq.~(\ref{uncorrelated})
+are given as pairs $\{E_{i,j}', \pi_E(E_{i,j}' \mid E_i)\}$ for the energy probability
+and pairs $\{\mu_{i,j}, \pi_\mu(\mu_{i,j} \mid E_i)\}$ for the angular probability.
+The incident energies~$E_i$ need not be the same for the two data sets,
+but the ranges of incident energy must agree.
+
+For uncorrelated energy-angle probability densities
+Eq.~(\ref{uncorrelated}) the number-preserving integral Eq.~(\ref{Inum}) becomes
+\begin{multline}
+   \Inum_{gh,\ell} =
+        \int_{\calE_g} dE \, \sigma ( E ) M(E) w(E) \widetilde \phi_\ell(E) \\
+       \, \int_{\calE_h' } d\Elab'   \, \pi_E(\Elab'   \mid E)
+       \, \int_{\mulab}   d\mulab   \,  P_\ell( \mulab   ) \pi_\mu(\mulab   \mid E),
+  \label{Inum-uncorr}
+\end{multline}
+and the energy-preserving integral Eq.~(\ref{Ien}) takes the form
+\begin{multline}
+  \Ien_{gh,\ell} =
+     \int_{\calE_g} dE \, \sigma ( E ) M(E) w(E) \widetilde \phi_\ell(E) \\
+     \, \int_{\calE_h' } d\Elab'   \, \pi_E(\Elab'   \mid E) \Elab'  
+     \, \int_{\mulab}   d\mulab    \,  P_\ell ( \mulab   ) \pi_\mu(\mulab   \mid E).
+  \label{Ien-uncorr}
+\end{multline}
+
+It is clear from Eqs.~(\ref{Inum-uncorr}) and~(\ref{Ien-uncorr}) that
+one should first evaluate the integrals
+\begin{equation}
+  \calU_\ell( E ) =  \int_{\mulab}   d\mulab   \, P_\ell ( \mulab   ) \pi_\mu(\mulab   \mid E)
+  \label{angle_int_uncorr}
+\end{equation}
+for the Legendre orders $\ell$ required.  When interpolation of  $\pi_\mu(\mulab   \mid E)$
+in $\mulab$ is piecewise linear or histogram, the integrand in Eq.~(\ref{angle_int_uncorr})
+is a piecewise polynomial and the integrals are evaluated exactly using Gaussian quadrature.
+Currently, the code handles Legendre order $\ell \le 18$ in this way.  Integrals with higher
+Legendre order are evaluated using adaptive quadrature.
+
+For the integrals
+$$
+  \calV_n( E ) = \int_{\calE_h' } d\Elab'   \, \pi_E(\Elab'   \mid E)
+$$
+and
+$$
+  \calV_E( E ) = \int_{\calE_h' } d\Elab'   \, \pi_E  (\Elab'   \mid E) \Elab'  
+$$
+the same geometric considerations apply as for the integrals Eqs.~(\ref{InumI4-0}) 
+and~(\ref{IenI4-0}) of tabular isotropic data $\pi_0(\Elab'   \mid E)$
+as discussed in Section~\ref{Sec:isotropicTables}.  That is, if unit-base interpolation
+Eq.~(\ref{unitbaseMap}) is being used, then the integral $\calV_n( E )$ takes the form
+$$
+  \calV_n( E ) = \int_{\widehat\calE_h' } d\widehat \Elab'   \, \pi_E(\widehat \Elab'   \mid E),
+$$
+and the range of integration is determined by the geometry of the
+shaded region in Figure~\ref{Fig:unit-base-region}.
+
+\section{Input of data for uncorrelated energy-angle probability densities}
+The process identifier in Section~\ref{data-model} is\\
+  \Input{Process: Uncorrelated energy-angle data transfer matrix}{}\\
+These data are in the laboratory frame, Section~\ref{Reference-frame},\\
+  \Input{Product Frame: lab}{}
+
+The model-dependent data in Section~\ref{model-info}
+consists of tables of values of 
+the angular probability density $\pi_\mu(\mulab   \mid E)$ and energy 
+probability density $\pi_E(\Elab'   \mid E)$ in
+Eq.~(\ref{uncorrelated}).  All energies must be in the same units as
+those used for the energy groups.
+
+The angular probability density table is of the form\\
+  \Input{Angular data: n = $K$}{}\\
+  \Input{Incident energy interpolation:}{probability interpolation flag}\\
+  \Input{Outgoing cosine interpolation:}{list interpolation flag}\\
+The interpolation flag for incident energy is one of those used for
+probability density tables in Section~\ref{interp-flags-probability}, while that for
+the cosine is for simple lists.  This information is followed
+by $K$ sections of the form\\
+  \Input{Ein: $E$:}{$\texttt{n} = J$}\\
+with $J$ pairs of values of $\mulab$ and $\pi_\mu(\mulab   \mid E)$.
+
+The energy probability density table is of the form\\
+  \Input{EEpPData: n = $K$}{}\\
+  \Input{Incident energy interpolation:}{probability interpolation flag}\\
+  \Input{Outgoing energy interpolation:}{list interpolation flag}\\
+The interpolation flags are those used for
+probability density tables in Section~\ref{interp-flags-probability}.
+This information is followed
+by $K$ sections of the form\\
+  \Input{Ein: $E$:}{$\texttt{n} = J$}\\
+with $J$ pairs of values of $\Elab'$ and $\pi_E(\Elab'   \mid E)$.
+
+An example with energies in MeV of the model-dependent section of the input file for
+uncorrelated energy-angle probability densities is\\
+  \Input{Angular data: n = 10}{}\\
+  \Input{Incident energy interpolation: lin-lin direct}{}\\
+  \Input{Outgoing cosine interpolation: lin-lin}{}\\
+  \Input{ Ein: 2.82600000e+00 : n = 2}{}\\
+  \Input{ \indent  -1  0.5}{}\\
+  \Input{ \indent  1  0.5}{}\\
+    \Input{ $\cdots$}{}\\
+  \Input{ Ein: 2.00000000e+01: n = 10}{}\\
+  \Input{ \indent  -1.00000000e+00  2.86849000e-01}{}\\
+  \Input{ \indent  -9.00000000e-01  2.98228000e-01}{}\\
+  \Input{ \indent  -6.00000000e-01  3.48724000e-01}{}\\
+  \Input{ \indent  -3.00000000e-01  4.08451000e-01}{}\\
+  \Input{ \indent  -1.00000000e-01  4.54198000e-01}{}\\
+  \Input{ \indent   1.00000000e-01  5.05334000e-01}{}\\
+  \Input{ \indent   3.00000000e-01  5.62452000e-01}{}\\
+  \Input{ \indent   7.00000000e-01  6.93910000e-01}{}\\
+  \Input{ \indent   9.00000000e-01  7.47781000e-01}{}\\
+  \Input{ \indent  1.00000000e+00  7.65990000e-01}{}
+  
+  \Input{EEpPData: n = 10}{}\\
+  \Input{Incident energy interpolation: lin-lin unitbase}{}\\
+  \Input{Outgoing energy interpolation: lin-lin}{}\\
+ \Input{ Ein:  2.826000e+00: n = 3}{}\\
+  \Input{ \indent  1.000000e-03  0.000000e+00}{}\\
+  \Input{ \indent  2.000000e-03  1.000000e+03}{}\\
+  \Input{ \indent  3.000000e-03  0.000000e+00}{}\\
+     \Input{ $\cdots$}{}\\
+ \Input{ Ein:  2.000000e+01: n = 33}{}\\
+  \Input{ \indent  0.000000e+00  0.000000e+00}{}\\
+  \Input{ \indent  1.000000e-01  1.678010e-02}{}\\
+  \Input{ \indent  2.000000e-01  2.383160e-02}{}\\
+    \Input{ \indent }{$\cdots$}\\
+  \Input{ \indent 1.530000e+01  1.150130e-02}{}\\
+  \Input{ \indent  1.560000e+01  9.260950e-03}{}
+
+
+
+
+
+

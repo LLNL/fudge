@@ -61,14 +61,14 @@
 # 
 # <<END-copyright>>
 
-import xData.XYs as XYsModule
-import pqu.PQU as PQUModule
+from pqu import PQU as PQUModule
 
-from fudge.core.utilities import brb
-import fudge.gnd.productData.distributions.KalbachMann as KalbachMannModule
+from xData import XYs as XYsModule
 
-import site_packages.legacy.toENDF6.endfFormats as endfFormatsModule
-import site_packages.legacy.toENDF6.gndToENDF6 as gndToENDF6Module
+from fudge.gnd.productData.distributions import KalbachMann as KalbachMannModule
+
+from ... import endfFormats as endfFormatsModule
+from ... import gndToENDF6 as gndToENDF6Module
 
 #
 # KalbachMann

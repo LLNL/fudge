@@ -1,0 +1,14 @@
+The data in this subdirectory are taken from the EPDL library, and it
+is for Compton scattering.  In the ScatteringFactorData
+we have kept the units of the first variable as 1/cm (reciprocal
+wavelength).  In order to convert this to MeV, the get_transfer code
+multiplies this by 2*pi*c*hbar.
+
+Note that the input files do not contain cross sections; these
+are derived from the ScatteringFactorData and are printed in the output.
+
+The input files are:
+
+in.Compton: Use the default adaptive quadrature.  The output file is
+  out.Compton.  The output from the Monte Carlo version of the code
+  is out.Compton.MC.

@@ -1,0 +1,21 @@
+The files in this subdirectory contain data for energy probability
+density for fission neutrons given as the Madland-Nix model.  Three 
+quadrature schemes are used, and their run times are virually the
+same.  The input files are:
+
+in.Madland-Am241: The default uses adaptive quadrature for both incident energy
+  and outgoing energy.  Its output file is out.Madland-Am241.
+
+in.Madland-Am241.Gauss6: The same data but with 6-th order Gaussian quadrature.
+  Its output file is out.Madland-Am241.Gauss6.  The accuracy is not good
+  in the low outgoing energy bins.
+
+Madland-Am241.interp: For these data the integtals over outgoing energy
+  are done separately, and their values are interpolated when integrating
+  over incident energy.  The output file is out.Madland-Am241.interp.  The
+  accuracy is not good in the low outgoing energy bins.
+
+Madland-Am241.high_Eout: The same file as Madland-Am241, except for the
+  addition of outgoing energy bins (20, 25), (25, 30), and (30, 40) MeV.
+  The output file is out.Madland-Am241.high_Eout.  The purpose of this file
+  is to check the effect of truncating the Madland-Nix model at 20 MeV.

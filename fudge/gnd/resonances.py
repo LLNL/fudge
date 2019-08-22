@@ -78,11 +78,11 @@ class hierarchy:
 
 # TODO: move to a 'resonances' module
 
-import math
+import fractions
 from pqu import PQU
-from xData import XYs as XYsModule, link as linkModule, table as tableModule
-from fudge.gnd import xParticle, baseClasses
+from xData import XYs as XYsModule, constant as constantModule, link as linkModule, table as tableModule
 from fudge.gnd import suites as suitesModule
+from fudge.gnd import abstractClasses as abstractClassesModule
 
 import xData.ancestry as ancestryModule
 
@@ -102,7 +102,7 @@ class resonances( ancestryModule.ancestry ) :
 
     moniker = 'resonances'
 
-    def __init__(self, scatteringRadius=None, resolved=None, unresolved=None, reconstructCrossSection=True):
+    def __init__(self, scatteringRadius=None, resolved=None, unresolved=None):
 
         ancestryModule.ancestry.__init__( self )
 
@@ -114,7 +114,6 @@ class resonances( ancestryModule.ancestry ) :
 
         for child in (self.scatteringRadius, self.resolved, self.unresolved):
             if child is not None: child.setAncestor( self )
-        self.reconstructCrossSection = reconstructCrossSection
         
     def  __str__( self ) :
         """ string representation """
@@ -134,8 +133,7 @@ class resonances( ancestryModule.ancestry ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
     
-        xmlString = [ '%s<%s reconstructCrossSection="%s">' % 
-                ( indent, self.moniker, str(self.reconstructCrossSection).lower() ) ]
+        xmlString = [ '%s<%s>' % ( indent, self.moniker ) ]
         if self.scatteringRadius is not None:
             xmlString += self.scatteringRadius.toXMLList( indent2, **kwargs )
         if self.resolved is not None:
@@ -155,13 +153,13 @@ class resonances( ancestryModule.ancestry ) :
 
         bounds = []
         if self.scatteringRadius:
-            bounds.append( (self.scatteringRadius.lowerBound, self.scatteringRadius.upperBound) )
+            bounds.append( (self.scatteringRadius.domainMin, self.scatteringRadius.domainMax) )
         if self.resolved:
             if self.resolved.multipleRegions:
-                bounds += [(reg.lowerBound, reg.upperBound) for reg in self.resolved.regions]
-            else: bounds.append( (self.resolved.lowerBound, self.resolved.upperBound) )
+                bounds += [(reg.domainMin, reg.domainMax) for reg in self.resolved.regions]
+            else: bounds.append( (self.resolved.domainMin, self.resolved.domainMax) )
         if self.unresolved:
-            bounds.append( (self.unresolved.lowerBound, self.unresolved.upperBound) )
+            bounds.append( (self.unresolved.domainMin, self.unresolved.domainMax) )
 
         for idx in range(len(bounds)-1):
             assert bounds[idx][1] == bounds[idx+1][0], "Resonance region boundaries don't match!"
@@ -173,12 +171,17 @@ class resonances( ancestryModule.ancestry ) :
         else:
             return (bounds[0][0].value, bounds[-1][1].value)
 
+    @property
+    def reconstructCrossSection( self ):
+        if self.resolved and self.resolved.reconstructCrossSection: return True
+        if self.unresolved and self.unresolved.reconstructCrossSection: return True
+        return False
+
     @staticmethod
     def parseXMLNode( element, xPath, linkData ):
         xPath.append( element.tag )
 
         scatRadius, RRR, URR = None,None,None
-        kReconstruct = (element.get("reconstructCrossSection") == "true")
         for child in element:
             if child.tag==scatteringRadius.moniker:
                 scatRadius = scatteringRadius.parseXMLNode( child, xPath, linkData )
@@ -189,8 +192,7 @@ class resonances( ancestryModule.ancestry ) :
             else:
                 raise Exception("unknown element '%s' encountered in resonances!" % child.tag)
 
-        res = resonances( scatteringRadius = scatRadius, resolved=RRR, unresolved=URR,
-                reconstructCrossSection=kReconstruct )
+        res = resonances( scatteringRadius = scatRadius, resolved=RRR, unresolved=URR )
         xPath.pop()
         return res
     
@@ -205,6 +207,37 @@ class resonances( ancestryModule.ancestry ) :
         if self.unresolved:
             s += self.unresolved.toString( simpleString = simpleString )
         return( s )
+
+
+# Q-value in resonance region may not be consistent with other parts of the evaluation
+class Q( ancestryModule.ancestry ):
+
+    moniker = "Q"
+
+    def __init__( self, value, unit ):
+        ancestryModule.ancestry.__init__(self)
+        self.value = value
+        self.unit = unit
+
+    def getValueAs(self, unit):
+        factor = PQU.PQU('1. ' + self.unit).getValueAs(unit)
+        return self.value * factor
+
+    def toXMLList( self, indent='', **kwargs ):
+        indent2 = indent + kwargs.get('incrementalIndent', '  ')
+
+        xml = ['%s<%s>' % (indent, self.moniker)]
+        xml.append( '%s<constant value="%r" unit="%s"/>' % (indent2, self.value, self.unit) )
+        xml[-1] += '</%s>' % self.moniker
+        return xml
+
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ):
+        xPath.append( element.tag )
+
+        tmp = Q( float(element.getchildren()[0].get('value')), element.getchildren()[0].get('unit') )
+        xPath.pop()
+        return tmp
 
 
 # scatteringRadius can be constant, energy-dependent or L-dependent:
@@ -226,27 +259,69 @@ class scatteringRadius( ancestryModule.ancestry ):
 
     def __nonzero__(self): return bool(self.form)
 
+    def toString( self, simpleString = False ) :
+        """Returns a string representation of self. If simpleString is True,
+        the string contains only an overview without listing resonances"""
+        if simpleString: return str(self)
+        return str(self)
+
     def check( self, info ):
-        return []
+        '''
+        Checks that the scattering radius is within a factor of 3 of the expected scattering radius
+        of AP = 0.123 * self.target.getMass('amu')**(1./3.) + 0.08
+
+        This default AP is roughly the nuclear radius, so getting within a factor of 3 of the default
+        shouldn't be a problem.
+
+        A similar test is included in PSYCHE, but PSYCHE's cannot handle LRF=7
+        :param info:
+        :return:
+        '''
+        from fudge.gnd import warning
+        warnings = []
+        target = info['reactionSuite'].PoPs[ info['reactionSuite'].target ]
+        expectedAP = 10.0*( 0.123 * target.getMass('amu')**(1./3.) + 0.08 ) # expected radius in fm
+        factor=3.0
+        if self.isEnergyDependent():
+            egrid=self.form.domainGrid
+# BRB6 hardwired
+            APs = self.getValueAs( 'fm', energy_grid=egrid )
+            for iE,AP in enumerate(APs):
+                if AP/expectedAP > factor or AP/expectedAP < 1./factor:
+                    warning.badScatteringRadius(factor=factor, gotAP=AP, expectedAP=expectedAP, E=egrid[iE])
+        elif isinstance(self.form, constantScatteringRadius):    # FIXME goes away once these are all converted to constant1d
+            AP = self.form.value
+            if self.form.unit != 'fm':
+                AP *= PQU.PQU('1. '+self.form.unit).getValueAs('fm')
+            if AP/expectedAP > factor or AP/expectedAP < 1./factor:
+                warning.badScatteringRadius(factor=factor, gotAP=AP, expectedAP=expectedAP)
+        else:
+            AP = self.form.constant
+            if self.form.rangeUnit != 'fm':
+                AP *= PQU.PQU(1, self.form.rangeUnit).getValueAs('fm')
+            if AP/expectedAP > factor or AP/expectedAP < 1./factor:
+                warning.badScatteringRadius(factor=factor, gotAP=AP, expectedAP=expectedAP)
+        return warnings
 
     def isEnergyDependent(self):
         return isinstance( self.form, XYsModule.XYs1d )
 
-    def isLdependent(self):
-        return isinstance(self.form, LdependentScatteringRadii)
-
     def getValueAs( self, unit, energy_grid=None, L=None ):
         if self.isEnergyDependent():
             if energy_grid is None:
-                raise Exception("Missing: energy grid to evaluate E-dependent scattering radius")
+                raise NameError("Missing: energy_grid to evaluate E-dependent scattering radius")
             energy_unit = self.form.axes[-1].unit
-            return [self.form.evaluate( PQU.PQU( e, energy_unit ), unitTo = unit ) for e in energy_grid]
-        elif self.isLdependent():
-            if L in self.form.lvals:
-                return self.form.lvals[L].getValueAs( unit )
-            return self.form.default.getValueAs( unit )
+            xScale = self.form.domainUnitConversionFactor( energy_unit )
+            yScale = self.form.rangeUnitConversionFactor( unit )
+            return [ yScale * self.form.evaluate( xScale * e ) for e in energy_grid ]
+        elif isinstance(self.form, constantScatteringRadius):   # FIXME goes away once these are converted to constant1d
+            oldUnit  = self.form.unit
+            factor = PQU.PQU(1,oldUnit).getValueAs( unit )
+            return self.form.value * factor
         else:
-            return self.form.value.getValueAs( unit )
+            oldUnit = self.form.rangeUnit
+            factor = PQU.PQU(1, oldUnit).getValueAs( unit )
+            return self.form.constant * factor
 
     def toXMLList( self, indent = '', **kwargs ):
 
@@ -261,8 +336,8 @@ class scatteringRadius( ancestryModule.ancestry ):
     def parseXMLNode( cls, element, xPath, linkData ):
         xPath.append( element.tag )
         form = {
+            constantModule.constant1d.moniker: constantModule.constant1d,
             constantScatteringRadius.moniker: constantScatteringRadius,
-            LdependentScatteringRadii.moniker: LdependentScatteringRadii,
             XYsModule.XYs1d.moniker: XYsModule.XYs1d,
         }[ element[0].tag ].parseXMLNode( element[0], xPath, linkData )
         SR = cls( form )
@@ -270,20 +345,29 @@ class scatteringRadius( ancestryModule.ancestry ):
         return SR
 
 
-class effectiveRadius( scatteringRadius ):
+class hardSphereRadius( scatteringRadius):
 
-    moniker = 'effectiveRadius'
+    moniker = 'hardSphereRadius'
 
 
-class constantScatteringRadius( baseClasses.formBase ):
+class baseScatteringRadiusForm( abstractClassesModule.form ) :
+
+    pass
+
+class constantScatteringRadius( baseScatteringRadiusForm ):
 
     moniker = 'constant'
 
-    def __init__( self, value, bounds = None, label = None ) :
+    def __init__( self, value, unit, domainMin = None, domainMax = None, domainUnit = None, label = None ) :
+
+        baseScatteringRadiusForm.__init__(self)
         if isinstance( value, str ):
             value = PQU.PQU( value )
         self.value = value
-        self.bounds = bounds
+        self.unit = unit
+        self.domainMin = domainMin
+        self.domainMax = domainMax
+        self.domainUnit = domainUnit
 
         if( label is not None ) :
             if not isinstance( label, str ):
@@ -299,66 +383,50 @@ class constantScatteringRadius( baseClasses.formBase ):
 
         attributeStr, boundsString = '', ''
         if( self.label is not None ) : attributeStr += ' label="%s"' % self.label
-        if self.bounds is not None:
-            boundsString = ' lowerBound="%s" upperBound="%s"' % self.bounds
-        return [ '%s<%s%s value="%s"%s/>' % ( indent, self.moniker, attributeStr, self.value, boundsString )]
+        if self.domainMin is not None:
+            boundsString = ' domainMin="%s" domainMax="%s" domainUnit="%s"' % (
+                self.domainMin, self.domainMax, self.domainUnit )
+        return [ '%s<%s%s value="%s" unit="%s" %s/>' %
+                 ( indent, self.moniker, attributeStr, self.value, self.unit, boundsString )]
 
     @staticmethod
     def parseXMLNode( element, xPath, linkData ):
         xPath.append( element.tag )
-        value = PQU.PQU(element.get('value'))
-        bounds = None
-        if 'lowerBound' in element.keys():
-            bounds = tuple([PQU.PQU(element.get( bound )) for bound in ('lowerBound','upperBound') ])
-        CSR = constantScatteringRadius( value, bounds=bounds, label = element.get( 'label' ) )
+        CSR = constantScatteringRadius( **getAttrs(element) )
         xPath.pop()
         return CSR
 
 
-class LdependentScatteringRadii( baseClasses.formBase ):
+class spin( fractions.Fraction ):
+    """
+    Store spins for a collection of resonances. Check denominator (must be integer or half-integer)
+    """
 
-    moniker = 'Ldependent'
+    def __init__( self, *args ):
+        fractions.Fraction.__init__( self, *args )
+        if self.denominator not in (1,2):
+            raise ValueError("Illegal spin '%s': must be integer or half-integer" % self)
 
-    def __init__( self, default, lvals, label = None ) :
-        self.default = default
-        self.lvals = lvals
 
-        if( label is not None ) :
-            if not isinstance( label, str ):
-                raise TypeError( 'label must be a string' )
-        self.__label = label
+class parity:
+    """Store parity for a collection of resonances. Allowed values for the parity are +1 or -1."""
 
-    @property
-    def label( self ) :
+    def __init__(self, parity):
+        self.value = int(parity)
+        if self.value not in (1,-1):
+            raise ValueError("%d is not a legal value for parity!" % self.value)
 
-        return( self.__label )
+    def __str__(self):
 
-    def toXMLList( self, indent = '', **kwargs ) :
+        return str(self.value)
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+    def __int__(self):
 
-        attributeStr = ''
-        if( self.label is not None ) : attributeStr += ' label="%s"' % self.label
-        xml = [ '%s<%s%s>' % ( indent, self.moniker, attributeStr ) ]
-        xml.append( indent2 + '<default value="%s"/>' % self.default )
-        for lval in sorted(self.lvals.keys()):
-            xml.append( indent2 + '<Lspecific L="%d" value="%s"/>' % (lval, self.lvals[lval]) )
-        xml[-1] += '</%s>' % self.moniker
-        return xml
+        return self.value
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ):
+    def __copy__( self ) :
 
-        xPath.append( element.tag )
-        default = PQU.PQU( element.find('default').get('value') )
-        lvals = {}
-        for child in element:
-            if child.tag == 'Lspecific':
-                lval = int(child.get('L'))
-                lvals[lval] = PQU.PQU( child.get('value') )
-        result = LdependentScatteringRadii( default, lvals, element.get( 'label' ) )
-        xPath.pop()
-        return result
+        return( parity( self.value ) )
 
 
 class resonanceParameters( ancestryModule.ancestry ):   # FIXME: still needed? It's an extra level of nesting...
@@ -369,8 +437,13 @@ class resonanceParameters( ancestryModule.ancestry ):   # FIXME: still needed? I
     moniker = 'resonanceParameters'
 
     def __init__(self, table):
+        ancestryModule.ancestry.__init__(self)
         self.table = table
         self.table.setAncestor(self)
+
+    def check( self, info ):
+        warnings=[]
+        return warnings
 
     def toXMLList(self, indent = '', **kwargs):
 
@@ -396,18 +469,22 @@ class resolved( ancestryModule.ancestry ):
 
     moniker = 'resolved'
 
-    def __init__(self, formalism=None, lowerBound='', upperBound='', multipleRegions=False):
+    def __init__(self, formalism, domainMin, domainMax, domainUnit, reconstructCrossSection=True,
+                 reconstructAngularDistributions=False, multipleRegions=False):
 
         ancestryModule.ancestry.__init__( self )
         if not multipleRegions:
             setattr(self, formalism.moniker, formalism)
         self.evaluated = formalism
         if self.evaluated is not None: self.evaluated.setAncestor( self )
-        self.lowerBound = lowerBound
-        self.upperBound = upperBound
+        self.domainMin = domainMin
+        self.domainMax = domainMax
+        self.domainUnit = domainUnit
+        self.reconstructCrossSection = reconstructCrossSection
+        self.reconstructAngularDistributions = reconstructAngularDistributions
         self.multipleRegions = multipleRegions
         self.regions = []  # contains multiple energyInterval (deprecated)
-    
+
     def toString(self, simpleString = False):
         if self.regions:
             return ("Resolved region with DEPRECATED multiple regions\n")
@@ -419,22 +496,27 @@ class resolved( ancestryModule.ancestry ):
         warnings = []
         if self.multipleRegions:
             warnings.append( warning.RRmultipleRegions() )
+        warningList = self.evaluated.check(info)
+        if warningList:
+            warnings.append(warning.context(self.evaluated.moniker,warningList))
         return warnings
     
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
+        attrs = ' reconstructCrossSection="%s"' % str(self.reconstructCrossSection).lower()
+        if self.reconstructAngularDistributions:
+            attrs += ' reconstructAngularDistributions="true"'
         xmlString = [ '%s<%s' % ( indent, self.moniker ) ]
         if self.multipleRegions:
-            xmlString[0] += ' multipleRegions="true">'
+            xmlString[0] += ' multipleRegions="true" domainMin="%r" domainMax="%r" domainUnit="%s"%s>' % (
+                self.domainMin, self.domainMax, self.domainUnit, attrs )
             for region in self.regions:
                 xmlString += region.toXMLList( indent2, **kwargs )
         else:
-            lowerBound = self.lowerBound.toString( keepPeriod = False )
-            upperBound = self.upperBound.toString( keepPeriod = False )
-            xmlString[0] += ' lowerBound="%s" upperBound="%s" formalism="%s">' % (
-                    lowerBound, upperBound, self.evaluated.moniker )
+            xmlString[0] += ' domainMin="%r" domainMax="%r" domainUnit="%s" formalism="%s"%s>' % (
+                    self.domainMin, self.domainMax, self.domainUnit, self.evaluated.moniker, attrs )
             xmlString += self.evaluated.toXMLList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return xmlString
@@ -458,7 +540,7 @@ class resolved( ancestryModule.ancestry ):
                 resonanceSection = readResolved( region[0] )
                 thisRegion = energyInterval( formalism = resonanceSection, **getAttrs( region, exclude=('formalism') ) )
                 regions.append( thisRegion )
-            RRR = resolved( multipleRegions = True )
+            RRR = resolved( formalism=None, **getAttrs( element ) )
             RRR.regions = regions
         else:
             formalism = readResolved(element[0])
@@ -471,13 +553,16 @@ class unresolved( ancestryModule.ancestry ):
 
     moniker = 'unresolved'
 
-    def __init__(self, formalism, lowerBound, upperBound):
+    def __init__(self, formalism, domainMin, domainMax, domainUnit, reconstructCrossSection=True):
         ancestryModule.ancestry.__init__( self )
         setattr(self, formalism.moniker, formalism)
         self.evaluated = formalism
         if isinstance( self.evaluated, ancestryModule.ancestry ): self.evaluated.setAncestor( self )
-        self.lowerBound = lowerBound
-        self.upperBound = upperBound
+        self.domainMin = domainMin
+        self.domainMax = domainMax
+        self.domainUnit = domainUnit
+        self.reconstructCrossSection = reconstructCrossSection
+
     
     def toString( self, simpleString = False ):
         return ("Unresolved resonances in %s form\n" % self.evaluated.moniker )
@@ -487,26 +572,26 @@ class unresolved( ancestryModule.ancestry ):
         warnings = []
         for L in self.tabulatedWidths.L_values:
             for J in L.J_values:
-                elist = J.energyDependentWidths.getColumn('energy','eV')
+# BRB6 hardwired
+                elist = J.energyDependentWidths.getColumn('energy',self.domainUnit)
                 if elist is None:
-                    warnings.append( warning.URRmissingEnergyList( L.L, J.J.value, J ) )
+                    warnings.append( warning.URRmissingEnergyList( L.L, J.J, J ) )
                 else:
-                    if elist[0] > self.lowerBound.getValueAs('eV') or elist[-1] < self.upperBound.getValueAs('eV'):
-                        warnings.append( warning.URRdomainMismatch( L.L, J.J.value, J ) )
+                    if elist[0] > self.domainMin or elist[-1] < self.domainMax:
+                        warnings.append( warning.URRdomainMismatch( L.L, J.J, J ) )
                     missingPoints = [i1 for i1 in range(1,len(elist)) if elist[i1] > 3*elist[i1-1]]
                     for idx in missingPoints:
-                        warnings.append( warning.URRinsufficientEnergyGrid( L.L, J.J.value, PQU.PQU(elist[idx-1],'eV'),
-                            PQU.PQU(elist[idx],'eV'), J ) )
+                        warnings.append( warning.URRinsufficientEnergyGrid( L.L, J.J,
+                            PQU.PQU(elist[idx-1],self.domainUnit), PQU.PQU(elist[idx],self.domainUnit), J ) )
         return warnings
     
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        lowerBound = self.lowerBound.toString( keepPeriod = False )
-        upperBound = self.upperBound.toString( keepPeriod = False )
-        xmlString = [ '%s<%s lowerBound="%s" upperBound="%s" formalism="%s">' %
-                ( indent, self.moniker, lowerBound, upperBound, self.evaluated.moniker ) ]
+        reconstructString = ' reconstructCrossSection="false"' if not self.reconstructCrossSection else ''
+        xmlString = [ '%s<%s domainMin="%s" domainMax="%s" domainUnit="%s" formalism="%s"%s>' %
+                ( indent, self.moniker, self.domainMin, self.domainMax, self.domainUnit, self.evaluated.moniker, reconstructString ) ]
         xmlString += self.evaluated.toXMLList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return xmlString
@@ -522,34 +607,127 @@ class unresolved( ancestryModule.ancestry ):
 
 class energyInterval:
     """ resolved region may be made up of multiple energy intervals (deprecated) """
-    def __init__(self,index, formalism, lowerBound, upperBound):
+    def __init__(self,index, formalism, domainMin, domainMax, domainUnit):
         self.index = index
         self.evaluated = formalism
-        self.lowerBound = lowerBound
-        self.upperBound = upperBound
+        self.domainMin = domainMin
+        self.domainMax = domainMax
+        self.domainUnit = domainUnit
     
     def setIndex(self, index):
         self.index = index
     
     def toString(self, simpleString = False):
         return ("%s resonances, %s to %s. Contains %i resonances" % 
-                (self.evaluated, self.lowerBound, self.upperBound, len(self.evaluated) ) )
+                (self.evaluated, self.domainMin, self.domainMax, len(self.evaluated) ) )
     
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        lowerBound = self.lowerBound.toString( keepPeriod = False )
-        upperBound = self.upperBound.toString( keepPeriod = False )
         xmlString = [indent+
-                '<region index="%s" lowerBound="%s" upperBound="%s" formalism="%s">'
-                % ( self.index, lowerBound, upperBound, self.evaluated.moniker ) ]
+                '<region index="%s" domainMin="%r" domainMax="%r" domainUnit="%s" formalism="%s">'
+                % ( self.index, self.domainMin, self.domainMax, self.domainUnit, self.evaluated.moniker ) ]
         if self.evaluated:
             xmlString += self.evaluated.toXMLList( indent2, **kwargs )
         else:
             raise Exception( "Resonance section contains no data!" )
         xmlString[-1] += '</region>'
         return xmlString
+
+
+def _resonance_checker(self,info,things):
+    '''
+    Common resolved resonance checks
+
+    :param self: a reference to the resonanceFormalismBaseClass (or derived) or RMatrix class
+    :param info: the dictionary of checking options, shared by all .check() member functions.
+                 For the potential scattering convergence test, the 'potentialScatteringCoverganceCriteria'
+                 value is the limit on the ratio of the Lth cross section term to the 0th one.  It is printed
+                 as a percent but should be entered as a fraction.
+    :param things: list of things to check the obvious way (with a .check() function)
+    :return:
+    '''
+    from fudge.gnd import warning
+    warnings=[]
+
+    # check the member data
+    for thing in things:
+        warningList = thing.check(info)
+        if warningList:
+            warnings.append(warning.context(thing.moniker,warningList))
+
+    # now for the physics checks
+    import fudge.processing.resonances.reconstructResonances as rrReconstructModule
+    rrReconstructor = rrReconstructModule.getResonanceReconstructionClass(self.moniker)(info['reactionSuite'])
+
+    # check for mismatched spins
+    warnings+=rrReconstructor.setResonanceParametersByChannel(\
+        warnOnly=True,\
+        useReichMooreApproximation=self.moniker==RM.moniker) #multipleSScheme='NJOY', 'ENDF' or None
+
+    # check for missing channels via sum rule of statistical weights
+    sumgJ={}
+    for c in rrReconstructor.channels:
+        if (c.reaction,c.l) not in sumgJ: sumgJ[(c.reaction,c.l)]=0.0
+        sumgJ[(c.reaction,c.l)]+=c.gfact
+    keys = sumgJ.keys()
+    keys.sort()
+    for rxn,L in keys:
+        if abs(abs(sumgJ[(rxn,L)]) - abs(2.0*L+1.0)) > 1e-6:
+            warnings.append(warning.badSpinStatisticalWeights(L,sumgJ[(rxn,L)],2.*L+1,rxn))
+
+    # check for missing channels by looping through all the allowed angular momenta
+    def getSList(Ia,Ib):
+        '''Get possible spins'''
+        smin=abs(Ia-Ib)
+        smax=Ia+Ib
+        nS = int(smax-smin)+1
+        return [iS+smin for iS in range(nS)]
+    LMax = 0
+    allSs = []
+    rxnList = []
+    for c in rrReconstructor.channels:
+        if c.eliminated: continue
+        LMax = max(c.l,LMax)
+        if c.reaction not in rxnList: rxnList.append(c.reaction)
+        if c.channelClass not in [rrReconstructModule.FISSIONCHANNEL,rrReconstructModule.COMPETATIVECHANNEL]:
+            for s in getSList(*rrReconstructor.getParticleSpins(c.reaction)):
+                if s not in allSs: allSs.append(s)
+    for L in range(0,LMax+1):
+        Jmin=min(allSs)
+        Jmax=LMax+max(allSs)
+        nJ=int(Jmax-Jmin)
+        for iJ in range(0,nJ+1):
+            J=iJ+Jmin
+            for rxn in rxnList:
+                if 'ission' not in rxn:
+                    for S in getSList(*rrReconstructor.getParticleSpins(rxn)):
+                        if not J in rrReconstructModule.getAllowedTotalSpins(L,S,useFactor2Trick=False): continue
+                        for c in rrReconstructor.channels:
+                            gotIt = False
+                            if rxn==c.reaction and \
+                                    rrReconstructModule.spins_equal(c.l,L) and \
+                                    rrReconstructModule.spins_equal(c.J,J) and \
+                                    rrReconstructModule.spins_equal(c.s,S):
+                                gotIt=True
+                                break
+                        if not gotIt:
+                            warnings.append(warning.missingResonanceChannel(L,S,J,rxn))
+
+    # check for convergence in L
+    import numpy
+    almostXS={}
+    for c in rrReconstructor.channels:
+        egrid = numpy.array([max(rrReconstructor.lowerBound, rrReconstructor.lowerBound + c.Xi), rrReconstructor.upperBound])
+        phis=rrReconstructor.phiByChannel(c,egrid)
+        almostXS.setdefault(c.l,[]).extend( list(pow(numpy.sin(phis)/rrReconstructor.k(egrid),2.0)) )
+    fom=max(almostXS[max(almostXS.keys())])/max(almostXS[min(almostXS.keys())])
+    fomTarget=info.get('potentialScatteringCoverganceCriteria',0.001)
+    if fom > fomTarget:
+        warnings.append(warning.potentialScatteringNotConverged(c.l, rrReconstructor.upperBound, fom, fomTarget))
+
+    return warnings
 
 
 ################################################################
@@ -577,7 +755,10 @@ class resonanceFormalismBaseClass( ancestryModule.ancestry ) :
         self.scatteringRadius = scatteringRadius
         if self.scatteringRadius: self.scatteringRadius.setAncestor( self )
         ancestryModule.ancestry.__init__( self )
-    
+
+    def check( self, info ):
+        return _resonance_checker(self, info, [self.scatteringRadius,self.resonanceParameters])
+
     def __getitem__(self, idx):
         return self.resonanceParameters.table[idx]
     
@@ -628,6 +809,63 @@ class SLBW( resonanceFormalismBaseClass ) :
 
     moniker = 'SingleLevel_BreitWigner'
 
+    def check(self,info):
+        '''
+        Common resolved resonance checks
+
+        :param self: a reference to the resonanceFormalismBaseClass (or derived) or RMatrix class
+        :param info: the dictionary of checking options, shared by all .check() member functions.
+                     For the potential scattering convergence test, the 'potentialScatteringCoverganceCriteria'
+                     value is the limit on the ratio of the Lth cross section term to the 0th one.  It is printed
+                     as a percent but should be entered as a fraction.
+        :return:
+        '''
+        from fudge.gnd import warning
+        warnings=[]
+
+        # check the member data
+        for thing in  [self.scatteringRadius,self.resonanceParameters]:
+            warningList = thing.check(info)
+            if warningList:
+                warnings.append(warning.context(thing.moniker,warningList))
+        from fudge.gnd import warning
+        warnings=[]
+
+        # now for the physics checks
+        import fudge.processing.resonances.reconstructResonances as rrReconstructModule
+        rrReconstructor = rrReconstructModule.getResonanceReconstructionClass(self.moniker)(info['reactionSuite'])
+        warnings+=rrReconstructor.setResonanceParametersByChannel(warnOnly=True) #multipleSScheme='NJOY', 'ENDF' or None
+
+        for i,channels in enumerate(rrReconstructor.channels):
+            # check for missing channels
+            sumgJ={}
+            for c in channels:
+                if not c.isElastic: continue
+                #FIXME: mixing gamma, neutron and fission channels!!!!
+                #FIXME: I think gJ should use particle pair spins, not neutron+target!!!!
+                if c.l not in sumgJ: sumgJ[c.l]=0.0
+                sumgJ[c.l]+=c.gfact
+            Ls = sumgJ.keys()
+            Ls.sort()
+            for L in Ls:
+                if abs(abs(sumgJ[L]) - abs(2.0*L+1.0)) > 1e-6:
+                    warnings.append(warning.badSpinStatisticalWeights(L,sumgJ[L],2.*L+1))
+
+            # check for convergence in L
+            import numpy
+            almostXS={}
+            for c in channels:
+                if c.l not in almostXS:
+                    egrid=numpy.array([rrReconstructor.lowerBound, rrReconstructor.upperBound])
+                    phis=rrReconstructor.phiByChannel(c,egrid)
+                    almostXS[c.l]=pow(numpy.sin(phis)/rrReconstructor.k(egrid),2.0)
+            fom=max(almostXS[max(almostXS.keys())])/max(almostXS[min(almostXS.keys())])
+            fomTarget=info.get('potentialScatteringCoverganceCriteria',0.001)
+            if fom > fomTarget:
+                warnings.append(warning.potentialScatteringNotConverged(c.l, rrReconstructor.upperBound, fom, fomTarget))
+
+        return warnings
+
 class MLBW( resonanceFormalismBaseClass ) :
     """Resonance region in Multi-Level Breit-Wigner form."""
 
@@ -642,19 +880,26 @@ class RM( resonanceFormalismBaseClass ) :
 # R-matrix (LRF=7 in ENDF) is more complex: #
 #############################################
 class RMatrix( ancestryModule.ancestry ):
-    """R-Matrix Limited formalism. """
+    """
+    RMatrix is a general container for resolved resonance parameters.
+    It can handle standard Lane & Thomas R-Matrix, but can also use various approximations
+    (Single- and Multi-level Breit Wigner plus Reich-Moore).
+    
+    Internally, resonances are sorted into spin groups, each with a conserved total angular momentum and parity.
+    """
 
-    moniker = 'R_Matrix_Limited'
+    moniker = 'RMatrix'
 
-    optAttrList = ('approximation','boundaryCondition','relativisticKinematics',
-            'reducedWidthAmplitudes','calculatePenetrability','calculateShift','calculateChannelRadius')
+    optAttrList = ('approximation','boundaryCondition','relativisticKinematics','reconstructAngular',
+            'reducedWidthAmplitudes','calculatePenetrability','calculateShift','calculateChannelRadius',
+            'ENDFconversionFlag')
 
-    def __init__(self, openChannels, spinGroups, **kwargs):
-        """R-matrix is sorted by 'spin groups', each with same Jpi (conserved)."""
+    def __init__(self, resonanceReactions, spinGroups, **kwargs):
 
         ancestryModule.ancestry.__init__(self)
-        self.channels = openChannels
+        self.resonanceReactions = resonanceReactions
         self.spinGroups = spinGroups
+        for sg in self.spinGroups: sg.setAncestor(self, attribute='index')
         for attr in self.optAttrList:
             setattr(self, attr, kwargs.get(attr))
 
@@ -663,6 +908,9 @@ class RMatrix( ancestryModule.ancestry ):
 
     def __len__(self):
         return len(self.spinGroups)
+
+    def check( self, info ):
+        return _resonance_checker(self, info, [self.resonanceReactions]+self.spinGroups)
 
     def toXMLList( self, indent = '', **kwargs ) :
 
@@ -674,7 +922,7 @@ class RMatrix( ancestryModule.ancestry ):
                 if type(attrVal) is bool: attrVal = str(attrVal).lower()
                 xmlString[0] += ' %s="%s"' % (attr,attrVal)
         xmlString[0] += '>'
-        xmlString += self.channels.toXMLList( indent=indent2, **kwargs )
+        xmlString += self.resonanceReactions.toXMLList( indent=indent2, **kwargs )
         for gr in self.spinGroups:
             xmlString.append( gr.toXMLList( indent, **kwargs ) )
         xmlString[-1] += '</%s>' % self.moniker
@@ -683,66 +931,112 @@ class RMatrix( ancestryModule.ancestry ):
     @staticmethod
     def parseXMLNode( element, xPath, linkData ):
         xPath.append( element.tag )
-        channels = openChannels()
-        channels.parseXMLNode( element.find(openChannels.moniker), xPath, linkData )
+        RRs = resonanceReactions()
+        RRs.parseXMLNode( element.find(resonanceReactions.moniker), xPath, linkData)
         spinGroups = []
-        linkData['conversionTable'] = {'index':int, 'L':int, 'channelSpin':float}
+        linkData['conversionTable'] = {'index':int, 'L':int, 'channelSpin':spin}
         for sg in [ch for ch in element if ch.tag=='spinGroup']:
             parameters = resonanceParameters.parseXMLNode( sg.find(resonanceParameters.moniker), xPath, linkData )
-            spinGroups.append( spinGroup( resonanceParameters=parameters, **getAttrs(sg, required=('background',) ) ) )
-            if sg.find( overrides.moniker ):
-                spinGroups[-1].overrides.parseXMLNode( sg.find(overrides.moniker), xPath, linkData )
-        tmp = RMatrix( channels, spinGroups, **getAttrs(element,
+            chs = channels()
+            chs.parseXMLNode( sg.find(channels.moniker), xPath, linkData )
+            spinGroups.append( spinGroup( channels=chs, resonanceParameters=parameters, **getAttrs(sg, required=('background',) ) ) )
+        tmp = RMatrix( RRs, spinGroups, **getAttrs(element,
             required=RMatrix.optAttrList ) )
         del linkData['conversionTable']
         xPath.pop()
         return tmp
 
-class openChannels( suitesModule.suite ):
+class resonanceReactions( suitesModule.suite ):
 
-    moniker = 'channels'
+    moniker = 'resonanceReactions'
 
     def __init__( self ) :
 
-        suitesModule.suite.__init__( self, [openChannel] )
+        suitesModule.suite.__init__( self, [resonanceReaction])
 
-class openChannel( ancestryModule.ancestry ):
+    def check( self, info ):
+        from fudge.gnd import warning
+        warnings = []
+        for c in self:
+            warningList = c.check(info)
+            if warningList:
+                warnings.append(warning.context(str(c.moniker)+' '+str(c.label),warningList))
+        return warnings
+
+class resonanceReaction( ancestryModule.ancestry):
     """
     Describes one reaction channel that opens up in the resonance region. In an R-Matrix section,
-    all open reaction channels should be described in the list of openChannel elements
+    all open reaction channels should be described in the list of resonanceReaction elements
     """
 
-    moniker = 'channel'
+    moniker = 'resonanceReaction'
 
-    optAttrList = ('Q', 'boundaryCondition', 'calculatePenetrability','calculateShift')
-    def __init__(self, label, reactionLink, name, ENDF_MT, scatteringRadius=None, effectiveRadius=None, **kwargs):
+    fission = 'fission'                 # special tokens to support fission reactions
+    fissionProduct = 'fissionProduct'
+
+    def __init__( self, label, reactionLink, ejectile, Q=None, scatteringRadius=None, hardSphereRadius=None,
+                  computeShiftFactor=False, eliminated=False):
 
         ancestryModule.ancestry.__init__(self)
         self.label = label
         self.reactionLink = reactionLink
-        self.name = name
-        self.ENDF_MT = ENDF_MT
+        self.__ejectile = ejectile
+        self.__residual = None
+        self.Q = Q
         self.scatteringRadius = scatteringRadius
-        self.effectiveRadius = effectiveRadius
-        for attr in self.optAttrList:
-            setattr(self, attr, kwargs.get(attr,None))
-    
+        self.hardSphereRadius = hardSphereRadius
+        self.computeShiftFactor = computeShiftFactor
+        self.eliminated = eliminated
+
+    @property
+    def ejectile(self):
+        return self.__ejectile
+
+    @property
+    def residual(self):
+        if self.__residual is None:
+            if self.ejectile == resonanceReaction.fission: return resonanceReaction.fissionProduct
+
+            products = set([p.name for p in self.reactionLink.link.outputChannel.products])
+            products.remove( self.ejectile )
+            if len(products) != 1: raise ValueError("Cannot compute resonanceReaction residual!")
+            self.__residual = products.pop()
+        return self.__residual
+
+    def check( self, info ):
+        from fudge.gnd import warning
+        warnings = []
+
+        # check the reaction link
+        theLinkTarget = None
+        try:
+            theLinkTarget = self.reactionLink.follow(self.getRootAncestor())
+            if theLinkTarget is None: warnings.append(warning.unresolvedLink(self.reactionLink))
+        except:
+            warnings.append(warning.unresolvedLink(self.reactionLink))
+
+        # check the radii
+        for thing in [self.scatteringRadius, self.hardSphereRadius]:
+            if thing is  None: continue
+            warningList = thing.check(info)
+            if warningList:
+                warnings.append(warning.context(thing.moniker,warningList))
+        return warnings
+
+    def isFission( self ):
+
+        return self.reactionLink.link.outputChannel.isFission()
+
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent+'  '
-        xmlString = ['%s<%s label="%s" name="%s" ENDF_MT="%s"' % (indent, self.moniker, self.label, self.name, self.ENDF_MT) ]
-        for attr in self.optAttrList:
-            if getattr(self,attr):
-                if( attr in [ 'Q' ] ) :
-                    xmlString[-1] += ' %s="%s"' % ( attr, getattr( self, attr ).toString( keepPeriod = False ) )
-                else :
-                    attrVal = getattr(self,attr)
-                    if type(attrVal) is bool: attrVal = str(attrVal).lower()
-                    xmlString[-1] += ' %s="%s"' % (attr, attrVal)
-        xmlString[-1] += '>'
+        attrstring = ' computeShiftFactor="true"' if self.computeShiftFactor else ''
+        if self.eliminated: attrstring += ' eliminated="true"'
+        xmlString = ['%s<%s label="%s" ejectile="%s"%s>' % (indent, self.moniker, self.label, self.ejectile, attrstring) ]
         xmlString += self.reactionLink.toXMLList( indent=indent2, **kwargs )
+        if self.Q is not None: xmlString += self.Q.toXMLList( indent=indent2, **kwargs )
         if self.scatteringRadius is not None: xmlString += self.scatteringRadius.toXMLList( indent=indent2, **kwargs)
-        if self.effectiveRadius is not None: xmlString += self.effectiveRadius.toXMLList( indent=indent2, **kwargs)
+        if self.hardSphereRadius is not None: xmlString += self.hardSphereRadius.toXMLList( indent=indent2, **kwargs)
         xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
@@ -750,54 +1044,64 @@ class openChannel( ancestryModule.ancestry ):
     def parseXMLNode( element, xPath, linkData ):
         xPath.append( element.tag )
         reactionLink = linkModule.link.parseXMLNode( element.find('link'), xPath, linkData )
-        attrs = getAttrs( element )
-        if 'Q' not in attrs : attrs['Q'] = PQU.PQU(0,'eV')
-        scatRad, effRad = None, None
+        Qval, scatRad, hsRad = None, None, None
+        if element.find( Q.moniker ):
+            Qval = Q.parseXMLNode( element.find( Q.moniker ), xPath, linkData )
         if element.find( scatteringRadius.moniker ):
             scatRad = scatteringRadius.parseXMLNode( element.find( scatteringRadius.moniker ), xPath, linkData )
-        if element.find( effectiveRadius.moniker ):
-            effRad = effectiveRadius.parseXMLNode( element.find( effectiveRadius.moniker ), xPath, linkData )
-        tmp = openChannel( attrs.pop('label'), reactionLink=reactionLink, scatteringRadius=scatRad,
-                effectiveRadius=effRad, **attrs )
+        if element.find( hardSphereRadius.moniker ):
+            hsRad = hardSphereRadius.parseXMLNode( element.find( hardSphereRadius.moniker), xPath, linkData)
+        tmp = resonanceReaction( element.get('label'), reactionLink=reactionLink, ejectile=element.get('ejectile'),
+                Q = Qval, scatteringRadius=scatRad, hardSphereRadius=hsRad,
+                computeShiftFactor=getBool( element.get('computeShiftFactor','false') ),
+                eliminated=getBool( element.get('eliminated','false') ) )
         xPath.pop()
         return tmp
 
-class overrides( suitesModule.suite ):
+class channels( suitesModule.suite ):
 
-    moniker = 'overrides'
+    moniker = 'channels'
 
     def __init__( self ) :
 
-        suitesModule.suite.__init__( self, [channelOverride] )
+        suitesModule.suite.__init__( self, [channel])
 
-class channelOverride( ancestryModule.ancestry ):
+class channel( ancestryModule.ancestry ):
     """
     Use if necessary to override the true scattering radius, effective radius, etc. for a single
     spin-group / channel combination.
     """
 
-    moniker = 'channelOverride'
+    moniker = 'channel'
 
-    def __init__(self, label, scatteringRadius=None, effectiveRadius=None, penetrability=None,
-                 shiftFactor=None, phaseShift=None):
+    def __init__(self, label, resonanceReaction, columnIndex, L=None, channelSpin=None,
+                 scatteringRadius=None, hardSphereRadius=None, penetrability=None,
+                 shiftFactor=None, phaseShift=None, boundaryConditionOverride=None):
 
         ancestryModule.ancestry.__init__(self)
         self.label = label
+        self.resonanceReaction = resonanceReaction
+        self.columnIndex = columnIndex
+        self.L = L
+        self.channelSpin = channelSpin
         self.scatteringRadius = scatteringRadius
-        self.effectiveRadius = effectiveRadius
+        self.hardSphereRadius = hardSphereRadius
         self.penetrability = penetrability
         self.shiftFactor = shiftFactor
         self.phaseShift = phaseShift
-
-    def __nonzero__(self):
-        return (self.scatteringRadius is not None or self.effectiveRadius is not None or self.penetrability is not None
-                or self.shiftFactor is not None or self.phaseShift is not None)
+        self.boundaryConditionOverride = boundaryConditionOverride
 
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent+'  '
-        xmlString = ['%s<%s label="%s">' % (indent, self.moniker, self.label) ]
-        for attr in ('scatteringRadius', 'effectiveRadius', 'penetrability', 'shiftFactor', 'phaseShift'):
+        attrs = ""
+        if self.L is not None: attrs += ' L="%d"' % self.L
+        if self.channelSpin is not None: attrs += ' channelSpin="%s"' % self.channelSpin
+        if self.boundaryConditionOverride is not None:
+            attrs += ' boundaryConditionOverride="%s"' % self.boundaryConditionOverride
+        xmlString = ['%s<%s label="%s" resonanceReaction="%s"%s columnIndex="%d">' %
+                     (indent, self.moniker, self.label, self.resonanceReaction, attrs, self.columnIndex) ]
+        for attr in ('scatteringRadius', 'hardSphereRadius', 'penetrability', 'shiftFactor', 'phaseShift'):
             if getattr(self, attr) is not None:
                 xmlString += getattr(self, attr).toXMLList( indent=indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
@@ -806,15 +1110,15 @@ class channelOverride( ancestryModule.ancestry ):
     @staticmethod
     def parseXMLNode( element, xPath, linkData ):
         xPath.append( element.tag )
-        data = {}
+        kwargs = getAttrs(element)
         for child in element:
             childClass = {'scatteringRadius': scatteringRadius,
-                          'effectiveRadius': effectiveRadius,
+                          'hardSphereRadius': hardSphereRadius,
                           'penetrability': None,    # FIXME last three not yet implemented
                           'shiftFactor': None,
                           'phaseShift': None}.get( child.tag )
-            data[ child.tag ] = childClass.parseXMLNode( child, xPath, linkData )
-        tmp = channelOverride( element.get('label'), **data )
+            kwargs[ child.tag ] = childClass.parseXMLNode( child, xPath, linkData )
+        tmp = channel( **kwargs )
         xPath.pop()
         return tmp
 
@@ -826,28 +1130,38 @@ class spinGroup( ancestryModule.ancestry ):
 
     moniker = 'spinGroup'
 
-    def __init__(self, index=None, spin=None, parity=None, background=None, applyPhaseShift=False,
-            resonanceParameters=None):
+    def __init__(self, index, spin, parity, channels, resonanceParameters, background=None, applyPhaseShift=False):
         ancestryModule.ancestry.__init__(self)
         self.index = index
         self.spin = spin
         self.parity = parity
+        self.channels = channels
+        self.channels.setAncestor( self )
+        self.resonanceParameters = resonanceParameters
+        self.resonanceParameters.setAncestor( self )
         self.background = background
         self.applyPhaseShift = applyPhaseShift
-        self.overrides = overrides()
-        self.resonanceParameters = resonanceParameters
-    
+
     def __getitem__(self, idx):
         return self.resonanceParameters[idx]
-    
+
     def __len__(self):
         return len(self.resonanceParameters.table)
     
     def __lt__(self, other):
         # for sorting spin groups by Jpi. group J values together
-        return (self.spin,self.parity) < (
-                other.spin,other.parity)
-    
+        return (self.spin, self.parity) < (other.spin, other.parity)
+
+    def check( self, info ):
+        from fudge.gnd import warning
+        warnings = []
+        for thing in []:
+            if thing is  None: continue
+            warningList = thing.check(info)
+            if warningList:
+                warnings.append(warning.context(thing.moniker,warningList))
+        return warnings
+
     def toXMLList( self, indent = '', **kwargs ) :
 
         incrementalIndent = kwargs.get( 'incrementalIndent', '  ' )
@@ -860,9 +1174,7 @@ class spinGroup( ancestryModule.ancestry ):
                 if type(attrVal) is bool: attrVal = str(attrVal).lower()
                 xmlString += ' %s="%s"' % (opt, attrVal)
         xmlString = [xmlString + '>']
-        #for ch in self.channelInfo:
-        #    xmlString.append( ch.toXMLList( indent2, **kwargs ) )
-        xmlString += self.overrides.toXMLList(indent=indent2, **kwargs)
+        xmlString += self.channels.toXMLList(indent=indent2, **kwargs)
         if self.resonanceParameters.table.columns:    # need not contain any data
             xmlString.extend( self.resonanceParameters.toXMLList( indent2, **kwargs ) )
         xmlString[-1] += '</%s>' % self.moniker
@@ -879,7 +1191,7 @@ class spinGroup( ancestryModule.ancestry ):
 class unresolvedTabulatedWidths:
 
     moniker = 'tabulatedWidths'
-    optAttrList = ('interpolation','forSelfShieldingOnly','ENDFconversionFlag')
+    optAttrList = ('interpolation','ENDFconversionFlag')
 
     def __init__(self, L_values=None, scatteringRadius=None, **kwargs):
         """ L_values is a list of URR_Lsections, which in turn contains a list of J_sections. 
@@ -931,11 +1243,11 @@ class unresolvedTabulatedWidths:
                 for quant in ('energy','levelSpacing','neutronWidth','captureWidth','fissionWidthA','competitiveWidth'):
                     if ( quant not in consWid and quant not in [e.name for e in edepWid.columns] ):
                         consWid[quant] = PQU.PQU(0,'eV')
-                J_values.append( URR_Jsection( xParticle.spin(jval.get('J')), edepWid, consWid,
+                J_values.append( URR_Jsection( spin(jval.get('J')), edepWid, consWid,
                     **getAttrs( jval, exclude=("J"), required=("neutronDOF","gammaDOF","fissionDOF","competitiveDOF") ) ) )
             L_values.append( URR_Lsection( int(lval.get("L")), J_values ) )
 
-        table = unresolvedTabulatedWidths( L_values, scatRadius, **getAttrs( element, required=('forSelfShieldingOnly',) ) )
+        table = unresolvedTabulatedWidths( L_values, scatRadius, **getAttrs( element ) )
         del linkData['conversionTable']
         xPath.pop()
         return table
@@ -964,6 +1276,7 @@ class URR_Jsection:
     """ unresolved average widths, grouped by J. Should contain *either*
      - energyDependentWidths, with a table of widths / level densities as function of energy, or
      - constantWidths + energyGrid (the grid is necessary to tell where to do the reconstruction) """
+    moniker = 'J_section'
     optAttrList = ('competitiveDOF','neutronDOF','gammaDOF','fissionDOF')
     def __init__(self, J, energyDependentWidths=None, constantWidths={}, **kwargs):
         self.J = J
@@ -981,9 +1294,9 @@ class URR_Jsection:
         edep = self.energyDependentWidths
         for colId in range(edep.nColumns)[::-1]:
             column = edep.columns[colId]
-            columnData = edep.getColumn( column.name, units='eV' )
+            columnData = edep.getColumn( column.name, unit='eV' )
             if len(set( columnData ) ) == 1:
-                setattr( self.constantWidths, column.name, PQU.PQU( PQU.pqu_float.surmiseSignificantDigits( columnData[0] ), column.units ) )
+                setattr( self.constantWidths, column.name, PQU.PQU( PQU.pqu_float.surmiseSignificantDigits( columnData[0] ), column.unit ) )
                 [d.pop(colId) for d in edep.data]
                 edep.columns.pop(colId)
         for idx, col in enumerate( edep.columns ): col.index = idx  #re-number
@@ -998,7 +1311,7 @@ class URR_Jsection:
         indent2 = indent + incrementalIndent
         indent3 = indent2 + incrementalIndent
 
-        xmlString = ['%s<J_section J="%s"' % (indent,self.J) ]
+        xmlString = ['%s<%s J="%s"' % (indent,self.moniker,self.J) ]
         for attr in URR_Jsection.optAttrList:
             if getattr(self, attr):
                 xmlString[-1] += ' %s="%s"' % (attr, getattr(self,attr))
@@ -1006,10 +1319,12 @@ class URR_Jsection:
         constwidth = self.constantWidths.toXMLList( indent2, **kwargs )
         if constwidth: xmlString.append(constwidth)
         if self.energyDependentWidths:
+# BRB6 Hardwried
             xmlString.extend( ['%s<energyDependentWidths>' % (indent2)] +
                     self.energyDependentWidths.toXMLList( indent3, **kwargs ) )
             xmlString[-1] += '</energyDependentWidths>'
-        xmlString[-1] += '</J_section>'
+# BRB6 Hardwried
+        xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
 
@@ -1047,16 +1362,15 @@ def floatOrint( value ):
 def getAttrs(element, exclude=(), required=()):
     """ read attributes from one xml element. Convert to PhysicalQuantityWithUncertainty (or bool, int, etc)
     where appropriate, and skip anything in the 'exclude' list: """
-    conversionTable = {'lowerBound':PQU.PQU, 'upperBound':PQU.PQU, 'value':PQU.PQU, 'energy':PQU.PQU,
+    conversionTable = {'domainMin':float, 'domainMax':float, 'value':float, 'energy':PQU.PQU,
             'neutronWidth':PQU.PQU, 'captureWidth':PQU.PQU, 'fissionWidthA':PQU.PQU, 'fissionWidthB':PQU.PQU, 'competitiveWidth':PQU.PQU,
-            'levelSpacing':PQU.PQU, 'Q':PQU.PQU, 'radius':PQU.PQU, 'effectiveRadius':PQU.PQU,
-            'reconstructCrossSection':getBool, 'multipleRegions': getBool, 'LdependentScatteringRadii': getBool,
-            'calculateChannelRadius':getBool, 'computeAngularDistribution':getBool, 'forSelfShieldingOnly': getBool,
-            'calculateShift':getBool,'calculatePenetrability':getBool,
+            'levelSpacing':PQU.PQU, 'radius':PQU.PQU, 'hardSphereRadius':PQU.PQU, 'channelSpin':spin,
+            'reconstructCrossSection':getBool, 'reconstructAngular':getBool, 'multipleRegions': getBool,
+            'calculateChannelRadius':getBool, 'computeAngularDistribution':getBool,
+            'calculateShift':getBool,'calculatePenetrability':getBool, 'channelIndex':int, 'columnIndex':int,
             'LvaluesNeededForConvergence':int, 'ENDF_MT':int, 'index':int, 'L':int,
             'neutronDOF':floatOrint, 'gammaDOF':floatOrint, 'competitiveDOF':floatOrint, 'fissionDOF':floatOrint,
-            'spin':xParticle.spin, 'parity':xParticle.parity,
-            'scatteringRadius':(lambda foo: scatteringRadius(PQU.PQU(foo)) if foo!='energyDependent' else foo),
+            'spin':spin, 'parity':parity, 'boundaryConditionOverride':float,
             }
     attrs = dict( element.items() )
     for key in attrs.keys():
@@ -1065,4 +1379,3 @@ def getAttrs(element, exclude=(), required=()):
     for val in required:
         if val not in attrs: attrs[val] = False
     return attrs
-

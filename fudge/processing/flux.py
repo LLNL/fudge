@@ -63,65 +63,110 @@
 
 __metaclass__ = type
 
+from xData import standards as standardsModule
 from xData import ancestry as ancestryModule
+from xData import axes as axesModule
 from xData import XYs as XYsModule
+from xData import series1d as series1dModule
+from xData import gridded as griddedModule
+from xData import array as arrayModule
+from xData import values as valuesModule
+from xData import multiD_XYs as multiD_XYsModule
 
-class fluxOrder( ancestryModule.ancestry ) :
-    """
-    This class stores the flux for one Legendre order.
-    """
+class LegendreSeries( series1dModule.LegendreSeries ) :
 
-    moniker = 'fluxOrder'
+    pass
 
-    def __init__( self, order, data ) :
+class XYs2d( multiD_XYsModule.XYs2d ) :
 
-        if( not( isinstance( data, XYsModule.XYs1d ) ) ) : raise TypeError( 'Flux order data must only be an XYs1d instance.' )
-        self.order = order
-        self.data = data
+    def getFluxAtLegendreOrder( self, order ) :
 
-    def toXMLList( self, indent = '', **kwargs ) :
+        axes = axesModule.axes( )
+        axes[1] = self.axes[2].copy( [] )
+        axes[0] = self.axes[0].copy( [] )
+        for LS in self :
+            if( len( LS ) > 1 ) : raise Exception( 'FIXME -- next line is wrong.' )
+        return( XYsModule.XYs1d( [ [ LS.value, LS[0] ] for LS in self ], axes = axes ) )
 
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
-        xmlStringList = [ '%s<%s order="%s">' % ( indent, self.moniker, self.order ) ]
-        xmlStringList += self.data.toXMLList( indent2, **kwargs )
-        xmlStringList[-1] += '</%s>' % self.moniker
-        return( xmlStringList )
+        # BRB, Currently only processes LegendreSeries for 1d data and only its l=0 term. Need to convert units if needed.
+        # The return instance is a list, this needs to be changed.
+
+        from fudge.processing import miscellaneous as miscellaneousModule
+
+        flux0 = self.getFluxAtLegendreOrder( 0 )
+        projectileName = tempInfo['reactionSuite'].projectile
+        return( flux0.groupOneFunction( style.transportables[projectileName].group.boundaries ) )
+
+    @staticmethod
+    def allowedSubElements( ) :
+
+        return( ( LegendreSeries, ) )
+
+class gridded2d( griddedModule.gridded2d ) :
+
+    pass
 
 class flux( ancestryModule.ancestry ) :
     """
-    This class stores the flux as a list of fluxOrder instances.
+    This class stores the flux as an XYs2d instance.
     """
 
     moniker = 'flux'
 
-    def __init__( self, label ) :
+    def __init__( self, label, data ) :
 
         if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must be a string instance.' )
         self.label = label
-        self.orders = []
 
-    def __len__( self ) :
+        if( not( isinstance( data, ( XYs2d, ) ) ) ) : raise TypeError( 'Invalid flux data.' )
+        self.data = data
+        self.data.setAncestor( self )
 
-        return( len( self.orders ) )
+    def getFluxAtLegendreOrder( self, order ) :
 
-    def __getitem__( self, order ) :
+        return( self.data.getFluxAtLegendreOrder( order ) )
 
-        return( self.orders[order].data )
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
-    def append( self, _fluxOrder ) :
+        reactionSuite = tempInfo['reactionSuite']
+        axes = self.data.axes.copy( )
+        axes[1] = axesModule.grid( axes[1].label, 1, axes[1].unit, style = axesModule.parametersGridToken,
+                values = valuesModule.values( [ 0 ], valueType = standardsModule.types.integer32Token ) )
+        axes[2] = style.transportables[reactionSuite.projectile].group.boundaries.copy( [] )
+        data = self.data.processMultiGroup( style, tempInfo, indent )
+        starts = valuesModule.values( [ 0 ], valueType = standardsModule.types.integer32Token )
+        lengths = valuesModule.values( [ len( data ) ], valueType = standardsModule.types.integer32Token )
+        array = arrayModule.flattened( shape = ( len( data ), 1 ), data = data, starts = starts, lengths = lengths )
+        data = gridded2d( axes = axes, array = array )
+        return( data )
 
-        if( not( isinstance( _fluxOrder, fluxOrder ) ) ) : raise TypeError( 'Flux order data must only be a fluxOrder instance.' )
-        if( len( self.orders ) != _fluxOrder.order ) :
-            raise Exception( 'Flux order = %d not in sequential: len( self.orders ) = %d', _fluxOrder.order, len( self.orders ) )
-        self.orders.append( _fluxOrder )
+    def toXML( self, indent = '', **kwargs ) :
+
+        return( '\n'.join( self.toXMLList( indent = indent, **kwargs ) ) )
 
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlStringList = [ '%s<%s label="%s">' % ( indent, self.moniker, self.label ) ]
-        for order in self.orders :
-            xmlStringList += order.toXMLList( indent2, **kwargs )
+        xmlStringList += self.data.toXMLList( indent2, **kwargs )
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
+
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ) :
+
+        xPath.append( element.tag )
+
+        label = element.get( 'label' )
+        for child in element :
+            if( child.tag == XYs2d.moniker ) :
+                fluxData = XYs2d.parseXMLNode( child, xPath, linkData )
+            else :
+                raise 'Unsupported tag = "%s"' % child.tag
+        _flux = flux( label, fluxData )
+
+        xPath.pop( )
+        return( _flux )

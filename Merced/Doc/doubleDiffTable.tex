@@ -1,0 +1,238 @@
+\chapter{Joint energy-angle probability density tables}
+\label{Sec:joint-table}
+It is also possible to give energy-angle probability densities
+as tables in \xendl.  These probability tables must be in the 
+laboratory coordinate system.
+The \ENDL~\cite{Omega} and \ENDF~\cite{ENDFB} forms of these
+tables differ slightly, and \gettransfer\ supports both formats.
+The \ENDF\ format is described first.
+
+One format for tables
+of values of $\pi(\Elab', \mulab \mid E)$ is as arrays
+\begin{equation}
+  \{ E, \{ \mulab, \{ \Elab', \pi(\Elab', \mulab \mid E) \} \} \}.
+ \label{ENDF-E-mu-table}
+\end{equation}
+The data for the lowest incident energy $E$ are given first,
+and data for a given incident energy are ordered by increasing direction cosine $\mulab$.
+For fixed $E$ and $\mulab$, the data consist of pairs $\{ \Elab', \pi(\Elab', \mulab \mid E) \}$
+for values of the energy $\Elab'$ of the outgoing particle.
+The normalization of the data $\pi(\Elab', \mulab \mid E)$ is such that 
+for each incident energy $E$
+the total probability is
+$$
+  \int_0^\infty d\Elab' \, \int_{-1}^1 d\mulab \, \pi(\Elab', \mulab \mid E) = 1.
+$$
+
+The \ENDL\ energy-angle probability density data tables
+are given in the form of the product
+\begin{equation}
+  \pi(\Elab', \mulab \mid E) =
+  \pi_\mu(\mulab \mid E)\pi_E(\Elab' \mid E, \mulab),
+   \label{correlated}
+\end{equation}
+in which $\pi_E(\Elab' \mid E, \mulab)$ is normalized so that
+$$
+  \int_0^\infty d\Elab' \, \pi_E(\Elab' \mid E, \mulab) = 1
+$$
+for each of the tabulated values of $E$ and~$\mulab$.
+
+In the \gettransfer\ code energy-angle probability density
+tables in the format of Eq.~(\ref{ENDF-E-mu-table}) are converted to
+the format of Eq.~(\ref{correlated}) via the formulas
+$$
+  \pi_\mu(\mulab \mid E) = \int_0^\infty d\Elab' \, \pi(\Elab', \mulab \mid E)
+$$
+and
+$$
+  \pi_E(\Elab' \mid E, \mulab) = \frac
+    {\pi(\Elab', \mulab \mid E)} {\pi_\mu(\mulab \mid E)}.
+$$
+The rest of the discussion of energy-angle probability density
+tables is therefore in terms of the form of the data in Eq.~(\ref{correlated}).
+Tbus, the discussion is in terms of the angular probability density $\pi_\mu(\mulab \mid E)$
+and the outgoing energy conditional probability density $\pi_E(\Elab' \mid E, \mulab)$.
+
+With the correlated energy-angle probability density
+(\ref{correlated}) the number-preserving integral (\ref{Inum}) is
+\begin{multline}
+   \Inum_{gh,\ell} =
+        \int_{\calE_g} dE \, \sigma ( E ) M(E) w(E) \widetilde \phi_\ell(E) 
+       \, \int_{\calE_h' } d\Elab' \, \\
+       \, \int_{\mulab} d\mulab \,  P_\ell( \mulab ) \pi_\mu(\mulab \mid E)\pi_E(\Elab' \mid E, \mulab),
+  \label{Inum-corr}
+\end{multline}
+and the energy-preserving integral (\ref{Ien}) becomes
+\begin{multline}
+  \Ien_{gh,\ell} =
+     \int_{\calE_g} dE \, \sigma ( E ) M(E) w(E) \widetilde \phi_\ell(E) 
+     \, \int_{\calE_h' } d\Elab' \,  \Elab' \\
+     \, \int_{\mulab} d\mulab  \,  P_\ell ( \mulab ) \pi_\mu(\mulab \mid E)\pi_E(\Elab' \mid E, \mulab).
+  \label{Ien-corr}
+\end{multline}
+
+The method used by \gettransfer\ to evaluate the integrals (\ref{Inum-corr})
+and (\ref{Ien-corr}) is to first compute the Legendre coefficients
+\begin{equation}
+  \pi_\ell(\Elab' \mid E) =
+  \int_{-1}^1 d\mulab  \,  P_\ell ( \mulab ) \pi_\mu(\mulab \mid E)\pi_E(\Elab' \mid E, \mulab).
+  \label{get-I4}
+\end{equation}
+The coding for the integration of (\ref{InumI4})
+and~(\ref{IenI4}) is then applied to obtain the transfer matrix.
+
+\section{Input of $\pi(\Elab', \mulab \mid E)$ the form of a table, Eq.~(\ref{ENDF-E-mu-table})}
+For tables of the energy-angle probability density $\pi(\Elab', \mulab \mid E)$
+in the format Eq.~(\ref{ENDF-E-mu-table}), the identification line in
+Section~\ref{model-info} is\\
+      \Input{Process: ENDF Double differential EMuEpP data}{}\\
+These data are always in the laboratory frame,\\
+  \Input{Product Frame: lab}{}
+
+The first lines in the data for Section~\ref{model-info} give the number~$K$
+of incident energies along with the interpolation rules\\
+  \Input{EMuEpPData:}{$n = K$}\\
+  \Input{Incident energy interpolation:}{probability interpolation flag}\\
+  \Input{Outgoing cosine interpolation:}{probability interpolation flag}\\
+  \Input{Outgoing energy interpolation:}{list interpolation flag}\\
+The flags for interpolation with respect to incident energy~$E$ and
+direction cosine~$\mulab$ are those for probability density tables in
+Section~\ref{interp-flags-probability}, and that for outgoing energy~$E'$ is
+one for simple lists.
+
+For each incident energy~$E$ there is a data section of the form\\
+    \Input{ Ein:}{$E$: \quad \texttt{n = $N$}}\\
+indicating that data are given for $N$ values of $\mulab$.  The block of
+data corresponding to a value of $\mulab$ is of the form\\
+    \Input{ mu:}{$\mulab$: \quad \texttt{n = $J$}}\\
+followed by $J$ pairs of values of outgoing energy $\Elab'$ and
+probability density~$\pi(\Elab', \mulab \mid E)$ .
+
+An example of such data with energy in MeV is\\
+  \Input{EMuEpPData: n = 18}{}\\
+  \Input{Incident energy interpolation: lin-lin unitbase}{}\\
+  \Input{Outgoing cosine interpolation: lin-lin unibase}{}\\
+  \Input{Outgoing energy interpolation: lin-lin }{}\\
+  \Input{ Ein: 1.748830e+00:  n = 21}{}\\
+  \Input{  mu: -1.000000e+00:  n = 15}{}\\
+  \Input{ \indent   1.092990e-03  0.000000e+00}{}\\
+  \Input{ \indent   1.093000e-03  7.406740e-01}{}\\
+  \Input{ \indent   3.278900e-03  1.166140e+00}{}\\
+  \Input{ \indent   7.650800e-03  1.466540e+00}{}\\
+  \Input{ \indent   1.202300e-02  1.585880e+00}{}\\
+  \Input{ \indent   2.076600e-02  1.610940e+00}{}\\
+   \Input{ \indent 2.951000e-02  1.546240e+00}{}\\
+\Input{ \indent  5.574100e-02  1.071950e+00}{}\\
+\Input{ \indent  7.104300e-02  7.097100e-01}{}\\
+\Input{ \indent  8.197300e-02  4.021720e-01}{}\\
+ \Input{ \indent 9.071600e-02  1.795810e-01}{}\\
+\Input{ \indent  9.508800e-02  9.526480e-02}{}\\
+\Input{ \indent  9.946000e-02  2.867760e-02}{}\\
+ \Input{ \indent 1.016500e-01  4.692750e-03}{}\\
+\Input{ \indent  1.016510e-01  0.000000e+00}{}\\
+\Input{ $\cdots$}{}\\
+\Input{ Ein: 2.000000e+01:  n = 21}{}\\
+ \Input{  mu: -1.000000e+00:  n = 76}{}\\
+\Input{ \indent  4.606790e-02  0.000000e+00}{}\\
+\Input{ \indent  4.606800e-02  3.837140e-02}{}\\
+\Input{ \indent  9.213400e-02  4.393050e-02}{}\\
+\Input{ \indent  1.842700e-01  4.977660e-02}{}\\
+\Input{ \indent  2.764100e-01  4.806820e-02}{}\\
+\Input{ \indent  3.685400e-01  4.385540e-02}{}\\
+\Input{ \indent  6.449500e-01  2.695920e-02}{}\\
+\Input{ \indent  7.370900e-01  2.255450e-02}{}\\
+ \Input{ \indent }{ etc.}
+
+\section{Input of $\pi(\Elab', \mulab \mid E)$ as a product, Eq.~(\ref{correlated})}
+For tables of the energy-angle probability density $\pi(\Elab', \mulab \mid E)$
+given as the product in Eq.~(\ref{correlated}), the identification line in
+Section~\ref{model-info} is\\
+      \Input{Process: Double differential EMuEpP data transfer matrix}{}\\
+These data are always in the laboratory frame,\\
+  \Input{Product Frame: lab}{}
+
+The model-dependent portion of the input file in Section~\ref{model-info}
+contains a section for the angular probability density $\pi_\mu(\mulab \mid E)$
+and another for the conditional probability density $\pi_E(\Elab' \mid E, \mulab)$.
+
+The section for angular probability density starts with the lines\\
+  \Input{Angular data:}{$n = K$}\\
+  \Input{Incident energy interpolation:}{probability interpolation flag}\\
+  \Input{Outgoing cosine interpolation:}{list interpolation flag}\\
+where $K$ is the number of incident energies~$E$.  The flag for
+interpolation with respect to incident energy is one of those for
+probability density tables in Section~\ref{interp-flags}, and that for 
+the direction cosine $\mulab$ is one of those 
+for simple lists.  There follows $K$ blocks of data,
+one for each incident energy\\
+    \Input{ Ein:}{$E$: \quad \texttt{n = $N$}}\\
+indicating that data are given for $N$ pairs of values of $\mulab$
+and $\pi_\mu(\mulab \mid E)$.
+
+The section for conditional probability density of outgoing energy
+$\pi_E(\Elab' \mid E, \mulab)$ gives the number~$K$
+of incident energies along with the interpolation rules\\
+  \Input{EMuEpPData:}{$n = K$}\\
+  \Input{Incident energy interpolation:}{probability interpolation flag}\\
+  \Input{Outgoing cosine interpolation:}{probability interpolation flag}\\
+  \Input{Outgoing energy interpolation:}{list interpolation flag}\\
+The flags for interpolation with respect to incident energy~$E$ and
+direction cosine~$\mulab$ are those for probability density tables in
+Section~\ref{interp-flags-probability}, and that for outgoing energy~$E$ is one of those
+for simple lists.
+
+For each incident energy~$E$ there is a data section of the form\\
+    \Input{ Ein:}{$E$: \quad \texttt{n = $N$}}\\
+indicating that data are given for $N$ values of $\mulab$.  The block of
+data corresponding to a value of $\mulab$ is of the form\\
+    \Input{ mu:}{$\mulab$: \quad \texttt{n = $J$}}\\
+followed by $J$ pairs of values of outgoing energy $E$ and
+probability density~$\pi_E(\Elab' \mid E, \mulab)$.
+
+An example of this type of data with energy in MeV is given by\\
+  \Input{Angular data: n = 13}{}\\
+  \Input{Incident energy interpolation: lin-lin unitbase}{}\\
+  \Input{Outgoing cosine interpolation: lin-lin}{}\\
+  \Input{ Ein:   7.78148000e+00:  n = 5}{}\\
+  \Input{ \indent   9.99788143e-01   5.88016882e+01}{}\\
+  \Input{ \indent   9.99841107e-01   1.03998708e+03}{}\\
+  \Input{ \indent   9.99894071e-01   1.70086214e+03}{}\\
+  \Input{ \indent   9.99947036e-01   2.60922780e+03}{}\\
+  \Input{ \indent   1.00000000e+00   2.70023193e+04}{}\\
+  \Input{ $\cdots$}{}\\
+   \Input{ Ein: 2.00000000e+02: n = 5}{}\\
+ \Input{ \indent -1.00000000e+00  3.26136085e-01}{}\\
+ \Input{ \indent -5.00000000e-01  3.82892835e-01}{}\\
+  \Input{ \indent 0.00000000e+00  4.64096868e-01}{}\\
+  \Input{ \indent 5.00000000e-01  5.89499334e-01}{}\\
+  \Input{ \indent 1.00000000e+00  8.00885838e-01}{}\\
+   \Input{EMuEpPData: n = 13}{}\\
+  \Input{Incident energy interpolation: lin-lin unitbase}{}\\
+  \Input{Outgoing cosine interpolation: lin-lin unitbase}{}\\
+  \Input{Outgoing energy interpolation: lin-lin}{}\\
+  \Input{ Ein:   7.78148000e+00:  n = 5}{}\\
+  \Input{ mu:   9.99788143e-01:  n = 4}{}\\
+  \Input{ \indent   2.35390141e-03  1.62759930e+05}{}\\
+  \Input{ \indent   2.35697064e-03  1.62877493e+05}{}\\
+  \Input{ \indent   2.35697074e-03  1.62877496e+05}{}\\
+  \Input{ \indent   2.36004196e-03  1.62892892e+05}{}\\
+  \Input{ mu:   9.99841107e-01:  n = 16}{}\\
+  \Input{ \indent   2.30884914e-03  9.56657064e+03}{}\\
+   \Input{ \indent  2.32094195e-03  9.99310479e+03}{}\\
+   \Input{ \indent}{ etc.}\\
+ \Input{ Ein:  2.00000000e+02: n = 5}{}\\
+\Input{  mu: -1.00000000e+00: n = 501}{}\\
+  \Input{ \indent 1.00000000e-18  5.38736174e-10}{}\\
+  \Input{ \indent 1.00563208e-17  1.70842412e-09}{}\\
+  \Input{ \indent 1.91126417e-17  2.35524717e-09}{}\\
+  \Input{ \indent 2.81689625e-17  2.85931206e-09}{}\\
+  \Input{ \indent 3.72252834e-17  3.28696542e-09}{}\\
+  \Input{ $\cdots$}{}\\
+  \Input{ mu: 1.00000000e+00: n = 993}{}\\
+  \Input{ \indent 1.00000000e-18  2.19383712e-10}{}\\
+  \Input{ \indent 7.55831305e-18  6.03138181e-10}{}\\
+  \Input{ \indent }{ $\cdots$}\\
+  \Input{ \indent 1.32751551e+01  1.88436981e-03}{}\\
+  \Input{ \indent 1.38015128e+01  1.90038969e-03}{}
+ 
+ 

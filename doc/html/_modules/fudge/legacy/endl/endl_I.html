@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.endl.endl_I &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.legacy.endl.endl_I</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains a set of routines that return information about ENDL I-values.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">endl_ILabels</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;cross section&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;angular dist.&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">3</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;E-angle dist.&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">4</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;l-order E-angle dist.&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">7</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;n_bar / fission&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">8</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;histogram E dist.&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">9</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;multiplicity&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">10</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;secondary ave. E&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">11</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;residual ave. E&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">12</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Q(E)&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">13</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;momentum&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">20</span><span class="p">,</span>  <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;URR(E,T)&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">21</span><span class="p">,</span>  <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;P(E|E_out)&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">22</span><span class="p">,</span>  <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;angular dist. in (1-mu)&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">80</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Maxwell reaction rate&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">81</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Doppler x-sec.&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">84</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Maxwell E dist.&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">89</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Maxwell multiplicity&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">90</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Maxwell secondary ave. E&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">91</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Maxwell residual ave. E&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">92</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Maxwell E of reaction part.&quot;</span> <span class="p">)</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="endl_ILabel"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_I.endl_ILabel">[docs]</a><span class="k">def</span> <span class="nf">endl_ILabel</span><span class="p">(</span> <span class="n">I</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns a mnemonic string for the specified I-value. If I-value is not defined than &#39;None&#39; is returned.&quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">endl_ILabels</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">I</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="endl_ILabelMaxWidth"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_I.endl_ILabelMaxWidth">[docs]</a><span class="k">def</span> <span class="nf">endl_ILabelMaxWidth</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the maximum length of a string returned by endl_ILabel.&quot;&quot;&quot;</span>
+
+    <span class="n">w</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">endl_ILabels</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">w</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">w</span></div>
+
+<div class="viewcode-block" id="endl_IColumns"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_I.endl_IColumns">[docs]</a><span class="k">def</span> <span class="nf">endl_IColumns</span><span class="p">(</span> <span class="n">I</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the number of columns of data for the specified I-value. If I-value is not defined than &#39;None&#39; is returned.&quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">endl_ILabels</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">I</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

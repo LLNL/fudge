@@ -71,18 +71,18 @@ import types
 import glob
 
 def uniquify(seq):
-    ''' 
+    """
     Fast implimentation of a function to strip out non-unique entries in a Python list, but preserving list order.
     Usage:
         >>> print uniquify( [1,4,2,4,7,2,1,1,1,'s','a',0.1] ) 
             [1, 4, 2, 7, 's', 'a', 0.10000000000000001]
-    '''
+    """
     seen = set()
     seen_add = seen.add
     return [ x for x in seq if x not in seen and not seen_add(x)] 
 
 def banner( s, justification = 'c' ):
-    '''A flower-box ascii banner generator.  The input string can have line feeds.  Each line will get centered in the box.'''
+    """A flower-box ascii banner generator.  The input string can have line feeds.  Each line will get centered in the box."""
 
     if( justification not in [ 'l', 'c', 'r' ] ) : raise Exception( 'Invalid justification = "%s", must be "l", "c", "r"' % justification )
     ss = s.split( '\n')
@@ -103,7 +103,7 @@ def winged_banner( x, wingsize=10 ):
     return wingsize*'*'+' '+x.replace( '\n', '; ' )+' '+wingsize*'*'
 
 def Pause( Prompt = "Enter <RET> to continue : ", ExtraStr = "" ) :
-    "Prompts and waits for user to enter a line. The line is returned. ExtraStr is added to the prompt string."
+    """Prompts and waits for user to enter a line. The line is returned. ExtraStr is added to the prompt string."""
 
     if( ExtraStr != "" ) : Prompt = Prompt + "(%s)" % ExtraStr
     try :
@@ -116,7 +116,7 @@ def Pause( Prompt = "Enter <RET> to continue : ", ExtraStr = "" ) :
     return( s )
 
 def tlist( l, w = 5, sep = None, rightJustify = 0 ) :
-    "Calls tylist with arguments passed."
+    """Calls tylist with arguments passed."""
 
     tylist( l, w, sep = sep, rightJustify = rightJustify )
 
@@ -253,7 +253,7 @@ def objectoutline( o, MaxLevel = 1, Full = 1 ) :
     objectoutline2( o, MaxLevel, 0, "", Full )
 
 def objectoutline2( o, MaxLevel, level, name, Full ) :
-    "For internal use only."
+    """For internal use only."""
 
     if( type( name ) != type( "" ) ) : name = str( name )
     if ( level == ( MaxLevel + 1 ) ) : return
@@ -302,9 +302,9 @@ def objectoutline2( o, MaxLevel, level, name, Full ) :
             if ( len( o.__bases__ ) > 0 ) :
                 print "%s  -- base(s) --" % sm
                 for i in o.__bases__ : objectoutline2ClassesOnly( i, nextlevel, i.__name__ )
-    elif ( type( o ) == type( 1 ) ) or ( type( o ) == type( 1. ) ) or ( type( o ) == type( "" ) ) or ( type( o ) == type( u"" ) ) or ( type( o ) == type( True ) ) :
+    elif( type( o ) == type( 1 ) ) or ( type( o ) == type( 1. ) ) or ( type( o ) == type( "" ) ) or ( type( o ) == type( u"" ) ) or ( type( o ) == type( True ) ) :
         print "%s%s = %s" % ( s, `type( o )`, `o` )
-    elif ( type( o ) == types.MethodType ) :
+    elif( isFunctionLike( o ) ) :
         print "%s %s" % ( s, o.__class__.__name__ )
     elif( isInstance ) :                  # Instance of a class.
         print "%sinstance of class %s" % ( s, o.__class__.__name__ )
@@ -314,15 +314,32 @@ def objectoutline2( o, MaxLevel, level, name, Full ) :
 #                for i in o.__class__.__bases__ : objectoutline2( i, MaxLevel, nextlevel, i.__name__, Full )
             print "%s  -- member --" % sm
             for i in dir( o ) : 
-                if ( type( getattr( o, i ) ) != types.MethodType ) : objectoutline2( getattr( o, i ), MaxLevel, nextlevel, i, Full )
+                obj = get_dict_attr( o, i )
+                if( not( isFunctionLike( obj ) ) ) : objectoutline2( obj, MaxLevel, nextlevel, i, Full )
             print "%s  -- methods --" % sm
             for i in dir( o ) :
-                if ( type( getattr( o, i ) ) == types.MethodType ) : objectoutline2( getattr( o, i ), MaxLevel, nextlevel, i, Full )
+                if( isFunctionLike( get_dict_attr( o, i ) ) ) : objectoutline2( get_dict_attr( o, i ), MaxLevel, nextlevel, i, Full )
     else :                                                      # Integer, Float, etc...
         print "%s%s" % ( s, `type( o )` )
 
+def isFunctionLike( obj ) :
+
+    if( type( obj ) == types.BuiltinFunctionType ) : return( True )
+    if( type( obj ) == types.BuiltinMethodType ) : return( True )
+    if( type( obj ) == types.FunctionType ) : return( True )
+    if( type( obj ) == types.GeneratorType ) : return( True )
+    if( type( obj ) == types.LambdaType ) : return( True )
+    if( type( obj ) == types.MethodType ) : return( True )
+    if( type( obj ) == types.UnboundMethodType ) : return( True )
+    return( False )
+
+def get_dict_attr( obj, attr ) :
+    for obj in [ obj ] + obj.__class__.mro( ) :
+        if( attr in obj.__dict__ ) : return( obj.__dict__[attr] )
+    raise AttributeError
+
 def objectoutline2ClassesOnly( o, level, name ) :
-    "For internal use only!"
+    """For internal use only!"""
 
     sm = " " * ( 4 * level )
     if( ( type( o ) == types.ClassType ) or ( type( o ) == types.TypeType ) ) :                     # Class old and new style

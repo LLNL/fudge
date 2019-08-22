@@ -1,0 +1,522 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.gnd.productData.multiplicity &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.gnd.productData.multiplicity</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="k">try</span> <span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">numericalFunctions</span> <span class="k">import</span> <span class="n">pointwiseXY_C</span> <span class="k">as</span> <span class="n">pointwiseXY_CModule</span>
+    <span class="n">floatToShortestString</span> <span class="o">=</span> <span class="n">pointwiseXY_CModule</span><span class="o">.</span><span class="n">floatToShortestString</span>
+<span class="k">except</span> <span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pqu</span> <span class="k">import</span> <span class="n">PQU</span> <span class="k">as</span> <span class="n">PQUModule</span>
+    <span class="n">floatToShortestString</span> <span class="o">=</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">floatToShortestString</span>
+
+<span class="kn">from</span> <span class="nn">PoPs</span> <span class="k">import</span> <span class="n">IDs</span> <span class="k">as</span> <span class="n">IDsPoPsModule</span>
+
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">standards</span> <span class="k">as</span> <span class="n">standardsModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">axes</span> <span class="k">as</span> <span class="n">axesModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">constant</span> <span class="k">as</span> <span class="n">constantModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">XYs</span> <span class="k">as</span> <span class="n">XYsModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">series1d</span> <span class="k">as</span> <span class="n">series1dModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">regions</span> <span class="k">as</span> <span class="n">regionsModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">gridded</span> <span class="k">as</span> <span class="n">griddedModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">link</span> <span class="k">as</span> <span class="n">linkModule</span>
+
+<span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="k">import</span> <span class="n">brb</span>
+<span class="kn">from</span> <span class="nn">fudge.gnd</span> <span class="k">import</span> <span class="n">tokens</span> <span class="k">as</span> <span class="n">tokensModule</span>
+<span class="kn">from</span> <span class="nn">fudge.gnd</span> <span class="k">import</span> <span class="n">abstractClasses</span> <span class="k">as</span> <span class="n">abstractClassesModule</span>
+
+<span class="kn">from</span> <span class="nn">fudge.gnd.reactions</span> <span class="k">import</span> <span class="n">base</span> <span class="k">as</span> <span class="n">reactionBaseModule</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<span class="n">energyDependentToken</span> <span class="o">=</span> <span class="s1">&#39;energyDependent&#39;</span>
+
+<div class="viewcode-block" id="defaultAxes"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.defaultAxes">[docs]</a><span class="k">def</span> <span class="nf">defaultAxes</span><span class="p">(</span> <span class="n">energyUnit</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">axes</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axes</span><span class="p">(</span> <span class="n">rank</span> <span class="o">=</span> <span class="mi">2</span> <span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span> <span class="s1">&#39;multiplicity&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span> <span class="s1">&#39;energy_in&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">energyUnit</span> <span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">axes</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="baseMultiplicityForm"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.baseMultiplicityForm">[docs]</a><span class="k">class</span> <span class="nc">baseMultiplicityForm</span><span class="p">(</span> <span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">form</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="unknown"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.unknown">[docs]</a><span class="k">class</span> <span class="nc">unknown</span><span class="p">(</span> <span class="n">baseMultiplicityForm</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">baseMultiplicityForm</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;label must be a string&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">label</span>
+
+<div class="viewcode-block" id="unknown.convertUnits"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.unknown.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="unknown.evaluate"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.unknown.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="mf">0.</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="unknown.getXMLAttribute"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.unknown.getXMLAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">getXMLAttribute</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="unknown.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.unknown.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Linear-linear XYs1d data for multiplicity form </span><span class="si">%s</span><span class="s1"> does not make sense&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="unknown.toXMLList"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.unknown.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">attributeStr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">attributeStr</span> <span class="o">+=</span> <span class="s1">&#39; label=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
+        <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributeStr</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="unknown.parseXMLNode"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.unknown.parseXMLNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">unknown</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">val</span></div></div>
+
+<div class="viewcode-block" id="constant1d"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.constant1d">[docs]</a><span class="k">class</span> <span class="nc">constant1d</span><span class="p">(</span> <span class="n">baseMultiplicityForm</span><span class="p">,</span> <span class="n">constantModule</span><span class="o">.</span><span class="n">constant1d</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">multiplicity</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">baseMultiplicityForm</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="n">constantModule</span><span class="o">.</span><span class="n">constant1d</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">multiplicity</span><span class="p">,</span> <span class="n">domainMin</span><span class="p">,</span> <span class="n">domainMax</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="constant1d.getEnergyLimits"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.constant1d.getEnergyLimits">[docs]</a>    <span class="k">def</span> <span class="nf">getEnergyLimits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span> <span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="constant1d.getXMLAttribute"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.constant1d.getXMLAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">getXMLAttribute</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">integer</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant</span> <span class="o">==</span> <span class="n">integer</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">integer</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">floatToShortestString</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="constant1d.isConstant"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.constant1d.isConstant">[docs]</a>    <span class="k">def</span> <span class="nf">isConstant</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="kc">True</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="constant1d.processMultiGroup"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.constant1d.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">8</span> <span class="p">)</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="constant1d.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.constant1d.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;This method returns the multiplicity as linear-linear XYs1d data which spans self&#39;s domain.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant</span> <span class="p">],</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">constant</span> <span class="p">]</span> <span class="p">],</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="XYs1d"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.XYs1d">[docs]</a><span class="k">class</span> <span class="nc">XYs1d</span><span class="p">(</span> <span class="n">baseMultiplicityForm</span><span class="p">,</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">baseMultiplicityForm</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="XYs1d.getEnergyLimits"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.XYs1d.getEnergyLimits">[docs]</a>    <span class="k">def</span> <span class="nf">getEnergyLimits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs1d.evaluate"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.XYs1d.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">E</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">E</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">E</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">E</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs1d.getXMLAttribute"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.XYs1d.getXMLAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">getXMLAttribute</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">energyDependentToken</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="XYs1d.isConstant"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.XYs1d.isConstant">[docs]</a>    <span class="k">def</span> <span class="nf">isConstant</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rangeMin</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">rangeMax</span></div>
+
+<div class="viewcode-block" id="XYs1d.processMultiGroup"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.XYs1d.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.processing</span> <span class="k">import</span> <span class="n">miscellaneous</span> <span class="k">as</span> <span class="n">miscellaneousModule</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">Multi-grouping XYs1d mutiplicity&#39;</span> <span class="o">%</span> <span class="n">indent</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">miscellaneousModule</span><span class="o">.</span><span class="n">groupFunctionCrossSectionAndFlux</span><span class="p">(</span> <span class="n">gridded1d</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="regions1d"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.regions1d">[docs]</a><span class="k">class</span> <span class="nc">regions1d</span><span class="p">(</span> <span class="n">baseMultiplicityForm</span><span class="p">,</span> <span class="n">regionsModule</span><span class="o">.</span><span class="n">regions1d</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">baseMultiplicityForm</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="n">regionsModule</span><span class="o">.</span><span class="n">regions1d</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="regions1d.getEnergyLimits"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.regions1d.getEnergyLimits">[docs]</a>    <span class="k">def</span> <span class="nf">getEnergyLimits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="regions1d.evaluate"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.regions1d.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">E</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">E</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">E</span> <span class="o">&lt;</span> <span class="n">region</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="k">break</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">region</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">E</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="regions1d.getXMLAttribute"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.regions1d.getXMLAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">getXMLAttribute</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">energyDependentToken</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="regions1d.processMultiGroup"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.regions1d.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span>  <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">8</span> <span class="p">)</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="regions1d.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.regions1d.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;See regionsXYs.toPointwise_withLinearXYs on the use of lowerEps, upperEps.&quot;&quot;&quot;</span>
+
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;removeOverAdjustedPoints&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">xys</span> <span class="o">=</span> <span class="n">regionsModule</span><span class="o">.</span><span class="n">regions1d</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="n">xys</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">xys</span><span class="o">.</span><span class="n">axes</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="reference"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.reference">[docs]</a><span class="k">class</span> <span class="nc">reference</span><span class="p">(</span> <span class="n">linkModule</span><span class="o">.</span><span class="n">link</span><span class="p">,</span> <span class="n">baseMultiplicityForm</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="n">tokensModule</span><span class="o">.</span><span class="n">referenceFormToken</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">link</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">root</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">relative</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">linkModule</span><span class="o">.</span><span class="n">link</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">link</span> <span class="o">=</span> <span class="n">link</span><span class="p">,</span> <span class="n">root</span> <span class="o">=</span> <span class="n">root</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">label</span><span class="p">,</span> <span class="n">relative</span> <span class="o">=</span> <span class="n">relative</span> <span class="p">)</span>
+        <span class="n">baseMultiplicityForm</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">reference</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">link</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unresolved link!&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">link</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="reference.convertUnits"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.reference.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="reference.getEnergyLimits"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.reference.getEnergyLimits">[docs]</a>    <span class="k">def</span> <span class="nf">getEnergyLimits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">getEnergyLimits</span><span class="p">(</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="reference.evaluate"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.reference.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">E</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="reference.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.reference.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="reference.getXMLAttribute"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.reference.getXMLAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">getXMLAttribute</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">getXMLAttribute</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="polynomial"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.polynomial">[docs]</a><span class="k">class</span> <span class="nc">polynomial</span><span class="p">(</span> <span class="n">baseMultiplicityForm</span><span class="p">,</span> <span class="n">series1dModule</span><span class="o">.</span><span class="n">polynomial1d</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">baseMultiplicityForm</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="n">series1dModule</span><span class="o">.</span><span class="n">polynomial1d</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">findClassInAncestry</span><span class="p">(</span> <span class="n">reactionBaseModule</span><span class="o">.</span><span class="n">base_reaction</span> <span class="p">)</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="polynomial.getEnergyLimits"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.polynomial.getEnergyLimits">[docs]</a>    <span class="k">def</span> <span class="nf">getEnergyLimits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span> <span class="p">]</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="polynomial.getXMLAttribute"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.polynomial.getXMLAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">getXMLAttribute</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">energyDependentToken</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="polynomial.processMultiGroup"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.polynomial.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">8</span> <span class="p">)</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="polynomial.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.polynomial.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">xys</span> <span class="o">=</span> <span class="n">series1dModule</span><span class="o">.</span><span class="n">polynomial1d</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="n">xys</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="partialProduction"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.partialProduction">[docs]</a><span class="k">class</span> <span class="nc">partialProduction</span><span class="p">(</span> <span class="n">baseMultiplicityForm</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="n">tokensModule</span><span class="o">.</span><span class="n">partialProductionFormToken</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">baseMultiplicityForm</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;label must be a string&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">label</span>
+
+<div class="viewcode-block" id="partialProduction.evaluate"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.partialProduction.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="partialProduction.getXMLAttribute"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.partialProduction.getXMLAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">getXMLAttribute</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">tokensModule</span><span class="o">.</span><span class="n">partialProductionFormToken</span> <span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="partialProduction.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.partialProduction.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">brb</span><span class="o">.</span><span class="n">objectoutline</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span>
+        <span class="k">raise</span> <span class="s1">&#39;Hell&#39;</span></div>
+
+<div class="viewcode-block" id="partialProduction.toXMLList"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.partialProduction.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">attributeStr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">attributeStr</span> <span class="o">+=</span> <span class="s1">&#39; label=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
+        <span class="k">return</span><span class="p">(</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1"> value=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributeStr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="partialProduction.parseXMLNode"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.partialProduction.parseXMLNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;label&#39;</span> <span class="p">)</span>
+        <span class="n">mult</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;value&#39;</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">mult</span><span class="o">.</span><span class="n">is_integer</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">mult</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">mult</span> <span class="p">)</span>
+        <span class="n">multiplicity</span> <span class="o">=</span> <span class="n">partialProduction</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="n">mult</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">multiplicity</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="gridded1d"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.gridded1d">[docs]</a><span class="k">class</span> <span class="nc">gridded1d</span><span class="p">(</span> <span class="n">baseMultiplicityForm</span><span class="p">,</span> <span class="n">griddedModule</span><span class="o">.</span><span class="n">gridded1d</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">griddedModule</span><span class="o">.</span><span class="n">gridded1d</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="gridded1d.getXMLAttribute"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.gridded1d.getXMLAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">getXMLAttribute</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="n">energyDependentToken</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="parseXMLNode"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.parseXMLNode">[docs]</a><span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">multElement</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Translate an xml &lt;multiplicity&gt; element into fudge.&quot;&quot;&quot;</span>
+
+    <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">multElement</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+    <span class="n">multiplicityComponent</span> <span class="o">=</span> <span class="n">component</span><span class="p">(</span> <span class="p">)</span>
+    <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="n">multElement</span> <span class="p">:</span>
+        <span class="n">formClass</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">unknown</span><span class="o">.</span><span class="n">moniker</span>                 <span class="p">:</span> <span class="n">unknown</span><span class="p">,</span>
+                <span class="n">constant1d</span><span class="o">.</span><span class="n">moniker</span>              <span class="p">:</span> <span class="n">constant1d</span><span class="p">,</span>
+                <span class="n">XYs1d</span><span class="o">.</span><span class="n">moniker</span>                   <span class="p">:</span> <span class="n">XYs1d</span><span class="p">,</span>
+                <span class="n">regions1d</span><span class="o">.</span><span class="n">moniker</span>               <span class="p">:</span> <span class="n">regions1d</span><span class="p">,</span>
+                <span class="n">reference</span><span class="o">.</span><span class="n">moniker</span>               <span class="p">:</span> <span class="n">reference</span><span class="p">,</span>
+                <span class="n">polynomial</span><span class="o">.</span><span class="n">moniker</span>              <span class="p">:</span> <span class="n">polynomial</span><span class="p">,</span>
+                <span class="n">partialProduction</span><span class="o">.</span><span class="n">moniker</span>       <span class="p">:</span> <span class="n">partialProduction</span><span class="p">,</span>
+                <span class="n">gridded1d</span><span class="o">.</span><span class="n">moniker</span>               <span class="p">:</span> <span class="n">gridded1d</span>
+            <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">form</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">formClass</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s2">&quot;encountered unknown multiplicity form: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">form</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">newForm</span> <span class="o">=</span> <span class="n">formClass</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">form</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="n">multiplicityComponent</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">newForm</span> <span class="p">)</span>
+    <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span> <span class="n">multiplicityComponent</span> <span class="p">)</span></div>
+
+<span class="c1">#</span>
+<span class="c1"># multiplicity component</span>
+<span class="c1">#</span>
+<div class="viewcode-block" id="component"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.component">[docs]</a><span class="k">class</span> <span class="nc">component</span><span class="p">(</span> <span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">component</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;multiplicity&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">abstractClassesModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">(</span> <span class="n">unknown</span><span class="p">,</span> <span class="n">constant1d</span><span class="p">,</span> <span class="n">XYs1d</span><span class="p">,</span> <span class="n">regions1d</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">polynomial</span><span class="p">,</span> 
+                <span class="n">partialProduction</span><span class="p">,</span> <span class="n">gridded1d</span> <span class="p">)</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="component.isConstant"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.component.isConstant">[docs]</a>    <span class="k">def</span> <span class="nf">isConstant</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="p">,</span> <span class="n">constant1d</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="component.getConstant"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.component.getConstant">[docs]</a>    <span class="k">def</span> <span class="nf">getConstant</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">isConstant</span><span class="p">()</span>  <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;multiplicity type = &quot;</span><span class="si">%s</span><span class="s1">&quot; is not single valued&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="component.getEnergyLimits"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.component.getEnergyLimits">[docs]</a>    <span class="k">def</span> <span class="nf">getEnergyLimits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">getEnergyLimits</span><span class="p">(</span> <span class="n">EMin</span><span class="p">,</span> <span class="n">EMax</span> <span class="p">)</span> <span class="p">)</span></div>
+        
+<div class="viewcode-block" id="component.evalute"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.component.evalute">[docs]</a>    <span class="k">def</span> <span class="nf">evalute</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">E</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">E</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="component.check"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.component.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
+
+        <span class="kn">from</span> <span class="nn">fudge.gnd</span> <span class="k">import</span> <span class="n">warning</span>
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isConstant</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getConstant</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">negativeMultiplicity</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">getConstant</span><span class="p">(),</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>   <span class="c1"># energy-dependent mult.</span>
+            <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">:</span>
+                <span class="n">domain</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="s1">&#39;domain&#39;</span><span class="p">)</span> <span class="p">:</span>
+                    <span class="n">domain</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">domainMin</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">domainMax</span>
+                <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">domain</span> <span class="o">!=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="c1"># photon multiplicities can start above cross section domainMin, but domainMax should agree:</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">getAncestor</span><span class="p">()</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="n">startRatio</span> <span class="o">=</span> <span class="n">domain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="n">endRatio</span> <span class="o">=</span> <span class="n">domain</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">startRatio</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">floats</span><span class="o">.</span><span class="n">epsilon</span> <span class="ow">or</span> <span class="n">endRatio</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">floats</span><span class="o">.</span><span class="n">epsilon</span>
+                            <span class="ow">or</span> <span class="n">endRatio</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">floats</span><span class="o">.</span><span class="n">epsilon</span><span class="p">):</span>
+                            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">domain_mismatch</span><span class="p">(</span>
+                                <span class="o">*</span><span class="p">(</span><span class="n">domain</span> <span class="o">+</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">]),</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="p">))</span>
+                    <span class="c1"># For all other products, both domainMin and domainMax should agree within epsilon</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">e1</span><span class="p">,</span> <span class="n">e2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">])):</span>
+                            <span class="n">ratio</span> <span class="o">=</span> <span class="n">e1</span> <span class="o">/</span> <span class="n">e2</span>
+                            <span class="k">if</span> <span class="p">(</span><span class="n">ratio</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">floats</span><span class="o">.</span><span class="n">epsilon</span> <span class="ow">or</span> <span class="n">ratio</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">standardsModule</span><span class="o">.</span><span class="n">floats</span><span class="o">.</span><span class="n">epsilon</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="p">(</span> <span class="n">idx</span><span class="o">==</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">domain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">form</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span> <span class="n">domain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">):</span>
+                                    <span class="k">continue</span>    <span class="c1"># multiplicity starting after xsc is ok if first multiplicity point == 0</span>
+                                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warning</span><span class="o">.</span><span class="n">domain_mismatch</span><span class="p">(</span> <span class="o">*</span><span class="p">(</span><span class="n">domain</span> <span class="o">+</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;crossSectionDomain&#39;</span><span class="p">]),</span> <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="p">))</span>
+                                <span class="k">break</span>
+
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">form</span><span class="p">,</span> <span class="s1">&#39;rangeMin&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">form</span><span class="o">.</span><span class="n">rangeMin</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">negativeMultiplicity</span><span class="p">(</span> <span class="n">form</span><span class="o">.</span><span class="n">rangeMin</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="n">form</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="component.getXMLAttribute"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.multiplicity.component.getXMLAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">getXMLAttribute</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluated</span><span class="o">.</span><span class="n">getXMLAttribute</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

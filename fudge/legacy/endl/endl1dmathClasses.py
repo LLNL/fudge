@@ -106,7 +106,7 @@ class endl1dmath :
     def __init__( self, data = None, checkDataType = False, yLabel = None, label = "unknown", toFloat = 0 ) :
         """Returns an endl1dmath object. Data must be a python list of numbers (e.g., [ number, number, ..., number ])."""
 
-        if( data == None ) : data = []
+        if( data is None ) : data = []
         self.data = endl1dmathmisc.get1dmathData( data, "endl1dmath.__init__", "data" )
         if ( checkDataType ) : endl1dmathmisc.check1dData( data )
         self.columns = 1
@@ -127,12 +127,12 @@ class endl1dmath :
         self.data[i] = v
 
     def __len__( self ) :
-        "Returns the number of points in self's data (i.e., return len( self.data ))."
+        """Returns the number of points in self's data (i.e., return len( self.data ))."""
 
         return len( self.data )
 
     def __repr__( self ) :
-        "Returns a printable string of self's data. Uses endl1dmathmisc.endl1d_repr_xFormat to convert each point to a string."
+        """Returns a printable string of self's data. Uses endl1dmathmisc.endl1d_repr_xFormat to convert each point to a string."""
 
         s = ""
         for v in self.data : s = s + endl1dmathmisc.endl1d_repr_xFormat % v + "\n"
@@ -146,7 +146,7 @@ class endl1dmath :
         return( 1 )
 
     def __neg__( self ) :
-        "Returns an endl1dmath object whose points are the negation of self's points."
+        """Returns an endl1dmath object whose points are the negation of self's points."""
 
         d = []
         for i in range( len( self.data ) ) : d.append( -self.data[i] )
@@ -283,8 +283,8 @@ class endl1dmath :
         ===== =============
         """
 
-        if( xLabel == None ) : xLabel = 'indice'
-        if( yLabel == None ) : yLabel = self.yLabel
+        if( xLabel is None ) : xLabel = 'indice'
+        if( yLabel is None ) : yLabel = self.yLabel
         dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title )
         f = fudgeFileMisc.fudgeTempFile( )
         i = 0
@@ -311,10 +311,10 @@ class endl1dmath :
         """
         import Gnuplot
         xylog = int( xylog )            # Allow argument to be a string
-        if( xMin != None ) : xMin = float( xMin )
-        if( xMax != None ) : xMax = float( xMax )
-        if( yMin != None ) : yMin = float( yMin )
-        if( yMax != None ) : yMax = float( yMax )
+        if( xMin is not None ) : xMin = float( xMin )
+        if( xMax is not None ) : xMax = float( xMax )
+        if( yMin is not None ) : yMin = float( yMin )
+        if( yMax is not None ) : yMax = float( yMax )
 
         self.g = Gnuplot.Gnuplot( )
         self.g( 'set style data linespoints' )
@@ -326,21 +326,21 @@ class endl1dmath :
         if   ( xylog == 1 ) : self.g( 'set logscale x' )
         elif ( xylog == 2 ) : self.g( 'set logscale y' )
         elif ( xylog == 3 ) : self.g( 'set logscale xy' )
-        if ( xMin != None ) or ( xMax != None ) :
+        if ( xMin is not None ) or ( xMax is not None ) :
             xMin = `xMin`
             if ( xMin == "None" ) : xMin = "*"
             xMax = `xMax`
             if ( xMax == "None" ) : xMax = "*"
             self.g( "set xrange [ %s : %s ]" % ( xMin, xMax ) )
-        if ( yMin != None ) or ( yMax != None ) :
+        if ( yMin is not None ) or ( yMax is not None ) :
             yMin = `yMin`
             if ( yMin == "None" ) : yMin = "*"
             yMax = `yMax`
             if ( yMax == "None" ) : yMax = "*"
             self.g( "set yrange [ %s : %s ]" % ( yMin, yMax ) )
-        if ( xLabel != None ) : self.g( "set xlabel %s" % xLabel )
-        if ( yLabel != None ) : self.g( "set ylabel %s" % yLabel )
-        if ( title  != None ) : self.g( "set title %s" % `title` )
+        if ( xLabel is not None ) : self.g( "set xlabel %s" % xLabel )
+        if ( yLabel is not None ) : self.g( "set ylabel %s" % yLabel )
+        if ( title  is not None ) : self.g( "set title %s" % `title` )
         d = []
         i = 0
         for v in self.data :
@@ -372,7 +372,7 @@ class endl1dmath :
         "Returns the string returned by the endl1dmath's __repr__ function."
 
         endl1d_repr_xFormat = endl1dmathmisc.endl1d_repr_xFormat
-        if( format != None ) : endl1dmathmisc.endl1d_repr_xFormat = format
+        if( format is not None ) : endl1dmathmisc.endl1d_repr_xFormat = format
         s = endl1dmath.__repr__( self )
         endl1dmathmisc.endl1d_repr_xFormat = endl1d_repr_xFormat
         return( s )

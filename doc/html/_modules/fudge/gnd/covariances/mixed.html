@@ -1,0 +1,389 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.gnd.covariances.mixed &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.gnd.covariances.mixed</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">from</span> <span class="nn">xData.ancestry</span> <span class="k">import</span> <span class="n">ancestry</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">gridded</span> <span class="k">as</span> <span class="n">griddedModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">axes</span> <span class="k">as</span> <span class="n">axesModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">link</span> <span class="k">as</span> <span class="n">linkModule</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<div class="viewcode-block" id="mixedForm"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm">[docs]</a><span class="k">class</span> <span class="nc">mixedForm</span><span class="p">(</span> <span class="n">ancestry</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Covariance for a single quantity, stored as several separate matrices that must be summed together.</span>
+<span class="sd">    In general, the energy bounds for these matrices can overlap (unlike regions1d cross section data). </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;mixed&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">components</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">ancestry</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="n">components</span> <span class="ow">or</span> <span class="p">[]</span> <span class="c1">#: a Python list containing instances of ``mixedForm``, ``summedCovariance``, and ``covarianceMatrix``</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="p">)</span>
+
+    <span class="nd">@label</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">label</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;label must be a string&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">label</span>
+
+<div class="viewcode-block" id="mixedForm.getRowBounds"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm.getRowBounds">[docs]</a>    <span class="k">def</span> <span class="nf">getRowBounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the bounds of the row. If unit is specified, return the bounds in that unit.</span>
+<span class="sd">        Otherwise, take unit from first sub-matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span>
+        <span class="n">allbounds</span> <span class="o">=</span> <span class="p">[</span> <span class="n">c</span><span class="o">.</span><span class="n">getRowBounds</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span> <span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">min</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">allbounds</span><span class="p">]),</span><span class="nb">max</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">allbounds</span><span class="p">]))</span></div>
+    
+<div class="viewcode-block" id="mixedForm.getColumnBounds"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm.getColumnBounds">[docs]</a>    <span class="k">def</span> <span class="nf">getColumnBounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">unit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the bounds of the column.  If unit is specified, return the bounds in that unit.</span>
+<span class="sd">        Otherwise, take unit from the first sub-matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">unit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">unit</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span>
+        <span class="n">allbounds</span> <span class="o">=</span> <span class="p">[</span> <span class="n">c</span><span class="o">.</span><span class="n">getColumnBounds</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span> <span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">min</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">allbounds</span><span class="p">]),</span><span class="nb">max</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">allbounds</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="mixedForm.check"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span> 
+        <span class="kn">from</span> <span class="nn">fudge.gnd</span> <span class="k">import</span> <span class="n">warning</span>
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+            <span class="n">componentWarnings</span> <span class="o">=</span> <span class="n">component</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">componentWarnings</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s1">&#39;Component </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">component</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">componentWarnings</span><span class="p">)</span> <span class="p">)</span>
+        
+        <span class="c1">#if warnings:</span>
+        <span class="c1">#    warnings = [warning.context(&#39;Section &quot;%s&quot;: %s&#39; % (self.id, form), warnings)]</span>
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="mixedForm.convertUnits"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">):</span>
+
+        <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span> <span class="n">component</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+        
+<div class="viewcode-block" id="mixedForm.fix"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm.fix">[docs]</a>    <span class="k">def</span> <span class="nf">fix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span> <span class="p">):</span> 
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">:</span> <span class="n">warnings</span> <span class="o">+=</span> <span class="n">comp</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span> <span class="o">**</span><span class="n">kw</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="mixedForm.plot"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">scalelabel</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlog</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ylog</span><span class="o">=</span><span class="kc">False</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">scalelabel</span><span class="o">=</span><span class="n">scalelabel</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="n">xlim</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="n">ylim</span><span class="p">,</span> <span class="n">xlog</span><span class="o">=</span><span class="n">xlog</span><span class="p">,</span> <span class="n">ylog</span><span class="o">=</span><span class="n">ylog</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="mixedForm.addComponent"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm.addComponent">[docs]</a>    <span class="k">def</span> <span class="nf">addComponent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">covariance</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;:param covariance: an instance of covariance (or inherited class)&#39;&#39;&#39;</span>
+        <span class="n">covariance</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">covariance</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="mixedForm.getMatchingComponent"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm.getMatchingComponent">[docs]</a>    <span class="k">def</span> <span class="nf">getMatchingComponent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">rowBounds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">columnBounds</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :param rowBounds:</span>
+<span class="sd">        :param columnBounds:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">gotRow</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">comp</span><span class="o">.</span><span class="n">getRowBounds</span><span class="p">()</span> <span class="o">==</span> <span class="n">rowBounds</span><span class="p">:</span>
+                <span class="n">gotRow</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="n">comp</span><span class="o">.</span><span class="n">getColumnBounds</span><span class="p">()</span> <span class="o">==</span> <span class="n">columnBounds</span><span class="p">:</span> <span class="k">return</span> <span class="n">comp</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">gotRow</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;No component with row bounds matching </span><span class="si">%s</span><span class="s2"> found&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">rowBounds</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;No component with column bounds matching </span><span class="si">%s</span><span class="s2"> found&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">columnBounds</span><span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="mixedForm.makeSafeBounds"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm.makeSafeBounds">[docs]</a>    <span class="k">def</span> <span class="nf">makeSafeBounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Go through all the components and make sure the bounds don&#39;t overlap.  If they do, it is likely a bug.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="kn">import</span> <span class="nn">fudge.gnd.covariances.base</span> <span class="k">as</span> <span class="nn">base</span>
+        <span class="n">itWorked</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">ic</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">c0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="n">ic</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">c0</span><span class="o">.</span><span class="n">getRowBounds</span><span class="p">()</span> <span class="o">!=</span> <span class="n">c0</span><span class="o">.</span><span class="n">getColumnBounds</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;All components must have their row and column covarianceAxes matching.&quot;</span><span class="p">)</span>
+            <span class="n">c1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="n">ic</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">c1</span><span class="o">.</span><span class="n">getRowBounds</span><span class="p">()</span> <span class="o">!=</span> <span class="n">c1</span><span class="o">.</span><span class="n">getColumnBounds</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;All components must have their row and column covarianceAxes matching.&quot;</span><span class="p">)</span>
+            <span class="n">itWorked</span> <span class="o">=</span> <span class="n">c0</span><span class="o">.</span><span class="n">getRowBounds</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">c1</span><span class="o">.</span><span class="n">getRowBounds</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">itWorked</span><span class="p">:</span> <span class="c1"># uh oh</span>
+                <span class="c1"># Try to fix c0</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c0</span><span class="p">,</span><span class="n">base</span><span class="o">.</span><span class="n">covarianceMatrix</span><span class="p">):</span>
+                    <span class="n">c0</span><span class="o">.</span><span class="n">removeExtraZeros</span><span class="p">()</span>
+                    <span class="n">itWorked</span> <span class="o">=</span> <span class="n">c0</span><span class="o">.</span><span class="n">getRowBounds</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">c1</span><span class="o">.</span><span class="n">getRowBounds</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">itWorked</span><span class="p">:</span> <span class="c1"># double uh oh</span>
+                <span class="c1"># Try to fix c1</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span><span class="n">base</span><span class="o">.</span><span class="n">covarianceMatrix</span><span class="p">):</span>
+                    <span class="n">c1</span><span class="o">.</span><span class="n">removeExtraZeros</span><span class="p">()</span>
+                    <span class="n">itWorked</span> <span class="o">=</span> <span class="n">c0</span><span class="o">.</span><span class="n">getRowBounds</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">c1</span><span class="o">.</span><span class="n">getRowBounds</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">itWorked</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Bounds between components </span><span class="si">%i</span><span class="s2"> and </span><span class="si">%i</span><span class="s2"> overlap: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">ic</span><span class="p">,</span><span class="n">ic</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">getRowBounds</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">])))</span></div>
+                
+<div class="viewcode-block" id="mixedForm.getUncertaintyVector"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm.getUncertaintyVector">[docs]</a>    <span class="k">def</span> <span class="nf">getUncertaintyVector</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">theData</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="kc">True</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combines all subsections into single uncertainty vector, converting to relative if requested.</span>
+
+<span class="sd">        :returns: an XYs1d instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">getUncertaintyVector</span><span class="p">(</span><span class="n">theData</span><span class="o">=</span><span class="n">theData</span><span class="p">,</span><span class="n">relative</span><span class="o">=</span><span class="n">relative</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="mixedForm.getCorrelationMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm.getCorrelationMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">getCorrelationMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">getCorrelationMatrix</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="mixedForm.toCovarianceMatrix"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm.toCovarianceMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">toCovarianceMatrix</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;composed&quot;</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sum all parts together to build a single matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span>
+        <span class="kn">import</span> <span class="nn">fudge.gnd.covariances.base</span> <span class="k">as</span> <span class="nn">base</span>
+        <span class="kn">import</span> <span class="nn">numpy</span>
+        <span class="kn">import</span> <span class="nn">xData.values</span> <span class="k">as</span> <span class="nn">valuesModule</span>
+        <span class="kn">import</span> <span class="nn">xData.array</span> <span class="k">as</span> <span class="nn">arrayModule</span>
+
+        <span class="c1"># Set up common data using first component</span>
+        <span class="n">firstCovMtx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">firstCovMtx</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">covarianceMatrix</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Shoudd have gotten base.covarianceMatrix, instead got </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">firstCovMtx</span><span class="o">.</span><span class="n">__class__</span><span class="p">))</span>
+        <span class="n">commonRowAxis</span> <span class="o">=</span> <span class="n">firstCovMtx</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">([])</span><span class="c1">#FIXME: unresolvedLinks are still unresolved!</span>
+        <span class="k">if</span> <span class="n">firstCovMtx</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">style</span><span class="o">==</span><span class="s1">&#39;link&#39;</span><span class="p">:</span>
+            <span class="n">commonColAxis</span> <span class="o">=</span> <span class="n">firstCovMtx</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">([])</span><span class="c1">#FIXME: unresolvedLinks are still unresolved!</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">commonColAxis</span> <span class="o">=</span> <span class="n">firstCovMtx</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">([])</span><span class="c1">#FIXME: unresolvedLinks are still unresolved!</span>
+        <span class="n">commonMatrixAxis</span> <span class="o">=</span> <span class="n">firstCovMtx</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">.</span><span class="n">copy</span><span class="p">([])</span><span class="c1">#FIXME: unresolvedLinks are still unresolved!</span>
+        <span class="n">commonType</span> <span class="o">=</span> <span class="n">firstCovMtx</span><span class="o">.</span><span class="n">type</span>
+
+        <span class="c1"># We need all the covariances to be either absolute or relative</span>
+        <span class="k">def</span> <span class="nf">make_common_type</span><span class="p">(</span><span class="n">cm</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">commonType</span> <span class="o">==</span> <span class="s1">&#39;relative&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="n">cm</span><span class="o">.</span><span class="n">toRelative</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="n">cm</span><span class="o">.</span><span class="n">toAbsolute</span><span class="p">()</span>
+
+        <span class="c1"># We&#39;re going to have to merge grids, so we&#39;ll need this function to do the dirty work</span>
+        <span class="k">def</span> <span class="nf">add_values</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="n">v2</span><span class="p">):</span>
+            <span class="n">v</span><span class="o">=</span><span class="nb">set</span><span class="p">()</span>
+            <span class="n">v</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">v1</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="n">v</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">v2</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">valuesModule</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+
+        <span class="c1"># First pass through components is to collect bins to set up the common grid + do assorted checking</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">cc</span> <span class="o">=</span> <span class="n">make_common_type</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">())</span> <span class="c1"># a little recursion to take care of nested covariances</span>
+            <span class="k">if</span> <span class="n">cc</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">commonType</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span> <span class="s2">&quot;Incompatible types in </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2"> vs. </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="n">commonType</span><span class="p">,</span> <span class="n">cc</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">cc</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="o">!=</span>  <span class="n">commonMatrixAxis</span><span class="o">.</span><span class="n">unit</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;covariance matrix components with different units?!? </span><span class="si">%s</span><span class="s2"> vs. </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">cc</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">commonMatrixAxis</span><span class="o">.</span><span class="n">unit</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">cc</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">style</span> <span class="o">!=</span> <span class="s1">&#39;link&#39;</span><span class="p">:</span> <span class="n">cc</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">convertToUnit</span><span class="p">(</span><span class="n">commonColAxis</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+            <span class="n">cc</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">convertToUnit</span><span class="p">(</span><span class="n">commonRowAxis</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+            <span class="n">commonRowAxis</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">add_values</span><span class="p">(</span><span class="n">commonRowAxis</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">cc</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cc</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">style</span> <span class="o">==</span> <span class="s1">&#39;link&#39;</span><span class="p">:</span> <span class="n">commonColAxis</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">add_values</span><span class="p">(</span><span class="n">commonColAxis</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">cc</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>                                 <span class="n">commonColAxis</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">add_values</span><span class="p">(</span><span class="n">commonColAxis</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">cc</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+        <span class="c1"># Now sum up the components</span>
+        <span class="n">commonMatrix</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mat</span><span class="p">(</span> <span class="n">firstCovMtx</span><span class="o">.</span><span class="n">group</span><span class="p">(</span> <span class="p">(</span> <span class="n">commonRowAxis</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">commonColAxis</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">values</span> <span class="p">),</span> <span class="p">(</span> <span class="n">commonRowAxis</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">commonColAxis</span><span class="o">.</span><span class="n">unit</span> <span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">constructArray</span><span class="p">()</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">cc</span> <span class="o">=</span> <span class="n">make_common_type</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">())</span> <span class="c1"># a little recursion to take care of nested covariances</span>
+            <span class="n">commonMatrix</span> <span class="o">+=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mat</span><span class="p">(</span> <span class="n">cc</span><span class="o">.</span><span class="n">group</span><span class="p">(</span> <span class="p">(</span> <span class="n">commonRowAxis</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">commonColAxis</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">values</span> <span class="p">),</span> <span class="p">(</span> <span class="n">commonRowAxis</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span> <span class="n">commonColAxis</span><span class="o">.</span><span class="n">unit</span> <span class="p">)</span> <span class="p">)</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">constructArray</span><span class="p">()</span> <span class="p">)</span>
+
+        <span class="c1"># Now create the instance of the resulting covarianceMatrix</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span> <span class="p">[</span><span class="n">component</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">style</span> <span class="o">==</span> <span class="s1">&#39;link&#39;</span> <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span> <span class="p">]</span> <span class="p">):</span>  <span class="n">commonColAxis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">([])</span><span class="c1">#FIXME: unresolvedLinks are still unresolved!</span>
+        <span class="n">newAxes</span><span class="o">=</span><span class="n">axesModule</span><span class="o">.</span><span class="n">axes</span><span class="p">(</span>
+                <span class="n">labelsUnits</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span> <span class="p">:</span> <span class="p">(</span><span class="n">commonMatrixAxis</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">commonMatrixAxis</span><span class="o">.</span><span class="n">unit</span><span class="p">),</span>
+                             <span class="mi">1</span> <span class="p">:</span> <span class="p">(</span><span class="n">commonColAxis</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">commonColAxis</span><span class="o">.</span><span class="n">unit</span><span class="p">),</span>
+                             <span class="mi">2</span> <span class="p">:</span> <span class="p">(</span><span class="n">commonRowAxis</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">commonRowAxis</span><span class="o">.</span><span class="n">unit</span><span class="p">)}</span> <span class="p">)</span>
+        <span class="n">newAxes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">commonRowAxis</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">commonRowAxis</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">commonRowAxis</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span>
+                                  <span class="n">style</span><span class="o">=</span><span class="n">axesModule</span><span class="o">.</span><span class="n">boundariesGridToken</span><span class="p">,</span>
+                                  <span class="n">values</span><span class="o">=</span><span class="n">commonRowAxis</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">newAxes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">commonColAxis</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">commonColAxis</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">commonColAxis</span><span class="o">.</span><span class="n">unit</span><span class="p">,</span>
+                              <span class="n">style</span><span class="o">=</span><span class="n">axesModule</span><span class="o">.</span><span class="n">linkGridToken</span><span class="p">,</span>
+                              <span class="n">values</span><span class="o">=</span><span class="n">linkModule</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">link</span><span class="o">=</span><span class="n">commonRowAxis</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="n">newAxes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="n">commonMatrixAxis</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">commonMatrixAxis</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">commonMatrixAxis</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+        <span class="n">trigdata</span> <span class="o">=</span> <span class="n">commonMatrix</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">tri</span><span class="p">(</span><span class="n">commonMatrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">==</span><span class="mf">1.0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">gridded</span> <span class="o">=</span> <span class="n">griddedModule</span><span class="o">.</span><span class="n">gridded2d</span><span class="p">(</span> <span class="n">axes</span><span class="o">=</span><span class="n">newAxes</span><span class="p">,</span> <span class="n">array</span><span class="o">=</span><span class="n">arrayModule</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">commonMatrix</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">trigdata</span><span class="p">,</span> <span class="n">symmetry</span><span class="o">=</span><span class="n">arrayModule</span><span class="o">.</span><span class="n">symmetryLowerToken</span><span class="p">))</span>
+        <span class="n">newCov</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">covarianceMatrix</span><span class="p">(</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">commonType</span><span class="p">,</span> <span class="n">matrix</span><span class="o">=</span><span class="n">gridded</span> <span class="p">)</span>
+        <span class="n">newCov</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">newCov</span></div>
+
+<div class="viewcode-block" id="mixedForm.toAbsolute"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm.toAbsolute">[docs]</a>    <span class="k">def</span> <span class="nf">toAbsolute</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">rowData</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colData</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Rescales self (if it is a relative covariance) using XYs1d rowData and colData</span>
+<span class="sd">        to convert self into an absolute covariance matrix.</span>
+<span class="sd">        </span>
+<span class="sd">        :param rowData: an XYs1d instance containing data to rescale covariance in the &quot;row direction&quot;</span>
+<span class="sd">        :param colData: an XYs1d instance containing data to rescale covariance in the &quot;col direction&quot;</span>
+<span class="sd">            </span>
+<span class="sd">        .. note::   If the column axis is set to &#39;mirrorOtherAxis&#39;, only rowData is needed.  </span>
+<span class="sd">                    If neither rowData nor colData are specified, you&#39;d better hope that the covariance is already </span>
+<span class="sd">                    absolute because this will throw an error.</span>
+<span class="sd">            </span>
+<span class="sd">        :returns: a copy of self, but rescaled and with the type set to absoluteToken</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+<span class="c1">#            if isinstance( c, summedCovariance ): </span>
+                <span class="c1"># If the covariance is summed, a call to toCovarianceMatrix() should add up</span>
+                <span class="c1"># the pointed-to covariances (if they are the same type (relative vs. absolute)),</span>
+                <span class="c1"># allowing us to do a toAbsolute() call with the correct row or column data</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">addComponent</span><span class="p">(</span> <span class="n">c</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">toAbsolute</span><span class="p">(</span> <span class="n">rowData</span><span class="p">,</span> <span class="n">colData</span> <span class="p">)</span> <span class="p">)</span>
+<span class="c1">#            else: result.components.append( c.toAbsolute( rowData, colData ) )</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+        
+<div class="viewcode-block" id="mixedForm.toRelative"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm.toRelative">[docs]</a>    <span class="k">def</span> <span class="nf">toRelative</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;composed&quot;</span><span class="p">,</span> <span class="n">rowData</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colData</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Rescales self (if it is a absolute covariance) using XYs1d rowData and colData</span>
+<span class="sd">        to convert self into a relative covariance matrix.</span>
+<span class="sd">        </span>
+<span class="sd">        :param rowData: an XYs1d instance containing data to rescale covariance in the &quot;row direction&quot;</span>
+<span class="sd">        :param colData: an XYs1d instance containing data to rescale covariance in the &quot;col direction&quot;</span>
+<span class="sd">            </span>
+<span class="sd">        .. note::   If the column axis is set to &#39;mirrorOtherAxis&#39;, only rowData is needed.  </span>
+<span class="sd">                    If neither rowData nor colData are specified, you&#39;d better hope that the covariance is already </span>
+<span class="sd">                    relative because this will throw an error.</span>
+<span class="sd">            </span>
+<span class="sd">        :returns: a copy of self, but rescaled and with the type set to relativeToken</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+<span class="c1">#            if isinstance( c, summedCovariance ): </span>
+                <span class="c1"># If the covariance is summed, a call to toCovarianceMatrix() should add up</span>
+                <span class="c1"># the pointed-to covariances (if they are the same type (relative vs. absolute)),</span>
+                <span class="c1"># allowing us to do a toRelative() call with the correct row or column data</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">addComponent</span><span class="p">(</span> <span class="n">c</span><span class="o">.</span><span class="n">toCovarianceMatrix</span><span class="p">()</span><span class="o">.</span><span class="n">toRelative</span><span class="p">(</span> <span class="n">rowData</span><span class="p">,</span> <span class="n">colData</span> <span class="p">)</span> <span class="p">)</span>
+<span class="c1">#            else: result.components.append( c.toRelative( rowData, colData ) )</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="mixedForm.toXMLList"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> label=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="k">for</span> <span class="n">covariance</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+            <span class="n">xmlString</span> <span class="o">+=</span> <span class="n">covariance</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span> <span class="n">xmlString</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="mixedForm.parseXMLNode"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.covariances.html#fudge.gnd.covariances.mixed.mixedForm.parseXMLNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Translate &lt;mixed&gt; element from xml.&quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">fudge.gnd.covariances.base</span> <span class="k">as</span> <span class="nn">base</span>
+        <span class="kn">import</span> <span class="nn">fudge.gnd.covariances.summed</span> <span class="k">as</span> <span class="nn">summed</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+        <span class="n">mixed_</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span> <span class="n">label</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s2">&quot;label&quot;</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
+            <span class="n">formClass</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">base</span><span class="o">.</span><span class="n">covarianceMatrix</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">base</span><span class="o">.</span><span class="n">covarianceMatrix</span><span class="p">,</span>
+                    <span class="n">summed</span><span class="o">.</span><span class="n">summedCovariance</span><span class="o">.</span><span class="n">moniker</span><span class="p">:</span> <span class="n">summed</span><span class="o">.</span><span class="n">summedCovariance</span><span class="p">,</span>
+                    <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">formClass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;encountered unknown covariance matrix form &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+            <span class="n">mixed_</span><span class="o">.</span><span class="n">addComponent</span><span class="p">(</span> <span class="n">formClass</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">form</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">mixed_</span><span class="o">.</span><span class="n">components</span> <span class="p">):</span> <span class="n">form</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">mixed_</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

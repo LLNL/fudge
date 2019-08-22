@@ -77,5 +77,3 @@ import resonances
 import styles
 import suites
 import sums
-import xParticle
-import xParticleList

@@ -114,18 +114,18 @@ class endl3dmath :
         """Creates an endl3dmath instance.  Data must be of type list[ number, list[ number, number ] ].
         The default plotting labels can be set with xLabel, yLabel and zLabel."""
 
-        if( data == None ) : data = []
+        if( data is None ) : data = []
         if( interpolation != 0 ) : raise Exception( "\nError in endl3dmath.__init__: Bad interpolation value = %s" % `interpolation` )
         self.interpolation = interpolation
         self.data = endl3dmathmisc.get3dmathData( data, 'endl3dmath.__init__', 'data' )
-        if ( template != None ) : endl3dmathmisc.valid3dClassType( template, "endl3dmath.__init__", "template" )
+        if ( template is not None ) : endl3dmathmisc.valid3dClassType( template, "endl3dmath.__init__", "template" )
         self.columns = 3
         self.xLabel = xLabel
-        if ( ( template != None ) and ( xLabel == None ) ) : self.xLabel = template.xLabel
+        if ( ( template is not None ) and ( xLabel is None ) ) : self.xLabel = template.xLabel
         self.yLabel = yLabel
-        if ( ( template != None ) and ( yLabel == None ) ) : self.yLabel = template.yLabel
+        if ( ( template is not None ) and ( yLabel is None ) ) : self.yLabel = template.yLabel
         self.zLabel = zLabel
-        if ( ( template != None ) and ( zLabel == None ) ) : self.zLabel = template.zLabel
+        if ( ( template is not None ) and ( zLabel is None ) ) : self.zLabel = template.zLabel
         self.label = label
         if(   self.interpolation == 0 ) :
             self.xInterpolation = 'linear,linear,linear'
@@ -268,7 +268,7 @@ class endl3dmath :
         return endl3dmath( d3, checkDataType = 0, template = self )
 
     def copyDataToW_XYs( self, wUnit = None, xUnit = None, yUnit = None ) :
-        "A function designed to work with fudgeMultiPlots.py. Not for general use."
+        """A function designed to work with fudgeMultiPlots.py. Not for general use."""
 
         import copy
 
@@ -321,12 +321,12 @@ class endl3dmath :
         return( endl2dmath_atX.getValue( y ) )
 
     def toString( self, format = None ) :
-        "Returns the string returned by the endl3dmath's __repr__ function. This can be useful when endl3dmath is used as a base class."
+        """Returns the string returned by the endl3dmath's __repr__ function. This can be useful when endl3dmath is used as a base class."""
 
         endl3d_repr_xFormat = endl3dmathmisc.endl3d_repr_xFormat
         endl3d_repr_yFormat = endl3dmathmisc.endl3d_repr_yFormat
         endl3d_repr_zFormat = endl3dmathmisc.endl3d_repr_zFormat
-        if( format != None ) :
+        if( format is not None ) :
             endl3dmathmisc.endl3d_repr_xFormat = format 
             endl3dmathmisc.endl3d_repr_yFormat = format
             endl3dmathmisc.endl3d_repr_zFormat = format
@@ -366,9 +366,9 @@ class endl3dmath :
               7     log-log-log
         """
 
-        if ( xLabel == None ) and ( self.xLabel != None ) : xLabel = self.xLabel
-        if ( yLabel == None ) and ( self.yLabel != None ) : yLabel = self.yLabel
-        if ( zLabel == None ) and ( self.zLabel != None ) : zLabel = self.zLabel
+        if ( xLabel is None ) and ( self.xLabel is not None ) : xLabel = self.xLabel
+        if ( yLabel is None ) and ( self.yLabel is not None ) : yLabel = self.yLabel
+        if ( zLabel is None ) and ( self.zLabel is not None ) : zLabel = self.zLabel
         dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title, zMin = zMin, zMax = zMax, zLabel = zLabel, \
             xrot = xrot, zrot = zrot )
         f = fudgeFileMisc.fudgeTempFile( )
@@ -379,26 +379,26 @@ class endl3dmath :
         subprocessing.spawn( s )
 
     def xArray( self ) :
-        "Returns an endl1dmath instances of the x values in self."
+        """Returns an endl1dmath instances of the x values in self."""
 
         xa = []
         for xy in self.data : xa.append( xy[0] )
         return endl1dmathClasses.endl1dmath( xa )
 
     def xMax( self ) :
-        "Returns the maximum x value of self if self contains data, otherwise it returns None."
+        """Returns the maximum x value of self if self contains data, otherwise it returns None."""
 
         if ( len( self.data ) > 0 ) : return self.data[-1][0]
         return None
 
     def xMin( self ) :
-        "Returns the minimum x value of self if self contains data, otherwise it returns None."
+        """Returns the minimum x value of self if self contains data, otherwise it returns None."""
 
         if ( len( self.data ) > 0 ) : return self.data[0][0]
         return None
 
     def copyDataToGridWsAndXsAndYs( self ) :
-        "A method to be like the W_XYs' method of the same name. Used in the vis.matplotlib.plot2d module."""
+        """A method to be like the W_XYs' method of the same name. Used in the vis.matplotlib.plot2d module."""
 
         xs = [ x for x, yzs in self.data ]
         ys = set( )

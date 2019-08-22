@@ -62,115 +62,203 @@
 # <<END-copyright>>
 
 import sys
+import fractions
 
-from pqu import PQU
+from pqu import PQU as PQUModule
 from xData import standards as standardsModule
 
+from PoPs import IDs as IDsPoPsModule
+from PoPs.quantities import quantity as quantityModule
+from PoPs.quantities import mass as massModule
+from PoPs.quantities import spin as spinModule
+from PoPs.quantities import charge as chargeModule
+from PoPs.quantities import parity as parityModule
+from PoPs.quantities import halflife as halflifeModule
+from PoPs.quantities import nuclearEnergyLevel as nuclearEnergyLevelModule
+from PoPs.families import gaugeBoson as gaugeBosonModule
+from PoPs.families import lepton as leptonModule
+from PoPs.families import baryon as baryonModule
+from PoPs.families import nuclearLevel as nuclearLevelModule
+from PoPs.families import nucleus as nucleusModule
+from PoPs.families import unorthodox as unorthodoxModule
+from PoPs.groups import chemicalElement as chemicalElementModule
+
 from fudge import gnd
-from fudge.structure import masses as massModule
-from fudge.legacy.endl import endl2
 from fudge.core.utilities import brb
 from fudge.core.math import fudgemath
 
-from fudge.gnd.productData.distributions import unspecified as unspecifiedModule
+from fudge.gnd.productData import multiplicity as multiplicityModule
+from fudge.gnd.channelData import Q as QModule
 
-def getTypeName( info, ZA, name = None, levelIndex = None, level = 0., levelUnit = 'MeV' ) :
-    """Returns the name for this ZA and level if present. Returned name is of the form Am_242, Am_242_m1, Am_242_e2.
-    levelIndex must be None, 'c', 's' or an integer > 0."""
+from fudge.gnd.productData.distributions import unspecified as unspecifiedModule
+from fudge.gnd.productData.distributions import unknown as unknownModule
+
+import massTracker as massTrackerModule
+
+def ZAToName( ZA ) :
+
+    if( ZA == 99120 ) : return( 'FissionProductENDL99120' )
+    if( ZA == 99125 ) : return( 'FissionProductENDL99125' )
+    ZSymbol = chemicalElementModule.symbolFromZ[ZA/1000]
+    return( "%s%s" % ( ZSymbol, ZA % 1000 ) )
+
+def addParticleData( particle, info, massValue, spinValue, parityValue, chargeValue, halflifeValue ) :
+
+    if( massValue is not None ) :
+        mass = massModule.double( info.PoPsLabel, massValue, quantityModule.stringToPhysicalUnit( 'amu' ) )
+        particle.mass.add( mass )
+
+    if( spinValue is not None ) :
+        spin = spinModule.fraction( info.PoPsLabel, fractions.Fraction( spinValue ), spinModule.baseUnit )
+        particle.spin.add( spin )
+
+    if( parityValue is not None ) :
+        parity = parityModule.integer( info.PoPsLabel, parityValue, parityModule.baseUnit )
+        particle.parity.add( parity )
+
+    if( chargeValue is not None ) :
+        charge = chargeModule.integer( info.PoPsLabel, chargeValue, chargeModule.baseUnit )
+        particle.charge.add( charge )
+
+    if( halflifeValue is not None ) :
+        if( isinstance( halflifeValue, str ) ) :
+            halflife = halflifeModule.string( info.PoPsLabel, halflifeValue, halflifeModule.baseUnit )
+        else :
+            halflife = halflifeModule.double( info.PoPsLabel, halflifeValue, halflifeModule.baseUnit )
+        particle.halflife.add( halflife )
+
+def addNucleusInfoForLightNuclei( ZA, nucleus, info ) :
+
+    spinValue, parityValue, halflifeValue = None, None, None
+    if( ZA == 1001 ) :
+        spinValue, parityValue, halflifeValue = '1/2', 1, 'stable'
+    elif( ZA == 1002 ) :
+        spinValue, parityValue, halflifeValue = '1', 1, 'stable'
+    elif( ZA == 1003 ) :
+        spinValue, parityValue, halflifeValue = '1/2', 1, 3.88789e+8
+    elif( ZA == 2003 ) :
+        spinValue, parityValue, halflifeValue = '1/2', 1, 'stable'
+    elif( ZA == 2004 ) :
+        spinValue, parityValue, halflifeValue = '0', 1, 'stable'
+    else :
+        return
+
+    addParticleData( nucleus, info, None, spinValue, parityValue, None, halflifeValue )
+
+def getPoPsParticle( info, ZA, name = None, levelIndex = None, level = 0., levelUnit = 'MeV' ) :
 
     if( levelIndex not in [ 'c', 's', None ] ) :
         levelIndex = int( levelIndex )
         if( levelIndex < 0 ) : raise Exception( 'levelIndex = %d must be >= 0' % levelIndex )
-    if( ZA == 17 ) : ZA = 7
-    particleQualifiers = {}
+
+    particle = None
+
+    if( ZA in[ 0, 17 ] ) : ZA = 7
     if( name is not None ) :
         pass
+    elif( ZA == 1 ) :
+        particle = baryonModule.particle( 'n' )
+        addParticleData( particle, info, 1.00866491574, "1/2", 1, 0, 881.5 )
+        name = particle.id
     elif( ZA == 7 ) :
-        name = 'gamma'
+        particle = gaugeBosonModule.particle( IDsPoPsModule.photon )
+        addParticleData( particle, info, 0.0, "1", 1, 0, halflifeModule.STABLE )
+        name = particle.id
     elif( ZA == 8 ) :
-        name = 'e+'
+        particle = leptonModule.particle( 'e+', generation = 'electronic' )
+# BRB need to make it 'e-_anti' and alias to 'e+'.
+#        particle = leptonModule.particle( 'e-_anti', generation = 'electronic' )
+        addParticleData( particle, info, 5.485799090e-4, "1/2", -1, 1, halflifeModule.STABLE )
+        name = particle.id
     elif( ZA == 9 ) :
-        name = 'e-'
+        particle = leptonModule.particle( 'e-', generation = 'electronic' )
+        addParticleData( particle, info, 5.485799090e-4, "1/2", 1, -1, halflifeModule.STABLE )
+        name = particle.id
+    elif( ZA in [ 99120, 99125 ] ) :
+        name = ZAToName( ZA )
+        particle = unorthodoxModule.particle( name )
+        mass = massModule.double( info.PoPsLabel, 117.5, quantityModule.stringToPhysicalUnit( 'amu' ) )
+        particle.mass.add( mass )
     else :
-        name = endl2.endlToGNDName( ZA )
-        if( levelIndex not in [ None, 0 ] ) :
-            if( level < 0. ) : raise Exception( 'Negative value = %s for continuum is not allowed' % level )
-            if( levelIndex in [ 'c', 's' ] ) :        # to continuum or sum of all levels.
-                particleQualifiers['level'] = gnd.xParticle.undefinedLevel( PQU.PQU( PQU.pqu_float.surmiseSignificantDigits( level ), levelUnit ) )
-                name += "_%s" % levelIndex
-            else :
-                particleQualifiers['level'] = PQU.PQU( PQU.pqu_float.surmiseSignificantDigits( level ), levelUnit )
-                if( levelIndex != 0 ) : name += '_e%d' % levelIndex
-
-    if( not( info.particleList.hasParticle( name ) ) ) :
-        if( ZA in info.ZAMasses ) :
-            if( ( info.ZAMasses[ZA] is not None ) and ( info.ZAMasses[ZA] < 0 ) ) : info.ZAMasses[ZA] *= -1
-            mass = info.ZAMasses[ZA]
+        name = ZAToName( ZA )
+        if( levelIndex is None ) :
+            levelIndex = 0
+            level = 0.
+        if( level < 0. ) : raise Exception( 'Negative value = %s for continuum is not allowed' % level )
+        if( levelIndex in [ 'c', 's' ] ) :        # to continuum or sum of all levels.
+            level = PQUModule.PQU( PQUModule.pqu_float.surmiseSignificantDigits( level ), levelUnit )
+            name += "_%s" % levelIndex
         else :
-            mass = info.masses.getMassFromZA( ZA )
-            if( mass is None ) :                                        # If mass is not found, let's attempt to make something up that is close.
-                A = ZA % 1000
-                for idx in xrange( 1, A ) :
-                    massLower = info.masses.getMassFromZA( ZA - idx )
-                    massHigher = info.masses.getMassFromZA( ZA + idx )
-                    if( massLower is not None ) :
-                        mass = massLower + idx * info.masses.getMassFromZA( 1 )
-                        break
-                    elif( massHigher is not None ) :
-                        mass = massHigher - idx * info.masses.getMassFromZA( 1 )
-                        break
-                if( mass is None ) : raise Exception( 'Could not obtain mass for ZA = %s' % ZA )
-                mass = round(mass,1)    # since we're extrapolating
-        if( mass is None ) :
-            massUnit = None
-        else :
-            massUnit = PQU.PQU( PQU.pqu_float.surmiseSignificantDigits( mass ), 'amu' )
-        if( name in info.transportables ) : particleQualifiers['transportable'] = 'true'
-        if( ( levelIndex is not None ) and ( levelIndex != 0 ) ) : particleQualifiers['levelIndex'] = levelIndex
-        if( name in [ 'n', 'H1', 'H2', 'H3', 'He3', 'He4', 'gamma' ] ) : particleQualifiers['transportable'] = 'true'
+            level = PQUModule.PQU( PQUModule.pqu_float.surmiseSignificantDigits( level ), levelUnit )
+            name += '_e%d' % levelIndex
 
-        if( particleQualifiers.get( 'level' ) is not None ) :                   # Add new particle or level.
-                # careful, always need to add ground state before excited level:
-            baseName = name.split('_')[0]
+    nucleus = None
+    if( ( particle is None ) and ( name not in info.PoPs ) ) :
+
+        if( level is not None ) :                                   # Add a nuclearLevel/isotope.
+            baseName = name.split('_')[0]                           # Always need to add ground state before excited level.
             if( 'natural' in name ) :
                 baseName = '_'.join( name.split('_')[:2] )
             elif( 'FissionProduct' in name ) :
                 baseName = name.split('_')[0]
-            if( baseName not in info.particleList ) :
-                info.particleList.addParticle( gnd.xParticle.isotope( baseName, mass = massUnit, attributes={} ) )
 
-                # now ground state is present, add excited state
-            if( 'levelIndex' in particleQualifiers ) :
-                index = particleQualifiers.pop('levelIndex')
-            elif( particleQualifiers['level'].getValueAs( 'MeV' ) == '0.' ) :
-                index = 0
-            else :
-                raise Exception( 'Index could not be determined for name = "%s", level = "%s", levelIndex = "%s"' % ( name, level, levelIndex ) )
-            energy = particleQualifiers.pop( 'level' )
-            particleOrLevel = gnd.xParticle.nuclearLevel( name, energy, index, attributes = particleQualifiers )
-        else:
-            if( name == 'e+' ) :
-                particleOrLevel = gnd.xParticle.lepton( name, 'electronic', massUnit, +1, anti = True, attributes = particleQualifiers )
-            elif( name == 'e-' ) :
-                particleOrLevel = gnd.xParticle.lepton( name, 'electronic', massUnit, -1, attributes = particleQualifiers )
-            elif( name == 'gamma' ) :
-                particleOrLevel = gnd.xParticle.photon( attributes = particleQualifiers )
-            elif( 'FissionProduct' in name ) :
-                particleOrLevel = gnd.xParticle.FissionProduct( name, mass = massUnit, attributes = particleQualifiers )
-            elif( 'TNSL' in name ) :
-                particleOrLevel = gnd.xParticle.thermalNeutronScatteringLawIsotope( name, mass = massUnit, attributes = particleQualifiers )
-            else :
-                particleOrLevel = gnd.xParticle.isotope( name, mass = massUnit, attributes = particleQualifiers )
-        info.particleList.addParticle( particleOrLevel )
+            index = levelIndex
+            if( level.getValueAs( 'MeV' ) == 0. ) : index = 0
 
-    return( info.particleList.getParticle( name ) )
+            particle = nuclearLevelModule.particle( name )
+            charge = chargeModule.integer( info.PoPsLabel, 0, chargeModule.baseUnit )
+            particle.charge.add( charge )
 
-def newGNDParticle( info, particle, attributes = None, multiplicity = 1, outputChannel = None ) :
-    """The arguments to this function must match those of product.product excluding self and label."""
+            nucleusName = name[0].lower( ) + name[1:]
+            nucleus = nucleusModule.particle( nucleusName, str( levelIndex ) )
+            energy = nuclearEnergyLevelModule.double( info.PoPsLabel, float( level ), level.unit )
+            nucleus.energy.add( energy )
+            charge = chargeModule.integer( info.PoPsLabel, ZA / 1000, chargeModule.baseUnit )
+            nucleus.charge.add( charge )
+            particle.nucleus = nucleus
+            addNucleusInfoForLightNuclei( ZA, nucleus, info )
+        else :
+            if( particle is None ) :
+                if( 'FissionProduct' in name ) :
+                    particleOrLevel = gnd.xParticle.FissionProduct( name, mass = massUnit, attributes = particleQualifiers )
+                elif( 'TNSL' in name ) :
+                    particleOrLevel = gnd.xParticle.thermalNeutronScatteringLawIsotope( name, mass = massUnit, attributes = particleQualifiers )
+                else :
+                    particleOrLevel = gnd.xParticle.isotope( name, mass = massUnit, attributes = particleQualifiers )
+    else :
+        if( particle is None ) : particle = info.PoPs[name]
+
+    if( name not in info.PoPs ) : info.PoPs.add( particle )
+
+    if( isinstance( particle, nuclearLevelModule.particle ) ) :
+        if( particle.intIndex == 0 ) : particle = particle.getAncestor( )
+
+    return( particle )
+
+def getTypeName( info, ZA, name = None, levelIndex = None, level = 0., levelUnit = 'MeV' ) :
+    """
+    Returns the name for this ZA and level if present. Returned name is of the form Am242, Am242_m1, Am242_e2.
+    levelIndex must be None, 'c', 's' or an integer > 0.
+    """
+
+    return( getPoPsParticle( info, ZA, name, levelIndex, level, levelUnit ) )
+
+def newGNDParticle( info, particle, crossSection, attributes = None, multiplicity = 1, outputChannel = None ) :
+    """
+    The arguments to this function must match those of product.product excluding self and label.
+
+    FIXME: the 'particle' argument is currently something from the xParticle module, should come from PoPs instead.
+    """
 
     if attributes is None: attributes = {}
-    product = gnd.product.product( particle, label = particle.name, attributes = attributes, outputChannel = outputChannel )
-    if( isinstance( multiplicity, ( int, float ) ) ) : multiplicity = gnd.productData.multiplicity.constant( info.style, multiplicity )
+    name = particle
+# BRBBRB
+    if( not( isinstance( particle, str ) ) ) : name = particle.id
+    product = gnd.product.product( id = name, label = name, attributes = attributes, outputChannel = outputChannel )
+    if( isinstance( multiplicity, ( int, float ) ) ) :
+        axes = multiplicityModule.defaultAxes( crossSection.domainUnit )
+        multiplicity = multiplicityModule.constant1d( multiplicity, crossSection.domainMin,
+                crossSection.domainMax, axes = axes, label = info.style )
     product.multiplicity.add( multiplicity )
     return( product )
 
@@ -196,39 +284,57 @@ def getTypeNameENDF( info, ZA, undefinedLevelInfo ) :
 
     levelIndex, level = None, 0.
     if( undefinedLevelInfo is not None ) :
-        if( undefinedLevelInfo['ZA'] is not None ) :
-            if( ( undefinedLevelInfo['ZA'] == ZA ) and ( ZA not in [ 1001, 1002, 1003, 2003, 2004 ] ) ) :
-                undefinedLevelInfo['count'] += 1
-                if( undefinedLevelInfo['count'] > 1 ) : raise Exception( "undefinedLevelInfo['count'] > 1 for ZA = %s" % ZA )
+        if( undefinedLevelInfo['ZA'] == ZA ) :
+            if undefinedLevelInfo['level'] > 0. and ZA in [ 1001, 1002, 1003, 2003, 2004 ] :
+                info.logs.write("  Excited state of ZA %d encountered" % ZA)
+            undefinedLevelInfo['count'] += 1
+            if( undefinedLevelInfo['count'] > 1 ) :
+                if( undefinedLevelInfo['level'] > 0. ) :
+                    raise Exception( "undefinedLevelInfo['count'] > 1 for ZA = %s" % ZA )
+            else:
                 levelIndex, level = undefinedLevelInfo['levelIndex'], undefinedLevelInfo['level']
     return( getTypeNameGamma( info, ZA, level = level, levelIndex = levelIndex ) )
 
 class infos :
 
-    def __init__( self, style, xenslIsotopes = None, transportables = None ) :
+    def __init__( self, style ) :
 
         self.style = style
-        self.masses = massModule
-        self.xenslIsotopes = xenslIsotopes
-        if( xenslIsotopes is None ) : self.xenslIsotopes = {}
-        self.transportables = transportables or []
-        self.particleList = gnd.xParticleList.xParticleList( )
-        self.ZAMasses = {}
+        self.massTracker = massTrackerModule.massTracker()
+        self.__logs = None
 
-    def setReactionSuite( self, reactionSuite )  :
+    @property
+    def logs(self): return self.__logs
 
-        self.reactionSuite = reactionSuite
+    @logs.setter
+    def logs(self, logs): self.__logs = logs
 
-def returnConstantQ( style, Q, unit = 'eV' ) :
+    def addMassAWR( self, ZA, AWR, asTarget=True ):
+        warning = self.massTracker.addMassAWR( ZA, AWR, asTarget=asTarget )
+        if warning: self.logs.write( warning )
 
-    return( gnd.channelData.Q.constant( style, PQU.PQU( PQU.pqu_float.surmiseSignificantDigits( Q ), unit ) ) )
+def returnConstantQ( style, Q, crossSection ) :
+
+    axes = QModule.defaultAxes( crossSection.domainUnit )
+    return( QModule.constant1d( Q, crossSection.domainMin, crossSection.domainMax, axes = axes, label = style ) )
 
 def addUnspecifiedDistributions( info, outputChannel, frame = None ) :
+    """
+    For products with no distribution, give them either an unspecified or unknown distribution
+    (unknown gets written to ENDF MF=6, unspecified does not).
+    Interim products before breakup are always unspecified, as are heavy residuals when the first product is a neutron.
+    Others are unknown, to ensure that the product (plus mass) appears in resulting ENDF file.
+    """
 
     if( outputChannel is None ) : return
+    firstProductId = outputChannel[0].name
     for product in outputChannel :
         if( len( product.distribution ) == 0 ) :
-            product.distribution.add( unspecifiedModule.form( info.style, productFrame = frame ) )
+            if product.outputChannel or firstProductId=='n':
+                product.distribution.add( unspecifiedModule.form( info.style, productFrame = frame ) )
+            else:
+                product.distribution.add( unknownModule.form( info.style, productFrame = frame ) )
         else :
             if( frame is None ) : frame = product.distribution[info.style].productFrame
         addUnspecifiedDistributions( info, product.outputChannel, frame = standardsModule.frames.labToken )
+

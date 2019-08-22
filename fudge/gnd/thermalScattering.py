@@ -63,20 +63,29 @@
 
 __metaclass__ = type
 
-from xData import XYs as XYsModule
+import math
 
-coherentElasticToken = 'coherentElastic'
-incoherentElasticToken = 'incoherentElastic'
-incoherentInelasticToken = 'incoherentInelastic'
+from . import documentation as documentationModule, suites as suitesModule
+from xData import XYs as XYsModule, physicalQuantity as physicalQuantityModule, gridded as griddedModule
+from xData import ancestry as ancestryModule
 
-class thermalScattering:
-    def __init__(self, material=None, MAT=None, mass=None, emax=None, documentation=None, coherentElastic=None,
+
+class thermalScattering( ancestryModule.ancestry ):
+
+    moniker = 'thermalScattering'
+    ancestryMembers = ('mass', 'cutoffEnergy', 'coherentElastic', 'incoherentElastic', 'incoherentInelastic')
+
+    def __init__(self, cutoffEnergy, material=None, MAT=None, mass=None, documentation=None, coherentElastic=None,
             incoherentElastic=None, incoherentInelastic=None):
+        ancestryModule.ancestry.__init__( self )
         self.material = material
+# BRB6 hardwired
+        self.projectile='n'
         self.MAT = MAT
         self.mass = mass
-        self.emax = emax
+        self.cutoffEnergy = cutoffEnergy
         self.documentation = documentation
+# BRB6 need to check for correct class.
         self.coherentElastic = coherentElastic
         self.incoherentElastic = incoherentElastic
         self.incoherentInelastic = incoherentInelastic
@@ -85,19 +94,19 @@ class thermalScattering:
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        xml = ['<?xml version="1.0" encoding="UTF-8"?>']
-        xml.append( indent+'<thermalScattering material="%s" MAT="%s" mass="%s" emax="%s">'
-                    % (self.material,self.MAT,self.mass,self.emax) )
+        xml = [ indent+'<%s material="%s" MAT="%s">' % (self.moniker,self.material,self.MAT) ]
         if self.documentation is not None: xml += self.documentation.toXMLList( indent2, **kwargs )
-        for ts in (coherentElasticToken,incoherentElasticToken,incoherentInelasticToken):
+        xml += self.cutoffEnergy.toXMLList( indent2, **kwargs )
+        xml += self.mass.toXMLList( indent2, **kwargs )
+        for ts in (coherentElastic.moniker,incoherentElastic.moniker,incoherentInelastic.moniker):
             if getattr(self,ts) is not None:
                 xml += getattr(self,ts).toXMLList( indent2, **kwargs )
-        xml.append(indent+'</thermalScattering>')
+        xml.append(indent+'</%s>' % self.moniker)
         return xml
 
     def check( self, **kwargs ) :
         """
-        Check all data in the reactionSuite, returning a list of warnings. 
+        Check all data in the reactionSuite, returning a list of warnings.
         """
 
         from fudge.gnd import warning
@@ -114,51 +123,113 @@ class thermalScattering:
         warnings = []
 
 
-        result = warning.context('ReactionSuite: %s + %s' % (self.projectile, self.target), warnings)
+        result = warning.context('ReactionSuite: %s + %s' % (self.projectile, self.material), warnings)
         result.info = info
         return result
 
+    def saveToFile( self, filename, **kwargs ):
 
-    def saveToFile( self, filename ):
         with open(filename,'w') as fout:
-            fout.write( '\n'.join( self.toXMLList() ) )
+# BRB6 hardwired
+            fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+            fout.write( '\n'.join( self.toXMLList(**kwargs) ) )
+
+    @staticmethod
+    def parseXMLNode( element ):
+
+        xPath = [ thermalScattering.moniker ]
+        linkData = {}
+        try:
+            kwargs = {
+                'material': element.get('material'),
+                'MAT': element.get('MAT')
+            }
+            for child in element:
+                _class = {
+                    documentationModule.documentation.moniker: documentationModule.documentation,
+                    mass.moniker: mass,
+                    cutoffEnergy.moniker: cutoffEnergy,
+                    coherentElastic.moniker: coherentElastic,
+                    incoherentElastic.moniker: incoherentElastic,
+                    incoherentInelastic.moniker: incoherentInelastic
+                }.get( child.tag, None )
+                if _class is None:
+                    print("Warning: encountered unexpected element '%s' in thermalScattering!" % child.tag)
+                kwargs[ child.tag ] = _class.parseXMLNode( child, xPath, linkData )
+            TS = thermalScattering( **kwargs )
+        except:
+            print("Error encountered at xpath = /%s" % '/'.join(xPath))
+            raise
+
+        return TS
 
 
-class coherentElastic:
+class mass( physicalQuantityModule.physicalQuantity ):
+    moniker = 'mass'
+
+
+class cutoffEnergy( physicalQuantityModule.physicalQuantity ):
+    moniker = 'cutoffEnergy'
+
+
+class coherentElastic( ancestryModule.ancestry ):
+
+    moniker = 'coherentElastic'
+
     def __init__(self, S_table):
+        ancestryModule.ancestry.__init__(self)
         self.S_table = S_table
 
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        xml = [indent+'<%s>' % coherentElasticToken]
+        xml = [indent+'<%s>' % self.moniker]
         xml += self.S_table.toXMLList( indent2, **kwargs )
-        xml[-1] += '</%s>' % coherentElasticToken
+        xml[-1] += '</%s>' % self.moniker
         return xml
 
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ):
 
-class S_table:
+        xPath.append( element.tag )
+        Stab = S_table.parseXMLNode( element[0], xPath, linkData )
+        cohEl = coherentElastic( Stab )
+        xPath.pop()
+        return cohEl
+
+
+class S_table( ancestryModule.ancestry ):
     """ For elastic coherent, cumulative structure factor 'S' is given as function of incident energy and temp. """ 
-    def __init__(self, form=None):
-        self.forms = []
-        if form is not None: self.forms.append( form )
+    moniker = 'S_table'
 
-    def __getitem__(self, idx): return self.forms[idx]
+    def __init__(self, gridded2d):
+        self.gridded2d = gridded2d
 
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        xml = [indent+'<S_table>']
-        for form in self:
-            xml += form.toXMLList( indent2, **kwargs )
-        xml[-1] += '</S_table>'
+        xml = [indent+'<%s>' % self.moniker]
+        xml += self.gridded2d.toXMLList( indent2, **kwargs )
+        xml[-1] += '</%s>' % self.moniker
         return xml
 
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ):
 
-class incoherentElastic:
+        xPath.append( element.tag )
+        g2d = griddedModule.gridded2d.parseXMLNode( element[0], xPath, linkData )
+        Stab = S_table( g2d )
+        xPath.pop()
+        return Stab
+
+
+class incoherentElastic( ancestryModule.ancestry ):
+    moniker = 'incoherentElastic'
+
     def __init__(self, characteristicCrossSection, DebyeWaller):
+        ancestryModule.ancestry.__init__(self)
         self.characteristicCrossSection = characteristicCrossSection
         self.DebyeWaller = DebyeWaller
 
@@ -166,11 +237,26 @@ class incoherentElastic:
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        xml = [indent+'<%s characteristicCrossSection="%s">' % (incoherentElasticToken, 
-            self.characteristicCrossSection) ]
+        xml = [indent+'<%s>' % self.moniker]
+        xml += self.characteristicCrossSection.toXMLList( indent2, **kwargs )
         xml += self.DebyeWaller.toXMLList( indent2, **kwargs )
-        xml[-1] += '</%s>' % incoherentElasticToken
+        xml[-1] += '</%s>' % self.moniker
         return xml
+
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ):
+
+        xPath.append( element.tag )
+        xsc = characteristicCrossSection.parseXMLNode(element.find(characteristicCrossSection.moniker), xPath, linkData)
+        DW = DebyeWaller.parseXMLNode(element.find(DebyeWaller.moniker), xPath, linkData)
+        incElastic = incoherentElastic( xsc, DW )
+
+        xPath.pop()
+        return incElastic
+
+class characteristicCrossSection( physicalQuantityModule.physicalQuantity ):
+
+    moniker = 'characteristicCrossSection'
 
 
 class DebyeWaller( XYsModule.XYs1d ):
@@ -178,15 +264,21 @@ class DebyeWaller( XYsModule.XYs1d ):
     temperature-dependent list of the Debye-Waller integral """
 
     mutableYUnit = False
+    moniker = "DebyeWaller"
 
     def __init__(self, *args, **kwargs):
         XYsModule.XYs1d.__init__(self, *args, **kwargs)
-        self.moniker = "DebyeWaller"
 
 
-class incoherentInelastic:
-    def __init__(self, S_alpha_beta, calculatedAtThermal = False, asymmetric = False, atoms = []):
-        self.scatteringAtoms = atoms
+class incoherentInelastic( ancestryModule.ancestry ):
+    moniker = 'incoherentInelastic'
+
+    def __init__(self, S_alpha_beta, calculatedAtThermal = False, asymmetric = False, atoms = None):
+        ancestryModule.ancestry.__init__(self)
+        self.scatteringAtoms = scatteringAtoms()
+        if atoms is not None:
+            for atom in atoms:
+                self.scatteringAtoms.add( atom )
         self.S_alpha_beta = S_alpha_beta
         self.calculatedAtThermal = calculatedAtThermal
         self.asymmetric = asymmetric
@@ -195,76 +287,174 @@ class incoherentInelastic:
 
         incrementalIndent = kwargs.get( 'incrementalIndent', '  ' )
         indent2 = indent + incrementalIndent
-        indent3 = indent2 + incrementalIndent
 
-        xml = [indent+'<%s' % incoherentInelasticToken]
-        if self.calculatedAtThermal: xml[0] += ' calculatedAtThermal="true"'
-        if self.asymmetric: xml[0] += ' asymmetric="true"'
-        xml[0] += '>'
-        xml += [indent+'  <scatteringAtoms>']
-        for atom in self.scatteringAtoms:
-            xml += atom.toXMLList( indent3, **kwargs )
-        xml[-1] += '</scatteringAtoms>'
+        attrs = ''
+        for attr in ('calculatedAtThermal', 'asymmetric'):
+            if getattr(self,attr): attrs += ' %s="true"' % attr
+        xml = [indent+'<%s%s>' % (self.moniker, attrs)]
+        xml += self.scatteringAtoms.toXMLList( indent2 )
         xml += self.S_alpha_beta.toXMLList( indent2, **kwargs )
-        xml[-1] += '</%s>' % incoherentInelasticToken
+        xml[-1] += '</%s>' % self.moniker
         return xml
 
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ):
 
-class scatteringAtom:
+        xPath.append( incoherentElastic.moniker )
+        kwargs = {
+            'calculatedAtThermal': element.get('calculatedAtThermal') == 'true',
+            'asymmetric': element.get('asymmetric') == 'true'
+        }
+        atoms = [scatteringAtom.parseXMLNode( child, xPath, linkData)
+                           for child in element.find('scatteringAtoms')]
+        Sab = S_alpha_beta.parseXMLNode( element.find( S_alpha_beta.moniker ), xPath, linkData )
+        incInelastic = incoherentInelastic( Sab, atoms = atoms, **kwargs )
+        xPath.pop()
+        return incInelastic
+
+
+class scatteringAtoms( suitesModule.suite ):
+    moniker = 'scatteringAtoms'
+
+    def __init__( self ):
+        suitesModule.suite.__init__( self, [scatteringAtom] )
+
+class scatteringAtom( ancestryModule.ancestry ):
     """ Inelastic incoherent scattering requires a description of each atom that is scattered off """
-    def __init__(self, mass, numberPerMolecule, freeAtomCrossSection, e_critical = None, e_max = None,
-            functionalForm = None, effectiveTemperature = None ):
-        self.mass = mass
+    moniker = 'scatteringAtom'
+
+    def __init__(self, label, numberPerMolecule, mass, freeAtomCrossSection, e_critical = None, e_max = None,
+            functionalForm = None, T_effective = None ):
+        ancestryModule.ancestry.__init__(self)
+        self.label = label
         self.numberPerMolecule = numberPerMolecule
+        self.mass = mass
         self.freeAtomCrossSection = freeAtomCrossSection
         self.e_critical = e_critical
         self.e_max = e_max
         self.functionalForm = functionalForm
-        self.effectiveTemperature = effectiveTemperature
+        self.T_effective = T_effective
+
+    def boundCrossSection(self):
+        return self.freeAtomCrossSection.value * ((self.mass.value + 1) / self.mass.value)**2
+
+    def shortCollisionTime( self, alpha, beta, T ):
+        """
+        Equation 7.8 in ENDF manual
+        :param alpha:
+        :param beta:
+        :param T:
+        :return:
+        """
+
+        Teff = self.T_effective.evaluate(T)
+        #num = math.exp( -(alpha-abs(beta))**2 * T / (4*alpha*Teff) - (beta + abs(beta))/2)
+        # reformulate using T/Teff = 1-f, should be more numerically stable
+        f = 1 - T/Teff
+        num = math.exp( (f * (alpha - abs(beta))**2 - (alpha + beta)**2) / (4*alpha) )
+        den = math.sqrt( 4 * math.pi * alpha * Teff / T )
+        return num/den
 
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        xml = [indent+'<atom mass="%s" numberPerMolecule="%i" freeAtomCrossSection="%s"' % (self.mass,
-            self.numberPerMolecule, self.freeAtomCrossSection)]
-        for attribute in ('e_critical','e_max','functionalForm'):
+        attrs = ''
+        if self.functionalForm is not None: attrs = ' functionalForm="%s"' % self.functionalForm
+        xml = [indent+'<%s label="%s" numberPerMolecule="%i"%s>' % (self.moniker, self.label, self.numberPerMolecule, attrs)]
+        for attribute in ('mass','freeAtomCrossSection','e_critical','e_max','T_effective'):
             if getattr(self, attribute) is not None:
-                xml[-1] += ' %s="%s"' % (attribute, getattr(self,attribute))
-        if self.effectiveTemperature is not None:
-            xml[-1] += '>'
-            xml += self.effectiveTemperature.toXMLList( indent2, **kwargs )
-            xml[-1] += '</atom>'
-        else:
-            xml[-1] += '/>'
+                xml += getattr(self,attribute).toXMLList( indent2, **kwargs )
+        xml[-1] += '</%s>' % self.moniker
         return xml
+
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ):
+
+        xPath.append( element.tag )
+        kwargs = {
+            'label': element.get('label'),
+            'numberPerMolecule': int(element.get('numberPerMolecule')),
+            'functionalForm': element.get('functionalForm'),
+        }
+        for child in element:
+            _class = {
+                mass.moniker: mass,
+                freeAtomCrossSection.moniker: freeAtomCrossSection,
+                e_critical.moniker: e_critical,
+                e_max.moniker: e_max,
+                T_effective.moniker: T_effective
+            }.get( child.tag, None )
+            if _class is None:
+                print("Warning: encountered unexpected element '%s' in scatteringAtom!" % child.tag)
+            kwargs[ child.tag ] = _class.parseXMLNode( child, xPath, linkData )
+        SA = scatteringAtom( **kwargs )
+        xPath.pop()
+        return SA
+
+
+class freeAtomCrossSection( physicalQuantityModule.physicalQuantity ):
+    moniker = 'freeAtomCrossSection'
+
+class e_critical( physicalQuantityModule.physicalQuantity ):
+    moniker = 'e_critical'
+
+class e_max( physicalQuantityModule.physicalQuantity ):
+    moniker = 'e_max'
 
 class T_effective( XYsModule.XYs1d ):
     """ In incoherent inelastic sections, each scattering atom using the short collision time (SCT)
     approximation needs an effective temperature. """
 
+    moniker = 'T_effective'
     mutableYUnit = False
 
     def __init__(self, *args, **kwargs):
         XYsModule.XYs1d.__init__(self, *args, **kwargs)
-        self.moniker = "T_effective"
 
 
-class S_alpha_beta:
-    """ Inelastic incoherent section contains one S_ab table per temperature """
-    def __init__(self, form=None):
-        self.forms = []
-        if form is not None: self.forms.append( form )
+class S_alpha_beta( ancestryModule.ancestry ):
+    """
+    Inelastic incoherent section contains S as a function of (alpha,beta,T).
+    Currently supports gridded3d, other options may be supported later.
+    """
+    moniker = 'S_alpha_beta'
 
-    def __getitem__(self, index): return self.forms[index]
+    def __init__(self, gridded3d):
+        ancestryModule.ancestry.__init__( self )
+        self.gridded3d = gridded3d
 
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        xml = [indent+'<S_alpha_beta>']
-        for form in self:
-            xml += form.toXMLList( indent2, **kwargs )
-        xml[-1] += '</S_alpha_beta>'
+        xml = [indent+'<%s>' % self.moniker]
+        xml += self.gridded3d.toXMLList( indent2, **kwargs )
+        xml[-1] += '</%s>' % self.moniker
         return xml
 
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ):
+
+        xPath.append( element.tag )
+        g3d = griddedModule.gridded3d.parseXMLNode( element[0], xPath, linkData )
+        Sab = S_alpha_beta( g3d )
+        xPath.pop()
+        return Sab
+
+
+def readXML( gndFile ):
+    """
+    Read a GND/xml file and create a new reactionSuite instance from the result.
+
+    :param gndFile: path to a GND file, as a string.
+    :return: reactionSuite instance containing all data from the file.
+    """
+
+    from xml.etree import cElementTree
+    # wrapper around the xml parser:
+    from fudge.core.utilities.xmlNode import xmlNode
+
+    tsElement = cElementTree.parse( gndFile ).getroot()
+    tsElement = xmlNode( tsElement, xmlNode.etree )
+    return thermalScattering.parseXMLNode( tsElement )

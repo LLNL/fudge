@@ -164,6 +164,11 @@ class arrayBase( baseModule.xDataCoreMembers ) :
 
         return( self.__offset )
 
+    def offsetScaleValues( self, offset, scale ):
+        """Modify every element in the array: multiply by scale and add offset."""
+
+        self.values.offsetScaleValues( offset, scale )
+
     def attributesToXMLAttributeStr( self ) :
 
         attributeStr = ' shape="%s"' % ','.join( [ "%d" % length for length in self.shape ] )
@@ -211,7 +216,7 @@ class arrayBase( baseModule.xDataCoreMembers ) :
             array1 = embedded( shape, **attributes )
             for subArrayElement in xDataElement :
                 array2 = arrayBase.parseXMLNode( subArrayElement, xPath, linkData )
-                array1.addArray( array2, copy = False )
+                array1.addArray( array2 )
         else :
             raise TypeError( 'Unsupported array type = "%s"' % compression )
 
@@ -282,6 +287,7 @@ class arrayBase( baseModule.xDataCoreMembers ) :
 class full( arrayBase ) :
 
     compression = 'full'
+    ancestryMembers = baseModule.xDataCoreMembers.ancestryMembers + ( 'values', )
 
     def __init__( self, shape = None, data = None, symmetry = symmetryNoneToken, storageOrder = storageRowToken, 
                 offset = None, permutation = permutationPlusToken,
@@ -300,7 +306,7 @@ class full( arrayBase ) :
             for i1 in range( self.dimension ) : size = size * ( length + i1 ) / ( i1 + 1 )
         if( size != len( data ) ) : raise ValueError( 'shape requires %d values while data has %d values' % ( size, len( data ) ) )
 
-        self.values = data.copy( )
+        self.values = data
 
     def constructArray( self ) :
 
@@ -349,7 +355,7 @@ class full( arrayBase ) :
 
     def copy( self ) :
 
-        return( full( self.shape, self.values, 
+        return( full( self.shape, self.values.copy( ), 
                 symmetry = self.symmetry, storageOrder = self.storageOrder, 
                 offset = self.offset, permutation = self.permutation,
                 index = self.index, label = self.label ) )
@@ -367,6 +373,7 @@ class full( arrayBase ) :
 class diagonal( arrayBase ) :
 
     compression = 'diagonal'
+    ancestryMembers = baseModule.xDataCoreMembers.ancestryMembers + ( 'values', )
 
     def __init__( self, shape = None, data = None, startingIndices = None, symmetry = symmetryNoneToken, storageOrder = storageRowToken, 
                 offset = None, permutation = permutationPlusToken,
@@ -385,7 +392,8 @@ class diagonal( arrayBase ) :
             if( not( isinstance( startingIndices, valuesModule.values ) ) ) :
                 startingIndices = valuesModule.values( startingIndices, valueType = standardsModule.types.integer32Token )
             if( startingIndices.valueType not in [ standardsModule.types.integer32Token ] ) : raise TypeError( 'startingIndices must be a list of integers' )
-            self.startingIndicesOriginal = startingIndices.copy( label = 'startingIndices' )
+            self.startingIndicesOriginal = startingIndices
+            self.startingIndicesOriginal.label = 'startingIndices'
 
         if( ( len( startingIndices ) == 0 ) or ( ( len( startingIndices ) % dimension ) != 0 ) ) :
             raise ValueError( 'lenght of startingIndices = %d must be a multiple of dimension = %d' %
@@ -405,7 +413,7 @@ class diagonal( arrayBase ) :
             size += offset
         if( size != len( data ) ) : raise ValueError( 'shape requires %d values while data has %d values' % ( size, len( data ) ) )
 
-        self.values = data.copy( )
+        self.values = data
 
     def constructArray( self ) :
 
@@ -441,7 +449,9 @@ class diagonal( arrayBase ) :
 
     def copy( self ) :
 
-        return( diagonal( self.shape, self.values, self.startingIndicesOriginal, 
+        startingIndicesOriginal = self.startingIndicesOriginal
+        if( startingIndicesOriginal is not None ) : startingIndicesOriginal = self.startingIndicesOriginal.copy( )
+        return( diagonal( self.shape, self.values.copy( ), startingIndicesOriginal, 
                 symmetry = self.symmetry, storageOrder = self.storageOrder,
                 offset = self.offset, permutation = self.permutation,
                 index = self.index, label = self.label ) )
@@ -461,10 +471,12 @@ class diagonal( arrayBase ) :
 class flattened( arrayBase ) :
 
     compression = 'flattened'
+    ancestryMembers = baseModule.xDataCoreMembers.ancestryMembers + ( 'values', 'lengths', 'starts' )
 
-    def __init__( self, shape = None, data = None, starts = None, lengths = None, symmetry = symmetryNoneToken, storageOrder = storageRowToken,
+    def __init__( self, shape = None, data = None, starts = None, lengths = None, symmetry = symmetryNoneToken, 
+                storageOrder = storageRowToken,
                 offset = None, permutation = permutationPlusToken,
-                index = None, label = None,
+                index = None, label = None, 
                 dataToString = None ) :
 
         arrayBase.__init__( self, shape, symmetry, storageOrder = storageOrder,
@@ -497,9 +509,13 @@ class flattened( arrayBase ) :
             if( indexPriorEnd > self.size ) :
                     raise ValueError( 'data beyond array boundary: indexPriorEnd = %d, size = %d', ( indexPriorEnd, self.size ) )
 
-        self.starts = starts.copy( label = 'starts' )
-        self.lengths = lengths.copy( label = 'lengths' )
-        self.data = data.copy( )
+        self.starts = starts
+        starts.label = 'starts'
+
+        self.lengths = lengths
+        lengths.label = 'lengths'
+
+        self.values = data
 
     def constructArray( self ) :
 
@@ -510,18 +526,69 @@ class flattened( arrayBase ) :
         for i1, start in enumerate( self.starts ) :
             length = self.lengths[i1]
             for i2 in range( length ) :
-                array1[start+i2] = self.data[index]
+                array1[start+i2] = self.values[index]
                 index += 1
 
         order = { storageRowToken : 'C', storageColumnToken : 'F' }[self.storageOrder]
-        return( array1.reshape( self.shape, order = order ) )
+        array1 = array1.reshape( self.shape, order = order )
+        if self.symmetry == symmetryLowerToken:
+            array1 = numpy.tril(array1) + numpy.tril(array1, -1).T
+        elif self.symmetry == symmetryUpperToken:
+            array1 = numpy.triu(array1) + numpy.triu(array1, -1).T
+        return array1
 
     def copy( self ) :
 
-        return( flattened( self.shape, self.data, self.starts, self.lengths, 
+        return( flattened( self.shape, self.values.copy( ), self.starts.copy( ), self.lengths.copy( ), 
                 symmetry = self.symmetry, storageOrder = self.storageOrder,
                 offset = self.offset, permutation = self.permutation,
                 index = self.index, label = self.label ) )
+
+    @staticmethod
+    def fromNumpyArray( array, symmetry = symmetryNoneToken, nzeroes = 4 ):
+        """
+        Generate a sparse flattened array that represents an arbitrary numpy array.
+        Only supports 'full' or 'lower-symmetric' matrices, with row-major data storage.
+        :param array: input numpy array
+        :param symmetry: allowed values are 'none' or 'lower'
+        :param nzeroes: how many zeroes to allow before adding a new 'start' and 'length' 
+        :return: 
+        """
+
+        starts, lengths, sparseData = [], [], []
+
+        def helper( data, offset = 0 ):
+            idx = 0
+            end = len(data)
+            while idx < end:
+                if data[idx] != 0:
+                    stop = idx+1
+                    while stop < end:
+                        if data[stop] != 0:
+                            stop += 1
+                        elif any(data[stop:stop + nzeroes]):
+                            for i in range(nzeroes):
+                                if stop + i < end and data[stop + i] != 0: stop += i
+                        else:
+                            break
+                    starts.append( idx + offset )
+                    lengths.append( stop - idx )
+                    sparseData.extend( data[idx:stop] )
+                    idx = stop
+                idx += 1
+
+        if symmetry == symmetryNoneToken:
+            helper( array.flatten() )
+        elif symmetry == symmetryLowerToken:
+            rows, cols = array.shape
+            for row in range(rows):
+                dat = array[row][:row+1]
+                helper( dat, offset = row * cols )
+        else:
+            raise NotImplementedError("Symmetry = '%s'" % symmetry)
+
+        return flattened(shape=array.shape, data=sparseData, starts=starts, lengths=lengths, symmetry=symmetry)
+
 
     def toXMLList( self, indent = '', **kwargs ) :
 
@@ -531,9 +598,7 @@ class flattened( arrayBase ) :
         XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributesStr ) ]
         XMLList += self.starts.toXMLList( indent2, **kwargs )
         XMLList += self.lengths.toXMLList( indent2, **kwargs )
-        kwargs['dataToString'] = self.dataToString
-        kwargs['dataToStringParent'] = self
-        XMLList += self.data.toXMLList( indent2, **kwargs )
+        XMLList += self.values.toXMLList( indent2, **kwargs )
         XMLList[-1] += '</%s>' % self.moniker
         return( XMLList )
 
@@ -551,7 +616,7 @@ class embedded( arrayBase ) :
 
         self.arrays = []
 
-    def addArray( self, array, copy = True ) :
+    def addArray( self, array ) :
 
         if( not( isinstance( array, arrayBase ) ) ) : raise TypeError( 'variable not an array instance' )
         if( self.dimension < array.dimension ) : raise ValueError( 'cannot embedded array into a smaller dimensional array: %s %s' %
@@ -565,7 +630,6 @@ class embedded( arrayBase ) :
             if( ( offset + shape[i1] ) > shapeOfParent[i1] ) :
                     raise ValueError( 'child array outside of parent: %s %s %s' % ( self.shape, array.shape, array.offset ) )
 
-        if( copy ) : array = array.copy( )
         self.arrays.append( array )
 
     def constructArray( self ) :
@@ -588,8 +652,13 @@ class embedded( arrayBase ) :
                 symmetry = self.symmetry, storageOrder = self.storageOrder,
                 offset = self.offset, permutation = self.permutation,
                 index = self.index, label = self.label )
-        for array in self.arrays : array1.addArray( array )
+        for array in self.arrays : array1.addArray( array.copy( ) )
         return array1
+
+    def offsetScaleValues( self, offset, scale ):
+        """Modify every sub-array: multiply by scale and add offset."""
+
+        for subarray in self.arrays: subarray.offsetScaleValues( offset, scale )
 
     def toXMLList( self, indent = '', **kwargs ) :
 

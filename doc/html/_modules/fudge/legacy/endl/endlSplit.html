@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.endl.endlSplit &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.legacy.endl.endlSplit</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">fudge</span> <span class="k">import</span> <span class="n">fudgeParameters</span>
+<span class="kn">import</span> <span class="nn">endlZA</span>
+<span class="kn">import</span> <span class="nn">endlFile</span>
+
+<span class="n">EOD</span> <span class="o">=</span> <span class="s1">&#39;                                                                       1</span><span class="se">\n</span><span class="s1">&#39;</span>
+<span class="n">tmpFileName</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="endlSplit"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlSplit.endlSplit">[docs]</a><span class="k">def</span> <span class="nf">endlSplit</span><span class="p">(</span> <span class="n">file</span><span class="p">,</span> <span class="n">outDir</span><span class="p">,</span> <span class="n">endlretHeaders</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">format</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;The function undoes what endlret does. That is, it takes an ascii file with a collect of</span>
+<span class="sd">    isotopes in ENDL ascii format, and splits the isotopes up into separate &#39;za&#39; directories</span>
+<span class="sd">    with the appropriate &#39;yo&#39; files. The za directories are placed in outDir.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">getData</span><span class="p">(</span> <span class="n">fIn</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">ZA</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[</span> <span class="n">l</span> <span class="p">]</span>
+        <span class="k">while</span><span class="p">(</span> <span class="n">l</span> <span class="o">!=</span> <span class="n">EOD</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">fIn</span><span class="o">.</span><span class="n">readline</span><span class="p">(</span> <span class="p">)</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">l</span> <span class="p">)</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">fIn</span><span class="o">.</span><span class="n">readline</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">l</span><span class="p">,</span> <span class="n">data</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">splitZA</span><span class="p">(</span> <span class="n">fIn</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">yi</span><span class="p">,</span> <span class="n">workDir</span><span class="p">,</span> <span class="nb">format</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">ZA</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">l</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">verbose</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span> <span class="s1">&#39;splitting ZA </span><span class="si">%5d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">ZA</span>
+        <span class="n">ZA_</span> <span class="o">=</span> <span class="n">ZA</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">endlZA</span><span class="o">.</span><span class="n">endlZA</span><span class="p">(</span> <span class="n">ZA</span><span class="p">,</span> <span class="n">yi</span><span class="p">,</span> <span class="n">workDir</span> <span class="o">=</span> <span class="n">workDir</span> <span class="p">)</span>
+        <span class="k">while</span><span class="p">(</span> <span class="n">ZA</span> <span class="o">==</span> <span class="n">ZA_</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">l</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">getData</span><span class="p">(</span> <span class="n">fIn</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">ZA</span> <span class="p">)</span>
+            <span class="n">yo</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">9</span><span class="p">:</span><span class="mi">12</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">C</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">][:</span><span class="mi">2</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">I</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">S</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">5</span><span class="p">:</span><span class="mi">8</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">tmpFile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">outDir</span><span class="p">,</span> <span class="s1">&#39;yo</span><span class="si">%2.2d</span><span class="s1">c</span><span class="si">%2.2d</span><span class="s1">i</span><span class="si">%3.3d</span><span class="s1">s</span><span class="si">%3.3d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">yo</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">S</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">fTmp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span> <span class="n">tmpFile</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span> <span class="p">)</span>
+            <span class="n">fTmp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">fTmp</span><span class="o">.</span><span class="n">close</span><span class="p">(</span> <span class="p">)</span>
+            <span class="n">endlData</span> <span class="o">=</span> <span class="n">endlFile</span><span class="o">.</span><span class="n">endlFile</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span> <span class="n">tmpFile</span> <span class="p">),</span> <span class="n">tmpFile</span><span class="p">,</span> <span class="n">ZA</span><span class="p">,</span> <span class="n">yi</span> <span class="p">)</span>
+            <span class="n">endlData</span><span class="o">.</span><span class="n">read</span><span class="p">(</span> <span class="p">)</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">findFile</span><span class="p">(</span> <span class="n">yo</span> <span class="o">=</span> <span class="n">yo</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">C</span><span class="p">,</span> <span class="n">I</span> <span class="o">=</span> <span class="n">I</span><span class="p">,</span> <span class="n">S</span> <span class="o">=</span> <span class="n">S</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">file</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span> <span class="n">yo</span> <span class="o">=</span> <span class="n">yo</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">C</span><span class="p">,</span> <span class="n">I</span> <span class="o">=</span> <span class="n">I</span><span class="p">,</span> <span class="n">S</span> <span class="o">=</span> <span class="n">S</span><span class="p">,</span> <span class="n">printWarnings</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">endlData</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">setFormat</span><span class="p">(</span> <span class="nb">format</span> <span class="p">)</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">addEndlData</span><span class="p">(</span> <span class="n">endlData</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">tmpFile</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">l</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="k">break</span>
+            <span class="n">ZA_</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">l</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">target</span><span class="o">.</span><span class="n">save</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">l</span> <span class="p">)</span>
+
+    <span class="n">fudgeParameters</span><span class="o">.</span><span class="n">VerboseMode</span> <span class="o">=</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">fIn</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span> <span class="n">file</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">endlretHeaders</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">fIn</span><span class="o">.</span><span class="n">readline</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="s1">&#39;date of processing&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">l</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Invalid first line for endlret type file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">file</span> <span class="p">)</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">fIn</span><span class="o">.</span><span class="n">readline</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="s1">&#39;date of last physics change&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">l</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Invalid second line for endlret type file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">file</span> <span class="p">)</span>
+
+    <span class="n">l</span> <span class="o">=</span> <span class="n">fIn</span><span class="o">.</span><span class="n">readline</span><span class="p">(</span> <span class="p">)</span>
+    <span class="n">yi</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">l</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">9</span><span class="p">]</span> <span class="p">)</span>
+    <span class="n">workDir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">outDir</span><span class="p">,</span> <span class="s1">&#39;yi</span><span class="si">%2.2d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">yi</span> <span class="p">)</span>
+    <span class="n">tmpFileName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">workDir</span><span class="p">,</span> <span class="s1">&#39;tmpFile&#39;</span> <span class="p">)</span>
+    <span class="k">while</span><span class="p">(</span> <span class="n">l</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="n">l</span> <span class="o">=</span> <span class="n">splitZA</span><span class="p">(</span> <span class="n">fIn</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">yi</span><span class="p">,</span> <span class="n">workDir</span><span class="p">,</span> <span class="nb">format</span> <span class="o">=</span> <span class="nb">format</span> <span class="p">)</span>
+    <span class="n">fIn</span><span class="o">.</span><span class="n">close</span><span class="p">(</span> <span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

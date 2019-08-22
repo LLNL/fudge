@@ -98,7 +98,7 @@ class endlZA :
     def __init__( self, ZA, yi, database = None, release = 'current', workDir = None, suffix = "", readOnly = 0, bdflsFile = None ) :
         """Creates a new endlZA object."""
 
-        if( bdflsFile == None ) : bdflsFile = bdfls.getDefaultBdfls( )
+        if( bdflsFile is None ) : bdflsFile = bdfls.getDefaultBdfls( )
         self.bdflsFile = bdflsFile
         self.sZA = endlmisc.strZASuffix( ZA, suffix )
         ZA_, suffix_ = endlmisc.intZASuffix( self.sZA )
@@ -114,14 +114,14 @@ class endlZA :
         self.readOnly = readOnly or fudgeParameters.ReadOnly
         gappsDir = os.path.realpath( '/usr/gapps/data/nuclear' )
         self.documentation = None
-        if( database == None ) :                    # This is a designer isotope.
+        if( database is None ) :                    # This is a designer isotope.
             self.DesignerIsotope = 1
             self.source = "Designer isotope"
             if( workDir == '' ) : workDir = None
             if ( self.readOnly ) :
                 self.workDir = None
             else :
-                if( workDir == None ) :
+                if( workDir is None ) :
                     self.workDir = tempfile.mkdtemp( )
                 else :
                     self.workDir = workDir
@@ -146,7 +146,7 @@ class endlZA :
                 if ( self.readOnly ) :
                     self.workDir = None
                 else :
-                    if( workDir == None ) :
+                    if( workDir is None ) :
                         self.workDir = tempfile.mkdtemp( )
                     else :
                         self.workDir = workDir
@@ -158,7 +158,7 @@ class endlZA :
                     if( not os.path.isdir( self.workDir ) ) : os.makedirs( self.workDir )
                 if ( fudgeParameters.VerboseMode > 0 ) : print "workDir =", self.workDir, "\nSource directory =", self.source
                 F = os.listdir( self.source )
-                if( ( self.workDir != None ) and os.path.samefile( self.source, self.workDir ) ) :
+                if( ( self.workDir is not None ) and os.path.samefile( self.source, self.workDir ) ) :
                     if( fudgeParameters.VerboseMode > 0 ) : 
                         endlmisc.printWarning( 'Are you sure you know what you are doing as database and work directories are the same?' )
                 else :
@@ -230,14 +230,14 @@ can be used to get a reference to the neutron in-elastic cross section,
         the headers of endlfile are compared to other headers in self, and modified if needed.
         A reference to endlfile is returned."""
 
-        if( templateData == None ) :
+        if( templateData is None ) :
             for f in self.filelist :
                 if( f.C != endlfile.C ) : continue
                 for l in f.levels :
                     if( len( l.h[0] ) >= 68 ) :
                         templateData = l
                         break
-            if( templateData == None ) :
+            if( templateData is None ) :
                 for f in self.filelist :
                     for l in f.levels :
                         if( len( l.h[0] ) >= 68 ) :
@@ -255,7 +255,7 @@ can be used to get a reference to the neutron in-elastic cross section,
         if( endlfile.levels == [] ) : endlfile.read( )
         for l in endlfile.levels : f.addEndlData( l )
         if( checkHeaders ) :
-            if( templateData != None ) :
+            if( templateData is not None ) :
                 if( ( l.C != 10 ) and ( l.C != templateData.C ) ) : endlmisc.printWarning( "Warning in endlZA.addEndlFile: template reaction not the same as new data, so Q and temperature may not be correct." )
                 for l in f.levels :
                     l.setZA( templateData.getZA( ) )
@@ -279,7 +279,7 @@ can be used to get a reference to the neutron in-elastic cross section,
         return f
 
     def addFile( self, yo, C, I, S, halflife = None, printWarnings = True ) :
-        "Adds the (yo, C, I, S) file to endlZA.  If the file already exist a raise is executed."
+        """Adds the (yo, C, I, S) file to endlZA.  If the file already exist a raise is executed."""
 
         if ( ( ( I == 10 ) or ( I == 11 ) ) and printWarnings ) :
             endlmisc.printWarning( "Warning in endlZA.addFile: I-values of 10 or 11 may be overwritten in processing" )
@@ -304,13 +304,13 @@ can be used to get a reference to the neutron in-elastic cross section,
         file.setYiZAYoCISs( yo = yo, C = C, I = I, S = S )
         if( deleteOldFile ) :
             cmd = "rm -rf " + self.workDir + "/" + oldName
-            if ( self.workDir != None ) : 
+            if ( self.workDir is not None ) : 
                 if ( fudgeParameters.VerboseMode > 0 ) : print "executing system command >>>", cmd
                 os.system( cmd )
 
     def check( self, dQ_MeV = 10e-3, dThreshold_MeV = 10e-3, xCloseEps = None, checkForEnDepData = False, normTolerance = 1e-5, allowZeroE = False,
         checkList = {}, crossSectionsOnly = False, maxAbsFloatValue = None ) :
-        "Checks all read in data in self."
+        """Checks all read in data in self."""
 
         checkListKeys = { 'checkEMin' : True, 'checkMissing' : True, 'checkSubChecks' : True, 'energyBalance' : 10e-3, 'maxGammaMultiplicity' : 100.,
             'crossSectionEnergyMax' : 20 }
@@ -475,7 +475,7 @@ can be used to get a reference to the neutron in-elastic cross section,
                         else :
                             if( ( self.A == 0 ) and ( ( I0.C < 50 ) or ( I0.C > 59 ) ) and ( self.yi != yo ) ) : 
                                 yoMsg = 'natural target cannot have only I = 1 data for this reaction'
-                    if( yoMsg != None ) :
+                    if( yoMsg is not None ) :
                         ErrMsgs.append( endlmisc.endlCheckerObject( yi = self.yi, ZA = self.ZA, suffix = self.suffix, yo = yo, C = C, S = S, X1 = X1, X2 = X2, \
                             X3 = X3, X4 = X4, Q = Q, message = '%s for yo = %2d' % ( yoMsg, yo ) ) )
                     if( I3present and I4present ) : ErrMsgs.append( endlmisc.endlCheckerObject( yi = self.yi, ZA = self.ZA, suffix = self.suffix, yo = yo, C = C, S = S, X1 = X1, \
@@ -535,7 +535,7 @@ can be used to get a reference to the neutron in-elastic cross section,
         return( ErrMsgs )
 
     def clean( self ) :
-        "Removes all I=10 and I=11 data files from self."
+        """Removes all I=10 and I=11 data files from self."""
 
         r = range( len( self.filelist ) )
         r.reverse( )
@@ -543,7 +543,7 @@ can be used to get a reference to the neutron in-elastic cross section,
             if ( self.filelist[i].I == 10 ) or ( self.filelist[i].I == 11 ) : del self.filelist[i]
 
     def CList( self ) :
-        "Returns the list of sorted C-values for self."
+        """Returns the list of sorted C-values for self."""
 
         cl = []
         for l in self.filelist :
@@ -596,11 +596,11 @@ can be used to get a reference to the neutron in-elastic cross section,
                 I3.normalize( )
 
                 I3File = self.findFile( yo = I4.yo, C = I4.C, I = 3, S = I4.S )
-                if( I3File == None ) : I3File = self.addFile( yo = I4.yo, C = I4.C, I = 3, S = I4.S )
+                if( I3File is None ) : I3File = self.addFile( yo = I4.yo, C = I4.C, I = 3, S = I4.S )
                 I3File.addEndlData( I3 )
 
                 I1File = self.findFile( yo = I4.yo, C = I4.C, I = 1, S = I4.S )
-                if( I1File == None ) : I1File = self.addFile( yo = I4.yo, C = I4.C, I = 1, S = I4.S )
+                if( I1File is None ) : I1File = self.addFile( yo = I4.yo, C = I4.C, I = 1, S = I4.S )
                 I1File.addEndlData( I1 )
 
                 yoCIS = [ I4.yo, I4.C, I4.I, I4.S ]
@@ -609,7 +609,7 @@ can be used to get a reference to the neutron in-elastic cross section,
         for yo, C, I, S in I4sToRemove : self.removeFile( yo, C, I, S )
 
     def SListForC( self, C ) :
-        "Returns the list of S-values for C-value of self."
+        """Returns the list of S-values for C-value of self."""
 
         sl = []
         for l in self.filelist :
@@ -622,7 +622,7 @@ can be used to get a reference to the neutron in-elastic cross section,
         return self.findData( 0, C, 0, S, X1, X2, X3, X4, Q )
 
     def file( self, yo = None, C = None, I = None, S = None ) :
-        "Deprecated method, use findFile instead. This method will not be in version 4."
+        """Deprecated method, use findFile instead. This method will not be in version 4."""
 
         return( self.findFile( yo = yo, C = C, I = I, S = S ) )
 
@@ -639,7 +639,7 @@ can be used to get a reference to the neutron in-elastic cross section,
         return a[0]
 
     def files( self, yo = None, C = None, I = None, S = None ) :
-        "Deprecated method, use findFiles instead. This method will not be in version 4."
+        """Deprecated method, use findFiles instead. This method will not be in version 4."""
 
         return( self.findFiles( yo = yo, C = C, I = I, S = S ) )
 
@@ -652,7 +652,7 @@ can be used to get a reference to the neutron in-elastic cross section,
         return a
 
     def findItems( self, yo = None, C = None, I = None, S = None, X1 = None, X2 = None, X3 = None, X4 = None, Q = None ) :
-        "Deprecated method, use findDatas instead. This method will not be in version 4."
+        """Deprecated method, use findDatas instead. This method will not be in version 4."""
 
         return( self.findDatas( yo = yo, C = C, I = I, S = S, X1 = X1, X2 = X2, X3 = X3, X4 = X4, Q = Q ) )
 
@@ -663,17 +663,17 @@ can be used to get a reference to the neutron in-elastic cross section,
         items = []
         for f in self.filelist : 
             if ( f.IsyoCIS( yo, C, I, S ) ) :
-                if ( f.levels == [] ) : raise Exception( "\nError in endlZA.findDatas: one or more data files not read" )
+                if ( f.levels == [] ) : raise Exception( "\nError in endlZA.findDatas: one or more data files not read, %s" % f.name )
                 for l in f.levels :
-                    if ( ( ( X1 == None ) or ( X1 == l.X1 ) ) and
-                         ( ( X2 == None ) or ( X2 == l.X2 ) ) and
-                         ( ( X3 == None ) or ( X3 == l.X3 ) ) and
-                         ( ( X4 == None ) or ( X4 == l.X4 ) ) and
-                         ( ( Q  == None ) or ( Q  == l.Q  ) ) ) : items.append( l )
+                    if ( ( ( X1 is None ) or ( X1 == l.X1 ) ) and
+                         ( ( X2 is None ) or ( X2 == l.X2 ) ) and
+                         ( ( X3 is None ) or ( X3 == l.X3 ) ) and
+                         ( ( X4 is None ) or ( X4 == l.X4 ) ) and
+                         ( ( Q  is None ) or ( Q  == l.Q  ) ) ) : items.append( l )
         return( items )
 
     def findItem( self, yo = None, C = None, I = None, S = None, X1 = None, X2 = None, X3 = None, X4 = None, Q = None ) :
-        "Deprecated method, use findData instead. This method will not be in version 4."
+        """Deprecated method, use findData instead. This method will not be in version 4."""
 
         return( self.findData( yo = yo, C = C, I = I, S = S, X1 = X1, X2 = X2, X3 = X3, X4 = X4, Q = Q ) )
 
@@ -698,15 +698,15 @@ can be used to get a reference to the neutron in-elastic cross section,
                     missing[8] or ( q_0.Q != q.Q ) ]
                 print "    (%2d, %2d, %3d, %2d, %14.6e %14.6e %14.6e %14.6e %14.6e)" % ( q.yo, q.C, q.I, q.S, q.X1, q.X2, q.X3, q.X4, q.Q )
             print "\nValues not specified are -",
-            if( yo == None ) : print "yo -",
-            if(  C == None ) : print "C -",
-            if(  I == None ) : print "I -",
-            if(  S == None ) : print "S -",
-            if( X1 == None ) : print "X1 -",
-            if( X2 == None ) : print "X2 -",
-            if( X3 == None ) : print "X3 -",
-            if( X4 == None ) : print "X4 -",
-            if( Q  == None ) : print "Q -",
+            if( yo is None ) : print "yo -",
+            if(  C is None ) : print "C -",
+            if(  I is None ) : print "I -",
+            if(  S is None ) : print "S -",
+            if( X1 is None ) : print "X1 -",
+            if( X2 is None ) : print "X2 -",
+            if( X3 is None ) : print "X3 -",
+            if( X4 is None ) : print "X4 -",
+            if( Q  is None ) : print "Q -",
             print "\nAdditional values required are -", 
             if( missing[0] ) : print "yo -",
             if( missing[1] ) : print "C -",
@@ -750,25 +750,25 @@ can be used to get a reference to the neutron in-elastic cross section,
         def getAnyData( anyData ) :
             """Attempts to find a dataset that is complete enough to determine. If one is not found a raise is executed."""
 
-            if( anyData != None ) : return( anyData )
+            if( anyData is not None ) : return( anyData )
             anyDatas = self.findDatas( )
             if( len( anyDatas ) > 0 ) : return( anyDatas[0] )
             raise fudgeExceptions.ENDL_fixHeadersException_NoC10Data( 'No dataset is complete enough for determining required information.' )
 
         anyData = None
         self.readIfNotRead( )
-        if( ( yi == None ) or (  ZA == None ) or ( ELevel == None ) or ( temperature == None ) ) :
+        if( ( yi is None ) or (  ZA is None ) or ( ELevel is None ) or ( temperature is None ) ) :
             anyData = getAnyData( anyData )
-            if( yi == None ) : yi = anyData.getYi( )
-            if( ZA == None ) : ZA = anyData.getZA( )
-            if( ELevel == None ) : ELevel = anyData.getELevel( )
-            if( temperature == None ) : temperature = anyData.getTemperature( )
+            if( yi is None ) : yi = anyData.getYi( )
+            if( ZA is None ) : ZA = anyData.getZA( )
+            if( ELevel is None ) : ELevel = anyData.getELevel( )
+            if( temperature is None ) : temperature = anyData.getTemperature( )
         mass = self.bdflsFile.mass( ZA )
-        if( mass == None ) :
+        if( mass is None ) :
             anyData = getAnyData( anyData )
             mass = anyData.getMass( )
         halflife = self.bdflsFile.halflife( ZA )
-        if( halflife == None ) :
+        if( halflife is None ) :
             try :
                 anyData = getAnyData( anyData )
                 halflife = anyData.getHalflife( )
@@ -779,7 +779,7 @@ can be used to get a reference to the neutron in-elastic cross section,
         for data in datas :
             data.setMass( mass )
             data.setELevel( ELevel )
-            if( halflife == None ) :
+            if( halflife is None ) :
                 halflife = data.getHalflife( )
             else :
                 data.setHalflife( halflife )
@@ -804,7 +804,7 @@ can be used to get a reference to the neutron in-elastic cross section,
                 theSame = v1 == v2
             return( theSame )
 
-        if( fixReactions != None ) :
+        if( fixReactions is not None ) :
             doIt = 7 * [ False ]
             doIts = { 'X1' : 2, 'X2' : 3, 'X3' : 4, 'X4' : 5, 'Q' : 6 }
             for r in fixReactions :
@@ -922,7 +922,7 @@ can be used to get a reference to the neutron in-elastic cross section,
     def getDocumentation( self ) :
         """Return None if there is not documentation file, otherwise, the text of the documentation file is returned."""
 
-        if( self.documentation == None ) : return( None )
+        if( self.documentation is None ) : return( None )
         return( self.documentation.getText( ) )
 
     def setDocumentation( self, text ) :
@@ -943,7 +943,7 @@ can be used to get a reference to the neutron in-elastic cross section,
             data.setTemperature( T )
 
     def info( self ) :
-        "Prints Source, Z, mass and halflife for self."
+        """Prints Source, Z, mass and halflife for self."""
 
         m = self.bdflsFile.mass( self.ZA )
         l = self.bdflsFile.halflife( self.ZA )
@@ -953,7 +953,7 @@ can be used to get a reference to the neutron in-elastic cross section,
         print "yi = %d %s %s, Z name = %s, mass = %e, halflife = %e" % ( self.yi, self.yiTags[2], self.yiTags[3], endl_Z.endl_ZLabel( self.ZA / 1000 ), m, l )
 
     def ll( self, yo = None, C = None, I = None, S = None ) :
-        "Prints a long listing of the data in self."
+        """Prints a long listing of the data in self."""
 
         print "Source =", self.source
         print "          Size   File name     ( yo,  C,   I,   S )    ------  yo ------  C-desc Comment"
@@ -973,7 +973,7 @@ can be used to get a reference to the neutron in-elastic cross section,
                 print "%3d %s%s %s" % ( Counter, r, l.mode, s ), 
                 print l.name, "[( %2d, %2d, %3d, %3d )]" % ( l.yo, l.C, l.I, l.S ),
                 s = endl_y.endl_yLongLabel( l.yo )
-                if ( s == None ) : s = " "
+                if ( s is None ) : s = " "
                 print sY % s,
                 print sC % endl_C.endl_CLabel( l.C ),
 #               print sI % endl_I.endl_ILabel( l.I ),
@@ -996,7 +996,7 @@ can be used to get a reference to the neutron in-elastic cross section,
         self.ll( None, C, 0, S )
 
     def ls( self, yo = None, C = None, I = None, S = None, w = 3 ) :
-        "Prints a short listing of the data in self."
+        """Prints a short listing of the data in self."""
 
         print "Source =", self.source
         d = []
@@ -1014,7 +1014,7 @@ can be used to get a reference to the neutron in-elastic cross section,
         self.ls( None, C, 0, S )
 
     def plotcs( self, C = 1, S = None ) :
-        "Plots cross section data for C_Value = C and S_Value = S.  Deprecated method, will not be in version 4."
+        """Plots cross section data for C_Value = C and S_Value = S.  Deprecated method, will not be in version 4."""
 
         for l in self.filelist :
             if ( l.IsyoCIS( None, C, 0, S ) and ( l.levels != [] ) ) :
@@ -1035,7 +1035,7 @@ can be used to get a reference to the neutron in-elastic cross section,
         return( csxqs )
 
     def read( self, yo = None, C = None, I = None, S = None, printWarning = True ) :
-        "Reads in all data matching yo, C, I and S. If printWarning is True and data has already be read in, a warning message is printed."
+        """Reads in all data matching yo, C, I and S. If printWarning is True and data has already be read in, a warning message is printed."""
 
         if ( self.DesignerIsotope ) : raise fudgeExceptions.ENDL_DesignerIsotopeReadException( "Error endlZA.read: cannot read designer isotope data from file" )
         for l in self.filelist :
@@ -1047,7 +1047,7 @@ can be used to get a reference to the neutron in-elastic cross section,
                     l.read( )
 
     def readIfNotRead( self, yo = None, C = None, I = None, S = None ) :
-        "Reads in all data matching yo, C, I and S which is not currently read in."
+        """Reads in all data matching yo, C, I and S which is not currently read in."""
 
         if ( self.DesignerIsotope ) : return
         for l in self.filelist :
@@ -1055,7 +1055,7 @@ can be used to get a reference to the neutron in-elastic cross section,
                 if ( l.levels == [] ) : l.read( )
 
     def readcs( self, C = None, S = None ) :
-        "Reads in all unread cross section data with C_Value = C and S_Value = S. Deprecated method, will not be in version 4."
+        """Reads in all unread cross section data with C_Value = C and S_Value = S. Deprecated method, will not be in version 4."""
 
         self.read( yo = None, C = C, I = 0, S = S )
 
@@ -1065,7 +1065,7 @@ can be used to get a reference to the neutron in-elastic cross section,
         n = len( self.filelist ) - 1
         while( n >= 0 ) :
             if ( self.filelist[n].IsyoCIS( yo, C, I, S ) ) :
-                if( self.workDir != None ) :
+                if( self.workDir is not None ) :
                     cmd = "rm -rf " + self.workDir + "/" + self.filelist[n].name
                     if ( fudgeParameters.VerboseMode > 0 ) : print "executing system command >>>", cmd
                     os.system( cmd )
@@ -1075,15 +1075,15 @@ can be used to get a reference to the neutron in-elastic cross section,
     def save( self, yo = None, C = None, I = None, S = None, path = None, file = None ) :
         """Saves all data matching yo, C, I and S to path = path and file = file.  In general file should not be specified."""
 
-        if ( path == None ) :
-            if ( self.workDir == None ) : raise Exception( "\nError in endlZA.save: project does not have a work directory." )
+        if ( path is None ) :
+            if ( self.workDir is None ) : raise Exception( "\nError in endlZA.save: project does not have a work directory." )
             path = self.workDir
         if( not os.path.exists( path ) ) : os.makedirs( path )
         for l in self.filelist :
             if ( l.IsyoCIS( yo, C, I, S ) ) :
                 if ( l.levels != [] ) : 
                     file_ = file
-                    if ( file_ == None ) : file_ = l.name
+                    if ( file_ is None ) : file_ = l.name
                     Name = os.path.join( path, file_ )
                     if ( fudgeParameters.VerboseMode > 0 ) : print "Saving data to file", Name
                     f = open( Name, "w" )
@@ -1092,15 +1092,15 @@ can be used to get a reference to the neutron in-elastic cross section,
         if( not ( self.documentation is None ) ) : self.documentation.write( os.sep.join( ( path, 'documentation.txt' ) ) )
 
     def savecs( self, C = None, S = None, path = None ) :
-        "Saves all cross section data matching C and S. Deprecated method, will not be in version 4."
+        """Saves all cross section data matching C and S. Deprecated method, will not be in version 4."""
 
         self.save( yo = None, C = C, I = 0, S = S, path = path )
 
     def sumcs( self ) :
-        "Returns a endl2dmath object for the sum of all cross secitions for reactions 10 <= C < 50."
+        """Returns a endl2dmath object for the sum of all cross secitions for reactions 10 <= C < 50."""
 
         def sortfunc4sumcs_( x, y ) :
-            "For internal use only."
+            """For internal use only."""
 
             if ( len( x )  < len( y ) ) : return -1
             if ( len( x ) == len( y ) ) : return 0
@@ -1114,7 +1114,7 @@ can be used to get a reference to the neutron in-elastic cross section,
         return s
 
     def SXList( self, C ) :
-        "Returns a sorted list of S- and X-values (and Q) for all reaction of type C in self, excluding S = 7."
+        """Returns a sorted list of S- and X-values (and Q) for all reaction of type C in self, excluding S = 7."""
 
         sxl = []
         for f in self.filelist :
@@ -1195,11 +1195,11 @@ can be used to get a reference to the neutron in-elastic cross section,
                 if( datum.I in [ 1, 3, 4 ] ) : yoDatas.append( [ datum.I, datum ] )
                 if( datum.I == 9 ) : addFile( datum.toZAsFrame( newProjectileMass, newTargetMass, halflife, self.bdflsFile )[0], halflife )
         return( newTarget )
-        
-    def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, testing = False, verbose = 0 ) :
+
+    def toGND( self, evaluationLibrary, evaluationVersion, excludeAverageProductData = True, testing = False, verbose = 0 ) :
 
         import fudge.legacy.converting.endlToGND as endlToGND
-        return( endlToGND.toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = xenslIsotopes, verbose = verbose ) )
+        return( endlToGND.toGND( self, evaluationLibrary, evaluationVersion, excludeAverageProductData = excludeAverageProductData, verbose = verbose ) )
 
     def adjustcs( self, C = 10, S = None, X1 = None, X2 = None, X3 = None, X4 = None, Q = None, f = 5.e-5, csRelChangeNotice = .1 ) :
         """Adjust the cross section given by C, S, X1, X2, X3, X4 and Q  so that the total cross section remains fixed.  
@@ -1257,7 +1257,7 @@ can be used to get a reference to the neutron in-elastic cross section,
         cross section by 16.7% of the different. Relative total cross section less than f are set to 0."""
 
         s = self.sumcs( )                                       # Calulate the new sum.
-        if( total == None ) : total = self.cs( 1 )              # Get the current total cross section.
+        if( total is None ) : total = self.cs( 1 )              # Get the current total cross section.
         d = total - s                                           # The difference.
         s = ( total + s ) / 2.
         i = 0
@@ -1273,7 +1273,7 @@ can be used to get a reference to the neutron in-elastic cross section,
             csList = self.findDatas( C = CNW[0], I = 0 )
             for cs in csList :
                 w = CNW[1]
-                if( CNW[1] == None ) : w = cs
+                if( CNW[1] is None ) : w = cs
                 totalWeight = totalWeight + w
                 csNWs.append( cs )
         d = d / totalWeight

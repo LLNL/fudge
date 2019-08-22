@@ -96,7 +96,7 @@ def get4dmathData( object, callingRoutine, msg ) :
     return( data )
 
 def valid4dClassType( object, callingRoutine, msg ) :
-    "Returns the first argument, object, if it is a subclass of the endl4dmath class; else, triggers a raise."
+    """Returns the first argument, object, if it is a subclass of the endl4dmath class; else, triggers a raise."""
 
     if( isinstance( object, endl4dmathClasses.endl4dmath ) ) : return( object )
     raise Exception( "\nError in %s: invalid type = %s for %s" % ( callingRoutine, type( object ), msg ) )
@@ -127,7 +127,7 @@ def check4dData( data, allowNegativeT = False, allowZeroT = True, allowNegativeX
     for t, xyz in points :
         fudgemath.checkNumber( t, "check4dData: t[%d]" % i, messages = messages, indentation = '    ', printErrors = printErrors, \
             maxAbsFloatValue = maxAbsFloatValue )
-        if( tPrior != None ) :
+        if( tPrior is not None ) :
             if( t <= tPrior ) :
                 s = 'check4dData: t value t[%d] >= t[%d] (%e >= %e)' % ( i-1, i, tPrior, t )
                 messages.append( s )
@@ -145,7 +145,7 @@ def check4dData( data, allowNegativeT = False, allowZeroT = True, allowNegativeX
     return( messages )
 
 def plot3dFrom4d( data, i, options, xyzlog = 0 ) :
-    "For internal use only."
+    """For internal use only."""
 
     ly_etal = data[i][1]
     f = fudgeFileMisc.fudgeTempFile( )
@@ -164,10 +164,10 @@ def string4dData( d, i0 = 0, i1 = 1, i2 = 2, i3 = 3, fmt0 = None, fmt1 = None, f
     i.sort( )
     if ( i[0] != 0 ) or ( i[1] != 1 ) or ( i[2] != 2 ) or ( i[3] != 3 ) :
         raise Exception( "\nError in string4dData: %s" % "Invalid i0 = %s, i1 = %s, i2 = %s, and/or i3 = %s" % (`i0`,`i1`,`i2`,`i3`) )
-    if( fmt0 == None ) : fmt0 = endl4d_repr_tFormat
-    if( fmt1 == None ) : fmt1 = endl4d_repr_xFormat
-    if( fmt2 == None ) : fmt2 = endl4d_repr_yFormat
-    if( fmt3 == None ) : fmt3 = endl4d_repr_zFormat
+    if( fmt0 is None ) : fmt0 = endl4d_repr_tFormat
+    if( fmt1 is None ) : fmt1 = endl4d_repr_xFormat
+    if( fmt2 is None ) : fmt2 = endl4d_repr_yFormat
+    if( fmt3 is None ) : fmt3 = endl4d_repr_zFormat
     fmt = [ fmt0, fmt1, fmt2, fmt3 ]
     s = []
     sa = [ "", "", "", "" ]

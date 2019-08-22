@@ -65,7 +65,9 @@
 This module adds the method toACE to the classes in the fudge.gnd.productData.multiplicity module.
 """
 
-from fudge.gnd.productData import multiplicity
+from xData import standards as standardsModule
+
+from fudge.gnd.productData import multiplicity as multiplicityModule
 
 #
 #   polynomial multiplicity.
@@ -78,20 +80,20 @@ def toACE( self ) :
         factor *= eFactor
     return( [ 1, len( self ) ] + coefficients )
 
-multiplicity.polynomial.toACE = toACE
+multiplicityModule.polynomial.toACE = toACE
 
 #
-#   pointwise multiplicity.
+#   XYs1d multiplicity.
 #
 def toACE( self ) :
 
     interpolation = 0
-    if( self.axes[0].isFlat( ) ) :
+    if( self.interpolation == standardsModule.interpolation.flatToken ) :
         interpolation = 1
-    elif( self.axes[0].isLinear( ) ) :
+    elif( self.interpolation == standardsModule.interpolation.linlinToken ) :
         interpolation = 2
-    if( interpolation == 0 ) : raise Exception( 'Interpolation "%s" not supported' % self.axes[0].interpolation.getInterpolationTokens( ) )
+    if( interpolation == 0 ) : raise Exception( 'Interpolation "%s" not supported' % self.interpolation )
     eFactor = self.domainUnitConversionFactor( 'MeV' )
     return( [ 2, 1, len( self ), interpolation, len( self ) ] + [ eFactor * E1 for E1, m1 in self ] + [ m1 for E1, m1 in self ] )
 
-multiplicity.pointwise.toACE = toACE
+multiplicityModule.XYs1d.toACE = toACE

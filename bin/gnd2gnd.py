@@ -63,14 +63,39 @@
 # 
 # <<END-copyright>>
 
-# This script takes a gnd/XML file, reads it in and rewrites it to a file with the same name 
-# (only in the currently directory) with the extension '.g2g' added. The intent of this script 
-# is for testing the reading/writing of gnd/XML file. More than one file can be inputted, and each
-# is read/written independently.
-
-import sys, os
+import os
+import argparse
 from fudge.gnd import reactionSuite
+from fudge.gnd.covariances import covarianceSuite
 
-for gndFile in sys.argv[1:] :
-    gnd = reactionSuite.readXML( gndFile )
-    gnd.saveToFile( os.path.basename( gndFile ) + '.g2g' )
+description1 = """Read one or more GND files into Fudge, then write back to GND/xml.  Intent is to test 
+    for errors during reading or writing.  Sample use: python gnd2gnd.py n-001_H_001.xml n-001_H_002.xml ...
+    If file n-001_H_001-cov.xml (or -covar.xml) exists, covariances will automatically be read and re-written.
+    Resulting files will be in the local directory, and will have extension '.g2g' appended.
+"""
+
+__doc__ = description1
+
+parser = argparse.ArgumentParser( description1 )
+parser.add_argument( 'gnds', nargs = "+", 
+        help = "GND file(s) to translate" )
+parser.add_argument( '-o', '--outline', default = False, action = 'store_true', 
+        help = "The outputted GND files are written in outline mode" )
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+
+    for gndFile in args.gnds:
+        covarianceFile = None
+        for extension in ('-cov.xml','-covar.xml'):
+            tmp = gndFile.replace('.xml', extension)
+            if os.path.exists(tmp): covarianceFile = tmp
+
+        gnd = reactionSuite.readXML( gndFile )
+        gndCov = None
+        if covarianceFile is not None:
+            gndCov = covarianceSuite.readXML( covarianceFile, reactionSuite=gnd )
+
+        gnd.saveToFile( os.path.basename( gndFile ) + '.g2g', outline = args.outline )
+        if gndCov is not None:
+            gndCov.saveToFile( os.path.basename( covarianceFile ) + '.g2g' )

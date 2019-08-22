@@ -1,0 +1,9 @@
+The data in this subdirectory is of ENDF-style energy-angle
+joint probability densities.  The files are as follows:
+
+in.ENDFdoubleDiff-Be9: The original ENDF data integrated using adaptive
+  quadrature.  Its output is out.ENDFdoubleDiff-Be9.
+  The output of this file from MC_merced is out.ENDFdoubleDiff-Be9.MC.
+
+in.ENDFdoubleDiff-Be9.Gauss6: The original ENDF data integrated using Gaussian
+  quadrature or order 6.  Its output is out.ENDFdoubleDiff-Be9.Gauss6.

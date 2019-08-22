@@ -1,0 +1,337 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.gnd.productData.distributions.photonScattering &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.gnd.productData.distributions.photonScattering</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Photon coherent and incoherent scattering factors.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">xData.ancestry</span> <span class="k">as</span> <span class="nn">ancestryModule</span>
+<span class="kn">import</span> <span class="nn">xData.standards</span> <span class="k">as</span> <span class="nn">standardsModule</span>
+<span class="kn">import</span> <span class="nn">xData.axes</span> <span class="k">as</span> <span class="nn">axesModule</span>
+<span class="kn">import</span> <span class="nn">xData.XYs</span> <span class="k">as</span> <span class="nn">XYsModule</span>
+<span class="kn">import</span> <span class="nn">xData.regions</span> <span class="k">as</span> <span class="nn">regionsModule</span>
+
+<span class="kn">import</span> <span class="nn">base</span> <span class="k">as</span> <span class="nn">baseModule</span>
+
+<div class="viewcode-block" id="scatteringFactor"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.scatteringFactor">[docs]</a><span class="k">class</span> <span class="nc">scatteringFactor</span> <span class="p">:</span>        <span class="c1"># This class is designed to look like a module and not a real class.</span>
+
+<div class="viewcode-block" id="scatteringFactor.XYs1d"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.scatteringFactor.XYs1d">[docs]</a>    <span class="k">class</span> <span class="nc">XYs1d</span><span class="p">(</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="scatteringFactor.XYs1d.toXMLList"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.scatteringFactor.XYs1d.toXMLList">[docs]</a>        <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="k">return</span><span class="p">(</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="scatteringFactor.regions1d"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.scatteringFactor.regions1d">[docs]</a>    <span class="k">class</span> <span class="nc">regions1d</span><span class="p">(</span> <span class="n">regionsModule</span><span class="o">.</span><span class="n">regions1d</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="n">regionsModule</span><span class="o">.</span><span class="n">regions1d</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+
+            <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getArguments</span><span class="p">(</span> <span class="n">kwargs</span><span class="p">,</span> <span class="p">{</span> <span class="s1">&#39;accuracy&#39;</span> <span class="p">:</span> <span class="n">XYsModule</span><span class="o">.</span><span class="n">defaultAccuracy</span> <span class="p">}</span> <span class="p">)[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">]</span>
+                <span class="n">xys</span> <span class="o">=</span> <span class="n">regionsModule</span><span class="o">.</span><span class="n">regions1d</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+                <span class="k">return</span><span class="p">(</span> <span class="n">scatteringFactor</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="n">xys</span><span class="o">.</span><span class="n">axes</span><span class="p">,</span> <span class="n">xys</span> <span class="p">)</span> <span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="scatteringFactor.defaultAxes"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.scatteringFactor.defaultAxes">[docs]</a>    <span class="k">def</span> <span class="nf">defaultAxes</span><span class="p">(</span> <span class="n">factorLabel</span><span class="p">,</span> <span class="n">energyUnit</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axes</span><span class="p">(</span> <span class="n">rank</span> <span class="o">=</span> <span class="mi">2</span> <span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span> <span class="n">factorLabel</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">axesModule</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span> <span class="s1">&#39;energy_in&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">energyUnit</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">axes</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="coherentFunctionBase"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.coherentFunctionBase">[docs]</a><span class="k">class</span> <span class="nc">coherentFunctionBase</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="p">(</span> <span class="n">scatteringFactor</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">,</span> <span class="n">scatteringFactor</span><span class="o">.</span><span class="n">regions1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;Needed </span><span class="si">%s</span><span class="s2"> scatteringFactor subform.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="coherentFunctionBase.convertUnits"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.coherentFunctionBase.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="coherentFunctionBase.toXML"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.coherentFunctionBase.toXML">[docs]</a>    <span class="k">def</span> <span class="nf">toXML</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="coherentFunctionBase.toXMLList"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.coherentFunctionBase.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">xmlStringList</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&lt;</span><span class="si">%s</span><span class="s2">&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">]</span>
+        <span class="n">xmlStringList</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlStringList</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">&quot;&lt;/</span><span class="si">%s</span><span class="s2">&gt;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">xmlStringList</span> <span class="p">)</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="coherentFunctionBase.parseXMLNode"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.coherentFunctionBase.parseXMLNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">cls</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">data</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">scatteringFactor</span><span class="o">.</span><span class="n">XYs1d</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">scatteringFactor</span><span class="o">.</span><span class="n">XYs1d</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="k">elif</span><span class="p">(</span> <span class="n">data</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">scatteringFactor</span><span class="o">.</span><span class="n">regions1d</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">scatteringFactor</span><span class="o">.</span><span class="n">regions1d</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid data &quot;</span><span class="si">%s</span><span class="s1">&quot; for &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">data</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">cls</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">cls</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="scatteringFunction"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.scatteringFunction">[docs]</a><span class="k">class</span> <span class="nc">scatteringFunction</span><span class="p">(</span> <span class="n">coherentFunctionBase</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;scatteringFactor&#39;</span>
+    <span class="n">ENDFMT</span> <span class="o">=</span> <span class="mi">502</span></div>
+
+<div class="viewcode-block" id="imaginaryAnomalousFactor"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.imaginaryAnomalousFactor">[docs]</a><span class="k">class</span> <span class="nc">imaginaryAnomalousFactor</span><span class="p">(</span> <span class="n">coherentFunctionBase</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;imaginaryAnomalousFactor&#39;</span>
+    <span class="n">ENDFMT</span> <span class="o">=</span> <span class="mi">505</span></div>
+
+<div class="viewcode-block" id="realAnomalousFactor"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.realAnomalousFactor">[docs]</a><span class="k">class</span> <span class="nc">realAnomalousFactor</span><span class="p">(</span> <span class="n">coherentFunctionBase</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;realAnomalousFactor&#39;</span>
+    <span class="n">ENDFMT</span> <span class="o">=</span> <span class="mi">506</span></div>
+
+<div class="viewcode-block" id="coherent"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.coherent">[docs]</a><span class="k">class</span> <span class="nc">coherent</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="coherent.form"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.coherent.form">[docs]</a>    <span class="k">class</span> <span class="nc">form</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">form</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;coherentScattering&#39;</span>
+        <span class="n">subformAttributes</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;formFactor&#39;</span><span class="p">,</span> <span class="s1">&#39;anomalousScatteringFactor_realPart&#39;</span><span class="p">,</span> <span class="s1">&#39;anomalousScatteringFactor_imaginaryPart&#39;</span> <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">formFactor</span><span class="p">,</span> <span class="n">realPart</span><span class="p">,</span> <span class="n">imaginaryPart</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">formFactor</span><span class="p">,</span> <span class="n">scatteringFunction</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Instance is class &quot;</span><span class="si">%s</span><span class="s1">&quot; and not scatteringFunction&#39;</span> <span class="o">%</span> <span class="n">formFactor</span><span class="o">.</span><span class="n">__class__</span> <span class="p">)</span>
+
+            <span class="k">if</span><span class="p">(</span> <span class="n">realPart</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">realPart</span><span class="p">,</span> <span class="n">realAnomalousFactor</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Instance is class &quot;</span><span class="si">%s</span><span class="s1">&quot; and not realAnomalousFactor&#39;</span> <span class="o">%</span> <span class="n">realPart</span><span class="o">.</span><span class="n">__class__</span> <span class="p">)</span>
+
+            <span class="k">if</span><span class="p">(</span> <span class="n">imaginaryPart</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">imaginaryPart</span><span class="p">,</span> <span class="n">imaginaryAnomalousFactor</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Instance is class &quot;</span><span class="si">%s</span><span class="s1">&quot; and not imaginaryAnomalousFactor&#39;</span> <span class="o">%</span> <span class="n">imaginaryPart</span><span class="o">.</span><span class="n">__class__</span> <span class="p">)</span>
+
+            <span class="n">baseModule</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="p">(</span> <span class="n">formFactor</span><span class="p">,</span> <span class="n">realPart</span><span class="p">,</span> <span class="n">imaginaryPart</span> <span class="p">)</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="coherent.form.calculateAverageProductData"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.coherent.form.calculateAverageProductData">[docs]</a>        <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Not supported for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="coherent.form.processMultiGroup"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.coherent.form.processMultiGroup">[docs]</a>        <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="kn">from</span> <span class="nn">fudge.processing.deterministic</span> <span class="k">import</span> <span class="n">transferMatrices</span> <span class="k">as</span> <span class="n">transferMatricesModule</span>
+            <span class="kn">from</span> <span class="nn">fudge.processing</span> <span class="k">import</span> <span class="n">group</span> <span class="k">as</span> <span class="n">groupModule</span>
+
+            <span class="n">verbosity</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">Grouping </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span>
+
+            <span class="nb">print</span> <span class="nb">type</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">anomalousScatteringFactor_imaginaryPart</span><span class="o">.</span><span class="n">data</span> <span class="p">)</span>
+            <span class="n">TM_1</span><span class="p">,</span> <span class="n">TM_E</span> <span class="o">=</span> <span class="n">transferMatricesModule</span><span class="o">.</span><span class="n">wholeAtomScattering</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">formFactor</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">realAnomalousFactor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">anomalousScatteringFactor_realPart</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">imaginaryAnomalousFactor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">anomalousScatteringFactor_imaginaryPart</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                    <span class="n">comment</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;transferMatrixComment&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; outgoing data for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;productLabel&#39;</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="n">groupModule</span><span class="o">.</span><span class="n">TMs2Form</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">TM_1</span><span class="p">,</span> <span class="n">TM_E</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="coherent.form.toXMLList"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.coherent.form.toXMLList">[docs]</a>        <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+            <span class="n">attributeStr</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">attributeStr</span> <span class="o">+=</span> <span class="s1">&#39; label=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
+            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">attributeStr</span> <span class="o">+=</span> <span class="s1">&#39; productFrame=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span>
+            <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="n">attributeStr</span> <span class="p">)</span> <span class="p">]</span>
+            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">formFactor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formFactor</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">anomalousScatteringFactor_realPart</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">anomalousScatteringFactor_realPart</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">anomalousScatteringFactor_imaginaryPart</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">anomalousScatteringFactor_imaginaryPart</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+            <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+            <span class="k">return</span><span class="p">(</span> <span class="n">xmlString</span> <span class="p">)</span></div>
+
+        <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="coherent.form.parseXMLNode"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.coherent.form.parseXMLNode">[docs]</a>        <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+            <span class="n">subForms</span> <span class="o">=</span> <span class="p">{</span> <span class="n">scatteringFunction</span><span class="o">.</span><span class="n">moniker</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">realAnomalousFactor</span><span class="o">.</span><span class="n">moniker</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">imaginaryAnomalousFactor</span><span class="o">.</span><span class="n">moniker</span> <span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
+
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">element</span> <span class="p">:</span>
+                <span class="k">for</span> <span class="n">_class</span> <span class="ow">in</span> <span class="p">(</span> <span class="n">scatteringFunction</span><span class="p">,</span> <span class="n">realAnomalousFactor</span><span class="p">,</span> <span class="n">imaginaryAnomalousFactor</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">_class</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span> <span class="k">break</span>
+
+                <span class="k">if</span><span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">!=</span> <span class="n">_class</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s2">&quot;Invalid element &#39;</span><span class="si">%s</span><span class="s2">&#39; encountered &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">)</span>
+                <span class="n">subForms</span><span class="p">[</span><span class="n">_class</span><span class="o">.</span><span class="n">moniker</span><span class="p">]</span> <span class="o">=</span> <span class="n">_class</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">child</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+
+            <span class="n">_form</span> <span class="o">=</span> <span class="n">coherent</span><span class="o">.</span><span class="n">form</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;label&#39;</span> <span class="p">),</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;productFrame&#39;</span> <span class="p">),</span>
+                    <span class="n">subForms</span><span class="p">[</span><span class="n">scatteringFunction</span><span class="o">.</span><span class="n">moniker</span><span class="p">],</span> <span class="n">subForms</span><span class="p">[</span><span class="n">realAnomalousFactor</span><span class="o">.</span><span class="n">moniker</span><span class="p">],</span>
+                    <span class="n">subForms</span><span class="p">[</span><span class="n">imaginaryAnomalousFactor</span><span class="o">.</span><span class="n">moniker</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="n">_form</span> <span class="p">)</span></div></div></div>
+
+<div class="viewcode-block" id="incoherent"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.incoherent">[docs]</a><span class="k">class</span> <span class="nc">incoherent</span> <span class="p">:</span>
+
+<div class="viewcode-block" id="incoherent.form"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.incoherent.form">[docs]</a>    <span class="k">class</span> <span class="nc">form</span><span class="p">(</span> <span class="n">baseModule</span><span class="o">.</span><span class="n">form</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;incoherentScattering&#39;</span>
+        <span class="n">subformAttributes</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;scatteringFunction&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="n">scatteringFunction</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">scatteringFunction</span><span class="p">,</span> <span class="p">(</span> <span class="n">incoherent</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">,</span> <span class="n">incoherent</span><span class="o">.</span><span class="n">regions1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Instance is class &quot;</span><span class="si">%s</span><span class="s1">&quot; and not scatteringFunction&#39;</span> <span class="o">%</span> <span class="n">scatteringFunction</span><span class="o">.</span><span class="n">__class__</span> <span class="p">)</span>
+
+            <span class="n">baseModule</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">productFrame</span><span class="p">,</span> <span class="p">(</span> <span class="n">scatteringFunction</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="incoherent.form.calculateAverageProductData"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.incoherent.form.calculateAverageProductData">[docs]</a>        <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Not supported for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="incoherent.form.processMultiGroup"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.incoherent.form.processMultiGroup">[docs]</a>        <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="kn">from</span> <span class="nn">fudge.processing.deterministic</span> <span class="k">import</span> <span class="n">transferMatrices</span> <span class="k">as</span> <span class="n">transferMatricesModule</span>
+            <span class="kn">from</span> <span class="nn">fudge.processing</span> <span class="k">import</span> <span class="n">group</span> <span class="k">as</span> <span class="n">groupModule</span>
+
+            <span class="n">verbosity</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">Grouping </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span>
+
+            <span class="n">TM_1</span><span class="p">,</span> <span class="n">TM_E</span> <span class="o">=</span> <span class="n">transferMatricesModule</span><span class="o">.</span><span class="n">comptonScattering</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">productFrame</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scatteringFunction</span><span class="p">,</span>
+                    <span class="n">comment</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;transferMatrixComment&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; outgoing data for </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;productLabel&#39;</span><span class="p">]</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="n">groupModule</span><span class="o">.</span><span class="n">TMs2Form</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">TM_1</span><span class="p">,</span> <span class="n">TM_E</span> <span class="p">)</span> <span class="p">)</span></div>
+
+        <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="incoherent.form.parseXMLNode"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.incoherent.form.parseXMLNode">[docs]</a>        <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
+
+            <span class="n">data</span> <span class="o">=</span> <span class="n">element</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">data</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">incoherent</span><span class="o">.</span><span class="n">XYs1d</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">incoherent</span><span class="o">.</span><span class="n">XYs1d</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+            <span class="k">elif</span><span class="p">(</span> <span class="n">data</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="n">incoherent</span><span class="o">.</span><span class="n">regions1d</span><span class="o">.</span><span class="n">moniker</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">incoherent</span><span class="o">.</span><span class="n">regions1d</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid data &quot;</span><span class="si">%s</span><span class="s1">&quot; for &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">data</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">cls</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span> <span class="p">)</span>
+
+            <span class="n">_form</span> <span class="o">=</span> <span class="n">incoherent</span><span class="o">.</span><span class="n">form</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;label&#39;</span> <span class="p">),</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;productFrame&#39;</span> <span class="p">),</span> <span class="n">data</span> <span class="p">)</span>
+            <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+            <span class="k">return</span><span class="p">(</span> <span class="n">_form</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="incoherent.XYs1d"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.incoherent.XYs1d">[docs]</a>    <span class="k">class</span> <span class="nc">XYs1d</span><span class="p">(</span> <span class="n">scatteringFactor</span><span class="o">.</span><span class="n">XYs1d</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">ENDFMT</span> <span class="o">=</span> <span class="mi">504</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwarg</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="n">scatteringFactor</span><span class="o">.</span><span class="n">XYs1d</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwarg</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="incoherent.regions1d"><a class="viewcode-back" href="../../../../../fudge/fudge.gnd.productData.distributions.html#fudge.gnd.productData.distributions.photonScattering.incoherent.regions1d">[docs]</a>    <span class="k">class</span> <span class="nc">regions1d</span><span class="p">(</span> <span class="n">scatteringFactor</span><span class="o">.</span><span class="n">regions1d</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">ENDFMT</span> <span class="o">=</span> <span class="mi">504</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwarg</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="n">scatteringFactor</span><span class="o">.</span><span class="n">regions1d</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwarg</span> <span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../../index.html">
+              <img class="logo" src="../../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

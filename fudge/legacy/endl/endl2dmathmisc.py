@@ -92,7 +92,7 @@ def get2dmathData( object, callingRoutine, msg ) :
     return( data )
 
 def valid2dClassType( object, callingRoutine, msg ) :
-    "Returns the first argument, object, if it is a subclass of the endl2dmath class; else, triggers a raise."
+    """Returns the first argument, object, if it is a subclass of the endl2dmath class; else, triggers a raise."""
 
     if( isinstance( object, endl2dmathClasses.endl2dmath ) ) : return( object )
     raise Exception( "\nError in %s: invalid type = %s for %s" % ( callingRoutine, type( object ), msg ) )
@@ -127,7 +127,7 @@ def check2dData( data, allowNegativeX = True, allowSameX = False, allowZeroX = T
     ne = 0                      # Number of points with negative y values.
     badXIndicies = []
     messages = []
-    if( xCloseEps == None ) :
+    if( xCloseEps is None ) :
         if( formatCode == 12 ) : formatCode = 14
         xCloseEps = endlParameters.endlEpsx / 3. * pow( 0.1, ( formatCode - 14 ) )
     if( l > 0 ) :
@@ -147,7 +147,7 @@ def check2dData( data, allowNegativeX = True, allowSameX = False, allowZeroX = T
                 maxAbsFloatValue = maxAbsFloatValue )
             fudgemath.checkNumber( pn[1], "check2dData: y[%d]" % i, messages = messages, indentation = '      ', printErrors = printErrors,
                 maxAbsFloatValue = maxAbsFloatValue )
-            if( pl != None ) :
+            if( pl is not None ) :
                 checkCloseness = True
                 if( pl[0] >= pn[0] ) :
                     checkCloseness = False
@@ -310,11 +310,11 @@ def gauss2d( xc, xw, f = 1e-3, xsigmax = 4, xMin = None, xMax = None ) :
         return x
 
     f = max( min( 1e-2, f ), 1e-8 )
-    if( xMin == None ) :
+    if( xMin is None ) :
         xmin = -xsigmax
     else :
         xmin = ( xMin - xc ) / float( xw )
-    if( xMax == None ) :
+    if( xMax is None ) :
         xmax = xsigmax
     else :
         xmax = ( xMax - xc ) / float( xw )
@@ -385,12 +385,12 @@ def gauss2dDull( xc, xw, f = 1e-3, xsigmax = 4, xMin = None, xMax = None ) :
     return dulledges2d( gauss2d( xc, xw, f, xsigmax, xMin, xMax ) )
 
 def point2d( x ) :
-    "Returns an endl2dmath instance of [ x, 1. ]."
+    """Returns an endl2dmath instance of [ x, 1. ]."""
 
     return endl2dmathClasses.endl2dmath( [ [ x, 1. ] ], checkDataType = 0 )
 
 def point2dDull( x ) :
-    "Returns an endl2dmath instance of point2d( x ) that is dulled using dulledges2d( )."
+    """Returns an endl2dmath instance of point2d( x ) that is dulled using dulledges2d( )."""
 
     return dulledges2d( point2d( x ) )
 
@@ -479,7 +479,7 @@ def convertLogLogToLinLin( self, accuracy, diSectionMax = 3 ) :
     new = self.copyData( )
     x1 = None
     for x2, y2 in self.data :
-        if( x1 != None ) :
+        if( x1 is not None ) :
             if( ( x1 <= 0 ) or ( y1 <= 0 ) or ( x2 <= 0 ) or ( y2 <= 0 ) ) : 
                 raise Exception( "One of x1 = %e y1 = %e x2 = %d or y2 = %e is <= 0." % ( x1, y1, x2, y2 ) )
             if( ( x1 != x2 ) and ( y1 != y2 ) ) : convertLogLogToLinLin2( new, x1, y1, x2, y2, 0 )

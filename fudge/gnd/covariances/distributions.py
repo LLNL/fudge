@@ -106,6 +106,10 @@ class LegendreOrderCovarianceForm( ancestry ):
                 warnings.append( warning.context( '%s L=%i vs %i' % (Lvalue.moniker,Lvalue.L1,Lvalue.L2), Lvalue_warnings ) )
         return warnings
 
+    def convertUnits( self, unitMap ):
+
+        for lvalue in self: lvalue.convertUnits( unitMap )
+
     def fix( self, **kw ): return []
 
     def toXMLList( self, indent = '', **kwargs ) :

@@ -61,33 +61,32 @@
 # 
 # <<END-copyright>>
 
-from fudge.core.utilities import brb
+from fudge.gnd.productData import multiplicity as multiplicityModule
+from fudge.gnd.productData.distributions import angular as angularModule
 
-import site_packages.legacy.toENDF6.gndToENDF6 as gndToENDF6Module
-import site_packages.legacy.toENDF6.endfFormats as endfFormatsModule
-import fudge.gnd.productData.multiplicity as multiplicityModule
-import fudge.gnd.productData.distributions.angular as angularModule
+from .. import gndToENDF6 as gndToENDF6Module
+from .. import endfFormats as endfFormatsModule
 
 #
-# constant
+# constant1d
 #
 def toENDF6List( self, targetInfo ) :
 
     nPoints = 2
     interpolationFlatData = [ nPoints, 2 ]
-    endfMult = endfFormatsModule.endfNdDataList( [ targetInfo['EMin'], self.value, targetInfo['EMax'], self.value ] )
+    endfMult = endfFormatsModule.endfNdDataList( [ targetInfo['EMin'], self.constant, targetInfo['EMax'], self.constant ] )
     return( interpolationFlatData, nPoints, endfMult )
 
-multiplicityModule.constant.toENDF6List = toENDF6List
+multiplicityModule.constant1d.toENDF6List = toENDF6List
 
 #
-#XYs1d 
+# XYs1d 
 #
 def toENDF6List( self, targetInfo ) :
 
     nPoints = len( self )
     interpolationFlatData = [ nPoints, gndToENDF6Module.gndToENDFInterpolationFlag( self.interpolation ) ]
-    endfMult = endfFormatsModule.endfNdDataList( self.copyDataToXYs( xUnitTo = 'eV' ) )
+    endfMult = endfFormatsModule.endfNdDataList( self.copyDataToXYs( ) )
     return( interpolationFlatData, nPoints, endfMult )
 
 multiplicityModule.XYs1d.toENDF6List = toENDF6List
@@ -102,7 +101,7 @@ def toENDF6List( self, targetInfo ) :
     lastX, lastY = None, None
     for region in self :
         ENDFInterpolation = gndToENDF6Module.gndToENDFInterpolationFlag( region.interpolation )
-        data = region.copyDataToXYs( xUnitTo = 'eV' )
+        data = region.copyDataToXYs( )
         if( lastX is not None ) :
             if( lastY == data[0][1] ) : data = data[1:]
         counter += len( data )

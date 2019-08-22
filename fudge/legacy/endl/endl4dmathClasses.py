@@ -161,16 +161,16 @@ Members ::
         if( interpolation != 0 ) : raise Exception( "\nError in endl4dmath.__init__: Bad interpolation value = %s" % `interpolation` )
         self.interpolation = interpolation
         self.data = endl4dmathmisc.get4dmathData( data, "endl4dmath.__init__", "data" )
-        if ( template != None ) : endl4dmathmisc.valid4dClassType( template, "endl4dmath.__init__", "template" )
+        if ( template is not None ) : endl4dmathmisc.valid4dClassType( template, "endl4dmath.__init__", "template" )
         self.columns = 4
         self.tLabel = tLabel
-        if ( ( template != None ) and ( tLabel == None ) ) : self.tLabel = template.tLabel
+        if ( ( template is not None ) and ( tLabel is None ) ) : self.tLabel = template.tLabel
         self.xLabel = xLabel
-        if ( ( template != None ) and ( xLabel == None ) ) : self.xLabel = template.xLabel
+        if ( ( template is not None ) and ( xLabel is None ) ) : self.xLabel = template.xLabel
         self.yLabel = yLabel
-        if ( ( template != None ) and ( yLabel == None ) ) : self.yLabel = template.yLabel
+        if ( ( template is not None ) and ( yLabel is None ) ) : self.yLabel = template.yLabel
         self.zLabel = zLabel
-        if ( ( template != None ) and ( zLabel == None ) ) : self.zLabel = template.zLabel
+        if ( ( template is not None ) and ( zLabel is None ) ) : self.zLabel = template.zLabel
         self.label = label
         if(   self.interpolation == 0 ) :
             self.xInterpolation = 'linear,linear,linear,linear'
@@ -204,7 +204,7 @@ Members ::
         return( z )
 
     def __len__( self ) :                                   # class endl4dmath
-        "Returns the number of items in the top list of self (i.e., the number of t-values)."
+        """Returns the number of items in the top list of self (i.e., the number of t-values)."""
 
         return len( self.data )
 
@@ -240,13 +240,13 @@ Members ::
         return( self.getDimensions( ) )
 
     def toString( self, format = None ) :
-        "Returns the string returned by the endl4dmath's __repr__ function. This can be useful when endl4dmath is used as a base class."
+        """Returns the string returned by the endl4dmath's __repr__ function. This can be useful when endl4dmath is used as a base class."""
 
         endl4d_repr_tFormat = endl4dmathmisc.endl4d_repr_tFormat
         endl4d_repr_xFormat = endl4dmathmisc.endl4d_repr_xFormat
         endl4d_repr_yFormat = endl4dmathmisc.endl4d_repr_yFormat
         endl4d_repr_zFormat = endl4dmathmisc.endl4d_repr_zFormat
-        if( format != None ) :
+        if( format is not None ) :
             endl4dmathmisc.endl4d_repr_tFormat = format
             endl4dmathmisc.endl4d_repr_xFormat = format
             endl4dmathmisc.endl4d_repr_yFormat = format
@@ -283,13 +283,13 @@ Members ::
         print s, ")"
 
     def ll( self ) :                                        # class endl4dmath
-        "Same as __repr__( )."
+        """Same as __repr__( )."""
 
         print endl4dmath.__repr__( self )
 
     def plot( self, xMin = None, xMax = None, yMin = None, yMax = None, zMin = None, zMax = None, xyzlog = 0, \
         tLabel = None, xLabel = None, yLabel = None, zLabel = None, title = None, tScaleLabel = None, \
-        xrot = None, zrot = None ) :                        # class endl4dmath
+        xrot = None, zrot = None, style = None ) :                        # class endl4dmath
         """
         Plots the data.
 
@@ -307,13 +307,13 @@ Members ::
               7     log-log-log
         """
 
-        if ( tLabel == None ) and ( self.tLabel != None ) : tLabel = self.tLabel
-        if ( xLabel == None ) and ( self.xLabel != None ) : xLabel = self.xLabel
-        if ( yLabel == None ) and ( self.yLabel != None ) : yLabel = self.yLabel
-        if ( zLabel == None ) and ( self.zLabel != None ) : zLabel = self.zLabel
+        if ( tLabel is None ) and ( self.tLabel is not None ) : tLabel = self.tLabel
+        if ( xLabel is None ) and ( self.xLabel is not None ) : xLabel = self.xLabel
+        if ( yLabel is None ) and ( self.yLabel is not None ) : yLabel = self.yLabel
+        if ( zLabel is None ) and ( self.zLabel is not None ) : zLabel = self.zLabel
 
         dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title, zMin = zMin, zMax = zMax, \
-            zLabel = zLabel, tLabel = tLabel, tScaleLabel = tScaleLabel, xrot = xrot, zrot = zrot )
+            zLabel = zLabel, tLabel = tLabel, tScaleLabel = tScaleLabel, xrot = xrot, zrot = zrot, style = style )
         f = fudgeFileMisc.fudgeTempFile( )
         format = fudgemisc.getFormat( self )
         f.write( endl4dmath.toString( self, format = format ) )
@@ -323,20 +323,20 @@ Members ::
         subprocessing.spawn( s )
 
     def tArray( self ) :
-        "Returns an endl1dmath instances of the t values in self."
+        """Returns an endl1dmath instances of the t values in self."""
 
         ta = []
         for t, xyz in self.data : ta.append( t )
         return endl1dmathClasses.endl1dmath( ta )
 
     def tMax( self ) :
-        "Returns the maximum t value of self if self contains data, otherwise it returns None."
+        """Returns the maximum t value of self if self contains data, otherwise it returns None."""
 
         if ( len( self.data ) > 0 ) : return self.data[-1][0]
         return None
 
     def tMin( self ) :
-        "Returns the minimum t value of self if self contains data, otherwise it returns None."
+        """Returns the minimum t value of self if self contains data, otherwise it returns None."""
 
         if ( len( self.data ) > 0 ) : return self.data[0][0]
         return None

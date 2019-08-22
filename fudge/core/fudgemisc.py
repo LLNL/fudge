@@ -103,7 +103,7 @@ def printWarning( s ) :
     if( s[-1:] != '\n' ) : sys.stderr.write( '\n' )
 
 def findPythonFile( file ) :
-    "For internal use only."
+    """For internal use only."""
 
     if( os.path.exists( file ) ) : return file
     if( 'PYTHONPATH' in os.environ ) :
@@ -118,7 +118,7 @@ def findPythonFile( file ) :
     return None
 
 def stringWithPrefixSuffix( list, Prefix = "", Suffix = "" ) :
-    "For internal use only."
+    """For internal use only."""
 
     PS = "\n"
     if( len( list ) > 0 ) :

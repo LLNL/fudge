@@ -63,8 +63,8 @@
 
 SHELL = /bin/ksh
 
-STATUSMESSAGEREPORTING_CFLAGS = -g -O0
-local_CFLAGS = $(CFLAGS) -I./ -I../../Src $(STATUSMESSAGEREPORTING_CFLAGS)
+STATUSMESSAGEREPORTING_CXXFLAGS = -g -O0
+local_CXXFLAGS = $(CXXFLAGS) -I./ -I../../Src $(STATUSMESSAGEREPORTING_CXXFLAGS)
 
 .PHONY: default check example clean realclean
 
@@ -76,7 +76,7 @@ check: default
 	echo
 
 example: example.c
-	$(CC) $(local_CFLAGS) -o example example.c ../../Src/statusMessageReporting.o
+	$(CXX) $(local_CXXFLAGS) -o example example.c ../../Src/statusMessageReporting.o
 
 clean:
 	rm -f example *.o

@@ -7,9 +7,9 @@ n-094_Pu_239.xml
 n-094_Pu_240-covar.xml	# sample of new covariance format
 
 plotCrossSection.py	# demonstrates resonance reconstruction and new plotting capability
-pltUtil.py		# another plotting widget, includes uncertainty intervals and experimental data
 compareCrossSections.py # compare cross sections for a single MT from two or more sources (which may be in ENDF or GND format)
 testMultiplicities.py	# simple checking of GND-formatted data
+newEvaluation.py        # script to demonstrate how to create an evaluation from scratch using the evaluator toolkit
 
 gnd.xsl			# xml 'stylesheet', for viewing GND files in a web browser.
 	for example, try:

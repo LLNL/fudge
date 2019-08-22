@@ -62,7 +62,6 @@
 # <<END-copyright>>
 
 import abc
-import re
 
 __metaclass__ = type
 
@@ -94,6 +93,7 @@ class ancestry :
     """
 
     __metaclass__ = abc.ABCMeta
+    ancestryMembers = tuple( )
 
     def __init__( self ) :
 
@@ -105,7 +105,41 @@ class ancestry :
         return( self.toXLink( ) )
 
     @abc.abstractproperty
-    def moniker(self): pass
+    def moniker( self ) :
+
+        pass
+
+    def checkAncestry( self, verbose = 0, level = 0 ) :
+
+        def check( child ) :
+
+            if( child is None ) : return
+            if( self.isChild( child ) ) :
+                child.checkAncestry( verbose = verbose, level = level )
+            else :
+                print 'WARNING from checkAncestry: member "%s" not a child of %s' % ( member, self.toXLink( ) )
+                print '    Its ancestry is: %s' % child.toXLink( )
+
+        if( self.ancestryMembers == ( '', ) ) : return
+
+        prefix = ( level + 1 ) * '    '
+        if( len( self.ancestryMembers ) == 0 ) :
+            if( verbose != 0 ) : print "%s---- no items in ancestryMembers for %s" % ( prefix, self.toXLink( ) )
+        for member in self.ancestryMembers :
+            if( member == '' ) : continue
+            if( verbose > 0 ) : print "%s%s" % ( prefix, member )
+            doLoop = False
+            if( member[0] == '[' ) :
+                member = member[1:]
+                doLoop = True
+            if( hasattr( self, member ) ) :
+                m1 = getattr( self, member )
+                if( doLoop ) :
+                    for child in m1 : check( child )
+                else :
+                    check( m1 )
+            else :
+                print 'WARNING from checkAncestry: %s does not have member "%s"' % ( self.toXLink( ), member )
 
     def findAttributeInAncestry( self, attributeName ) :
 
@@ -121,10 +155,10 @@ class ancestry :
 
     def findEntity( self, entityName, attribute = None, value = None ) :
         """
-        Default findEntity method. In general, this method should be over written by sub-class. This method 
-        uses the follow algorithm to find entity. Firstly, if 'attribute' is None, then self is assumed to 
-        have a attribute named entityName which is taken to be the desired entity. Otherwise, self is iterated 
-        over until an item with an attribute named attribute with value value is found. In either case, if 
+        Default findEntity method. In general, sub-classes should over-ride this method.
+        This method uses the following algorithm to find entity. Firstly, if 'attribute' is None, then self is assumed
+        to have an attribute named entityName which is taken to be the desired entity. Otherwise, self is iterated
+        over until an item with an attribute named attribute with value value is found. In either case, if
         an entity is found, its moniker value must be entityName. If no entity is found, raise AttributeError.
         """
 
@@ -158,6 +192,15 @@ class ancestry :
         ancestor = self
         while( ancestor.ancestor is not None ) : ancestor = ancestor.ancestor
         return( ancestor )
+
+    def isChild( self, child ) :
+
+        if( isinstance( child, ancestry ) ) : return( child.ancestor == self )
+        return( False )
+
+    def isParent( self, parent ) :
+
+        return( self.ancestor == parent )
 
     def setAncestor( self, ancestor, attribute = None ) :
         """Sets self's ancestor to ancestor."""
@@ -207,8 +250,6 @@ class ancestry :
 
         return( s1 + '/%s%s' % ( self.moniker, attribute ) )
 
-    xPathRegex = re.compile("([a-zA-Z0-9_]+)\[@([a-z]+)='([a-zA-Z0-9_]+|[a-zA-Z]*\([a-zA-Z0-9_,]+\))'\]")
-
     def followXPath( self, xPath ):
         """
         :param xPath: string xPath, e.g. "/reactionSuite/reaction[@label='2']"
@@ -221,19 +262,30 @@ class ancestry :
             if len(xPathList)==0: return node
 
             xPathNext = xPathList[0]
-            match = ancestry.xPathRegex.match(xPathNext)
             try:
-                if match:
-                    nodeNext = node.findEntity( *match.groups() )
+                if "[@" in xPathNext:
+                    r1,r2 = xPathNext.split("[@")
+                    r2,r3 = r2.split("=")
+                    r3 = r3.rstrip(']')[1:-1]
+                    nodeNext = node.findEntity( r1, r2, r3 )
                 else:
                     nodeNext = node.findEntity( xPathNext )
             except:
                 raise XPathNotFound()
             return follow2(xPathList[1:], nodeNext)
 
+        # FIXME refactor to use xml.etree.ElementPath.xpath_tokenizer?
         xPathList = xPath.split('/')
         while not xPathList[0]: # trim empty sections from the beginning
             xPathList = xPathList[1:]
+        if '{' in xPath:        # careful, qualifiers may contain '/'
+            xpl2 = []
+            for val in xPathList:
+                if '}' in val and '{' not in val and '{' in xpl2[-1] and '}' not in xpl2[-1]:
+                    xpl2[-1] += '/' + val
+                else:
+                    xpl2.append( val )
+            xPathList = xpl2
         try:
             return follow2( xPathList, self )
         except XPathNotFound:
@@ -315,3 +367,7 @@ if( __name__ == '__main__' ) :
     print c.findEntity( 'child', 'name', 'Tom' )
     print c.findEntity( 'granddaughter', 'name', 'Tami' )
     print c.findEntity( 'grandson', 'name', 'Joe' )
+
+    print
+    print 'Checking ancestry:'
+    p.checkAncestry( )

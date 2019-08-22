@@ -99,6 +99,14 @@ def getDoubleValue( name, ls ) :
     value = float( ls[0].split( '=' )[1] )
     return( ls[1:], value )
 
+def getStringValue( name, ls ) :
+
+    s = "# %s = " % name
+    n = len( s )
+    if( ls[0][:n] != s ) : raise Exception( 'missing %s info: "%s"' % ( name, ls[0][:-1] ) )
+    value = ls[0].split( '=' )[1].strip( )
+    return( ls[1:], value )
+
 def getXData( ls, sep = None ) :
 
     ls, length = getIntegerValue( 'length', ls )

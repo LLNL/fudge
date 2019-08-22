@@ -64,136 +64,101 @@
 # <<END-copyright>>
 
 """
-translate xml to hdf5
-cmattoon, 10/21/2010
-
-updates:
-October 2011, check the 'xData' attribute to determine how to store data
-June 2011: use etree instead of DOM
+Translate GND/XML to HDF5. Each xml element becomes a group in HDF, except a few elements that become
+HDF datasets. Attributes are translated to HDF5 metadata
 """
 import sys
 import os
 import numpy
+from collections import Counter
 
 from xml.etree import cElementTree as parser
 import h5py
 
-keydir = {
-        'alias': 'key',
-        'particle': 'name',
-        'level': 'label',
-        'gamma': 'finalLevel',
-        'openChannel': 'index',
-        'spinGroup': 'index',
-        'J_section': 'J',
-        'L_section': 'L',
-        'LdependentScatteringRadius': 'L',
-        'column': 'index',
-        'reaction': 'label',
-        'summedReaction': 'label',
-        'fissionComponent': 'label',
-        'production': 'label',
-        'product': 'label',
-        'region': 'index',
-        'weighted': 'index',
-        'key': 'label',
-        'axis': 'index',
-        'energy_in': 'index',
-        'energy_out': 'index',
-        'mu': 'index',
-        'summand': '{http://www.w3.org/1999/xlink}href',
-        # covariances:
-        'covariance': 'id'
-        }
+def fixName( node, suffix=None ):
+    name = node.tag
+    if suffix is not None:
+        name += '_%s' % str(suffix)
+    return name
 
-def addNode( parent, node ):
+def addAttributes( h5node, node, index ):
+    for key,val in node.items():
+        h5node.attrs.create(str(key),str(val))
+    h5node.attrs.create("_xmltag", node.tag)    # save original tag for translating back to XML
+    h5node.attrs.create("_xmlindex", index)  # hdf5 doesn't preserve group order, so preserve it here
+
+def addNode( parent, node, index, suffix=None ):
     """
     recursively copy xml data (one <node> at a time) to hdf5
-    parent is a hdf5 element,
-    node is an xml.dom element to be added to hdf5
+
+    :param parent: hdf5 file or group
+    :param node:   xml node to be added to hdf5
+    :param suffix: suffix to append to xml tag name (since hdf5 doesn't allow duplicate group names)
+    :return:
     """
-    name = node.tag
-    # some names must be modified since hdf5 doesn't allow duplicates
-    if name in keydir.keys():
-        node.set('tag', name)
-        name = "%s: %s" % (name, node.get( keydir[node.tag] ))
-    name = name.replace('/','_')    # "1/2" not allowed in hdf5 group name
+    name = fixName(node, suffix)
 
     try:
         h5node = parent.create_group( name )
-        for key,val in node.items():
-            h5node.attrs.create(str(key),str(val))
+        addAttributes(h5node, node, index)
         newParent = h5node
 
-        if node.get('xData') is not None:
-            addXData( newParent, node )
-        elif name=='table':
-            addTable( newParent, node )
-        elif name=='documentation':
-            addDocumentation( newParent, node )
-        else:
-            for child in node.getchildren():
-                addNode( newParent, child )
+        child_names = Counter( [ child.tag for child in node.getchildren() ] )
+        for key,value in child_names.items():
+            if value == 1: child_names[key] = None
+            else: child_names[key] = 0
+
+        for idx,child in enumerate(node.getchildren()):
+            suffix = child_names[ child.tag ]
+            if suffix is not None: child_names[ child.tag ] += 1
+            if child.tag == 'values':
+                addValues( newParent, child, idx, suffix, isTwoDimensional=(node.tag=='XYs1d') )
+            elif child.tag == 'data':
+                addTableData( newParent, child, idx, int(node.get('rows')), int(node.get('columns')), suffix )
+            elif child.tag=='documentation':
+                addDocumentation( newParent, child, idx, suffix )
+            else:
+                addNode( newParent, child, idx, suffix )
     except:
         print ("addNode backtrace: node=%s, name=%s" % (node,name))
         raise
 
-def addXData( parent, node ):
+def addValues( parent, node, index, suffix=None, isTwoDimensional=False ):
     """
-    called when elements with 'xData' attributes are encountered
-    Data should be first stored in numpy array, then dumped into hdf5 dataset
+    <values> elements in GND store a list of numbers. Convert to HDF5 dataset
     """
-    def addDataSet( parent, dataNode, twoDimensional=True ):
-        data = numpy.array( map(float, dataNode.text.split()) )
-        if twoDimensional: data.shape = (len(data)//2, 2)
-        name = dataNode.tag
-        if name in keydir:
-            dataNode.set('tag', name)
-            name="%s: %s" % (name, dataNode.get( keydir[dataNode.tag] ))
-        h5data = parent.create_dataset( name, data=data )
-        for key,val in dataNode.items(): h5data.attrs.create(str(key),str(val))
+    name = fixName(node, suffix)
 
-    # xData always needs axes info:
-    addNode( parent, node.find('axes') )
+    data = numpy.array( map(float, node.text.split()) )
+    if isTwoDimensional:
+        data.shape = (len(data)//2,2)
+    h5data = parent.create_dataset( name, data=data )
+    addAttributes(h5data, node, index)
 
-    xData = node.get('xData')
-    if xData=='XYs': addDataSet( parent, node.find('data') )
-    elif xData=='polynomial': addDataSet( parent, node.find('data') )
-    elif xData in ('W_XYs', 'W_XYs_LegendreSeries'):
-        twoDimensional = (xData=='W_XYs')   # otherwise it's a 1-d list of Legendre coefs
-        for energy_in in node[1:]:
-            addDataSet( parent, energy_in, twoDimensional )
-    elif xData in ('V_W_XYs', 'V_W_XYs_LegendreSeries'):
-        twoDimensional = (xData=='V_W_XYs')
-        for energy_in in node[1:]:
-            h5energy_in = parent.create_group( "energy_in: %s" % energy_in.get("index") )
-            for key,val in energy_in.items(): h5energy_in.attrs.create(str(key),str(val))
-            for W in energy_in: # could be 'mu' or 'energy_out'
-                addDataSet( h5energy_in, W, twoDimensional )
-    elif xData in ('regionsXYs', 'regionsW_XYs_LegendreSeries'):
-        for region in node[1:]:
-            h5region = parent.create_group( "region: %s" % region.get('index') )
-            for key,val in region.items():
-                h5region.attrs.create(str(key),str(val))
-            addNode( h5region, region.find('interpolationAxes') )
-            if xData=='regionsXYs':
-                addDataSet( h5region, region.find('data'), twoDimensional=True )
-            else: # piecewise Legendre data
-                for energy_in in region[1:]:
-                    addDataSet( h5region, energy_in, twoDimensional=False )
+def addTableData( parent, node, index, rows, columns, suffix=None ):
+    """
+    <data> elements in GND store a table. Convert to HDF5 dataset.
+    Note that tables can be empty
+    """
+    name = fixName(node, suffix)
+
+    data = node.text
+    if data is None:
+        data = numpy.array([])
     else:
-        raise Exception("Encountered unknown form of xData: %s" % xData)
+        data = numpy.array( map(float, node.text.split()) )
+    data.shape = (rows, columns)
+    h5data = parent.create_dataset( name, data=data )
+    addAttributes(h5data, node, index)
 
-def addTable( parent, node ):
-    addNode( parent, node.find('columnHeaders') )
-    dimensions = map(int, [node.get(val) for val in ('rows','columns')])
-    data = numpy.array( map(float, node[1].text.split()) )
-    data.shape = dimensions
-    parent.create_dataset( 'data', data=data )
+def addDocumentation( parent, node, index, suffix=None ):
+    """
+    <documentation> element stores CDATA. Convert to HDF5 text array
+    """
+    name = fixName( node, suffix )
 
-def addDocumentation( parent, docNode ):
-    text = docNode.text
-    h5node = parent.create_dataset( 'text', data=numpy.array(text) )
+    h5node = parent.create_dataset( name, data=numpy.array(node.text) )
+    addAttributes(h5node,node,index)
 
 
 if __name__ == '__main__':
@@ -211,5 +176,4 @@ if __name__ == '__main__':
         h5 = h5py.File( h5file, "w" )
 
     root = xdoc.getroot()
-    addNode( h5, root )
-
+    addNode( h5, root, index=0 )

@@ -68,7 +68,6 @@ This module contains all the classes for the various types of ENDL I data.
 import copy
 
 import endl2dmathClasses, endl2dmathmisc, endl3dmathClasses, endl3dmathmisc, endl4dmathClasses, endl4dmathmisc
-from fudge.core.math import fudge2dGrouping
 import endlmath
 from fudge.core.utilities import fudgeExceptions
 from fudge.vis.gnuplot import plotbase
@@ -85,7 +84,7 @@ fixThresholdMode_All = endlIClassesParameters.fixThresholdMode_All
 fixThreshold_deltaFunctionEpsilon = 1e-4
 
 def endlAddIObject( f, yo, C, I, S, h, points, bdflsFile = None ) :
-    "For internal use only."
+    """For internal use only."""
 
     if   ( I ==   0 ) : return endlI0( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
     elif ( I ==   7 ) : return endlI7( f, yo, C, I, S, h, points, bdflsFile = bdflsFile )
@@ -148,7 +147,7 @@ class endlI0( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         return( EMin, EMinNext )
 
     def getThresholdsForChecker( self ) :
-        "For internal use only."
+        """For internal use only."""
 
         return( getThresholdsForChecker2d( self ) )
 
@@ -164,11 +163,11 @@ class endlI0( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         dT = T - TData
         if( ( len( self ) > 1 ) and ( dT > 0. ) ) :
             massRatio = self.bdflsFile.mass( self.ZA ) / self.bdflsFile.mass( self.yi )
-            if( lowerlimit == None ) :
+            if( lowerlimit is None ) :
                 lowerlimit = "oneOverV"
                 if( self.C == 10 ) : lowerlimit = "constant"
                 elif ( unheated.xMin( ) > 1e-8 ) : lowerlimit = "threshold"
-            if( upperlimit == None ) : upperlimit = 'constant'
+            if( upperlimit is None ) : upperlimit = 'constant'
             if( not heatBelowThreshold ) : EMin = max( unheated.data[0][0], EMin )
             from crossSectionAdjustForHeatedTarget import heat as heatModule
             d  = heatModule.crossSectionAdjustForHeatedTarget( massRatio, dT, EMin, unheated.data, lowerlimit = lowerlimit, \
@@ -231,7 +230,7 @@ class endlI7( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         return( EMin, EMinNext )
 
     def getThresholdsForChecker( self ) :
-        "For internal use only."
+        """For internal use only."""
 
         return( getThresholdsForChecker2d( self ) )
 
@@ -276,7 +275,7 @@ class endlI9( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         return( EMin, EMinNext )
 
     def getThresholdsForChecker( self ) :
-        "For internal use only."
+        """For internal use only."""
 
         return( getThresholdsForChecker2d( self ) )
 
@@ -329,7 +328,7 @@ class endlI10( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         return( EMin, EMinNext )
 
     def getThresholdsForChecker( self ) :
-        "For internal use only."
+        """For internal use only."""
 
         return( getThresholdsForChecker2d( self ) )
 
@@ -376,7 +375,7 @@ class endlI11( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         return( EMin, EMinNext )
 
     def getThresholdsForChecker( self ) :
-        "For internal use only."
+        """For internal use only."""
 
         return( getThresholdsForChecker2d( self ) )
 
@@ -421,7 +420,7 @@ class endlI12( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         return( EMin, EMinNext )
 
     def getThresholdsForChecker( self ) :
-        "For internal use only."
+        """For internal use only."""
 
         return( getThresholdsForChecker2d( self ) )
 
@@ -468,7 +467,7 @@ class endlI13( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         return( EMin, EMinNext )
 
     def getThresholdsForChecker( self ) :
-        "For internal use only."
+        """For internal use only."""
 
         return( getThresholdsForChecker2d( self ) )
 
@@ -787,7 +786,7 @@ class endlI1( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
         return( EMin, EMinNext )
 
     def getThresholdsForChecker( self ) :
-        "For internal use only."
+        """For internal use only."""
 
         if( len( self ) > 1 ) : return [ self.data[0][0], self.data[1][0] ]
         if( len( self ) > 0 ) : return [ self.data[0][0] ]
@@ -799,7 +798,7 @@ class endlI1( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
         then linear interpolation is performed. """
 
         EmuP = self.data
-        if( EmuP == None ) : return( None )
+        if( EmuP is None ) : return( None )
         nE = len( EmuP )
         if( nE == 0 ) : return( None )
         if( ( E < EmuP[0][0] ) or ( E > EmuP[-1][0] ) ) : return( None )
@@ -1143,14 +1142,14 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
         return( EMin, EMinNext )
 
     def getThresholdsForChecker( self ) :
-        "For internal use only."
+        """For internal use only."""
 
         if( len( self ) > 1 ) : return [ self.data[0][0], self.data[1][0] ]
         if( len( self ) > 0 ) : return [ self.data[0][0] ]
         return []
 
     def E( self, i ) :
-        "Returns the (i+1)^th incident energy value as a float or None if i is out-of-range."
+        """Returns the (i+1)^th incident energy value as a float or None if i is out-of-range."""
 
         if ( i < len( self.data ) ) : return float( self.data[i][0] )
         return None
@@ -1170,12 +1169,12 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
         return( endl2dmathClasses.endl2dmath( data ) )
 
     def EMax( self ) :
-        "Returns the last incident energy value for self. Returns None if data is empty."
+        """Returns the last incident energy value for self. Returns None if data is empty."""
 
         return( self.tMax( ) )
 
     def EMin( self ) :
-        "Returns the first incident energy value for self. Returns None if data is empty."
+        """Returns the first incident energy value for self. Returns None if data is empty."""
 
         return( self.tMin( ) )
 
@@ -1208,7 +1207,7 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
             return( a )
 
         d3i = self.muEpP( E, relEps )                       # Get 3-d data (u, E', P).
-        if ( d3i == None ) : return None
+        if ( d3i is None ) : return None
         EpGrid = []                                         # All E' points.
         EpL = []                                            # Lower E' end point of data for all u.
         EpU = []                                            # Upper E' end point of data for all u.
@@ -1251,14 +1250,14 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
                         EP = etal[i]
                     else :
                         E1 = None
-                elif ( E1 != None ) :                       # Interpolate.
+                elif ( E1 is not None ) :                       # Interpolate.
                     P = ( EP[1] * ( E - E1 ) + P1 * ( EP[0] - E ) ) / ( EP[0] - E1 )
                 d2.append( [ E, P ] )
             d3o.append( [ u_etal[0], d2 ] )
         return endl3dmathClasses.endl3dmath( d3o, checkDataType = 0, xLabel = "mu", yLabel = "E'", zLabel = "Probability" )
 
     def normalize( self ) :
-        "Normalizes the data so that the integral P(E, mu, E') dE' = 1."
+        """Normalizes the data so that the integral P(E, mu, E') dE' = 1."""
 
         for E_Data in self.data :                   # Loop for each E.
             for mu_Data in E_Data[1] :              # Loop for each mu.
@@ -1267,7 +1266,7 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
                 for Data in mu_Data[1] :            # Loop for each E'.
                     Ep1 = Data[0]
                     C1 = Data[1]
-                    if ( Ep0 != None ) : s += ( Ep1 - Ep0 ) * ( C1 + C0 )
+                    if ( Ep0 is not None ) : s += ( Ep1 - Ep0 ) * ( C1 + C0 )
                     Ep0 = Ep1
                     C0 = C1
                 s /= 2.
@@ -1275,7 +1274,7 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
                     if( s != 0. ) : Data[1] /= s    # Loop for each E'.
 
     def convertToI4( self, i1=None, lmax=0 ):
-        "Converts the self and the I=1 data given as an argument to an endlI4 instance where the new object has Legendre orders 0, 1, ..., lmax"
+        """Converts the self and the I=1 data given as an argument to an endlI4 instance where the new object has Legendre orders 0, 1, ..., lmax"""
 
         from xData import series1d as seriesModule
 
@@ -1308,14 +1307,14 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
         return i4
 
     def reduceToEEpP( self ) :
-        "Integrates the mu dimension, returning an endl3dmath object of list[ E, list[ E', P( E, E' ) ] ]."
+        """Integrates the mu dimension, returning an endl3dmath object of list[ E, list[ E', P( E, E' ) ] ]."""
 
         d3 = []
         for e_etal in self.data :
             d = self.mapMuEpPToGrid( e_etal[0], relEps = 1e-14 )
             u = None
             for u_etal in d.data :
-                if ( u == None ) :
+                if ( u is None ) :
                     d3p = []
                     for etal in u_etal[1] : d3p.append( [ etal[0], etal[1], 0. ] )
                 else :
@@ -1332,7 +1331,7 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
         return endl3dmathClasses.endl3dmath( d3, checkDataType = 0, xLabel = "E", yLabel = "E'", zLabel = "Probability" )
 
     def reduceToEMuP( self, normalize = False ) :                          # class endlI3
-        "Integrates the E' dimension, returning an unnormalized (normalize = False) or normalized (normalize = True) endlI1 object."
+        """Integrates the E' dimension, returning an unnormalized (normalize = False) or normalized (normalize = True) endlI1 object."""
 
         d3 = []
         for e_etal in self.data :
@@ -1340,7 +1339,7 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
             for u_etal in e_etal[1] :
                 Ep1 = None
                 for etal in u_etal[1] :
-                    if ( Ep1 == None ) :
+                    if ( Ep1 is None ) :
                         s = 0
                     else :
                         s += ( etal[1] + P1 ) * ( etal[0] - Ep1 )
@@ -1368,7 +1367,7 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
             zLabel = "running Sum of P( E, mu, E' ) vs E'" )
 
     def plot( self, E = None, xMin = None, xMax = None, yMin = None, yMax = None, zMin = None, zMax = None, \
-        xyzlog = 0, tLabel = None, xLabel = None, yLabel = None, zLabel = None, title = None, \
+        xyzlog = 0, tLabel = None, xLabel = None, yLabel = None, zLabel = None, title = None, style = None, \
         xrot = None, zrot = None ) :                                                                # class endlI3
         """Plots the data.  If E = None uses 4d plotting otherwise uses 3d plotting for the requested E.
 
@@ -1384,24 +1383,24 @@ xyzlog values and meaning::
       6     linear-log-log
       7     log-log-log"""
 
-        if ( tLabel == None ) and ( self.tLabel != None ) : tLabel = self.tLabel
-        if ( xLabel == None ) and ( self.xLabel != None ) : xLabel = self.xLabel
-        if ( yLabel == None ) and ( self.yLabel != None ) : yLabel = self.yLabel
-        if ( zLabel == None ) and ( self.zLabel != None ) : zLabel = self.zLabel
+        if ( tLabel is None ) and ( self.tLabel is not None ) : tLabel = self.tLabel
+        if ( xLabel is None ) and ( self.xLabel is not None ) : xLabel = self.xLabel
+        if ( yLabel is None ) and ( self.yLabel is not None ) : yLabel = self.yLabel
+        if ( zLabel is None ) and ( self.zLabel is not None ) : zLabel = self.zLabel
 
-        if ( E != None ) :
+        if ( E is not None ) :
             iE = None
             i = -1
             for E_xyz in self.data :
                 i += 1
                 if ( abs( E - E_xyz[0] ) < E * 1e-8 ) : iE = i
-            if ( iE == None ) : raise Exception( "\nError in endlI3.plot: E value not found" )
+            if ( iE is None ) : raise Exception( "\nError in endlI3.plot: E value not found" )
             dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title, \
-                zMin = zMin, zMax = zMax, zLabel = zLabel, xrot = xrot, zrot = zrot )
+                zMin = zMin, zMax = zMax, zLabel = zLabel, xrot = xrot, zrot = zrot, style = style )
             endl4dmathmisc.plot3dFrom4d( self.data, iE, dt, xyzlog = xyzlog )
         else :
             endl4dmathClasses.endl4dmath.plot( self, xMin = xMin, xMax = xMax, yMin = yMin, yMax = yMax, zMin = zMin, zMax = zMax, xyzlog = xyzlog, \
-                tLabel = tLabel, xLabel = xLabel, yLabel = yLabel, title = title, tScaleLabel = "Incident Energy", xrot = xrot, zrot = zrot )
+                tLabel = tLabel, xLabel = xLabel, yLabel = yLabel, title = title, style = style, tScaleLabel = "Incident Energy", xrot = xrot, zrot = zrot )
 
     def set( self, data, checkDataType = 0, tLabel = "E (MeV)", xLabel = "mu", yLabel = "E' (MeV)", zLabel = "pdf(E,mu,E') vs E' (1/MeV)", interpolation = 0 ) :
 
@@ -1473,7 +1472,7 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
 
         from xData import series1d as seriesModule
 
-        if( lMax == None ) : lMax = seriesModule.maxLegendreOrder
+        if( lMax is None ) : lMax = seriesModule.maxLegendreOrder
         lMax = max( 0, min( lMax, seriesModule.maxLegendreOrder ) )
             
         I3Data = []
@@ -1552,22 +1551,22 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
         return endlI4( None, self.yo, self.C, self.I, self.S, self.h, endl4dmathClasses.endl4dmath.copyData( self ) )
 
     def EMax( self ) :
-        "Returns the last incident energy value for self. Returns None if data is empty."
+        """Returns the last incident energy value for self. Returns None if data is empty."""
 
         EMax = None
         for l, EEpP in self.data :
-            if( EMax == None ) :
+            if( EMax is None ) :
                 if( len( EEpP ) > 0 ) : EMax = EEpP[0][0]
             else :
                 if( len( EEpP ) > 0 ) : EMax = max( EMax, EEpP[0][0] )
         return( EMax )
 
     def EMin( self ) :
-        "Returns the first incident energy value for self. Returns None if data is empty."
+        """Returns the first incident energy value for self. Returns None if data is empty."""
 
         EMin = None
         for l, EEpP in self.data :
-            if( EMin == None ) :
+            if( EMin is None ) :
                 if( len( EEpP ) > 0 ) : EMin = EEpP[0][0]
             else :
                 if( len( EEpP ) > 0 ) : EMin = min( EMin, EEpP[0][0] )
@@ -1591,10 +1590,10 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
             n = len( EEpP )
             if( n > 0 ) :
                 EMin_ = EEpP[0][0]
-                if( ( EMin == None ) or ( EMin_ < EMin ) ) : EMin = EMin_
+                if( ( EMin is None ) or ( EMin_ < EMin ) ) : EMin = EMin_
                 if( n > 1 ) :
                     EMinNext_ = EEpP[1][0]
-                    if( ( EMinNext == None ) or ( EMinNext_ < EMinNext ) ) : EMinNext = EMinNext_
+                    if( ( EMinNext is None ) or ( EMinNext_ < EMinNext ) ) : EMinNext = EMinNext_
         return( EMin, EMinNext )
 
     def getlData( self, l ) :
@@ -1613,7 +1612,7 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
         is performed. If unitBase is true, the Ep, P(l,E,Ep) data are unit based linear interpolated."""
 
         EEpP = self.getlData( l ).data
-        if( EEpP == None ) : return( None )
+        if( EEpP is None ) : return( None )
         nE = len( EEpP )
         if( nE == 0 ) : return( None )
         if( ( E < EEpP[0][0] ) or ( E > EEpP[-1][0] ) ) : return( None )
@@ -1663,7 +1662,7 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
                     return
 
     def getThresholdsForChecker( self ) :
-        "For internal use only."
+        """For internal use only."""
 
         thresholds = []
         for l, EAndOthers in self.data :
@@ -1692,7 +1691,7 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
                 for d1 in d0[1] :               # Loop for each E'.
                     Ep1 = d1[0]
                     C1 = d1[1]
-                    if ( Ep0 != None ) : s += ( Ep1 - Ep0 ) * ( C1 + C0 )
+                    if ( Ep0 is not None ) : s += ( Ep1 - Ep0 ) * ( C1 + C0 )
                     Ep0 = Ep1
                     C0 = C1
                 s /= 2.
@@ -1726,12 +1725,12 @@ xyzlog values and meaning::
       6     linear-log-log
       7     log-log-log"""
 
-        if ( tLabel == None ) and ( self.tLabel != None ) : tLabel = self.tLabel
-        if ( xLabel == None ) and ( self.xLabel != None ) : xLabel = self.xLabel
-        if ( yLabel == None ) and ( self.yLabel != None ) : yLabel = self.yLabel
-        if ( zLabel == None ) and ( self.zLabel != None ) : zLabel = self.zLabel
+        if ( tLabel is None ) and ( self.tLabel is not None ) : tLabel = self.tLabel
+        if ( xLabel is None ) and ( self.xLabel is not None ) : xLabel = self.xLabel
+        if ( yLabel is None ) and ( self.yLabel is not None ) : yLabel = self.yLabel
+        if ( zLabel is None ) and ( self.zLabel is not None ) : zLabel = self.zLabel
 
-        if ( l != None ) :
+        if ( l is not None ) :
             dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title, \
                 zMin = zMin, zMax = zMax, zLabel = zLabel, xrot = xrot, zrot = zrot )
             endl4dmathmisc.plot3dFrom4d( self.data, l, dt, xyzlog = xyzlog )
@@ -1981,7 +1980,7 @@ def I1sToCommonGrids( I1List, muGridPerE = True ) :
     thisMuGrid = muMasterGrid
     for I1 in I1List :
         EMin, EMax = I1.xMin( ), I1.xMax( )
-        if( ( EMin == None ) or ( EMax == None ) ) : raise Exception( 'I = 1 data does not contain at least two energy points: %s' % `I1` )
+        if( ( EMin is None ) or ( EMax is None ) ) : raise Exception( 'I = 1 data does not contain at least two energy points: %s' % `I1` )
         for E in Es :
             if( muGridPerE ) : thisMuGrid = muGrids[E]
             if( EMin <= E <= EMax ) : 

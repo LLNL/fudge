@@ -61,15 +61,23 @@
 # 
 # <<END-copyright>>
 
+try :
+    from numericalFunctions import pointwiseXY_C as pointwiseXY_CModule
+    floatToShortestString = pointwiseXY_CModule.floatToShortestString
+except :
+    from pqu import PQU as PQUModule
+    floatToShortestString = PQUModule.floatToShortestString
+
+from PoPs import IDs as IDsPoPsModule
+
 from xData import standards as standardsModule
 from xData import axes as axesModule
+from xData import constant as constantModule
 from xData import XYs as XYsModule
 from xData import series1d as series1dModule
 from xData import regions as regionsModule
 from xData import gridded as griddedModule
 from xData import link as linkModule
-
-from fudge.processing import group as groupModule
 
 from fudge.core.utilities import brb
 from fudge.gnd import tokens as tokensModule
@@ -79,8 +87,14 @@ from fudge.gnd.reactions import base as reactionBaseModule
 
 __metaclass__ = type
 
-multiplicityToken = 'multiplicity'
 energyDependentToken = 'energyDependent'
+
+def defaultAxes( energyUnit ) :
+
+    axes = axesModule.axes( rank = 2 )
+    axes[0] = axesModule.axis( 'multiplicity', 0, '' )
+    axes[1] = axesModule.axis( 'energy_in', 1, energyUnit )
+    return( axes )
 
 class baseMultiplicityForm( abstractClassesModule.form ) :
 
@@ -98,7 +112,11 @@ class unknown( baseMultiplicityForm ) :
             if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must be a string' )
         self.__label = label
 
-    def getValue( self, E ) :
+    def convertUnits( self, unitMap ) :
+
+        pass
+
+    def evaluate( self, E ) :
 
         return( 0. )
 
@@ -111,7 +129,7 @@ class unknown( baseMultiplicityForm ) :
 
         return( self.__label )
 
-    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
 
         raise Exception( 'Linear-linear XYs1d data for multiplicity form %s does not make sense' % self.moniker )
 
@@ -129,85 +147,35 @@ class unknown( baseMultiplicityForm ) :
         xPath.pop()
         return val
 
-class constant( baseMultiplicityForm ) :
+class constant1d( baseMultiplicityForm, constantModule.constant1d ) :
 
-    moniker = 'constant'
-
-    def __init__( self, label, value ) :
+    def __init__( self, multiplicity, domainMin, domainMax, axes, label = None ) :
 
         baseMultiplicityForm.__init__( self )
-
-        if( not( isinstance( value, ( int, float ) ) ) ) :
-            raise TypeError( 'constant multiplicity must be an int or float' )
-        self.value = value
-
-        if( label is not None ) :
-            if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must be a string' )
-        self.__label = label
-
-    def domainMin( self, unitTo = None, asPQU = False ) :
-
-        return( self.findClassInAncestry( reactionBaseModule.base_reaction ).domainMin( unitTo = unitTo, asPQU = asPQU ) )
-
-    def domainMax( self, unitTo = None, asPQU = False ) :
-
-        return( self.findClassInAncestry( reactionBaseModule.base_reaction ).domainMax( unitTo = unitTo, asPQU = asPQU ) )
-
-    def domain( self, unitTo = None, asPQU = False ) :
-
-        return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
-
-    def domainUnit( self ) :
-
-        return( self.findClassInAncestry( reactionBaseModule.base_reaction ).domainUnit( ) )
+        constantModule.constant1d.__init__( self, multiplicity, domainMin, domainMax, axes = axes, label = label )
 
     def getEnergyLimits( self, EMin, EMax ) :
 
         return( [ EMin, EMax ] )
 
-    def getValue( self, E ) :
-
-        return( self.value )
-
     def getXMLAttribute( self ) :
 
-        return( self.value )
+        integer = int( self.constant )
+        if( self.constant == integer ) : return( integer )
+        return( floatToShortestString( self.constant ) )
 
     def isConstant( self ) :
 
         return( True )
 
-    @property
-    def label( self ) :
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
-        return( self.__label )
+        return( self.toPointwise_withLinearXYs( accuracy = 1e-5, upperEps = 1e-8 ).processMultiGroup( style, tempInfo, indent ) )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
-
-        return( self.toPointwise_withLinearXYs( 1e-8, 1e-8 ).processSnMultiGroup( style, tempInfo, indent ) )
-
-    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
         """This method returns the multiplicity as linear-linear XYs1d data which spans self's domain."""
 
-        axes = XYs1d.defaultAxes( energyUnit = self.domainUnit( ) )
-        return( XYs1d( data = [ [ self.domainMin( ), self.value ], [ self.domainMax( ), self.value ] ],
-                axes = axes, accuracy = 1e-12 ) )
-
-    def toXMLList( self, indent = '', **kwargs ) :
-
-        attributeStr = ''
-        if( self.label is not None ) : attributeStr += ' label="%s"' % self.label
-        return( [ '%s<%s%s value="%s"/>' % ( indent, self.moniker, attributeStr, self.value ) ] )
-
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ) :
-
-        xPath.append( element.tag )
-        mult = float( element.get( 'value' ) )
-        if( mult.is_integer( ) ) : mult = int( mult )
-        multiplicity = constant( element.get( 'label' ), mult )
-        xPath.pop( )
-        return( multiplicity )
+        return( XYs1d( data = [ [ self.domainMin, self.constant ], [ self.domainMax, self.constant ] ], axes = self.axes ) )
 
 class XYs1d( baseMultiplicityForm, XYsModule.XYs1d ) :
 
@@ -218,9 +186,9 @@ class XYs1d( baseMultiplicityForm, XYsModule.XYs1d ) :
 
     def getEnergyLimits( self, EMin, EMax ) :
 
-        return( self.domain( ) )
+        return( self.domainMin, self.domainMax )
 
-    def getValue( self, E ) :
+    def evaluate( self, E ) :
 
         if( E < self[0][0] ) : E = self[0][0]
         if( E > self[-1][0] ) : E = self[-1][0]
@@ -232,24 +200,15 @@ class XYs1d( baseMultiplicityForm, XYsModule.XYs1d ) :
 
     def isConstant( self ) :
 
-        return self.rangeMin() == self.rangeMax()
+        return self.rangeMin == self.rangeMax
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
         from fudge.processing import miscellaneous as miscellaneousModule
 
-        if( tempInfo['verbosity'] > 2 ) : print '%sProcessing XYs1d cross section' % indent
+        if( tempInfo['verbosity'] > 2 ) : print '%sMulti-grouping XYs1d mutiplicity' % indent
 
-        multiplicityGrouped = miscellaneousModule.groupOneFunctionAndFlux( style, tempInfo, self )
-        return( groupModule.toMultiGroup1d( multiGroup, style, tempInfo, self.axes, multiplicityGrouped ) )
-
-    @staticmethod
-    def defaultAxes( energyUnit = 'eV', multiplicityName = multiplicityToken ) :
-
-        axes = axesModule.axes( rank = 2 )
-        axes[0] = axesModule.axis( multiplicityName, 0, '' )
-        axes[1] = axesModule.axis( 'energy_in', 1, energyUnit )
-        return( axes )
+        return( miscellaneousModule.groupFunctionCrossSectionAndFlux( gridded1d, style, tempInfo, self ) )
 
 class regions1d( baseMultiplicityForm, regionsModule.regions1d ) :
 
@@ -262,7 +221,7 @@ class regions1d( baseMultiplicityForm, regionsModule.regions1d ) :
 
         return( [ self[0][0][0], self[-1][-1][0] ] )
 
-    def getValue( self, E ) :
+    def evaluate( self, E ) :
 
         if( E < self[0][0][0] ) : E = self[0][0][0]
         for region in self :
@@ -273,17 +232,16 @@ class regions1d( baseMultiplicityForm, regionsModule.regions1d ) :
 
         return( energyDependentToken )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
-        return( self.toPointwise_withLinearXYs( 1e-8, 1e-8 ).processSnMultiGroup( style, tempInfo, indent ) )
+        return( self.toPointwise_withLinearXYs( accuracy = 1e-5, upperEps =  1e-8 ).processMultiGroup( style, tempInfo, indent ) )
 
-    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
         """See regionsXYs.toPointwise_withLinearXYs on the use of lowerEps, upperEps."""
 
-        accuracy = 1e-6
-        if( len( self ) > 0 ) : accuracy = self[0].getAccuracy( )
-        xys = regionsModule.regions1d.toPointwise_withLinearXYs( self, accuracy, lowerEps, upperEps, removeOverAdjustedPoints = True )
-        return( XYs1d( data = xys, axes = xys.axes, accuracy = xys.getAccuracy( ) ) )
+        kwargs['removeOverAdjustedPoints'] = True
+        xys = regionsModule.regions1d.toPointwise_withLinearXYs( self, **kwargs )
+        return( XYs1d( data = xys, axes = xys.axes ) )
 
 class reference( linkModule.link, baseMultiplicityForm ) :
 
@@ -300,29 +258,36 @@ class reference( linkModule.link, baseMultiplicityForm ) :
             raise Exception("Unresolved link!")
         return self.link
 
-    def domainMin( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMin( self ) :
 
-        return( self.reference.domainMin( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.reference.domainMin )
 
-    def domainMax( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMax( self ) :
 
-        return( self.reference.domainMax( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.reference.domainMax )
 
-    def domain( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainUnit( self ) :
 
-        return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.reference.domainUnit )
+
+    def convertUnits( self, unitMap ) :
+
+        pass
 
     def getEnergyLimits( self, EMin, EMax ) :
 
         return( self.reference.getEnergyLimits( EMin, EMax ) )
 
-    def getValue( self, E ) :
+    def evaluate( self, E ) :
 
-        return( self.reference.getValue( E ) )
+        return( self.reference.evaluate( E ) )
 
-    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
 
-        return( self.reference.toPointwise_withLinearXYs( lowerEps, upperEps ) )
+        return( self.reference.toPointwise_withLinearXYs( **kwargs ) )
 
     def getXMLAttribute( self ) :
 
@@ -335,9 +300,10 @@ class polynomial( baseMultiplicityForm, series1dModule.polynomial1d ) :
         baseMultiplicityForm.__init__( self )
         series1dModule.polynomial1d.__init__( self, **kwargs )
 
+    @property
     def domainUnit( self ) :
 
-        return( self.findClassInAncestry( reactionBaseModule.base_reaction ).domainUnit( ) )
+        return( self.findClassInAncestry( reactionBaseModule.base_reaction ).domainUnit )
 
     def getEnergyLimits( self, EMin, EMax ) :
 
@@ -347,22 +313,14 @@ class polynomial( baseMultiplicityForm, series1dModule.polynomial1d ) :
 
         return( energyDependentToken )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
-        return( self.toPointwise_withLinearXYs( 1e-8, 1e-8 ).processSnMultiGroup( style, tempInfo, indent ) )
+        return( self.toPointwise_withLinearXYs( accuracy = 1e-5, upperEps = 1e-8 ).processMultiGroup( style, tempInfo, indent ) )
 
-    def toPointwise_withLinearXYs( self, lowerEps, upperEps, accuracy = 1e-6 ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
 
-        xys = series1dModule.polynomial1d.toPointwise_withLinearXYs( self, self.domainMin, self.domainMax )
-        return( XYs1d( data = xys, axes = self.axes, accuracy = accuracy ) )
-
-    @staticmethod
-    def defaultAxes( energyName = 'energy_in', energyUnit = 'eV', multiplicityName = multiplicityToken ) :
-
-        axes = axesModule.axes( rank = 2 )
-        axes[0] = axesModule.axis( "C_i(%s)" % energyName, 0, "%s^(-i)" % energyUnit )
-        axes[1] = axesModule.axis( "i", 1, "" )
-        return( axes )
+        xys = series1dModule.polynomial1d.toPointwise_withLinearXYs( self, accuracy = 1e-6 )
+        return( XYs1d( data = xys, axes = self.axes ) )
 
 class partialProduction( baseMultiplicityForm ) :
 
@@ -377,7 +335,7 @@ class partialProduction( baseMultiplicityForm ) :
             if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must be a string' )
         self.__label = label
 
-    def getValue( self, E ) :
+    def evaluate( self, E ) :
 
         return( self.data )
 
@@ -390,7 +348,7 @@ class partialProduction( baseMultiplicityForm ) :
 
         return( self.__label )
 
-    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
 
         brb.objectoutline( self.data )
         raise 'Hell'
@@ -412,11 +370,11 @@ class partialProduction( baseMultiplicityForm ) :
         xPath.pop( )
         return( multiplicity )
 
-class multiGroup( baseMultiplicityForm, griddedModule.gridded ) :
+class gridded1d( baseMultiplicityForm, griddedModule.gridded1d ) :
 
     def __init__( self, **kwargs ) :
 
-        griddedModule.gridded.__init__( self, **kwargs )
+        griddedModule.gridded1d.__init__( self, **kwargs )
 
     def getXMLAttribute( self ) :
 
@@ -430,13 +388,13 @@ def parseXMLNode( multElement, xPath, linkData ) :
     for form in multElement :
         formClass = {
                 unknown.moniker                 : unknown,
-                constant.moniker                : constant,
+                constant1d.moniker              : constant1d,
                 XYs1d.moniker                   : XYs1d,
                 regions1d.moniker               : regions1d,
                 reference.moniker               : reference,
                 polynomial.moniker              : polynomial,
                 partialProduction.moniker       : partialProduction,
-                multiGroup.moniker              : multiGroup
+                gridded1d.moniker               : gridded1d
             }.get( form.tag )
         if( formClass is None ) : raise Exception( "encountered unknown multiplicity form: %s" % form.tag )
         newForm = formClass.parseXMLNode( form, xPath, linkData )
@@ -449,41 +407,44 @@ def parseXMLNode( multElement, xPath, linkData ) :
 #
 class component( abstractClassesModule.component ) :
 
-    moniker = multiplicityToken
+    moniker = 'multiplicity'
 
     def __init__( self ) :
 
-        abstractClassesModule.component.__init__( self, ( unknown, constant, XYs1d, regions1d, reference, polynomial, 
-                partialProduction, multiGroup ) )
+        abstractClassesModule.component.__init__( self, ( unknown, constant1d, XYs1d, regions1d, reference, polynomial, 
+                partialProduction, gridded1d ) )
 
     def isConstant( self ) :
 
-        return( isinstance( self.evaluated, constant ) )
+        return( isinstance( self.evaluated, constant1d ) )
 
     def getConstant( self ) :
 
-        if( self.isConstant()  ) : return( self.getValue( 0 ) )
+        if( self.isConstant()  ) : return( self.evaluated.evaluate( 0 ) )
         raise Exception( 'multiplicity type = "%s" is not single valued' % self.evaluated.moniker )
 
-    def domainMin( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMin( self ) :
 
-        return( self.evaluated.domainMin( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.evaluated.domainMin )
 
-    def domainMax( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMax( self ) :
 
-        return( self.evaluated.domainMax( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.evaluated.domainMax )
 
-    def domain( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainUnit( self ) :
 
-        return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.evaluated.domainUnit )
 
     def getEnergyLimits( self, EMin, EMax ) :
 
         return( self.evaluated.getEnergyLimits( EMin, EMax ) )
         
-    def getValue( self, E ) :
+    def evalute( self, E ) :
 
-        return( self.evaluated.getValue( E ) )
+        return( self.evaluated.evaluate( E ) )
 
     def check( self, info ):
 
@@ -497,23 +458,31 @@ class component( abstractClassesModule.component ) :
             for form in self :
                 domain = None
                 if hasattr(form, 'domain') :
-                    if( isinstance( form, polynomial ) ) :
-                        domain = form.domain
-                    else :
-                        domain = form.domain( )
+                    domain = form.domainMin, form.domainMax
                 if( ( domain is not None ) and ( domain != info['crossSectionDomain'] ) ) :
-                    for idx in range(2):    # check bounds individually: is difference due to floating point precision?
-                        ratio = domain[idx] / info['crossSectionDomain'][idx]
-                        if (ratio < 1-standardsModule.floats.epsilon or ratio > 1+standardsModule.floats.epsilon):
-                            if ( idx==0 and domain[0] > info['crossSectionDomain'][0] and form.getValue( domain[0] ) == 0 ):
-                                continue    # multiplicity starting after xsc is ok if first multiplicity point == 0
-                            warnings.append( warning.domain_mismatch( *(domain + info['crossSectionDomain']), obj=form ) )
-                            break
-                if hasattr(form, 'rangeMin') and form.rangeMin() < 0:
-                    warnings.append( warning.negativeMultiplicity( form.rangeMin(), obj=form ) )
+                    # photon multiplicities can start above cross section domainMin, but domainMax should agree:
+                    if( self.getAncestor().id == IDsPoPsModule.photon ) :
+                        startRatio = domain[0] / info['crossSectionDomain'][0]
+                        endRatio = domain[1] / info['crossSectionDomain'][1]
+                        if (startRatio < 1 - standardsModule.floats.epsilon or endRatio < 1 - standardsModule.floats.epsilon
+                            or endRatio > 1 + standardsModule.floats.epsilon):
+                            warnings.append(warning.domain_mismatch(
+                                *(domain + info['crossSectionDomain']), obj=self))
+                    # For all other products, both domainMin and domainMax should agree within epsilon
+                    else:
+                        for idx, (e1, e2) in enumerate(zip(domain, info['crossSectionDomain'])):
+                            ratio = e1 / e2
+                            if (ratio < 1 - standardsModule.floats.epsilon or ratio > 1 + standardsModule.floats.epsilon):
+                                if ( idx==0 and domain[0] > info['crossSectionDomain'][0] and form.evaluate( domain[0] ) == 0 ):
+                                    continue    # multiplicity starting after xsc is ok if first multiplicity point == 0
+                                warnings.append(warning.domain_mismatch( *(domain + info['crossSectionDomain']), obj=self))
+                                break
+
+                if hasattr(form, 'rangeMin') and form.rangeMin < 0:
+                    warnings.append( warning.negativeMultiplicity( form.rangeMin, obj=form ) )
 
         return warnings
 
     def getXMLAttribute( self ) :
 
-        return( self[0].getXMLAttribute( ) )    # BRB. need to fix this. A kludge until nativeData stuff is fixed.
+        return( self.evaluated.getXMLAttribute( ) )

@@ -69,7 +69,9 @@
 static int verbose = 0;
 static int check1ID = smr_unknownID;
 
-void addMessage( statusMessageReporting *smr1, statusMessageReporting *smr2, enum smr_status status, int count, char *message );
+static char const text1[] = "Hi";
+
+void addMessage( statusMessageReporting *smr1, statusMessageReporting *smr2, enum smr_status status, int count, char const *message );
 void printMessages( statusMessageReporting *smr1, statusMessageReporting *smr2, int clear );
 void releaseMessages( statusMessageReporting *smr1, statusMessageReporting *smr2 );
 enum smr_status getStatus( void );
@@ -94,7 +96,7 @@ int main( int argc, char **argv ) {
         exit( EXIT_FAILURE );
     }
 
-    addMessage( smr1, smr2, smr_status_Info, 1, "Hi" );
+    addMessage( smr1, smr2, smr_status_Info, 1, text1 );
     printMessages( smr1, smr2, 0 );
     releaseMessages( smr1, smr2 );
 
@@ -121,7 +123,7 @@ int main( int argc, char **argv ) {
 /*
 ============================================================
 */
-void addMessage( statusMessageReporting *smr1, statusMessageReporting *smr2, enum smr_status status, int count, char *message ) {
+void addMessage( statusMessageReporting *smr1, statusMessageReporting *smr2, enum smr_status status, int count, char const *message ) {
 
     int i;
 

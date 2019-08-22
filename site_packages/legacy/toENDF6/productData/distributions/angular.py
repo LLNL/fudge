@@ -61,27 +61,27 @@
 # 
 # <<END-copyright>>
 
+from pqu import PQU as PQUModule
+
+from xData import standards as standardsModule
+from xData import XYs as XYsModule
+from xData import multiD_XYs as multiD_XYsModule
+from xData import regions as regionsModule
+from xData import series1d as series1dModule
+
 from fudge.core.utilities import brb
 
-import site_packages.legacy.toENDF6.endfFormats as endfFormatsModule
-import site_packages.legacy.toENDF6.gndToENDF6 as gndToENDF6Module
+from fudge.gnd.productData.distributions import angular as angularModule
 
-import fudge.gnd.productData.distributions.angular as angularModule
-import xData.standards as standardsModule
-import xData.XYs as XYsModule
-import xData.multiD_XYs as multiD_XYsModule
-import xData.regions as regionsModule
-import xData.series1d as series1dModule
-
-import pqu.PQU as PQUModule
+from ... import endfFormats as endfFormatsModule
+from ... import gndToENDF6 as gndToENDF6Module
 
 #
 # form
 #
 def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
-    if( MT==455 ) and ( MT in endfMFList[4] ):
-        return  # only write one 'isotropic' section for all delayed neutron groups
+    if( MT == 455 ) : return                # No angular data for delayed neutrons in ENDF
     angularSubform = self.angularSubform
     if( hasattr( angularSubform, 'toENDF6' ) ) :
 
@@ -193,7 +193,7 @@ def toAngularPointwise( angularSubform, targetInfo, insertSENDL ) :
     interpolation = ( gndToENDF6Module.gndToENDFInterpolationFlag( angularSubform.interpolation ) )
     ENDFDataList += endfFormatsModule.endfInterpolationList( [ len( angularSubform ), interpolation ] )
     start = 0
-    if targetInfo.get('skipFirstEnergy'): start = 1
+    if( targetInfo.get( 'skipFirstEnergy' ) ) : start = 1
     for energy_in in angularSubform[start:] : ENDFDataList += angularPointwiseEnergy2ENDF6( energy_in, targetInfo )
     if( insertSENDL ) : ENDFDataList.append( endfFormatsModule.endfSENDLineNumber( ) )
     return( 0, 2, ENDFDataList )
@@ -206,7 +206,7 @@ def toAngularLegendre( angularSubform, targetInfo, insertSENDL ) :
     energyConversionFactor = PQUModule.PQU(1, angularSubform.axes[-1].unit ).getValueAs('eV')
     ENDFDataList = []
     start = 0
-    if targetInfo.get('skipFirstEnergy'): start = 1
+    if( targetInfo.get( 'skipFirstEnergy' ) ) : start = 1
     for energy in angularSubform[start:] :
         NW, NL = len( energy ) - 1, 0
         if( targetInfo['doMF4AsMF6'] ) : NL = NW
@@ -215,70 +215,6 @@ def toAngularLegendre( angularSubform, targetInfo, insertSENDL ) :
         NM = max(NM, len(energy.coefficients[1:]))
     if( insertSENDL ) : ENDFDataList.append( endfFormatsModule.endfSENDLineNumber( ) )
     return( interpolation, len( angularSubform[start:] ), 0, 1, NM, ENDFDataList )
-
-#
-# CoulombExpansionForm
-#
-def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
-
-    def LTP_oneSubParsing( LTP, LIDP, nuclear, interferenceReal, interferenceImaginary, lineData ) :
-
-        if LIDP:
-            NL = len( nuclear ) - 1
-            NW = 3 * NL + 3
-        else :
-            NL = ( len( nuclear ) - 1 ) // 2
-            NW = 4 * NL + 3
-        lineData.append( endfFormatsModule.endfContLine( 0, nuclear.value, LTP, 0, NW, NL ) )
-        legendreDat = nuclear.coefficients
-        for j, r in enumerate( interferenceReal.coefficients ) :
-            legendreDat.append( r )
-            legendreDat.append( interferenceImaginary[j] )
-        lineData += endfFormatsModule.endfDataList( legendreDat )
-
-    counts, interpolationFlagsList, lineData = 0, [], []
-    LTP = 1                     # indicates this is a nuclear + interference section
-    target, projectile = targetInfo['reactionSuite'].target, targetInfo['reactionSuite'].projectile
-    LIDP = target==projectile
-    if( isinstance( self.nuclear_term, angularModule.XYs2d ) ) :
-        for ridx in xrange( len( self.nuclear_term ) ) :
-            counts += 1
-            nuclear, interferenceReal, interferenceImaginary = self.nuclear_term[ridx], self.interferenceReal_term[ridx], self.interferenceImaginary_term[ridx]
-            LTP_oneSubParsing( LTP, LIDP, nuclear, interferenceReal, interferenceImaginary, lineData )
-        interpolationFlagsList += [ counts, gndToENDF6Module.gndToENDFInterpolationFlag( self.nuclear_term.interpolation ) ]
-    elif( isinstance( self.nuclear_term, angularModule.regions2d ) ) :
-        for regionIndex, region in enumerate( self.nuclear_term ) :
-            interferenceReal, interferenceImaginary = self.interferenceReal_term[regionIndex], self.interferenceImaginary_term[regionIndex]
-            for energyIndex, nuclear in enumerate( region ) :
-                if( ( regionIndex != 0 ) and ( energyIndex == 0 ) ) : continue
-                counts += 1
-                LTP_oneSubParsing( LTP, LIDP, nuclear, interferenceReal[energyIndex], interferenceImaginary[energyIndex], lineData )
-            interpolationFlagsList += [ counts, gndToENDF6Module.gndToENDFInterpolationFlag( region.interpolation ) ]
-    else :
-        raise NotImplementedError( "Unknown data storage inside CoulombExpansion: %s" % type(self.nuclear_term) )
-    interpolationFlags = endfFormatsModule.endfInterpolationList( interpolationFlagsList )
-    ENDFDataList = [ endfFormatsModule.endfContLine( projectile.getSpin().value, 0, LIDP, 0, len( interpolationFlagsList ) / 2, counts ) ] + interpolationFlags + lineData
-    if( not( targetInfo['doMF4AsMF6'] ) ) : ENDFDataList.append( endfFormatsModule.endfSENDLineNumber( ) )
-    LAW = 5
-    gndToENDF6Module.toENDF6_MF6(MT, endfMFList, flags, targetInfo, LAW, self.productFrame, ENDFDataList)
-
-angularModule.CoulombExpansionForm.toENDF6 = toENDF6
-
-#
-# NuclearPlusCoulombInterference
-#
-def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
-
-    LI, LTT, MF6 = self.angularSubform.toENDF6( flags, { 'doMF4AsMF6' : True } )
-    target, projectile = targetInfo['reactionSuite'].target, targetInfo['reactionSuite'].projectile
-    spin = projectile.getSpin().value
-    LIDP = target==projectile
-    NR, NE = [ int(a) for a in MF6[0].split()[-2:] ]
-    MF6[0] = endfFormatsModule.endfContLine( spin, 0, LIDP, 0, NR, NE )
-    LAW = 5
-    gndToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, self.productFrame, MF6 )
-
-angularModule.NuclearPlusCoulombInterferenceForm.toENDF6 = toENDF6
 
 #
 # isotropic
@@ -317,11 +253,12 @@ def toENDF6( self, flags, targetInfo ) :
     ENDFDataList = [ endfFormatsModule.endfContLine( 0, 0, 0, 0, 1, len( self ) ) ]
     interpolation = gndToENDF6Module.gndToENDF2PlusDInterpolationFlag( self.interpolation, self.interpolationQualifier )
     ENDFDataList += endfFormatsModule.endfInterpolationList( [ len( self ), interpolation ] )
+    EInFactor = PQUModule.PQU( 1, self.axes[-1].unit ).getValueAs( 'eV' )
     for energy_in in self : 
         if( isinstance( energy_in, XYsModule.XYs1d ) ) :
-            ENDFDataList += gndToENDF6Module.angularPointwiseEnergy2ENDF6( energy_in, targetInfo )
+            ENDFDataList += gndToENDF6Module.angularPointwiseEnergy2ENDF6( energy_in, targetInfo, EInFactor )
         elif( isinstance( energy_in, series1dModule.LegendreSeries ) ) :
-            ENDFDataList += gndToENDF6Module.angularLegendreEnergy2ENDF6( energy_in, targetInfo )
+            ENDFDataList += gndToENDF6Module.angularLegendreEnergy2ENDF6( energy_in, targetInfo, EInFactor )
         else :
             raise 'hell - fix me'
     if( not( targetInfo['doMF4AsMF6'] ) ) : ENDFDataList.append( endfFormatsModule.endfSENDLineNumber( ) )

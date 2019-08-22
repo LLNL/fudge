@@ -61,6 +61,8 @@
 # 
 # <<END-copyright>>
 
+from pqu import PQU as PQUModule
+
 from fudge.gnd import sums as sumsModule
 from fudge.gnd.reactionData import crossSection as crossSectionModule
 
@@ -71,10 +73,13 @@ __metaclass__ = type
 #
 def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
 
+    if self.ENDF_MT in xrange(851,871) : return   # for lumped-sum covariance, only write MF 33
     if flags['verbosity'] >= 10 : print '%ssummed reaction: %s' % (verbosityIndent, self.label)
-    targetInfo['Q'] = self.Q[targetInfo['style']].Q.getValueAs( 'eV' )   # FIXME may need to account for ground state
+    Q = self.Q[targetInfo['style']]
+    Q = PQUModule.PQU( Q.constant, Q.axes[0].unit ).getValueAs( 'eV' )
+    targetInfo['Q'] = Q                     # FIXME may need to account for ground state
     crossSection = self.crossSection
-    targetInfo['EMin'], targetInfo['EMax'] = crossSection.domain( )
+    targetInfo['EMin'], targetInfo['EMax'] = crossSection.domainMin, crossSection.domainMax
     if self.summands:
         level = min( [ max( [p.getLevelAsFloat('eV') for p in reac.link.ancestor.outputChannel])
             for reac in self.summands.summandList] )

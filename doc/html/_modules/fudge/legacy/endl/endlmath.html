@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.endl.endlmath &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.legacy.endl.endlmath</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains useful fudge math routines that do not fit into any other module.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pqu</span> <span class="k">import</span> <span class="n">PQU</span>
+<span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="k">import</span> <span class="n">brb</span>
+<span class="k">try</span> <span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">numpy</span>
+    <span class="n">numpyFloat64</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span> <span class="mf">1.</span> <span class="p">)</span>
+<span class="k">except</span> <span class="p">:</span>
+    <span class="n">numpyFloat64</span> <span class="o">=</span> <span class="mf">1.</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<div class="viewcode-block" id="runningZSum"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlmath.runningZSum">[docs]</a><span class="k">def</span> <span class="nf">runningZSum</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">xLabel</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">yLabel</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">zLabel</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">normalize</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the running sum of dy * z (normalized to 1 of normalize is True) for each x as an endl3dmath object.</span>
+<span class="sd">    Data must be list of ( x, list of ( y, z ) ).&quot;&quot;&quot;</span>
+
+    <span class="n">d3</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">x_yz</span> <span class="ow">in</span> <span class="n">data</span> <span class="p">:</span> <span class="n">d3</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">x_yz</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">runningYSum</span><span class="p">(</span> <span class="n">x_yz</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">normalize</span> <span class="o">=</span> <span class="n">normalize</span> <span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="p">]</span> <span class="p">)</span>
+    <span class="kn">from</span> <span class="nn">fudge.legacy.endl</span> <span class="k">import</span> <span class="n">endl3dmathClasses</span>
+    <span class="k">return</span> <span class="n">endl3dmathClasses</span><span class="o">.</span><span class="n">endl3dmath</span><span class="p">(</span> <span class="n">d3</span><span class="p">,</span> <span class="n">xLabel</span> <span class="o">=</span> <span class="n">xLabel</span><span class="p">,</span> <span class="n">yLabel</span> <span class="o">=</span> <span class="n">yLabel</span><span class="p">,</span> <span class="n">zLabel</span> <span class="o">=</span> <span class="n">zLabel</span><span class="p">,</span> <span class="n">checkDataType</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="runningYSum"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlmath.runningYSum">[docs]</a><span class="k">def</span> <span class="nf">runningYSum</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">normalize</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the running sum of dx * y (normalized to 1 of normalize is True) as an endl2dmath object. </span>
+<span class="sd">    Data must be list of ( x, y ).&quot;&quot;&quot;</span>
+
+    <span class="n">x1</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">runningSum</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">xy</span> <span class="ow">in</span> <span class="n">data</span> <span class="p">:</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">xy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y2</span> <span class="o">=</span> <span class="n">xy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">x1</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">Sum</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">Sum</span> <span class="o">+=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span> <span class="n">y2</span> <span class="o">+</span> <span class="n">y1</span> <span class="p">)</span> <span class="o">*</span> <span class="p">(</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span> <span class="p">)</span>
+        <span class="n">runningSum</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">x2</span><span class="p">,</span> <span class="n">Sum</span> <span class="p">]</span> <span class="p">)</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="n">x2</span>
+        <span class="n">y1</span> <span class="o">=</span> <span class="n">y2</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">normalize</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">Sum</span> <span class="o">!=</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="k">for</span> <span class="n">xy</span> <span class="ow">in</span> <span class="n">runningSum</span> <span class="p">:</span> <span class="n">xy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/=</span> <span class="n">Sum</span>
+    <span class="kn">from</span> <span class="nn">fudge.legacy.endl</span> <span class="k">import</span> <span class="n">endl2dmathClasses</span>
+    <span class="k">return</span> <span class="n">endl2dmathClasses</span><span class="o">.</span><span class="n">endl2dmath</span><span class="p">(</span> <span class="n">runningSum</span><span class="p">,</span> <span class="n">checkDataType</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="ZSum"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlmath.ZSum">[docs]</a><span class="k">def</span> <span class="nf">ZSum</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the area under the curve z(y) for each x as an endl2dmath object. Data must be list of</span>
+<span class="sd">    ( x, list of ( y, z ) ).&quot;&quot;&quot;</span>
+
+    <span class="n">d2</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">x_yz</span> <span class="ow">in</span> <span class="n">data</span> <span class="p">:</span> <span class="n">d2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">[</span> <span class="n">x_yz</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">YSum</span><span class="p">(</span> <span class="n">x_yz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+    <span class="kn">from</span> <span class="nn">fudge.legacy.endl</span> <span class="k">import</span> <span class="n">endl2dmathClasses</span>
+    <span class="k">return</span> <span class="n">endl2dmathClasses</span><span class="o">.</span><span class="n">endl2dmath</span><span class="p">(</span> <span class="n">d2</span><span class="p">,</span> <span class="n">checkDataType</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="YSum"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlmath.YSum">[docs]</a><span class="k">def</span> <span class="nf">YSum</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the area under the curve y(x). Data must be list of list( x, y ).&quot;&quot;&quot;</span>
+
+    <span class="n">x1</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="ow">in</span> <span class="n">data</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">x1</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">Sum</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">Sum</span> <span class="o">+=</span> <span class="p">(</span> <span class="n">y2</span> <span class="o">+</span> <span class="n">y1</span> <span class="p">)</span> <span class="o">*</span> <span class="p">(</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span> <span class="p">)</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="n">x2</span>
+        <span class="n">y1</span> <span class="o">=</span> <span class="n">y2</span>
+    <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">Sum</span></div>
+
+<div class="viewcode-block" id="fastSumOfManyAddends"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlmath.fastSumOfManyAddends">[docs]</a><span class="k">class</span> <span class="nc">fastSumOfManyAddends</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This class in designed to sum a lot of endl2dmath or fudge2dmath object together efficiently. For example,</span>
+<span class="sd">    consider the list f2d of 100,000 fudge2dmath objects that are to be summed. One way to do this is as</span>
+<span class="sd">    s = fudge2dmath( )</span>
+<span class="sd">    for f in f2d : s = s + f</span>
+
+<span class="sd">    In general, this is very inefficient and will take a long time. Using, this class as</span>
+
+<span class="sd">    fs = fastSumOfManyAddends( )</span>
+<span class="sd">    for f in f2d : fs.appendAddend( f )</span>
+<span class="sd">    s = fs.returnSum( )</span>
+
+<span class="sd">    is, in general, much more efficient (i.e., runs a lot faster) and it should never be less efficient.</span>
+
+<span class="sd">    While this class was designed for endl2dmath and fudge2dmath objects, it should work for any object</span>
+<span class="sd">    for which the &#39;+&#39; operation is defined.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Constructor for fastSumOfManyAddends.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">(</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="fastSumOfManyAddends.appendAddend"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlmath.fastSumOfManyAddends.appendAddend">[docs]</a>    <span class="k">def</span> <span class="nf">appendAddend</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">addend</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Adds addend to current sum efficiently.&quot;&quot;&quot;</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">list</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span> <span class="n">n</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">addend</span>
+                <span class="n">addend</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">break</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">addend</span> <span class="o">=</span> <span class="n">addend</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">addend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">addend</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="fastSumOfManyAddends.clear"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlmath.fastSumOfManyAddends.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Clears currently summed data.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="fastSumOfManyAddends.returnSum"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlmath.fastSumOfManyAddends.returnSum">[docs]</a>    <span class="k">def</span> <span class="nf">returnSum</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the current sum of all addends appended.&quot;&quot;&quot;</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">list</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">l</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">s</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="n">l</span>
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="n">l</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="getValue"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endlmath.getValue">[docs]</a><span class="k">def</span> <span class="nf">getValue</span><span class="p">(</span> <span class="n">n</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="n">isNumber</span><span class="p">(</span> <span class="n">n</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">n</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">n</span><span class="p">,</span> <span class="n">PQU</span><span class="o">.</span><span class="n">PQU</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">n</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Invalue number object = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">brb</span><span class="o">.</span><span class="n">getType</span><span class="p">(</span> <span class="n">n</span> <span class="p">)</span> <span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

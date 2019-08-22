@@ -13,31 +13,31 @@
 
 ======= Status message reports =======
 smr_setReportInfo, MACRO = 0
-    At line 34 of check3.c in function main
+    At line nn of check3.c in function main
 ======= Status message reports =======
 smr_setReportInfo2, MACRO = 1
-    At line 36 of check3.c in function main
+    At line nn of check3.c in function main
 ======= Status message reports =======
 smr_vsetReportInfo2, MACRO = 1
-    At line 66 of check3.c in function _smr_setReportInfo2
+    At line nn of check3.c in function _smr_setReportInfo2
 
 ======= Status message reports =======
 smr_setReportWarning, MACRO = 0
-    At line 41 of check3.c in function main
+    At line nn of check3.c in function main
 ======= Status message reports =======
 smr_setReportWarning2, MACRO = 1
-    At line 43 of check3.c in function main
+    At line nn of check3.c in function main
 ======= Status message reports =======
 smr_vsetReportWarning2, MACRO = 1
-    At line 78 of check3.c in function _smr_setReportWarning2
+    At line nn of check3.c in function _smr_setReportWarning2
 
 ======= Status message reports =======
 smr_setReportError, MACRO = 0
-    At line 48 of check3.c in function main
+    At line nn of check3.c in function main
 ======= Status message reports =======
 smr_setReportError2, MACRO = 1
-    At line 50 of check3.c in function main
+    At line nn of check3.c in function main
 ======= Status message reports =======
 smr_vsetReportError2, MACRO = 1
-    At line 90 of check3.c in function _smr_setReportError2
+    At line nn of check3.c in function _smr_setReportError2
 

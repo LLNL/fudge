@@ -69,9 +69,9 @@
 
 static int verbose = 0, ID;
 
-void _smr_setReportInfo2( statusMessageReporting *smr, char *fmt, ... );
-void _smr_setReportWarning2( statusMessageReporting *smr, char *fmt, ... );
-void _smr_setReportError2( statusMessageReporting *smr, char *fmt, ... );
+void _smr_setReportInfo2( statusMessageReporting *smr, char const *fmt, ... );
+void _smr_setReportWarning2( statusMessageReporting *smr, char const *fmt, ... );
+void _smr_setReportError2( statusMessageReporting *smr, char const *fmt, ... );
 /*
 ============================================================
 */
@@ -123,7 +123,7 @@ int main( int argc, char **argv ) {
 /*
 ============================================================
 */
-void _smr_setReportInfo2( statusMessageReporting *smr, char *fmt, ... ) {
+void _smr_setReportInfo2( statusMessageReporting *smr, char const *fmt, ... ) {
 
     va_list args;
 
@@ -135,7 +135,7 @@ void _smr_setReportInfo2( statusMessageReporting *smr, char *fmt, ... ) {
 /*
 ============================================================
 */
-void _smr_setReportWarning2( statusMessageReporting *smr, char *fmt, ... ) {
+void _smr_setReportWarning2( statusMessageReporting *smr, char const *fmt, ... ) {
 
     va_list args;
 
@@ -147,7 +147,7 @@ void _smr_setReportWarning2( statusMessageReporting *smr, char *fmt, ... ) {
 /*
 ============================================================
 */
-void _smr_setReportError2( statusMessageReporting *smr, char *fmt, ... ) {
+void _smr_setReportError2( statusMessageReporting *smr, char const *fmt, ... ) {
 
     va_list args;
 

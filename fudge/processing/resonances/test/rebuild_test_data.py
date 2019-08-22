@@ -75,6 +75,7 @@ def process_args():
     parser = argparse.ArgumentParser(description="translates an ENDF files to the new GND format")
     parser.add_argument("-v", action="store_true", dest="verbose", help="enable verbose output")
     parser.add_argument("-q", action="store_false", dest="verbose", help="disable verbose output")
+    parser.add_argument("-k", action="store_true", dest="keepGoing", default=False, help="keep going, namely skip to next file on error")
     parser.add_argument("--noSkipBadData", dest='skipBadData', action="store_false", default=True, help="do not skip bad data when reading an ENDF file, throw an exception instead")
     return parser.parse_args()
 
@@ -86,20 +87,30 @@ for inFile in glob.glob('*.endf'):
     outFile = inFile.replace('.endf','.gnd.xml')
     outCovFile = inFile.replace('.endf','.gndCov.xml')
 
+    x=None
+    c=None
+
+    if args.verbose:
+        print
+        print
+        print 50*'-'
+        print "Translating ENDF file into GND: ", inFile
+        print 50 * '-'
+
     try:
         results = endfFileToGND.endfFileToGND( inFile, toStdOut = args.verbose, skipBadData = args.skipBadData )
         x = results['reactionSuite']
         c = results['covarianceSuite']
     except Exception as err:
         sys.stderr.write( 'WARNING: ENDF READ HALTED BECAUSE "'+str(err)+'" for file %s\n'%inFile )
-        exit()
+        if not args.keepGoing: exit()
 
     f = open( outFile, 'w' )
     try:
         f.write( '\n'.join( x.toXMLList(  ) ) )
     except Exception as err:
         sys.stderr.write( 'WARNING: MAIN ENDF WRITE HALTED BECAUSE "'+str(err)+'" for file %s\n'%inFile )
-        exit()
+        if not args.keepGoing: exit()
     f.close( )
     if c:
         f = open( outCovFile, 'w' )
@@ -107,5 +118,5 @@ for inFile in glob.glob('*.endf'):
             f.write( '\n'.join( c.toXMLList(  ) ) )
         except Exception as err:
             sys.stderr.write( 'WARNING: COVARIANCE ENDF WRITE HALTED BECAUSE  "'+str(err)+'" for file %s\n'%inFile )
-            exit()
+            if not args.keepGoing: exit()
         f.close()

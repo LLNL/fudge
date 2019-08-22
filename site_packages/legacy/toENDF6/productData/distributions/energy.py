@@ -61,13 +61,15 @@
 # 
 # <<END-copyright>>
 
-from fudge.core.utilities import brb
-import pqu.PQU as PQUModule
-import site_packages.legacy.toENDF6.gndToENDF6 as gndToENDF6Module
-import site_packages.legacy.toENDF6.endfFormats as endfFormatsModule
-import fudge.gnd.productData.distributions.energy as energyModule
-import xData.standards as standardsModule
-import xData.regions as regionsModule
+from pqu import PQU as PQUModule
+
+from xData import standards as standardsModule
+from xData import regions as regionsModule
+
+from fudge.gnd.productData.distributions import energy as energyModule
+
+from ... import gndToENDF6 as gndToENDF6Module
+from ... import endfFormats as endfFormatsModule
 
 __metaclass__ = type
 #
@@ -78,7 +80,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     weight = targetInfo['delayedNubarWeight']
     energySubform = self.energySubform
     if( hasattr( energySubform, 'toENDF6' ) ) :
-        if( isinstance( energySubform, energyModule.constant ) ) :
+        if( isinstance( energySubform, ( energyModule.discreteGamma, energyModule.primaryGamma ) ) ) :
             energySubform.toENDF6( flags, targetInfo )
             return
         if( MT in [ 527, 528 ] ) :
@@ -99,15 +101,6 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
 energyModule.form.toENDF6 = toENDF6
 
-#
-# constant subform
-#
-def toENDF6( self, flags, targetInfo, weight = None, MT = None ) :
-
-# BRB : need more checking as this should only happen for twoBody reactions.
-    targetInfo['primaryGammaEnergy'] = self.value.getValueAs( 'eV' )
-
-energyModule.constant.toENDF6 = toENDF6
 #
 # XYs2d subform
 #
@@ -132,7 +125,7 @@ def toENDF6( self, flags, targetInfo, weight = None, MT = None ) :
             if( isinstance( energy, regionsModule.regions1d ) ) :
                 interpolations, data = [], []
                 for region in energy :
-                    regionData = region.copyDataToXYs( xUnitTo = 'eV', yUnitTo = '1/eV' )
+                    regionData = region.copyDataToXYs( )
                     if( len( data ) > 0 ) :
                         if( data[-1] == regionData[0] ) : regionData.pop( 0 )
                     data += regionData
@@ -222,7 +215,7 @@ energyModule.functionalBase.toENDF6 = toENDF6
 #
 def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
-    mass = self.numberOfProductsMasses.getValueAs( 'eV/c**2' ) / targetInfo['neutronMass']
+    mass = self.numberOfProductsMasses.getValueAs( 'amu' ) / targetInfo['massTracker'].neutronMass
     ENDFDataList = [ endfFormatsModule.endfContLine( mass, 0, 0, 0, 0, self.numberOfProducts ) ]
     gndToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, 6, standardsModule.frames.centerOfMassToken, ENDFDataList )
 
@@ -247,19 +240,3 @@ def toENDF6( self, flags, targetInfo, weight = None ) :                 # The we
     return( len( self.weights ), ENDFDataList )
 
 energyModule.weightedFunctionals.toENDF6 = toENDF6
-
-#
-# energyLoss
-#
-def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
-
-    data = []
-    for xy in self.copyDataToXYs( xUnitTo = 'eV', yUnitTo = 'eV' ) : data += xy
-    NE = len( self )
-    EInInterpolation = gndToENDF6Module.gndToENDFInterpolationFlag( self.interpolation )
-    ENDFDataList = [ endfFormatsModule.endfContLine( 0, 0, 0, 0, 1, NE ) ] + \
-            endfFormatsModule.endfInterpolationList( [ NE, EInInterpolation ] )
-    ENDFDataList += endfFormatsModule.endfDataList( data )
-    return( standardsModule.frames.labToken, ENDFDataList )
-
-energyModule.energyLoss.toENDF6 = toENDF6

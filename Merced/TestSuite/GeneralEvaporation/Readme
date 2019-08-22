@@ -1,0 +1,13 @@
+The data in this subdirectory is for energy probability densities for
+delayed fission neutrons using the ENDF general evaporation model.  These
+tables are independent of the energy of the incident neutron.  The input
+files are:
+
+in.genEvap-Pa231: Use the default adaptive quadrature.  The output file
+  is out.genEvap-Pa231.  This file has Theta = 1.
+
+in.genEvap-Pa231.Gauss2: Use 2nd-order Gaussian quadrature.  The output file
+  is out.genEvap-Pa231.Gauss2. This output is the same as out.genEvap-Pa231.
+
+in.U235_delayedNeutron_MeV: This file has Theta = 1.0e-6.  The output is
+  out.U235_delayedNeutron_MeV.

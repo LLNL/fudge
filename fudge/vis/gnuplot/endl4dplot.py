@@ -169,7 +169,7 @@ if( len( sys.argv ) > 1 ) :
     f.close( )
 
 g = Gnuplot.Gnuplot( )
-g( 'set style data lines' )
+#g( 'set style data lines' )
 g( 'set ticslevel 0.' )
 g( "set nokey" )
 
@@ -186,6 +186,7 @@ tLabel = "t"
 xLabel = "x"
 yLabel = "y"
 zLabel = "z"
+styleType = "points"
 Title = ""
 tScaleLabel = "t scale"
 xrot = 60
@@ -206,6 +207,7 @@ while ( i < n ) :
     elif ( sys.argv[i] == 'xLabel' ) : xLabel = sys.argv[i+1]
     elif ( sys.argv[i] == 'yLabel' ) : yLabel = sys.argv[i+1]
     elif ( sys.argv[i] == 'zLabel' ) : zLabel = sys.argv[i+1]
+    elif ( sys.argv[i] == 'style' ) : styleType = sys.argv[i+1]
     elif ( sys.argv[i] == 'title' ) : Title = sys.argv[i+1]
     elif ( sys.argv[i] == 'tScaleLabel' ) : tScaleLabel = sys.argv[i+1]
     elif ( sys.argv[i] == 'xrot' ) : xrot = float( sys.argv[i+1] )
@@ -227,6 +229,7 @@ while ( i < n ) :
         for o in sys.argv : print o,
         sys.exit( )
     i = i + inc
+g( 'set style data %s'%styleType )
 
 def Replot( extraGnuplotCommand = None ) :
     """This function is called whenever the plot needs to be redrawn (e.g., axis is changed)."""

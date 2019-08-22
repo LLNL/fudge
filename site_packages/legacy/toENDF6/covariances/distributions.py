@@ -61,8 +61,9 @@
 # 
 # <<END-copyright>>
 
-from fudge.gnd.covariances.distributions import LegendreOrderCovarianceForm
-from fudge.gnd.covariances.mixed import mixedForm
+from fudge.gnd.covariances.distributions import LegendreOrderCovarianceForm as LegendreOrderCovarianceFormModule
+from fudge.gnd.covariances.mixed import mixedForm as mixedFormModule
+
 from .. import endfFormats
 
 def toENDF6(self, flags, targetInfo):
@@ -74,9 +75,9 @@ def toENDF6(self, flags, targetInfo):
             LCT = {'lab':1, 'centerOfMass':2}[ lVal.frame ]
         form = lVal[ targetInfo['style'] ]
         NI = 1
-        if form.moniker == mixedForm.moniker: NI = len(form)
+        if form.moniker == mixedFormModule.moniker: NI = len(form)
         endf.append( endfFormats.endfHeadLine(0,0,lVal.L1, lVal.L2, LCT, NI) )
         endf += form.toENDF6(flags, targetInfo)
     return endf
 
-LegendreOrderCovarianceForm.toENDF6 = toENDF6
+LegendreOrderCovarianceFormModule.toENDF6 = toENDF6

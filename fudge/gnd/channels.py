@@ -124,21 +124,19 @@ fissionGenreFourthChance = 'fourthChance'
 
 manyToken = 'many'
 
-from fudge.core.utilities import fudgeExceptions, brb
+from PoPs import IDs as IDsPoPsModule
+
 import xData.ancestry as ancestryModule
 
-import channelData
-
 from . import tokens as tokensModule
-from . import xParticle as xParticleModule
 
 from .channelData import Q as QModule
-
 
 class channel( ancestryModule.ancestry ) :
     """This is the class for a gnd channel which is a list of products (i.e., product class objects)."""
 
     moniker = outputChannelToken
+    ancestryMembers = ( 'Q', 'products' )
 
     def __init__( self, genre, numberOfAllowedParticles = manyToken, fissionGenre = None, process = None ) :
         """Creates a new channel object."""
@@ -150,7 +148,6 @@ class channel( ancestryModule.ancestry ) :
         self.numberOfAllowedParticles = numberOfAllowedParticles
         self.fissionGenre = fissionGenre
         self.process = process
-        self.fissionEnergyReleased = None
 
         self.Q = QModule.component( )
         self.Q.setAncestor( self )
@@ -187,13 +184,15 @@ class channel( ancestryModule.ancestry ) :
 
         return( self.toString( simpleString = False ) )
 
-    def addFissionEnergyReleased( self, fissionEnergyReleased ) :
-
-        self.fissionEnergyReleased = fissionEnergyReleased
-
     def removeProductAtIndex( self, index ) :
 
         del self.products[index]
+
+    def convertUnits( self, unitMap ) :
+        "See documentation for reactionSuite.convertUnits."
+
+        self.Q.convertUnits( unitMap )
+        self.products.convertUnits( unitMap )
 
     def checkProductFrame( self ) :
         """Calls checkProductFrame for self's products."""
@@ -204,21 +203,21 @@ class channel( ancestryModule.ancestry ) :
         """Returns a list of [ multiplicity, name ] in order for the final products of this channel."""
 
         mP = []
-        for particle in self :
-            if( particle.outputChannel is None ) :
+        for product in self :
+            if( product.outputChannel is None ) :
                 try :
-                    multiplicity = particle.multiplicity.getConstant( )
+                    multiplicity = product.multiplicity.getConstant( )
                 except :
                     multiplicity = "(?)"                        # ????? This needs work.
-                mP += [ [ multiplicity, particle.particle.name] ]
+                mP += [ [ multiplicity, product.id ] ]
             else :
-                mP += particle.outputChannel.getFinalProductList( )
+                mP += product.outputChannel.getFinalProductList( )
         return( mP )
 
     def getProductsWithName( self, name ) :
         """Returns a list of all the channel's products with given name ('gamma','n', etc)."""
 
-        return [ prod for prod in self if prod.name == name ]
+        return [ prod for prod in self if prod.id == name ]
 
     def getProductWithName( self, name ) :
         """Return the product with given name. If no such product is found, or if more than one are found,
@@ -244,11 +243,14 @@ class channel( ancestryModule.ancestry ) :
             Q = self.Q.getConstantAs( unit )
         else:  # calculate from particle masses
             massUnit = unit + '/c**2'
-            Q = self.getRootAncestor().target.getMass(massUnit) + self.getRootAncestor().projectile.getMass(massUnit)
+            reactionSuite = self.getRootAncestor( )
+            projectile = reactionSuite.PoPs[reactionSuite.projectile]
+            target = reactionSuite.PoPs[reactionSuite.target]
+            Q = target.mass[0].float( massUnit ) + projectile.mass[0].float( massUnit )
             for product in self:
                 try: Q -= product.getMass(massUnit) * product.multiplicity.getConstant()
                 except:
-                    if product.name == 'gamma': continue
+                    if( product.id == IDsPoPsModule.photon ) : continue
                     raise ValueError( "Non-constant Q-value must be explicitly listed in GND!" )
         # Q????? need recursion for final = True
         return( Q )  
@@ -268,29 +270,41 @@ class channel( ancestryModule.ancestry ) :
         """
 
         kwargs['outputChannel'] = self
+
         for productIndex, product in enumerate( self ) :
-            kwargs['product'] = product
             kwargs['productIndex'] = str( productIndex )
             product.calculateAverageProductData( style, indent = indent, **kwargs )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMC( self, style, tempInfo, indent = '', incrementalIndent = '  ' ) :
 
         indent2 = indent + tempInfo['incrementalIndent']
-        status = 0
 
-        self.Q.processSnMultiGroup( style, tempInfo, indent )
+        for productIndex, product in enumerate( self ) :
+            tempInfo['productIndex'] = str( productIndex )
+            product.processMC( style, tempInfo, indent2 )
+
+    def processMultiGroup( self, style, tempInfo, indent ) :
+
+        indent2 = indent + tempInfo['incrementalIndent']
+
+        self.Q.processMultiGroup( style, tempInfo, indent )
 
         tempInfo['transferMatrixComment'] = tempInfo['reactionSuite'].inputParticlesToReactionString( suffix = " --> " ) +  \
                 self.toString( simpleString = True )
+# BRBBRB
         for productIndex, product in enumerate( self ) :
             tempInfo['productIndex'] = str( productIndex )
-            tempInfo['productName'] = product.name
-            if( isinstance( product.particle, xParticleModule.nuclearLevel ) ) :
-                tempInfo['productName'] = product.particle.groundState.name
+            tempInfo['productName'] = product.id
             tempInfo['productLabel'] = product.label
-            status += product.processSnMultiGroup( style, tempInfo, indent2 )
+            product.processMultiGroup( style, tempInfo, indent2 )
 
-        return( status )
+    def QToPointwiseLinear( self, final = True, **kwargs ) :
+
+        linearQ = self.Q.toPointwise_withLinearXYs( **kwargs )
+        if( final ) :
+            for product in self.products :
+                if( product.outputChannel is not None ) : linearQ += product.outputChannel.Q.toPointwise_withLinearXYs( final = final, **kwargs )
+        return( linearQ )
 
     def toXMLList( self, indent = '', **kwargs ) :
 
@@ -300,7 +314,6 @@ class channel( ancestryModule.ancestry ) :
         if( self.process is not None ) : qualifiers += ' process="%s"' % str( self.process )
         xmlStringList = [ '%s<%s genre="%s"%s>' % ( indent, self.moniker, self.genre, qualifiers ) ]
         xmlStringList += self.Q.toXMLList( indent2, **kwargs )
-        if ( self.fissionEnergyReleased is not None ) : xmlStringList += self.fissionEnergyReleased.toXMLList( indent2, **kwargs )
         xmlStringList += self.products.toXMLList( indent2, **kwargs )
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
@@ -342,24 +355,28 @@ class channel( ancestryModule.ancestry ) :
         s, p, gammaString, delayNeutrons = '', '', None, 0
         for product in self.products :
             addParticle = True
-            if( self.isFission( ) and ( product.name == 'n' ) ) :
+            if( self.isFission( ) and ( product.id == IDsPoPsModule.neutron ) ) :
+# BRB6 'emissionMode'?
                 if( product.getAttribute( 'emissionMode' ) == tokensModule.delayedToken ) :
                     addParticle = False
                     delayNeutrons += 1
             if( addParticle ) :
-                if( product.name == 'gamma' ) :
+                if( product.id == IDsPoPsModule.photon ) :
                     gammaStringP = product.toString( simpleString = True, exposeGammaMultiplicity = exposeGammaMultiplicity )
                     if( gammaString is None ) : gammaString = gammaStringP
+# BRB6 'energyDependent'?
                     if( 'energyDependent' in gammaStringP ) : gammaString = gammaStringP
                 else :
                     s += '%s%s' % ( p, product.toString( simpleString = simpleString, exposeGammaMultiplicity = exposeGammaMultiplicity ) )
                     p = ' + '
         if( delayNeutrons > 0 ) :
+# BRB6 'n[emissionMode:'%s delayed']'?
             s += '%s%s' % ( p, "n[emissionMode:'%s delayed']" % delayNeutrons )
             p = ' + '
         if( not( gammaString is None ) ) : s += '%s%s' % ( p, gammaString )
         process = []
         if( self.isFission( ) ) :
+# BRB6 '%s fission'?
             process.append( "%s fission" % self.fissionGenre )
         elif( self.process is not None ) :
             process.append( str( self.process ) )
@@ -429,7 +446,6 @@ def parseXMLNode( channelElement, xPath, linkData ) :
     """Translate '<outputChannel>' from xml."""
 
     xPath.append( channelElement.tag )
-    from fudge import gnd
     outputChannelClass = {
             outputChannelToken : {
                 twoBodyGenre : twoBodyOutputChannel, NBodyGenre : NBodyOutputChannel,
@@ -437,22 +453,17 @@ def parseXMLNode( channelElement, xPath, linkData ) :
                 productionGenre : productionChannel }
             }[channelElement.tag][channelElement.get( 'genre' )]
     outputChannel = outputChannelClass( )
-    # FIXME: next lines only needed for discrete gammas. If we convert them to 'uncorrelated', this can be removed
-    parentChannelGenre = linkData.get( 'channelGenre', None )
-    linkData['channelGenre'] = channelElement.get( 'genre' )
+    if channelElement.get('process') is not None:
+        outputChannel.process = channelElement.get('process')
 
+# BRB6 'Q' and 'products' need to come from class monikers.
     for dat in channelElement :
         if( dat.tag == 'Q' ) :
-            Q = channelData.Q.parseXMLNode( dat, xPath, linkData )
+            Q = QModule.parseXMLNode( dat, xPath, linkData )
             for QForm in Q : outputChannel.Q.add( QForm )
-        elif( dat.tag == channelData.base.fissionEnergyReleasedToken ) :
-            outputChannel.addFissionEnergyReleased( 
-                    gnd.channelData.fissionEnergyReleased.component.parseXMLNode( dat, xPath, linkData ) )
         elif( dat.tag == 'products' ) :
             outputChannel.products.parseXMLNode( dat, xPath, linkData )
         else :
             raise ValueError( "Parsing %s not yet supported" % dat.tag )
     xPath.pop( )
-    del linkData['channelGenre']
-    if( parentChannelGenre ) : linkData['channelGenre'] = parentChannelGenre
     return( outputChannel )

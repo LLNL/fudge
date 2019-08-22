@@ -65,8 +65,12 @@
 This module handles a few special case for MF 6 data that are not easily converted from the ENDF format to the ACE format.
 """
 
-from fudge.gnd.productData.distributions import angular, energy, energyAngular
-from xData import axes
+from xData import standards as standardsModule
+from xData import axes as axesModule
+
+from fudge.gnd.productData.distributions import angular as angularModule
+from fudge.gnd.productData.distributions import energy as energyModule
+from fudge.gnd.productData.distributions import energyAngular as energyAngularModule
 
 class multipleNeutronDistributions :
     """
@@ -93,7 +97,9 @@ class multipleNeutronDistributions :
 
         DLWs = []
         for i1, functional in enumerate( self ) :
-            weight = [ 2 ] + [ E1 for E1 in functional.domain( 'MeV' ) ] + [ 1., 1. ]
+            domainScale = functional.domainUnitConversionFactor( 'MeV' )
+            domainMin, domainMax = functional.domainMin, functional.domainMax
+            weight = [ 2 ] + [ domainScale * domainMin, domainScale * domainMax, 1., 1. ]
             DLW = functional.toACE( label, offset, weight, **kwargs )
             offset += len( DLW )
             if( functional is not self[-1] ) : DLW[0] = offset + 1
@@ -106,31 +112,38 @@ class energyToEnergyAngular :
 
         self.energyData = energyData
 
-    def domain( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMin( self ) :
 
-        return( self.energyData.domain( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.energyData.domainMin )
+
+    @property
+    def domainMax( self ) :
+
+        return( self.energyData.domainMax )
 
     def toACE( self, label, offset, weight, **kwargs  ) :
 
         energyData = self.energyData
         header = [ 0, 61, len( weight ) + 4 ] + weight
-        e_inFactor, e_outFactor = energyData.axes[0].unitConversionFactor( 'MeV' ), energyData.axes[1].unitConversionFactor( 'MeV' )
+        e_inFactor = energyData.axes[2].unitConversionFactor( 'MeV' )
+        e_outFactor =  energyData.axes[1].unitConversionFactor( 'MeV' )
 
         INTE = -1
-        independent, dependent, qualifier = energyData.axes[0].interpolation.getInterpolationTokens( )
-        if( dependent == axes.flatToken ) :
+        interpolation = energyData.interpolation
+        if( interpolation == standardsModule.interpolation.flatToken ) :
             INTE = 1
-        elif( independent == dependent == axes.linearToken ) :
+        elif( interpolation == standardsModule.interpolation.linlinToken ) :
             INTE = 2
-        if( INTE == -1 ) : raise Exception( 'Interpolation "%s, %s" not supported for incident energy' % ( independent, dependent ) )
+        if( INTE == -1 ) : raise Exception( 'Interpolation "%s" not supported for incident energy' % interpolation )
 
         INTT = -1
-        independent, dependent, qualifier = energyData.axes[1].interpolation.getInterpolationTokens( )
-        if( dependent == axes.flatToken ) :
+        interpolation = energyData[0].interpolation
+        if( interpolation == standardsModule.interpolation.flatToken ) :
             INTT = 1
-        elif( independent == dependent == axes.linearToken ) :
+        elif( interpolation == standardsModule.interpolation.linlinToken ) :
             INTT = 2
-        if( INTT == -1 ) : raise Exception( 'Interpolation "%s, %s" not supported for outgoing energy' % ( independent, dependent ) )
+        if( INTT == -1 ) : raise Exception( 'Interpolation "%s" not supported for outgoing energy' % ( interpolation ) )
 
         NE, e_ins, Ls, epData = len( energyData ), [], [], []
         offset += len( header ) + 3 + 1 + 2 * NE + 1        # header length plus NR, NE, Es, Ls, (1-based).
@@ -179,10 +192,11 @@ def neutrons( neutronDatas ) :
         angularData = neutronData['angularData']
         if( neutronData['frame'] != frame ) : raise Exception( 'All neutrons must have the same frame' )
         energyData = neutronData['energyData']
-        if( isinstance( energyData, energyAngular.pointwise ) ) :
+        if( isinstance( energyData, energyAngularModule.XYs3d ) ) :
             LAW61.append( energyData )
-        elif( isinstance( energyData, energy.pointwise ) ) :
-            if( not( isinstance( angularData, angular.isotropic ) ) ) : raise Exception( 'Only isotropic angular data is currently supported' )
+        elif( isinstance( energyData, energyModule.XYs2d ) ) :
+            if( not( isinstance( angularData, angularModule.isotropic ) ) ) :
+                raise Exception( 'Only isotropic angular data is currently supported' )
             angularData = None
             LAW61.append( energyToEnergyAngular( energyData ) )
         else :

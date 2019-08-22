@@ -61,6 +61,7 @@
 # 
 # <<END-copyright>>
 
+import abc
 import datetime
 
 from fudge.core.utilities import brb
@@ -69,9 +70,12 @@ from pqu.PQU import PQU as PQUModule
 
 import xData.ancestry as ancestryModule
 
+from fudge.gnd import physicalQuantity as physicalQuantityModule
 from fudge.gnd import suites as suitesModule
+
 from fudge.processing import flux as fluxModule
 from fudge.processing import transportables as transportablesModule
+from fudge.processing import inverseSpeed as inverseSpeedModule
 
 __metaclass__ = type
 
@@ -85,12 +89,6 @@ def getClassDict():
             if issubclass(thingClass, style) and thingClass!=style:
                 classDict[thingClass.moniker]=thingClass
         except TypeError: pass # catches imported modules that are irrelevant
-    #classDict = {
-    #    evaluated.moniker : evaluated,
-    #    crossSectionReconstructed.moniker : crossSectionReconstructed,
-    #    heated.moniker : heated,
-    #    averageProductData.moniker : averageProductData,
-    #    angularDistributionReconstructed.moniker : angularDistributionReconstructed }
     return classDict
 
 class styles( ancestryModule.ancestry ) :
@@ -100,6 +98,7 @@ class styles( ancestryModule.ancestry ) :
     """
 
     moniker = 'styles'
+    ancestryMembers = ( '', )
 
     def __init__( self ) :
 
@@ -143,6 +142,10 @@ class styles( ancestryModule.ancestry ) :
             if( __style.label == _style.label ) : raise ValueError( 'style labeled "%s" already exists' % _style.label )
         self.__styles.append( _style )
         _style.setAncestor( self, 'label' )
+
+    def convertUnits( self, unitMap ) :
+
+        for _style in self : _style.convertUnits( unitMap )
 
     def remove( self, _style ):
         """
@@ -202,26 +205,35 @@ class styles( ancestryModule.ancestry ) :
     def parseXMLNode( self, stylesElement, xPath, linkData ) :
 
         xPath.append( stylesElement.tag )
-        classDict = getClassDict()
-        for styleElement in stylesElement :
-            class_ = classDict.get( styleElement.tag, None )
-            if class_ is None :
-                raise TypeError( 'encountered unknown style "%s"' % styleElement.tag )
 
-            self.add( class_.parseXMLNode( styleElement, xPath, linkData ) )
+        classDict = {}
+        for _style in ( evaluated, crossSectionReconstructed, angularDistributionReconstructed, heated, 
+                averageProductData, multiGroup, heatedMultiGroup, MC ) :
+            classDict[_style.moniker] = _style
+        for styleElement in stylesElement :
+            _class = classDict.get( styleElement.tag, None )
+            if( _class is None ) :
+                raise TypeError( 'encountered unknown style "%s"' % styleElement.tag )
+            self.add( _class.parseXMLNode( styleElement, xPath, linkData ) )
+
         xPath.pop()
 
 class style( ancestryModule.ancestry ) :
 
-    # FIXME should be abstract base class
+    __metaclass__ = abc.ABCMeta
 
-    def __init__( self, label, date = None ) :
+    def __init__( self, label, derivedFrom, date = None ) :
 
         ancestryModule.ancestry.__init__( self )
+
+        if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must be a str instance.' )
         self.__label = label
+
         if( date is None ) : date = str( datetime.date.today( ) )
         self.__date = date
-        self.__derivedStyles = derivedStyles( )
+
+        if( not( isinstance( derivedFrom, str ) ) ) : raise TypeError( 'label must be a str instance.' )
+        self.__derivedFrom = derivedFrom
 
     @property
     def date( self ) :
@@ -229,60 +241,106 @@ class style( ancestryModule.ancestry ) :
         return( self.__date )
 
     @property
-    def derivedStyles( self ) :
+    def derivedFrom( self ) :
 
-        return( self.__derivedStyles )
+        return( self.__derivedFrom )
+
+    @property
+    def derivedFromStyle( self ) :
+
+        for _style in self.getAncestor( ) :
+            if( _style.label == self.__derivedFrom ) : return( _style )
+        return( None )
 
     @property
     def label( self ) :
 
         return( self.__label )
 
-    def findFormMatchingDerivedStyles( self, components ) :
+    @property
+    def temperature( self ) :
+
+        return( self.derivedFromStyle.temperature )
+
+    def findFormMatchingDerivedStyle( self, component, styleFilter = None ) :
         """
-        This methods checks sequentially through each style in self's list of styles.
-        For each style, this method loops over each component in components. If a component
-        with that style is found that component is returned. Otherwise, None is returned.
+        This method searches the link of derivedFroms, starting with self's derivedFrom,
+        to find a form in component matching one of the derivedFroms. If a form is found
+        matching one of the derivedFroms, that form is returned. If no match is found, None is returned.
         """
 
-        for _style in self.__derivedStyles :
-            for form in components :
-                if( _style.label == form.label ) : return( form )
+        def alwaysTrue( a_style ) : return( True )
+
+        if( styleFilter is None ) : styleFilter = alwaysTrue
+
+        parent = self.getAncestor( )
+        derivedFrom = self.derivedFrom
+        while( derivedFrom != '' ) :
+            for form in component :
+                if( ( derivedFrom == form.label ) and styleFilter( parent[derivedFrom] ) ) : return( form )
+            derivedFrom = parent[derivedFrom].derivedFrom
+        return( None )
+        
+    def findDerivedFromStyle( self, cls ) :
+
+        _style = self
+        while( _style is not None ) :
+            _style = _style.derivedFromStyle
+            if( ( _style is not None ) and ( isinstance( _style, cls ) ) ) : return( _style )
         return( None )
 
+    def sibling( self, label ) :
+        """Returns the sibling of self's with label."""
+
+        return( self.getAncestor( )[label] )
+
+    def convertUnits( self, unitMap ) :
+
+        pass
+
+    def XMLCommonAttributes( self ) :
+
+        XMLCommon = 'label="%s"' % self.label
+        if( self.derivedFrom != "" ) : XMLCommon += ' derivedFrom="%s"' % self.derivedFrom
+        if( self.date is not None ) : XMLCommon += ' date="%s"' % self.date
+        return( XMLCommon )
+
     @staticmethod
-    def requiredArgs() :
+    def parseXMLNodeBase( element, xPath ) :
 
-        return( 'label', 'date' )
-
-    @classmethod
-    def parseXMLNode( cls, styleElement, xPath, linkData ) :
-
-        xPath.append( styleElement.tag )
-        attrs = dict.fromkeys( cls.requiredArgs(), None )
-        for attribute in attrs : attrs[attribute] = styleElement.get( attribute )
-        for name in attrs :
-            if( attrs[name] is None ) : raise Exception( 'required attribute "%s" is missing' % name )
-        xPath.pop()
-        return cls( **attrs )
+        label = element.get( 'label' )
+        xPath.append( '%s[@label="%s"]' % ( element.tag, label ) )
+        derivedFrom = element.get( 'derivedFrom', "" )
+        date = element.get( 'date', None )
+        return( label, derivedFrom, date )
 
 class evaluated( style ) :
 
     moniker = 'evaluated'
 
-    def __init__( self, label, temperature, library, version, date = None ) :
+    def __init__( self, label, derivedFrom, temperature, library, version, date = None ) :
 
-        style.__init__( self, label, date = date )
+        style.__init__( self, label, derivedFrom, date = date )
+
         if( not( isinstance( library, str ) ) ) : raise TypeError( 'library must be a string' )
         self.__library = library
+
         if( not( isinstance( version, str ) ) ) : raise TypeError( 'version must be a string' )
         self.__version = version
-        self.__temperature = PQUModule( temperature )
+
+        if( not( isinstance( temperature, physicalQuantityModule.temperature ) ) ) :
+            raise TypeError( 'invalid temperature object' )
+        self.__temperature = temperature
 
     @property
     def library( self ) :
 
         return( self.__library )
+
+    @library.setter
+    def library( self, value ) :
+
+        self.__library = value
 
     @property
     def temperature( self ) :
@@ -294,68 +352,109 @@ class evaluated( style ) :
 
         return( self.__version )
 
+    @version.setter
+    def version( self, value ) :
+
+        self.__version = value
+
+    def convertUnits( self, unitMap ) :
+
+        self.__temperature.convertUnits( unitMap )
+
     def toXMLList( self, indent = '', **kwargs ) :
 
-        xmlStringList = [ '%s<%s label="%s" library="%s" version="%s" date="%s" temperature="%s">' %
-                ( indent, self.moniker, self.label, self.library, self.version, self.date, self.temperature ) ]
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
+        xmlStringList = [ '%s<%s %s library="%s" version="%s">' %
+                ( indent, self.moniker, self.XMLCommonAttributes( ), self.library, self.version ) ]
+        xmlStringList += self.temperature.toXMLList( indent2, **kwargs )
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
 
     @staticmethod
-    def requiredArgs() :
+    def parseXMLNode( element, xPath, linkData ) :
 
-        return ( 'label', 'date', 'temperature', 'library', 'version' )
+        label, derivedFrom, date = style.parseXMLNodeBase( element, xPath )
+
+        library = element.get( 'library' )
+        version = element.get( 'version' )
+        temperature = physicalQuantityModule.temperature.parseXMLNode( element.find( 'temperature' ), xPath, linkData )
+
+        _evaluated = evaluated( label, derivedFrom, temperature, library, version, date = date )
+
+        xPath.pop( )
+        return( _evaluated )
 
 class crossSectionReconstructed( style ) :
 
     moniker = 'crossSectionReconstructed'
 
-    def __init__( self, label, date = None ) :
+    def __init__( self, label, derivedFrom, date = None ) :
 
-        style.__init__( self, label, date = date )
+        style.__init__( self, label, derivedFrom, date = date )
 
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        xmlStringList = [ '%s<%s label="%s" date="%s">' % ( indent, self.moniker, self.label, self.date ) ]
-        xmlStringList += self.derivedStyles.toXMLList( indent2, **kwargs )
+        xmlStringList = [ '%s<%s %s>' % ( indent, self.moniker, self.XMLCommonAttributes( ) ) ]
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
+
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ) :
+
+        label, derivedFrom, date = style.parseXMLNodeBase( element, xPath )
+
+        _crossSectionReconstructed = crossSectionReconstructed( label, derivedFrom, date = date )
+
+        xPath.pop()
+        return( _crossSectionReconstructed )
 
 class angularDistributionReconstructed( style ) :
 
     moniker = 'angularDistributionReconstructed'
 
-    def __init__( self, label, date = None ) :
+    def __init__( self, label, derivedFrom, date = None ) :
 
-        style.__init__( self, label, date = date )
+        style.__init__( self, label, derivedFrom, date = date )
 
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        xmlStringList = [ '%s<%s label="%s" date="%s">' % ( indent, self.moniker, self.label, self.date ) ]
-        xmlStringList += self.derivedStyles.toXMLList( indent2, **kwargs )
+        xmlStringList = [ '%s<%s %s>' % ( indent, self.moniker, self.XMLCommonAttributes( ) ) ]
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
+
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ) :
+
+        label, derivedFrom, date = style.parseXMLNodeBase( element, xPath )
+
+        _angularDistributionReconstructed = angularDistributionReconstructed( label, derivedFrom, date = date )
+
+        xPath.pop()
+        return( _angularDistributionReconstructed )
 
 class heated( style ) :
 
     moniker = 'heated'
 
-    def __init__( self, label, temperature, date = None ) :
+    def __init__( self, label, derivedFrom, temperature, date = None ) :
 
-        style.__init__( self, label, date = date )
-        self.__temperature = PQUModule( temperature )
+        style.__init__( self, label, derivedFrom, date = date )
+
+        if( not( isinstance( temperature, physicalQuantityModule.temperature ) ) ) :
+            raise TypeError( 'invalid temperature object' )
+        self.__temperature = temperature
 
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        xmlStringList = [ '%s<%s label="%s" date="%s" temperature="%s">' % ( indent, self.moniker, self.label, self.date,
-                self.temperature ) ]
-        xmlStringList += self.derivedStyles.toXMLList( indent2, **kwargs )
+        xmlStringList = [ '%s<%s %s>' % ( indent, self.moniker, self.XMLCommonAttributes( ) ) ]
+        xmlStringList += self.temperature.toXMLList( indent2, **kwargs )
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
 
@@ -364,34 +463,56 @@ class heated( style ) :
 
         return( self.__temperature )
 
+    def convertUnits( self, unitMap ) :
+
+        self.__temperature.convertUnits( unitMap )
+
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ) :
+
+        label, derivedFrom, date = style.parseXMLNodeBase( element, xPath )
+
+        temperature = physicalQuantityModule.temperature.parseXMLNode( element.find( 'temperature' ), xPath, linkData )
+        _heated = heated( label, derivedFrom, temperature, date = date )
+
+        xPath.pop()
+        return( _heated )
+
 class averageProductData( style ) :
 
     moniker = 'averageProductData'
 
-    def __init__( self, label, date = None ) :
+    def __init__( self, label, derivedFrom, date = None ) :
 
-        style.__init__( self, label, date = date )
+        style.__init__( self, label, derivedFrom, date = date )
 
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        xmlStringList = [ '%s<%s label="%s" date="%s">' % ( indent, self.moniker, self.label, self.date ) ]
-        xmlStringList += self.derivedStyles.toXMLList( indent2, **kwargs )
+        xmlStringList = [ '%s<%s %s>' % ( indent, self.moniker, self.XMLCommonAttributes( ) ) ]
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
 
-class SnMultiGroup( style ) :
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ) :
 
-    moniker = 'SnMultiGroup'
+        label, derivedFrom, date = style.parseXMLNodeBase( element, xPath )
 
-    def __init__( self, label, lMax, flux, date = None ) :
+        _averageProductData = averageProductData( label, derivedFrom, date = date )
 
-        if( not( isinstance( flux, fluxModule.flux ) ) ) : raise TypeError( 'Invalid flux instance' )
+        xPath.pop()
+        return( _averageProductData )
 
-        style.__init__( self, label, date = date )
+class multiGroup( style ) :
+
+    moniker = 'multiGroup'
+
+    def __init__( self, label, lMax, date = None ) :
+
+        style.__init__( self, label, "", date = date )
         self.__lMax = int( lMax )
-        self.__flux = flux
+
         self.__transportables = transportablesModule.transportables( )
         self.__transportables.setAncestor( self )
 
@@ -401,45 +522,164 @@ class SnMultiGroup( style ) :
         return( self.__lMax )
 
     @property
-    def flux( self ) :
-
-        return( self.__flux )
-
-    @property
     def transportables( self ) :
 
         return( self.__transportables )
+
+    def convertUnits( self, unitMap ) :
+        # BRB - FIXME Still need to fully implement.
+
+        pass
 
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        xmlStringList = [ '%s<%s label="%s" date="%s" lMax="%s">' % ( indent, self.moniker, self.label, self.date, self.lMax ) ]
-        xmlStringList += self.derivedStyles.toXMLList( indent2, **kwargs )
-        xmlStringList += self.flux.toXMLList( indent2, **kwargs )
+        xmlStringList = [ '%s<%s %s lMax="%s">' % ( indent, self.moniker, self.XMLCommonAttributes( ), self.lMax ) ]
         xmlStringList += self.transportables.toXMLList( indent2, **kwargs )
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
 
-class derivedStyles( suitesModule.suite ) :
-    """
-    Each dataset can be derived from other datasets. For a style instance, this class list the other styles
-    that are search to find a datasets derived datasets.
-    """
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ) :
 
-    moniker = 'derivedStyles'
+        label, derivedFrom, date = style.parseXMLNodeBase( element, xPath )
 
-    def __init__( self ) :
+        lMax = element.get( 'lMax' )
 
-        suitesModule.suite.__init__( self, [ style ] )
+        _multiGroup = multiGroup( label, lMax, date = date )
+        for child in element:
+            if child.tag == transportablesModule.transportables.moniker:
+                _multiGroup.transportables.parseXMLNode( child, xPath, linkData )
+            else:
+                raise TypeError("Encountered unexpected element '%s'" % child.tag)
+
+        xPath.pop( )
+        return( _multiGroup )
+
+class heatedMultiGroup( style ) :
+
+    moniker = 'heatedMultiGroup'
+
+    def __init__( self, label, derivedFrom, parameters, flux, date = None ) :
+
+        style.__init__( self, label, derivedFrom, date = date )
+
+        if( not( isinstance( parameters, str ) ) ) : raise TypeError( 'parameters must be a str instance' )
+        self.__parameters = parameters
+
+        if( not( isinstance( flux, fluxModule.flux ) ) ) : raise TypeError( 'Invalid flux instance' )
+        self.__flux = flux
+        self.__flux.setAncestor( self )
+
+        self.__inverseSpeed = None
+
+        self.__multiGroupFlux = None                # Only for internal use, it not written to GND file.
+
+    @property
+    def flux( self ) :
+
+        return( self.__flux )
+
+    @property
+    def inverseSpeed( self ) :
+
+        return( self.__inverseSpeed )
+
+    @inverseSpeed.setter
+    def inverseSpeed( self, value ) :
+
+        self.__inverseSpeed = value
+
+    @property
+    def lMax( self ) :
+
+        _style = self.sibling( self.parameters )
+        if( _style is None ) : raise TypeError( 'Cannot find a multiGroup in styles' )
+        return( _style.lMax )
+
+    @property
+    def multiGroupFlux( self ) :
+
+        return( self.__multiGroupFlux )
+
+    @property
+    def parameters( self ) :
+
+        return( self.__parameters )
+
+    @property
+    def transportables( self ) :
+ 
+        _style = self.sibling( self.parameters )
+        if( _style is None ) : raise TypeError( 'Cannot find a multiGroup in styles' )
+        return( _style.transportables )
+
+    def convertUnits( self, unitMap ) :
+        # BRB - FIXME Still need to fully implement.
+
+        self.__inverseSpeed.convertUnits( unitMap )
+
+    def processMultiGroup( self, style, tempInfo, indent ) :
+
+        self.__multiGroupFlux = self.flux.processMultiGroup( self, tempInfo, indent )
+        self.inverseSpeed = inverseSpeedModule.inverseSpeed( inverseSpeedModule.multiGroupInverseSpeed( self, tempInfo ) )
 
     def toXMLList( self, indent = '', **kwargs ) :
 
-        if( len( self ) == 0 ) : return( [] )
-        xmlStringList = '%s<%s>' % ( indent, self.moniker )
-        xmlStringList += ' '.join( [ item.label for item in self ] )
-        xmlStringList += '</%s>' % self.moniker
-        return( [ xmlStringList ] )
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
+        xmlStringList = [ '%s<%s %s parameters="%s">' % ( indent, self.moniker, self.XMLCommonAttributes( ), self.parameters ) ]
+        xmlStringList += self.flux.toXMLList( indent2, **kwargs )
+        if( self.inverseSpeed is not None ) : xmlStringList += self.inverseSpeed.toXMLList( indent2, **kwargs )
+        xmlStringList[-1] += '</%s>' % self.moniker
+        return( xmlStringList )
+
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ) :
+
+        label, derivedFrom, date = style.parseXMLNodeBase( element, xPath )
+        parameters = element.get('parameters')
+
+        flux = None
+        inverseSpeed = None
+        for child in element :
+            if( child.tag == fluxModule.flux.moniker ) :
+                flux = fluxModule.flux.parseXMLNode( child, xPath, linkData )
+            elif( child.tag == inverseSpeedModule.inverseSpeed.moniker ) :
+                inverseSpeed = inverseSpeedModule.inverseSpeed.parseXMLNode( child, xPath, linkData )
+
+        _heatedMultiGroup = heatedMultiGroup( label, derivedFrom, parameters, flux, date = date )
+        _heatedMultiGroup.inverseSpeed = inverseSpeed
+
+        xPath.pop( )
+        return( _heatedMultiGroup )
+
+class MC( style ) :
+
+    moniker = 'MC'
+
+    def __init__( self, label, derivedFrom, date = None ) :
+
+        style.__init__( self, label, derivedFrom, date = date )
+
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
+        xmlStringList = [ '%s<%s %s>' % ( indent, self.moniker, self.XMLCommonAttributes( ) ) ]
+        xmlStringList[-1] += '</%s>' % self.moniker
+        return( xmlStringList )
+
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ) :
+
+        label, derivedFrom, date = style.parseXMLNodeBase( element, xPath )
+
+        _MC = MC( label, derivedFrom, date = date )
+
+        xPath.pop( )
+        return( _MC )
 
 def findEvaluated( forms ) :
 

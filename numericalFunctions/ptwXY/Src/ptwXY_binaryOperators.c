@@ -244,6 +244,14 @@ ptwXYPoints *ptwXY_binary_ptwXY( statusMessageReporting *smr, ptwXYPoints *ptwXY
         return( NULL );
     }
 
+    if( ( ptwXY1->interpolation != ptwXY_interpolationLinLin ) && ( ptwXY1->interpolation != ptwXY_interpolationLinLog ) &&
+            ( ptwXY1->interpolation != ptwXY_interpolationFlat ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_invalidInterpolation,
+                "Only '%s' and '%s' interpolation supported, not '%s' interpolation.", ptwXY_interpolationToString( ptwXY_interpolationLinLin ),
+                ptwXY_interpolationToString( ptwXY_interpolationFlat ), ptwXY1->interpolationString );
+        return( NULL );
+    }
+
     if( ( status = ptwXY_areDomainsMutual( smr, ptwXY1, ptwXY2 ) ) != nfu_Okay ) {
         double domainMin1, domainMax1, domainMin2, domainMax2;
 
@@ -253,7 +261,7 @@ ptwXYPoints *ptwXY_binary_ptwXY( statusMessageReporting *smr, ptwXYPoints *ptwXY
         ptwXY_domainMax( NULL, ptwXY2, &domainMax2 );
 
         smr_setReportError2( smr, nfu_SMR_libraryID, nfu_domainsNotMutual, "Domains not mutual (%.17e, %.17e) vs (%.17e, %.17e).",
-                domainMin2, domainMax1, domainMin2, domainMax2 );
+                domainMin1, domainMax1, domainMin2, domainMax2 );
         return( NULL );
     }
 
@@ -293,7 +301,7 @@ ptwXYPoints *ptwXY_add_ptwXY( statusMessageReporting *smr, ptwXYPoints *ptwXY1, 
 */
 ptwXYPoints *ptwXY_sub_ptwXY( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2 ) {
 
-    ptwXYPoints *diff;
+    ptwXYPoints *diff = NULL;
 
     if( ptwXY1->length == 0 ) {
         diff = ptwXY_clone( smr, ptwXY2 );
@@ -475,7 +483,7 @@ ptwXYPoints *ptwXY_div_ptwXY( statusMessageReporting *smr, ptwXYPoints *ptwXY1, 
         ptwXY_domainMax( NULL, ptwXY2, &domainMax2 );
 
         smr_setReportError2( smr, nfu_SMR_libraryID, nfu_domainsNotMutual, "Domains not mutual (%.17e, %.17e) vs (%.17e, %.17e).",
-                domainMin2, domainMax1, domainMin2, domainMax2 );
+                domainMin1, domainMax1, domainMin2, domainMax2 );
         return( NULL );
     }
 
@@ -616,18 +624,18 @@ static nfu_status ptwXY_div_s_ptwXY( statusMessageReporting *smr, ptwXYPoints *d
     if( ( x2 - x1 ) < ClosestAllowXFactor * DBL_EPSILON * ( fabs( x1 ) + fabs( x2 ) ) ) return( nfu_Okay );
     if( level >= div->biSectionMax ) return( nfu_Okay );
     level++;
-    if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x1, &u1 ) != nfu_Okay ) ) return( status );
-    if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x2, &u2 ) != nfu_Okay ) ) return( status );
+    if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x1, &u1 ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x2, &u2 ) ) != nfu_Okay ) return( status );
     if( ( status = ptwXY_getValueAtX_signal_XOutsideDomainError( smr, __LINE__, __func__, ptwXY2, x1, &v1 ) ) != nfu_Okay ) return( status );
     if( ( status = ptwXY_getValueAtX_signal_XOutsideDomainError( smr, __LINE__, __func__, ptwXY2, x2, &v2 ) ) != nfu_Okay ) return( status );
     if( isNAN1 ) {
         x = 0.5 * ( x1 + x2 );
-        if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x, &u1 ) != nfu_Okay ) ) return( status );
+        if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x, &u1 ) ) != nfu_Okay ) return( status );
         if( ( status = ptwXY_getValueAtX_signal_XOutsideDomainError( smr, __LINE__, __func__, ptwXY2, x, &v1 ) ) != nfu_Okay ) return( status );
         y = u1 / v1; }
     else if( isNAN2 ) {
         x = 0.5 * ( x1 + x2 );
-        if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x, &u2 ) != nfu_Okay ) ) return( status );
+        if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x, &u2 ) ) != nfu_Okay ) return( status );
         if( ( status = ptwXY_getValueAtX_signal_XOutsideDomainError( smr, __LINE__, __func__, ptwXY2, x, &v2 ) ) != nfu_Okay ) return( status );
         y = u2 / v2; }
     else {

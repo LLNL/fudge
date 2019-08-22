@@ -64,6 +64,7 @@
 from xData.ancestry import ancestry
 from xData import gridded as griddedModule
 from xData import axes as axesModule
+from xData import link as linkModule
 import copy
 
 __metaclass__ = type
@@ -80,6 +81,8 @@ class mixedForm( ancestry ):
         ancestry.__init__( self )
         self.__label = label
         self.components = components or [] #: a Python list containing instances of ``mixedForm``, ``summedCovariance``, and ``covarianceMatrix``
+        for c in self.components:
+            c.setAncestor(self)
 
     def __getitem__(self, idx):
         return self.components[idx]
@@ -100,13 +103,21 @@ class mixedForm( ancestry ):
         self.__label = label
 
     def getRowBounds(self,unit=None):
-        '''Get the bounds of the row.  If unit is specified, return the bounds in that unit.'''
-        allbounds = [ c.getRowBounds() for c in self.components ]
+        """
+        Get the bounds of the row. If unit is specified, return the bounds in that unit.
+        Otherwise, take unit from first sub-matrix.
+        """
+        if unit is None: unit = self[0].matrix.axes[-1].unit
+        allbounds = [ c.getRowBounds(unit) for c in self.components ]
         return (min([x[0] for x in allbounds]),max([x[1] for x in allbounds]))
     
     def getColumnBounds(self,unit=None):
-        '''Get the bounds of the column.  If unit is specified, return the bounds in that unit.'''
-        allbounds = [ c.getColumnBounds() for c in self.components ]
+        """
+        Get the bounds of the column.  If unit is specified, return the bounds in that unit.
+        Otherwise, take unit from the first sub-matrix.
+        """
+        if unit is None: unit = self[0].matrix.axes[-1].unit
+        allbounds = [ c.getColumnBounds(unit) for c in self.components ]
         return (min([x[0] for x in allbounds]),max([x[1] for x in allbounds]))
 
     def check( self, info ): 
@@ -116,11 +127,15 @@ class mixedForm( ancestry ):
         for component in self.components:
             componentWarnings = component.check( info )
             if componentWarnings:
-                warnings.append( warning.context('Component %i' % component.index, componentWarnings) )
+                warnings.append( warning.context('Component %s' % component.label, componentWarnings) )
         
         #if warnings:
         #    warnings = [warning.context('Section "%s": %s' % (self.id, form), warnings)]
         return warnings
+
+    def convertUnits( self, unitMap ):
+
+        for component in self: component.convertUnits( unitMap )
         
     def fix( self, **kw ): 
         warnings = []
@@ -150,45 +165,30 @@ class mixedForm( ancestry ):
         if not gotRow: raise ValueError( "No component with row bounds matching %s found" % str(rowBounds) )
         raise ValueError( "No component with column bounds matching %s found" % str(columnBounds) )
 
-    def shrinkToBounds(self,bounds):
-        '''
-        Return the subset of self's components whose row bounds fit within requested bounds.
-        Only works on mixedForms that are made up of parts where the column's covarianceAxis is a mirror of the row's.
-        '''
-        import fudge.gnd.covariances.base as base
-        def inRange( thisBounds, otherBounds ):
-            return otherBounds[0] >= thisBounds[0] and otherBounds[1] <= thisBounds[1]
-        newMixed = mixedForm()
-        for c in self.components:
-            if c.getRowBounds() != c.getColumnBounds(): raise ValueError( "All components must have their row and column covarianceAxes matching.")
-            if isinstance(c,base.covarianceMatrix): 
-                c = copy.copy(c)
-                c.removeExtraZeros()
-            if inRange(bounds,c.getRowBounds()): newMixed.addComponent(c)
-        return newMixed
-
     def makeSafeBounds(self):
         '''
         Go through all the components and make sure the bounds don't overlap.  If they do, it is likely a bug.
         '''
         import fudge.gnd.covariances.base as base
+        itWorked = True
         for ic in range(len(self)-1):
-            itWorked = True
             c0 = self.components[ic]
-            if c0.getRowBounds() != c0.getColumnBounds(): raise ValueError( "All components must have their row and column covarianceAxes matching.")
+            if c0.getRowBounds() != c0.getColumnBounds():
+                raise ValueError( "All components must have their row and column covarianceAxes matching.")
             c1 = self.components[ic+1]
-            if c1.getRowBounds() != c1.getColumnBounds(): raise ValueError( "All components must have their row and column covarianceAxes matching.")
-            itWorked = c0.getRowBounds()[1] <= c1.getRowBounds()[0] 
+            if c1.getRowBounds() != c1.getColumnBounds():
+                raise ValueError( "All components must have their row and column covarianceAxes matching.")
+            itWorked = c0.getRowBounds()[1] <= c1.getRowBounds()[0]
             if not itWorked: # uh oh
                 # Try to fix c0
-                if isinstance(c0,base.covarianceMatrix): 
+                if isinstance(c0,base.covarianceMatrix):
                     c0.removeExtraZeros()
-                    itWorked = c0.getRowBounds()[1] <= c1.getRowBounds()[0] 
+                    itWorked = c0.getRowBounds()[1] <= c1.getRowBounds()[0]
             if not itWorked: # double uh oh
                 # Try to fix c1
-                if isinstance(c1,base.covarianceMatrix): 
+                if isinstance(c1,base.covarianceMatrix):
                     c1.removeExtraZeros()
-                    itWorked = c0.getRowBounds()[1] <= c1.getRowBounds()[0] 
+                    itWorked = c0.getRowBounds()[1] <= c1.getRowBounds()[0]
         if not itWorked:
             raise ValueError("Bounds between components %i and %i overlap: %s" %(ic,ic+1, str( [c.getRowBounds() for c in self.components])))
                 
@@ -203,10 +203,9 @@ class mixedForm( ancestry ):
     def getCorrelationMatrix(self):
         return self.toCovarianceMatrix().getCorrelationMatrix()
 
-    def toCovarianceMatrix( self ):
+    def toCovarianceMatrix( self, label="composed" ):
         """
         Sum all parts together to build a single matrix.
-        FIXME: currently breaks if the 'mixed' section contains a mixture of absolute/relative/correlation matrices.
         """
         if len( self.components ) == 1: return self.components[0].toCovarianceMatrix()
         import fudge.gnd.covariances.base as base
@@ -214,15 +213,22 @@ class mixedForm( ancestry ):
         import xData.values as valuesModule
         import xData.array as arrayModule
 
-        # set up common data using first component
+        # Set up common data using first component
         firstCovMtx = self.components[0].toCovarianceMatrix()
-        commonRowAxis = copy.copy( firstCovMtx.matrix.axes[2] )
+        if not isinstance( firstCovMtx, base.covarianceMatrix):
+            raise TypeError("Shoudd have gotten base.covarianceMatrix, instead got %s"%str(firstCovMtx.__class__))
+        commonRowAxis = firstCovMtx.matrix.axes[2].copy([])#FIXME: unresolvedLinks are still unresolved!
         if firstCovMtx.matrix.axes[1].style=='link':
-            commonColAxis = copy.copy( firstCovMtx.matrix.axes[2] )
+            commonColAxis = firstCovMtx.matrix.axes[2].copy([])#FIXME: unresolvedLinks are still unresolved!
         else:
-            commonColAxis = copy.copy( firstCovMtx.matrix.axes[1] )
-        commonMatrixAxis = copy.copy( firstCovMtx.matrix.axes[0] )
+            commonColAxis = firstCovMtx.matrix.axes[1].copy([])#FIXME: unresolvedLinks are still unresolved!
+        commonMatrixAxis = firstCovMtx.matrix.axes[0] .copy([])#FIXME: unresolvedLinks are still unresolved!
         commonType = firstCovMtx.type
+
+        # We need all the covariances to be either absolute or relative
+        def make_common_type(cm):
+            if commonType == 'relative': return cm.toRelative()
+            else: return cm.toAbsolute()
 
         # We're going to have to merge grids, so we'll need this function to do the dirty work
         def add_values(v1,v2):
@@ -231,39 +237,44 @@ class mixedForm( ancestry ):
             v.update(v2.values)
             return valuesModule.values(sorted(v))
 
-        # first pass through components is to collect bins to set up the common grid + do assorted checking
+        # First pass through components is to collect bins to set up the common grid + do assorted checking
         for c in self.components[1:]:
-            cc = c.toCovarianceMatrix() # a little recursion to take care of nested covariances
+            cc = make_common_type(c.toCovarianceMatrix()) # a little recursion to take care of nested covariances
             if cc.type != commonType:
                 raise ValueError( "Incompatible types in %s: %s vs. %s" % (self.__class__, commonType, cc.type) )
             if cc.matrix.axes[0].unit !=  commonMatrixAxis.unit: raise ValueError("covariance matrix components with different units?!? %s vs. %s"%(cc.matrix.axes[0].unit, commonMatrixAxis.unit))
             if cc.matrix.axes[1].style != 'link': cc.matrix.axes[1].convertToUnit(commonColAxis.unit)
             cc.matrix.axes[2].convertToUnit(commonRowAxis.unit)
-            commonRowAxis.__values = add_values(commonRowAxis.values, cc.matrix.axes[2].values)
-            if cc.matrix.axes[1].style == 'link': commonColAxis.__values = add_values(commonColAxis.values, cc.matrix.axes[2].values)
-            else:                                 commonColAxis.__values = add_values(commonColAxis.values, cc.matrix.axes[1].values)
+            commonRowAxis.values.values = add_values(commonRowAxis.values, cc.matrix.axes[2].values)
+            if cc.matrix.axes[1].style == 'link': commonColAxis.values.values = add_values(commonColAxis.values, cc.matrix.axes[2].values)
+            else:                                 commonColAxis.values.values = add_values(commonColAxis.values, cc.matrix.axes[1].values)
 
-        # now sum up the components
-        commonMatrix = numpy.mat( firstCovMtx.group( ( commonRowAxis.values, commonColAxis.values ), ( commonRowAxis.unit, commonColAxis.unit ) ).matrix.array.constructArray() )
+        # Now sum up the components
+        commonMatrix = numpy.mat( firstCovMtx.group( ( commonRowAxis.values.values, commonColAxis.values.values ), ( commonRowAxis.unit, commonColAxis.unit ) ).matrix.array.constructArray() )
         for c in self.components[1:]:
-            cc = c.toCovarianceMatrix() # a little recursion to take care of nested covariances
-            commonMatrix += numpy.mat( cc.group( ( commonRowAxis.values, commonColAxis.values ), ( commonRowAxis.unit, commonColAxis.unit ) ).matrix.array.constructArray() )
-        
-        # now create the instance of the resulting covarianceMatrix
-        if all( [component.matrix.axes[1].style == 'link' for component in self.components] ):  commonColAxis = self.components[0].matrix.axes[1].copy()
+            cc = make_common_type(c.toCovarianceMatrix()) # a little recursion to take care of nested covariances
+            commonMatrix += numpy.mat( cc.group( ( commonRowAxis.values.values, commonColAxis.values.values ), ( commonRowAxis.unit, commonColAxis.unit ) ).matrix.array.constructArray() )
+
+        # Now create the instance of the resulting covarianceMatrix
+        if all( [component.toCovarianceMatrix().matrix.axes[1].style == 'link' for component in self.components ] ):  commonColAxis = self.components[0].toCovarianceMatrix().matrix.axes[1].copy([])#FIXME: unresolvedLinks are still unresolved!
         newAxes=axesModule.axes(
                 labelsUnits={0 : (commonMatrixAxis.label, commonMatrixAxis.unit),
                              1 : (commonColAxis.label, commonColAxis.unit),
                              2 : (commonRowAxis.label, commonRowAxis.unit)} )
-        newAxes[0]=commonMatrixAxis
-        newAxes[1]=commonColAxis
-        newAxes[2]=commonRowAxis
+        newAxes[2] = axesModule.grid(commonRowAxis.label, commonRowAxis.index, commonRowAxis.unit,
+                                  style=axesModule.boundariesGridToken,
+                                  values=commonRowAxis.values)
+        newAxes[1] = axesModule.grid(commonColAxis.label, commonColAxis.index, commonColAxis.unit,
+                              style=axesModule.linkGridToken,
+                              values=linkModule.link(link=commonRowAxis.values, relative=True))
+        newAxes[0] = axesModule.axis(commonMatrixAxis.label, commonMatrixAxis.index, commonMatrixAxis.unit)
         trigdata = commonMatrix[numpy.tri(commonMatrix.shape[0])==1.0].tolist()[0]
-        gridded = griddedModule.gridded( axes=newAxes, array=arrayModule.full(shape=commonMatrix.shape,data=trigdata,symmetry=arrayModule.symmetryLowerToken) )
+        gridded = griddedModule.gridded2d( axes=newAxes, array=arrayModule.full(shape=commonMatrix.shape, data=trigdata, symmetry=arrayModule.symmetryLowerToken))
+        newCov = base.covarianceMatrix( label=label, type=commonType, matrix=gridded )
+        newCov.setAncestor(self.ancestor)
+        return newCov
 
-        return base.covarianceMatrix( type=commonType, matrix=gridded )
-
-    def toAbsolute( self, rowData=None, colData=None ): 
+    def toAbsolute( self, rowData=None, colData=None ):
         '''
         Rescales self (if it is a relative covariance) using XYs1d rowData and colData
         to convert self into an absolute covariance matrix.
@@ -284,11 +295,11 @@ class mixedForm( ancestry ):
                 # If the covariance is summed, a call to toCovarianceMatrix() should add up
                 # the pointed-to covariances (if they are the same type (relative vs. absolute)),
                 # allowing us to do a toAbsolute() call with the correct row or column data
-                result.components.append( c.toCovarianceMatrix().toAbsolute( rowData, colData ) )
+                result.addComponent( c.toCovarianceMatrix().toAbsolute( rowData, colData ) )
 #            else: result.components.append( c.toAbsolute( rowData, colData ) )
         return result
         
-    def toRelative( self, rowData=None, colData=None ): 
+    def toRelative( self, label="composed", rowData=None, colData=None ):
         '''
         Rescales self (if it is a absolute covariance) using XYs1d rowData and colData
         to convert self into a relative covariance matrix.
@@ -309,7 +320,7 @@ class mixedForm( ancestry ):
                 # If the covariance is summed, a call to toCovarianceMatrix() should add up
                 # the pointed-to covariances (if they are the same type (relative vs. absolute)),
                 # allowing us to do a toRelative() call with the correct row or column data
-                result.components.append( c.toCovarianceMatrix().toRelative( rowData, colData ) )
+                result.addComponent( c.toCovarianceMatrix().toRelative( rowData, colData ) )
 #            else: result.components.append( c.toRelative( rowData, colData ) )
         return result
 

@@ -61,46 +61,13 @@
 # 
 # <<END-copyright>>
 
-import fudge.gnd.productData.distributions.Legendre as LegendreModule
-import site_packages.legacy.toENDF6.gndToENDF6 as gndToENDF6Module
-import site_packages.legacy.toENDF6.endfFormats as endfFormatsModule
+from fudge.gnd.productData.distributions import Legendre as LLNLLegendreModule
+
+from ... import gndToENDF6 as gndToENDF6Module
+from ... import endfFormats as endfFormatsModule
 
 #
 # form
-#
-def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
-
-    self.LegendreSubform.toENDF6( MT, endfMFList, flags, targetInfo )
-
-LegendreModule.form.toENDF6 = toENDF6
-
-#
-# pointwise
-#
-def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
-
-    EInInterpolation = gndToENDF6Module.axisToEndfInterpolationFlag( self.axes[0] )
-    independent, dependent, qualifier = self.axes[1].interpolation.getInterpolationTokens( )
-    if( dependent == standardsModule.interpolation.flatToken ) :
-        LEP = 1  # interpolation for Eout
-    else :
-        LEP = 2
-    ENDFDataList = [ endfFormatsModule.endfContLine( 0, 0, 1, LEP, 1, len( self ) ) ]
-    ENDFDataList += endfFormatsModule.endfInterpolationList( [ len( self ), EInInterpolation ] )
-    for energy_in in self :
-        NA, data = 0, []
-        for w_xys_LegendreSeries in energy_in :
-            NA = max( len( w_xys_LegendreSeries) , NA )
-            data += [ w_xys_LegendreSeries.value ] + w_xys_LegendreSeries.coefficients
-        ENDFDataList.append( endfFormatsModule.endfContLine( 0, energy_in.value, 0, NA - 1, len( data ), len( data ) / ( NA + 1 ) ) )
-        ENDFDataList += endfFormatsModule.endfDataList( data )
-    LAW = 1
-    gndToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, self.productFrame, ENDFDataList )
-
-LegendreModule.pointwise.toENDF6 = toENDF6
-
-#
-# LLNLPointwise
 #
 def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
@@ -128,4 +95,4 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
         ENDFDataList += endfFormatsModule.endfDataList( data )
     gndToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, self.productFrame, ENDFDataList )
 
-LegendreModule.LLNLPointwise.toENDF6 = toENDF6
+LLNLLegendreModule.form.toENDF6 = toENDF6

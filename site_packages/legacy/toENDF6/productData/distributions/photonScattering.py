@@ -61,9 +61,10 @@
 # 
 # <<END-copyright>>
 
-import site_packages.legacy.toENDF6.endfFormats as endfFormatsModule
-import site_packages.legacy.toENDF6.gndToENDF6 as gndToENDF6Module
-import fudge.gnd.productData.distributions.photonScattering as photonScatteringModule
+from fudge.gnd.productData.distributions import photonScattering as photonScatteringModule
+
+from ... import endfFormats as endfFormatsModule
+from ... import gndToENDF6 as gndToENDF6Module
 
 #
 # scatteringFactorXYs1d.
@@ -75,7 +76,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
     endfInterpolation = gndToENDF6Module.gndToENDFInterpolationFlag( self.interpolation )
     data = []
-    for xy in self.copyDataToXYs( xUnitTo = 'eV', yUnitTo = '' ) : data += xy
+    for xy in self.copyDataToXYs( ) : data += xy
     endfMFList[27][MT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'],  0, 0, 0, 0 ),
                            endfFormatsModule.endfContLine( 0, Z,  0, 0, 1, len( data ) / 2 ) ] + \
                            endfFormatsModule.endfInterpolationList( ( len( data ) / 2, endfInterpolation ) ) + \
@@ -94,7 +95,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo, energyUnit = 'eV' ) :
     counter, lastX, lastY = 0, None, None
     for region in self :
         ENDFInterpolation = gndToENDF6Module.gndToENDFInterpolationFlag( region.interpolation )
-        regionData = region.copyDataToXYs( xUnitTo = energyUnit, yUnitTo = '' )
+        regionData = region.copyDataToXYs( )
         if( lastX is not None ) :
             if( lastY == regionData[0][1] ) : del regionData[0]
         counter += len( regionData )

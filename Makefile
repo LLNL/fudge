@@ -61,9 +61,9 @@
 # 
 # <<END-copyright>>
 
-.PHONY: clean realclean build extensions
+.PHONY: default build inplace bin clean realclean build extensions
 
-EXTENSIONS = statusMessageReporting numericalFunctions crossSectionAdjustForHeatedTarget
+EXTENSIONS = statusMessageReporting numericalFunctions crossSectionAdjustForHeatedTarget Merced
 
 EPYDOC=epydoc-2.6
 PYTHON=python
@@ -75,6 +75,11 @@ build:
 
 inplace:
 	$(PYTHON) setup.py --quiet build_ext --inplace build
+
+bin:
+	cd bin; $(MAKE)
+
+merced: bin
 
 clean:
 	rm -rf build
@@ -92,19 +97,28 @@ extensions:
 	for directory in $(EXTENSIONS); do cd $$directory; $(MAKE) $(MODE); cd $$SAVED_PWD; done
 
 docs:
-	$(EPYDOC) -o doc/code-ref --html --show-imports --exclude="fudge.processing.resonances.setup" --exclude="fudge.vis.gnuplot.fudge2dMultiPlot" --exclude="fudge.vis.gnuplot.endl[2-4]dplot" --no-frames --docformat="epytext" -v fudge
-# --check --debug --graph="umlclasstree"
+	cd doc/sphinx; $(MAKE) $(MODE) html; cd ../..
+
+rebuild-test-data:
+	cd fudge/gnd/covariances/test; python rebuild_test_data.py
+	cd fudge/processing/resonances/test; python rebuild_test_data.py
 
 dist:
 	$(PYTHON) setup.py sdist --formats=gztar,zip
 
-check: check-pqu check-nf check-smr check-fudge
+check: rebuild-test-data check-pqu check-nf check-smr check-fudge check-PoPs
+
+check-site-packages:
+	cd site_packages; $(MAKE) check
 
 check-heat: # BROKEN?
 	$(PYTHON) crossSectionAdjustForHeatedTarget/Python/Test/t.py
 
 check-pqu:
 	$(PYTHON) pqu/Check/check.py
+
+check-PoPs:
+	cd PoPs/Test/; $(MAKE) check
 
 check-nf:
 	cd numericalFunctions/nf_specialFunctions/Python/Test/UnitTesting/; $(MAKE) check
@@ -122,9 +136,27 @@ FUDGETESTFILES = \
     fudge/gnd/reactionData/test/test_crossSection.py \
     fudge/gnd/covariances/test/test_base.py \
     fudge/gnd/covariances/test/test_mixed.py \
+    fudge/gnd/covariances/test/test_summed.py \
     fudge/gnd/covariances/test/test_covarianceSuite.py \
-    fudge/gnd/test/testCovariances.py \
     fudge/particles/test/testParticles.py
 
+FUDGECOVTESTFILES = \
+    fudge/gnd/reactionData/test/test_crossSection.py \
+    fudge/gnd/covariances/test/test_base.py \
+    fudge/gnd/covariances/test/test_mixed.py \
+    fudge/gnd/covariances/test/test_summed.py \
+    fudge/gnd/covariances/test/test_covarianceSuite.py
+
+check-cov:
+	for testFile in $(FUDGECOVTESTFILES); do echo ; \
+		echo ======================================================================= ; \
+		echo \>\>\> TESTING $$testFile ; \
+		echo =======================================================================; \
+		echo ; python $$testFile; done
+
 check-fudge:
-	for testFile in $(FUDGETESTFILES); do echo ; echo ======================================================================= ; echo \>\>\> TESTING $$testFile ; echo =======================================================================; echo ; python $$testFile; done
+	for testFile in $(FUDGETESTFILES); do echo ; \
+		echo ======================================================================= ; \
+		echo \>\>\> TESTING $$testFile ; \
+		echo =======================================================================; \
+		echo ; python $$testFile; done

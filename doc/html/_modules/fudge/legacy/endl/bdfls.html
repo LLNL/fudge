@@ -1,0 +1,995 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.endl.bdfls &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.legacy.endl.bdfls</h1><div class="highlight"><pre>
+<span></span># &lt;&lt;BEGIN-copyright&gt;&gt;
+# &lt;&lt;END-copyright&gt;&gt;
+
+&quot;&quot;&quot;
+This module contains classes for dealing with a bdfls file and its contents.
+&quot;&quot;&quot;
+
+import os
+import string
+from fudge.core import fudgemisc
+from fudge.core.utilities import fudgeFileMisc, subprocessing
+from fudge.particles import nuclear
+from fudge.vis.gnuplot import plotbase
+
+default_bdfls = None
+
+# set default bdfls file path
+_BDFLS_FILE_ = &quot;/usr/gapps/data/nuclear/bdfls&quot;
+bdfls_EOD =    &quot;                                                                        1\n&quot;
+bdfls_mh_EOD = &quot;    999999                                                              1\n&quot;
+
+<div class="viewcode-block" id="targetToZA"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.targetToZA">[docs]</a>def targetToZA( za ) :
+    &quot;&quot;&quot;This routine converts an integer or string into a ZA (e.g., &quot;FissionProductENDL99120&quot; to 99120).&quot;&quot;&quot;
+
+    try :
+        iza = int( za )
+    except :
+        if( type( za ) == ( type( &#39;&#39; ) ) ) :
+            if( za[:2] == &#39;za&#39; ) :
+                iza = int( za[2:8] )
+            elif( za[:18] == &#39;FissionProductENDL&#39; ) :
+                iza = int( za[18:] )
+            else :
+                if( &#39;_&#39; in za ) :
+                    ZA, suffix = za.split( &#39;_&#39; )
+                else :
+                    ZA, suffix = za, None
+                if( suffix == &#39;natural&#39; ) :
+                    Z = ZA
+                    A = 0
+                else :
+                    for i, s in enumerate( za ) :
+                        if( s.isdigit( ) ) : break
+                    Z, A = za[:i], za[i:]
+                foundZA = False
+                if Z in nuclear.elementsSymbolZ:
+                    iza = 1000 * nuclear.elementZFromSymbol( Z ) + int ( A )
+                    foundZA = True
+                if( not foundZA ) : raise Exception( &#39;Could not handle za = %s.&#39; % `za` )
+        else :
+            raise Exception( &#39;za = &quot;%s&quot; cannot be converted into an integer&#39; % `za` )
+    return( iza )</div>
+
+<div class="viewcode-block" id="bdfls"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls">[docs]</a>class bdfls :
+    &quot;&quot;&quot;This class reads in a bdfls file.&quot;&quot;&quot;
+
+    def __init__( self, name = None, template = None ) :
+        &quot;&quot;&quot;Reads in the bdfls file give by template. If self&#39;s save is called with name = None,
+        then this methods name is used as the output bdfls file&#39;s name.&quot;&quot;&quot;
+
+        if ( template is None ) :
+            if ( os.path.exists( &quot;./bdfls&quot; ) ) :
+                template = &quot;./bdfls&quot;
+            else :
+                if( &#39;BDFLSPATH&#39; in os.environ ) :
+                    template = os.environ[ &#39;BDFLSPATH&#39; ]
+                elif os.path.exists( _BDFLS_FILE_ ):
+                    template = _BDFLS_FILE_
+                else:
+                    template = os.path.split(__file__)[0] + os.sep+ &#39;bdfls&#39;
+        if ( not os.path.exists( template ) ) : raise IOError( &quot;\n    Error in bdfls.__init__: bdfls file does not exist\n    %s&quot; % template )
+        self.name = name
+        if ( name is None ) : self.name = &quot;./&quot; + template.split( &quot;/&quot; )[-1]
+        self.template = template
+        self.g = []
+        self.f = []
+        self.m = []
+        self.massFormat = &#39;old&#39;
+        self.h = []
+        self.c = []
+        self.t = []
+        self.s = []
+        self.read( template )
+
+    def __repr__( self ) :
+        &quot;&quot;&quot;Returns a string that summarizes the information in this class.&quot;&quot;&quot;
+
+        s = &quot;File name = %s\n&quot; % self.name
+        s += &quot;Template file = %s\n&quot; % self.template
+        s += &quot;  Group data\n&quot;
+        for g in self.g : s += &quot;    id = %4d  groups = %4d  boundaries = %d\n&quot; % ( g.id, g.n - 1, g.n )
+        s += &quot;  Flux data\n&quot;
+        for f in self.f : s += &quot;    id = %4d  lMax = %d\n&quot; % ( f.id, f.lMax )
+        s += &quot;  There are %s masses\n&quot; % len( self.m )
+        s += &quot;  There are %s halflifes\n&quot; % len( self.h )
+        s += &quot;  There are %s constants\n&quot; % len( self.c )
+        s += &quot;  Temperature data\n&quot;
+        for t in self.t : s = s + &quot;    id = %4d  n = %d\n&quot; % ( t.id, t.n )
+        s += &quot;  There are %s subshell designators\n&quot; % len( self.s )
+        return s
+
+<div class="viewcode-block" id="bdfls.addGroup"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.addGroup">[docs]</a>    def addGroup( self, ebs, id, label = &quot;&quot;, overwrite = 0 ) :
+        &quot;&quot;&quot;Adds the group with id to self&#39;s list of groups. ebs is a python list
+        of numbers and label is the groups label (see class bdfls_group). If overwrite
+        is false, a raise is triggered if self already contains group with id, else
+        the old one is overwritten.&quot;&quot;&quot;
+
+        pos = None
+        for i in range( len( self.g ) ) :
+            if( self.g[i].id == id ) :
+                if( overwrite ) :
+                    del self.g[i]
+                    pos = i
+                    break
+                else :
+                    raise Exception( &quot;\nError in bdfls.addGroup: group with id = %d already exist&quot; % id )
+            elif( self.g[i].id &gt; id ) :
+                pos = i
+                break
+        g = bdfls_group( ebs )
+        g.n = len( ebs )
+        g.id = id
+        g.label = label
+        g.name = &#39;LLNL_gid_%d&#39; % g.id
+        if( pos is None ) :
+            self.g.append( g )
+        else :
+            self.g.insert( pos, g )</div>
+
+<div class="viewcode-block" id="bdfls.addFlux"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.addFlux">[docs]</a>    def addFlux( self, EF_ls, id, label = &quot;&quot;, overwrite = 0 ) :
+        &quot;&quot;&quot;Adds the flux with id to self&#39;s list of fluxes. EF_ls is a python list
+        with the following structure:
+            [
+                [ [E0, f0], [E1, f1], ... ], # for l = 0 
+                [ [E0, f0], [E1, f1], ... ], # for l = 1 
+                ...
+            ]
+        and label is the flux&#39;s label (see class bdfls_flux). If overwrite
+        is false, a raise is triggered if self already contains group with id, else
+        the old one is overwritten.&quot;&quot;&quot;
+
+        pos = None
+        for i in range( len( self.f ) ) :
+            if( self.f[i].id == id ) :
+                if( overwrite ) :
+                    del self.f[i]
+                    pos = i
+                    break
+                else :
+                    raise Exception( &quot;\nError in bdfls.addFlux: flux with id = %d already exist&quot; % id )
+            elif( self.f[i].id &gt; id ) :
+                pos = i
+                break
+        f = bdfls_flux( EF_ls )
+        f.id = id
+        f.label = label
+        f.name = &#39;LLNL_fid_%d&#39; % f.id
+        if( pos is None ) :
+            self.f.append( f )
+        else :
+            self.f.insert( pos, f )</div>
+
+<div class="viewcode-block" id="bdfls.addZA"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.addZA">[docs]</a>    def addZA( self, za, mass, halflife, warning = 1 ) :
+        &quot;&quot;&quot;Calls addZAHalflife with halflife and addZAMass with mass.&quot;&quot;&quot;
+
+        self.addZAHalflife( za, halflife, warning )
+        self.addZAMass( za, mass, warning )</div>
+
+<div class="viewcode-block" id="bdfls.addZAHalflife"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.addZAHalflife">[docs]</a>    def addZAHalflife( self, za, halflife, warning = 1 ) :
+        &quot;&quot;&quot;Adds or changes the halflife for ZA. If warning is true and ZA is already in self&#39;s halflife list,
+        then a warning message is printed.&quot;&quot;&quot;
+
+        i = 0
+        for h in self.h :
+            if ( h.za == za ) :
+                if ( warning ) : fudgemisc.printWarning( &quot;changing halflife for za = %d from %s to %s&quot; % ( za, `h.halflife`, `halflife` ) )
+                h.halflife = halflife
+                return
+            elif ( h.za &gt; za ) :
+                self.h.insert( i, bdfls_halflife( za, halflife ) )
+                return
+            i += 1</div>
+
+<div class="viewcode-block" id="bdfls.addZAMass"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.addZAMass">[docs]</a>    def addZAMass( self, za, mass, warning = 1 ) :
+        &quot;&quot;&quot;Adds or changes the mass for ZA. If warning is true and ZA is already in self&#39;s mass list,
+        then a warning message is printed.&quot;&quot;&quot;
+
+        i = 0
+        for m in self.m :
+            if ( m.za == za ) :
+                if ( warning ) : fudgemisc.printWarning( &quot;changing mass for za = %d from %s to %s&quot; % ( za, `m.mass`, `mass` ) )
+                m.mass = mass
+                return
+            elif ( m.za &gt; za ) :
+                self.m.insert( i, bdfls_mass( za, mass, format = self.massFormat ) )
+                return
+            i += 1</div>
+
+<div class="viewcode-block" id="bdfls.flux"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.flux">[docs]</a>    def flux( self, id ) :
+        &quot;&quot;&quot;Returns the flux that matches id.&quot;&quot;&quot;
+
+        if( type( id ) == type( 1 ) ) :
+            for f in self.f :
+                if( f.id == id ) : return f
+        else :
+            for f in self.f :
+                if( f.name == id ) : return f
+        raise Exception( &quot;\nError in bdfls.flux: id does not exist (%s)&quot; % id )</div>
+
+<div class="viewcode-block" id="bdfls.group"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.group">[docs]</a>    def group( self, id ) :
+        &quot;&quot;&quot;Returns the group that matches id.&quot;&quot;&quot;
+
+        if( type( id ) == type( 1 ) ) :
+            for g in self.g :
+                if( g.id == id ) : return g
+        else :
+            for g in self.g :
+                if( g.name == id ) : return g
+        raise Exception( &quot;\nError in bdfls.group: id does not exist (%s)&quot; % id )</div>
+
+<div class="viewcode-block" id="bdfls.subGroups"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.subGroups">[docs]</a>    def subGroups( self, id ) :
+        &quot;&quot;&quot;Returns the sub-group ids for group id.&quot;&quot;&quot;
+
+        subgs = []
+        for g in self.g :
+            if( g.id == id ) : continue
+            if( self.isSubGroup( g.id, id ) ) : subgs.append( g.id )
+        subgs.sort( )
+        return( subgs )</div>
+
+<div class="viewcode-block" id="bdfls.isSubGroup"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.isSubGroup">[docs]</a>    def isSubGroup( self, sid_, id_, eps = 0. ) :
+        &quot;&quot;&quot;Returns true if sid is a sub-group of id, false otherwise.&quot;&quot;&quot;
+
+        sid = None
+        id = None
+        for g in self.g :
+            if(   sid_ == g.id ) : sid = g
+            elif( id_  == g.id ) : id = g
+        if( id is None ) : raise Exception( &quot;isSubGroup: group with id = %d does not exist&quot; )
+        if( sid is None ) : raise Exception( &quot;isSubGroup: sub group with id = %d does not exist&quot; )
+        i = 0
+        n = id.n
+        for sg in sid.gb :
+            while( 1 ) :
+                if( n == i ) : return( 0 )
+                d = sg - id.gb[i]
+                if( abs( d ) &lt;= eps ) :
+                    i += 1
+                    break
+                if( d &lt; 0. ) : return( 0 )
+                i += 1
+        return( 1 )</div>
+
+<div class="viewcode-block" id="bdfls.halflife"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.halflife">[docs]</a>    def halflife( self, za ) :
+        &quot;&quot;&quot;Returns the halflife of the za if in database, else returns None.&quot;&quot;&quot;
+
+        if( za == &#39;gamma&#39; ) : return( 1e50 )
+        za_ = targetToZA( za )
+        iMin = 0
+        iMax = len( self.h ) - 1
+        while( True ) :
+            iMid = ( iMin + iMax ) / 2
+            h = self.h[iMid]
+            if( h.za == za_ ) : return h.halflife
+            if( iMin == iMax ) : break
+            if( h.za &gt; za_ ) :
+                iMax = iMid
+            else :
+                iMin = iMid + 1
+        return None</div>
+
+<div class="viewcode-block" id="bdfls.mass"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.mass">[docs]</a>    def mass( self, za ) :
+        &quot;&quot;&quot;Returns the mass of the za if in database, else returns None (the mass of a za is for a neutral atom, not the nucleus).&quot;&quot;&quot;
+
+        if( za == &#39;gamma&#39; ) : return( 0. )
+        za_ = targetToZA( za )
+        iMin = 0
+        iMax = len( self.m ) - 1
+        while( True ) :
+            iMid = ( iMin + iMax ) / 2
+            m = self.m[iMid]
+            if( m.za == za_ ) : return m.mass
+            if( iMin == iMax ) : break
+            if( m.za &gt; za_ ) :
+                iMax = iMid
+            else :
+                iMin = iMid + 1
+        return None</div>
+
+<div class="viewcode-block" id="bdfls.constant"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.constant">[docs]</a>    def constant( self, i ) :
+        &quot;&quot;&quot;Returns the (i+1)^th constant from self&#39;s constant list.&quot;&quot;&quot;
+
+        return( self.c[i].value )</div>
+
+<div class="viewcode-block" id="bdfls.printza"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.printza">[docs]</a>    def printza( self, za, im = 0, ih = 0 ) :
+        &quot;&quot;&quot;Prints the za, mass and halflife for za.&quot;&quot;&quot;
+
+        ( za, m, h ) = self.za( za, im, ih )
+        if ( za is None ) : return
+        sm = 15 * &quot; &quot;
+        if( m is not None ) : sm = &quot;%15.8e&quot; % m
+        sh = 12 * &quot; &quot;
+        if ( h is not None ) : sh = &quot;%12e&quot; % self.h[ih].halflife
+        print &quot;%6d %s %s&quot; % ( za, sm, sh )</div>
+
+<div class="viewcode-block" id="bdfls.read"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.read">[docs]</a>    def read( self, name ) :
+        &quot;&quot;&quot;Reads in the bdfls file given by name. For internal use only.&quot;&quot;&quot;
+
+        class fileInfo :
+
+            def __init__( self, name ) :
+                &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+                self.f = open( name, &quot;r&quot; )
+                self.lineNumber = 0
+                self.line = None
+                self.linesRead = []
+
+            def close( self ) :
+                &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+                self.f.close( )
+
+            def readline( self ) :
+                &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+                if( len( self.linesRead ) &gt; 0 ) :
+                    self.line = self.linesRead[0]
+                    del self.linesRead[0]
+                else :
+                    self.line = self.f.readline( )
+                self.lineNumber += 1
+                return( self.line )
+
+            def unreadline( self, line ) :
+
+                self.linesRead.append( line )
+                self.lineNumber -= 1
+
+            def errMsg( self, routine, str ) :
+                &quot;&quot;&quot;For internal use only.&quot;&quot;&quot;
+
+                return( &#39;\nError in %s: %s at line %d\n%s&#39; % ( routine, str, self.lineNumber, self.line ) )
+
+        if ( not os.path.exists( name ) ) : raise Exception( &quot;\nError in bdfls.read: file does not exist (%s)&quot; % name )
+        f = fileInfo( name )
+        self.Source = name
+        while 1 :                               # Read the group data.
+            g = bdfls_group( f )
+            if ( g.id is None ) : break
+            self.g.append( g )
+        while 1 :                               # Read the flux data.
+            fl = bdfls_flux( f )
+            if ( fl.id is None ) : break
+            self.f.append( fl )
+        line = f.readline( )                    # Handle new mass format.
+        f.unreadline( line )
+        s = line.split( &quot;#&quot; )
+        self.massFormat = &#39;old&#39;
+        if( len( s ) &gt; 1 ) :
+            self.massLabel = s[1][:-1]
+            self.massFormat = &#39;Audi2003&#39;
+        while 1 :
+            m = bdfls_mass( f, format = self.massFormat )
+            if ( m.za is None ) : break
+            self.m.append( m )
+        while 1 :
+            h = bdfls_halflife( f )
+            if ( h.za is None ) : break
+            self.h.append( h )
+        ( self.nConstants, i ) = bdfls_read_int_label( f, 0, &quot;bdfls.read&quot;, &quot;constant&quot;, &quot;number of constants&quot; )
+        i = self.nConstants
+        while 1 :
+            c = bdfls_constant( f )
+            if ( c.value is None ) : break
+            self.c.append( c )
+            i = i - 1
+        if ( i != 0 ) : raise Exception( &quot;\nError in bdfls.read: %d unread constants&quot; % i )
+        while 1 :
+            t = bdfls_temperature( f )
+            if ( t.id is None ) : break
+            self.t.append( t )
+        ( self.nSubshells, i ) = bdfls_read_int_label( f, 0, &quot;bdfls.read&quot;, &quot;subshell&quot;, &quot;number of subshell designators&quot; )
+        i = self.nSubshells
+        while 1 :
+            s = bdfls_subshell( f )
+            if ( s.line is None ) : break
+            self.s.append( s )
+            i = i - 1
+        if ( i != 0 ) : raise Exception( &quot;\nError in bdfls.read: %d unread subshells&quot; % i )
+            
+        f.close( )</div>
+
+<div class="viewcode-block" id="bdfls.save"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.save">[docs]</a>    def save( self, fileName = None ) :
+        &quot;&quot;&quot;Saves the contents of self to fileName.&quot;&quot;&quot;
+
+        if ( fileName is None ) : fileName = self.name
+        try :
+            f = open( fileName, &quot;w&quot; )
+        except :
+            raise Exception( &quot;\nError in bdfls.save: cannot open file %s&quot; % fileName )
+        s = `self.g`
+        for g in self.g : f.write( `g` )
+        f.write( bdfls_EOD )
+        for fl in self.f : f.write( `fl` )
+        f.write( bdfls_EOD )
+        if( self.massFormat == &#39;old&#39; ) :
+            l = &quot;                 nuclear masses                          *\n&quot;
+        elif( self.massFormat == &#39;Audi2003&#39; ) :
+            n = 0
+            if( len( self.m ) &gt; 0 ) :
+                n = len( `self.m[0]` )
+            l = &#39;#&#39; + self.massLabel
+            n = 80 - ( len( l ) + n )
+            l = n * &#39; &#39; + l + &#39;\n&#39;
+        else :
+            raise Exception( &#39;\nError in bdfls.save: bad format = &quot;%s&quot;&#39; % self.format )
+        for m in self.m :
+            f.write( `m` + l )
+            l = &quot;\n&quot;
+        f.write( bdfls_mh_EOD )
+        l = &quot;                 half-lives                              *\n&quot;
+        for h in self.h :
+            f.write( `h` + l )
+            l = &quot;\n&quot;
+        f.write( bdfls_mh_EOD )
+        f.write( &quot;%4d         nuclear constants                                                 *\n&quot; % self.nConstants )
+        for c in self.c : f.write( `c` )
+        f.write( bdfls_EOD )
+        for t in self.t : f.write( `t` )
+        f.write( bdfls_EOD )
+        f.write( &quot;%4d    subshell designators                                                   *\n&quot; % self.nSubshells )
+        for s in self.s : f.write( `s` )
+        f.write( bdfls_EOD )
+        f.close( )</div>
+
+<div class="viewcode-block" id="bdfls.setZAHalflife"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.setZAHalflife">[docs]</a>    def setZAHalflife( self, za, halflife ) :
+        &quot;&quot;&quot;Changes the halflife for ZA. A raise is triggered is za in not in self&#39;s halflife list.&quot;&quot;&quot;
+
+        for h in self.h :
+            if ( h.za == za ) :
+                h.halflife = halflife
+                return
+            elif ( h.za &gt; za ) :
+                raise Exception( &quot;\nError in bdfls.setZAHalflife: no such ZA = %s&quot; % `za` )</div>
+
+<div class="viewcode-block" id="bdfls.setZAMass"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.setZAMass">[docs]</a>    def setZAMass( self, za, mass ) :
+        &quot;&quot;&quot;Changes the mass for ZA. A raise is triggered is za in not in self&#39;s mass list.&quot;&quot;&quot;
+
+        for m in self.m :
+            if ( m.za == za ) :
+                m.mass = mass
+                return
+            elif ( m.za &gt; za ) :
+                raise Exception( &quot;\nError in bdfls.setZAMass: no such ZA = %s&quot; % `za` )</div>
+
+<div class="viewcode-block" id="bdfls.za"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.za">[docs]</a>    def za( self, za, im = 0, ih = 0 ) :
+        &quot;&quot;&quot;Returns the tuple ( za, mass, halflife ) for za.&quot;&quot;&quot;
+
+        m = None
+        lm = len( self.m )
+        while ( im &lt; lm ) :
+            if ( self.m[im].za == za ) : m = self.m[im].mass
+            if ( self.m[im].za &gt;= za ) : break
+            im = im + 1
+        h = None
+        lh = len( self.h )
+        while ( ih &lt; lh ) :
+            if ( self.h[ih].za == za ) : h = self.h[ih].halflife
+            if ( self.h[ih].za &gt;= za ) : break
+            ih = ih + 1
+        if ( m is None ) and ( h is None ) : za = None
+        return ( za, m, h )</div>
+
+<div class="viewcode-block" id="bdfls.zas"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls.zas">[docs]</a>    def zas( self, ZAMin, ZAMax = None ) :
+        &quot;&quot;&quot;Print za, mass and halflife for all za between ZAMin and ZAMax inclusive.&quot;&quot;&quot;
+
+        if ( ZAMax is None ) : ZAMax = ZAMin
+        im = 0
+        lm = len( self.m )
+        ih = 0
+        lh = len( self.h )
+        while ( ( im &lt; lm ) and ( self.m[im].za &lt; ZAMin ) ) : im = im + 1
+        while ( ( ih &lt; lh ) and ( self.h[ih].za &lt; ZAMin ) ) : ih = ih + 1
+        za = ZAMin
+        while za &lt;= ZAMax :
+            if ( ( im &lt; lm ) and ( za &gt; self.m[im].za ) ) : im = im + 1
+            if ( ( ih &lt; lh ) and ( za &gt; self.h[ih].za ) ) : ih = ih + 1
+            if ( ( im == lm ) and ( ih == lh ) ) : break
+            if ( im == lm ) :
+                za = self.h[ih].za
+            elif ( ih == lh ) :
+                za = self.m[im].za
+            else :
+                za = min( self.m[im].za, self.h[ih].za )
+            if ( za &lt;= ZAMax ) :
+                self.printza( za, im, ih )
+                za = za + 1</div></div>
+
+<div class="viewcode-block" id="bdfls_group"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_group">[docs]</a>class bdfls_group :
+    &quot;&quot;&quot;A class that contains a single group.&quot;&quot;&quot;
+
+    def __init__( self, f ) :
+        &quot;&quot;&quot;f must be a python list of number for the group boundaries or an opened python file
+        that is a bdfls file positioned at the start of a group.&quot;&quot;&quot;
+
+        self.id = None
+        if( type( f ) == type( [] ) ) :
+            self.label  = None
+            self.n = len( f )
+            self.gb = f
+        else :
+            self.read( f )
+
+    def __len__( self ) :
+        &quot;&quot;&quot;Return the number of group boundaries.&quot;&quot;&quot;
+
+        return( len( self.gb ) )
+
+    def __getitem__( self, index ) :
+        &quot;&quot;&quot;Returns the (index - 1)^th boundary&quot;&quot;&quot;
+
+        return( self.gb[index] )
+
+    def __repr__( self ) :
+        &quot;&quot;&quot;Returns a string of the group as it would appear in a bdfls file.&quot;&quot;&quot;
+
+        s = &quot;%4d %-74s*\n&quot; % ( self.id, self.label )
+        if ( len( s ) &gt; 81 ) : s = s[:79] + &quot;*\n&quot;
+        s = s + &quot;%4d                                                                           *\n&quot; % self.n
+        j = 0
+        for i in self.gb :
+            s = s + &quot;%12.5e&quot; % i
+            j = j + 1
+            if ( ( j % 6 ) == 0 ) : s = s + &quot;\n&quot;
+        if ( ( j % 6 ) != 0 ) : s = s + &quot;\n&quot;
+        return s
+
+<div class="viewcode-block" id="bdfls_group.plot"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_group.plot">[docs]</a>    def plot( self, xMin = None, xMax = None, yMin = None, yMax = None, xylog = 0, xLabel = None, yLabel = None,
+        title = None, style = &quot;lines&quot; ) :
+        &quot;&quot;&quot;Plots the group boundaries.
+
+xylog meanings::
+    xylog   plot-type
+   -----------------------
+      0     linear-linear
+      1     log-linear
+      2     linear-log
+      3     log-log&quot;&quot;&quot;
+
+        if ( xLabel is None ) : xLabel = &#39;Energy (MeV)&#39;
+        if ( yLabel is None ) : yLabel = &#39;A. U.&#39;
+        dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title )
+        f = fudgeFileMisc.fudgeTempFile( )
+        for p in self.gb: f.write( &quot;%15.7e 0.1\n%15.7e 10.\n\n&quot; % ( p, p ) )
+        f.close( )
+        p = os.path.join( __file__.split( &#39;fudge/processing/&#39; )[0], &quot;fudge&quot;, &quot;vis&quot;, &quot;gnuplot&quot;, &quot;endl2dplot.py&quot; )
+        s = [ &#39;python&#39;, p, &#39;xylog&#39;, str( xylog ) ] + dt + [ f.getName( ) ]
+        subprocessing.spawn( s )</div>
+
+<div class="viewcode-block" id="bdfls_group.read"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_group.read">[docs]</a>    def read( self, f ) :
+        &quot;&quot;&quot;Reads in the next group from a bdfls file. Sets self&#39;s id to None if not more groups to read in.&quot;&quot;&quot;
+
+        ( self.id, self.label ) = bdfls_read_int_label( f, 1, &quot;bdfls_group.read&quot;, &quot;group&quot;, &quot;group id&quot; )
+        if( self.id is None ) : return
+        self.name = &#39;LLNL_gid_%d&#39; % self.id
+        ( self.n, l ) = bdfls_read_int_label( f, 0, &quot;bdfls_group.read&quot;, &quot;group&quot;, &quot;number of groups&quot; )
+        self.gb = []
+        i = 0
+        while ( i &lt; self.n ) :
+            if ( ( i % 6 ) == 0 ) :
+                l = f.readline( )
+                if ( l == &quot;&quot; ) : raise Exception( f.errMsg( &#39;bdfls_group.__init__&#39;, &#39;EOF while reading group data&#39; ) )
+                if ( l == bdfls_EOD ) : raise Exception( f.errMsg( &#39;bdfls_group.__init__&#39;, &#39;EOD detected while reading group data&#39; ) )
+                j = 0
+            self.gb.append( float( l[j:j+12] ) )
+            j = j + 12
+            i = i + 1</div></div>
+
+<div class="viewcode-block" id="bdfls_flux"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_flux">[docs]</a>class bdfls_flux :
+    &quot;&quot;&quot;A class that contains a single flux.&quot;&quot;&quot;
+
+    def __init__( self, f ) :
+        &quot;&quot;&quot;f must be a python list of number for the with the following structure:
+            [
+                [ [E0, f0], [E1, f1], ... ], # for l = 0 
+                [ [E0, f0], [E1, f1], ... ], # for l = 1 
+                ...
+            ]
+        or an opened python file that is a bdfls file positioned at the start of a flux.&quot;&quot;&quot;
+
+        self.id = None
+        if( type( f ) == type( [] ) ) :
+            self.label  = None
+            self.lMax = len( f ) - 1
+            self.n = [ len(x) for x in f ]
+            self.EF_l = f
+        else :
+            self.id = None
+            self.read( f )
+
+    def __len__( self ) :
+        &quot;&quot;&quot;Returns the number of Legendre orders for this flux.&quot;&quot;&quot;
+
+        return( len( self.EF_l ) )
+
+    def __repr__( self ) :
+        &quot;&quot;&quot;Returns a string of the flux as it would appear in a bdfls file.&quot;&quot;&quot;
+
+        s = &quot;%4d %-74s*\n&quot; % ( self.id, self.label )
+        if ( len( s ) &gt; 81 ) : s = s[:79] + &quot;*\n&quot;
+        s = s + &quot;%4d                                                                           *\n&quot; % self.lMax
+        r = range( self.lMax + 1 )
+        for i in r :
+            s = s + &quot;%4d                                                                           *\n&quot; % ( 2 * self.n[i] )
+        k = 0
+        for i in r :
+            for j in self.EF_l[i] :
+                s = s + &quot;%12.5e%12.5e&quot; % ( j[0], j[1] )
+                k = k + 1
+                if ( ( k % 3 ) == 0 ) : s = s + &quot;\n&quot;
+        if ( ( k % 3 ) != 0 ) : s = s + &quot;\n&quot;
+        return s
+
+<div class="viewcode-block" id="bdfls_flux.plot"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_flux.plot">[docs]</a>    def plot( self, xMin = None, xMax = None, yMin = None, yMax = None, xylog = 0, xLabel = None, yLabel = None,
+        title = None, style = &quot;lines&quot; ) :
+        &quot;&quot;&quot;Plots the fluxes
+
+xylog meanings::
+    xylog   plot-type
+   -----------------------
+      0     linear-linear
+      1     log-linear
+      2     linear-log
+      3     log-log&quot;&quot;&quot;
+
+        if ( xLabel is None ) : xLabel = &#39;Energy (MeV)&#39;
+        if ( yLabel is None ) : yLabel = &#39;A. U.&#39;
+        dt = plotbase.parsePlotOptions( xMin, xMax, yMin, yMax, xLabel, yLabel, title )
+        f = fudgeFileMisc.fudgeTempFile( )
+        for lGroup in self.EF_l:
+            for p in lGroup: f.write( &#39;   &#39;.join( map( str, p ) ) + &#39;\n&#39; )
+            f.write( &#39;\n&#39; )
+        f.close( )
+        p = os.path.join( __file__.split( &#39;fudge/processing/&#39; )[0], &quot;fudge&quot;, &quot;vis&quot;, &quot;gnuplot&quot;, &quot;endl2dplot.py&quot; )
+        s = [ &#39;python&#39;, p, &#39;xylog&#39;, str( xylog ) ] + dt + [ f.getName( ) ]
+        subprocessing.spawn( s )</div>
+
+<div class="viewcode-block" id="bdfls_flux.read"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_flux.read">[docs]</a>    def read( self, f ) :
+        &quot;&quot;&quot;Reads in the next flux from a bdfls file. Sets self&#39;s id to None if no more fluxes to read in.&quot;&quot;&quot;
+
+        ( self.id, self.label ) = bdfls_read_int_label( f, 1, &quot;bdfls_flux.read&quot;, &quot;flux&quot;, &quot;flux id&quot; )
+        if( self.id is None ) : return
+        self.name = &#39;LLNL_fid_%d&#39; % self.id
+        ( self.lMax, l ) = bdfls_read_int_label( f, 0, &quot;bdfls_flux.read&quot;, &quot;flux&quot;, &quot;lMax&quot; )
+        self.EF_l = []
+        self.n = []
+        r = range( self.lMax + 1 )
+        for i in r :
+            ( n, l ) = bdfls_read_int_label( f, 0, &quot;bdfls_flux.read&quot;, &quot;flux&quot;, &quot;number of flux points&quot; )
+            self.n.append( n / 2 )
+        for i in r :
+            j = 0
+            EF = []
+            while ( j &lt; self.n[i] ) :
+                if ( ( j % 3 ) == 0 ) :
+                    l = f.readline( )
+                    if ( l == &quot;&quot; ) : raise Exception( f.errMsg( &#39;bdfls_flux.__init__&#39;, &#39;EOD while reading flux data&#39; ) )
+                    if ( l == bdfls_EOD ) : f.errMsg( &#39;bdfls_flux.__init__&#39;, &#39;EOD detected while reading flux data&#39; )
+                    k = 0
+                EF.append( [ float( l[k:k+12] ), float( l[k+12:k+24] ) ] )
+                k = k + 24
+                j = j + 1
+            self.EF_l.append( EF )</div></div>
+
+<div class="viewcode-block" id="bdfls_mass"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_mass">[docs]</a>class bdfls_mass :
+    &quot;&quot;&quot;A class that contains a single za and mass datum.&quot;&quot;&quot;
+
+    def __init__( self, f_or_za, mass = None, format = &#39;old&#39; ) :
+        &quot;&quot;&quot;f_or_za must be an integer for the za or an opened python file
+        that is a bdfls file positioned at a mass datum. If f_or_za
+        is an integer then mass is its mass; otherwise, the za and mass are
+        read in from the file.&quot;&quot;&quot;
+
+        if ( type( f_or_za ) == type( 1 ) ) :
+            self.za = f_or_za
+            self.mass = mass
+        else :
+            self.read( f_or_za )
+        self.format = format
+
+    def __repr__( self ) :
+        &quot;&quot;&quot;Returns a string of the za and mass as they would appear in a bdfls file.&quot;&quot;&quot;
+
+        if( self.format == &#39;old&#39; ) :
+            s = &quot;    %6.4d&quot; % self.za
+            if ( self.mass == 0 ) :
+                s = s + &quot;    0.&quot;
+            elif ( self.mass &lt; 1. ) :
+                s = s + &quot;%14.8f&quot; % self.mass
+            elif ( self.mass &gt; ( 1.e4 - 1e-6 ) ) :
+                if   ( self.mass &lt;= ( 1.e5  - 1e-6 ) ) :
+                    s = s + &quot;%12.5f&quot; % self.mass
+                elif ( self.mass &lt;= ( 1.e6  - 1e-5 ) ) :
+                    s = s + &quot;%12.4f&quot; % self.mass
+                elif ( self.mass &lt;= ( 1.e7  - 1e-4 ) ) :
+                    s = s + &quot;%12.3f&quot; % self.mass
+                elif ( self.mass &lt;= ( 1.e8  - 1e-3 ) ) :
+                    s = s + &quot;%12.2f&quot; % self.mass
+                elif ( self.mass &lt;= ( 1.e9  - 1e-2 ) ) :
+                    s = s + &quot;%12.1f&quot; % self.mass
+                elif ( self.mass &lt;= ( 1.e10 - 1e-1 ) ) :
+                    s = s + &quot;%12.0f&quot; % self.mass
+                else :
+                    s = s + &quot;%12.5e&quot; % self.mass
+            else :
+                s = s + &quot;%12.6f&quot; % self.mass
+                if ( ( ( self.za % 1000 ) == 0 ) or ( self.za == 99120 ) or ( self.za == 99125 ) ) :
+                    while ( s[-1] == &#39;0&#39; ) :
+                        if ( s[-2] == &quot;.&quot; ) : break
+                        s = s[:-1]
+        elif( self.format == &#39;Audi2003&#39; ) :
+            s = &quot;    %6d&quot; % self.za
+            d = &#39; %17.12f&#39; % self.mass
+            try :
+                while( d[-1] == &#39;0&#39; ) : d = d[:-1]
+            except :
+                fudgemisc.printWarning( d )
+                raise
+            s += d
+        else :
+            raise Exception( &#39;\nError in bdfls.bdfls_mass.__repr__: bad format = &quot;%s&quot;&#39; % self.format )
+        return s
+
+<div class="viewcode-block" id="bdfls_mass.read"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_mass.read">[docs]</a>    def read( self, f ) :
+        &quot;&quot;&quot;Reads in the next mass datum from the bdfls file. Returns the tuple (za, mass) or
+        (None, None) if at end of mass data.&quot;&quot;&quot;
+
+        ( self.za, self.mass ) = bdfls_read_int_float( f, &quot;bdfls_mass.read&quot;, &quot;mass&quot; )</div></div>
+
+<div class="viewcode-block" id="bdfls_halflife"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_halflife">[docs]</a>class bdfls_halflife :
+    &quot;&quot;&quot;A class that contains a single za and halflife datum.&quot;&quot;&quot;
+
+    def __init__( self, f_or_za, halflife = None ) :
+        &quot;&quot;&quot;f_or_za must be an integer for the za or an opened python file
+        that is a bdfls file positioned at a halflife datum. If f_or_za
+        is an integer then halflife is its halflife; otherwise, the za and halflife are
+        read in from the file.&quot;&quot;&quot;
+
+        if ( type( f_or_za ) == type( 1 ) ) :
+            self.za = f_or_za
+            self.halflife = halflife
+        else :
+            self.read( f_or_za )
+
+    def __repr__( self ) :
+        &quot;&quot;&quot;Returns a string of the za and halflife as they would appear in a bdfls file.&quot;&quot;&quot;
+
+        if ( self.halflife is None ) :
+            s = &quot;    %6d&quot; % self.za
+        else :
+            s = &quot;    %6d%12.4e&quot; % ( self.za, self.halflife )
+        return s
+
+<div class="viewcode-block" id="bdfls_halflife.read"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_halflife.read">[docs]</a>    def read( self, f ) :
+        &quot;&quot;&quot;Reads in the next halflife datum from the bdfls file. Set za and halflife 
+        to None if at end of halflife data.&quot;&quot;&quot;
+
+        ( self.za, self.halflife ) = bdfls_read_int_float( f, &quot;bdfls_halflife.read&quot;, &quot;halflife&quot; )</div></div>
+
+<div class="viewcode-block" id="bdfls_constant"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_constant">[docs]</a>class bdfls_constant :
+    &quot;&quot;&quot;A class that contains a single constant datum.&quot;&quot;&quot;
+
+    def __init__( self, f ) :
+        &quot;&quot;&quot;f must be an opened python file that is a bdfls file positioned at a constant datum.&quot;&quot;&quot;
+
+        self.read( f )
+
+    def __repr__( self ) :
+        &quot;&quot;&quot;Returns a string of the constant as it would appear in a bdfls file.&quot;&quot;&quot;
+
+        return &quot;%15.8e $%s\n&quot; % ( self.value, self.label )
+
+<div class="viewcode-block" id="bdfls_constant.read"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_constant.read">[docs]</a>    def read( self, f ) :
+        &quot;&quot;&quot;Reads in the next constand datum from the bdfls file. Sets self&#39;s value to None if at end of constant data.&quot;&quot;&quot;
+
+        self.value = None
+        self.label = &quot;&quot;
+        l = f.readline( )
+        if ( l == bdfls_EOD ) : return
+        i = string.find( l, &quot;$&quot; )
+        if ( i == -1 ) : raise Exception( f.errMsg( &#39;bdfls_constant.read&#39;, &#39;missing $&#39; ) )
+        try :
+            self.value = float( l[:i] )
+        except :
+            raise Exception( f.errMsg( &#39;bdfls_constant.read&#39;, &#39;converting constant to float&#39; ) )
+        self.label = l[i+1:-1]</div></div>
+
+<div class="viewcode-block" id="bdfls_temperature"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_temperature">[docs]</a>class bdfls_temperature :
+    &quot;&quot;&quot;A class that contains a temperaure datum.&quot;&quot;&quot;
+
+    def __init__( self, f ) :
+        &quot;&quot;&quot;f must be an opened python file that is a bdfls file positioned at a temperature datum.&quot;&quot;&quot;
+
+        self.read( f )
+
+    def __repr__( self ) :
+        &quot;&quot;&quot;Returns a string of the temperature data as they would appear in a bdfls file.&quot;&quot;&quot;
+
+        s = &quot;%4d %-74s*\n&quot; % ( self.id, self.label )
+        if ( len( s ) &gt; 81 ) : s = s[:79] + &quot;*\n&quot;
+        s = s + &quot;%4d                                                                           *\n&quot; % self.n
+        for i in self.ts : s = s + &quot;%s\n&quot; % i
+        return s
+
+<div class="viewcode-block" id="bdfls_temperature.read"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_temperature.read">[docs]</a>    def read( self, f ) :
+        &quot;&quot;&quot;Reads in the next temperature datum from the bdfls file. Set self&#39;s id
+        to None if at end of temerature data.&quot;&quot;&quot;
+
+        ( self.id, self.label ) = bdfls_read_int_label( f, 1, &quot;bdfls_temperature.read&quot;, &quot;temperature&quot;, &quot;temperature id&quot; )
+        if( self.id is None ) : return
+        ( self.n, l ) = bdfls_read_int_label( f, 0, &quot;bdfls_temperature.read&quot;, &quot;temperature&quot;, &quot;number of temperatures&quot; )
+        self.ts = []
+        i = 0
+        while i &lt; self.n :
+            l = f.readline( )
+            if ( l == &quot;&quot; ) : raise Exception( f.errMsg( &#39;bdfls_temperature.read&#39;, &#39;EOF while reading temperature data&#39; ) )
+            self.ts.append( l[:-1] )
+            i = i + string.count( l, &quot;,&quot; )
+            if ( l[-2] != &quot;,&quot; ) : break</div></div>
+
+<div class="viewcode-block" id="bdfls_subshell"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_subshell">[docs]</a>class bdfls_subshell :
+    &quot;&quot;&quot;A class that contains the subshell data.&quot;&quot;&quot;
+
+    def __init__( self, f ) :
+        &quot;&quot;&quot;f must be an opened python file that is a bdfls file positioned at a subshell data.&quot;&quot;&quot;
+
+        self.read( f )
+
+    def __repr__( self ) :
+        &quot;&quot;&quot;Returns a string of the subshell as it would appear in a bdfls file.&quot;&quot;&quot;
+
+        return( self.line )
+
+<div class="viewcode-block" id="bdfls_subshell.read"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_subshell.read">[docs]</a>    def read( self, f ) :
+        &quot;&quot;&quot;Reads in the subshell data from the bdfls file. Set self&#39;s line
+        to None if at end of subshell data.&quot;&quot;&quot;
+
+        self.line = None
+        l = f.readline( )
+        if ( l == &quot;&quot; ) : raise Exception( f.errMsg( &#39;bdfls_subshell.read&#39;, &#39;EOF while reading subshell data&#39; ) )
+        if ( l != bdfls_EOD ) : self.line = l</div></div>
+
+<div class="viewcode-block" id="bdfls_read_int_label"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_read_int_label">[docs]</a>def bdfls_read_int_label( f, allowEOD, callingRoutine, Str1, Str2 ) :
+
+    l = f.readline( )
+    if ( l == bdfls_EOD ) :
+        if ( allowEOD ) :
+            return ( None, None )
+        else :
+            raise Exception( f.errMsg( callingRoutine, &#39;EOD detected while reading %s&#39; % Str1 ) )
+    if ( l == &quot;&quot; ) : raise Exception( f.errMsg( callingRoutine, &#39;EOF while reading %s data&#39; % Str1 ) )
+    if ( len( l ) != 81 ) or ( l[79] != &quot;*&quot; ) : raise Exception( f.errMsg( callingRoutine, &#39;invalid %s line&#39; % Str2 ) )
+    try :
+        n = int( l[:4] )
+    except :
+        raise Exception( f.errMsg( callingRoutine, &#39;converting %s to integer&#39; % Str2 ) )
+    return( n, l[5:-2] )</div>
+
+<div class="viewcode-block" id="bdfls_read_int_float"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.bdfls_read_int_float">[docs]</a>def bdfls_read_int_float( f, callingRoutine, Str ) :
+
+    l = f.readline( )
+    if ( l == bdfls_mh_EOD ) : return( None, None )
+    if ( ( len( l ) == 81 ) and ( l[79] != &quot;*&quot; ) ) : raise Exception( f.errMsg( callingRoutine, &#39;invalid first za/%s line&#39;, Str ) )
+    if ( l[:4] != &quot;    &quot; ) : raise Exception( f.errMsg( callingRoutine, &#39;bad za/%s line&#39; % Str ) )
+    s = l.split( )
+    try :
+        za = int( s[0] )
+    except :
+        raise Exception( f.errMsg( callingRoutine, &#39;converting za to integer&#39; ) )
+    d = None
+    if ( len( s ) &gt; 1 ) :
+        try :
+            d = float( s[1] )
+        except :
+            raise Exception( f.errMsg( callingRoutine, &#39;converting mass to float &quot;%s&quot;&#39; % Str ) )
+    return( za, d )</div>
+
+<div class="viewcode-block" id="getDefaultBdfls"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.getDefaultBdfls">[docs]</a>def getDefaultBdfls( name = None, template = None ) :
+
+    global default_bdfls
+    if( default_bdfls is None ) :
+        if( name is None ) : name = &quot;bdfls.junk&quot;
+        default_bdfls = bdfls( name = name, template = template )
+    return( default_bdfls )</div>
+
+<div class="viewcode-block" id="getBdflsFile"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.bdfls.getBdflsFile">[docs]</a>def getBdflsFile( name = None ) :
+
+    return( bdfls( name = None, template = name ) )</div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

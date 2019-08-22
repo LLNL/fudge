@@ -63,56 +63,85 @@
 # 
 # <<END-copyright>>
 
-import argparse
-from fudge.legacy.converting.endfFileToGND import endfFileToGND
+import argparse, traceback, sys
 
-# Process command line options
-parser = argparse.ArgumentParser(description='Check an ENDF file')
-parser.add_argument('inFile', type=str, help='The ENDF file you want to check.' )
-parser.add_argument('-v', dest='verbose', default=False, action='store_true', help='Enable verbose output' )
-parser.add_argument('--skipCov',default=False,action='store_true',help='skip covariance checks' )
-parser.add_argument('--skipRes',default=False,action='store_true',help='skip resonance reconstruction and associated checks' )
-parser.add_argument('-o', dest='outFile', default=None, type=str, help='Output file prefix for gnd files (.gnd.xml and .gndCov.xml)' )
+def readEvaluation( filename, verbose=True, skipBadData=True, continuumSpectraFix=False ):
+    '''
+    Read in an evaluation in either Fudge/GND or ENDF and return result as Fudge classes
+    '''
 
-args = parser.parse_args()
+    firstline = open(filename).readline()
 
+    # Is the file a GND file?
+    if firstline.startswith( "<?xml" ):
+        import fudge.gnd
+        RS = fudge.gnd.reactionSuite.readXML( filename )
+        try:
+            CS = fudge.gnd.covariances.covarianceSuite.readXML( filename.replace( '.gnd.', '.gndCov.' ) )
+        except:
+            CS = None
+        return {'reactionSuite':RS, 'covarianceSuite':CS, 'errors':[]}
 
-if args.skipRes: raise NotImplementedError( "write skipRes option" )
+    # Maybe its an ENDF file?
+    elif firstline.endswith(' 0  0    0\n') or \
+            firstline.endswith(' 0  0    0\r') or \
+            firstline.endswith(' 0  0    0\r\n') or \
+            filename.endswith('.endf'):
+        from fudge.legacy.converting import endfFileToGND
+        return endfFileToGND.endfFileToGND( filename, toStdOut=verbose, skipBadData=skipBadData, continuumSpectraFix=continuumSpectraFix )
 
-# Now translate
-result = endfFileToGND( args.inFile, toStdOut=args.verbose, skipBadData=True )
-myEval=result['reactionSuite']
-myCov=result['covarianceSuite']
-print '\n\n'
+    # Failed!
+    else: print "WARNING: Unknown file type, not reading %s"% filename
 
-# Check the evaluation
-print "Errors encountered on read of "+args.inFile
-print "------------------------------------------------"
-print '\n'.join( result['errors'] )
-print '\n'
+def process_args():
+    '''Process command line options'''
+    parser = argparse.ArgumentParser(description='Check an ENDF or GND file')
+    parser.add_argument('inFile', type=str, help='The ENDF or GND file you want to check.' )
+    parser.add_argument('-v', dest='verbose', default=False, action='store_true', help='Enable verbose output' )
+    parser.add_argument('--skipCov',default=False,action='store_true',help='skip covariance checks' )
+    parser.add_argument('--skipEnergyBalance',default=False,action='store_true',help='skip energy balance checks' )
+    parser.add_argument('--skipRes',default=False,action='store_true',help='skip resonance reconstruction and associated checks' )
+    parser.add_argument('--traceback',default=False, action='store_true',help='on exception, print the python traceback')
+    parser.add_argument( "--continuumSpectraFix", default = False, action = "store_true", help = "Skip unnormalizeable continuum gamma distributions" )
+    return parser.parse_args()
 
-# Check the evaluation
-try:
-    print "Checking evaluation for "+args.inFile
+if __name__=="__main__":
+    args=process_args()
+
+    if args.skipRes: raise NotImplementedError( "write skipRes option" )
+
+    # Read the evaluation
+    print "\nErrors encountered on read of "+args.inFile
     print "------------------------------------------------"
-    print myEval.check()
-    print '\n'
-except Exception, err:
-    print "Checking evaluation failed, got", str(err)
-    print '\n'
+    result = readEvaluation( args.inFile, verbose=args.verbose, skipBadData=True, continuumSpectraFix=args.continuumSpectraFix )
+    myEval=result['reactionSuite']
+    myCov=result['covarianceSuite']
+    print '\n'.join( result['errors'] )
+    print '\n\n'
 
 
-# Check the covariance
-if not args.skipCov and myCov is not None:
+    # Check the evaluation
     try:
-        print "Checking covariances for "+args.inFile
+        print "Checking evaluation for "+args.inFile
         print "------------------------------------------------"
-        print myCov.check()
+        print myEval.check(checkEnergyBalance=not args.skipEnergyBalance)
         print '\n'
     except Exception, err:
-        print "Checking covariance failed, got", str(err)
+        print "Checking evaluation failed, got", str(err)
         print '\n'
+        if args.traceback:
+            traceback.print_exc(file=sys.stdout)
 
-if args.outFile != None:
-    myEval.saveToFile( args.outFile+'.gnd.xml' )
-    if not args.skipCov: myCov.saveToFile( args.outFile+'.gndCov.xml' )
+
+    # Check the covariance
+    if not args.skipCov and myCov is not None:
+        try:
+            print "Checking covariances for "+args.inFile
+            print "------------------------------------------------"
+            print myCov.check()
+            print '\n'
+        except Exception, err:
+            print "Checking covariance failed, got", str(err)
+            print '\n'
+            if args.traceback:
+                traceback.print_exc(file=sys.stdout)

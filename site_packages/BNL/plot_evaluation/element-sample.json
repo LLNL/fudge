@@ -1,0 +1,40 @@
+{
+    "target":"Fe0",
+    "projectile":"n",
+    "legend":"Fe(natural)",
+    "lineStyle":"-",
+    "lineColor":"black",
+    "lineWidth":2,
+    "eMin":"1e-5 eV",
+    "eMax":"20 MeV",
+    "isotopes":{
+        "Fe54":{
+            "atomicFraction":5.85e-2,
+            "pathToFile":"/Users/davidbrown/Sites/endfb71.dev/neutrons/n-026_Fe_054.endf",
+            "legend":"Fe54",
+            "lineStyle":"-",
+            "lineWidth":1,
+            "lineColor":"red"},
+        "Fe56":{
+            "atomicFraction":91.75e-2,
+            "pathToFile":"/Users/davidbrown/Sites/endfb71.dev/neutrons/n-026_Fe_056.endf",
+            "legend":"Fe56",
+            "lineStyle":"-",
+            "lineWidth":1,
+            "lineColor":"blue"},
+        "Fe57":{
+            "atomicFraction":2.12e-2,
+            "pathToFile":"/Users/davidbrown/Sites/endfb71.dev/neutrons/n-026_Fe_057.endf",
+            "legend":"Fe57",
+            "lineStyle":"-",
+            "lineWidth":1,
+            "lineColor":"green"},
+        "Fe58":{
+            "atomicFraction":0.28e-2,
+            "pathToFile":"/Users/davidbrown/Sites/endfb71.dev/neutrons/n-026_Fe_058.endf",
+            "legend":"Fe58",
+            "lineStyle":"-",
+            "lineWidth":1,
+            "lineColor":"grey"}
+    }
+}

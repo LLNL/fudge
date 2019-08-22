@@ -63,6 +63,8 @@
 
 from fudge.core.utilities import brb
 
+from PoPs import IDs as IDsPoPsModule
+
 import fudge.particles.nuclear as nuclearModule
 import fudge.gnd.xParticle as xParticleModule
 
@@ -106,7 +108,7 @@ def ITYPE_6( Z, MTDatas, info, verbose = False ) :
             if( SUBK > 0 ) : secondAC = MT_AtomicConfigurations[534 + SUBK - 1]
             daughters = []
             if( SUBK == 0 ) :
-                daughters.append( 'photon' )
+                daughters.append( IDsPoPsModule.photon )
                 daughters.append( '%s{%s}' % ( elementSymbol, MT_AtomicConfigurations[534 + SUBJ - 1] ) )
             else :
                 daughters.append( 'e-' )

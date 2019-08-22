@@ -1,0 +1,24 @@
+<chemicalElement id="O" Z="8" name="Oxygen">
+  <isotope id="O14" A="14"></isotope>
+  <isotope id="O15" A="15"></isotope>
+  <isotope id="O16" A="16">
+    <nuclearLevel id="O16_e0">
+      <mass>
+        <double label="base" value="15.9949146196" unit="amu"/></mass>
+      <nucleus id="o16_e0" index="0">
+        <energy>
+          <double label="base" value="0.0" unit="eV"/></energy></nucleus></nuclearLevel>
+    <nuclearLevel id="O16_e1">
+      <nucleus id="o16_e1" index="1">
+        <energy>
+          <double label="base" value="6049400.0" unit="eV"/></energy></nucleus></nuclearLevel>
+    <nuclearLevel id="O16_e2">
+      <nucleus id="o16_e2" index="2">
+        <energy>
+          <double label="base" value="6129893.0" unit="eV"/></energy></nucleus></nuclearLevel>
+    <nuclearLevel id="O16_e3">
+      <nucleus id="o16_e3" index="3">
+        <energy>
+          <double label="base" value="6917100.0" unit="eV"/></energy></nucleus></nuclearLevel></isotope>
+  <isotope id="O17" A="17"></isotope>
+  <isotope id="O18" A="18"></isotope></chemicalElement>

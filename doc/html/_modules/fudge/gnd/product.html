@@ -1,0 +1,530 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.gnd.product &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.gnd.product</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the product class.</span>
+
+<span class="sd">GND classes store reaction data in a hierarchical format. At the top is the product class. Next is the</span>
+<span class="sd">channel, representing the reaction output channels. An output channel contains the Q-value and a list</span>
+<span class="sd">of outgoing products (some of which may decay into other particles).</span>
+<span class="sd">The channel is stored inside the reaction class, which consists of an input and output channel together,</span>
+<span class="sd">(e.g. n_1 + O_16  --&gt; H_1 + N_16). Finally, the reactionSuite class is used to store a list of reaction</span>
+<span class="sd">for a given input channel (that is, for the incoming particles that come together in the reaction).</span>
+<span class="sd">The following outline summarizes the classes.</span>
+
+<span class="sd">:product:</span>
+<span class="sd">    Outgoing particle, including multiplicity and distribution information.</span>
+
+<span class="sd">:channel:</span>
+<span class="sd">    A Q-value plus a list of products.</span>
+
+<span class="sd">:reaction:</span>
+<span class="sd">    Contains a cross section (defined in the gnd.reactionData.crossSection module), along with</span>
+<span class="sd">    an outgoing channel which must be one of the classes defined in gnd.channels (e.g., 2n + Pu239).</span>
+<span class="sd">    </span>
+<span class="sd">:reactionSuite:</span>
+<span class="sd">    Contains all reactions sharing the same input channel (e.g. n + Pu239)</span>
+<span class="sd">    </span>
+<span class="sd">        (e.g., n + Pu239 --&gt; n + Pu239, n + Pu239 --&gt; n + Pu239_e1,</span>
+<span class="sd">        n + Pu239 --&gt; n + Pu239_e2, n + Pu239 --&gt; 2n + Pu239 ... )</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pqu</span> <span class="k">import</span> <span class="n">PQU</span> <span class="k">as</span> <span class="n">PQUModule</span>
+
+<span class="kn">from</span> <span class="nn">PoPs</span> <span class="k">import</span> <span class="n">IDs</span> <span class="k">as</span> <span class="n">IDsPoPsModule</span>
+
+<span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="k">import</span> <span class="n">brb</span>
+
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">ancestry</span> <span class="k">as</span> <span class="n">ancestryModule</span>
+<span class="kn">from</span> <span class="nn">xData</span> <span class="k">import</span> <span class="n">physicalQuantity</span> <span class="k">as</span> <span class="n">physicalQuantityModule</span>
+
+<span class="kn">from</span> <span class="nn">fudge.gnd</span> <span class="k">import</span> <span class="n">suites</span> <span class="k">as</span> <span class="n">suitesModule</span>
+
+<span class="kn">from</span> <span class="nn">.productData.distributions</span> <span class="k">import</span> <span class="n">distribution</span> <span class="k">as</span> <span class="n">distributionModule</span>
+<span class="kn">from</span> <span class="nn">.productData.distributions</span> <span class="k">import</span> <span class="n">unspecified</span> <span class="k">as</span> <span class="n">unspecifiedModule</span>
+<span class="kn">from</span> <span class="nn">.productData</span> <span class="k">import</span> <span class="n">multiplicity</span> <span class="k">as</span> <span class="n">multiplicityModule</span>
+<span class="kn">from</span> <span class="nn">.productData</span> <span class="k">import</span> <span class="n">energyDeposition</span> <span class="k">as</span> <span class="n">energyDepositionModule</span>
+<span class="kn">from</span> <span class="nn">.productData</span> <span class="k">import</span> <span class="n">momentumDeposition</span> <span class="k">as</span> <span class="n">momentumDepositionModule</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">channels</span> <span class="k">as</span> <span class="n">channelsModule</span>
+
+<span class="n">__metaclass__</span> <span class="o">=</span> <span class="nb">type</span>
+
+<div class="viewcode-block" id="product"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.product">[docs]</a><span class="k">class</span> <span class="nc">product</span><span class="p">(</span> <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the class for a gnd product. If the product can decay (e.g. for breakup reactions),</span>
+<span class="sd">    the resulting decay information is defined in the product outputChannel</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;product&#39;</span>
+    <span class="n">ancestryMembers</span> <span class="o">=</span> <span class="p">(</span> <span class="s1">&#39;multiplicity&#39;</span><span class="p">,</span> <span class="s1">&#39;distribution&#39;</span><span class="p">,</span> <span class="s1">&#39;outputChannel&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;energyDeposition&#39;</span><span class="p">,</span> <span class="s1">&#39;momentumDeposition&#39;</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">attributes</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">outputChannel</span> <span class="o">=</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Creates a new product object.&quot;&quot;&quot;</span>
+
+        <span class="n">ancestryModule</span><span class="o">.</span><span class="n">ancestry</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># lazy evaluation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">attributes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">attributes</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">addAttribute</span><span class="p">(</span> <span class="n">q</span><span class="p">,</span> <span class="n">attributes</span><span class="p">[</span><span class="n">q</span><span class="p">]</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">outputChannel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">addOutputChannel</span><span class="p">(</span> <span class="n">outputChannel</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span> <span class="o">=</span> <span class="n">multiplicityModule</span><span class="o">.</span><span class="n">component</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__energyDeposition</span> <span class="o">=</span> <span class="n">energyDepositionModule</span><span class="o">.</span><span class="n">component</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__energyDeposition</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__momentumDeposition</span> <span class="o">=</span> <span class="n">momentumDepositionModule</span><span class="o">.</span><span class="n">component</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__momentumDeposition</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__distribution</span> <span class="o">=</span> <span class="n">distributionModule</span><span class="o">.</span><span class="n">component</span><span class="p">(</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__distribution</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__cmp__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Compares self to other.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span>  <span class="mi">1</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">outputChannel</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">outputChannel</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span>  <span class="mi">1</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="mi">0</span> <span class="p">)</span>
+
+    <span class="k">def</span>  <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Converts product object to a string representation.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">simpleString</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__id</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">particle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findAttributeInAncestry</span><span class="p">(</span><span class="s1">&#39;PoPs&#39;</span><span class="p">)[</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__particle</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns self&#39;s label.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="p">)</span>
+
+    <span class="nd">@label</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">value</span><span class="p">,</span> <span class="nb">str</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;label must be a string&#39;</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">multiplicity</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__multiplicity</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">energyDeposition</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__energyDeposition</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">momentumDeposition</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__momentumDeposition</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">distribution</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__distribution</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="product.addOutputChannel"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.product.addOutputChannel">[docs]</a>    <span class="k">def</span> <span class="nf">addOutputChannel</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">outputChannel</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Adds outputChannel to particle.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">outputChannel</span><span class="p">,</span> <span class="n">channelsModule</span><span class="o">.</span><span class="n">channel</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">outputChannel</span><span class="o">.</span><span class="n">setAncestor</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="o">=</span> <span class="n">outputChannel</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span> <span class="s1">&#39;Invalid decay channel = </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">brb</span><span class="o">.</span><span class="n">getType</span><span class="p">(</span> <span class="n">outputChannel</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="product.addAttribute"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.product.addAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">addAttribute</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Add name and value to attribute list.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="product.convertUnits"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.product.convertUnits">[docs]</a>    <span class="k">def</span> <span class="nf">convertUnits</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unitMap</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="s2">&quot;See documentation for reactionSuite.convertUnits.&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="s1">&#39;originationLevel&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">originationLevel</span> <span class="o">=</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;originationLevel&#39;</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">originationLevel</span> <span class="o">=</span> <span class="n">physicalQuantityModule</span><span class="o">.</span><span class="n">physicalQuantity</span><span class="p">(</span> <span class="nb">float</span><span class="p">(</span> <span class="n">originationLevel</span> <span class="p">),</span> <span class="n">originationLevel</span><span class="o">.</span><span class="n">unit</span> <span class="p">)</span>
+            <span class="n">originationLevel</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;originationLevel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">originationLevel</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">significantDigits</span> <span class="o">=</span> <span class="mi">12</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energyDeposition</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">momentumDeposition</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">convertUnits</span><span class="p">(</span> <span class="n">unitMap</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="product.checkProductFrame"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.product.checkProductFrame">[docs]</a>    <span class="k">def</span> <span class="nf">checkProductFrame</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calls checkProductFrame for self&#39;s distributions and if present for its outputChannel.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">checkProductFrame</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">checkProductFrame</span><span class="p">(</span> <span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainMin</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">domainMin</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainMax</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">domainMax</span> <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">domainUnit</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">domainUnit</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="product.getLevelAsFloat"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.product.getLevelAsFloat">[docs]</a>    <span class="k">def</span> <span class="nf">getLevelAsFloat</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="mf">0.</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="nb">hasattr</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">particle</span><span class="p">,</span> <span class="s1">&#39;getLevelAsFloat&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">particle</span><span class="o">.</span><span class="n">getLevelAsFloat</span><span class="p">(</span> <span class="n">unit</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="n">default</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">default</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="product.getMass"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.product.getMass">[docs]</a>    <span class="k">def</span> <span class="nf">getMass</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the mass of the particle if possible, otherwise None is returned.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">particle</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span> <span class="n">unit</span> <span class="p">)</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="product.getAttribute"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.product.getAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">getAttribute</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns value for attribute name if it exists; otherwise, returns None.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="kc">None</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="product.calculateAverageProductData"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.product.calculateAverageProductData">[docs]</a>    <span class="k">def</span> <span class="nf">calculateAverageProductData</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">verbosity</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span>
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span>  <span class="o">+</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">]</span>
+        <span class="n">indent3</span> <span class="o">=</span> <span class="n">indent2</span> <span class="o">+</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">]</span>
+
+        <span class="n">reactionSuite</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;reactionSuite&#39;</span><span class="p">]</span>
+        <span class="n">energyUnit</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;incidentEnergyUnit&#39;</span><span class="p">]</span>
+        <span class="n">momentumDepositionUnit</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;momentumDepositionUnit&#39;</span><span class="p">]</span>
+        <span class="n">massUnit</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;massUnit&#39;</span><span class="p">]</span>
+        <span class="n">energyAccuracy</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;energyAccuracy&#39;</span><span class="p">]</span>
+        <span class="n">momentumAccuracy</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;momentumAccuracy&#39;</span><span class="p">]</span>
+
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;product&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">try</span> <span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;productMass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">PoPs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span> <span class="n">massUnit</span> <span class="p">)</span>
+        <span class="k">except</span> <span class="p">:</span>                        <span class="c1"># Can happend when mass is not needed for evaluation and hence not stored.</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;productMass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="nb">print</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">: label = </span><span class="si">%s</span><span class="s1">: calculating average product data&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">multiplicity</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">findFormMatchingDerivedStyle</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiplicity</span> <span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;multiplicity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">multiplicity</span><span class="o">.</span><span class="n">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="n">upperEps</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">8</span> <span class="p">)</span>
+            <span class="n">energyData</span><span class="p">,</span> <span class="n">momentumData</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">energyData</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">axes</span> <span class="o">=</span> <span class="n">energyDepositionModule</span><span class="o">.</span><span class="n">defaultAxes</span><span class="p">(</span> <span class="n">energyUnit</span> <span class="o">=</span> <span class="n">energyUnit</span> <span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">energyData</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">averageEnergy</span> <span class="o">=</span> <span class="n">energyDepositionModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="n">energyData</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> 
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="n">averageEnergy</span> <span class="o">=</span> <span class="n">energyDepositionModule</span><span class="o">.</span><span class="n">regions1d</span><span class="p">(</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">energyDataRegion</span> <span class="ow">in</span> <span class="n">energyData</span> <span class="p">:</span>
+                        <span class="n">averageEnergyRegion</span> <span class="o">=</span> <span class="n">energyDepositionModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="n">energyDataRegion</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span> <span class="p">)</span>
+                        <span class="n">averageEnergy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">averageEnergyRegion</span> <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">energyDeposition</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">averageEnergy</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">momentumData</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">axes</span> <span class="o">=</span> <span class="n">momentumDepositionModule</span><span class="o">.</span><span class="n">defaultAxes</span><span class="p">(</span> <span class="n">energyUnit</span> <span class="o">=</span> <span class="n">energyUnit</span><span class="p">,</span> <span class="n">momentumDepositionUnit</span> <span class="o">=</span> <span class="n">momentumDepositionUnit</span> <span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">momentumData</span> <span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">averageMomentum</span> <span class="o">=</span> <span class="n">momentumDepositionModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="n">momentumData</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> 
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="n">averageMomentum</span> <span class="o">=</span> <span class="n">momentumDepositionModule</span><span class="o">.</span><span class="n">regions1d</span><span class="p">(</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span> 
+                    <span class="k">for</span> <span class="n">momentumDataRegion</span> <span class="ow">in</span> <span class="n">momentumData</span> <span class="p">:</span>
+                        <span class="n">averageMomentumRegion</span> <span class="o">=</span> <span class="n">momentumDepositionModule</span><span class="o">.</span><span class="n">XYs1d</span><span class="p">(</span> <span class="n">data</span> <span class="o">=</span> <span class="n">momentumDataRegion</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span> <span class="p">)</span> 
+                        <span class="n">averageMomentum</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">averageMomentumRegion</span> <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">momentumDeposition</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="n">averageMomentum</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">calculateAverageProductData</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="n">indent3</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="product.processMC"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.product.processMC">[docs]</a>    <span class="k">def</span> <span class="nf">processMC</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">incrementalIndent</span> <span class="o">=</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">]</span>
+        <span class="n">verbosity</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="nb">print</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">: label = </span><span class="si">%s</span><span class="s1">: MC processing&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">processMC</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">processMC</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent2</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="product.processMultiGroup"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.product.processMultiGroup">[docs]</a>    <span class="k">def</span> <span class="nf">processMultiGroup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;incrementalIndent&#39;</span><span class="p">]</span>
+        <span class="n">verbosity</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;verbosity&#39;</span><span class="p">]</span>
+
+        <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+
+        <span class="n">doIt</span> <span class="o">=</span> <span class="ow">not</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">unspecifiedModule</span><span class="o">.</span><span class="n">form</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">doIt</span> <span class="ow">and</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">style</span><span class="o">.</span><span class="n">transportables</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="nb">print</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">: label = </span><span class="si">%s</span><span class="s1">: multiGroup processing&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+
+            <span class="n">productMass</span> <span class="o">=</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;masses&#39;</span><span class="p">][</span><span class="s1">&#39;Product&#39;</span><span class="p">]</span>             <span class="c1"># Save to restore later</span>
+            <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;masses&#39;</span><span class="p">][</span><span class="s1">&#39;Product&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getMass</span><span class="p">(</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;massUnit&#39;</span><span class="p">]</span> <span class="p">)</span>
+            <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;product&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;multiplicity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiplicity</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">energyDeposition</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">momentumDeposition</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span>
+            <span class="k">try</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent</span> <span class="p">)</span>
+            <span class="k">except</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;logFile&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="k">raise</span>
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="kn">import</span> <span class="nn">traceback</span>
+                    <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;logFile&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">toXLink</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">(</span> <span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="p">)</span>
+                    <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;failures&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;masses&#39;</span><span class="p">][</span><span class="s1">&#39;Product&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">productMass</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">processMultiGroup</span><span class="p">(</span> <span class="n">style</span><span class="p">,</span> <span class="n">tempInfo</span><span class="p">,</span> <span class="n">indent2</span> <span class="p">)</span>
+        <span class="k">del</span> <span class="n">tempInfo</span><span class="p">[</span><span class="s1">&#39;workFile&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="product.check"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.product.check">[docs]</a>    <span class="k">def</span> <span class="nf">check</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">info</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; check product multiplicity, distribution and breakup products (if applicable) &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">fudge.gnd</span> <span class="k">import</span> <span class="n">warning</span>
+        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">multWarnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">multWarnings</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s2">&quot;Multiplicity:&quot;</span><span class="p">,</span> <span class="n">multWarnings</span><span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;transportables&#39;</span><span class="p">]</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">hasData</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">missingDistribution</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">distributionWarnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">distributionWarnings</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s2">&quot;Distribution:&quot;</span><span class="p">,</span> <span class="n">distributionWarnings</span><span class="p">)</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parentIsTwoBody</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;isTwoBody&#39;</span><span class="p">]</span>
+            <span class="n">info</span><span class="p">[</span><span class="s1">&#39;isTwoBody&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="p">,</span> <span class="n">channelsModule</span><span class="o">.</span><span class="n">twoBodyOutputChannel</span> <span class="p">)</span>
+            <span class="k">for</span> <span class="n">decayProduct</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="p">:</span>
+                <span class="n">decayWarnings</span> <span class="o">=</span> <span class="n">decayProduct</span><span class="o">.</span><span class="n">check</span><span class="p">(</span> <span class="n">info</span> <span class="p">)</span>
+                <span class="k">if</span> <span class="n">decayWarnings</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">warning</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="s2">&quot;Decay product: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">decayProduct</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">decayWarnings</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">info</span><span class="p">[</span><span class="s1">&#39;isTwoBody&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">parentIsTwoBody</span> <span class="c1"># reset to parent channel</span>
+
+        <span class="k">return</span> <span class="n">warnings</span></div>
+
+<div class="viewcode-block" id="product.toXMLList"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.product.toXMLList">[docs]</a>    <span class="k">def</span> <span class="nf">toXMLList</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">indent2</span> <span class="o">=</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;incrementalIndent&#39;</span><span class="p">,</span> <span class="s1">&#39;  &#39;</span> <span class="p">)</span>
+
+        <span class="n">attributeString</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">q</span> <span class="ow">in</span> <span class="p">[</span> <span class="s1">&#39;discrete&#39;</span><span class="p">,</span> <span class="s1">&#39;decayRate&#39;</span><span class="p">,</span> <span class="s1">&#39;primary&#39;</span> <span class="p">]</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">attributeString</span> <span class="o">+=</span> <span class="s1">&#39; </span><span class="si">%s</span><span class="s1">=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">q</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">q</span><span class="p">]</span><span class="o">.</span><span class="n">toString</span><span class="p">(</span> <span class="n">keepPeriod</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">attributeString</span> <span class="o">+=</span> <span class="s1">&#39; </span><span class="si">%s</span><span class="s1">=&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">q</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">q</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&lt;</span><span class="si">%s</span><span class="s1"> name=&quot;</span><span class="si">%s</span><span class="s1">&quot; label=&quot;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">indent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">attributeString</span> <span class="p">)</span> <span class="p">]</span>
+
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energyDeposition</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">momentumDeposition</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">xmlString</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="n">indent2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span> <span class="p">)</span>
+        <span class="n">xmlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">xmlString</span> <span class="p">)</span></div>
+
+<div class="viewcode-block" id="product.toString"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.product.toString">[docs]</a>    <span class="k">def</span> <span class="nf">toString</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">simpleString</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">exposeGammaMultiplicity</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a string representation of self. If simpleString is True, the string contains only the final </span>
+<span class="sd">        particles, and not any intermediate particles.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">multiplicityString</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+
+            <span class="n">multiplicity</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span> <span class="ow">or</span> <span class="n">exposeGammaMultiplicity</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">_multiplicity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">evaluated</span>
+                <span class="k">if</span><span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">_multiplicity</span><span class="p">,</span> <span class="n">multiplicityModule</span><span class="o">.</span><span class="n">constant1d</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+                    <span class="n">iValue</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">_multiplicity</span><span class="o">.</span><span class="n">constant</span> <span class="p">)</span>
+                    <span class="k">if</span><span class="p">(</span> <span class="n">iValue</span> <span class="o">==</span> <span class="n">_multiplicity</span><span class="o">.</span><span class="n">constant</span> <span class="p">)</span> <span class="p">:</span>
+                        <span class="k">if</span><span class="p">(</span> <span class="n">iValue</span> <span class="o">!=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="n">multiplicity</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">iValue</span>
+                    <span class="k">else</span> <span class="p">:</span>
+                        <span class="n">multiplicity</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">multiplicity</span><span class="o">.</span><span class="n">constant</span>
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="n">multiplicity</span> <span class="o">=</span> <span class="s1">&#39;m(E)*&#39;</span>
+            <span class="k">return</span><span class="p">(</span> <span class="n">multiplicity</span> <span class="p">)</span>
+
+        <span class="n">multiplicity</span> <span class="o">=</span> <span class="n">multiplicityString</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">simpleString</span> <span class="o">==</span> <span class="kc">True</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">productName</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">multiplicity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="p">)</span>
+        <span class="k">else</span> <span class="p">:</span>
+            <span class="n">productName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span>
+            <span class="n">qs</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="s1">&#39;[&#39;</span>
+            <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span> <span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span> <span class="n">q</span> <span class="o">==</span> <span class="s1">&#39;ENDFconversionFlag&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">[</span><span class="n">q</span><span class="p">]</span>
+                <span class="n">qs</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">%s%s</span><span class="s2">:&#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">c</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">v</span> <span class="p">)</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">qs</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">qs</span> <span class="o">+=</span> <span class="s1">&#39;]&#39;</span>
+            <span class="n">productName</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">multiplicity</span><span class="p">,</span> <span class="n">productName</span><span class="p">,</span> <span class="n">qs</span> <span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">productName</span> <span class="o">=</span> <span class="s1">&#39;(</span><span class="si">%s</span><span class="s1"> -&gt; </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">productName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputChannel</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">productName</span> <span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="product.parseXMLNode"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.product.parseXMLNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">productElement</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Translate a &lt;product&gt; element from xml.&quot;&quot;&quot;</span>
+
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">[@label=&quot;</span><span class="si">%s</span><span class="s1">&quot;]&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">productElement</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">productElement</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="s1">&#39;label&#39;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="n">productElement</span><span class="o">.</span><span class="n">items</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">prod</span> <span class="o">=</span> <span class="n">product</span><span class="p">(</span> <span class="nb">id</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="s1">&#39;name&#39;</span> <span class="p">),</span> <span class="n">label</span> <span class="o">=</span> <span class="n">attrs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="s1">&#39;label&#39;</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">prod</span><span class="o">.</span><span class="n">multiplicity</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">productElement</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">multiplicityModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span> <span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="n">prod</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">productElement</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">distributionModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span> <span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="n">outputChannel</span> <span class="o">=</span> <span class="n">productElement</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">channelsModule</span><span class="o">.</span><span class="n">outputChannelToken</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">outputChannel</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">prod</span><span class="o">.</span><span class="n">addOutputChannel</span><span class="p">(</span> <span class="n">channelsModule</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">outputChannel</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">(</span> <span class="s1">&#39;decayRate&#39;</span><span class="p">,</span> <span class="s1">&#39;primary&#39;</span><span class="p">,</span> <span class="s1">&#39;discrete&#39;</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">prod</span><span class="o">.</span><span class="n">attributes</span> <span class="o">=</span> <span class="n">attrs</span>
+
+        <span class="n">depositionEnergyToken</span> <span class="o">=</span> <span class="n">energyDepositionModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">productElement</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">depositionEnergyToken</span> <span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">prod</span><span class="o">.</span><span class="n">energyDeposition</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">productElement</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">depositionEnergyToken</span> <span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="n">depositionMomentumToken</span> <span class="o">=</span> <span class="n">momentumDepositionModule</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">moniker</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">productElement</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">depositionMomentumToken</span> <span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">prod</span><span class="o">.</span><span class="n">momentumDeposition</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">productElement</span><span class="o">.</span><span class="n">find</span><span class="p">(</span> <span class="n">depositionMomentumToken</span> <span class="p">),</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span> <span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">prod</span> <span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="products"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.products">[docs]</a><span class="k">class</span> <span class="nc">products</span><span class="p">(</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">suite</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">moniker</span> <span class="o">=</span> <span class="s1">&#39;products&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+
+        <span class="n">suitesModule</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="p">(</span> <span class="n">product</span><span class="p">,</span> <span class="p">)</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="products.uniqueLabel"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.product.products.uniqueLabel">[docs]</a>    <span class="k">def</span> <span class="nf">uniqueLabel</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">product</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If product&#39;s label is the same as another product&#39;s label in self, construct a new unique label</span>
+<span class="sd">        based on product&#39;s name appended with &#39;__&#39; and one or more lower case letters (i.e., &#39;a&#39; to &#39;z&#39;).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">product</span><span class="o">.</span><span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">product</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">id</span>
+        <span class="k">return</span><span class="p">(</span> <span class="n">suitesModule</span><span class="o">.</span><span class="n">suite</span><span class="o">.</span><span class="n">uniqueLabel</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">product</span> <span class="p">)</span> <span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

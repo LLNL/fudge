@@ -1,0 +1,28 @@
+% mapping to laboratory coordinates
+\begin{center}
+
+\begin{tikzpicture}
+% the triangle
+  \draw[-{>[scale=2.5,
+          length=5,
+          width=3]},line width=0.4pt] (0, 0) -- (7.5, 3);
+  \draw[-{>[scale=2.5,
+          length=5,
+          width=3]},line width=0.4pt] (0, 0) -- (6, 0);
+  \draw[-{>[scale=2.5,
+          length=5,
+          width=3]},line width=0.4pt] (6, 0) -- (7.5, 3);
+ % \draw[->, stealth, line width=0.4pt] (6, 0) -- (7.5, 3);
+\draw (6, 0) -- (7.8, 0);
+  \draw ( 1.2, 0) arc (0: 21.8: 1.2);
+  \draw (6.8, 0) arc (0: 63.43: 0.8);
+% labels
+  \node [below] at (3.5, -0.15) {$\Vtrans$};
+  \node [above] at (3.6, 1.7) {$\Vlab'$};
+  \node [right] at (6.9, 1.6) {$\Vcm'$};
+  \node [right] at (1.4, 0.4) {$\cos^{-1} \mulab$};
+  \node [right] at (6.9, 0.6){$\cos^{-1} \mucm$};
+\end{tikzpicture}
+\caption{Newtonian mapping to laboratory coordinates}
+\label{Fig:2-body-boost}
+\end{center} 

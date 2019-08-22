@@ -65,7 +65,6 @@ from xData import axes as axesModule
 from xData import XYs as XYsModule
 from xData import gridded as griddedModule
 
-from fudge.gnd import miscellaneous as miscellaneousModule
 from fudge.gnd import tokens as tokensModule
 from fudge.gnd import abstractClasses as abstractClassesModule
 
@@ -73,17 +72,40 @@ import base as baseModule
 
 __metaclass__ = type
 
+def defaultAxes( energyUnit ) :
+
+    axes = axesModule.axes( rank = 2 )
+    axes[0] = axesModule.axis( 'energy_available', 0, energyUnit )
+    axes[1] = axesModule.axis( 'energy_in', 1, energyUnit )
+    return( axes )
+
 class baseAvailableEnergyForm( abstractClassesModule.form ) :
 
     pass
 #
 # availableEnergy forms
 #
-class multiGroup( baseAvailableEnergyForm, griddedModule.gridded ) :
+class XYs1d( baseAvailableEnergyForm, XYsModule.XYs1d ) :
+
+    mutableYUnit = False
 
     def __init__( self, **kwargs ) :
 
-        griddedModule.gridded.__init__( self, **kwargs )
+        XYsModule.XYs1d.__init__( self, **kwargs )
+
+    def processMultiGroup( self, style, tempInfo, indent ) :
+
+        from fudge.processing import miscellaneous as miscellaneousModule
+
+        if( tempInfo['verbosity'] > 2 ) : print '%sMulti-grouping XYs1d available energy' % indent
+
+        return( miscellaneousModule.groupFunctionCrossSectionAndFlux( gridded1d, style, tempInfo, self ) )
+
+class gridded1d( baseAvailableEnergyForm, griddedModule.gridded1d ) :
+
+    def __init__( self, **kwargs ) :
+
+        griddedModule.gridded1d.__init__( self, **kwargs )
 #
 # availableEnergy component
 #
@@ -93,33 +115,24 @@ class component( abstractClassesModule.component ) :
 
     def __init__( self ) :
 
-        abstractClassesModule.component.__init__( self, ( multiGroup, ) )
+        abstractClassesModule.component.__init__( self, ( XYs1d, gridded1d, ) )
 
-    def makeGrouped( self, processInfo, tempInfo ) :
-
-        projectile, target = processInfo.getProjectileName( ), processInfo.getTargetName( )
-        groups = processInfo.getParticleGroups( projectile )
-        energyUnit = tempInfo['crossSection'].domainUnit( )
-        axes = axesModule.axes( labelsUnits = { 0 : [ 'energy_in', energyUnit ], 1 : [ 'energy', energyUnit ] } )
-        domainMin, domainMax = tempInfo['crossSection'].domain( )
-        energy = XYsModule.XYs1d( data = [ [ domainMin, domainMin ], [ domainMax, domainMax ] ], axes = axes, accuracy = 1e-8 )
-        axes, grouped_ = miscellaneousModule.makeGrouped( self, processInfo, tempInfo, energy )
-        self.addForm( grouped( axes, grouped_ ) )
-        axes, grouped_ = miscellaneousModule.makeGrouped( self, processInfo, tempInfo, energy, normType = 'groupedFlux' )
-        self.addForm( groupedWithCrossSection( axes, grouped_ ) )
-
-def parseXMLNode( element, linkData = {} ) :
+def parseXMLNode( element, xPath, linkData ) :
     """Reads an xml <availableEnergy> component element into fudge, including all forms in the component."""
+
+    xPath.append( element.tag )
 
     aec = component()
     for form in element:
         formClass = {
-                tokensModule.groupedFormToken :                   multiGroup,
+                XYs1d.moniker : XYs1d,
+                gridded1d.moniker : gridded1d,
             }.get( form.tag )
         if( formClass is None ) : raise Exception( "encountered unknown availableEnergy form: %s" % form.tag )
         try :
-            newForm = formClass.parseXMLNode( form, linkData )
+            newForm = formClass.parseXMLNode( form, xPath, linkData )
         except Exception as e:
             raise Exception, "availableEnergy/%s: %s" % (form.tag, e)
-        aec.addForm( newForm )
+        aec.add( newForm )
+    xPath.pop()
     return aec

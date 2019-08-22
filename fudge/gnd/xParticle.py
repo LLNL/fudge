@@ -108,6 +108,11 @@ class base( ancestryModule.ancestry ) :
 
         return self.__name
 
+    @property
+    def id( self ) :
+
+        return self.__name
+
 class particle( base ):
     """
     Base class for particles.
@@ -601,13 +606,17 @@ class spin:
         elif type(spin) == str:
             match = re.search(self._re, spin)
             if not match:
-                raise ValueError( "Cannot decipher spin from string: %s" % spin )
-            num,den = match.groups()
-            #self.spin = float(num)/(2 if den else 1) # this is such a pretty construction that I hate to remove it for Python 2.4
-            if den: self.value = float(num)/(2)
-            else:   self.value = float(num)/(1)
+                try:
+                    self.value=float(spin)
+                except:
+                    raise ValueError( "Cannot decipher spin from string: '%s'" % spin )
+            else:
+                num,den = match.groups()
+                #self.spin = float(num)/(2 if den else 1) # this is such a pretty construction that I hate to remove it for Python 2.4
+                if den: self.value = float(num)/(2)
+                else:   self.value = float(num)/(1)
         else:
-            if not ( spin * 2 ).is_integer() :
+            if not ( spin * 2. ).is_integer() :
                 raise ValueError( "Spin '%g' is not supported (must be integer or half-integer)" % spin )
             self.value = spin
     

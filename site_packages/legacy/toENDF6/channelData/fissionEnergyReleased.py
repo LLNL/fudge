@@ -61,39 +61,36 @@
 # 
 # <<END-copyright>>
 
-import fudge.gnd.channelData.fissionEnergyReleased as fissionEnergyReleasedModule
+from fudge.gnd.channelData import fissionEnergyReleased as fissionEnergyReleasedModule
 
-import site_packages.legacy.toENDF6.endfFormats as endfFormatsModule
+from .. import endfFormats as endfFormatsModule
 
 #
 # component
 #
-def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
+def toENDF6( self, endfMFList, flags, targetInfo ) :
 
-    self.forms[targetInfo['style']].toENDF6( MT, endfMFList, flags, targetInfo )
+    order = len( self.promptProductKE.data.coefficients )-1
 
-fissionEnergyReleasedModule.component.toENDF6 = toENDF6
+    energyReleaseTerms = (
+        'promptProductKE',      'promptNeutronKE',      'delayedNeutronKE', 'promptGammaEnergy',
+        'delayedGammaEnergy',   'delayedBetaEnergy',    'neutrinoEnergy',   'nonNeutrinoEnergy',
+        'totalEnergy')
 
-#
-# polynomial
-#
-def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
-
-    n, data = self.order + 1, {}
+    n, data = order+1, {}
     for i in xrange( n ) :
         data[i] = []
-        for index, label in enumerate( self.labels ) :
-            d = self.data[label][i][0]
-            u = 0
-            if( self.hasUncertainties ) : u = self.data[label][i][1]
-            data[i].append( d )
-            data[i].append( u )
+# BRBBRB: need to convert to eV.
+        for term in energyReleaseTerms:
+            polynomial = getattr( self, term ).data
+            data[i] += [ polynomial.coefficients[i], polynomial.uncertainties[0].data.coefficients[i] ]
     list = []
     for i in xrange( n ) : list += data[i]
 
-    endfMFList[MT][458] = [ endfFormatsModule.endfContLine( targetInfo['ZA'], targetInfo['mass'], 0, 0, 0, 0 ) ]
-    endfMFList[MT][458].append( endfFormatsModule.endfContLine( 0, 0, 0, self.order, 18 * n, 9 * n ) )
-    endfMFList[MT][458] += endfFormatsModule.endfDataList( list )
-    endfMFList[MT][458].append( endfFormatsModule.endfSENDLineNumber( ) )
+    endfMFList[1][458] = [ endfFormatsModule.endfContLine( targetInfo['ZA'], targetInfo['mass'], 0, 0, 0, 0 ) ]
+    endfMFList[1][458].append( endfFormatsModule.endfContLine( 0, 0, 0, order, 18 * n, 9 * n ) )
+    endfMFList[1][458] += endfFormatsModule.endfDataList( list )
+    endfMFList[1][458].append( endfFormatsModule.endfSENDLineNumber( ) )
 
-fissionEnergyReleasedModule.polynomial.toENDF6 = toENDF6
+
+fissionEnergyReleasedModule.fissionEnergyReleased.toENDF6 = toENDF6

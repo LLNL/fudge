@@ -74,6 +74,11 @@ __version__ = '%s.%s.%s' % ( FUDGE_MAJORVERSION, FUDGE_MINORVERSION, FUDGE_PATCH
 __docformat__ = 'epytext en'
 from __doc__ import __doc__
 
+try:
+    import numericalFunctions
+except ImportError:
+    raise ImportError("Cannot import required modules! Have extensions been compiled?")
+
 import fudgeDefaults
 import fudgeParameters
 from core import *

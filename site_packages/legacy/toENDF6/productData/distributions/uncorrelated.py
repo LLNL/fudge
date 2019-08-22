@@ -61,19 +61,21 @@
 # 
 # <<END-copyright>>
 
-from fudge.core.utilities import brb
+from pqu import PQU as PQUModule
 
-import site_packages.legacy.toENDF6.endfFormats as endfFormatsModule
-import site_packages.legacy.toENDF6.gndToENDF6 as gndToENDF6Module
+from PoPs import IDs as IDsPoPsModule
+
+from xData import axes as axesModule
+from xData import regions as regionsModule
+from xData import standards as standardsModule
+
 import fudge.gnd.productData.distributions.uncorrelated as uncorrelatedModule
 import fudge.gnd.productData.distributions.energy as energyModule
 import fudge.gnd.productData.distributions.angular as angularModule
 import fudge.gnd.productData.distributions.energyAngular as energyAngularModule
 
-import pqu.PQU as PQUModule
-import xData.axes as axesModule
-import xData.regions as regionsModule
-import xData.standards as standardsModule
+from ... import endfFormats as endfFormatsModule
+from ... import gndToENDF6 as gndToENDF6Module
 
 #
 # form
@@ -91,13 +93,10 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     angularSubform = self.angularSubform.data
     if( isinstance( energySubform, energyModule.NBodyPhaseSpace ) ) :
         energySubform.toENDF6( MT, endfMFList, flags, targetInfo )
-    elif( isinstance( energySubform, energyModule.energyLoss ) ) :
-        frame, ENDFDataList = energySubform.toENDF6( MT, endfMFList, flags, targetInfo )
-        gndToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, 8, frame, ENDFDataList )
-    elif( targetInfo['product'].getAttribute( 'ENDFconversionFlag' ) in [ 'MF6', 'MF26' ] ) :
-        if( isinstance( energySubform, energyModule.constant ) ) :
+    elif( targetInfo['doMF4AsMF6'] ) :
+        if( isinstance( energySubform, ( energyModule.discreteGamma, energyModule.primaryGamma ) ) ) :
 # BRB - this needs to be checked.
-            if( targetInfo['product'].name != 'gamma' ) : raise ValueError( 'This logic is only for discete gammas' )
+            if( targetInfo['product'].id != IDsPoPsModule.photon ) : raise ValueError( 'This logic is only for discrete gammas' )
             energyForm = energyModule.form( self.label, frame, energySubform )
             angularForm = angularModule.form( self.label, frame, angularSubform )
             energyForm.toENDF6( MT, endfMFList, flags, targetInfo )
@@ -123,16 +122,18 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
                         xynew = region.copyDataToXYs()
                         xynew[0][0] *= 1.00000001
                         xyvals.extend( xynew )
-                    EIn_copy = EIn[0].copy( value=EIn.value, axes=EIn.axes )
+                    EIn_copy = EIn[0].copy( )
+                    EIn_copy.value = EIn.value
+                    EIn_copy.axes = EIn.axes.copy( )
                     EIn_copy.setData( xyvals )
                     EIn = EIn_copy
                 multiD_2d = energyAngularModule.XYs2d( value = EIn.value * EInFactor, interpolation = EIn.interpolation )
-                EpCls = EIn.copyDataToXYs( xUnitTo = 'eV', yUnitTo = '1/eV' )
+                EpCls = EIn.copyDataToXYs( )
                 for e_out, Cls in EpCls :
                     multiD_2d.append( energyAngularModule.Legendre( [ Cls ], value = e_out ) )
                 energyAngularSubform.append( multiD_2d )
             form = energyAngularModule.form( '', self.productFrame, energyAngularSubform )
-            if( targetInfo.dict.get( "gammaToENDF6" ) ) : return( form )
+            if( targetInfo.get( "gammaToENDF6" ) ) : return( form )
             form.toENDF6( MT, endfMFList, flags, targetInfo )
         elif( isinstance( energySubform, energyModule.XYs2d ) and isinstance( angularSubform, angularModule.XYs2d ) ) :
 
@@ -160,7 +161,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
             gndToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, frame, MF6 )
         else :
             raise Exception( 'uncorrelated.toENDF6 not supported for energy subform = %s and angular subform = %s' %
-                ( energySubform.label, angularSubform.label ) )
+                ( energySubform.moniker, angularSubform.moniker ) )
     else :                          # original data is in uncorrelated form
         if( MT not in [ 527, 528 ] ) :
             angularForm = angularModule.form( "", frame, self.angularSubform.data )

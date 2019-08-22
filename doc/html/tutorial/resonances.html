@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4.2. Resonances &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="4.3. Outgoing Distributions" href="outgoingDistributions.html" />
+    <link rel="prev" title="4.1. Cross sections" href="crossSections.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="outgoingDistributions.html" title="4.3. Outgoing Distributions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="crossSections.html" title="4.1. Cross sections"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="diggingDeeper.html" accesskey="U">4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="resonances">
+<h1>4.2. Resonances<a class="headerlink" href="#resonances" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="resolved">
+<h2>4.2.1. Resolved<a class="headerlink" href="#resolved" title="Permalink to this headline">¶</a></h2>
+<p>In the resolved resonance region, each resonance is listed along with partial widths for the various open outgoing
+reaction channels. From these parameters, cross sections for each open channel can be reconstructed.</p>
+<dl class="docutils">
+<dt>The following formalisms for storing resolved region resonance parameters are supported in GND:</dt>
+<dd><ul class="first last simple">
+<li>BreitWigner (used to store equivalent of LRF 1 and 2 in the ENDF-6 format)</li>
+<li>RMatrix (LRF 3 and 7)</li>
+</ul>
+</dd>
+</dl>
+<p>The Adler-Adler formalism (ENDF LRF 4) is still allowed in ENDF-6 formatted files, but no evaluations using
+this parameterization are present anymore in the ENDF/B-VII.1 library. Thus GND does not yet support Adler-Adler
+resonance parameters.</p>
+</div>
+<div class="section" id="unresolved">
+<h2>4.2.2. Unresolved<a class="headerlink" href="#unresolved" title="Permalink to this headline">¶</a></h2>
+<p>In the unresolved resonance region, the density of available excited nuclear states increases and resonances begin to
+overlap. Here, average widths and level densities are given as a function of resonance L and J values for each energy
+interval. From these parameters, an average cross section for each open channel can be reconstructed.</p>
+<p>While the ENDF-6 format supports several ways of storing unresolved resonance parameters, fundamentally they all use
+the Single-Level Breit Wigner approximation. GND always stored unresolved parameters in tables, containing partial
+widths for each energy interval, for each combination of resonance L and J.</p>
+</div>
+<div class="section" id="resonance-reconstruction">
+<h2>4.2.3. Resonance reconstruction<a class="headerlink" href="#resonance-reconstruction" title="Permalink to this headline">¶</a></h2>
+<p>Resonance reconstruction in <code class="docutils literal"><span class="pre">Fudge</span></code> is simple: starting with a reactionSuite instance, we use the
+&#8216;reconstructResonances&#8217; method. For example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge.gnd</span> <span class="k">import</span> <span class="n">reactionSuite</span><span class="p">,</span> <span class="n">styles</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RS</span> <span class="o">=</span> <span class="n">reactionSuite</span><span class="o">.</span><span class="n">readXML</span><span class="p">(</span> <span class="s2">&quot;gnd_formatted_file.xml&quot;</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">evalStyle</span> <span class="o">=</span> <span class="n">RS</span><span class="o">.</span><span class="n">styles</span><span class="o">.</span><span class="n">getEvaluatedStyle</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reconStyle</span> <span class="o">=</span> <span class="n">styles</span><span class="o">.</span><span class="n">crossSectionReconstructed</span><span class="p">(</span> <span class="s2">&quot;reconstructed&quot;</span><span class="p">,</span> <span class="n">derivedFrom</span><span class="o">=</span><span class="n">evalStyle</span><span class="o">.</span><span class="n">label</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RS</span><span class="o">.</span><span class="n">reconstructResonances</span><span class="p">(</span> <span class="n">reconStyle</span><span class="p">,</span> <span class="n">accuracy</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>This method reconstructs the pointwise cross section from resonance parameters, and then adds the background cross
+section to obtain the full cross section at all incident energies. The background is typically required since
+resonance parameters usually only apply at small incident energies. See the &#8216;resonancesWithBackground&#8217; section
+(need link to cross section page) for more detail.</p>
+<p>Before reconstructing resonances, we must create a new &#8216;style&#8217; associated with the reconstructed values.
+After reconstruction, cross sections for resonance reactions will have an additional data form with the label
+&#8220;reconstructed&#8221;.</p>
+<p>The &#8216;reconstructResonances&#8217; method takes two optional parameters. If an &#8216;accuracy&#8217; is supplied, extra points are added
+during reconstruction to ensure that the resulting cross section can be interpolated to the desired
+accuracy. The &#8216;verbose&#8217; option can be used to print out some details during resonance reconstruction.</p>
+<p>&#8216;reconstructResonances&#8217; is meant as an easy-to-use interface for resonance reconstruction. Under the covers, it uses
+the Python module at <code class="docutils literal"><span class="pre">fudge.processing.resonances.fudgeReconstructResonances</span></code>. For improved performance
+that module uses numpy, multiprocessing, and also some compiled extensions, written in C, that handle the most
+computationally intensive tasks.</p>
+</div>
+<div class="section" id="angular-distributions-from-resonances">
+<h2>4.2.4. Angular distributions from resonances<a class="headerlink" href="#angular-distributions-from-resonances" title="Permalink to this headline">¶</a></h2>
+<p>Modern resonance parameterizations can be used to describe not only the cross section as a function of incident
+energy, but also the outgoing angular distributions for products. For more detail, see section D.1.7.2 of the
+ENDF-6 manual (available at <a class="reference external" href="https://ndclx4.bnl.gov/gf/project/endf6man">https://ndclx4.bnl.gov/gf/project/endf6man</a>).</p>
+<p>Angular distribution reconstruction capability has not yet been added to <code class="docutils literal"><span class="pre">Fudge</span></code>, although we expect to add
+this feature soon.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">4.2. Resonances</a><ul>
+<li><a class="reference internal" href="#resolved">4.2.1. Resolved</a></li>
+<li><a class="reference internal" href="#unresolved">4.2.2. Unresolved</a></li>
+<li><a class="reference internal" href="#resonance-reconstruction">4.2.3. Resonance reconstruction</a></li>
+<li><a class="reference internal" href="#angular-distributions-from-resonances">4.2.4. Angular distributions from resonances</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="crossSections.html"
+                        title="previous chapter">4.1. Cross sections</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="outgoingDistributions.html"
+                        title="next chapter">4.3. Outgoing Distributions</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/resonances.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="outgoingDistributions.html" title="4.3. Outgoing Distributions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="crossSections.html" title="4.1. Cross sections"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="diggingDeeper.html" >4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code></a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

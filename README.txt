@@ -8,7 +8,7 @@ plus tools for testing and visualizing GND-formatted data.
 
 If you are encountering Fudge and GND for the first time, we strongly
 recommend you look at the html documentation and tutorial available inside the
-package at fudge-4.2.1/doc/html/index.html, where you will find much more
+package at fudge-4.2.2/doc/html/index.html, where you will find much more
 detail about installing and using the software.
 
 Contents of this README:
@@ -24,12 +24,14 @@ and is available for all platforms at www.python.org/getit
   To install the package:
     1) obtain the current version (available online at nuclear.llnl.gov), and place it on your system.
     2) to unzip the package, type
-        >tar -xvf fudge-4.2.1.tar.gz	(or latest version)
-    3) The unzipped directory is named 'fudge-4.2.1’ (or latest version). Navigate into the new directory, and type 
+        >tar -xvf fudge-4.2.2.tar.gz	(or latest version)
+    3) The unzipped directory is named 'fudge-4.2.2' (or latest version). Navigate into the new directory, and type 
         >make
-       this builds extra tools for better performance. If you encounter errors at this step, you can still use the ENDF
-       translation tool but advanced features will be unavailable.
-    3) You are now set to use Fudge! For advanced use, see the optional components below.
+       This builds extra tools for better performance. Please let us know about any errors or warnings encountered at this step.
+    4) [Optional] Build 'Merced', used for generating transfer matrices for deterministic transport:
+	>make merced
+       If you run into the error "'omp.h' file not found", please see below for suggestions.
+    5) You are now set to use Fudge! For advanced use, see the optional components below.
 
   [Optional] Extra python packages: For more advanced use, Fudge depends on these additional, optional packages:
     gnuplot and Gnuplot.py (for plotting, http://gnuplot-py.sourceforge.net)
@@ -49,13 +51,19 @@ the directory containing this README file:
   on Windows, the environment variable should be added to the registry (see for example
        http://www.support.tabs3.com/main/R10463.htm)
 
-  [Optional] Building Extensions: Fudge is primarily written in python, which is easily portable across many different
+  Building Extensions: Fudge is primarily written in python, which is easily portable across many different
 systems. Some advanced features of fudge (computationally intensive tasks) are however implemented in C, and
 must be compiled before use. To build these extensions, use the Makefile included in this directory:
     >make
 
   If you encounter trouble with installing, building extensions or setting environment variables, please let us know
      (email: mattoon1@llnl.gov)
+
+
+  Note for OS X users: Merced uses openMP threading, but the default c++ compiler on OS X does not support openMP.
+If you are running on OS X and wish to test out Merced, we recommend installing g++-mp-4.9
+(available through MacPorts), then compiling with
+    >make merced CXX=g++-mp-4.9
 
 
 2) Basic Use:
@@ -74,10 +82,7 @@ Usage:
   After running rePrint.py, you may wish to compare the original/new ENDF files using diff,kompare, etc:
     >diff test.endf6.orig.noLineNumbers test.endf6.noLineNumbers
 
-  See fudge-4.2.1/doc/GND_1.1_manual.pdf for a discussion of the most common differences between original/translated ENDF files
-
-  Another tool included in the release is 'rePrintSample.py'. This is very similar to rePrint, except it randomly picks 
-an ENDF-formatted file from the included samples.
+  See fudge-4.2.2/doc/GND_1.1_manual.pdf for a discussion of the most common differences between original/translated ENDF files
 
 3) Getting Help:
   Documentation in html is packaged along with Fudge. To view the documentation, open the file "doc/html/index.html"

@@ -35,12 +35,16 @@ def getReactions( reactionSuite, MT ):
 
 
 def getPointwiseCrossSection( reac ):
-    if   'linear'            in reac.crossSection.forms: return reac.crossSection['linear']
-    elif 'pointwise'         in reac.crossSection.forms: return reac.crossSection['pointwise']
-    elif 'piecewise'         in reac.crossSection.forms: return reac.crossSection['piecewise'].toPointwise_withLinearXYs(1e-8, 0)
-    elif 'weightedPointwise' in reac.crossSection.forms: return reac.crossSection['weightedPointwise'].toPointwise_withLinearXYs(1e-8, 0)
+    if   'linear'            in reac.crossSection.forms:
+        return reac.crossSection['linear']
+    elif 'pointwise'         in reac.crossSection.forms:
+        return reac.crossSection['pointwise']
+    elif 'piecewise'         in reac.crossSection.forms:
+        return reac.crossSection['piecewise'].toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-8 )
+    elif 'weightedPointwise' in reac.crossSection.forms:
+        return reac.crossSection['weightedPointwise'].toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-8 )
     elif 'resonancesWithBackground' in reac.crossSection.forms: # in case --noReconstruct option is used:
-        return reac.crossSection['resonancesWithBackground'].tabulatedData.toPointwise_withLinearXYs(1e-8, 0) 
+        return reac.crossSection['resonancesWithBackground'].tabulatedData.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-8 )
     return None
 
 

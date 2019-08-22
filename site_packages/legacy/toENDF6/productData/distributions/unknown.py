@@ -61,8 +61,9 @@
 # 
 # <<END-copyright>>
 
-import site_packages.legacy.toENDF6.gndToENDF6 as gndToENDF6Module
-import fudge.gnd.productData.distributions.unknown as unknownModule
+from fudge.gnd.productData.distributions import unknown as unknownModule
+
+from ... import gndToENDF6 as gndToENDF6Module
 
 def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 

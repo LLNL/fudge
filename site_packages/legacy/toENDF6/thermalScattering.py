@@ -61,32 +61,31 @@
 # 
 # <<END-copyright>>
 
-import endfFormats as endfFormatsModule
-import gndToENDF6
 import itertools
 
-import fudge.gnd.thermalScattering as thermalScatteringModule
+from fudge.gnd import thermalScattering as thermalScatteringModule
+
+from . import endfFormats as endfFormatsModule
+from . import gndToENDF6
 
 #
 # thermalScattering
 #
-def toENDF6( self, flags = {}, verbosityIndent = '' ):
+def toENDF6( self, flags = {}, verbosityIndent = '', covarianceSuite = None ):
     endfMFList = { 1 : { 451 : [] }, 7 : {} }
-    targetInfo = {'ZA':self.MAT + 100, 'mass':self.mass}
+    targetInfo = {'ZA':self.MAT + 100, 'mass':float(self.mass)}
     MAT = self.MAT
-    NSUB, NVER = 12, 7  # 12: thermal scattering sub-library, 7: ENDF/B-VII
+    NSUB, NVER = 12, 8  # 12: thermal scattering sub-library, 8: ENDF/B-VIII
 
-    for subsection in (thermalScatteringModule.coherentElasticToken,
-                       thermalScatteringModule.incoherentElasticToken,
-                       thermalScatteringModule.incoherentInelasticToken):
-        if getattr(self, subsection) is not None:
-            getattr(self, subsection).toENDF6( endfMFList, flags, targetInfo, verbosityIndent )
+    for subsection in (self.coherentElastic, self.incoherentElastic, self.incoherentInelastic):
+        if subsection is not None:
+            subsection.toENDF6( endfMFList, flags, targetInfo, verbosityIndent )
 
     endfDoc = self.documentation.getLines()
     docHeader = [
             endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], -1, 0, 0, 0 ),
             endfFormatsModule.endfHeadLine( 0, 0, 0, 0, 0, 6 ),    # ENDF-6
-            endfFormatsModule.endfHeadLine( 1.0, self.emax.getValueAs('eV'), 1, 0, NSUB, NVER ),
+            endfFormatsModule.endfHeadLine( 1.0, self.cutoffEnergy.value, 1, 0, NSUB, NVER ),
             endfFormatsModule.endfHeadLine( 0.0, 0.0, 0, 0, len(endfDoc), 0 ) ]
     endfMFList[1][451] = docHeader + endfDoc
 
@@ -109,10 +108,10 @@ thermalScatteringModule.coherentElastic.toENDF6 = toENDF6
 #
 def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
 
-    gridded = self.forms[0]
+    gridded = self.gridded2d
     data = gridded.array.constructArray()
-    Tlist = list( gridded.axes[-1].grid )   #FIXME what if grid units aren't 'K'?
-    Elist = list( gridded.axes[-2].grid )   #FIXME      ""                  'eV'?
+    Tlist = list( gridded.axes[-1].values )   #FIXME what if grid units aren't 'K'?
+    Elist = list( gridded.axes[-2].values )   #FIXME      ""                  'eV'?
 
     LT = len(Tlist)-1
     # first temperature includes the energy list:
@@ -149,7 +148,8 @@ def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
     NR = 1; NP = len(self)
     endf = [endfFormatsModule.endfHeadLine( targetInfo['characteristicCrossSection'], 0, 0, 0, NR, NP )]
     interp = gndToENDF6.gndToENDFInterpolationFlag( self.interpolation )
-    endf += ['%11i%11i%44s' % (len(self), interp, '')]
+    #endf += ['%11i%11i%44s' % (len(self), interp, '')]
+    endf += endfFormatsModule.endfInterpolationList( (len(self), interp) )
     endf += endfFormatsModule.endfDataList( list( itertools.chain( *self.copyDataToXYs() ) ) )
     return endf
 thermalScatteringModule.DebyeWaller.toENDF6 = toENDF6
@@ -167,28 +167,28 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ):
     endf += [endfFormatsModule.endfHeadLine( 0, 0, LLN, 0, NI, NS )]
     # principal scattering atom:
     atom = self.scatteringAtoms[0]
-    endf += [endfFormatsModule.endfDataLine( [atom.freeAtomCrossSection.getValueAs('b'),
-        atom.e_critical, atom.mass, atom.e_max.getValueAs('eV'), 0, atom.numberPerMolecule] )]
-    for atom in self.scatteringAtoms[1:]:
+    endf += [endfFormatsModule.endfDataLine( [atom.freeAtomCrossSection.value,
+        atom.e_critical.value, atom.mass.value, atom.e_max.value, 0, atom.numberPerMolecule] )]
+    for atom in list(self.scatteringAtoms)[1:]:
         a1 = {'SCT':0.0, 'free_gas':1.0, 'diffusive_motion':2.0} [ atom.functionalForm ]
-        endf += [endfFormatsModule.endfDataLine( [a1, atom.freeAtomCrossSection.getValueAs('b'),
-            atom.mass, 0, 0, atom.numberPerMolecule] )]
+        endf += [endfFormatsModule.endfDataLine( [a1, atom.freeAtomCrossSection.value,
+            atom.mass.value, 0, 0, atom.numberPerMolecule] )]
 
     # convert data form: sort first by beta, then E, then T
-    gridded = self.S_alpha_beta.forms[0]
+    gridded = self.S_alpha_beta.gridded3d
     array = gridded.array.constructArray()   # 3D numpy array
 
-    Tlist = list( gridded.axes[3].grid ) # FIXME check grid units
-    betas = list( gridded.axes[2].grid )
-    alphas = list( gridded.axes[1].grid )
+    Tlist = list( gridded.axes[3].values )
+    betas = list( gridded.axes[2].values )
+    alphas = list( gridded.axes[1].values )
 
     # switch array back to ENDF ordering:  1st beta, then T, then alpha:
     array = array.transpose( (1,0,2) )
 
     NR = 1; NB = len(betas)
     endf += [endfFormatsModule.endfHeadLine( 0, 0, 0, 0, NR, NB )]
-    #endf += endfFormatsModule.endfInterpolationList( (NB, 4) )
-    endf += ['%11i%11i%44s' % ( NB, 4, '' )]  # FIXME add 'suppressTrailingZeros' option to endfInterpolationList
+    endf += endfFormatsModule.endfInterpolationList( (NB, 4) )
+    #endf += ['%11i%11i%44s' % ( NB, 4, '' )]  # FIXME add 'suppressTrailingZeros' option to endfInterpolationList
 
     LT = len(Tlist)-1
     if LT:
@@ -202,7 +202,8 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ):
         data = array[index,:,:] # 2D sub-array for this beta
 
         endf += [endfFormatsModule.endfHeadLine( Tlist[0], beta, LT, 0, 1, len(data[0]) )]
-        endf += ['%11i%11i%44s' % (len(alphas), alpha_interp, '' )]    # no trailing zeros
+        endf += endfFormatsModule.endfInterpolationList( (len(alphas), alpha_interp) )
+        #endf += ['%11i%11i%44s' % (len(alphas), alpha_interp, '' )]    # no trailing zeros
         # For each beta, the first temperature needs to include the energy list:
         endf += endfFormatsModule.endfDataList( list( itertools.chain( *zip(alphas, data[0]) ) ) )
 
@@ -212,8 +213,8 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ):
             endf += endfFormatsModule.endfDataList( datList )
 
     for atom in self.scatteringAtoms:
-        if atom.effectiveTemperature is not None:
-            endf += atom.effectiveTemperature.toENDF6( flags, targetInfo, verbosityIndent = '' )
+        if atom.T_effective is not None:
+            endf += atom.T_effective.toENDF6( flags, targetInfo, verbosityIndent = '' )
     endfMFList[7][4] = endf + [99999]
 thermalScatteringModule.incoherentInelastic.toENDF6 = toENDF6
 
@@ -224,7 +225,8 @@ def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
     NR = 1; NP = len(self)
     endf = [endfFormatsModule.endfHeadLine( 0, 0, 0, 0, NR, NP )]
     interp = gndToENDF6.gndToENDFInterpolationFlag( self.interpolation )
-    endf += ['%11i%11i%44s' % (len(self), interp, '')]
+    endf += endfFormatsModule.endfInterpolationList( (len(self), interp) )
+    #endf += ['%11i%11i%44s' % (len(self), interp, '')]
     endf += endfFormatsModule.endfDataList( list( itertools.chain( *self.copyDataToXYs() ) ) )
     return endf
 thermalScatteringModule.T_effective.toENDF6 = toENDF6

@@ -71,7 +71,6 @@ import miscellaneous
 
 from fudge.core.utilities import brb
 
-from fudge.gnd import styles as stylesModule
 import xData.ancestry as ancestryModule
 import xData.link as linkModule
 import xData.standards as standardsModule
@@ -95,7 +94,6 @@ equalProbableBinsFormToken = 'equalProbableBins'
 groupedFormToken = 'grouped'
 LegendrePointwiseFormToken = 'LegendrePointwise'
 LegendrePiecewiseFormToken = 'LegendrePiecewise'
-energyLossFormToken = 'energyLoss'
 
 class form( abstractClassesModule.form ) :
 
@@ -112,7 +110,7 @@ class form( abstractClassesModule.form ) :
 
         for i1, subform in enumerate( subForms ) :
             setattr( self, self.subformAttributes[i1], subform )
-            subform.setAncestor( self )
+            if( subform is not None ) : subform.setAncestor( self )
         self.subforms = [ subform for subform in subForms ]
 
     @property
@@ -132,6 +130,14 @@ class form( abstractClassesModule.form ) :
 
         return( self.__productFrame )
 
+    def convertUnits( self, unitMap ) :
+        "See documentation for reactionSuite.convertUnits."
+
+        if( hasattr( self, 'subforms' ) ) :
+            for subform in self.subforms :
+                if( subform is None ) : continue                    # FIXME, needed for photo-atomic coherentScattering data with no anomalousScattering subforms.
+                subform.convertUnits( unitMap )
+
     def findEntity( self, entityName, attribute = None, value = None ):
         """
         Find specific subform within the form. Overrides ancestry.findEntity.
@@ -141,9 +147,9 @@ class form( abstractClassesModule.form ) :
             if( subform.moniker == entityName ) : return( subform )
         return( ancestryModule.ancestry.findEntity( self, entityName, attribute, value ) )
 
-    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
 
-        return( self.subforms[0].toPointwise_withLinearXYs( accuracy, lowerEps, upperEps ) )
+        return( self.subforms[0].toPointwise_withLinearXYs( **kwargs ) )
 
     def toXMLList( self, indent = '', **kwargs ) :
 

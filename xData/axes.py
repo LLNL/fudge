@@ -65,9 +65,12 @@ __metaclass__ = type
 
 import string
 
-import ancestry as ancestryModule
-from xData.link import link
-import values as valuesModule
+from pqu import PQU as PQUModule
+
+from . import ancestry as ancestryModule
+from . import base as baseModule
+from . import link as linkModule
+from . import values as valuesModule
 
 noneGridToken = 'none'
 pointsGridToken = 'points'
@@ -81,6 +84,7 @@ lognormalPDF = 'log-normal'
 class axis( ancestryModule.ancestry ) :
 
     moniker = 'axis'
+    ancestryMembers = ( '', )
 
     def __init__( self, label, index, unit ) :
         """
@@ -89,7 +93,7 @@ class axis( ancestryModule.ancestry ) :
 
         ancestryModule.ancestry.__init__( self )
 
-        if( not( isinstance( label, str ) ) ) : raise Exception( 'label = "%s" is not a string' % label )
+        if( not( isinstance( label, str ) ) ) : raise TypeError( 'label = "%s" is not a string' % label )
         self.__label = label.strip( )
 
         self.__index = int( index )
@@ -109,11 +113,16 @@ class axis( ancestryModule.ancestry ) :
 
         return( not( self.__eq__( other ) ) )
 
-    def copy( self, index = None ) :
+    def convertUnits( self, unitMap ) :
+
+        unit, factor = PQUModule.convertUnits( self.unit, unitMap )
+        self.unit = unit
+        return( factor )
+
+    def copy( self, unresolvedLinks ) :
         """Returns a new instance that is a copy of self."""
 
-        if( index is None ) : index = self.__index
-        return( axis( self.label, index, self.unit ) )
+        return( axis( self.label, self.index, self.unit ) )
 
     __copy__ = copy
     __deepcopy__ = __copy__
@@ -123,10 +132,20 @@ class axis( ancestryModule.ancestry ) :
 
         return( self.__index )
 
+    @index.setter
+    def index( self, value ) :
+
+        self.__index = value
+
     @property
     def label( self ) :
 
         return( self.__label )
+
+    @label.setter
+    def label( self, value ) :
+
+        self.__label = value
 
     @property
     def unit( self ) :
@@ -170,12 +189,12 @@ class axis( ancestryModule.ancestry ) :
     def unitConversionFactor( self, newUnit ) :
         """Returns as a float the factor needed to convert self's unit to newUnit. If units are not compatible, a raise is executed."""
 
-        from pqu import PQU
-        return( PQU.PQU( 1., self.unit ).getValueAs( newUnit ) )
+        return( PQUModule.PQU( 1., self.unit ).getValueAs( newUnit ) )
 
 class grid( axis ) :
 
     moniker = 'grid'
+    ancestryMembers = ( 'values', )
 
     def __init__( self, label, index, unit, style, values, uncertainty = None, pdf = normalPDF, interpolation = None ) :
         """
@@ -185,7 +204,7 @@ class grid( axis ) :
         axis.__init__( self, label, index, unit )
 
         if( style == linkGridToken ) :
-            if( not isinstance( values , link ) ):
+            if( not isinstance( values , linkModule.link ) ):
                 raise TypeError( "style = 'link' not consistent with grid '%s'" % values.moniker )
         else :
             if( style not in [ pointsGridToken, boundariesGridToken, parametersGridToken ] ) :
@@ -215,17 +234,27 @@ class grid( axis ) :
 
     def convertToUnit( self, unit ) :
 
-        if self.style=='link': return
         factor = self.unitConversionFactor( unit )
         self.unit = unit
-        self.__value = valuesModule.values( [ factor * value for value in self.values ] )
+        if self.style==linkGridToken: return
+        self.__values = valuesModule.values( [ factor * value for value in self.values ] )
 
-    def copy( self, index = None ) :
+    def convertUnits( self, unitMap ) :
+
+        factor = axis.convertUnits( self, unitMap )
+        if( factor != 1 ) :
+            if isinstance( self.__values, linkModule.link ):
+                pass
+            else:
+                self.__values.offsetScaleValues( 0, factor )
+
+    def copy( self, unresolvedLinks ) :             # FIXME, unresolvedLinks is a kludge until links are handled in a better way.
         """Returns a new grid instance that is a copy of self."""
 
-        if( index is None ) : index = self.index
-        return( grid( self.label, index, self.unit, self.style, self.values, uncertainty = self.uncertainty, 
-                pdf = self.pdf, interpolation = self.interpolation ) )
+        _grid = grid( self.label, self.index, self.unit, self.style, self.values.copy( ), uncertainty = self.uncertainty, 
+                pdf = self.pdf, interpolation = self.interpolation )
+        if( isinstance( self.values, linkModule.link ) ) : unresolvedLinks.append( _grid.values )
+        return( _grid )
 
     __copy__ = copy
     __deepcopy__ = __copy__
@@ -265,13 +294,16 @@ class grid( axis ) :
 
         style = element.get( 'style' )
         gridClass = {
-            'link': link,
-            'boundaries': valuesModule.values
+            'link': linkModule.link,
+            'boundaries': valuesModule.values,
+            'parameters': valuesModule.values,
+            'points': valuesModule.values,
         }.get( style )
         if( gridClass is None ) : raise Exception( "grid style '%s' not yet supported" % style )
 
         gridData = gridClass.parseXMLNode( element[0], xPath, linkData )
-        _grid = grid( element.get( 'label' ), element.get( 'index' ), element.get( 'unit' ), style, gridData )
+        _grid = grid( element.get( 'label' ), element.get( 'index' ), element.get( 'unit' ), style, gridData,
+                interpolation = element.get('interpolation') )
 
         xPath.pop()
         return( _grid )
@@ -279,16 +311,18 @@ class grid( axis ) :
 class axes( ancestryModule.ancestry ) :
 
     moniker = 'axes'
+    ancestryMembers = ( '[axes', )
 
-    def __init__( self, rank = None, labelsUnits = {} ) :
+    def __init__( self, rank = None, labelsUnits = None ) :
         """
         Constructor for ``axes`` class. For example::
 
-            axes_ = axes( labelsUnits = { 0 : ( 'crossSection' , 'b' ), 1 : ( 'energy_in', 'eV' ) } )
+            _axes = axes( labelsUnits = { 0 : ( 'crossSection' , 'b' ), 1 : ( 'energy_in', 'eV' ) } )
         """
 
         ancestryModule.ancestry.__init__( self )
 
+        if( labelsUnits is None ) : labelsUnits = {}
         if( rank is None ) :
             rank = 2
             if( len( labelsUnits ) > 0 ) : rank = len( labelsUnits )
@@ -305,9 +339,10 @@ class axes( ancestryModule.ancestry ) :
 
     def __eq__( self, other ) :
 
+        if( isinstance( other, referenceAxes ) ) : return( other.__eq__( self ) )
         if( isinstance( other, axes ) and ( len( self ) == len( other ) ) ) :
-            for index, axis_ in enumerate( self.axes ) :
-                if( axis_ != other[index] ) : return( False )
+            for index, _axis in enumerate( self.axes ) :
+                if( _axis != other[index] ) : return( False )
             return( True )
         return( False )
 
@@ -330,7 +365,8 @@ class axes( ancestryModule.ancestry ) :
         index = int( index )
         if( index < 0 ) : index += rank 
         if( not( 0 <= index < rank ) ) : raise IndexError( "index = %s out of range for self of rank %s" % ( index, rank ) )
-        self.axes[index] = axisOrGrid.copy( index = index )
+        self.axes[index] = axisOrGrid
+        axisOrGrid.index = index
         self.axes[index].setAncestor( self, 'index' )
 
     def __str__( self ) :
@@ -342,10 +378,22 @@ class axes( ancestryModule.ancestry ) :
 
         if( len( self ) != rank ) : raise Exception( "self's rank = %s != %s" % ( len( self ), rank ) )
 
+    def convertUnits( self, unitMap ) :
+        """
+        Converts each axis units.
+        unitMap is a dictionary of mapping old units to new units (e.g., { 'eV' : 'MeV', 'b' : 'mb' }).
+        """
+
+        factors = []
+        for axis in self : factors.append( axis.convertUnits( unitMap ) )
+        return( factors )
+
     def copy( self ) :
 
+        unresolvedLinks = []
         newAxes = axes( rank = len( self ) )
-        for index, axis in enumerate( self ) : newAxes[index] = axis        # __setitem__ makes a copy, so no need to here.
+        for index, axis in enumerate( self ) : newAxes[index] = axis.copy( unresolvedLinks )
+        for object in unresolvedLinks : object.link = object.follow( object )
         return( newAxes )
 
     __copy__ = copy
@@ -372,20 +420,75 @@ class axes( ancestryModule.ancestry ) :
 
         xPath.append( axesElement.tag )
         if( axesElement.tag == axes.moniker ) :
-            axes_ = axes( rank = len( axesElement ) )
+            _axes = axes( rank = len( axesElement ) )
             for child in axesElement :
                 childClass = {axis.moniker: axis, grid.moniker: grid}.get(child.tag)
                 if childClass is None:
                     raise TypeError("Unexpected child element '%s' encountered in axes" % child.tag)
                 index = child.get( "index" )
-                axes_[index] = childClass.parseXMLNode( child, xPath, linkData )
+                _axes[index] = childClass.parseXMLNode( child, xPath, linkData )
         else :
             raise Exception( 'Invalid tag "%s" for axes' % ( axesElement.tag ) )
         xPath.pop()
-        return( axes_ )
+        return( _axes )
 
     @staticmethod
     def parseXMLString( axisString, xPath, linkData ) :
 
         from xml.etree import cElementTree
         return( axes.parseXMLNode( cElementTree.fromstring( axisString ), xPath = xPath, linkData = linkData ) )
+
+class referenceAxes( ancestryModule.ancestry ) :
+    """
+    A referenceAxes links to an axes or another referenceAxes instance, although the final link must always be
+    an axes instance. All references to a referenceAxes's axis's are de-referenced to the linked axes or referenceAxes
+    instance.  A referenceAxes does not write its self to an XML file; but, instead, only reside in Python instances.
+
+    Unlike an axes instance, a referenceAxes does not allow one to change members of the linked axes.
+    """
+
+    moniker = 'referenceAxes'
+    ancestryMembers = ( '', )
+
+    def __init__( self, axes ) :
+        """
+        Constructor for ``referenceAxes`` class. For example::
+
+            _axes = referenceAxes( axes )
+        """
+
+        ancestryModule.ancestry.__init__( self )
+
+        self.__axes = axes
+
+    def __getitem__( self, index ) :
+
+        return( self.__axes[index] )
+
+    def __str__( self ) :
+
+        return( self.__axes.__str__( ) )
+
+    def __eq__( self, other ) :
+
+        return( self.__axes.__eq__( other ) )
+
+    def __ne__( self, other ) :
+
+        return( self.__axes.__ne__( other ) )
+
+    def __len__( self ) :
+
+        return( len( self.__axes ) )
+
+    def copy( self, unresolvedLinks ) :
+
+        return( referenceAxes( self.__axes ) )
+
+    def toXML( self, indent = '', **kwargs ) :
+
+        return( '\n'.join( self.toXMLList( indent = indent, **kwargs ) ) )
+
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        return( [] )

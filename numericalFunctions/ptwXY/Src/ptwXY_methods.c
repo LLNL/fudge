@@ -414,6 +414,118 @@ static nfu_status ptwXY_thin2( statusMessageReporting *smr, ptwXYPoints *thinned
 /*
 ************************************************************
 */
+ptwXYPoints *ptwXY_thinDomain( statusMessageReporting *smr, ptwXYPoints *ptwXY1, double epsilon ) {
+/*
+*   Thins domain points that are closer the '0.5 * (x[i+1] + x[1]) * epsilon'.
+*/
+    int64_t i1, i2, length = ptwXY1->length, lengthm1 = length - 1, thinnedLength = 0;
+    ptwXYPoint *points;
+    ptwXYPoints *thinned = NULL;
+    double x1, x2, x3, dx, y2, half_epsilon = 0.5 * epsilon;
+
+    if( ptwXY1->interpolation == ptwXY_interpolationFlat ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_invalidInterpolation, "Flat interpolation not allowed." );
+        return( NULL );
+    }
+
+    if( ptwXY1->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Other interpolation not allowed." );
+        return( NULL );
+    }
+
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY1 ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
+
+    if( length > 1 ) {
+        if( ( ptwXY1->points[length-1].x - ptwXY1->points[0].x ) < half_epsilon * ( fabs( ptwXY1->points[0].x ) + fabs( ptwXY1->points[0].x ) ) ) {
+            smr_setReportError2( smr, nfu_SMR_libraryID, nfu_Error, "Domain (%.17e, %.17e) is less than epsilon = %.17e.", 
+                    ptwXY1->points[0].x, ptwXY1->points[length-1].x, epsilon );
+            return( NULL );
+        }
+    }
+
+    if( ( length <= 2 ) || ( epsilon < 2 * DBL_EPSILON ) ) {
+        if( ( thinned = ptwXY_clone( smr, ptwXY1 ) ) == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( thinned );
+    }
+
+    if( ( thinned = ptwXY_new( smr, ptwXY1->interpolation, ptwXY1->interpolationString, ptwXY1->biSectionMax, ptwXY1->accuracy, 
+            length, ptwXY1->overflowAllocatedSize, ptwXY1->userFlag ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
+
+    points = thinned->points;
+    *points = ptwXY1->points[0];
+    ++points;
+    ++thinnedLength;
+    x1 = ptwXY1->points[0].x;
+    x2 = x3 = x1;                                                       /* To stop some compilers from printing a warning. */
+    for( i1 = 1; i1 < lengthm1; i1 = i2 ) {
+        for( i2 = i1; i2 < length; ++i2 ) {                             /* Find next x3 that is  epsilon * ( x1 + x2 ) / 2 above x1. */
+            x3 = ptwXY1->points[i2].x;
+            if( ( x3 - x1 ) >= half_epsilon * ( fabs( x1 ) + fabs( x3 ) ) ) break;
+            x2 = x3;
+        }
+        if( i1 == i2 ) {
+            y2 = ptwXY1->points[i2].y;
+            x2 = x3; }
+        else {
+            if( ( x3 - x1 ) > ( epsilon * ( fabs( x1 ) + fabs( x3 ) ) ) ) {
+                dx = fabs( x2 * epsilon );
+                x2 = x1 + dx;
+                if( ptwXY_getValueAtX( smr, ptwXY1, x2, &y2 ) != nfu_Okay ) {
+                    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+                    ptwXY_free( thinned );
+                    return( NULL );
+                }
+                --i2; }
+            else {
+                if( i2 == length ) break;
+                x2 = x3;
+                y2 = ptwXY1->points[i2].y;
+            }
+        }
+        points->x = x2;
+        points->y = y2;
+        ++points;
+        ++thinnedLength;
+        x1 = x2;
+        ++i2;
+    }
+
+    x3 = ptwXY1->points[lengthm1].x;
+    x2 = thinned->points[thinnedLength-1].x;
+    if( ( x3 - x2 ) < ( half_epsilon * ( fabs( x2 ) + fabs( x3 ) ) ) ) {
+        --points;
+        --thinnedLength;
+        x1 = thinned->points[thinnedLength-1].x;
+        if( ( x3 - x1 ) > ( epsilon * ( fabs( x1 ) + fabs( x2 ) ) ) ) {
+            dx = fabs( x3 * epsilon );
+            x2 = x3 - dx;
+            if( ptwXY_getValueAtX( smr, ptwXY1, x2, &y2 ) != nfu_Okay ) {
+                smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+                ptwXY_free( thinned );
+                return( NULL );
+            }
+            points->x = x2;
+            points->y = y2;
+            ++points;
+            ++thinnedLength;
+        }
+    }
+    points->x = x3;
+    points->y = ptwXY1->points[lengthm1].y;
+    ++thinnedLength;
+    thinned->length = thinnedLength;
+
+    return( thinned );
+}
+/*
+************************************************************
+*/
 nfu_status ptwXY_trim( statusMessageReporting *smr, ptwXYPoints *ptwXY ) {
 /*
 c   Remove extra zeros at beginning and end.

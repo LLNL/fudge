@@ -61,14 +61,15 @@
 # 
 # <<END-copyright>>
 
-from fudge.core.utilities import brb
-import fudge.gnd.productData.distributions.energyAngular as energyAngularModule
+from pqu import PQU as PQUModule
 
-import site_packages.legacy.toENDF6.endfFormats as endfFormatsModule
-import site_packages.legacy.toENDF6.gndToENDF6 as gndToENDF6Module
-import xData.multiD_XYs as multiD_XYsModule
-import xData.series1d as series1dModule
-import pqu.PQU as PQUModule
+from xData import multiD_XYs as multiD_XYsModule
+
+from xData import series1d as series1dModule
+from fudge.gnd.productData.distributions import energyAngular as energyAngularModule
+
+from ... import endfFormats as endfFormatsModule
+from ... import gndToENDF6 as gndToENDF6Module
 
 #
 # form
@@ -90,7 +91,6 @@ energyAngularModule.form.toENDF6 = toENDF6
 #
 def toENDF6( self, flags, targetInfo ) :
 
-    MT = 5
     EInInterpolation = gndToENDF6Module.gndToENDF2PlusDInterpolationFlag( self.interpolation, self.interpolationQualifier )
     EpInterpolation0 = gndToENDF6Module.gndToENDF2PlusDInterpolationFlag( self[0].interpolation, self[0].interpolationQualifier )
     if( EpInterpolation0 == 1 ) :       # flat interpolation
@@ -99,23 +99,51 @@ def toENDF6( self, flags, targetInfo ) :
         LEP = 2
     else :
         raise 'hell - fix me'
-    ENDFDataList = [ endfFormatsModule.endfContLine( 0, 0, 1, LEP, 1, len( self ) ) ]
-    ENDFDataList += endfFormatsModule.endfInterpolationList( [ len( self ), EInInterpolation ] )
+    ENDFDataList = endfFormatsModule.endfInterpolationList( [ len( self ), EInInterpolation ] )
     energyInFactor = PQUModule.PQU( 1, self.axes[3].unit ).getValueAs( 'eV' )
     energyPFactor = PQUModule.PQU( 1, self.axes[2].unit ).getValueAs( 'eV' )
-    for energyIn in self :
-        if( not( isinstance( energyIn, multiD_XYsModule.XYs2d ) ) ) : raise 'hell - fix me'
-        EpInterpolation = gndToENDF6Module.gndToENDF2PlusDInterpolationFlag( energyIn.interpolation, energyIn.interpolationQualifier )
-        if( EpInterpolation != EpInterpolation0 ) : raise 'hell - fix me'
-        NA, data = 0, []
-        for energy_p in energyIn :
-            if( not( isinstance( energy_p, series1dModule.LegendreSeries ) ) ) : raise 'hell - fix me'
-            NA = max( len( energy_p ) , NA )
-            coefficients = [ coefficient / energyPFactor for coefficient in energy_p ]
-            data += [ energy_p.value * energyPFactor ] + coefficients
-        ENDFDataList.append( endfFormatsModule.endfContLine( 0, energyIn.value * energyInFactor, 0, NA - 1, len( data ), len( data ) / ( NA + 1 ) ) )
-        ENDFDataList += endfFormatsModule.endfDataList( data )
-    LAW = 1
+    if( not( isinstance( self[0], multiD_XYsModule.XYs2d ) ) ) : raise 'hell - fix me'
+    if( isinstance( self[0][0], energyAngularModule.Legendre ) ) :
+        for energyIn in self :
+            EpInterpolation = gndToENDF6Module.gndToENDF2PlusDInterpolationFlag( energyIn.interpolation, energyIn.interpolationQualifier )
+            if( EpInterpolation != EpInterpolation0 ) : raise 'hell - fix me'
+            NA, data = 0, []
+            for energy_p in energyIn :
+                if( not( isinstance( energy_p, energyAngularModule.Legendre ) ) ) : raise 'hell - fix me'
+                NA = max( len( energy_p ), NA )
+                coefficients = [ coefficient / energyPFactor for coefficient in energy_p ]
+                data += [ energy_p.value * energyPFactor ] + coefficients
+            ENDFDataList.append( endfFormatsModule.endfContLine( 0, energyIn.value * energyInFactor, 0, NA - 1, len( data ), len( data ) / ( NA + 1 ) ) )
+            ENDFDataList += endfFormatsModule.endfDataList( data )
+        LAW = 1
+        LANG = 1
+    elif( isinstance( self[0][0], energyAngularModule.XYs1d ) ) :
+        for energyIn in self :
+            EpInterpolation = gndToENDF6Module.gndToENDF2PlusDInterpolationFlag( energyIn.interpolation, energyIn.interpolationQualifier )
+            if( EpInterpolation != EpInterpolation0 ) : raise 'hell - fix me'
+            data = []
+            NAp = 2 * len( energyIn[0] )
+            data = []
+            for energy_p in energyIn :
+                if( not( isinstance( energy_p, energyAngularModule.XYs1d ) ) ) : raise 'hell - fix me'
+                NA = 2 * len( energy_p )
+                if( NA != NAp ) : raise Exception( 'These data cannot be converted to ENDF6' )
+                energy_p = energy_p.convertAxisToUnit( 0, '1/eV' )
+                f0 = float( energy_p.integrate( ) )
+                data += [ energy_p.value * energyPFactor, f0 ]
+                if( f0 == 0 ) :                 # Special case for when f0 == 0 in the ENDF file.
+                    for mu, f1 in energy_p :
+                        data.append( mu )
+                        data.append( 0.5 )
+                else :
+                    for mu, f1 in energy_p.normalize( ).copyDataToXYs( ) :
+                        data.append( mu )
+                        data.append( f1 )
+            ENDFDataList.append( endfFormatsModule.endfContLine( 0, energyIn.value * energyInFactor, 0, NA, len( data ), len( energyIn ) ) )
+            ENDFDataList += endfFormatsModule.endfDataList( data )
+        LANG = 12
+        LAW = 1
+    ENDFDataList.insert( 0, endfFormatsModule.endfContLine( 0, 0, LANG, LEP, 1, len( self ) ) )
     return( LAW, ENDFDataList )
 
 energyAngularModule.XYs3d.toENDF6 = toENDF6

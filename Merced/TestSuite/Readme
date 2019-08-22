@@ -1,0 +1,103 @@
+This directory contains test files and sample output for the getTransferMatrix code.
+
+Note: The following parameters may be set in the input file or on the
+command line.
+  skip_logging # default  0       // if == 1, don't log errors in documentation.txt file
+  message_level # default 0       // three levels of messages - info, warn and severe
+                                // info = 0 (all messages written)
+                                // warn = 1 (only warnings and errors)
+                                // severe >=2 (errors only, these cause exits anyway!)
+  datafield_precision # default 8 // 8 sig-figs in all data fields
+  quad_tol # default  0.0001  // relative error in the quadrature
+  abs_quad_tol # default  1.0e-8  // absolute error in the quadrature
+  check_row_sum # default  1   // if > 0, check the sums over each row
+  E_tol # default  1.0e-9   // tolerance on hitting the corner of an energy box
+  abs_tol # default  2.0e-14   // absolute tolerance if E = 0
+For example:
+quad_tol: 1.0e-6 # in the input file or
+-quad_tol 1.0e-6 # in the command line
+
+Parameters used only by coherent and Compton scattering:
+  Thompson # default  0.6652448    // cross section for Thompson scattering (barns)
+  # to rescale x from 1/cm to MeV: multiply by 2*pi*c*hbar
+  double cminv_to_MeV = 6.2831853071795862*2.99792458e+02*6.58212200e-14;
+  cminv_to_MeV # default  cminv_to_MeV
+
+Parameters used only by Compton scattering:
+  m_electron # default  0.511   // electron mass
+  Compton_cutoff # default  1.0e-6   // when is mu approx 1 for Compton scattering
+
+Input and output files are given only on the command line
+  input # default   ""
+  output # default   "utfil"
+  path_to_input # default  "."
+For example:
+getTransferMatrix -output somefile.out somefile
+
+
+The data is organized into subdirectories according to the type of data given.
+
+*** Traditional ENDL data:
+
+doubleDifferential: table of angular probability density for an outgoing
+  particle in the laboratory frame together with a table of joint
+  energy-angle probability density.  This is traditional ENDL I=1 data
+  along with I=3 data.
+
+isotropic: a table of energy probability density for an outgoing particle,
+  isotropic in the laboratory frame.
+
+Legendre: a table of Legendre coefficients for the energy probability density
+  of an outgoing particle in the laboratory frame.  This is traditional ENDL
+  I=4 data.
+
+twoBody: for discrete 2-body reactions this data is a table of angular
+  probability densities in the center-of-mass frame.  The reaction may be
+  elastic or inelastic (with an excited residual).  This is traditional
+  ENDL I=1 data.
+
+uncorrelated: tables of uncorrelated energy and angle probability
+  densities for an outgoing particle.  This is traditional ENDL I=1 data
+  along with I=4 data of Legendre order 0.
+
+*** Models used in ENDF which are not in ENDL:
+
+captureGamma: data for special relativistic treatment of gamma as the
+  product of capture as a discrete 2-body reaction.
+
+ENDFdoubleDiff: ENDF-style table of joint energy-angle probability density
+  in the labaoratory frame. 
+
+ENDFLegendre: Legendre expansions of energy-angle probability density
+  in the labaoratory frame.  The data is ordered according to ENDF rules.
+
+evaporation: energy distribution as an evaporation spectrum.
+
+GeneralEvaporation: data for energy probability densities of delayed fission
+  neutrons.  This data is independent of the energy of the incident neutron.
+
+Kalbach: data for the Kalbach-Mann model for energy-angle probability density
+  in the center-of-mass coordinate system.
+
+Legendre2Body: angular probability densities for discrete 2-body reactions
+  given as Legendre expansions.  The data is in the center-of-mass frame.
+
+Madland: data for the Madland-Nix model for fission neutrons.
+
+phaseSpace: data for the N-body phase-space model for energy probability density
+  in the center-of-mass coordinate system.
+
+Maxwell: data for the Maxwell model for fission neutrons.
+
+Watt: data for the Watt model for fission neutrons.
+
+weights: data files to test the handling of model weights.  This feature
+  is typically used for one neutron in an (n, 2n) reaction or for multiple
+  interpolation regions.
+
+*** EPDL photon data:
+
+coherent: The form factor for coherent scattering.
+
+Compton: The scattering factor for Compton scattering.
+

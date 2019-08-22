@@ -61,29 +61,45 @@
 # 
 # <<END-copyright>>
 
-""" angular distribution classes """
+"""
+This is for ENDL I = 4 data with l > 0.
+This is a temporary module, to be removed once testing is done and all coefficients in endl99, H2(n,2n)p data are filled in.
+"""
 
 import math
-import miscellaneous
-from fudge.core.utilities import brb
-from fudge.gnd import tokens as tokensModule
 
+from xData import standards as standardsModule
 from xData import axes as axesModule
 from xData import XYs as XYsModule
 from xData import multiD_XYs as multiD_XYsModule
+
+from fudge.core.utilities import brb
+
+from fudge.gnd import tokens as tokensModule
+
+from fudge.processing import group as groupModule
 
 from fudge.gnd.productData import multiplicity as multiplicityModule
 from fudge.gnd.productData import energyDeposition as energyDepositionModule
 from fudge.gnd.productData import momentumDeposition as momentumDepositionModule
 
 from . import base as baseModule
-
-noExtrapolationToken = 'noExtrapolation'
+from . import miscellaneous as miscellaneousModule
+from . import energyAngular as energyAngularModule
 
 __metaclass__ = type
 
+def defaultAxes( energyUnit ) :
+
+    axes = axesModule.axes( rank = 4 )
+    axes[3] = axesModule.axis( 'l',          3, '' )
+    axes[2] = axesModule.axis( 'energy_in',  2, energyUnit )
+    axes[1] = axesModule.axis( 'energy_out', 1, energyUnit )
+    axes[0] = axesModule.axis( 'c_l',        0, '1/' + energyUnit )
+    return( axes )
+
 class subform( baseModule.subform ) :
-    """Abstract base class for angular forms."""
+    """Abstract base class for LLNLLegendre forms."""
 
     def __init__( self ) :
 
@@ -117,106 +133,114 @@ class LLNLPointwise( subform ) :
         if( not( isinstance( EEpP, multiD_XYsModule.XYs2d ) ) ) : raise Exception( 'EEpP is an instance of %s' % brb.getType( EEpP ) )
         self.data.append( EEpP )
 
-    def calculateDepositionData( self, style, indent = '', **kwargs ) :
+    def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
         verbosity = kwargs.get( 'verbosity', 0 )
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
         energyUnit = kwargs['incidentEnergyUnit']
-        momentumDepositionUnit = energyUnit + '/c'
-        massUnit = energyUnit + '/c**2'
+        momentumDepositionUnit = kwargs['momentumDepositionUnit']
         multiplicity = kwargs['multiplicity']
-        productMass = kwargs['product'].getMass( massUnit )
+        productMass = kwargs['productMass']
         energyAccuracy = kwargs['energyAccuracy']
         momentumAccuracy = kwargs['momentumAccuracy']
         EMin = kwargs['EMin']
 
-        depData = []
-
         Legendre_l0, Legendre_l1 = self[0], None
         if( len( self ) > 1 ) : Legendre_l1 = self[1]
 
-        if( isinstance( multiplicity, multiplicityModule.XYs1d ) ) :
-            Es = [ EpP.value for EpP in Legendre_l0 ]
-            doIt = False
-            for E, m in multiplicity.getFormByToken( tokensModule.pointwiseFormToken ) :
-                if( E < Es[0] ) : continue
-                if( E not in Es ) :
-                    doIt = True
-                    Es.append( E )
-            if( doIt ) :
-                Es.sort( )
-                Legendre_l0p, Legendre_l1p = LLNLPointwiseEEpP( 0 ), LLNLPointwiseEEpP( 1 )
-                indexE, EpP1 = 0, None
-                for EpP2 in Legendre_l0 :
-                    while( ( indexE < len( Es ) ) and ( EpP2.value > Es[indexE] ) ) :
-                        if( EpP1.value != Es[indexE] ) :
-                            EpP = XYs.pointwiseXY_C.unitbaseInterpolate( Es[indexE], EpP1.value, EpP1, EpP2.value, EpP2 )
-                            axes = EpP1.axes.copy( )
-                            Legendre_l0p.append( XYs.XYs( axes, EpP, EpP1.getAccuracy( ), value = Es[indexE] ) )
-                        indexE += 1
-                    Legendre_l0p.append( EpP2 )
-                    EpP1 = EpP2
+        if( isinstance( multiplicity, multiplicityModule.XYs1d ) ) :    # If multiplicity as points not in Legendre_l0 add them.
+            Es = set( [ EpP.value for EpP in Legendre_l0 ] )
+            for E, m in multiplicity : Es.add( E )
+            if( len( Es ) > len( Legendre_l0 ) ) :
+                Es = sorted( Es )
+
+                Legendre_l0p = multiD_XYsModule.XYs2d( )
+                for energy in Es :
+                    Legendre_l0p.append( Legendre_l0.interpolateAtValue( energy, unitBase = True, 
+                            extrapolation = standardsModule.flatExtrapolationToken ) )
                 Legendre_l0 = Legendre_l0p
+
                 if( Legendre_l1 is not None ) :
-                    for EpP2 in Legendre_l1 :
-                        while( ( indexE < len( Es ) ) and ( EpP2.value > Es[indexE] ) ) :
-                            if( EpP1 is None ) : raise Exception( 'multiplicity energy = %s before Legendre l = 0 distribution energy = %s' 
-                                % ( Es[indexE], EpP2.value ) )
-                            if( EpP1.value != Es[indexE] ) :
-                                EpP = XYs.pointwiseXY_C.unitbaseInterpolate( Es[indexE], EpP1.value, EpP1, EpP2.value, EpP2 )
-                                axes = EpP1.axes.copy( )
-                                Legendre_l1p.append( XYs.XYs( axes, EpP, EpP1.getAccuracy( ), value = Es[indexE] ) )
-                            indexE += 1
-                        Legendre_l1p.append( EpP2 )
-                        EpP1 = EpP2
+                    Legendre_l1p = multiD_XYsModule.XYs2d( )
+                    for energy in Es :
+                        Legendre_l1p.append( Legendre_l1.interpolateAtValue( energy, unitBase = True,
+                                extrapolation = standardsModule.flatExtrapolationToken ) )
                     Legendre_l1 = Legendre_l1p
 
-        depEnergy = [ [ EpP.value, multiplicity.getValue( EpP.value ) * miscellaneous.calculateDepositionEnergyFromEpP( EpP.value, EpP ) ] for EpP in Legendre_l0 ]
-        if( depEnergy[0][0] > EMin ) : depEnergy.insert( 0, [ 'EMin', 0. ] ) # Special case for bad data
-
-        axes = energyDepositionModule.XYs1d.defaultAxes( energyUnit = energyUnit, energyDepositionUnit = energyUnit )
-        depData.append( energyDepositionModule.XYs1d( data = depEnergy, axes = axes,
-                label = style.label, accuracy = energyAccuracy ) )
+        calculateDepositionEnergyFromEpP = miscellaneousModule.calculateDepositionEnergyFromEpP
+        depEnergy = [ [ EpP.value, multiplicity.evaluate( EpP.value ) * calculateDepositionEnergyFromEpP( EpP.value, EpP ) ] for EpP in Legendre_l0 ]
+        if( depEnergy[0][0] > EMin ) : depEnergy.insert( 0, [ EMin, 0. ] ) # Special case for bad data
+        axes = energyDepositionModule.defaultAxes( energyUnit )
+        energyDep = energyDepositionModule.XYs1d( data = depEnergy, axes = axes, label = style.label )
 
         if( Legendre_l1 is not None ) :
-            const = math.sqrt( 2. * productMass )
-            if( const == 0. ) : const = 1               # For gammas.
             depMomentum = []
-            EpP = Legendre_l1[0]
+            const = math.sqrt( 2. * productMass )
             for EpP in Legendre_l1 :
-                if( const == 0. ) :                     # For gammas.
-                    depMomentum.append( [ EpP.value, const * multiplicity.getValue( EpP.value ) * EpP.integrateWithWeight_x( ) ] )
+                if( const == 0 ) :                          # For gammas.
+                    depMomentum.append( [ EpP.value, multiplicity.evaluate( EpP.value ) * EpP.integrateWithWeight_x( ) ] )
                 else :
-                    depMomentum.append( [ EpP.value, const * multiplicity.getValue( EpP.value ) * EpP.integrateWithWeight_sqrt_x( ) ] )
+                    depMomentum.append( [ EpP.value, const * multiplicity.evaluate( EpP.value ) * EpP.integrateWithWeight_sqrt_x( ) ] )
         else :
             depMomentum = [ [ Legendre_l0[0].value, 0. ], [ Legendre_l0[-1].value, 0. ] ]
-        axes = momentumDepositionModule.XYs1d.defaultAxes( energyUnit = energyUnit, momentumDepositionUnit = momentumDepositionUnit )
+        axes = momentumDepositionModule.defaultAxes( energyUnit, momentumDepositionUnit )
         if( depMomentum[0][0] > EMin ) : depMomentum.insert( 0, [ EMin, 0. ] ) # Special case for bad data
-        depData.append( momentumDepositionModule.XYs1d( data = depMomentum, axes = axes,
-                label = style.label, accuracy = momentumAccuracy ) )
-        return( depData )
+        momentumDep = momentumDepositionModule.XYs1d( data = depMomentum, axes = axes, label = style.label )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+        return( [ energyDep ], [ momentumDep ] )
 
-        raise Exception( 'need to implement' )
+    def convertUnits( self, unitMap ) :
+        "See documentation for reactionSuite.convertUnits."
 
-#    def process( self, processInfo, tempInfo, verbosityIndent ) :
+        self.axes.convertUnits( unitMap )
+        for data in self.data : data.convertUnits( unitMap )
 
-        import energy
-        from fudge.processing.deterministic import transferMatrices
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
-        newComponents = []
-        Legendre = self.data
+        from fudge.processing.deterministic import transferMatrices as transferMatricesModule
 
-        if( 'LLNL_Pn' in processInfo['styles'] ) :
-            if( processInfo.verbosity >= 30 ) : print '%sGrouping %s' % ( verbosityIndent, self.moniker )
-            outputChannel = tempInfo['reaction'].outputChannel
-            projectile, product = processInfo.getProjectileName( ), tempInfo['product'].particle.name
-            TM_1, TM_E = transferMatrices.ELEpP_TransferMatrix( processInfo, projectile, product, tempInfo['crossSection'],
-                Legendre, tempInfo['multiplicity'], comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
-            fudge.gnd.miscellaneous.TMs2Form( processInfo, tempInfo, newComponents, TM_1, TM_E, self.axes )
+        verbosity = tempInfo['verbosity']
+        if( verbosity > 2 ) : print '%sGrouping %s' % ( indent, self.moniker )
 
-        return( newComponents )
+        TM_1, TM_E = transferMatricesModule.ELEpP_TransferMatrix( style, tempInfo, tempInfo['crossSection'], tempInfo['productFrame'],
+            self.data, tempInfo['multiplicity'], comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
+
+        return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
+
+    def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
+
+        linear = self.toPointwise_withLinearXYs( )
+        return( linear.to_xs_pdf_cdf1d( style, tempInfo, indent ) )
+
+    def toPointwise_withLinearXYs( self, **kwargs ) :
+
+        energy_ins = {}
+        for order in self.data :
+            for EEpCl in order :
+                if( EEpCl.value not in energy_ins ) : energy_ins[EEpCl.value] = set( )
+                E_outs = energy_ins[EEpCl.value]
+                for Ep, Cl in EEpCl : E_outs.add( Ep )
+
+        energy_ins_sorted = sorted( energy_ins )
+        for energy_in in energy_ins_sorted : energy_ins[energy_in] = sorted( energy_ins[energy_in] )
+
+        axes = energyAngularModule.defaultAxes( self.axes[-2].unit )
+
+        XYs3d = energyAngularModule.XYs3d( axes = axes )
+        for i1, energy_in in enumerate( energy_ins_sorted ) :
+            XYs2d = energyAngularModule.XYs2d( axes = axes, value = energy_in )
+
+            energy_outs = energy_ins[energy_in]
+            for energy_out in energy_outs :
+                coefficients = []
+                for order in self.data :
+                    value = order.evaluate( energy_in ).evaluate( energy_out )
+                    if( value is None ) : value = 0                             # This is a Kludge for W data.
+                    coefficients.append( value )
+                XYs2d.append( energyAngularModule.Legendre( coefficients, axes = axes, value = energy_out ) )
+            XYs3d.append( XYs2d )
+        return( XYs3d )
 
     def toXMLList( self, indent = '', **kwargs ) :
 
@@ -240,72 +264,35 @@ class LLNLPointwise( subform ) :
         xPath.pop( )
         return( lpw )
 
-    @staticmethod
-    def defaultAxes( ) :
-
-        axes = axesModule.axes( rank = 4 )
-        axes[0] = axesModule.axis( 'c_l',        0, '1/MeV' )
-        axes[1] = axesModule.axis( 'energy_out', 1, 'MeV' )
-        axes[2] = axesModule.axis( 'energy_in',  2, 'MeV' )
-        axes[3] = axesModule.axis( 'l',          3, '' )
-        return( axes )
-
-class LLNLPointwiseEEpP :
-
-    def __init__( self, l ) :
-
-        raise "This should no longer be used, but should not be removed until LLNLPointwise.calculateAverageProductData is changed as it uses it."
-        self.l = l
-        self.EpP = []
-
-    def __getitem__( self, index ) :
-
-        return( self.EpP[index] )
-
-    def __len__( self ) :
-
-        return( len( self.EpP ) )
-
-    def append( self, EpP ) :
-
-        if( not( isinstance( EpP, XYsModule.XYs1d ) ) ) : raise Exception( 'EpP is an instance of %s' % brb.getType( EpP ) )
-        if( len( self ) > 0 ) :
-            if( EpP.value is None ) : raise Exception( "EpP's value is None" )
-            if( EpP.value <= self.EpP[-1].value ) : raise Exception( "EpP.value = %s <= prior's values = %s " % ( EpP.value, self.EpP[-1].value ) )
-        self.EpP.append( EpP )
-
-    def toXMLList( self, indent = '', **kwargs ) :
-
-        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
-        kwargs['oneLine'] = True
-
-        xmlString = [ '%s<l index="%s">' % ( indent, self.l ) ]
-        for energy in self : xmlString += energy.toXMLList( indent2, **kwargs )
-        xmlString[-1] += '</l>'
-        return( xmlString )
-
 class form( baseModule.form ) :
+    """
+    This is for ENDL I = 4 data with l > 0.
+    This is a temporary class, to be removed once testing is done and all coefficients in endl99, H2(n,2n)p data are filled in.
+    """
 
-    moniker = 'Legendre'
-    subformAttributes = ( 'LegendreSubform', )
+    moniker = 'LLNLLegendre'
+    subformAttributes = ( 'Legendre', )
 
     def __init__( self, label, productFrame, LegendreSubform ) :
 
         if( not( isinstance( LegendreSubform, subform ) ) ) : raise TypeError( 'instance is not a Legendre subform' )
         baseModule.form.__init__( self, label, productFrame, ( LegendreSubform, ) )
 
-    def calculateDepositionData( self, style, indent = '', **kwargs ) :
+    def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
-        raise 'hell - I do not think this is used anymore - BRB'
-        return( self.forms[0].calculateDepositionData( style, indent = '', **kwargs ) )
+        return( self.Legendre.calculateAverageProductData( style, indent = '', **kwargs ) )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
-        raise Exception( 'need to implement' )
+        tempInfo['productFrame'] = self.productFrame
+        return( self.Legendre.processMultiGroup( style, tempInfo, indent ) )
 
-#    def process( self, processInfo, tempInfo, verbosityIndent ) :
+    def processMC( self, style, tempInfo, indent ) :
 
-        return( self.forms[0].process( processInfo, tempInfo, verbosityIndent ) )
+        from . import energyAngularMC as energyAngularMCModule
+
+        energy, energyAngular = self.Legendre.to_xs_pdf_cdf1d( style, tempInfo, indent )
+        return( energyAngularMCModule.form( style.label, self.productFrame, energy, energyAngular ) )        
 
     @staticmethod
     def parseXMLNode( LegendreElement, xPath, linkData ) :
@@ -317,6 +304,6 @@ class form( baseModule.form ) :
             }.get( subformElement.tag )
         if( subformClass is None ) : raise Exception( "unknown Legendre subform: %s" % subformElement.tag )
         LegendreSubform = subformClass.parseXMLNode( subformElement, xPath, linkData )
-        form_ = form( LegendreElement.get( 'label' ), LegendreElement.get( 'productFrame' ), LegendreSubform )
+        _form = form( LegendreElement.get( 'label' ), LegendreElement.get( 'productFrame' ), LegendreSubform )
         xPath.pop( )
-        return( form_ )
+        return( _form )

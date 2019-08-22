@@ -64,93 +64,93 @@
 """
 This module contains the product class.
 
-GND classes store reaction data in a hierarchical format. At the base is the product class. Next is the
-channel that represents input and output channels. An input channel is a list of the inputcoming particles. 
-As example, for a neutron hitting oxygen-16, the input channel is composed of the neutron and oxygen-16 
-(i.e., 'n_1 + O_16'). An output channel is a list of the outgoing particles (some of which may decay into 
-other particles). The third class in the hierarchy is the reaction class which is used to specify a 
-reaction. A reaction is an input and output channel together, (e.g. n_1 + O_16  --> H_1 + N_16). Finally, the 
-reactionSuite class is used to store a list of reaction for a given input channel. The following outline 
-summarizes the classes.
+GND classes store reaction data in a hierarchical format. At the top is the product class. Next is the
+channel, representing the reaction output channels. An output channel contains the Q-value and a list
+of outgoing products (some of which may decay into other particles).
+The channel is stored inside the reaction class, which consists of an input and output channel together,
+(e.g. n_1 + O_16  --> H_1 + N_16). Finally, the reactionSuite class is used to store a list of reaction
+for a given input channel (that is, for the incoming particles that come together in the reaction).
+The following outline summarizes the classes.
 
 :product:
-    A particle distribution information.
+    Outgoing particle, including multiplicity and distribution information.
 
 :channel:
-    A list of particles of class product.
+    A Q-value plus a list of products.
 
 :reaction:
-    An input channel of class channel (e.g. n + Pu_239) and
-    a single outgoing channel of sub-class of channel (e.g., 2n + Pu_239).
-    Sub-classes of channel are twoBodyOutputChannel, NBodyOutputChannel and productionChannel.
+    Contains a cross section (defined in the gnd.reactionData.crossSection module), along with
+    an outgoing channel which must be one of the classes defined in gnd.channels (e.g., 2n + Pu239).
     
 :reactionSuite:
-    An input channel of class channel (e.g. n + Pu_239)
-    and a list of outgoing channels of class reaction with the same input channel instance::
+    Contains all reactions sharing the same input channel (e.g. n + Pu239)
     
-        (e.g., n + Pu_239 --> n + Pu_239, n + Pu_239 --> n + Pu_239_e1, n + Pu_239 --> n + Pu_239_e2, n + Pu_239 --> 2n + Pu_239 ... )
+        (e.g., n + Pu239 --> n + Pu239, n + Pu239 --> n + Pu239_e1,
+        n + Pu239 --> n + Pu239_e2, n + Pu239 --> 2n + Pu239 ... )
 """
-import string
+
+from pqu import PQU as PQUModule
+
+from PoPs import IDs as IDsPoPsModule
 
 from fudge.core.utilities import brb
 
-import xData.ancestry as ancestryModule
-from xData import standards as standardsModule
+from xData import ancestry as ancestryModule
+from xData import physicalQuantity as physicalQuantityModule
 
 from fudge.gnd import suites as suitesModule
 
-from .productData import distributions as distributionsModule
 from .productData.distributions import distribution as distributionModule
-from .productData.distributions import angular as angularModule
-from .productData.distributions import energy as energyModule
 from .productData.distributions import unspecified as unspecifiedModule
-from .productData.distributions import reference as referenceModule
-from .productData.distributions import KalbachMann as KalbachMannModule
-
 from .productData import multiplicity as multiplicityModule
 from .productData import energyDeposition as energyDepositionModule
 from .productData import momentumDeposition as momentumDepositionModule
 from . import channels as channelsModule
-from . import productData
 
 __metaclass__ = type
 
 class product( ancestryModule.ancestry ) :
     """
-    This is the class for a gnd particle. A gnd particle can decay (i.e., breakup), the decay
-    formula is defined via the outputChannel member.
+    This is the class for a gnd product. If the product can decay (e.g. for breakup reactions),
+    the resulting decay information is defined in the product outputChannel
     """
 
     moniker = 'product'
+    ancestryMembers = ( 'multiplicity', 'distribution', 'outputChannel',
+                        'energyDeposition', 'momentumDeposition' )
 
-    def __init__( self, particle, label = None, attributes = {}, outputChannel = None ) :
+    def __init__( self, id, label = None, attributes = None, outputChannel = None ) :
         """Creates a new product object."""
 
         ancestryModule.ancestry.__init__( self )
-        self.particle = particle
+
+        self.__id = id
         self.__label = label
+        self.__particle = None  # lazy evaluation
         self.attributes = {}
-        for q in attributes : self.addAttribute( q, attributes[q] )
+        if attributes is not None:
+            for q in attributes : self.addAttribute( q, attributes[q] )
+
         self.outputChannel = None
         if( outputChannel is not None ) : self.addOutputChannel( outputChannel )
 
-        self.multiplicity = multiplicityModule.component( )
-        self.multiplicity.setAncestor( self )
+        self.__multiplicity = multiplicityModule.component( )
+        self.__multiplicity.setAncestor( self )
 
-        self.energyDeposition = energyDepositionModule.component( )
-        self.energyDeposition.setAncestor( self )
+        self.__energyDeposition = energyDepositionModule.component( )
+        self.__energyDeposition.setAncestor( self )
 
-        self.momentumDeposition = momentumDepositionModule.component( )
-        self.momentumDeposition.setAncestor( self )
+        self.__momentumDeposition = momentumDepositionModule.component( )
+        self.__momentumDeposition.setAncestor( self )
 
-        self.distribution = distributionModule.component( )
-        self.distribution.setAncestor( self )
+        self.__distribution = distributionModule.component( )
+        self.__distribution.setAncestor( self )
 
     def __cmp__( self, other ) :
         """Compares self to other."""
 
-        if( self.name < other.name ) : return( -1 )
-        if( self.name > other.name ) : return(  1 )
+        if( self.id < other.id ) : return( -1 )
+        if( self.id > other.id ) : return(  1 )
         if( self.outputChannel < other.outputChannel ) : return( -1 )
         if( self.outputChannel > other.outputChannel ) : return(  1 )
         return( 0 )
@@ -161,10 +161,20 @@ class product( ancestryModule.ancestry ) :
         return( self.toString( simpleString = False ) )
 
     @property
-    def name( self ) :
-        """Returns self's name"""
+    def id( self ) :
 
-        return( self.particle.name )
+        return( self.__id )
+
+    @property
+    def name( self ) :
+
+        return( self.id )
+
+    @property
+    def particle(self):
+        if self.__particle is None:
+            self.__particle = self.findAttributeInAncestry('PoPs')[self.id]
+        return self.__particle
 
     @property
     def label( self ) :
@@ -178,6 +188,25 @@ class product( ancestryModule.ancestry ) :
         if( not( isinstance( value, str ) ) ) : raise TypeError( 'label must be a string' )
         self.__label = value
 
+    @property
+    def multiplicity( self ) :
+
+        return( self.__multiplicity )
+
+    @property
+    def energyDeposition( self ) :
+
+        return( self.__energyDeposition )
+
+    @property
+    def momentumDeposition( self ) :
+
+        return( self.__momentumDeposition )
+
+    @property
+    def distribution( self ) :
+
+        return( self.__distribution )
 
     def addOutputChannel( self, outputChannel ) :
         """Adds outputChannel to particle."""
@@ -186,12 +215,26 @@ class product( ancestryModule.ancestry ) :
             outputChannel.setAncestor( self )
             self.outputChannel = outputChannel
         else :
-            raise Exception( 'Invalid decay channel = %s' % brb.getType( outputChannel ) )
+            raise TypeError( 'Invalid decay channel = %s' % brb.getType( outputChannel ) )
 
     def addAttribute( self, name, value ) :
         """Add name and value to attribute list."""
 
         self.attributes[name] = value
+
+    def convertUnits( self, unitMap ) :
+        "See documentation for reactionSuite.convertUnits."
+
+        if( 'originationLevel' in self.attributes ) :
+            originationLevel = PQUModule.PQU( self.attributes['originationLevel'] )
+            originationLevel = physicalQuantityModule.physicalQuantity( float( originationLevel ), originationLevel.unit )
+            originationLevel.convertUnits( unitMap )
+            self.attributes['originationLevel'] = originationLevel.toString( significantDigits = 12 )
+        self.multiplicity.convertUnits( unitMap )
+        self.energyDeposition.convertUnits( unitMap )
+        self.momentumDeposition.convertUnits( unitMap )
+        self.distribution.convertUnits( unitMap )
+        if( self.outputChannel is not None ) : self.outputChannel.convertUnits( unitMap )
 
     def checkProductFrame( self ) :
         """
@@ -201,17 +244,20 @@ class product( ancestryModule.ancestry ) :
         self.distribution.checkProductFrame( )
         if( self.outputChannel is not None ) : self.outputChannel.checkProductFrame( )
 
-    def domainMin( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMin( self ) :
 
-        return( self.multiplicity.domainMin( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.multiplicity.domainMin )
 
-    def domainMax( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMax( self ) :
 
-        return( self.multiplicity.domainMax( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.multiplicity.domainMax )
 
-    def domain( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainUnit( self ) :
 
-        return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.multiplicity.domainUnit )
 
     def getLevelAsFloat( self, unit, default = 0. ) :
 
@@ -234,83 +280,94 @@ class product( ancestryModule.ancestry ) :
         verbosity = kwargs['verbosity']
         indent2 = indent  + kwargs['incrementalIndent']
         indent3 = indent2 + kwargs['incrementalIndent']
+
+        reactionSuite = kwargs['reactionSuite']
         energyUnit = kwargs['incidentEnergyUnit']
-        momentumDepositionUnit = energyUnit + '/c'
+        momentumDepositionUnit = kwargs['momentumDepositionUnit']
+        massUnit = kwargs['massUnit']
         energyAccuracy = kwargs['energyAccuracy']
         momentumAccuracy = kwargs['momentumAccuracy']
 
+        kwargs['product'] = self
+        try :
+            kwargs['productMass'] = reactionSuite.PoPs[self.id].getMass( massUnit )
+        except :                        # Can happend when mass is not needed for evaluation and hence not stored.
+            kwargs['productMass'] = None
+
         if( verbosity > 1 ) :
-            print '%s%s: label = %s: calculating average product data' % ( indent, self.name, self.label )
+            print '%s%s: label = %s: calculating average product data' % ( indent, self.id, self.label )
         if( len( self.distribution ) > 0 ) :
-            multiplicity = style.findFormMatchingDerivedStyles( self.multiplicity )
-            kwargs['multiplicity'] = multiplicity.toPointwise_withLinearXYs( 1e-8, 1e-8 )
-            kwargs['product'] = self
+            multiplicity = style.findFormMatchingDerivedStyle( self.multiplicity )
+            kwargs['multiplicity'] = multiplicity.toPointwise_withLinearXYs( accuracy = 1e-5, upperEps = 1e-8 )
             energyData, momentumData = self.distribution.calculateAverageProductData( style, indent = indent2, **kwargs )
             if( energyData is not None ) :
-                axes = energyDepositionModule.XYs1d.defaultAxes( energyUnit = energyUnit, energyDepositionUnit = energyUnit )
+                axes = energyDepositionModule.defaultAxes( energyUnit = energyUnit )
                 if( len( energyData ) == 1 ) :
-                    averageEnergy = energyDepositionModule.XYs1d( data = energyData[0], axes = axes, label = style.label, 
-                            accuracy = energyAccuracy ) 
+                    averageEnergy = energyDepositionModule.XYs1d( data = energyData[0], axes = axes, label = style.label ) 
                 else :
                     averageEnergy = energyDepositionModule.regions1d( axes = axes, label = style.label )
                     for energyDataRegion in energyData :
-                        averageEnergyRegion = energyDepositionModule.XYs1d( data = energyDataRegion, axes = axes, 
-                                accuracy = energyAccuracy )
+                        averageEnergyRegion = energyDepositionModule.XYs1d( data = energyDataRegion, axes = axes )
                         averageEnergy.append( averageEnergyRegion )
                 self.energyDeposition.add( averageEnergy )
             if( momentumData is not None ) :
-                axes = momentumDepositionModule.XYs1d.defaultAxes( energyUnit = energyUnit, momentumDepositionUnit = momentumDepositionUnit )
+                axes = momentumDepositionModule.defaultAxes( energyUnit = energyUnit, momentumDepositionUnit = momentumDepositionUnit )
                 if( len( momentumData ) == 1 ) :
-                    averageMomentum = momentumDepositionModule.XYs1d( data = momentumData[0], axes = axes, label = style.label, 
-                            accuracy = energyAccuracy ) 
+                    averageMomentum = momentumDepositionModule.XYs1d( data = momentumData[0], axes = axes, label = style.label ) 
                 else :
                     averageMomentum = momentumDepositionModule.regions1d( axes = axes, label = style.label ) 
                     for momentumDataRegion in momentumData :
-                        averageMomentumRegion = momentumDepositionModule.XYs1d( data = momentumDataRegion, axes = axes, 
-                                accuracy = momentumAccuracy ) 
+                        averageMomentumRegion = momentumDepositionModule.XYs1d( data = momentumDataRegion, axes = axes ) 
                         averageMomentum.append( averageMomentumRegion )
                 self.momentumDeposition.add( averageMomentum )
         if( self.outputChannel is not None ) : self.outputChannel.calculateAverageProductData( style, indent = indent3, **kwargs )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMC( self, style, tempInfo, indent = '', incrementalIndent = '  ' ) :
 
         indent2 = indent + tempInfo['incrementalIndent']
         verbosity = tempInfo['verbosity']
-        status = 0
+        if( verbosity > 1 ) : print '%s%s: label = %s: MC processing' % ( indent, self.id, self.label )
+
+        self.distribution.processMC( style, tempInfo, indent )
+        if( self.outputChannel is not None ) : self.outputChannel.processMC( style, tempInfo, indent2 )
+
+    def processMultiGroup( self, style, tempInfo, indent ) :
+
+        indent2 = indent + tempInfo['incrementalIndent']
+        verbosity = tempInfo['verbosity']
 
         tempInfo['workFile'].append( self.label )
 
-        if( self.particle.name in style.transportables ) :
+        doIt = not( isinstance( self.distribution[0], unspecifiedModule.form ) )
+        if( doIt and ( self.id in style.transportables ) ) :
             if( verbosity > 1 ) :
-                print '%s%s: label = %s: Sn processing' % ( indent, self.name, self.label )
+                print '%s%s: label = %s: multiGroup processing' % ( indent, self.id, self.label )
 
             productMass = tempInfo['masses']['Product']             # Save to restore later
             tempInfo['masses']['Product'] = self.getMass( tempInfo['massUnit'] )
             tempInfo['product'] = self
             tempInfo['multiplicity'] = self.multiplicity
 
-            self.multiplicity.processSnMultiGroup( style, tempInfo, indent )
-            self.energyDeposition.processSnMultiGroup( style, tempInfo, indent )
-            self.momentumDeposition.processSnMultiGroup( style, tempInfo, indent )
+            self.multiplicity.processMultiGroup( style, tempInfo, indent )
+            self.energyDeposition.processMultiGroup( style, tempInfo, indent )
+            self.momentumDeposition.processMultiGroup( style, tempInfo, indent )
             try :
-                self.distribution.processSnMultiGroup( style, tempInfo, indent )
+                self.distribution.processMultiGroup( style, tempInfo, indent )
             except :
                 if( tempInfo['logFile'] is None ) :
                     raise
                 else :
                     import traceback
                     tempInfo['logFile'].write( '\n' + self.toXLink() + ':\n' + traceback.format_exc( ) + '\n' )
-                    status = 1
+                    tempInfo['failures'] += 1
             tempInfo['masses']['Product'] = productMass
 
-        if( self.outputChannel is not None ) : status += self.outputChannel.processSnMultiGroup( style, tempInfo, indent2 )
+        if( self.outputChannel is not None ) : self.outputChannel.processMultiGroup( style, tempInfo, indent2 )
         del tempInfo['workFile'][-1]
-        return( status )
 
     def check( self, info ):
-        """ check product and distributions """
+        """ check product multiplicity, distribution and breakup products (if applicable) """
         from fudge.gnd import warning
-        base = distributionsModule.base
         warnings = []
 
         multWarnings = self.multiplicity.check( info )
@@ -320,58 +377,9 @@ class product( ancestryModule.ancestry ) :
         if( ( self.label in info['transportables'] ) and ( not self.distribution.hasData( ) ) ) :
             warnings.append( warning.missingDistribution( self.label, self ) )
 
-        for form in self.distribution:
-
-            if info['isTwoBody']:
-                if( form.productFrame != standardsModule.frames.centerOfMassToken ) :
-                    warnings.append( warning.wrong2BodyFrame( form ) )
-
-                if form.moniker not in (angularModule.twoBodyForm.moniker,
-                                        referenceModule.form.moniker,
-                                        angularModule.CoulombExpansionForm.moniker,
-                                        unspecifiedModule.form.moniker):
-                    warnings.append( warning.wrongDistributionComponent( form.moniker, '2-body' ) )
-            else:
-                if form.moniker in (angularModule.twoBodyForm.moniker,
-                                    angularModule.form.moniker,
-                                    energyModule.form.moniker):
-                    if not ( ( self.name =='gamma' ) and ( 'discrete' in self.attributes ) ) :
-                        warnings.append( warning.wrongDistributionComponent( form.moniker, 'N-body' ) )
-
-            def checkForm( form, uncorrelatedSubform='' ):
-                distributionErrors = []
-                try:
-                    if hasattr(form, 'domain') and form.domain() != info['crossSectionDomain']:
-                        for idx in range(2):    # check lower and upper edges: only warn if they disagree by > eps
-                            ratio = form.domain()[idx] / info['crossSectionDomain'][idx]
-                            if (ratio < 1-standardsModule.floats.epsilon or ratio > 1+standardsModule.floats.epsilon):
-                                distributionErrors.append( warning.domain_mismatch(
-                                        *(form.domain() + info['crossSectionDomain']), obj=form ) )
-                                break
-                except IndexError as err:
-                    distributionErrors.append(warning.ExceptionRaised(err))
-                    if info['failOnException']: raise
-                if not hasattr(form,'check'):
-                    warnings.append( warning.NotImplemented(form.moniker, form ) )
-                    if info['failOnException']:
-                        raise NotImplementedError("Checking distribution form '%s'" % form.moniker)
-                else:
-                    distributionErrors += form.check( info )
-                if distributionErrors:
-                    warnings.append( warning.context("Distribution %s %s - %s:"
-                        % (form.moniker, uncorrelatedSubform, form.moniker), distributionErrors ) )
-
-            if isinstance(form, distributionsModule.uncorrelated.form):
-                for subformName in ('angularSubform','energySubform'):
-                    subform = getattr(form, subformName ).data
-                    checkForm( subform, subformName.replace('Subform','') )
-
-            elif isinstance(form, KalbachMannModule.form):
-                checkForm( form )
-
-            else:
-                for subform in form.subforms:
-                    checkForm( subform )
+        distributionWarnings = self.distribution.check( info )
+        if distributionWarnings:
+            warnings.append( warning.context("Distribution:", distributionWarnings) )
 
         if self.outputChannel is not None:
             parentIsTwoBody = info['isTwoBody']
@@ -394,7 +402,7 @@ class product( ancestryModule.ancestry ) :
                 attributeString += ' %s="%s"' % ( q, self.attributes[q].toString( keepPeriod = False ) )
             else :
                 attributeString += ' %s="%s"' % ( q, self.attributes[q] )
-        xmlString = [ '%s<%s name="%s" label="%s"%s>' % ( indent, self.moniker, self.name, self.label, attributeString ) ]
+        xmlString = [ '%s<%s name="%s" label="%s"%s>' % ( indent, self.moniker, self.id, self.label, attributeString ) ]
 
         xmlString += self.multiplicity.toXMLList( indent2, **kwargs )
         xmlString += self.distribution.toXMLList( indent2, **kwargs )
@@ -412,33 +420,37 @@ class product( ancestryModule.ancestry ) :
         particles, and not any intermediate particles.
         """
 
-        if( simpleString == True ) :
-            s = self.name
-            multiplicity = self.multiplicity.getXMLAttribute( )
-            if( ( s != 'gamma' ) or exposeGammaMultiplicity ) :
-                if( type( multiplicity ) == type( 1 ) ) :
-                    if( multiplicity != 1 ) : s = "%s[multiplicity:'%s']" % ( s, multiplicity )
+        def multiplicityString( ) :
+
+            multiplicity = ''
+            if( ( self.id != IDsPoPsModule.photon ) or exposeGammaMultiplicity ) :
+                _multiplicity = self.multiplicity.evaluated
+                if( isinstance( _multiplicity, multiplicityModule.constant1d ) ) :
+                    iValue = int( _multiplicity.constant )
+                    if( iValue == _multiplicity.constant ) :
+                        if( iValue != 1 ) : multiplicity = '%s' % iValue
+                    else :
+                        multiplicity = '%s ' % multiplicity.constant
                 else :
-                    s = "%s[multiplicity:'%s']" % ( s, multiplicity )
+                    multiplicity = 'm(E)*'
+            return( multiplicity )
+
+        multiplicity = multiplicityString( )
+        if( simpleString == True ) :
+            productName = '%s%s' % ( multiplicity, self.id )
         else :
-            s = self.name
+            productName = self.id
             qs = ''
             c = '['
-            if( ( s != 'gamma' ) or exposeGammaMultiplicity ) :
-                multiplicity = self.multiplicity.getXMLAttribute( )
-                if( multiplicity != 1 ) :
-                    qs += "%smultiplicity:'%s'" % ( c, multiplicity )
-                    c = ', '
             for q in self.attributes :
                 if( q == 'ENDFconversionFlag' ) : continue
                 v = self.attributes[q]
-                if( ( q == 'multiplicity' ) and ( v == 1 ) ) : continue
                 qs += "%s%s:'%s'" % ( c, q, v )
                 c = ', '
             if( len( qs ) > 0 ) : qs += ']'
-            s = '%s%s' % ( s, qs )
-            if( self.outputChannel is not None ) : s = '(%s -> %s)' % ( s, self.outputChannel )
-        return( s )
+            productName = '%s%s%s' % ( multiplicity, productName, qs )
+            if( self.outputChannel is not None ) : productName = '(%s -> %s)' % ( productName, self.outputChannel )
+        return( productName )
 
     @staticmethod
     def parseXMLNode( productElement, xPath, linkData ):
@@ -446,8 +458,7 @@ class product( ancestryModule.ancestry ) :
 
         xPath.append( '%s[@label="%s"]' % ( productElement.tag, productElement.get( 'label' ) ) )
         attrs = dict( productElement.items( ) )
-        particle = linkData['particles'].getParticle( attrs.pop( 'name' ) )
-        prod = product( particle, label = attrs.pop( 'label' ) )
+        prod = product( id = attrs.pop( 'name' ), label = attrs.pop( 'label' ) )
         prod.multiplicity.parseXMLNode( productElement.find( multiplicityModule.component.moniker ), xPath, linkData )
         prod.distribution.parseXMLNode( productElement.find( distributionModule.component.moniker ), xPath, linkData )
         outputChannel = productElement.find( channelsModule.outputChannelToken )
@@ -455,14 +466,13 @@ class product( ancestryModule.ancestry ) :
             prod.addOutputChannel( channelsModule.parseXMLNode( outputChannel, xPath, linkData ) )
         for attr in ( 'decayRate', 'primary', 'discrete' ) :
             if( attr in attrs ) :
-                from pqu import PQU
-                attrs[attr] = PQU.PQU( attrs[attr] )
+                attrs[attr] = PQUModule.PQU( attrs[attr] )
         prod.attributes = attrs
 
         depositionEnergyToken = energyDepositionModule.component.moniker
         if( productElement.find( depositionEnergyToken ) is not None ) :
             prod.energyDeposition.parseXMLNode( productElement.find( depositionEnergyToken ), xPath, linkData )
-        depositionMomentumToken = productData.momentumDeposition.component.moniker
+        depositionMomentumToken = momentumDepositionModule.component.moniker
         if( productElement.find( depositionMomentumToken ) is not None ) :
             prod.momentumDeposition.parseXMLNode( productElement.find( depositionMomentumToken ), xPath, linkData )
         xPath.pop( )
@@ -482,32 +492,5 @@ class products( suitesModule.suite ) :
         based on product's name appended with '__' and one or more lower case letters (i.e., 'a' to 'z').
         """
 
-        def incrementSuffix( suffix ) :
-
-            if( len( suffix ) == 0 ) : return( 'a' )
-            index = string.ascii_lowercase.find( suffix[-1] ) + 1
-            if( index != 26 ) : return( suffix[:-1] + string.ascii_lowercase[index] )
-            return( incrementSuffix( suffix[:-1] ) + 'a' )
-
-        if( product.label is None ) : product.__label = product.name
-        if( product.label in self ) :
-            name__ = product.name + '__'
-            n1 = len( name__ )
-            l1 = 0
-            suffixes = []
-            for _product in self :          # Find list of longest labels that start with name__.
-                if( _product.label[:n1] == name__ ) :
-                    suffix = _product.label[n1:]
-                    if( not( suffix.islower( ) ) ) : continue       # Ignore non-standard labels.
-                    l2 = len( suffix )
-                    if( l2 < l1 ) : continue
-                    if( l2 > l1 ) :
-                        l1 = l2
-                        suffixes = []
-                    suffixes.append( suffix )
-            if( len( suffixes ) == 0 ) :
-                suffix = 'a'
-            else :
-                suffix = incrementSuffix( sorted( suffixes )[-1] )
-            product.label = name__ + suffix
-        return( product )
+        if( product.label is None ) : product.label = product.id
+        return( suitesModule.suite.uniqueLabel( self, product ) )

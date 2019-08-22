@@ -152,10 +152,10 @@ def convertUnit( unitFrom, unitTo, xs, xErrs, legend ) :
     if( ( unitFrom is not None ) and ( unitTo is not None ) and ( unitFrom != unitTo ) ) :
         try:
             conversionFactor = PQU.valueOrPQ( 1.0, unitFrom = unitFrom, unitTo = unitTo, asPQU = False )
-        except TypeError, err: 
+        except TypeError as err:
             if legend is None: legend="name suppressed"
             raise TypeError( "In plot2d.convertUnit, " + err.message + ', error from PQU: ' + unitFrom + ' -> ' + unitTo + ' for dataset ' + str( legend ) )
-        except NameError, err:
+        except NameError as err:
             if legend is None: legend="name suppressed"
             raise NameError( "In plot2d.convertUnit, " + err.message + ', error from PQU: ' + unitFrom + ' -> ' + unitTo + ' for dataset ' + str( legend ) )
         if( xErrs is not None ) :
@@ -426,7 +426,7 @@ class DataSet2d( DataSetParameters ):
                 self.yUnit = data.axes[0].unit
             if( infill ) :
                 if( not( hasattr( data, 'toPointwise_withLinearXYs' ) ) ) : raise TypeError( "Unsupported type for infilling: %s" % type( data ) )
-                data = data.toPointwise_withLinearXYs( 0, 0.00001 )
+                data = data.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-6 )
             if( hasattr( data, 'copyDataToXsAndYs' ) ) :
                 self.x, self.y = data.copyDataToXsAndYs( )
                 if( uncertainty is not None ): self.yerr = [ uncertainty.evaluate( xx ) for xx in self.x ]
@@ -506,7 +506,7 @@ class DataSet3d( DataSetParameters ):
     def __init__( self, data, dataType = None, xUnit = None, yUnit = None, zUnit = None, **kw ):
 
         data_ = data
-        if( hasattr( data, 'toPointwise_withLinearXYs' ) ) : data_ = data.toPointwise_withLinearXYs( 0, 0 )
+        if( hasattr( data, 'toPointwise_withLinearXYs' ) ) : data_ = data.toPointwise_withLinearXYs( accuracy = 1e-5, upperEps = 1e-8 )
         self.x, self.y, self.z = data_.copyDataToGridWsAndXsAndYs()
 
         self.xUnit, self.yUnit, self.zUnit = xUnit, yUnit, zUnit
@@ -559,7 +559,7 @@ class DataSet3d( DataSetParameters ):
 
         for ix, x in enumerate( self.x ) :
             xys = [ [ y, self.z[iy][ix] ] for iy, y in enumerate( self.y ) ]
-            w_xys[ix] = XYsModule.XYs( xys, axes = axes_2d, accuracy = 1e-3, value = x )
+            w_xys[ix] = XYsModule.XYs( xys, axes = axes_2d, value = x )
         return( w_xys )
 
     @property
@@ -580,6 +580,29 @@ def __makePlot2d( datasets, xAxisSettings=None, yAxisSettings=None, theTitle=Non
     import matplotlib
     if matplotlib.get_backend() != defaultBackend: matplotlib.use( defaultBackend )
     import matplotlib.pyplot as plt
+
+    # Check the axis settings.  If they are set to None and we can safely initialize them using information in the
+    # appropriate XYs1d data structure, then do so
+    if xAxisSettings is None:
+        xUnit = None
+        xLabel = None
+        for ds in datasets:
+            if hasattr(ds, 'axes'):
+                if xUnit is None: xUnit = ds.axes[1].unit
+                if xUnit != ds.axes[1].unit: raise ValueError(
+                    "Incompatible units found in x axes of datasets, %s vs. %s" % (xUnit, ds.axes[1].unit))
+                if xLabel is None: xLabel = ds.axes[1].label
+        xAxisSettings=AxisSettings(unit=xUnit,label=xLabel)
+    if yAxisSettings is None:
+        yUnit = None
+        yLabel = None
+        for ds in datasets:
+            if hasattr(ds, 'axes'):
+                if yUnit is None: yUnit = ds.axes[0].unit
+                if yUnit != ds.axes[0].unit: raise ValueError(
+                    "Incompatible units found in y axes of datasets, %s vs. %s" % (yUnit, ds.axes[0].unit))
+                if yLabel is None: yLabel = ds.axes[0].label
+        yAxisSettings=AxisSettings(unit=yUnit,label=yLabel)
 
     # Create a plotting instance in a figure if one is needed.  
     # If the user passed in a plot, we'll return that.
@@ -836,7 +859,7 @@ def plotTests( tests = 11*[ False ] ):
     if tests[0]:
         xSec = za.findData( I = 0, C = 46 )
         makePlot2d( [ xSec ], xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,\gamma)$ Cross Section', outFile = None )
-        xys = XYsModule.XYs( xSec.data, axes = xyAxes, accuracy = 1e-3 )
+        xys = XYsModule.XYs( xSec.data, axes = xyAxes )
         makePlot2d( ( xys ), xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,\gamma)$ Cross Section', outFile = None )
         dataset = DataSet2d( xys, xUnit = xAxis.unit, yUnit = yAxis.unit )
         dataset.convertUnits( 'eV', 'mb' )
@@ -850,7 +873,7 @@ def plotTests( tests = 11*[ False ] ):
     if tests[2]:
         xSecs = za.findDatas( I = 0 )
         makePlot2d( xSecs, xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,*)$ Cross Sections', outFile = None )   
-        xySecs = [ XYsModule.XYs( xSec.data, axes = xyAxes, accuracy = 1e-3 ) for xSec in xSecs ]
+        xySecs = [ XYsModule.XYs( xSec.data, axes = xyAxes ) for xSec in xSecs ]
         xySecs = ( xySecs[0], xySecs[1], xySecs[2] )
         makePlot2d( xySecs, xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,*)$ Cross Sections', outFile = None )   
 
@@ -871,7 +894,7 @@ def plotTests( tests = 11*[ False ] ):
         makePlot2dContour( DataSet3d( data = endfData, legend = 'ENDF/B-VII.0', xUnit = EAxis.unit, yUnit = muAxis.unit ), 
             xAxisSettings = EAxis, yAxisSettings = muAxis, title = '$^1$H$(n,el)$ Angular Distribution', outFile = None )
         w_xys = multiD_XYsModule.multiD_XYs( axes = axesModule.axes( rank = 3, labelsUnits = { 2 : ( '$E_n$', 'MeV' ) } ) )
-        for w, xy in endfData.data : w_xys.append( XYsModule.XYs( xy, axes = axesModule.axes( ), accuracy = 1e-3, value = w ) )
+        for w, xy in endfData.data : w_xys.append( XYsModule.XYs( xy, axes = axesModule.axes( ), value = w ) )
         dataset = DataSet3d( data = w_xys, legend = 'ENDF/B-VII.0' )
         dataset.convertUnits( 'eV', None, None )
         makePlot2dContour( dataset, xAxisSettings = EAxis, yAxisSettings = muAxis, 

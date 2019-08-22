@@ -61,10 +61,16 @@
 # 
 # <<END-copyright>>
 
-import site_packages.legacy.toENDF6.endfFormats as endfFormatsModule
-import fudge.gnd.productData.distributions.distribution as distributionModule
-import fudge.gnd.productData.distributions.reference as referenceModule
-import fudge.gnd.productData.distributions.unspecified as unspecifiedModule
+from PoPs import misc as miscPoPsModule
+
+from xData import standards as standardsModule
+
+from fudge.gnd.productData.distributions import distribution as distributionModule
+from fudge.gnd.productData.distributions import reference as referenceModule
+from fudge.gnd.productData.distributions import unspecified as unspecifiedModule
+
+from ... import endfFormats as endfFormatsModule
+from ... import gndToENDF6 as gndToENDF6Module
 
 def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
@@ -72,23 +78,38 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
         raise Exception( 'This needs to be tested' )     # In particular, the method endfMultiplicityList has been removed.
         if( MT in [ 452, 455, 456 ] ) : return
         targetInfo['MF6LCTs'].append( None )
-        particleID = targetInfo[ 'zapID' ]    # get ZAP for the outgoing particle
-        if( particleID == 'gamma' ) :
-            ZAP = 0
-        else :
-            Z, A, suffix, ZAP = nuclear.getZ_A_suffix_andZAFromName( particleID )
+        particle = targetInfo['reactionSuite'].PoPs[targetInfo['zapID']]
+        ZAP = miscPoPsModule.ZA( particle )
         nPoints, multiplicityList = targetInfo['multiplicity'].endfMultiplicityList( targetInfo )
-        endfMFList[6][MT] += [ endfFormatsModule.endfContLine( ZAP, targetInfo['particleMass'] / targetInfo['neutronMass'], 0, 0, 1, nPoints ) ]
+        AWP = targetInfo['massTracker'].getMassAWR(ZAP, asTarget = False)
+        endfMFList[6][MT] += [ endfFormatsModule.endfContLine( ZAP, AWP, 0, 0, 1, nPoints ) ]
         endfMFList[6][MT] += multiplicityList
         return
     form = self[targetInfo['style']]
     if( hasattr( form, 'toENDF6' ) ) :
         form.toENDF6( MT, endfMFList, flags, targetInfo )
-    elif( isinstance( form, referenceModule.form ) ) :
-        pass
     elif( isinstance( form, unspecifiedModule.form ) ) :
-        pass
+        if( MT in [ 527, 528 ] ) : energyLoss( self, MT, endfMFList, flags, targetInfo )
     else :
         print 'WARNING: Distribution, no toENDF6 for class = %s' % form.__class__
 
 distributionModule.component.toENDF6 = toENDF6
+
+def energyLoss( self, MT, endfMFList, flags, targetInfo ) :
+
+    energyDeposition = self.getAncestor( ).energyDeposition
+    try :
+        energyLoss = energyDeposition[targetInfo['style']]
+    except :
+        return
+    data = [ [ energyLoss.domainMin, energyLoss.domainMin ], [ energyLoss.domainMax, energyLoss.domainMax ] ]
+    energyLoss = energyLoss.__class__( data = data, axes = energyLoss.axes ) - energyLoss
+    data = []
+    for xy in energyLoss.copyDataToXYs( ) : data += xy
+    NE = len( energyLoss )
+    EInInterpolation = gndToENDF6Module.gndToENDFInterpolationFlag( energyLoss.interpolation )
+    ENDFDataList = [ endfFormatsModule.endfContLine( 0, 0, 0, 0, 1, NE ) ] + \
+            endfFormatsModule.endfInterpolationList( [ NE, EInInterpolation ] )
+    ENDFDataList += endfFormatsModule.endfDataList( data )
+    frame = standardsModule.frames.labToken
+    gndToENDF6Module.toENDF6_MF6( MT, endfMFList, flags, targetInfo, 8, frame, ENDFDataList )

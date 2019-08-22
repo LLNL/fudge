@@ -61,40 +61,55 @@
 # 
 # <<END-copyright>>
 
-from pqu import PQU
+from pqu import PQU as PQUModule
+
+from xData import standards as standardsModule
+
+from PoPs import misc as miscPoPsModule
+from PoPs import IDs as IDsPoPsModule
+from PoPs.families import nuclearLevel as nuclearLevelModule
+
 from fudge.particles import nuclear
 
+from fudge.gnd import sums as sumsModule
+from fudge.gnd.productData import multiplicity as multiplicityModule
+from fudge.gnd.reactionData import crossSection as crossSectionModule
+from fudge.gnd.productData.distributions import base as distributionBaseModule
+from fudge.gnd.productData.distributions import energy as energyModule
+from fudge.gnd.productData.distributions import angular as angularModule
+from fudge.gnd.productData.distributions import uncorrelated as uncorrelatedModule
+from fudge.gnd.productData.distributions import energyAngular as energyAngularModule
+from fudge.gnd.productData.distributions import unspecified as unspecifiedModule
+
 import endfFormats as endfFormatsModule
-import fudge.gnd.sums as sumsModule
-import fudge.gnd.productData.multiplicity as multiplicityModule
-import fudge.gnd.reactionData.crossSection as crossSectionModule
-import fudge.gnd.productData.distributions.base as distributionBaseModule
-import fudge.gnd.productData.distributions.energy as energyModule
-import fudge.gnd.productData.distributions.angular as angularModule
-import fudge.gnd.productData.distributions.uncorrelated as uncorrelatedModule
-import fudge.gnd.productData.distributions.energyAngular as energyAngularModule
-import fudge.gnd.productData.distributions.unspecified as unspecifiedModule
 
-import xData.standards as standardsModule
-
-def angularPointwiseEnergy2ENDF6( self, targetInfo ) :
+def angularPointwiseEnergy2ENDF6( self, targetInfo, EinFactor = 1 ) :
 
     interpolation = gndToENDFInterpolationFlag( self.interpolation )
+    if len(self) > 201:
+        accuracy, angularData = self.thinToNumberOfPoints( 201 )
+        assert len(angularData) <= 201
+        angularData = angularData.normalize()
+        print("          WARNING: ENDF limited to 201 mu values. %d points removed for incident energy %g %s" %
+                (len(self) - len(angularData), self.value, self.axes[-1].unit) )
+    else:
+        angularData = self
     if( targetInfo['doMF4AsMF6'] ) :
         interpolation += 10
-        ENDFDataList = [ endfFormatsModule.endfContLine( 0, self.value, interpolation, 0, 2 * len( self ), len( self ) ) ]
-        ENDFDataList += endfFormatsModule.endfNdDataList( self )
+        ENDFDataList = [ endfFormatsModule.endfContLine( 0, self.value * EinFactor, interpolation, 0,
+            2 * len( angularData ), len( angularData ) ) ]
+        ENDFDataList += endfFormatsModule.endfNdDataList( angularData )
     else :
-        ENDFDataList = [ endfFormatsModule.endfContLine( 0, self.value, 0, 0, 1, len( self ) ) ]
-        ENDFDataList += endfFormatsModule.endfInterpolationList( [ len( self ), interpolation ] )
-        ENDFDataList += endfFormatsModule.endfNdDataList( self )
+        ENDFDataList = [ endfFormatsModule.endfContLine( 0, self.value * EinFactor, 0, 0, 1, len( angularData ) ) ]
+        ENDFDataList += endfFormatsModule.endfInterpolationList( [ len( angularData ), interpolation ] )
+        ENDFDataList += endfFormatsModule.endfNdDataList( angularData )
     return( ENDFDataList )
 
-def angularLegendreEnergy2ENDF6( self, targetInfo ) :
+def angularLegendreEnergy2ENDF6( self, targetInfo, EinFactor = 1 ) :
 
     data = self
     if( 'doProductionGamma' in targetInfo ) : data = data.coefficients[1:]
-    ENDFDataList = [ endfFormatsModule.endfContLine( 0, self.value, 0, 0, len( data ), 0 ) ]
+    ENDFDataList = [ endfFormatsModule.endfContLine( 0, self.value * EinFactor, 0, 0, len( data ), 0 ) ]
     ENDFDataList += endfFormatsModule.endfNdDataList( data )
     return( ENDFDataList )
 
@@ -106,12 +121,55 @@ def gammaType( component ) :
         energySubform = component.energySubform.data
         if( isinstance( energySubform, energyModule.primaryGamma ) ) :
             isPrimary = True
-        elif( isinstance( energySubform, energyModule.constant ) ) :
+        elif( isinstance( energySubform, energyModule.discreteGamma ) ) :
             isDiscrete = True
         angularSubform = component.angularSubform.data
     else :
         raise 'hell - fix me'
     return( isPrimary, isDiscrete, energySubform, angularSubform )
+
+def gammasToENDF6_MF6_oneGamma( MT, endfMFList, flags, targetInfo, gamma, LANG, LEP, frame ) :
+
+    component = gamma.distribution[targetInfo['style']]
+    isPrimary, isDiscrete, energySubform, angularSubform = gammaType( component )
+    if( isPrimary or isDiscrete ) : return( False )
+
+    targetInfo['multiplicity'] = gamma.multiplicity[targetInfo['style']]
+
+    if( isinstance( component, uncorrelatedModule.form ) ) :
+        angularSubform = component.angularSubform.data
+        energySubform = component.energySubform.data
+        if( not( isinstance( angularSubform, angularModule.isotropic ) ) ) :
+            raise Exception( 'Unsupport angular form = "%s"' % angularSubform.moniker )
+        if( not( isinstance( energySubform, energyModule.regions2d ) ) ) : energySubform = [ energySubform ]
+        interpolationEIn = gndToENDF2PlusDInterpolationFlag( energySubform[0].interpolation, energySubform[0].interpolationQualifier )
+        EInFactor = PQUModule.PQU( 1, energySubform[0].axes[2].unit ).getValueAs( 'eV' )
+        EOutFactor = PQUModule.PQU( 1, energySubform[0].axes[1].unit ).getValueAs( 'eV' )
+
+        NE, NR = 0, 1
+        ENDFDataList = []
+        for i1, region in enumerate( energySubform ) :
+            interpolationEIn = gndToENDF2PlusDInterpolationFlag( region.interpolation, region.interpolationQualifier )
+            for energyInData in region :
+                NE += 1
+                EIn = energyInData.value
+                data = []
+                if( not( isinstance( energyInData, energyModule.regions1d ) ) ) : energyInData = [ energyInData ]
+                for region2 in energyInData :
+                    for Ep, probability in region2 :
+                        data.append( Ep * EOutFactor )
+                        data.append( probability / EOutFactor )
+                ENDFDataList += [ endfFormatsModule.endfContLine( 0, EIn, 0, 0, len( data ), len( data ) / 2 ) ]
+                ENDFDataList += endfFormatsModule.endfDataList( data )
+    else :
+        raise Exception( 'Unsupport continuum gamma distribution = "%s"' % component.moniker )
+
+    interpolations = [ NE, interpolationEIn ]
+    ENDFDataList.insert( 0, endfFormatsModule.endfContLine( 0, 0, LANG, LEP, NR, NE ) )
+    ENDFDataList.insert( 1, endfFormatsModule.endfInterpolationLine( interpolations ) )
+
+    toENDF6_MF6( MT, endfMFList, flags, targetInfo, 1, frame, ENDFDataList )
+    return( True )
 
 def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
 # FIXME - Still need to convert energies to eV.
@@ -126,11 +184,10 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
     def getTotalMultiplicityRegion( region, multiplicityRegions ) :
 
         for i2, totalRegion in enumerate( multiplicityRegions ) :
-            if( totalRegion.domainMin( ) <= region.domainMin( ) ) :
-                if( totalRegion.domainMax( ) > region.domainMin( ) ) : return( i2, totalRegion )
-        for i2, totalRegion in enumerate( multiplicityRegions ) : print i2, totalRegion.domain( )
-        domainMin, domainMax = region.domain( )
-        raise Exception( 'Could not find total region with domain %s, %s' % ( domainMin, domainMax ) )
+            if( totalRegion.domainMin <= region.domainMin ) :
+                if( totalRegion.domainMax > region.domainMin ) : return( i2, totalRegion )
+        for i2, totalRegion in enumerate( multiplicityRegions ) : print i2, totalRegion.domainMin, totalRegion.domainMax
+        raise Exception( 'Could not find total region with domain %s, %s' % ( self.domainMin, self.domainMax ) )
 
     if( len( gammas ) == 1 ) :          # Check for LLNL legacy data
         distribution = gammas[0].distribution
@@ -168,8 +225,10 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
     if( LEP < 0 ) : LEP = discreteLEP
     if( frame is None ) : return
 
-    total = [ tmp for tmp in targetInfo['reactionSuite'].sums if
-                  isinstance( tmp, sumsModule.multiplicitySum ) and tmp.ENDF_MT == MT ]
+    if( len( gammas ) == 1 ) :
+        if( gammasToENDF6_MF6_oneGamma( MT, endfMFList, flags, targetInfo, gammas[0], LANG, abs( LEP ), frame ) ) : return
+
+    total = [ tmp for tmp in targetInfo['reactionSuite'].sums.multiplicities if tmp.ENDF_MT == MT ]
     if( len( total ) > 1 ) :
             raise Exception( "Multiple total gamma multiplicities for MT=%d" % MT )
     elif( len( total ) == 1 ) :
@@ -216,7 +275,7 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
             for EIn, probability  in region :
                 total = totalRegion.evaluate( EIn )
                 if( total != 0 ) : probability /= total
-                gammaEnergy = energySubform.value.getValueAs( 'eV' )
+                gammaEnergy = PQUModule.PQU( energySubform.value, energySubform.axes[1].unit ).getValueAs( 'eV' )
                 realGammaEnergy = gammaEnergy
                 if( isPrimary ) : realGammaEnergy = -( gammaEnergy + massRatio * EIn )
                 if( EIn not in discreteWeightsRegions[i2] ) : discreteWeightsRegions[i2][EIn] = []
@@ -249,11 +308,11 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
                 raise Exception( 'Unsupport angular form = "%s"' % angularSubform.moniker )
             if( not( isinstance( energySubform, energyModule.regions2d ) ) ) : energySubform = [ energySubform ]
             interpolationEIn = gndToENDF2PlusDInterpolationFlag( energySubform[0].interpolation, energySubform[0].interpolationQualifier )
+            EInFactor = PQUModule.PQU( 1, energySubform[0].axes[2].unit ).getValueAs( 'eV' )
+            EOutFactor = PQUModule.PQU( 1, energySubform[0].axes[1].unit ).getValueAs( 'eV' )
             for i1, region in enumerate( energySubform ) :
                 i2, multiplicityRegion = getTotalMultiplicityRegion( region, multiplicityRegions )
                 i2, totalRegion = getTotalMultiplicityRegion( region, totalMultiplicityRegions )
-                EInFactor = PQU.PQU( 1, region.axes[-1].unit ).getValueAs( 'eV' )
-                EOutFactor = PQU.PQU( 1, region.axes[-2].unit ).getValueAs( 'eV' )
                 for energyInData in region :
                     EIn = energyInData.value
                     total = totalRegion.evaluate( EIn )
@@ -263,7 +322,7 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
                         for region2 in energyInData :
                             for Ep, probability in region2 :
                                 if( total != 0 ) : probability *= continuumMultiplicity / total
-                                data.append( Ep )
+                                data.append( Ep * EOutFactor )
                                 data.append( probability )
                     else :
                         for Ep, probability in energyInData :
@@ -278,8 +337,8 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
                 raise Exception( 'Multiple regions not supported for %s' % component.moniker )
             form = component.energyAngularForm
             interpolationEIn = gndToENDF2PlusDInterpolationFlag( form.interpolation, form.interpolationQualifier )
-            EInFactor = PQU.PQU( 1, component.axes[-1].unit ).getValueAs( 'eV' )
-            EOutFactor = PQU.PQU( 1, component.axes[-2].unit ).getValueAs( 'eV' )
+            EInFactor = PQUModule.PQU( 1, component.axes[-1].unit ).getValueAs( 'eV' )
+            EOutFactor = PQUModule.PQU( 1, component.axes[-2].unit ).getValueAs( 'eV' )
             incident_e_vals = []
             for energy_in in form :
                 EIn = energy_in.value
@@ -323,27 +382,25 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
             ENDFDataList += endfFormatsModule.endfDataList( gammaData )
     targetInfo['multiplicity'] = totalMultiplicity
     toENDF6_MF6( MT, endfMFList, flags, targetInfo, 1, frame, ENDFDataList )
-            
+
 def toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, frame, MF6 ) :
 
+    reactionSuite = targetInfo['reactionSuite']
     MF6or26 = { 3 : 6, 23 : 26 }[targetInfo['crossSectionMF']]
     targetInfo['MF6LCTs'].append( { standardsModule.frames.labToken : 1, standardsModule.frames.centerOfMassToken : 2 }[frame] )
     LIP = 0
-    if( ( targetInfo['product'].particle.name in targetInfo['metastables'] ) and not( ( 50 <= MT <= 91 ) or ( 600 <= MT <= 850 ) ) ) :
+    if( ( targetInfo['product'].id in targetInfo['metastables'] ) and not( ( 50 <= MT <= 91 ) or ( 600 <= MT <= 850 ) ) ) :
             # set LIP to metastable index of product UNLESS excited state of product is encoded in MT number:
-        alias, = [ alias for alias in targetInfo['reactionSuite'].aliases.values() if
-                alias.getValue() == targetInfo['product'].particle.name ]
-        LIP = int( alias.getAttribute( 'nuclearMetaStable' ) )
+        alias = targetInfo['metastables'][ targetInfo['product'].id ]
+        LIP = int( alias.metaStableIndex )
     if( MT not in endfMFList[MF6or26] ) : endfMFList[MF6or26][MT] = []
-    particleID = targetInfo[ 'zapID' ]    # get ZAP for the outgoing particle
-    if( particleID == 'gamma' ) :
-        ZAP = 0
-    if( particleID == 'e-' ) :
+    particleID = targetInfo['zapID']    # get ZAP for the outgoing particle
+    if( particleID == IDsPoPsModule.electron ) :
         ZAP = 11
     else :
-        Z, A, suffix, ZAP = nuclear.getZ_A_suffix_andZAFromName( particleID )
+        ZAP = miscPoPsModule.ZA( reactionSuite.PoPs[particleID] )
     productMass = targetInfo['particleMass']
-    if( ( particleID == 'n' ) and ( MT in [ 18 ] ) ) :                            # Special case when fission has MF = 6 data.
+    if( ( particleID == IDsPoPsModule.neutron ) and ( MT in [ 18 ] ) ) :                            # Special case when fission has MF = 6 data.
         nPoints = 2
         interpolationFlatData = [ nPoints, 2 ]
         multiplicityList = endfFormatsModule.endfDataList( [ [ targetInfo['EMin'], 1. ], [ targetInfo['EMax'], 1. ] ] )
@@ -351,10 +408,13 @@ def toENDF6_MF6( MT, endfMFList, flags, targetInfo, LAW, frame, MF6 ) :
         multiplicity = targetInfo['multiplicity']
         if( isinstance( multiplicity, multiplicityModule.component ) ) : multiplicity = multiplicity[targetInfo['style']]
         interpolationFlatData, nPoints, multiplicityList = multiplicity.toENDF6List( targetInfo )
-    if( ( particleID == 'gamma' ) and ( 'primaryGammaEnergy' in targetInfo.keys( ) ) ) :
-        AWP = targetInfo.dict.pop( 'primaryGammaEnergy' )
+    if( ( particleID == IDsPoPsModule.photon ) and ( LAW == 2 ) ) :
+        projectileMass = reactionSuite.PoPs[reactionSuite.projectile].getMass( 'eV/c**2' )
+        targetMass = reactionSuite.PoPs[reactionSuite.projectile].getMass( 'eV/c**2' )
+        AWP = targetInfo['Q']
+        AWP /= 1. + 0.5 * AWP / ( projectileMass + targetMass )             # Should be divided by residual mass, but this is close.
     else :
-        AWP = productMass / targetInfo['neutronMass']
+        AWP = productMass
     ENDFHeaderList = [ endfFormatsModule.endfContLine( ZAP, AWP, LIP, LAW, len( interpolationFlatData ) / 2, nPoints ) ]
     ENDFHeaderList += endfFormatsModule.endfInterpolationList( interpolationFlatData )
     ENDFHeaderList += multiplicityList
@@ -366,6 +426,7 @@ def upDateENDFMF8Data( endfMFList, targetInfo ) :
 
 def upDateENDF_MT_MF8Data( MT, endfMFList, targetInfo ) :
 
+    reactionSuite = targetInfo['reactionSuite']
     MF8Channels = targetInfo['MF8'][MT]
     ZA, mass = targetInfo[ 'ZA' ], targetInfo[ 'mass' ]
     LIS, LISO, NO, NS = targetInfo['LIS'], targetInfo['LISO'], 1, len( MF8Channels )
@@ -375,7 +436,7 @@ def upDateENDF_MT_MF8Data( MT, endfMFList, targetInfo ) :
     crossSection_ = firstReaction.crossSection[targetInfo['style']]  # LMF determines which MF section to write to.
     if( isinstance( crossSection_, crossSectionModule.reference ) ) : 
         multiplicity = residual.multiplicity[targetInfo['style']]
-        if(   isinstance( multiplicity, multiplicityModule.constant ) ) :
+        if(   isinstance( multiplicity, multiplicityModule.constant1d ) ) :
             LMF = 3
         elif( isinstance( multiplicity, multiplicityModule.reference ) ) :
             LMF = 6
@@ -394,11 +455,14 @@ def upDateENDF_MT_MF8Data( MT, endfMFList, targetInfo ) :
         if( len( outputChannel ) != 1 ) : raise Exception( 'Currently, production channel can only have one product; not %d' % len( outputChannel ) )
         product = outputChannel[0]
 
-        Z, A, suffix, ZAP = product.particle.getZ_A_SuffixAndZA( )
+        particle = reactionSuite.PoPs[product.id]
+        ZAP = miscPoPsModule.ZA( particle )
+
         QI = outputChannel.getConstantQAs( 'eV', final = True )
         LFS2, level2 = 0, 0
-        if( hasattr( product.particle, 'getLevelIndex' ) ) :
-            LFS2, level2 = product.particle.getLevelIndex(), product.particle.getLevelAsFloat( 'eV' )
+        if( isinstance( particle, nuclearLevelModule.particle ) ) :
+            LFS2 = particle.intIndex
+            level2 = particle.energy[0].float( 'eV' )
         QM = QI + level2
 
         endfMFList[8][MT].append( endfFormatsModule.endfHeadLine( ZAP, level2, LMF, LFS2, 0, 0 ) )
@@ -447,14 +511,13 @@ def gammasToENDF6_MF12_13( MT, MF, endfMFList, flags, targetInfo, gammas ) :
     crossSection = None
     if( MF == 13 ) :
         crossSection = targetInfo['crossSection']
-        crossSection = crossSection.toPointwise_withLinearXYs( 1e-8, 1e-8 )
+        crossSection = crossSection.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-8 )
 
     if( NK > 1 ) :
         # If more than one gamma is present, both MF=12 and MF=13 start with the sum over all gammas.
         # Search for the correct multiplicitySum in reactionSuite/sums section
 
-        total = [tmp for tmp in targetInfo['reactionSuite'].sums if
-                  isinstance( tmp, sumsModule.multiplicitySum ) and tmp.ENDF_MT == MT]
+        total = [tmp for tmp in targetInfo['reactionSuite'].sums.multiplicities if tmp.ENDF_MT == MT]
         if len(total) > 1:
             raise Exception("Cannot find unique gamma multiplicity sum for MT%d" % MT)
         elif not total:     # total multiplicity is missing from sums section, need to recompute from parts
@@ -470,24 +533,24 @@ def gammasToENDF6_MF12_13( MT, MF, endfMFList, flags, targetInfo, gammas ) :
 
         originationLevel = 0
         if( 'originationLevel' in gamma.attributes ) : 
-            originationLevel = PQU.PQU( gamma.getAttribute( 'originationLevel' ) ).getValueAs( 'eV' )
+            originationLevel = PQUModule.PQU( gamma.getAttribute( 'originationLevel' ) ).getValueAs( 'eV' )
 
         isPrimary, isDiscrete = False, False
         if( isinstance( component, uncorrelatedModule.form ) ) :
             energySubform = component.energySubform.data
             if( isinstance( energySubform, energyModule.primaryGamma ) ) :
                 isPrimary = True
-            elif( isinstance( energySubform, energyModule.constant ) ) :
+            elif( isinstance( energySubform, energyModule.discreteGamma ) ) :
                 isDiscrete = True
             angularSubform = component.angularSubform.data
         else :
             raise 'hell - fix me'
         LP, LF, levelEnergy = 0, 2, 0.
         if( isPrimary ) :
-            gammaEnergy = energySubform.value.getValueAs( 'eV' )
+            gammaEnergy = PQUModule.PQU( energySubform.value, energySubform.axes[1].unit ).getValueAs( 'eV' )
             LP = 2
         elif( isDiscrete ) :
-            gammaEnergy = energySubform.value.getValueAs( 'eV' )
+            gammaEnergy = PQUModule.PQU( energySubform.value, energySubform.axes[1].unit ).getValueAs( 'eV' )
             if( originationLevel != 0 ) : LP = 1
         else :
             if( continuum is not None ) : raise Exception( 'Multiple continuum gammas detected for MT=%s' % ( MT ) )

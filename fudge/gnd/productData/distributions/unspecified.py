@@ -73,6 +73,7 @@ class form( baseModule.form ) :
 
     moniker = 'unspecified'
     subformAttributes = []
+    ancestryMembers = ( '', )
 
     def __init__( self, label, productFrame = standardsModule.frames.labToken ) :
 
@@ -90,6 +91,10 @@ class form( baseModule.form ) :
 
         return( [ None, None ] )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMC( self, style, tempInfo, indent ) :
+
+        return( None )
+
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
         return( None )

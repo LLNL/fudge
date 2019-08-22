@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.endl.endl_y &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" accesskey="U">fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.legacy.endl.endl_y</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains a set of routines that return the symbol or name for an ENDL </span>
+<span class="sd">incident, yi, or outgoing, yo, particle designator.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">endl_yLabels</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span>  <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="s2">&quot;neutron&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="s2">&quot;proton&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;deuteron&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;triton&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;He3&quot;</span><span class="p">,</span> <span class="s2">&quot;helium3&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;He&quot;</span><span class="p">,</span> <span class="s2">&quot;alpha&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">7</span><span class="p">,</span> <span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="s2">&quot;gamma&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;e+&quot;</span><span class="p">,</span> <span class="s2">&quot;positron&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span>  <span class="mi">9</span><span class="p">,</span> <span class="s2">&quot;e-&quot;</span><span class="p">,</span> <span class="s2">&quot;electron&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;EC&quot;</span><span class="p">,</span> <span class="s2">&quot;electron capture&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">11</span><span class="p">,</span> <span class="s2">&quot;n as residual&quot;</span><span class="p">,</span> <span class="s2">&quot;n as residual&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">&quot;p as residual&quot;</span><span class="p">,</span> <span class="s2">&quot;p as residual&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">13</span><span class="p">,</span> <span class="s2">&quot;d as residual&quot;</span><span class="p">,</span> <span class="s2">&quot;d as residual&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">14</span><span class="p">,</span> <span class="s2">&quot;t as residual&quot;</span><span class="p">,</span> <span class="s2">&quot;t as residual&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">15</span><span class="p">,</span> <span class="s2">&quot;He3 as residual&quot;</span><span class="p">,</span> <span class="s2">&quot;He3 as residual&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">16</span><span class="p">,</span> <span class="s2">&quot;He as residual&quot;</span><span class="p">,</span> <span class="s2">&quot;He as residual&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">18</span><span class="p">,</span> <span class="s2">&quot;positron as residual&quot;</span><span class="p">,</span> <span class="s2">&quot;positron as residual&quot;</span> <span class="p">),</span> \
+    <span class="p">(</span> <span class="mi">19</span><span class="p">,</span> <span class="s2">&quot;electron as residual&quot;</span><span class="p">,</span> <span class="s2">&quot;electron as residual&quot;</span> <span class="p">)</span> <span class="p">)</span>
+
+<div class="viewcode-block" id="endl_yLabel"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_y.endl_yLabel">[docs]</a><span class="k">def</span> <span class="nf">endl_yLabel</span><span class="p">(</span> <span class="n">y</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the symbol for the specified y or &#39;None&#39; if y is out-of-bounds.&quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">endl_yLabels</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">y</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="endl_yLongLabel"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_y.endl_yLongLabel">[docs]</a><span class="k">def</span> <span class="nf">endl_yLongLabel</span><span class="p">(</span> <span class="n">y</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the label (i.e., name) for the specified y or &#39;None&#39; if y is out-of-bounds.&quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">endl_yLabels</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">y</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="endl_yLabelMaxWidth"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_y.endl_yLabelMaxWidth">[docs]</a><span class="k">def</span> <span class="nf">endl_yLabelMaxWidth</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the maximum length of a string returned by endl_yLabel.&quot;&quot;&quot;</span>
+
+    <span class="n">w</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">endl_yLabels</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">w</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">w</span></div>
+
+<div class="viewcode-block" id="endl_yLongLabelMaxWidth"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.endl_y.endl_yLongLabelMaxWidth">[docs]</a><span class="k">def</span> <span class="nf">endl_yLongLabelMaxWidth</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Returns the maximum length of a string returned by endl_yLongLabel.&quot;&quot;&quot;</span>
+
+    <span class="n">w</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">endl_yLabels</span> <span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="n">w</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">w</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">w</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../endl.html" >fudge.legacy.endl</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

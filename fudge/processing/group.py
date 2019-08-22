@@ -71,35 +71,24 @@ from xData import array as arrayModule
 
 class group( ancestryModule.ancestry ) :
     """
-    This class stores the group for one particle.
+    This class stores the multi-group infomation.
     """
 
     moniker = 'group'
 
-    def __init__( self, particle, gid, boundaries ) :
+    def __init__( self, label, boundaries ) :
 
-        if( not( isinstance( particle, str ) ) ) : raise TypeError( 'particle must only be a string instance.' )
-        if( not( isinstance( gid, str ) ) ) : raise TypeError( 'gid must only be a string instance.' )
+        ancestryModule.ancestry.__init__( self )
+        if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must only be a string instance.' )
+        self.__label = label
+
         if( not( isinstance( boundaries, axesModule.grid ) ) ) : raise TypeError( 'Group boundaries must only be a grid instance.' )
-
-        self.__particle = particle
-        self.__gid = gid
         self.__boundaries = boundaries
 
     @property
     def label( self ) :
 
-        return( self.particle )
-
-    @property
-    def particle( self ) :
-
-        return( self.__particle )
-
-    @property
-    def gid( self ) :
-
-        return( self.__gid )
+        return( self.__label )
 
     @property
     def boundaries( self ) :
@@ -108,7 +97,7 @@ class group( ancestryModule.ancestry ) :
 
     def copy( self ) :
 
-        return( group( self.particle, self.gid, self.boundaries.copy( ) ) )
+        return( group( self.label, self.boundaries.copy( ) ) )
 
     __copy__ = copy
     __deepcopy__ = __copy__
@@ -118,12 +107,20 @@ class group( ancestryModule.ancestry ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-        xmlStringList = [ '%s<%s label="%s" gid="%s">' % ( indent, self.moniker, self.label, self.gid ) ]
+        xmlStringList = [ '%s<%s label="%s">' % ( indent, self.moniker, self.label ) ]
         xmlStringList += self.boundaries.toXMLList( indent2, **kwargs )
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
 
-def toMultiGroup1d( cls, style, tempInfo, _axes, data ) :
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ) :
+
+        xPath.append( element.tag )
+        boundaries = axesModule.grid.parseXMLNode( element.find('grid'), xPath, linkData )
+        xPath.pop()
+        return group( element.get( 'label' ), boundaries )
+
+def toMultiGroup1d( cls, style, tempInfo, _axes, data, addLabel = True ) :
     """
     This function takes 1-d multi-group data as a list of floats and return to 1-d gridded instance
     containing the multi-group data. The list of data must contain n values where n is the
@@ -131,11 +128,10 @@ def toMultiGroup1d( cls, style, tempInfo, _axes, data ) :
     """
 
     reactionSuite = tempInfo['reactionSuite']
-    energyUnit = tempInfo['incidentEnergyUnit']
 
     axes = axesModule.axes( rank = 2 )
     axes[0] = axesModule.axis( _axes[0].label, 0, _axes[0].unit )
-    energyInGrid = style.transportables[reactionSuite.projectile.name].group.boundaries.values.copy( )
+    energyInGrid = style.transportables[reactionSuite.projectile].group.boundaries.values.copy( )
     axes[1] = axesModule.grid( _axes[1].label, 1, _axes[1].unit, axesModule.boundariesGridToken, energyInGrid )
     shape = [ len( data ) ]
     data = valuesModule.values( data )
@@ -152,20 +148,22 @@ def toMultiGroup1d( cls, style, tempInfo, _axes, data ) :
     starts = valuesModule.values( [ start ], valueType = standardsModule.types.integer32Token )
     lengths = valuesModule.values( [ len( data ) ], valueType = standardsModule.types.integer32Token )
     flattened = arrayModule.flattened( shape = shape, data = data, starts = starts, lengths = lengths )
-    return( cls( label = style.label, axes = axes, array = flattened ) )
+    label = None
+    if( addLabel ) : label = style.label
+    return( cls( label = label, axes = axes, array = flattened ) )
 
 def TMs2Form( style, tempInfo, TM_1, TM_E ) :
 
-    from fudge.core.utilities import brb
     from fudge.processing import transportables as transportablesModule
     from fudge.gnd.productData.distributions import multiGroup as multiGroupModule
 
     reactionSuite = tempInfo['reactionSuite']
     productName = tempInfo['productName']
     transportable = style.transportables[productName]
-    energyUnit = tempInfo['incidentEnergyUnit']
     conserve = transportable.conserve
+    energyUnit = tempInfo['incidentEnergyUnit']
 
+# BRB hardwired.
     crossSectionUnit = 'b'                          # ?????? 'b' should not be hardwired.
     axes = axesModule.axes( rank = 4 )
     axes[0] = axesModule.axis( 'C_l(energy_in,energy_out)', 0, crossSectionUnit )
@@ -174,12 +172,12 @@ def TMs2Form( style, tempInfo, TM_1, TM_E ) :
     axes[1] = axesModule.grid( 'l',                         1,         '', axesModule.parametersGridToken, lGrid )
     energyOutGrid = style.transportables[productName].group.boundaries.values.copy( )
     axes[2] = axesModule.grid( 'energy_out',                2, energyUnit, axesModule.boundariesGridToken, energyOutGrid )
-    energyInGrid = style.transportables[reactionSuite.projectile.name].group.boundaries.values.copy( )
+    energyInGrid = style.transportables[reactionSuite.projectile].group.boundaries.values.copy( )
     axes[3] = axesModule.grid( 'energy_in',                 3, energyUnit, axesModule.boundariesGridToken, energyInGrid )
     if( conserve == transportablesModule.conserve.number ) :
         TM = TM_1
     else :
-        raise Exception( 'Need to implement' )
+        raise NotImplementedError( 'Need to implement' )
 
     n1 = len( TM )
     n2 = len( TM[0] )
@@ -209,6 +207,6 @@ def TMs2Form( style, tempInfo, TM_1, TM_E ) :
     starts = valuesModule.values( starts, valueType = standardsModule.types.integer32Token )
     lengths = valuesModule.values( lengths, valueType = standardsModule.types.integer32Token )
     flattened = arrayModule.flattened( shape = shape, data = data, starts = starts, lengths = lengths, 
-            dataToString = multiGroupModule.multiGroup.dataToString )
-    multiGroup = multiGroupModule.multiGroup( axes = axes, array = flattened )
-    return( multiGroupModule.form( style.label, standardsModule.frames.labToken, multiGroup ) )
+            dataToString = multiGroupModule.gridded3d.dataToString )
+    gridded3d = multiGroupModule.gridded3d( axes = axes, array = flattened )
+    return( multiGroupModule.form( style.label, standardsModule.frames.labToken, gridded3d ) )

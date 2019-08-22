@@ -74,7 +74,7 @@ class xmlNode:
     allowedParsers = (etree, dom)
 
     def __init__(self, parsedXMLNode, parser):
-        """ keep track of which parser is used ('etree','dom', etc) """
+        """Keep track of which parser is used ('etree','dom', etc). """
         if parser not in xmlNode.allowedParsers:
             raise Exception("%s xml parser not supported" % parser)
         self.data = parsedXMLNode
@@ -118,7 +118,7 @@ class xmlNode:
     def getchildren(self):
         """Returns a list of all child elements."""
         if self.parser==xmlNode.etree:
-            return [xmlNode(a) for a in self.data.getchildren()]
+            return [xmlNode(a,self.parser) for a in self.data.getchildren()]
 
     def find(self, path):
         """Searches for child elements matching the path, and returns the first match."""

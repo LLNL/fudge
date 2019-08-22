@@ -60,10 +60,14 @@
 # product endorsement purposes.
 # 
 # <<END-copyright>>
+
+from PoPs.families import nuclearLevel as nuclearLevelModule
     
-import site_packages.legacy.toENDF6.gndToENDF6 as gndToENDF6Module
-import site_packages.legacy.toENDF6.endfFormats as endfFormatsModule
 import fudge.gnd.reactionData.crossSection as crossSectionModule
+import fudge.gnd.differentialCrossSection.CoulombElastic as CoulombElasticModule
+
+from .. import gndToENDF6 as gndToENDF6Module
+from .. import endfFormats as endfFormatsModule
 
 def toENDF6( self, MT, endfMFList, targetInfo, level, LR ) :
     """
@@ -86,17 +90,20 @@ def toENDF6( self, MT, endfMFList, targetInfo, level, LR ) :
                 QM = QI
             elif( MT == 4 ) :                               # Q should be 0 except for excited-state targets:
                 QM = 0
-                if( hasattr( targetInfo['reactionSuite'].target, 'getLevelIndex' ) ) :
-                    if( targetInfo['reactionSuite'].target.getLevelIndex() > 0 ) : QM = QI
+                reactionSuite = targetInfo['reactionSuite']
+                target = reactionSuite.PoPs[reactionSuite.target]
+                if( isinstance( target, nuclearLevelModule.particle ) ) :
+                    if( target.index != 0 ) : QM = QI
             else :
                 QM = QI + level
     interpolationFlatData, crossSectionFlatData = self[targetInfo['style']].toENDF6Data( MT, endfMFList, targetInfo, level )
-    MF = targetInfo['crossSectionMF']
-    endfMFList[MF][MT] = [ endfFormatsModule.endfHeadLine( ZA, mass, 0, 0, 0, 0 ) ]
-    endfMFList[MF][MT].append( endfFormatsModule.endfContLine( QM, QI, 0, LR, len( interpolationFlatData ) / 2, len( crossSectionFlatData ) / 2 ) )
-    endfMFList[MF][MT] += endfFormatsModule.endfInterpolationList( interpolationFlatData )
-    endfMFList[MF][MT] += endfFormatsModule.endfDataList( crossSectionFlatData )
-    endfMFList[MF][MT].append( endfFormatsModule.endfSENDLineNumber( ) )
+    if( interpolationFlatData is not None ) :
+        MF = targetInfo['crossSectionMF']
+        endfMFList[MF][MT] = [ endfFormatsModule.endfHeadLine( ZA, mass, 0, 0, 0, 0 ) ]
+        endfMFList[MF][MT].append( endfFormatsModule.endfContLine( QM, QI, 0, LR, len( interpolationFlatData ) / 2, len( crossSectionFlatData ) / 2 ) )
+        endfMFList[MF][MT] += endfFormatsModule.endfInterpolationList( interpolationFlatData )
+        endfMFList[MF][MT] += endfFormatsModule.endfDataList( crossSectionFlatData )
+        endfMFList[MF][MT].append( endfFormatsModule.endfSENDLineNumber( ) )
 
 crossSectionModule.component.toENDF6 = toENDF6
 
@@ -104,7 +111,7 @@ def toENDF6Data( self, MT, endfMFList, targetInfo, level ) :
 
     endfInterpolation = gndToENDF6Module.gndToENDFInterpolationFlag( self.interpolation )
     crossSectionFlatData = []
-    for xy in self.copyDataToXYs( xUnitTo = 'eV', yUnitTo = 'b' ) : crossSectionFlatData += xy
+    for xy in self.copyDataToXYs( ) : crossSectionFlatData += xy
     return( [ len( crossSectionFlatData ) / 2, endfInterpolation ], crossSectionFlatData )
 
 crossSectionModule.XYs1d.toENDF6Data = toENDF6Data
@@ -116,7 +123,7 @@ def toENDF6Data( self, MT, endfMFList, targetInfo, level ) :
     lastX, lastY = None, None
     for region in self :
         ENDFInterpolation = gndToENDF6Module.gndToENDFInterpolationFlag( region.interpolation )
-        data = region.copyDataToXYs( xUnitTo = 'eV', yUnitTo = 'b' )
+        data = region.copyDataToXYs( )
         if( lastX is not None ) :
             if( lastY == data[0][1] ) :
                 data = data[1:]
@@ -148,3 +155,16 @@ def toENDF6Data( self, MT, endfMFList, targetInfo, level ) :
     return( [ len( crossSectionFlatData ) / 2, endfInterpolation ], crossSectionFlatData )
 
 crossSectionModule.weightedPointwise.toENDF6Data = toENDF6Data
+
+def toENDF6Data( self, MT, endfMFList, targetInfo, level ) :
+
+    if isinstance( self.link, CoulombElasticModule.form ):
+        if isinstance( self.link.data, CoulombElasticModule.CoulombExpansion ):
+            # actual cross section is in the Coulomb expansion, MF=3 stores a dummy value:
+            return( [ 2, 2 ], [ self.link.domainMin,1, self.link.domainMax,1] )
+        elif isinstance( self.link.data, CoulombElasticModule.NuclearPlusCoulombInterference ):
+            return self.link.data.effectiveCrossSection.data.toENDF6Data( MT, endfMFList, targetInfo, level )
+    else :
+        return( [ None, None ] )
+
+crossSectionModule.reference.toENDF6Data = toENDF6Data

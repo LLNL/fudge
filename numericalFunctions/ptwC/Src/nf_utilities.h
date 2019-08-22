@@ -130,6 +130,11 @@ void *nfu_calloc( size_t size, size_t n );
 void *nfu_realloc( size_t size, void *old );
 void *nfu_free( void *p );
 /*
+* Functions in nf_stringToInt32s.c
+*/
+int32_t *nfu_stringToListOfInt32s( statusMessageReporting *smr, char const *str, char sep, int64_t *numberConverted,
+        char **endCharacter );
+/*
 * Functions in nf_stringToDoubles.c
 */
 double *nfu_stringToListOfDoubles( statusMessageReporting *smr, char const *str, char sep, int64_t *numberConverted, 

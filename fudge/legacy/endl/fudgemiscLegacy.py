@@ -61,6 +61,15 @@
 # 
 # <<END-copyright>>
 
+import os, re
+
+from fudge.core.utilities import brb
+
+from fudge import fudgeDefaults
+
+from . import endlmisc
+from . import bdfls
+
 def databaseList( yi = None, path = None ) :
     """Returns a list of the default databases. The list can be narrowed to a single incident particle
     type if yi is specified. Also, the location where databases are to be searched for can be set with path.
@@ -79,12 +88,12 @@ def databaseList( yi = None, path = None ) :
                     if( os.path.isdir( y ) ) :
                         iyi = int( f[2:] )
                         if( iyi in [ 0, 1, 2, 3, 4, 5, 6, 7, 9 ] ) :
-                            if( ( yi == None ) or ( yi == iyi ) ) : yis.append( f )
+                            if( ( yi is None ) or ( yi == iyi ) ) : yis.append( f )
         if( len( yis ) > 0 ) : list.append( [ db, yis ] )
 
-    listTranslated = path == None
-    if( yi != None ) : yi = endlmisc.incidentParticleTags( yi )[0]
-    if ( path == None ) : path = fudgeDefaults.ENDL_DATABASE_DIR
+    listTranslated = path is None
+    if( yi is not None ) : yi = endlmisc.incidentParticleTags( yi )[0]
+    if ( path is None ) : path = fudgeDefaults.ENDL_DATABASE_DIR
     l = os.listdir( path )
     l.sort( )
     ll = []
@@ -116,7 +125,7 @@ def projectileList( path = None ) :
                     if( iyi in [ 0, 1, 2, 3, 4, 5, 6, 7, 9 ] ) : yis.append( f )
         return( yis )
 
-    if( path == None ) : path = fudgeDefaults.ENDL_DEFAULT_DATABASE
+    if( path is None ) : path = fudgeDefaults.ENDL_DEFAULT_DATABASE
     database, Status = endlmisc.getFullPath( path, fudgeDefaults.ENDL_DATABASE_DIR )
     yis = getYis( database )
     if( len( yis ) == 0 ) : yis = getYis( os.path.join( database, "ascii" ) )

@@ -181,7 +181,7 @@ class endl2dmath :
         self.setValue( x, y )
 
     def __len__( self ) :
-        "Returns the number of (x,y) pairs in the self's data member."
+        """Returns the number of (x,y) pairs in the self's data member."""
 
         return len( self.data )
 
@@ -195,14 +195,14 @@ class endl2dmath :
         return s
 
     def __neg__( self ) :
-        "Returns an endl2dmath instance that has all y values of self negated."
+        """Returns an endl2dmath instance that has all y values of self negated."""
 
         d = self.copyData( )
         for xy in d.data : xy[1] = -xy[1]
         return d
 
     def __abs__( self ) :
-        "Returns an endl2dmath instance whose y values are the absolute value of self's y values."
+        """Returns an endl2dmath instance whose y values are the absolute value of self's y values."""
 
         d = self.copyData( )
         for xy in d.data : xy[1] = math.fabs( xy[1] )
@@ -430,13 +430,13 @@ class endl2dmath :
 
         global doSafeDivide
         def getMaxValue( y ) :
-            "For internal use only. Returns safeDivideMaxValue if argument is positive and -safeDivideMaxValue otherwise."
+            """For internal use only. Returns safeDivideMaxValue if argument is positive and -safeDivideMaxValue otherwise."""
 
             if( y < 0. ) : return( -safeDivideMaxValue )
             return( safeDivideMaxValue )
 
         def addPoint( self, safeData, flag, x1, x2, newOther, yMax ) :
-            "For internal use only. Adds a point near the zero of the denominator."
+            """For internal use only. Adds a point near the zero of the denominator."""
 
             eps = 1e-5
             if( abs( x2 - x1 ) < eps * ( abs( x1 ) + abs( x2 ) ) ) : return
@@ -523,14 +523,14 @@ class endl2dmath :
             raise Exception( "\nError in endl2dmath.__rdiv__: numerator must be a number." )
 
     def __pow__( self, p ) :
-        "Returns an endl2dmath instance whose y values are self's y values raised to the power p."
+        """Returns an endl2dmath instance whose y values are self's y values raised to the power p."""
 
         d = self.copyData( )
         for xy in d.data : xy[1] = math.pow( xy[1], p )
         return d
 
     def __rpow__( self, p ) :
-        "Returns an endl2dmath instance whose y values are p raised to the power of self's y values."
+        """Returns an endl2dmath instance whose y values are p raised to the power of self's y values."""
 
         d = self.copyData( )
         for xy in d.data : xy[1] = math.pow( p, xy[1] )
@@ -568,7 +568,7 @@ class endl2dmath :
             raise Exception( "\nError in endl2dmath.GetValueNIndex: i not an integer" )
 
     def toString( self, format = None ) :
-        "Returns the string returned by the endl2dmath's __repr__ function. This can be useful when endl2dmath is used as a base class."
+        """Returns the string returned by the endl2dmath's __repr__ function. This can be useful when endl2dmath is used as a base class."""
 
         endl2d_repr_xFormat = endl2dmathmisc.endl2d_repr_xFormat
         endl2d_repr_yFormat = endl2dmathmisc.endl2d_repr_yFormat
@@ -581,7 +581,7 @@ class endl2dmath :
         return( s )
 
     def toStringWithPrefixSuffix( self, Prefix = "", Suffix = "" ) :
-        "Returns a printable string of the data in self with Prefix and Suffix append to each line."
+        """Returns a printable string of the data in self with Prefix and Suffix append to each line."""
 
         xy = "%s %s" % ( endl2dmathmisc.endl2d_repr_xFormat, endl2dmathmisc.endl2d_repr_yFormat )
         s = [ xy % ( x, y ) for x, y in self.data ]
@@ -625,7 +625,7 @@ class endl2dmath :
         return( endl2dmath( d, checkDataType = 0, template = self ) )
 
     def cmp( self, other, f = 5.e-5 ) :
-        "Compares self to other and prints out data where they differ by more than f."
+        """Compares self to other and prints out data where they differ by more than f."""
 
         l1 = len( self )
         l2 = len( other )
@@ -774,7 +774,7 @@ class endl2dmath :
         return endl2dmath( d, checkDataType = 0, template = self )
 
     def exp( self ) :
-        "Returns an endl2dmath instance that has all y values of self exponentiated."
+        """Returns an endl2dmath instance that has all y values of self exponentiated."""
 
         d = self.copyData( )
         for xy in d.data : xy[1] = math.exp( xy[1] )
@@ -791,7 +791,7 @@ class endl2dmath :
         return( self.getDimensions( ) )
 
     def domain( self ) :
-        "Returns the domain (minumum and maximum x values) for self."
+        """Returns the domain (minumum and maximum x values) for self."""
 
         return( self.xMin( ), self.xMax( ) )
 
@@ -906,7 +906,7 @@ class endl2dmath :
         if( xMax is None ) : xMax = self.xMax( )
         xMin = max( xMin, self.xMin( ) )
         xMax = min( xMax, self.xMax( ) )
-        self_ = XYsModule.XYs( self.data, accuracy = 1e-5, axes = XYsModule.XYs.defaultAxes( ) )
+        self_ = XYsModule.XYs( self.data, axes = XYsModule.XYs.defaultAxes( ) )
         return( float( self_.integrate( xMin, xMax ) ) )
 
     def integrateTwoFunctions( self, other, xMin = None, xMax = None ) :
@@ -917,8 +917,8 @@ class endl2dmath :
         if( xMax is None ) : xMax = self.xMax( )
         xMin = max( xMin, self.xMin( ), other.xMin( ) )
         xMax = min( xMax, self.xMax( ), other.xMax( ) )
-        self_ = XYsModule.XYs( self.data, accuracy = 1e-5, axes = XYsModule.XYs.defaultAxes( ) )
-        other_ = XYsModule.XYs( other.data, accuracy = 1e-5, axes = XYsModule.XYs.defaultAxes( ) )
+        self_ = XYsModule.XYs( self.data, axes = XYsModule.XYs.defaultAxes( ) )
+        other_ = XYsModule.XYs( other.data, axes = XYsModule.XYs.defaultAxes( ) )
         return( self_.integrateTwoFunctions( other_, xMin, xMax ) )
 
     def integrateThreeFunctions( self, other1, other2, xMin = None, xMax = None ) :
@@ -930,9 +930,9 @@ class endl2dmath :
         if( xMax is None ) : xMax = self.xMax( )
         xMin = max( xMin, self.xMin( ), other1.xMin( ), other1.xMin( ) )
         xMax = min( xMax, self.xMax( ), other1.xMax( ), other2.xMax( ) )
-        self_ = XYsModule.XYs( self.data, accuracy = 1e-5, axes = XYsModule.XYs.defaultAxes( ) )
-        other1_ = XYsModule.XYs( other1.data, accuracy = 1e-5, axes = XYsModule.XYs.defaultAxes( ) )
-        other2_ = XYsModule.XYs( other2.data, accuracy = 1e-5, axes = XYsModule.XYs.defaultAxes( ) )
+        self_ = XYsModule.XYs( self.data, axes = XYsModule.XYs.defaultAxes( ) )
+        other1_ = XYsModule.XYs( other1.data, axes = XYsModule.XYs.defaultAxes( ) )
+        other2_ = XYsModule.XYs( other2.data, axes = XYsModule.XYs.defaultAxes( ) )
         return( self_.integrateThreeFunctions( other1_, other2_, xMin, xMax ) )
 
     def union( self, other, xDomainUnionOnly = False ) :
@@ -995,21 +995,21 @@ class endl2dmath :
         return d
 
     def log( self ) :
-        "Returns an endl2dmath instance that has all y values of self log_e-ed."
+        """Returns an endl2dmath instance that has all y values of self log_e-ed."""
 
         d = self.copyData( )
         for xy in d.data : xy[1] = math.log( xy[1] )
         return d
 
     def log10( self ) :
-        "Returns an endl2dmath instance that has all y values of self log10_e-ed."
+        """Returns an endl2dmath instance that has all y values of self log10_e-ed."""
 
         d = self.copyData( )
         for xy in d.data : xy[1] = math.log10( xy[1] )
         return d
 
     def max( self ) :
-        "Returns the maximum y value of self of None if self is empty."
+        """Returns the maximum y value of self of None if self is empty."""
 
         if( len( self ) == 0 ) :
             m = None
@@ -1020,7 +1020,7 @@ class endl2dmath :
         return m
 
     def min( self ) :
-        "Returns the minimum y value of self or None if self is empty."
+        """Returns the minimum y value of self or None if self is empty."""
 
         if( len( self ) == 0 ) :
             m = None
@@ -1219,7 +1219,7 @@ class endl2dmath :
         return( d )
 
     def set( self, other ) :
-        "Sets self's data to other's data."
+        """Sets self's data to other's data."""
 
         self.data = other.data
 
@@ -1301,7 +1301,7 @@ class endl2dmath :
         return s
 
     def sqrt( self ) :
-        "Returns an endl2dmath instance that has all y values of self sqrt-ed."
+        """Returns an endl2dmath instance that has all y values of self sqrt-ed."""
 
         d = self.copyData( )
         for xy in d.data : xy[1] = math.sqrt( xy[1] )
@@ -1479,15 +1479,14 @@ class endl2dmath :
             d = self.copyData( )
         return( d )
 
-    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0, cls = None ) :
+    def toPointwise_withLinearXYs( self, accuracy = 1e-3, lowerEps = 0, upperEps = 0, cls = None ) :
         """
         This routine is designed to make an endl2dmath instance work with plotting packages like plot2d.py. This routine is not 
         compatible with legacy fudge as the returned instance is of type XYs and not of type endl2dmath.
         """
 
-        if( accuracy == None ) : accuracy = 1e-3
         linear = self.toInterpolation( 0, accuracy )
-        linearXYs = XYsModule.XYs( linear.data, accuracy = accuracy, axes = XYsModule.XYs.defaultAxes( ) )
+        linearXYs = XYsModule.XYs( linear.data, axes = XYsModule.XYs.defaultAxes( ) )
         if( cls is not None ) : linearXYs = cls.returnAsClass( linearXYs )
         return( linearXYs )
 
@@ -1545,36 +1544,36 @@ class endl2dmath :
         return d
 
     def xArray( self ) :
-        "Returns an endl1dmath instances of the x values in self."
+        """Returns an endl1dmath instances of the x values in self."""
 
         xa = []
         for xy in self.data : xa.append( xy[0] )
         return endl1dmathClasses.endl1dmath( xa )
 
     def xMax( self ) :
-        "Returns the maximum x value of self if self contains data, otherwise it returns None."
+        """Returns the maximum x value of self if self contains data, otherwise it returns None."""
 
         if ( len( self.data ) > 0 ) : return self.data[-1][0]
         return None
 
     def xMin( self ) :
-        "Returns the minimum x value of self if self contains data, otherwise it returns None."
+        """Returns the minimum x value of self if self contains data, otherwise it returns None."""
 
         if ( len( self.data ) > 0 ) : return self.data[0][0]
         return None
 
     def yMax( self ) :
-        "Returns the maximum y value of self if self contains data, otherwise it returns None."
+        """Returns the maximum y value of self if self contains data, otherwise it returns None."""
 
         return( self.yMinMax( )[1] )
 
     def yMin( self ) :
-        "Returns the minimum y value of self if self contains data, otherwise it returns None."
+        """Returns the minimum y value of self if self contains data, otherwise it returns None."""
 
         return( self.yMinMax( )[0] )
 
     def yMinMax( self ) :
-        "Returns the tuple of the minimum and maximum y values of self if self contains data, otherwise it returns ( None, None )."
+        """Returns the tuple of the minimum and maximum y values of self if self contains data, otherwise it returns ( None, None )."""
 
         the_min = None
         if ( len( self.data ) > 0 ) : the_min = self.data[0][1]

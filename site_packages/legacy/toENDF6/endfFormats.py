@@ -63,24 +63,31 @@
 
 """Routines for writing an ENDF file"""
 
-import site_packages.legacy.toENDF6.gndToENDF6 as gndToENDF6Module
 from pqu import PQU as PQUModule
-import xData.XYs as XYsModule
-import xData.regions as regionsModule
+
+from xData import XYs as XYsModule
+from xData import regions as regionsModule
+
+from . import gndToENDF6 as gndToENDF6Module
+
+useRedsFloatFormat = False
 
 def floatToFunky( value ) :
 
-    s = '%13.6e' % value
-    sValue = float( s )
-    if s[ 11 ] == '0' :
-        s = s[:9] + s[10] + s[-1]
+    if( useRedsFloatFormat ) :
+        s, floatStr_Orig = floatToFunky2( value )
     else :
-        s = '%12.5e' % value
+        s = '%13.6e' % value
         sValue = float( s )
-        s = s.replace( 'e', '' )
-    if( abs( sValue - value ) > abs( 1e-11 * value ) ) :
-        floatStr, floatStr_Orig = floatToFunky2( value )
-        if( float( sValue ) != float( floatStr_Orig ) ) : s = floatStr
+        if s[ 11 ] == '0' :
+            s = s[:9] + s[10] + s[-1]
+        else :
+            s = '%12.5e' % value
+            sValue = float( s )
+            s = s.replace( 'e', '' )
+        if( abs( sValue - value ) > abs( 1e-11 * value ) ) :
+            floatStr, floatStr_Orig = floatToFunky2( value )
+            if( float( sValue ) != float( floatStr_Orig ) ) : s = floatStr
     return( s )
 
 def floatToFunky2( value ) :
@@ -89,15 +96,15 @@ def floatToFunky2( value ) :
     floatStr_Orig = floatStr
     valueStr = str( value )
     eNotInStrValue = 'e' not in valueStr
-    if( ( value >= 0.0 ) and ( len( valueStr ) < 11 ) and eNotInStrValue ) :
-        floatStr = valueStr.rjust( 11 )
-        floatStr_Orig = floatStr
-    elif( ( len( valueStr ) < 12 ) and eNotInStrValue ) :
+    if( useRedsFloatFormat and eNotInStrValue ) : valueStr = valueStr[:10]
+    length = 10
+    if( value < 0.0 ) : length = 11                             # Allow for '-' sign.
+    if( ( len( valueStr ) <= length ) and eNotInStrValue ) :
         floatStr = valueStr.rjust( 11 )
         floatStr_Orig = floatStr
     elif( floatStr[11] == '0' ) :
         floatStr = floatStr[:9] + floatStr[10] + floatStr[-1]
-    else:
+    else :
         floatStr = '%12.5e' % value
         floatStr_Orig = floatStr
         floatStr = floatStr.replace( 'e', '' )
@@ -109,11 +116,14 @@ def endfContLine( C1, C2, L1, L2, N1, N2 ) :
 
     return( '%11s%11s%11d%11d%11d%11d' % ( floatToFunky( C1 ), floatToFunky( C2 ), L1, L2, N1, N2 ) )
 
-def endfContLine2( C1, C2, L1, L2, N1, N2, MAT, MF, MT, NS ) :
+def endfContLine2( C1, C2, L1, L2, N1, N2, MAT, MF, MT, NS = None ) :
     "This is the basic 'control' line in ENDF."
 
-    return( '%11s%11s%11d%11d%11d%11d%4d%2d%3d%5d' % ( floatToFunky( C1 ), floatToFunky( C2 ),
-                                                   L1, L2, N1, N2, MAT, MF, MT, NS ) )
+    line = '%11s%11s%11d%11d%11d%11d%4d%2d%3d' % ( floatToFunky( C1 ), floatToFunky( C2 ),
+                                                   L1, L2, N1, N2, MAT, MF, MT )
+    if NS is not None:
+        line += '%5d' % NS
+    return line
 
 def endfHeadLine( ZA, AWR, L1, L2, N1, N2 ) :
     "Indicates the start of an ENDF data section."
@@ -125,25 +135,33 @@ def endfSENDLineNumber( ) :
 
     return( 99999 )
 
-def endfSENDLine( MAT, MF ) :
+def endfSENDLine( MAT, MF, lineNumbers = True ) :
     "Indicates the end of an ENDF data section for one (MF, MT) pair."
 
-    return( endfContLine2( 0, 0, 0, 0, 0, 0, MAT, MF, 0, endfSENDLineNumber( ) ) )
+    lineNum = None
+    if lineNumbers: lineNum = endfSENDLineNumber()
+    return( endfContLine2( 0, 0, 0, 0, 0, 0, MAT, MF, 0, lineNum ) )
 
-def endfFENDLine( MAT ) :
+def endfFENDLine( MAT, lineNumbers = True ) :
     "Indicates the end of an ENDF data block for one MF."
 
-    return( endfContLine2( 0, 0, 0, 0, 0, 0, MAT, 0, 0, 0 ) )
+    lineNum = None
+    if lineNumbers: lineNum = 0
+    return( endfContLine2( 0, 0, 0, 0, 0, 0, MAT, 0, 0, lineNum ) )
 
-def endfMENDLine( ) :
+def endfMENDLine( lineNumbers = True ) :
     "Indicates the end of ENDF data for one material."
 
-    return endfContLine2( 0, 0, 0, 0, 0, 0,  0, 0, 0, 0 )
+    lineNum = None
+    if lineNumbers: lineNum = 0
+    return endfContLine2( 0, 0, 0, 0, 0, 0,  0, 0, 0, lineNum )
 
-def endfTENDLine( ) :
+def endfTENDLine( lineNumbers = True ) :
     "Indicates the end of ENDF data."
 
-    return endfContLine2( 0, 0, 0, 0, 0, 0, -1, 0, 0, 0 )
+    lineNum = None
+    if lineNumbers: lineNum = 0
+    return endfContLine2( 0, 0, 0, 0, 0, 0, -1, 0, 0, lineNum )
 
 def endfComment( text, MAT, MF, MT, NS ) :
     "Used for writing the introductory comments."
@@ -193,7 +211,7 @@ def toTAB1( self, xUnitTo, yUnitTo, C1 = 0, C2 = 0, L1  = 0, L2 = 0 ) :
     elif( isinstance( self, regionsModule.regions1d ) ) :
         interpolations, data = [], []
         for region in self :
-            subData = region.copyDataToXYs( xUnitTo = xUnitTo, yUnitTo = yUnitTo )
+            subData = region.copyDataToXYs( )
             if( len( data ) > 0 ) :
                 if( subData[0] == data[-1] ) : subData.pop( 0 )
             data += subData
@@ -278,14 +296,14 @@ def endfMFListToFinalFile( endfMFList, MAT, lineNumbers = True ) :
             data = MFData[MT]
             for i1, datum in enumerate( data ) :
                 if( datum == 99999 ) :
-                    endfList.append( endfSENDLine( MAT, MF ) )
+                    endfList.append( endfSENDLine( MAT, MF, lineNumbers ) )
                 else :
                     if lineNumbers:
                         endfList.append( '%-66s%4d%2d%3d%5d' % ( datum, MAT, MF, MT, i1 + 1 ) )
                     else:
                         endfList.append( '%-66s%4d%2d%3d' % ( datum, MAT, MF, MT ) )
-        if( len( MTs ) > 0 ) : endfList.append( endfFENDLine( MAT ) )
-    endfList.append( endfMENDLine( ) )
-    endfList.append( endfTENDLine( ) )
+        if( len( MTs ) > 0 ) : endfList.append( endfFENDLine( MAT, lineNumbers ) )
+    endfList.append( endfMENDLine( lineNumbers ) )
+    endfList.append( endfTENDLine( lineNumbers ) )
     endfList.append( '' )
     return( '\n'.join( endfList ) )

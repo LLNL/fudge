@@ -227,6 +227,8 @@ nfu_status ptwXY_domainMax( statusMessageReporting *smr, ptwXYPoints *ptwXY, dou
 nfu_status ptwXY_range( statusMessageReporting *smr, ptwXYPoints *ptwXY, double *rangeMin, double *rangeMax );
 nfu_status ptwXY_rangeMin( statusMessageReporting *smr, ptwXYPoints *ptwXY, double *value );
 nfu_status ptwXY_rangeMax( statusMessageReporting *smr, ptwXYPoints *ptwXY, double *value );
+char const *ptwXY_interpolationToString( ptwXY_interpolation interpolation );
+ptwXY_interpolation ptwXY_stringToInterpolation( char const *interpolationString );
 
 /* 
 * Methods in ptwXY_methods.c 
@@ -235,6 +237,7 @@ nfu_status ptwXY_clip( statusMessageReporting *smr, ptwXYPoints *ptwXY1, double 
 nfu_status ptwXY_thicken( statusMessageReporting *smr, ptwXYPoints *ptwXY1, int sectionSubdivideMax, 
         double dDomainMax, double fDomainMax );
 ptwXYPoints *ptwXY_thin( statusMessageReporting *smr, ptwXYPoints *ptwXY1, double accuracy );
+ptwXYPoints *ptwXY_thinDomain( statusMessageReporting *smr, ptwXYPoints *ptwXY1, double epsilon );
 nfu_status ptwXY_trim( statusMessageReporting *smr, ptwXYPoints *ptwXY );
 
 ptwXYPoints *ptwXY_union( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, int unionOptions );
@@ -351,6 +354,7 @@ ptwXPoints *ptwXY_runningIntegral( statusMessageReporting *smr, ptwXYPoints *ptw
 nfu_status ptwXY_integrateWithFunction( statusMessageReporting *smr, ptwXYPoints *ptwXY, ptwXY_createFromFunction_callback func, 
         void *argList, double domainMin, double domainMax, int degree, int recursionLimit, double tolerance,
         double *value );
+ptwXPoints *ptwXY_equalProbableBins( statusMessageReporting *smr, ptwXYPoints *ptwXY, int numberOfBins );
 
 #if defined __cplusplus
     }

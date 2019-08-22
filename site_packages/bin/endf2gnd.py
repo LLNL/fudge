@@ -63,7 +63,7 @@
 # 
 # <<END-copyright>>
 
-import sys, os
+import sys, os, traceback
 binDir = os.path.dirname( os.path.abspath( __file__ ) )
 sys.path.insert(0, os.path.dirname( binDir ) )
 
@@ -77,6 +77,13 @@ def process_args():
     parser.add_argument("-v", action="store_true", dest="verbose", help="enable verbose output")
     parser.add_argument("-q", action="store_false", dest="verbose", help="disable verbose output")
     parser.add_argument("--skipBadData", action="store_true", default=False, help="skip bad data, rather than throw an exception, when reading an ENDF file")
+    parser.add_argument("--skipCovariances", action="store_true", default=False, help="skip the covariance, if present")
+    parser.add_argument("--verboseWarnings", action="store_true", default=False, help="print verbose warnings")
+    parser.add_argument("--printBadNK14", action="store_true", default=False, help="print bad NK's if found")
+    parser.add_argument("--continuumSpectraFix", action="store_true", default=False, help="fix continuous spectra on read, if foobar")
+    parser.add_argument("--ignoreBadDate", action="store_true", default=False, help="ignore malformed ENDF dates")
+    parser.add_argument("--ignoreMF10Fission", action="store_true", default=False, help="ignore fission in MF=10 (for IAEA W evaluation)")
+    parser.add_argument("--traceback", action="store_true", default=False, help="print traceback on exception")
     return parser.parse_args()
 
 
@@ -87,18 +94,32 @@ outFile = inFile+'.gnd.xml'
 outCovFile = inFile+'.gndCov.xml'
 
 try:
-    results = endfFileToGND.endfFileToGND( inFile, toStdOut = args.verbose, skipBadData = args.skipBadData )
-    x = results['reactionSuite']
-    c = results['covarianceSuite']
+    results = endfFileToGND.endfFileToGND( inFile, toStdOut = args.verbose,
+                                           skipBadData = args.skipBadData, doCovariances = not (args.skipCovariances),
+                                           verboseWarnings = args.verboseWarnings,
+                                           printBadNK14 = args.printBadNK14, continuumSpectraFix = args.continuumSpectraFix,
+                                           ignoreBadDate = args.ignoreBadDate, ignoreMF10Fission = args.ignoreMF10Fission)
+    e = results.get('element',None)
+    x = results.get('reactionSuite',None)
+    c = results.get('covarianceSuite',None)
+    p = results.get('PoPs',None)
 except Exception as err:
-    sys.stderr.write( 'WARNING: ENDF READ HALTED BECAUSE '+str(err) )
+    sys.stderr.write( 'WARNING: ENDF READ HALTED BECAUSE '+str(err)+'\n' )
+    if args.traceback:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        traceback.print_tb(exc_traceback)
     exit()
         
 f = open( outFile, 'w' )
 try:
-    f.write( '\n'.join( x.toXMLList(  ) ) )
+    for thing in [x,e,p]:
+        if thing is not None:
+            f.write( '\n'.join( thing.toXMLList(  ) ) )
 except Exception as err:
-    sys.stderr.write( 'WARNING: MAIN ENDF WRITE HALTED BECAUSE '+str(err) )
+    sys.stderr.write( 'WARNING: MAIN ENDF WRITE HALTED BECAUSE '+str(err)+'\n' )
+    if args.traceback:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        traceback.print_tb(exc_traceback)
     exit()
 f.close( )
 if c:
@@ -106,7 +127,10 @@ if c:
     try:
         f.write( '\n'.join( c.toXMLList(  ) ) )
     except Exception as err:
-        sys.stderr.write( 'WARNING: COVARIANCE ENDF WRITE HALTED BECAUSE '+str(err) )
+        sys.stderr.write( 'WARNING: COVARIANCE ENDF WRITE HALTED BECAUSE '+str(err)+'\n' )
+        if args.traceback:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback.print_tb(exc_traceback)
         exit()
     f.close()
 

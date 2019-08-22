@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_6 &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_6</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="k">import</span> <span class="n">brb</span>
+
+<span class="kn">from</span> <span class="nn">PoPs</span> <span class="k">import</span> <span class="n">IDs</span> <span class="k">as</span> <span class="n">IDsPoPsModule</span>
+
+<span class="kn">import</span> <span class="nn">fudge.particles.nuclear</span> <span class="k">as</span> <span class="nn">nuclearModule</span>
+<span class="kn">import</span> <span class="nn">fudge.gnd.xParticle</span> <span class="k">as</span> <span class="nn">xParticleModule</span>
+
+<span class="kn">import</span> <span class="nn">pqu.PQU</span> <span class="k">as</span> <span class="nn">PQUModule</span>
+<span class="kn">import</span> <span class="nn">endfFileToGNDMisc</span>
+<span class="kn">from</span> <span class="nn">ENDF_ITYPE_3_6_Misc</span> <span class="k">import</span> <span class="n">MT_AtomicConfigurations</span>
+
+<div class="viewcode-block" id="ITYPE_6"><a class="viewcode-back" href="../../../../../fudge/fudge.legacy.converting.ENDFToGND.html#fudge.legacy.converting.ENDFToGND.ENDF_ITYPE_6.ITYPE_6">[docs]</a><span class="k">def</span> <span class="nf">ITYPE_6</span><span class="p">(</span> <span class="n">Z</span><span class="p">,</span> <span class="n">MTDatas</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span> <span class="p">)</span> <span class="p">:</span>
+
+    <span class="n">MT</span> <span class="o">=</span> <span class="mi">533</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">elementSymbol</span> <span class="o">=</span> <span class="n">nuclearModule</span><span class="o">.</span><span class="n">elementSymbolFromZ</span><span class="p">(</span> <span class="n">Z</span> <span class="p">)</span>
+    <span class="n">element</span> <span class="o">=</span> <span class="n">xParticleModule</span><span class="o">.</span><span class="n">element</span><span class="p">(</span> <span class="n">elementSymbol</span> <span class="p">)</span>
+    <span class="n">MTs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">MTDatas</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="mi">451</span> <span class="ow">in</span> <span class="n">MTs</span> <span class="p">)</span> <span class="p">:</span> <span class="n">MTs</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="mi">451</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">MTs</span> <span class="o">!=</span> <span class="p">[</span> <span class="n">MT</span> <span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Only allowed MT is </span><span class="si">%s</span><span class="s1"> (and 451): </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">MT</span><span class="p">,</span> <span class="n">MTs</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">warningList</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">MFData</span> <span class="o">=</span> <span class="n">MTDatas</span><span class="p">[</span><span class="n">MT</span><span class="p">]</span>
+    <span class="n">info</span><span class="o">.</span><span class="n">logs</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39;    </span><span class="si">%3d</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">MT</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">MFData</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span> <span class="n">MFData</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="o">!=</span> <span class="p">[</span> <span class="mi">28</span> <span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;For MT </span><span class="si">%s</span><span class="s1"> data, only allowed MF is 28: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">MT</span><span class="p">,</span> <span class="n">MFData</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="n">MF28</span> <span class="o">=</span> <span class="n">MFData</span><span class="p">[</span><span class="mi">28</span><span class="p">]</span>
+
+    <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">ZA</span><span class="p">,</span> <span class="n">AWP</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">NSS</span><span class="p">,</span> <span class="n">dummy</span> <span class="o">=</span> <span class="n">endfFileToGNDMisc</span><span class="o">.</span><span class="n">sixFunkyFloatStringsToIntsAndFloats</span><span class="p">(</span> <span class="n">MF28</span><span class="p">[</span><span class="n">offset</span><span class="p">],</span> <span class="n">intIndices</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">4</span> <span class="p">],</span> <span class="n">logFile</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">logs</span> <span class="p">)</span>
+    <span class="n">offset</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">subshell</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">NSS</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="n">SUBI</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">NTR</span> <span class="o">=</span> <span class="n">endfFileToGNDMisc</span><span class="o">.</span><span class="n">sixFunkyFloatStringsToIntsAndFloats</span><span class="p">(</span> <span class="n">MF28</span><span class="p">[</span><span class="n">offset</span><span class="p">],</span> <span class="n">intIndices</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span> <span class="p">],</span> <span class="n">logFile</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">logs</span> <span class="p">)</span>
+        <span class="n">offset</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">EBI</span><span class="p">,</span> <span class="n">ELN</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">dummy</span> <span class="o">=</span> <span class="n">endfFileToGNDMisc</span><span class="o">.</span><span class="n">sixFunkyFloatStringsToIntsAndFloats</span><span class="p">(</span> <span class="n">MF28</span><span class="p">[</span><span class="n">offset</span><span class="p">],</span> <span class="n">intIndices</span> <span class="o">=</span> <span class="p">[</span> <span class="p">],</span> <span class="n">logFile</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">logs</span> <span class="p">)</span>
+        <span class="n">offset</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">atomicConfiguration</span> <span class="o">=</span> <span class="n">xParticleModule</span><span class="o">.</span><span class="n">atomicConfiguration</span><span class="p">(</span> <span class="n">MT_AtomicConfigurations</span><span class="p">[</span><span class="mi">534</span> <span class="o">+</span> <span class="n">SUBI</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> 
+                <span class="n">PQUModule</span><span class="o">.</span><span class="n">PQU</span><span class="p">(</span> <span class="n">EBI</span><span class="p">,</span> <span class="s1">&#39;eV&#39;</span> <span class="p">),</span> <span class="n">ELN</span> <span class="p">)</span>
+        <span class="n">probabilitySum</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">logs</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39; : </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">MT_AtomicConfigurations</span><span class="p">[</span><span class="mi">534</span> <span class="o">+</span> <span class="n">SUBI</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">transition</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span> <span class="n">NTR</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="n">SUBJ</span><span class="p">,</span> <span class="n">SUBK</span><span class="p">,</span> <span class="n">ETR</span><span class="p">,</span> <span class="n">FTF</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">dummy</span> <span class="o">=</span> <span class="n">endfFileToGNDMisc</span><span class="o">.</span><span class="n">sixFunkyFloatStringsToIntsAndFloats</span><span class="p">(</span> <span class="n">MF28</span><span class="p">[</span><span class="n">offset</span><span class="p">],</span> <span class="n">intIndices</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span> <span class="p">],</span> <span class="n">logFile</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">logs</span> <span class="p">)</span>
+            <span class="n">offset</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">secondAC</span> <span class="o">=</span> <span class="s1">&#39;     &#39;</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">SUBK</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">secondAC</span> <span class="o">=</span> <span class="n">MT_AtomicConfigurations</span><span class="p">[</span><span class="mi">534</span> <span class="o">+</span> <span class="n">SUBK</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">daughters</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">SUBK</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="n">daughters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">IDsPoPsModule</span><span class="o">.</span><span class="n">photon</span> <span class="p">)</span>
+                <span class="n">daughters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">{</span><span class="si">%s</span><span class="s1">}&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">elementSymbol</span><span class="p">,</span> <span class="n">MT_AtomicConfigurations</span><span class="p">[</span><span class="mi">534</span> <span class="o">+</span> <span class="n">SUBJ</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">daughters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;e-&#39;</span> <span class="p">)</span>
+                <span class="n">daughters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">{</span><span class="si">%s</span><span class="s1">,</span><span class="si">%s</span><span class="s1">}&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">elementSymbol</span><span class="p">,</span> <span class="n">MT_AtomicConfigurations</span><span class="p">[</span><span class="mi">534</span> <span class="o">+</span> <span class="n">SUBJ</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">MT_AtomicConfigurations</span><span class="p">[</span><span class="mi">534</span> <span class="o">+</span> <span class="n">SUBK</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span>
+            <span class="n">atomicDecay</span> <span class="o">=</span> <span class="n">xParticleModule</span><span class="o">.</span><span class="n">atomicDecay</span><span class="p">(</span> <span class="n">FTF</span><span class="p">,</span> <span class="n">daughters</span> <span class="p">)</span>
+            <span class="n">atomicConfiguration</span><span class="o">.</span><span class="n">addDecay</span><span class="p">(</span> <span class="n">atomicDecay</span> <span class="p">)</span>
+            <span class="n">probabilitySum</span> <span class="o">+=</span> <span class="n">FTF</span>
+        <span class="k">if</span><span class="p">(</span> <span class="n">NTR</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="nb">abs</span><span class="p">(</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">probabilitySum</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span> <span class="p">)</span> <span class="p">:</span> <span class="n">warningList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s1">&#39;decay probabilities sum to </span><span class="si">%.6f</span><span class="s1"> not 1.&#39;</span> <span class="o">%</span> <span class="n">probabilitySum</span> <span class="p">)</span>
+        <span class="n">element</span><span class="o">.</span><span class="n">addConfiguration</span><span class="p">(</span> <span class="n">atomicConfiguration</span><span class="o">.</span><span class="n">subshell</span><span class="p">,</span> <span class="n">atomicConfiguration</span> <span class="p">)</span>
+
+    <span class="k">if</span><span class="p">(</span> <span class="n">offset</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span> <span class="n">MF28</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span> <span class="s1">&#39;Not allow lines of MF 28 data processed: offset = </span><span class="si">%d</span><span class="s1">, len( MF28 ) = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">offset</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">MF28</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+    <span class="n">info</span><span class="o">.</span><span class="n">logs</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="p">)</span>
+    <span class="k">for</span> <span class="n">warning</span> <span class="ow">in</span> <span class="n">warningList</span> <span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">logs</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="s2">&quot;       WARNING: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">warning</span><span class="p">,</span> <span class="n">stderrWriting</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span>
+
+    <span class="k">return</span><span class="p">(</span> <span class="p">{</span> <span class="s1">&#39;element&#39;</span> <span class="p">:</span> <span class="n">element</span><span class="p">,</span> <span class="s1">&#39;errors&#39;</span> <span class="p">:</span> <span class="n">errors</span> <span class="p">}</span> <span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../../index.html">
+              <img class="logo" src="../../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

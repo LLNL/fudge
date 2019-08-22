@@ -100,6 +100,14 @@ nfu_status ptwXY_neg( statusMessageReporting *smr, ptwXYPoints *ptwXY ) {
         return( ptwXY->status );
     }
 
+    if( ( ptwXY->interpolation != ptwXY_interpolationLinLin ) && ( ptwXY->interpolation != ptwXY_interpolationLinLog ) &&
+            ( ptwXY_interpolationLinLog != ptwXY_interpolationFlat ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_unsupportedInterpolation, 
+                "Negation of non-linear y-interpolation not allowed: interpolation = '%s'.",
+                ptwXY->interpolationString ); 
+        return( nfu_unsupportedInterpolation );
+    }
+
     for( i = 0, p = ptwXY->points; i < nonOverflowLength; i++, p++ ) p->y = -p->y;
     for( o = overflowHeader->next; o != overflowHeader; o = o->next ) o->point.y = -o->point.y;
     return( ptwXY->status );

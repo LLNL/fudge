@@ -91,15 +91,14 @@ class scatteringFactor :        # This class is designed to look like a module a
 
             regionsModule.regions1d.__init__( self, **kwargs )
 
-            def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+            def toPointwise_withLinearXYs( self, **kwargs ) :
 
-                accuracy = 1e-3
-                if( len( self ) > 0 ) : accuracy = self[0].getAccuracy( )
-                xys = regionsModule.regions1d.toPointwise_withLinearXYs( self, accuracy, lowerEps, upperEps )
-                return( scatteringFactor.XYs1d( xys.axes, xys, accuracy = xys.getAccuracy( ) ) )
+                kwargs['accuracy'] = self.getArguments( kwargs, { 'accuracy' : XYsModule.defaultAccuracy } )['accuracy']
+                xys = regionsModule.regions1d.toPointwise_withLinearXYs( self, **kwargs )
+                return( scatteringFactor.XYs1d( xys.axes, xys ) )
 
     @staticmethod
-    def defaultAxes( factorLabel, energyUnit = 'eV' ) :
+    def defaultAxes( factorLabel, energyUnit ) :
 
         axes = axesModule.axes( rank = 2 )
         axes[0] = axesModule.axis( factorLabel, 0, "" )
@@ -116,6 +115,14 @@ class coherentFunctionBase( ancestryModule.ancestry ) :
         self.data = data
         data.setAncestor( self )
 
+    def convertUnits( self, unitMap ):
+
+        self.data.convertUnits( unitMap )
+
+    def toXML( self, indent = "", **kwargs ) :
+
+        return( '\n'.join( self.toXMLList( indent = indent, **kwargs ) ) )
+
     def toXMLList( self, indent = "", **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
@@ -124,6 +131,22 @@ class coherentFunctionBase( ancestryModule.ancestry ) :
         xmlStringList += self.data.toXMLList( indent = indent2, **kwargs )
         xmlStringList[-1] += "</%s>" % self.moniker
         return( xmlStringList )
+
+    @classmethod
+    def parseXMLNode( cls, element, xPath, linkData ) :
+
+        xPath.append( element.tag )
+
+        data = element[0]
+        if( data.tag == scatteringFactor.XYs1d.moniker ) :
+            data = scatteringFactor.XYs1d.parseXMLNode( data, xPath, linkData )
+        elif( data.tag == scatteringFactor.regions1d.moniker ) :
+            data = scatteringFactor.regions1d.parseXMLNode( data, xPath, linkData )
+        else :
+            raise TypeError( 'Invalid data "%s" for "%s"' % ( data.tag, cls.tag ) )
+
+        xPath.pop( )
+        return( cls( data ) )
 
 class scatteringFunction( coherentFunctionBase ) :
 
@@ -147,7 +170,7 @@ class coherent :
         moniker = 'coherentScattering'
         subformAttributes = ( 'formFactor', 'anomalousScatteringFactor_realPart', 'anomalousScatteringFactor_imaginaryPart' )
 
-        def __init__( self, label, productFrame, formFactor, realPart, imaginaryPart, makeCopy = True ) :
+        def __init__( self, label, productFrame, formFactor, realPart, imaginaryPart ) :
 
             if( not( isinstance( formFactor, scatteringFunction ) ) ) :
                 raise Exception( 'Instance is class "%s" and not scatteringFunction' % formFactor.__class__ )
@@ -166,6 +189,21 @@ class coherent :
 
             raise Exception( 'Not supported for %s' % self.moniker )
 
+        def processMultiGroup( self, style, tempInfo, indent ) :
+
+            from fudge.processing.deterministic import transferMatrices as transferMatricesModule
+            from fudge.processing import group as groupModule
+
+            verbosity = tempInfo['verbosity']
+            if( verbosity > 2 ) : print '%sGrouping %s' % ( indent, self.moniker )
+
+            print type( self.anomalousScatteringFactor_imaginaryPart.data )
+            TM_1, TM_E = transferMatricesModule.wholeAtomScattering( style, tempInfo, self.productFrame, self.formFactor.data,
+                    realAnomalousFactor = self.anomalousScatteringFactor_realPart.data,
+                    imaginaryAnomalousFactor = self.anomalousScatteringFactor_imaginaryPart.data,
+                    comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
+            return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
+
         def toXMLList( self, indent = "", **kwargs ) :
 
             indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
@@ -182,6 +220,25 @@ class coherent :
             xmlString[-1] += '</%s>' % self.moniker
             return( xmlString )
 
+        @staticmethod
+        def parseXMLNode( element, xPath, linkData ) :
+
+            xPath.append( element.tag )
+            subForms = { scatteringFunction.moniker : None, realAnomalousFactor.moniker : None, imaginaryAnomalousFactor.moniker : None }
+
+            for child in element :
+                for _class in ( scatteringFunction, realAnomalousFactor, imaginaryAnomalousFactor ) :
+                    if( child.tag == _class.moniker ) : break
+
+                if( child.tag != _class.moniker ) : raise TypeError( "Invalid element '%s' encountered '%s'" % ( child.tag, self.moniker ) )
+                subForms[_class.moniker] = _class.parseXMLNode( child, xPath, linkData )
+
+            _form = coherent.form( element.get( 'label' ), element.get( 'productFrame' ),
+                    subForms[scatteringFunction.moniker], subForms[realAnomalousFactor.moniker],
+                    subForms[imaginaryAnomalousFactor.moniker] )
+            xPath.pop( )
+            return( _form )
+
 class incoherent :
 
     class form( baseModule.form ) :
@@ -189,17 +246,45 @@ class incoherent :
         moniker = 'incoherentScattering'
         subformAttributes = ( 'scatteringFunction', )
 
-        def __init__( self, label, productFrame, scatteringFunction, makeCopy = True ) :
+        def __init__( self, label, productFrame, scatteringFunction ) :
 
             if( not( isinstance( scatteringFunction, ( incoherent.XYs1d, incoherent.regions1d ) ) ) ) :
                 raise Exception( 'Instance is class "%s" and not scatteringFunction' % scatteringFunction.__class__ )
-            if( makeCopy ) : scatteringFunction = scatteringFunction.copy( )
 
             baseModule.form.__init__( self, label, productFrame, ( scatteringFunction, ) )
 
         def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
             raise Exception( 'Not supported for %s' % self.moniker )
+
+        def processMultiGroup( self, style, tempInfo, indent ) :
+
+            from fudge.processing.deterministic import transferMatrices as transferMatricesModule
+            from fudge.processing import group as groupModule
+
+            verbosity = tempInfo['verbosity']
+            if( verbosity > 2 ) : print '%sGrouping %s' % ( indent, self.moniker )
+
+            TM_1, TM_E = transferMatricesModule.comptonScattering( style, tempInfo, self.productFrame, self.scatteringFunction,
+                    comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
+            return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
+
+        @staticmethod
+        def parseXMLNode( element, xPath, linkData ) :
+
+            xPath.append( element.tag )
+
+            data = element[0]
+            if( data.tag == incoherent.XYs1d.moniker ) :
+                data = incoherent.XYs1d.parseXMLNode( data, xPath, linkData )
+            elif( data.tag == incoherent.regions1d.moniker ) :
+                data = incoherent.regions1d.parseXMLNode( data, xPath, linkData )
+            else :
+                raise TypeError( 'Invalid data "%s" for "%s"' % ( data.tag, cls.tag ) )
+
+            _form = incoherent.form( element.get( 'label' ), element.get( 'productFrame' ), data )
+            xPath.pop( )
+            return( _form )
 
     class XYs1d( scatteringFactor.XYs1d ) :
 

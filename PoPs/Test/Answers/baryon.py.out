@@ -1,0 +1,24 @@
+<baryon id="p">
+  <mass>
+    <double label="base" value="1.00727646681" unit="amu"/></mass>
+  <spin>
+    <fraction label="base" value="1/2" unit="hbar"/></spin>
+  <parity>
+    <integer label="base" value="1"/></parity>
+  <charge>
+    <integer label="base" value="1" unit="e"/></charge>
+  <halflife>
+    <string label="base" value="stable" unit="s"/></halflife></baryon>
+
+<baryons>
+  <baryon id="p">
+    <mass>
+      <double label="base" value="1.00727646681" unit="amu"/></mass>
+    <spin>
+      <fraction label="base" value="1/2" unit="hbar"/></spin>
+    <parity>
+      <integer label="base" value="1"/></parity>
+    <charge>
+      <integer label="base" value="1" unit="e"/></charge>
+    <halflife>
+      <string label="base" value="stable" unit="s"/></halflife></baryon></baryons>

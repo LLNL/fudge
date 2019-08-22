@@ -95,7 +95,7 @@ def get3dmathData( object, callingRoutine, msg ) :
     return( data )
 
 def valid3dClassType( object, callingRoutine, msg ) :
-    "Returns the first argument, object, if it is a subclass of the endl3dmath class; else, triggers a raise."
+    """Returns the first argument, object, if it is a subclass of the endl3dmath class; else, triggers a raise."""
     import endl3dmathClasses
     if( isinstance( object, endl3dmathClasses.endl3dmath ) ) : return( object )
     raise Exception( "\nError in %s: invalid type = %s for %s" % ( callingRoutine, type( object ), msg ) )
@@ -130,7 +130,7 @@ def check3dData( data, allowNegativeX = False, allowZeroX = True, allowNegativeY
             s = 'check3dData: x = %s is not a number' % points[0][0]
             messages.append( s )
             if( printErrors ) : fudgemisc.printWarning( '\n'.join( fudgemisc.checkMessagesToString( s, indentation = '      ' ) ) )
-        if( xPrior != None ) :
+        if( xPrior is not None ) :
             if( x <= xPrior ) :
                 s = 'check3dData: x value x[%d] >= x[%d] (%e >= %e)' % ( i-1, i, xPrior, x )
                 messages.append( s )

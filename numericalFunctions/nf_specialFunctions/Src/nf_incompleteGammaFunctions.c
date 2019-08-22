@@ -89,7 +89,10 @@ nfu_status nf_incompleteGammaFunctionComplementary( statusMessageReporting *smr,
         return( nfu_badInput );
     }
 
-    if( ( x <= 0 ) || ( a <= 0 ) ) return( 1.0 );
+    if( ( x <= 0 ) || ( a <= 0 ) ) {
+        *value = 1.;
+        return( nfu_Okay );
+    }
     if( ( x < 1.0 ) || ( x < a ) ) {
         if( ( status = nf_gammaFunction( smr, a, value ) ) != nfu_Okay ) return( status );
         if( ( status = nf_incompleteGammaFunction( smr, a, x, &ans ) ) != nfu_Okay ) return( status );

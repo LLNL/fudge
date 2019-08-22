@@ -1,0 +1,385 @@
+\chapter{Discrete two-body reactions}
+\label{Sec:2-body}
+This section describes how the contribution to the transfer matrix
+is calculated for data consisting of probability densities for
+the cosine of the angle of deflection in discrete 2-body reactions.
+In this case, the probability densities are always given in 
+the center-of-mass frame.
+Because
+the transfer matrices are defined in terms of laboratory
+coordinates, the computations involve a boost.
+
+For all except very light-weight targets, the mapping from
+center-of-mass to laboratory coordinates is usually done using 
+Newtonian mechanics.  The discussion given here is therefore
+Newtonian.  A relativistic treatment is presented in Appendix~\ref{Appendix-relativity}.
+The choice of Newtonian or relativistic mechanics is determined by
+the value of the \textsf{kinetics} input parameter to \gettransfer\ as
+explained in Section~\ref{Sec:relativistic}.  Of course, relativistic mechanics must
+be used if either the incident particle or the outgoing particle is a
+photon.
+
+For discrete 2-body reactions,  the center-of-mass energy of the emitted particle
+is determined by the energy $E$ of the incident particle.  Consequently, the
+energy-angle probability density $\picm(\Ecm', \mucm \mid E)$ in the
+center-of-mass frame is given by
+\begin{equation}
+  \picm(\Ecm', \mucm \mid E) =
+  g( \mucm \mid  E) \, \delta( \Ecm' - \Psi( E ) )
+  \label{prob_cm}
+\end{equation}
+for the function~$\Psi$ given below in Eq.~(\ref{E_cm}).  
+From here on, the energy~$E$ and direction cosine~$\mu$
+of the outgoing particle will be marked with the subscript ``lab'' or ``cm'' to
+indicate that the variable is in the laboratory or center-of-mass frame.
+
+Because of Eq.~(\ref{prob_cm}), the data for discrete 2-body reactions consist
+of angular probability densities $g( \mucm \mid E)$ given in the 
+center-of-mass frame, either as a 2-dimensional table 
+for given incident energy~$E$ and direction cosine~$\mucm$
+or as Legendre coefficients $c_\ell(E)$ for
+\begin{equation}
+  g( \mucm \mid  E) =
+  \sum_\ell 
+  \left(
+     \ell + \frac{1}{2}
+  \right)
+    c_\ell(E)P_\ell( \mucm ).
+  \label{cmLegendre}
+\end{equation}
+
+This section begins with an overview of Newtonian mechanics
+for discrete 2-body problems.  In particular, the form of the function
+$\Psi$ in Eq.~(\ref{prob_cm}) is derived, as is the boost from the
+center-of-mass to the laboratory frame.  The section closes
+with an examination of the use of angular probability data 
+$g( \mucm \mid E)$ in the computation of the integrals
+Eqs.~(\ref{Inum}) and~(\ref{Ien}) used in the calculation of the
+transfer matrix.  
+
+\section{Newtonian mechanics of discrete 2-body reactions}
+Only a summary of the results is given here; for more information,
+see the reference~\cite{endep}.  A relativistic treatment is
+developed in Appendix~\ref{Appendix-relativity}.  It is assumed that the target is at rest 
+and that the incident particle has
+energy $E$ in laboratory coordinates.
+
+The following
+notations are used for the masses of the particles involved:\\
+ \Input{$\myi$,}{  the mass of the incident particle,}\\
+ \Input{$\mtarg$,}{ the mass of the target,}\\
+ \Input{$\myo$,}{ the mass of the emitted particle,}\\
+ \Input{$\mres$,}{ the mass of the residual.}\\
+For the conversion
+between center-of-mass and laboratory coordinates, define
+the mass ratios
+$$
+  \gamma = \frac
+    { \myi \myo }
+    { ( \myi + \mtarg )^2 },
+$$
+$$
+   \beta = \frac
+    { \mres }
+    { \myo + \mres },
+$$
+and
+$$
+   \alpha = \frac
+    {\beta \mtarg}
+    { \myi + \mtarg }.
+$$
+
+Velocity vectors are printed in bold face $\textbf{V}$ with
+magnitude (speed) in math italics
+$$
+  V = | \textbf{V} |.
+$$
+
+For a target at rest and an incident particle with
+energy $E$ in laboratory coordinates, the center of mass
+moves in the direction of motion of
+the incident particle with velocity $\Vtrans$ having magnitude squared 
+\begin{equation}
+  \vtrans^2 = \Vtrans^2 =
+    \frac{ 2\myi  E}
+    { ( \myi + \mtarg )^2 }.
+  \label{Vtrans-length}
+\end{equation}
+
+The reaction may have a nonzero energy value $Q$, arising
+for example from the excitation level of the target
+and/or residual nucleus in inelastic scattering.  A nonzero
+$Q$ value may also arise from the
+mass difference in a knock-on reaction.  
+It follows from conservation of energy and momentum that in
+center-of-mass coordinates the energy of the emitted
+particle is given by
+\begin{equation}
+  \Ecm' = \Psi( E ) = \alpha E + \beta Q.
+  \label{E_cm}
+\end{equation}
+This defines the function $\Psi$ appearing in Eq.~(\ref{prob_cm}).
+The speed of the outgoing particle in the
+center-of-mass frame is
+\begin{equation}
+  \vcm' = |\Vcm'| = \sqrt{ \frac{ 2\Ecm' }{\myo} }.
+    \label{V-cm-outgoing}
+\end{equation}
+It follows from Eq.~(\ref{E_cm}) that for an endothermic
+reaction ($Q < 0)$, the threshold is at
+$$
+  E = \frac{-\beta Q}{\alpha}.
+$$ 
+
+\subsection{The boost to the laboratory frame}
+As illustrated in Figure~\ref{Fig:2-body-boost}, the boost from center-of-mass
+to laboratory coordinates is obtained by adding the velocities
+\begin{equation}
+  \Vlab' = \Vtrans + \Vcm'.
+ \label{V-lab-2-body}
+\end{equation}
+Consequently, the energy of the outgoing particle in the
+laboratory frame is
+$$
+  \Elab' = \frac{ \myo {\Vlab'}^2 }{2} =
+        \frac{ \myo }{2}
+        ( \vtrans^2 + {\vcm'}^2 + 2\Vtrans \cdot \Vcm' ).
+$$
+In terms of the notation Eq.~(\ref{E_cm}) and
+\begin{equation}
+  \Etrans' = \frac{ \myo \vtrans^2 }{2} =
+  \gamma E,
+  \label{E_trans}
+\end{equation}
+this equation takes the form
+\begin{equation}
+  \Elab' = \Etrans' + \Ecm' + 2 \mucm \sqrt{ \Etrans' \Ecm' }.
+  \label{E_lab}
+\end{equation}
+Here, $\mucm$ is the direction cosine defined by the
+relation
+$$
+   \Vtrans \cdot \Vcm' = \mucm \vtrans \vcm'.
+$$
+ 
+\begin{figure}
+\input{fig4-1}
+\end{figure}
+
+It is also necessary to determine the direction cosine $\mulab$ in
+the laboratory frame for
+$$
+     \Vtrans \cdot \Vlab' = \mulab \vtrans \vlab'.
+$$
+This is most easily derived from the trigonometry in Figure~\ref{Fig:2-body-boost}
+$$
+  \mulab  \vlab' = 
+   \vtrans + \mucm \vcm'.
+$$
+In terms of the energies defined in Eqs.~(\ref{E_cm}), (\ref{E_trans}),
+and~(\ref{E_lab}), this relation takes the form
+\begin{equation}
+  \mulab  = \frac
+   { \sqrt{ \Etrans' } + \mucm \sqrt{ \Ecm'} }
+    {\sqrt{\Elab'}}
+    \quad \text{if $\Elab' > 0$.}
+  \label{get_mu}
+\end{equation}
+
+It is clear from Eq.~(\ref{V-lab-2-body}) that 
+$$
+  \Elab' = \frac{\myo {\vlab'}^2}{2} = 0,
+$$
+if and only if
+$$
+  \Vcm' = - \Vtrans.
+$$
+In this case, the value of $\mulab$ is undefined.
+
+\section{Computation of the transfer matrix from data for
+discrete 2-body reactions}
+Consider the use of data $g(\mucm \mid E)$ in Eq.~(\ref{prob_cm})
+in the computation of integrals for the transfer matrix
+Eqs.~(\ref{Inum}) and~(\ref{Ien}), either as tables or as Legendre
+coefficients in Eq.~(\ref{cmLegendre}).  In these integrals
+the multiplicity is always $M(E) = 1$ for discrete 2-body reactions.
+The discussion given here concentrates on the
+evaluation of the integral in Eq.~(\ref{Inum}).  The integral in
+Eq.~(\ref{Ien}) differs only in that its integrand contains an extra
+factor $\Elab'$, the energy of the outgoing particle in the laboratory frame.
+
+Because the probability density data $g(\mucm \mid E)$ in 
+Eq.~(\ref{prob_cm}) is given in center-of-mass coordinates, it is
+desirable to transform the integrals Eqs.~(\ref{Inum})
+to the center-of-mass frame.
+The center-of-mass form of the integral Eq.~(\ref{Inum}) is
+\begin{equation}
+    \Inum_{g,h,\ell} =
+   \int_{\calE_g}dE \, \sigma ( E ) w(E) \widetilde \phi_\ell(E) 
+     \int_{\mucm} d\mucm  \,  g(\mucm \mid E)
+     \int_{\Ecm'} d\Ecm' \, P_\ell( \mulab ) \,
+        \delta(\Ecm' - \Psi(E) )
+  \label{cmint}
+\end{equation}
+with $\Psi(E)$ as given by Eq.~(\ref{E_cm}).
+The range of integration over $\mucm$ and $\Ecm'$ in
+Eq.~(\ref{cmint})  is such that for fixed incident energy $E$ in $\calE_g$,
+the energy $\Elab'$ of the outgoing particle given by Eq.~(\ref{E_lab}) lies
+in~$\calE_h'$.
+
+Integration of Eq.~(\ref{cmint})  with respect to $\Ecm'$ yields the result that
+\begin{equation}
+    \Inum_{g,h,\ell} =
+     \int_{\calE_g} dE \, \sigma ( E ) w(E) \widetilde \phi_\ell(E) 
+    \int_{\mucm} d\mucm  \,
+     P_\ell( \mulab ) g(\mucm \mid E),
+  \label{muEint}
+\end{equation}
+where it is understood that the direction cosine $\mulab$ in the laboratory
+frame is calculated from Eq.~(\ref{get_mu}) and that the range of
+integration over $\mucm$ is such that $E$ is in~$\calE_h'$.
+
+The \gettransfer\ code steps through the data $g(\mucm \mid E)$
+to compute contributions to the entries of the transfer matrix in
+Eq.~(\ref{muEint}).
+The case of tabular data with direct interpolation (Section~\ref{Sec:direct-interp}) is
+illustrated in the laboratory frame in Figure~\ref{Fig:2-body-region-lab}.
+This figure shows an integration region identified by an incident energy
+bin~$\calE_g$ and an outgoing energy bin~$\calE_h'$.  The data
+$g(\mucm \mid E)$ are given at incident energies $E_{k-1}$ and
+$E_k$, such that the interval $E_{k-1} < E < E_k$ overlaps the
+energy bin~$\calE_g$.  Furthermore, it is assumed that data entries
+$g(\mucm \mid E)$ for $\mucm = \mucmjm$ and $\mucm = \mucm$ are
+given at $E = E_{k-1} $ or at $E = E_k$ and that the table contains
+no entries $g(\mucm \mid E_{k-1})$ or $g(\mucm \mid E_k)$ for 
+$\mucmjm < \mucm < \mucm$.  Any missing data values 
+$g(\mucmjm \mid E_{k-1})$ or $g(\mucmj \mid E_{k-1})$ or
+$g(\mucmjm \mid E_k)$ or~$g(\mucmj \mid E_k)$ are computed
+by interpolation with respect to~$\mucm$.  The integration region
+in the laboratory frame
+for the contribution of such a set of data to the integral $\Inum_{g,h,\ell}$
+in Eq.~(\ref{cmint}) is the shaded area of Figure~\ref{Fig:2-body-region-lab}.  This region is
+mapped to center-of-mass coordinates in Figure~\ref{Fig:2-body-region-cm}.
+
+\begin{figure}
+\input{fig4-2}
+\end{figure}
+
+\begin{figure}
+\input{fig4-3}
+\end{figure}
+
+When the tabular data are interpolated by the method of cumulative
+points of Section~\ref{Sec:cumProb}, the geometry is complicated by the
+local unit-base transformations, but the basic ideas are the same.
+Finally, for probability density data $g( \mucm \mid E)$ given as
+Legendre coefficients in Eq.~(\ref{cmLegendre}), the only significant
+difference is that the range of direction cosines becomes $-1 \le \mucm \le 1$
+with the limitation that the energy $E$ of the outgoing particle lies in the
+energy bin~$\calE_h'$.
+
+\section{Format of data in the input file}
+For tabulated probability density data $g( \mucm \mid E)$, the
+data identifier as in Section~\ref{data-model}, is\\
+  \Input{Process: two body transfer matrix}{}\\
+and for the Legendre coefficients it is\\
+  \Input{Process: Legendre two body transfer matrix}{}
+
+\subsection{Data for both forms of probability density}
+Because the boost from the center-of-mass frame to the laboratory
+frame depends on the rest masses of the particles, these must be included
+in the input file as described in Section~\ref{model-info}.  The format for doing so is\\
+  \Input{Projectile's mass:}{$\myi$} \\
+ \Input{Target's mass:}{$\mtarg$} \\
+ \Input{Product's mass:}{$\myo$} \\
+ \Input{Reaction's Q value:}{$Q$} \\
+The values of these quantities must be in the same units as
+the energy bin boundaries.
+
+The code computes the rest mass of the residual from the $Q$ value and
+the masses of the other particles.  If the input file also contains the line\\
+ \Input{Residual's mass:}{$\mres$}\\
+the code compares this value with the mass it computed, printing
+a warning message if they are significantly different.
+
+The code may use either Newtonian or relativistic mechanics in its
+computations as specified in Section~\ref{Sec:relativistic}.
+
+The specifications that the energy $E$ of the incident particle is given in the laboratory
+frame and the direction cosine $\mucm$ in the center-of-mass frame are,
+Section~\ref{Reference-frame},\\
+  \Input{Projectile Frame:  lab}{}\\
+  \Input{Product Frame:  CenterOfMass}{}
+
+\subsection{Angular probability density tables}
+The identification line for tabulated angular probability densities
+is\\
+  \Input{Angular data:}{$n = K$}\\
+where $K$ is the number of incident energies~$E$.
+This is followed by the interpolation rules for probability
+densities from Section~\ref{interp-flags-probability}\\
+  \Input{Incident energy interpolation:}{probability interpolation flag}\\
+  \Input{Outgoing cosine interpolation:}{list interpolation flag}
+
+There are then $K$ blocks, one for each incident energy $E_k$,\\
+  \Input{Ein: $E_k$:}{$n = J_k$}\\
+with $J_k$ pairs of values $\mucmj$ and $g(\mucm \mid E_k)$.  Thus,
+with incident energy in MeV
+a table of angular probability densities $g( \mucm \mid E)$ may look like\\
+  \Input{Angular data:}{$n = 22$}\\
+  \Input{Incident energy interpolation:}{lin-lin direct}\\
+  \Input{Outgoing cosine interpolation:}{lin-lin}\\
+  \Input{ Ein: 1.500000000000e-01 : n = 2}{}\\
+   \Input{\indent -1.000000000000e+00  5.000000000000e-01}{}\\
+    \Input{\indent 1.000000000000e+00  5.000000000000e-01}{}\\
+  \Input{ Ein: 2.000000000000e-01 : n = 2}{}\\
+  \Input{\indent  -1.000000000000e+00  4.550000000000e-01}{}\\
+    \Input{\indent 1.000000000000e+00  5.450000000000e-01}{}\\
+   \Input{\indent  } {$\cdots$}\\
+  \Input{ Ein: 2.000000000000e+01 : n = 29}{}\\
+   \Input{\indent -1.000000000000e+00  3.873180000000e-02}{}\\
+  \Input{\indent  -9.500000000000e-01  2.943580000000e-02}{}\\
+   \Input{\indent -9.000000000000e-01  2.582090000000e-02}{}\\
+   \Input{\indent  } {$\cdots$}\\
+    \Input{\indent 9.000000000000e-01  2.530490000000e+00}{}\\
+   \Input{\indent 9.500000000000e-01  3.873180000000e+00}{}\\
+    \Input{\indent 1.000000000000e+00  8.262750000000e+00}{}
+
+\subsection{Legendre coefficients of angular probability density}
+Legendre coefficient data of the form Eq.~(\ref{cmLegendre})
+for discrete 2-body reactions are given as\\
+    \Input{Legendre coefficients:}{$n = K$}\\
+where $K$ is the number of incident energies~$E$.
+This is followed by the interpolation rule for simple lists
+from Section~\ref{interp-flags-list}\\
+  \Input{Interpolation:}{list interpolation flag}
+
+The file closes with $K$ sets of data\\
+    \Input{Ein: $E_k$:}{$n = L_k$}\\
+with $L_k$ Legendre coefficients $c_\ell(E_k)$ for $\ell = 0$, 1,
+\ldots\ , $L_k - 1$ in Eq.~(\ref{cmLegendre}).  With incident energy
+in units of MeV, an example of this portion of the input file is\\
+   \Input{Legendre coefficients: n = 17}\\
+  \Input{Interpolation:}{lin-lin}\\
+  \Input{  Ein: 1.843100e+00:  n = 3}{}\\
+    \Input{\indent 1.000000e+00}{}\\
+    \Input{\indent 0.000000e+00}{}\\
+    \Input{\indent 0.000000e+00}{}\\
+   \Input{\indent  } {$\cdots$}\\
+  \Input{ Ein: 2.000000e+01:  n = 12}{}\\
+    \Input{\indent 1.000000e+00}{}\\
+    \Input{\indent 4.640500e-01}{}\\
+    \Input{\indent 2.320700e-01}{}\\
+    \Input{\indent 8.593700e-02}{}\\
+    \Input{\indent 5.338700e-02}{}\\
+    \Input{\indent 2.465600e-02}{}\\
+    \Input{\indent -1.500600e-03}{}\\
+    \Input{\indent -1.756300e-02}{}\\
+   \Input{\indent  -1.108000e-02}{}\\
+    \Input{\indent 1.931100e-02}{}\\
+    \Input{\indent 1.150900e-02}{}\\
+    \Input{\indent 5.643500e-03}{}
+
+
+

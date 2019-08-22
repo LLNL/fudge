@@ -66,12 +66,12 @@ NUMERICALFUNCTIONS_PATH = ../../../..
 
 CC = gcc
 CDEBUGFLAGS = -g -O0 -Wall
-ptwXYCFLAGS = -I$(NUMERICALFUNCTIONS_PATH)/include -L$(NUMERICALFUNCTIONS_PATH)/lib -lnumericalfunctions \
-              -I$(SMR_PATH)/include -L$(SMR_PATH)/lib -lstatusMessageReporting \
-              -lptwXY_utilities -lnfut_utilities
+ptwXYCFLAGS = -lnfut_utilities -lptwXY_utilities \
+			  -I$(NUMERICALFUNCTIONS_PATH)/include -L$(NUMERICALFUNCTIONS_PATH)/lib -lnumericalfunctions \
+              -I$(SMR_PATH)/include -L$(SMR_PATH)/lib -lstatusMessageReporting
 localCFLAGS = $(CDEBUGFLAGS) $(CFLAGS) $(ptwXYCFLAGS) -lm
 
-TARGETS = toLinearLinear unitbase unitbase2 chargedParticle strings badLogValue
+TARGETS = toLinearLinear unitbase unitbase2 chargedParticle strings strings2 badLogValue
 
 .PHONY: default check clean realclean $(TARGETS)
 
@@ -92,6 +92,9 @@ chargedParticle: chargedParticle.c
 strings: strings.c
 	$(CC) -o strings strings.c $(localCFLAGS) -lm
 
+strings2: strings2.c
+	$(CC) -o strings2 strings2.c $(localCFLAGS) -lm
+
 badLogValue: badLogValue.c
 	$(CC) -o badLogValue badLogValue.c $(localCFLAGS) -lm
 
@@ -104,6 +107,7 @@ check: default
 	./test.com unitbase2 $(CHECKOPTIONS)
 	./test.com chargedParticle $(CHECKOPTIONS)
 	./test.com strings.com $(CHECKOPTIONS)
+	./test.com strings2 $(CHECKOPTIONS)
 	./test.com badLogValue $(CHECKOPTIONS)
 
 clean:

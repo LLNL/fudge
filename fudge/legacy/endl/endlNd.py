@@ -94,7 +94,7 @@ Useful Members (all of these should be accessed via get/set methods)::
         """For internal use only."""
 
         if ( I != I_ ) : raise Exception( "\nError in endlI%d.__init__: I = %d != %d" % ( I_, I, I_ ) )
-        if( bdflsFile == None ) : bdflsFile = bdfls.getDefaultBdfls( )
+        if( bdflsFile is None ) : bdflsFile = bdfls.getDefaultBdfls( )
         self.bdflsFile = bdflsFile
         self.columns = endlmisc.getNumberOfColumns_( I, "endlNd.__init__" )
         self.yo = yo
@@ -102,7 +102,7 @@ Useful Members (all of these should be accessed via get/set methods)::
         self.I = I
         self.S = S
         self.format = 12
-        if ( f == None ) :                              # Designer data.
+        if ( f is None ) :                              # Designer data.
             self.h = copy.deepcopy( h )
             data = points
             self.designerData = 1
@@ -180,13 +180,13 @@ Useful Members (all of these should be accessed via get/set methods)::
             ( self.yo, self.C, self.I, self.S, self.X1, self.X2, self.X3, self.X4, self.Q )
 
     def checkHeader( self, index = None ) :
-        "For internal use only."
+        """For internal use only."""
 
-        if( ( index == None ) or ( index == 1 ) ) :
+        if( ( index is None ) or ( index == 1 ) ) :
             if( len( self.h[0] ) < 71 ) :
                 if( self.h[0][-1] == "\n" ) : self.h[0][:-1]
                 self.h[0] = "%-70s\n" % self.h[0]
-        if( ( index == None ) or ( index == 2 ) ) :
+        if( ( index is None ) or ( index == 2 ) ) :
             if( len( self.h[1] ) < 69 ) :
                 if( self.h[1][-1] == "\n" ) : self.h[1][:-1]
                 self.h[1] = "%-68s\n" % self.h[1]
@@ -250,93 +250,93 @@ Useful Members (all of these should be accessed via get/set methods)::
             fixThresholdMode = fixThresholdMode, threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getDate( self ) :
-        "Returns the target's date."
+        """Returns the target's date."""
 
         return( int( self.h[0][25:31] ) )
 
     def getELevel( self ) :
-        "Returns the target's excitation level."
+        """Returns the target's excitation level."""
 
         return( self.ELevel )
 
     def getENDLInterpolation( self ) :
-        "Returns the target's ENDL interpolation flag. 0 or 2 is lin-lin, 3 is log-lin, 4 is lin-log and 5 is log-log. Also see getInterpolation."
+        """Returns the target's ENDL interpolation flag. 0 or 2 is lin-lin, 3 is log-lin, 4 is lin-log and 5 is log-log. Also see getInterpolation."""
 
         return( self.ENDLInterpolation )
 
     def getInterpolation( self ) :
-        "Returns the target's fudge interpolation flag. 0 is lin-lin, 1 is log-lin, 2 is lin-log and 3 is log-log. Also see getENDLInterpolation."
+        """Returns the target's fudge interpolation flag. 0 is lin-lin, 1 is log-lin, 2 is lin-log and 3 is log-log. Also see getENDLInterpolation."""
 
         return( self.interpolation )
 
     def getFormat( self ) :
-        "Returns the target's format specifier."
+        """Returns the target's format specifier."""
 
         return( self.format )
 
     def getLifetime( self ) :
-        "Deprecated method. Use getHalflife instead."
+        """Deprecated method. Use getHalflife instead."""
 
         endlmisc.printWarning( 'getLifetime is a deprecated method. Use getHalflife instead.' )
         return( self.getHalflife( ) )
 
     def getHalflife( self ) :
-        "Returns the target's halflife."
+        """Returns the target's halflife."""
 
         return( self.Halflife )
 
     def getMass( self ) :
-        "Returns the target's mass."
+        """Returns the target's mass."""
 
         return( self.Mass )
 
     def getQ( self ) :
-        "Returns the Q value for self's reaction."
+        """Returns the Q value for self's reaction."""
 
         return( self.Q )
 
     def getTemperature( self ) :
-        "Returns the taget's temperature."
+        """Returns the taget's temperature."""
 
         return( self.Temperature )
 
     def getX1( self ) :
-        "Returns the X1 value for this data."
+        """Returns the X1 value for this data."""
 
         return( self.X1 )
 
     def getX2( self ) :
-        "Returns the X2 value for this data."
+        """Returns the X2 value for this data."""
 
         return( self.X2 )
 
     def getX3( self ) :
-        "Returns the X3 value for this data."
+        """Returns the X3 value for this data."""
 
         return( self.X3 )
 
     def getX4( self ) :
-        "Returns the X4 value for this data."
+        """Returns the X4 value for this data."""
 
         return( self.X4 )
 
     def getYi( self ) :
-        "Returns projectile's identifier, yi value."
+        """Returns projectile's identifier, yi value."""
 
         return( self.yi )
 
     def getYo( self ) :
-        "Returns the outgoing particle's identifier, yo value."
+        """Returns the outgoing particle's identifier, yo value."""
 
         return( self.yo )
 
     def getZA( self ) :
-        "Returns the targets ZA value."
+        """Returns the targets ZA value."""
 
         return( self.ZA )
 
     def info( self ) :
-        "Prints information about self's data."
+        """Prints information about self's data."""
 
         print "C = %2d  I = %3d  S = %3d  X1 = %e  X2 = %e  X3 = %e  X4 = %e  Q = %e" % \
             ( self.C, self.I, self.S, self.X1, self.X2, self.X3, self.X4, self.Q )
@@ -345,9 +345,9 @@ Useful Members (all of these should be accessed via get/set methods)::
 
     def save( self, f = None ) :        # ??????
         """Writes header and data to file f where f is a python file type (e.g., sys.stdout).
-    If f == None then writes data to sys.stdout."""
+    If f is None then writes data to sys.stdout."""
 
-        if ( f == None ) : f = sys.stdout
+        if ( f is None ) : f = sys.stdout
         f.write( self.h[0] )
         f.write( self.h[1] )
         Fmt = None
@@ -358,16 +358,16 @@ Useful Members (all of these should be accessed via get/set methods)::
         f.write( "                                                                       1\n" )
 
     def setC( self, C ) :
-        "Sets self's C value and self's header C value to C."
+        """Sets self's C value and self's header C value to C."""
 
         self.checkHeader( 2 )
         self.C = C
         self.h[1] = "%2d" % C + self.h[1][2:]
 
     def setDate( self, date = None ) :
-        "Sets self's data and self's header date value to data. If date == None then today's date is used."
+        "Sets self's data and self's header date value to data. If date is None then today's date is used."
 
-        if ( date == None ) :
+        if ( date is None ) :
             date = time.localtime( time.time( ) )
             date = 10000 * ( date[0] - 2000 ) + 100 * date[1] + date[2]
         if ( type( date ) == type( "" ) ) :
@@ -382,14 +382,14 @@ Useful Members (all of these should be accessed via get/set methods)::
             raise Exception( "\nError in setDate: date must be an integer, or a string convertible to an \ninteger, in the range [1, 999999]" )
 
     def setELevel( self, ELevel ) :
-        "Sets self's ELevel value and self's header ELevel value to ELevel."
+        """Sets self's ELevel value and self's header ELevel value to ELevel."""
 
         self.checkHeader( 1 )
         self.ELevel = ELevel
         self.h[0] = self.h[0][:35] + endlmisc.headerFunkyDouble2String( ELevel ) + self.h[0][46:]
 
     def setFormat( self, width ) :
-        "Sets self's format specifier and self's header format specifier value to width."
+        """Sets self's format specifier and self's header format specifier value to width."""
 
         if( ( width < 7 ) or ( width > 99 ) ) : raise Exception( '\nError in endlNd.setFormat: width = %d not in range [7 to 99].' % width )
         self.checkHeader( 1 )
@@ -397,76 +397,76 @@ Useful Members (all of these should be accessed via get/set methods)::
         self.h[0] = '%s%2d%s' % ( self.h[0][:32], width, self.h[0][34:] )
 
     def setI( self, I ) :
-        "Sets self's I value and self's header I value to I."
+        """Sets self's I value and self's header I value to I."""
 
         self.checkHeader( 2 )
         self.I = I
         self.h[1] = self.h[1][:2] + "%3d" % I + self.h[1][5:]
 
     def setLifetime( self, Halflife) :
-        "Deprecated method. Use setHalflife instead."
+        """Deprecated method. Use setHalflife instead."""
 
         endlmisc.printWarning( 'setLifetime is a deprecated method. Use setHalflife instead.' )
         self.setHalflife( Halflife )
 
     def setHalflife( self, Halflife) :
-        "Sets self's Halflife value and self's header Halflife value to Halflife."
+        """Sets self's Halflife value and self's header Halflife value to Halflife."""
 
         self.checkHeader( 1 )
         self.Halflife = Halflife
         self.h[0] = self.h[0][:47] + endlmisc.headerFunkyDouble2String( Halflife ) + self.h[0][58:]
 
     def setMass( self, Mass ) :
-        "Sets self's Mass value and self's header Mass value to Mass."
+        """Sets self's Mass value and self's header Mass value to Mass."""
 
         self.checkHeader( 1 )
         self.Mass = Mass
         self.h[0] = self.h[0][:13] + endlmisc.headerFunkyDouble2String( Mass ) + self.h[0][24:]
 
     def setQ( self, Q ) :
-        "Sets self's Q value and self's header Q value to Q."
+        """Sets self's Q value and self's header Q value to Q."""
 
         self.checkHeader( 2 )
         self.Q = Q
         self.h[1] = self.h[1][:9] + endlmisc.headerFunkyDouble2String( Q ) + self.h[1][20:]
 
     def setS( self, S ) :
-        "Sets self's S value and self's header S value to S."
+        """Sets self's S value and self's header S value to S."""
 
         self.checkHeader( 2 )
         self.S = S
         self.h[1] = self.h[1][:5] + "%3d" % S + self.h[1][8:]
 
     def setTemperature( self, T ) :
-        "Sets self's Temperature value and self's header Temperature value to T."
+        """Sets self's Temperature value and self's header Temperature value to T."""
 
         self.checkHeader( 1 )
         self.Temperature = T
         self.h[0] = self.h[0][:59] + endlmisc.headerFunkyDouble2String( T ) + self.h[0][70:]
 
     def setX1( self, X1 ) :
-        "Sets self's X1 value and self's header X1 value to X1."
+        """Sets self's X1 value and self's header X1 value to X1."""
 
         self.checkHeader( 2 )
         self.X1 = X1
         self.h[1] = self.h[1][:21] + endlmisc.headerFunkyDouble2String( X1 ) + self.h[1][32:]
 
     def setX2( self, X2 ) :
-        "Sets self's X2 value and self's header X2 value to X2."
+        """Sets self's X2 value and self's header X2 value to X2."""
 
         self.checkHeader( 2 )
         self.X2 = X2
         self.h[1] = self.h[1][:33] + endlmisc.headerFunkyDouble2String( X2 ) + self.h[1][44:]
 
     def setX3( self, X3 ) :
-        "Sets self's X3 value and self's header X3 value to X3."
+        """Sets self's X3 value and self's header X3 value to X3."""
 
         self.checkHeader( 2 )
         self.X3 = X3
         self.h[1] = self.h[1][:45] + endlmisc.headerFunkyDouble2String( X3 ) + self.h[1][56:]
 
     def setX4( self, X4 ) :
-        "Sets self's X4 value and self's header X4 value to X4."
+        """Sets self's X4 value and self's header X4 value to X4."""
 
         self.checkHeader( 2 )
         self.X4 = X4
@@ -508,15 +508,15 @@ Useful Members (all of these should be accessed via get/set methods)::
     def setYiZAYoCIS( self, yi = None, ZA = None, yo = None, C = None, I = None, S = None ) :
         """For input parameters that are not None, sets self's value to input parameter."""
 
-        if( yi != None ) : self.setYi( yi )
-        if( ZA != None ) : self.setZA( ZA )
-        if( yo != None ) : self.setYo( yo )
-        if( C  != None ) : self.setC( C )
-        if( I  != None ) : self.setI( I )
-        if( S  != None ) : self.setS( S )
+        if( yi is not None ) : self.setYi( yi )
+        if( ZA is not None ) : self.setZA( ZA )
+        if( yo is not None ) : self.setYo( yo )
+        if( C  is not None ) : self.setC( C )
+        if( I  is not None ) : self.setI( I )
+        if( S  is not None ) : self.setS( S )
 
 def readNdEndlData( f, i0, i1, i2 = None, i3 = None ) :
-    "For internal use only."
+    """For internal use only."""
 
     data = []
     while 1 :
@@ -524,6 +524,6 @@ def readNdEndlData( f, i0, i1, i2 = None, i3 = None ) :
         if ( l == "" ) : raise Exception( "\nError: end-of-file while reading from %s" % f.name )
         if ( l == "                                                                       1\n" ) : break
         data.append( l )
-    if ( i3 != None ) : return endlmisc.translate4dStringData( data, i0 = i0, i1 = i1, i2 = i2, i3 = i3 )
-    elif ( i2 != None ) : return endlmisc.translate3dStringData( data, i0 = i0, i1 = i1, i2 = i2 )
+    if ( i3 is not None ) : return endlmisc.translate4dStringData( data, i0 = i0, i1 = i1, i2 = i2, i3 = i3 )
+    elif ( i2 is not None ) : return endlmisc.translate3dStringData( data, i0 = i0, i1 = i1, i2 = i2 )
     else : return endlmisc.translate2dStringData( data, i0 = i0, i1 = i1 )

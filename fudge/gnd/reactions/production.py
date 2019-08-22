@@ -83,10 +83,12 @@ class production( baseModule.base_reaction ):
 
     moniker = 'production'
 
-    def __init__( self, outputChannel, label, ENDF_MT, documentation = None, date = None ) :
+    def __init__( self, outputChannel, ENDF_MT, documentation = None, label = None, process = None, EFL = None ) :
         """Creates a new production reaction object."""
 
-        baseModule.base_reaction.__init__( self, label, outputChannel, ENDF_MT, documentation, date = date )
+        baseModule.base_reaction.__init__( self, outputChannel, ENDF_MT, documentation, label = label, process = process )
+
+    def __str__(self): return self.label
 
     def isBasicReaction( self ) :
 
@@ -95,7 +97,3 @@ class production( baseModule.base_reaction ):
     def isCompleteReaction( self ):
 
         return( False )
-
-    def getQ( self, unit, final = True, groundStateQ = False ) :
-
-        return( self.outputChannel.getConstantQAs( unit, final = final ) )

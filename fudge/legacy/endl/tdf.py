@@ -77,6 +77,10 @@ from fudge import fudgeDefaults
 from fudge.legacy.endl import  endl2, bdfls,endl_Z,endl2dmathClasses,fudgeFileMisc,endlmisc  ### for private copies of fudge
 from endl2dmathClasses import endl2dmath
 
+## fudgeParameters.VerboseMode = 0
+from fudge.core import fudgemisc
+fudgemisc.verbose( 0 )
+#import fudgeDefaults
 
 
 ### find path to tdfgen
@@ -119,12 +123,16 @@ from endl2dmathClasses import endl2dmath
 #yi, ZA, C = 1, 1001, 10 # n1__H1_n1__H1 (elastic)
 
 
-default_C_list = ( 11, 40, 41, 42, 12, 44, 45 )
-default_C_list = ( 11, 40, 41, 42, 12, 44, 45 , 39) # try to get Li6__H2_H1__H3__He4 too!
+#default_C_list = ( 11, 40, 41, 42, 12, 44, 45, 39) # try to get Li6__H2_H1__H3__He4 too!
+default_C_list = ( 11, 18, 26, 27, 34, 37, 39, 40, 41, 42, 12, 44, 45, 47, 48  ) ### new complete list for P. Bedrossian
 
 default_lib_path = "/usr/gapps/data/nuclear/endl_official/"
 
-default_ZAs = [ 1, 1001, 1002, 1003, 2003, 2004, 3006, 3007 ]
+default_ZAs = [ 1, 1001, 1002, 1003, 2003, 2004, 3006, 3007, 4007, 4009, 5010, 5011 ] 
+
+
+miscReactions = ((1,2003,40), (3,2003,41), (3,2003,20), (1,3006,42), (1,4007,40) )  #((2,4009,47),(2,4009,45)) ## these Be reactions are not in endl
+
 
 tdfgenpath = os.path.join(fudgeDefaults.DefaultFudgePath,'bin','tdfgen')
 
@@ -143,16 +151,16 @@ def processTDF_Reaction( target, C, S = None, X1 = None, X2 = None, X3 = None, X
     dataList = target.findDatas( C = C, I = 0, S = S, X1 = X1, X2 = X2, X3 = X3, X4 = X4, Q = Q )
     for xsec in dataList:
         xsec.set( xsec.thin( interpolationAccuracy = 1e-4 ) )
-        if( movePoints != None ) :
+        if( movePoints is not None ) :
             for x, y in xsec.data :
                 for x_, y_ in movePoints :
                     if( abs( x - x_ ) < movePointsEps * x ) :
                         xsec.setValue( x, y_ )
                         break
-        if( addPoints != None ) :
+        if( addPoints is not None ) :
             for x, y in addPoints : xsec.setValue( x, y )
 
-## thicken the data if needed ##
+## thicken the data if needed ## 
         x1 = None
         data = []
         for x2, y2 in xsec.data :
@@ -175,6 +183,8 @@ def processTDF_Reaction( target, C, S = None, X1 = None, X2 = None, X3 = None, X
 
         electronMass = endl_bdfls.mass( 9 )
         residualZA, yos, Q = endl2.residualZA_yos_Q( target.yi, target.ZA, C )
+        #print target.yi, target.ZA, C
+        #print residualZA, yos, Q 
         projectileMass = endl_bdfls.mass( target.yi ) - yiZ * electronMass
         targetMass = endl_bdfls.mass( target.ZA ) - target.Z * electronMass
         projectileZ = yiZ
@@ -191,6 +201,11 @@ def processTDF_Reaction( target, C, S = None, X1 = None, X2 = None, X3 = None, X
             return
         else :
             reaction = '%s%d+%s%d=' % ( endl_Z.endl_ZSymbol( ZAZ ), ZAA, endl_Z.endl_ZSymbol( yiZ ), yiA )
+
+        if Q<0.0 : 
+            print "%s is an endothermic reaction"%reaction
+            print "\t --> skipping it"
+            return
 
         outGoing = []
         for yo in yos : 
@@ -248,7 +263,7 @@ def processTDF_Reaction( target, C, S = None, X1 = None, X2 = None, X3 = None, X
         x1 = None
         f = 1.03
         for x2, y2 in xsec.data :
-            if( x1 != None ) :
+            if( x1 is not None ) :
                 x = f * x1
                 while( f * x <= x2 ) :
                     xsec_.append( [ x, xsec.getValue( x ) ] )
@@ -274,6 +289,7 @@ def processTDF_Reaction( target, C, S = None, X1 = None, X2 = None, X3 = None, X
             if os.path.exists( reaction + ".tdf" ): raise IOError( reaction + ".tdf exists!" )
 
         # Assemble list of commands to run during processing
+        print 'reaction str : %s'%reaction
         commands = [ "cp " + inputName + " " + reaction + ".tdfgen" ]
         print "starting tdfgen"
         if libraryVersion in [ None, '' ]:
@@ -288,7 +304,7 @@ def processTDF_Reaction( target, C, S = None, X1 = None, X2 = None, X3 = None, X
 
         # Cleanup
         if not os.path.exists( reaction + ".tdf" ): raise RuntimeError( "tdfgen did not produce the output file %s !" % ( reaction + ".tdf" ) )
-        if outputDir != None:
+        if outputDir is not None:
             if not os.path.exists( outputDir ): raise OSError( "output dir %s does not exist" % ( outputDir ) )
             run_command( 'mv %s %s' % ( reaction + ".tdf", outputDir ), verbose )
         import glob
@@ -313,7 +329,8 @@ def process_one_reaction( yi, ZA, C, libraryName = 'endl2009.0', libraryVersion 
         print 'yi:',yi
         print '    za:',ZA
         print "        C:",C
-    e = endlProject( os.path.join(libPath,libraryName,libraryVersion), projectile = yi ) 
+    print "       next endlproject call...       "    
+    e = endlProject( os.path.join(libPath,libraryName,libraryVersion), projectile = yi, readOnly=True  ) 
     target = e.readZA( ZA )
     if verbose: target.ll()         
     target.read( I = 0 )
@@ -325,10 +342,13 @@ def process_one_reaction( yi, ZA, C, libraryName = 'endl2009.0', libraryVersion 
 # ------------- process_one_evaluation -----------------
 def process_one_evaluation( yi, ZA, libraryName = 'endl2008.2', libraryVersion = '', libPath = default_lib_path, outputDir = None, workDir = 'work', verbose = False, dryrun = False ):
     '''process all reactions for an evaluation that we possibley can'''
-    e = endlProject( database = os.path.join(libPath,libraryName,libraryVersion), projectile = yi )
 
-    try:	target = e.readZA( ZA )
-    except: return 
+    try:	
+        e = endlProject( database = os.path.join(libPath,libraryName,libraryVersion), projectile = yi, readOnly=True  )
+        target = e.readZA( ZA )
+    except: 
+        print 'target za%06d yi%02d doesnt exist'%(ZA,yi)
+        return []
 
     if verbose:
         print '---- process_one_evaluation ----'
@@ -344,13 +364,16 @@ def process_one_evaluation( yi, ZA, libraryName = 'endl2008.2', libraryVersion =
     #if CList == []: print "No C's to process for yi =", yi, "za =", ZA,"!"
     reactionnames = []
     for C in CList:
+        #target.read( I = 0 )
+        #print " yi %02d za%06d  C %02d \n"% (yi,ZA,C)
         if target.findDatas( I=0, C=C )[0].data[0][0] > cutOffEnergy:
-            #print "        C:", C, "first energy point too high"
+            #print  "yi %02d za%06d  C %02d  : "%(yi,ZA,C), "first energy point too high \n"
             continue
         if verbose: print "        C:",C
         try:
             reactionname = processTDF_Reaction( target, C, workDir = workDir, outputDir = outputDir, libraryName = libraryName, libraryVersion = libraryVersion, verbose = verbose, dryrun = dryrun )
             reactionnames.append(reactionname)
+            print 'adding to tdf list :',reactionname
         except RuntimeError, err:
             print err
             print "\n.... continuing\n"
@@ -360,16 +383,18 @@ def process_one_evaluation( yi, ZA, libraryName = 'endl2008.2', libraryVersion =
 
 # ------------- process_sublibrary -----------------
 def process_sublibrary( yi, libraryName = 'endl2008.2', libraryVersion = '', libPath = default_lib_path, outputDir = None, workDir = 'work', verbose = False, dryrun = False ):
-    for ZA in [ 1, 1001, 1002, 1003, 2003, 2004, 3006, 3007 ]:
+    for ZA in default_ZAs: #[ 1, 1001, 1002, 1003, 2003, 2004, 3006, 3007 ]:
         if verbose: 
             print '---- process_sublibrary ----'
             print '    za:',ZA
         process_one_evaluation( yi, ZA, libraryName = libraryName, libraryVersion = libraryVersion, libPath = libPath, outputDir = outputDir, workDir = workDir, verbose = verbose, dryrun = dryrun )
-
+    for yi,za,C in miscReactions:
+        process_one_reaction( yi, ZA, C, libraryName = libraryName, libraryVersion = libraryVersion, libPath = libPath, outputDir = outputDir, workDir = workDir, verbose = verbose, dryrun = dryrun )
+ 
 
 # ------------- process_everything -----------------
 def process_everything( libraryName = 'endl2008.2', libraryVersion = '', libPath = default_lib_path, outputDir = None, workDir = 'work', verbose = False, dryrun = False ):
-    for yi in range( 1, 7 ):
+    for yi in range( 2, 7 ):
         if verbose: 
             print '---- process_everything ----'
             print 'yi:',yi
@@ -377,9 +402,10 @@ def process_everything( libraryName = 'endl2008.2', libraryVersion = '', libPath
 
 def process_names(libraryName = 'endl2008.2', libraryVersion = '', libPath = default_lib_path, outputDir = None, workDir = 'work', verbose = False, dryrun = True, ZAlist=default_ZAs  ):
     reactionnames = []
-    for yi in range( 1, 7 ):
+    for yi in range( 2, 7 ):
         for ZA in ZAlist:
             A = process_one_evaluation( yi, ZA, libraryName = libraryName, libraryVersion = libraryVersion, libPath = libPath, outputDir = outputDir, workDir = workDir, verbose = verbose, dryrun = dryrun )
+            #print 'yi za A ',yi, ZA, A
             reactionnames.extend(A)
     #print reactionnames  
     return reactionnames        
@@ -415,7 +441,7 @@ def version():
 def main( arglist ):
 
     try:
-        opts, args = getopt.getopt( arglist, "ho:vV", [ "help", "all", "verbose", "output=", "yi=", "za=", "work=", "library=", "libversion=", "libpath=", "dryrun", "tdfgenpath=" ] )
+        opts, args = getopt.getopt( arglist, "ho:vV", [ "help", "all", "verbose", "output=", "yi=", "za=", "C=", "work=", "library=", "libversion=", "libpath=", "dryrun", "tdfgenpath=" ] )
 
     except getopt.GetoptError, err:
         # print help information and exit:
@@ -427,6 +453,7 @@ def main( arglist ):
     verbose = False
     yi = None
     za = None
+    cnum = None
     library = 'endl2009.0'
     libversion = ''
     libpath = default_lib_path
@@ -446,6 +473,8 @@ def main( arglist ):
             sys.exit()
         elif o in ( "-o", "--output" ):
             output = a
+        elif o == "--C":
+            cnum = int( a )
         elif o == "--yi":
             yi = int( a )
         elif o == "--za":
@@ -470,6 +499,7 @@ def main( arglist ):
     if verbose:
         print '---- options ----'
         print "output:",output
+        print "C:",cnum
         print "yi:",yi
         print "za:",za
         print "library:",library
@@ -480,10 +510,13 @@ def main( arglist ):
 
     if all:
         process_everything( libraryName = library, libraryVersion = libversion, libPath = libpath, outputDir = output, workDir = workdir, verbose = verbose, dryrun = dryrun )
-    elif za == None and yi != None:
+    elif za is None and yi is not None:
         process_sublibrary( yi, libraryName = library, libraryVersion = libversion, libPath = libpath, outputDir = output, workDir = workdir, verbose = verbose, dryrun = dryrun )
-    elif za != None and yi != None:
-        if len( args ) == 0:    
+    elif za is not None and yi is not None:
+        if cnum is not None:
+            print 'C = ',cnum
+            process_one_reaction( yi, za, cnum, libraryName = library, libraryVersion = libversion, libPath = libpath, outputDir = output, workDir = workdir, verbose = verbose, dryrun = dryrun )
+        elif len( args ) == 0:    
             process_one_evaluation( yi, za, libraryName = library, libraryVersion = libversion, libPath = libpath, outputDir = output, workDir = workdir, verbose = verbose, dryrun = dryrun )
         else:
             for C in args:

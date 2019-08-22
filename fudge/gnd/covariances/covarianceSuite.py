@@ -85,17 +85,17 @@ class covarianceSuite( ancestry ):
 
     moniker = 'covarianceSuite'
 
-    def __init__(self, projectile=None, target=None, reactionSums=None,
+    def __init__(self, projectile, target, evaluation,
             externalReactions=None, sections=None, modelParameterCovariances=None, style=None):
 
         ancestry.__init__( self )
 
         self.projectile = projectile            #: The projectile
         self.target = target                    #: The target
-        self.reactionSums = reactionSums or []  #: List of lumped sums, etc
+        self.evaluation = evaluation
         self.externalReactions = externalReactions or [] #: List of cross-material covariances
         self.sections = sections or []          #: List of section instances
-        self.modelParameterCovariances = modelParameterCovariances or [] #: List of modelParameterCovariance instances
+        self.modelParameterCovariances = modelParameterCovariances or [] #: List of parameterCovariance instances
         self.__styles = stylesModule.styles( )
         self.__styles.setAncestor( self )
         if( style is not None ) : self.styles.add( style )
@@ -120,13 +120,16 @@ class covarianceSuite( ancestry ):
         self.modelParameterCovariances.append(mpcovar)
         self.modelParameterCovariances[-1].setAncestor( self, 'label' )
     
-    def addReactionSum(self, reactionSum):
-        self.reactionSums.append(reactionSum)
-        self.reactionSums[-1].setAncestor( self, 'id' )
-
     def addExternalReaction(self, externalReaction_):
         self.externalReactions.append(externalReaction_)
-        self.externalReactions[-1].setAncestor( self, 'id' )
+        self.externalReactions[-1].setAncestor( self, 'label' )
+
+    def convertUnits( self, unitMap ) :
+        """
+        unitMap is a dictionary with old/new unit pairs where the old unit is the key (e.g., { 'eV' : 'MeV', 'b' : 'mb' }).
+        """
+
+        for section in self: section.convertUnits( unitMap )
 
     def saveToOpenedFile( self, fOut, **kwargs ) :
 
@@ -216,7 +219,7 @@ class covarianceSuite( ancestry ):
         for section_ in self.sections:
             sectionWarnings = section_.check( info )
             if sectionWarnings:
-                warnings.append( warning.context('Section %s (%s):' % (section_.label, section_.id), sectionWarnings ) )
+                warnings.append( warning.context("Section '%s':" % section_.label, sectionWarnings ) )
 
         return warning.context('CovarianceSuite: %s + %s' % (self.projectile, self.target), warnings)
 
@@ -288,16 +291,10 @@ class covarianceSuite( ancestry ):
         indent2 = indent + incrementalIndent
         indent3 = indent2 + incrementalIndent
 
-        xmlString = [ '%s<%s projectile="%s" target="%s" version="%s"'
-                % ( indent, self.moniker, self.projectile, self.target, self.version ) ]
+        xmlString = [ '%s<%s projectile="%s" target="%s" evaluation="%s" version="%s"'
+                % ( indent, self.moniker, self.projectile, self.target, self.evaluation, self.version ) ]
         xmlString[-1] += ' xmlns:xlink="http://www.w3.org/1999/xlink">'
         xmlString += self.styles.toXMLList( indent2, **kwargs )
-        if self.reactionSums:
-            xmlString += [ indent2 + '<reactionSums>',
-                indent3 + '<!-- Covariances may be given for a sum of several reactions. Define these "summed reactions" here: -->' ]
-            for reactionSum in self.reactionSums:
-                xmlString += reactionSum.toXMLList( indent3, **kwargs )
-            xmlString[-1] += '</reactionSums>'
         if self.externalReactions:
             xmlString += [ indent2 + '<externalReactions>',
                 indent3 + "<!-- This target has covariances with reactions on different target(s). List other target/reactions: -->" ]
@@ -315,20 +312,18 @@ class covarianceSuite( ancestry ):
 
         xPath.append( CSelement.tag ) # keep track of location in the tree, in case errors come up
         try:
-            covariances = covarianceSuite( CSelement.get('projectile'), CSelement.get('target') )
+            covariances = covarianceSuite( CSelement.get('projectile'), CSelement.get('target'), CSelement.get('evaluation') )
             for child in CSelement:
                 if child.tag == 'styles':
                     covariances.styles.parseXMLNode( child, xPath, linkData )
-                elif child.tag == 'reactionSums':
-                    for reactionSumElement in child:
-                        covariances.addReactionSum( section.reactionSum.parseXMLNode(
-                            reactionSumElement, xPath, linkData ) )
                 elif child.tag == 'externalReactions':
                     for external in child:
                         covariances.addExternalReaction( section.externalReaction.parseXMLNode(
                             external, xPath, linkData ) )
                 elif child.tag == section.section.moniker:
                     covariances.addSection( section.section.parseXMLNode( child, xPath, linkData ) )
+                elif child.tag == modelParameters.parameterCovariance.moniker:
+                    covariances.addModelParameterCovariance( modelParameters.parameterCovariance.parseXMLNode(child, xPath, linkData) )
                 elif child.tag in ('resonanceParameterCovariance',):
                     covariances.addModelParameterCovariance( modelParameters.resonanceParameterCovariance.parseXMLNode(
                         child, xPath, linkData ) )
@@ -362,4 +357,8 @@ def readXML( gndCovariancesFile, reactionSuite=None ):
     from fudge.core.utilities.xmlNode import xmlNode
     csElement = xmlNode( csElement, xmlNode.etree )
     linkData = {'reactionSuite': reactionSuite, 'unresolvedLinks':[]}
-    return covarianceSuite.parseXMLNode( csElement, xPath=[], linkData=linkData )
+    covSuite = covarianceSuite.parseXMLNode( csElement, xPath=[], linkData=linkData )
+    if reactionSuite is not None:
+        for externalLink in reactionSuite._externalLinks:
+            externalLink.link = externalLink.follow( covSuite )
+    return covSuite

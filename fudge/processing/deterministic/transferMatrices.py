@@ -63,6 +63,10 @@
 
 import os, subprocess
 
+from pqu import PQU as PQUModule
+
+from PoPs import IDs as IDsPoPsModule
+
 from fudge.core.utilities import brb
 from fudge.core.utilities import fudgeFileMisc, subprocessing, times
 
@@ -72,12 +76,12 @@ from xData import XYs as XYsModule
 from xData import multiD_XYs as multiD_XYsModule
 from xData import regions as regionsModule
 
-from fudge.gnd.reactionData import crossSection as crossSectionModule
-
 from fudge.gnd.productData import multiplicity as multiplicityModule
 
 from fudge.gnd.productData.distributions import angular as angularModule
+from fudge.gnd.productData.distributions import energy as energyModule
 from fudge.gnd.productData.distributions import energyAngular as energyAngularModule
+from fudge.gnd.productData.distributions import angularEnergy as angularEnergyModule
 
 linlin = standardsModule.interpolation.linlinToken
 linlog = standardsModule.interpolation.linlogToken
@@ -99,12 +103,13 @@ upperEps = 1e-8
 startOfNewData = "\n# Start data\n"
 startOfNewSubData = "# Start sub data"
 
-transferMatrixExecute = 'getTransferMatrix'
+from fudge import fudgeDefaults as fudgeDefaultsModule
+transferMatrixExecute = 'merced'
 if( os.path.exists( transferMatrixExecute ) ) :
     srcPath = os.path.abspath( './' )
 else :
-    srcPath = os.path.split( os.path.abspath( __file__ ) )[0]
-transferMatrixExecute = '%s/%s' % ( srcPath, transferMatrixExecute )
+    srcPath = os.path.join( os.path.dirname( os.path.dirname( fudgeDefaultsModule.__file__ ) ), 'bin' )
+transferMatrixExecute = os.path.join( srcPath, transferMatrixExecute )
 
 def twoBodyTransferMatrix( style, tempInfo, productFrame, crossSection, angularData, Q, weight = None, comment = None ) :
     """
@@ -119,16 +124,16 @@ def twoBodyTransferMatrix( style, tempInfo, productFrame, crossSection, angularD
         TM1, TME = twoBodyTransferMatrix2( style, tempInfo, crossSection, angularData, Q, productFrame, comment = comment )
     elif( isinstance( angularData, angularModule.regions2d ) ) :
         TM1s, TMEs = [], []
-        lowestBound, highestBound = angularData[0].domainMin( ), angularData[-1].domainMax( )
+        lowestBound, highestBound = angularData[0].domainMin, angularData[-1].domainMax
         weightAxes = axesModule.axes( )
         for iRegion, region in enumerate( angularData ) :
                 if( iRegion == 0 ) :
-                    weightData = [ [ lowestBound, 1 ], [ region.domainMax( ), 0 ], [ highestBound, 0 ] ]
+                    weightData = [ [ lowestBound, 1 ], [ region.domainMax, 0 ], [ highestBound, 0 ] ]
                 elif( iRegion == len( angularData ) - 1 ) :
-                    weightData = [ [ lowestBound, 0 ], [ region.domainMin( ), 1 ], [ highestBound, 1 ] ]
+                    weightData = [ [ lowestBound, 0 ], [ region.domainMin, 1 ], [ highestBound, 1 ] ]
                 else :
-                    weightData = [ [ lowestBound, 0 ], [ region.domainMin( ), 1 ], [ region.domainMax( ), 0 ], [ highestBound, 0 ] ]
-                _weight = XYsModule.XYs1d( data = weightData, axes = weightAxes, accuracy = 1e-6 )
+                    weightData = [ [ lowestBound, 0 ], [ region.domainMin, 1 ], [ region.domainMax, 0 ], [ highestBound, 0 ] ]
+                _weight = XYsModule.XYs1d( data = weightData, axes = weightAxes )
 
                 tempInfo['workFile'].append( 'r%s' % iRegion )
                 try :
@@ -153,12 +158,10 @@ def twoBodyTransferMatrix2( style, tempInfo, crossSection, angularData, Q, produ
     region within a regions2d form.
     """
 
-    from fudge.gnd.productData import distributions
-
     logFile = tempInfo['logFile']
     workDir = tempInfo['workDir']
 
-    if( isinstance( angularData, distributions.angular.recoil ) ) : angularData = angularData.getNumericalDistribution( )
+    if( isinstance( angularData, angularModule.recoil ) ) : angularData = angularData.getNumericalDistribution( )
 
     s = versionStr + '\n'
     if( isinstance( angularData[0], angularModule.XYs1d ) ) :
@@ -169,38 +172,51 @@ def twoBodyTransferMatrix2( style, tempInfo, crossSection, angularData, Q, produ
     else :
         raise Exception( 'Unsupported P(mu) = %s' % angularData[0].moniker )
 
-    if( comment is not None ) : s += "Comment: %s\n" % comment
     s += "Reaction's Q value: %s\n" % floatToString( Q )
 
-    s += commonDataToString( style, tempInfo, crossSection, productFrame )
+    s += commonDataToString( comment, style, tempInfo, crossSection, productFrame, photonFrame = standardsModule.frames.centerOfMassToken )
     s += angularToString( angularData, crossSection, weight = weight, twoBody = True )
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'] ) )
 
-def wholeAtomScattering( processInfo, projectile, product, formFactor, comment = None ) :
-
-    workDir = tempInfo['workDir']
-
-    s  = versionStr + '\n'
-    s += "Process: 'whole atom scattering'\n"
-
-    if( comment is not None ) : s += "Comment: %s\n" % comment
-    s += commonDataToString( style, tempInfo, crossSection, productFrame )
-    s += startOfNewData
-    s += '\n'.join( twoDToString( "FormFactorData", formFactor ) )
-    return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'] ) )
-
-def comptonScattering( processInfo, projectile, product, formFactor, comment = None ) :
+def wholeAtomScattering( style, tempInfo, productFrame, formFactor, realAnomalousFactor = None, imaginaryAnomalousFactor = None, comment = None ) :
 
     logFile = tempInfo['logFile']
     workDir = tempInfo['workDir']
+    incidentEnergyUnit = tempInfo['incidentEnergyUnit']
+    waveLengthUnit = formFactor.axes[1].unit
+    inverseWaveLengthToEnergyFactor = PQUModule.PQU( 1, 'hplanck * c * %s' % waveLengthUnit ).getValueAs( incidentEnergyUnit )
 
-    s  = versionStr + '\n'
-    s += "Process: 'Compton scattering'\n"
+    s1  = versionStr + '\n'
+    s1 += "Process: 'coherent scattering'\n"
+    s1 += 'inverseWaveLengthToEnergyFactor = %s\n' % inverseWaveLengthToEnergyFactor
 
-    if( comment is not None ) : s += "Comment: %s\n" % comment
-    s += commonDataToString( style, tempInfo, crossSection, standardsModule.frames.labToken )
-    s += '\n'.join( twoDToString( "ScatteringFactorData", formFactor ) )
-    return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'] ) )
+    s1 += commonDataToString( comment, style, tempInfo, None, productFrame )
+    s1 += startOfNewData
+    s1 += '\n'.join( twoDToString( "FormFactorData", formFactor ) )
+# BRB: FIXME For realAnomalousFactor and imaginaryAnomalousFactor need to convert energy to proper unit.
+    if( realAnomalousFactor is not None ) : 
+        s1 += startOfNewData
+        s1 += '\n'.join( twoDToString( "realAnomalousFactor", realAnomalousFactor ) )
+    if( imaginaryAnomalousFactor is not None ) :
+        s1 += startOfNewData
+        s1 += '\n'.join( twoDToString( "imaginaryAnomalousFactor", imaginaryAnomalousFactor ) )
+    return( executeCommand( logFile, transferMatrixExecute, s1, workDir, tempInfo['workFile'] ) )
+
+def comptonScattering( style, tempInfo, productFrame, scatteringFunction, comment = None ) :
+
+    logFile = tempInfo['logFile']
+    workDir = tempInfo['workDir']
+    incidentEnergyUnit = tempInfo['incidentEnergyUnit']
+    waveLengthUnit = scatteringFunction.axes[1].unit
+    inverseWaveLengthToEnergyFactor = PQUModule.PQU( 1, 'hplanck * c * %s' % waveLengthUnit ).getValueAs( incidentEnergyUnit )
+
+    s1  = versionStr + '\n'
+    s1 += "Process: 'Compton scattering'\n"
+    s1 += 'inverseWaveLengthToEnergyFactor = %s\n' % inverseWaveLengthToEnergyFactor
+
+    s1 += commonDataToString( comment, style, tempInfo, None, productFrame )
+    s1 += '\n'.join( twoDToString( "ScatteringFactorData", scatteringFunction ) )
+    return( executeCommand( logFile, transferMatrixExecute, s1, workDir, tempInfo['workFile'] ) )
 
 def ENDFEMuEpP_TransferMatrix( style, tempInfo, productFrame, crossSection, angularEnergyData, multiplicity, comment = None ) :
     """This is ENDF MF = 6, LAW = 7 type data."""
@@ -211,13 +227,12 @@ def ENDFEMuEpP_TransferMatrix( style, tempInfo, productFrame, crossSection, angu
     s  = versionStr + '\n'
     s += "Process: ENDF Double differential EMuEpP data\n"
 
-    if( comment is not None ) : s += "Comment: %s\n" % comment
     s += "Quadrature method: adaptive\n"
-    s += commonDataToString( style, tempInfo, crossSection, productFrame, multiplicity = multiplicity )
+    s += commonDataToString( comment, style, tempInfo, crossSection, productFrame, multiplicity = multiplicity )
     s += EMuEpPDataToString( angularEnergyData )
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'] ) )
 
-def EMuEpP_TransferMatrix( processInfo, projectile, product, crossSection, angularData, EMuEpPData, multiplicity, comment = None ) :
+def ENDLEMuEpP_TransferMatrix( style, tempInfo, crossSection, productFrame, angularData, EMuEpPData, multiplicity, comment = None ) :
     """This is LLNL I = 1, 3 type data."""
 
     logFile = tempInfo['logFile']
@@ -226,13 +241,12 @@ def EMuEpP_TransferMatrix( processInfo, projectile, product, crossSection, angul
     s  = versionStr + '\n'
     s += "Process: 'Double differential EMuEpP data transfer matrix'\n"
 
-    if( comment is not None ) : s += "Comment: %s\n" % comment
-    s += commonDataToString( style, tempInfo, crossSection, productFrame, multiplicity = multiplicity )
+    s += commonDataToString( comment, style, tempInfo, crossSection, productFrame, multiplicity = multiplicity )
     s += angularToString( angularData, crossSection )
     s += EMuEpPDataToString( EMuEpPData )
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'] ) )
 
-def ELEpP_TransferMatrix( processInfo, projectile, product, crossSection, LEEpPData, multiplicity, comment = None ) :
+def ELEpP_TransferMatrix( style, tempInfo, crossSection, productFrame, LEEpPData, multiplicity, comment = None ) :
     """
     This is for ENDL I = 4 data with l > 0. This form is deprecated.
     """
@@ -242,9 +256,8 @@ def ELEpP_TransferMatrix( processInfo, projectile, product, crossSection, LEEpPD
 
     s  = versionStr + '\n'
     s += "Process: 'Legendre EEpP data transfer matrix'\n"
-    if( comment is not None ) : s += "Comment: %s\n" % comment
 
-    s += commonDataToString( style, tempInfo, crossSection, productFrame, multiplicity = multiplicity )
+    s += commonDataToString( comment, style, tempInfo, crossSection, productFrame, multiplicity = multiplicity )
     s += LEEpPDataToString( LEEpPData )
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'] ) )
 
@@ -264,18 +277,15 @@ def Legendre_TransferMatrix( style, tempInfo, productFrame, crossSection, Legend
 
     s  = versionStr + '\n'
     s += "Process: Legendre energy-angle data\n"
-    if( comment is not None ) : s += "Comment: %s\n" % comment
 
     s += "Quadrature method: adaptive\n"
-    s += commonDataToString( style, tempInfo, crossSection, productFrame, multiplicity = multiplicity )
+    s += commonDataToString( comment, style, tempInfo, crossSection, productFrame, multiplicity = multiplicity )
     s += LegendreDataToString( LegendreData )
 
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'] ) )
 
 def uncorrelated_EMuP_EEpP_TransferMatrix( style, tempInfo, crossSection, productFrame, angularData, energyData, 
         multiplicity, comment = None, weight = None ) :
-
-    from fudge.gnd.productData.distributions import energy as energyModule
 
     logFile = tempInfo['logFile']
     workDir = tempInfo['workDir']
@@ -298,7 +308,7 @@ def uncorrelated_EMuP_EEpP_TransferMatrix( style, tempInfo, crossSection, produc
         TM1s, TMEs = [], []
         axes = axesModule.axes( )
         for i1, region in enumerate( energyData ) :
-            weight = XYsModule.XYs1d( data = [ [ region.domainMin( ), 1. ], [ region.domainMax( ), 1. ] ], axes = axes, accuracy = 1e-6 )
+            weight = XYsModule.XYs1d( data = [ [ region.domainMin, 1. ], [ region.domainMax, 1. ] ], axes = axes )
             tempInfo['workFile'].append( 'r%s' % i1 )
             try :
                 TM1, TME = uncorrelated_EMuP_EEpP_TransferMatrix( style, tempInfo, crossSection, productFrame, angularData,
@@ -315,11 +325,14 @@ def uncorrelated_EMuP_EEpP_TransferMatrix( style, tempInfo, crossSection, produc
     elif( isinstance( energyData, energyModule.primaryGamma ) ) :
         return( primaryGammaAngularData( style, tempInfo, crossSection, energyData, angularData, multiplicity = multiplicity, comment = comment ) )
     else :
-        sProcess = "Process: 'Uncorrelated energy-angle data transfer matrix'\n"
-        sData = angularToString( angularData, crossSection )
-        sData += EEpPDataToString( energyData )
-    if( comment is not None ) : sProcess += "Comment: %s\n" % comment
-    sCommon = commonDataToString( style, tempInfo, crossSection, productFrame, multiplicity = multiplicity, weight = weight )
+        if( angularData.isIsotropic() ) :
+            sProcess = "Process: isotropic table\n"
+            sData = EEpPDataToString( energyData )
+        else:
+            sProcess = "Process: 'Uncorrelated energy-angle data transfer matrix'\n"
+            sData = angularToString( angularData, crossSection )
+            sData += EEpPDataToString( energyData )
+    sCommon = commonDataToString( comment, style, tempInfo, crossSection, productFrame, multiplicity = multiplicity, weight = weight )
     s = versionStr + '\n' + sProcess + sSpecific + sCommon + sData
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'] ) )
 
@@ -330,7 +343,7 @@ def discreteGammaAngularData( style, tempInfo, gammaEnergy, crossSection, angula
     from fudge.processing import miscellaneous as miscellaneousModule
 
     reactionSuite = tempInfo['reactionSuite']
-    projectileName = reactionSuite.projectile.name
+    projectileName = reactionSuite.projectile
     projectileGroupBoundaries = style.transportables[projectileName].group.boundaries.values
     productName = tempInfo['productName']
     productGroupBoundaries = style.transportables[productName].group.boundaries.values
@@ -351,13 +364,10 @@ def discreteGammaAngularData( style, tempInfo, gammaEnergy, crossSection, angula
         if( gammaEnergy <= Ep ) : break
         indexEp += 1
     indexEp = min( max( indexEp, 0 ), nProd - 1 )
-    form = style.findFormMatchingDerivedStyles( crossSection )
-    f1 = form
-    if( isinstance( form, crossSectionModule.reference ) ) : form = style.findFormMatchingDerivedStyles( form.link )
-    if( isinstance( form, crossSectionModule.regions1d ) ) : form = form.toPointwise_withLinearXYs( 1e-8, 1e-8 )
-    xsec = miscellaneousModule.groupOneFunctionAndFlux( style, tempInfo, form )
+    xsecTimesMult = miscellaneousModule.groupTwoFunctionsAndFlux( style, tempInfo, crossSection, multiplicity,
+            norm = tempInfo['groupedFlux'] )
     for indexE in range( nProj ) :
-        x = multiplicity * xsec[indexE]
+        x = xsecTimesMult[indexE]
         TM_1[indexE][indexEp] = [ x ]
         TM_E[indexE][indexEp] = [ x * gammaEnergy ]
 
@@ -381,14 +391,14 @@ def primaryGammaAngularData( style, tempInfo, crossSection, energyData, angularD
     """
 
     reactionSuite = tempInfo['reactionSuite']
-    projectileName = reactionSuite.projectile.name
+    projectileName = reactionSuite.projectile
     projectileGroupBoundaries = style.transportables[projectileName].group.boundaries
     productName = tempInfo['productName']
     productGroupBoundaries = style.transportables[productName].group.boundaries
-    flux = style.flux
+    flux0 = style.flux.getFluxAtLegendreOrder( 0 )
     groupedFlux = tempInfo['groupedFlux']
 
-    bindingEnergy = energyData.value.getValueAs( tempInfo['incidentEnergyUnit']  )
+    bindingEnergy = energyData.value * energyData.axes[1].unitConversionFactor( tempInfo['incidentEnergyUnit'] )
     massRatio = energyData.massRatio
 
     nProj = len( projectileGroupBoundaries.values ) - 1
@@ -405,13 +415,10 @@ def primaryGammaAngularData( style, tempInfo, crossSection, energyData, angularD
         if( Eg2 <= Eo ) : break
     indexEo = min( max( indexEo - 1, 0 ), nProd - 1 )
 
-    crossSectionForm = style.findFormMatchingDerivedStyles( crossSection )
-    crossSectionForm = crossSectionForm.toPointwise_withLinearXYs( 1e-8, 1e-8 )
-    EMin, EMax = crossSectionForm.domainMin( ), crossSectionForm.domainMax( )
+    EMin, EMax = crossSection.domainMin, crossSection.domainMax
     axes = axesModule.axes( labelsUnits = { 0 : ( 'energy_out', tempInfo['incidentEnergyUnit'] ), 
-                                            1 : ( crossSectionForm.axes[1].label, crossSectionForm.axes[1].unit ) } )
-    Egp = XYsModule.XYs1d( data = [ [ EMin, bindingEnergy + massRatio * EMin ], [ EMax, bindingEnergy + massRatio * EMax ] ], 
-            axes = axes, accuracy = 1e-12 )
+                                            1 : ( crossSection.axes[1].label, crossSection.axes[1].unit ) } )
+    Egp = XYsModule.XYs1d( data = [ [ EMin, bindingEnergy + massRatio * EMin ], [ EMax, bindingEnergy + massRatio * EMax ] ], axes = axes )
 
     for indexEi in range( nProj ) :
         Ei2 = projectileGroupBoundaries.values[indexEi + 1]
@@ -423,9 +430,9 @@ def primaryGammaAngularData( style, tempInfo, crossSection, energyData, angularD
                 if( Eg2 > productGroupBoundaries.values[indexEo + 1] ) :
                     incrementIndexEo = 1
                     EiMax = ( productGroupBoundaries.values[indexEo + 1] - bindingEnergy ) / massRatio
-            TM_1[indexEi][indexEo][0] = float( crossSectionForm.integrateTwoFunctions( flux[0], 
+            TM_1[indexEi][indexEo][0] = float( crossSection.integrateTwoFunctions( flux0, 
                     domainMin = EiMin, domainMax = EiMax ) / groupedFlux[indexEi] )
-            TM_E[indexEi][indexEo][0] = float( crossSectionForm.integrateThreeFunctions( flux[0], Egp, 
+            TM_E[indexEi][indexEo][0] = float( crossSection.integrateThreeFunctions( flux0, Egp, 
                     domainMin = EiMin, domainMax = EiMax ) / groupedFlux[indexEi] )
             if( incrementIndexEo == 0 ) : break
             EiMin = EiMax
@@ -439,13 +446,12 @@ def NBodyPhaseSpace( style, tempInfo, crossSection, numberOfProducts, mTotal, Q,
 
     s  = versionStr + '\n'
     s += "Process: phase space spectrum\n"
-    if( comment is not None ) : s += "Comment: %s\n" % comment
     s += "Number of particles: %s\n" % numberOfProducts
     s += "Total mass: %s\n" % mTotal
     s += "Q value: %s\n" % Q
     s += 'Quadrature method: Gauss6\n'
     productFrame = standardsModule.frames.centerOfMassToken
-    s += commonDataToString( style, tempInfo, crossSection, productFrame, multiplicity = multiplicity )
+    s += commonDataToString( comment, style, tempInfo, crossSection, productFrame, multiplicity = multiplicity )
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'] ) )
 
 def KalbachMann_TransferMatrix( style, tempInfo, crossSection, particlesData, KalbachMannData, multiplicity = 1, comment = None ) :
@@ -456,14 +462,13 @@ def KalbachMann_TransferMatrix( style, tempInfo, crossSection, particlesData, Ka
     energy_in_unit = 'MeV'
     s  = versionStr + '\n'
     s += "Process: Kalbach spectrum\n"
-    if( comment is not None ) : s += "Comment: %s\n" % comment
     s += "Projectile's ZA: %s\n" % particlesData['projectile']['ZA']
     s += "Target's ZA: %s\n" % particlesData['target']['ZA']
     s += "Product's ZA: %s\n" % particlesData['product']['ZA']
     s += "Compound's mass: %s\n" % particlesData['compound']['mass']
     s += "Quadrature method: adaptive\n"
     productFrame = standardsModule.frames.centerOfMassToken
-    s += commonDataToString( style, tempInfo, crossSection, productFrame, multiplicity = multiplicity, energy_in_unit = energy_in_unit )
+    s += commonDataToString( comment, style, tempInfo, crossSection, productFrame, multiplicity = multiplicity, energy_in_unit = energy_in_unit )
     s += KalbachMannDataToString( KalbachMannData, energy_in_unit )
     return( executeCommand( logFile, transferMatrixExecute, s, workDir, tempInfo['workFile'] ) )
 
@@ -539,6 +544,15 @@ def parseOutputFile( file ) :
         except :
             raise TypeError( 'bad value type at line %d' % ( value, lineNumber ) )
 
+    def parseCrossSection( paras, lineNumber, ls, file ) :
+
+        s1 = ls[lineNumber].split( ':' )                        # This line should start as 'Cross section: n = '
+        n1 = int( s1[1].split( '=' )[1] )
+        s1 = ls[lineNumber].split( ':' )                        # This line should start as 'Interpolation: '
+        interpolation = s1[1].strip( )
+        lineNumber += n1 + 1
+        return( lineNumber )
+
     def parseTransferMatrix( paras, lineNumber, ls, file ) :
 
         s1 = ls[lineNumber].split( ":" )                      # This line should start as 'Integrals, weight = ...'
@@ -566,6 +580,7 @@ def parseOutputFile( file ) :
                 for i3, Cl in enumerate( rowLs ) : TM[i1][i2][i3] = Cl
         return( TM, lineNumber )
 
+    crossSection = None
     TM1 = None
     TME = None
     try :
@@ -574,7 +589,7 @@ def parseOutputFile( file ) :
         raise Exception( 'Could not open transfer file = %s' % file )
     ls = f.readlines( )
     f.close( )
-    if( ls[0] != "xndfgenGetTransfer: version 1\n" ) : raise Exception( 'Bad transfer file version in file %s\n%s' % ( file, ls[0] ) )
+    if( ls[0] != "merced: version 1\n" ) : raise Exception( 'Bad transfer file version in file %s\n%s' % ( file, ls[0] ) )
     lineNumber = 1
     n = len( ls )
     paras = { 'outputLegendreOrder' : None, 'numEinBins' : None, 'numEoutBins' : None }
@@ -589,6 +604,9 @@ def parseOutputFile( file ) :
                 raise Exception( "Bad transfer file, could not convert data for key = %s to integer\n%s in file %s" % ( key, ls[lineNumber], file ) )
         elif( key == "Comment" ) : 
             pass
+        elif( key == "Cross section" ) : 
+            if( crossSection is not None ) : raise Exception( "Bad transfer file, multiple cross section datasets in file %s" % file )
+            lineNumber = parseCrossSection( paras, lineNumber, ls, file )
         elif( key == "Integrals, weight = 1" ) :
             if( TM1 is not None  ) : raise Exception( "Bad transfer file, multiple weight = 1 datasets in file %s" % file )
             TM1, lineNumber = parseTransferMatrix( paras, lineNumber, ls, file )
@@ -600,19 +618,18 @@ def parseOutputFile( file ) :
         lineNumber += 1
     return( TM1, TME )
 
-def commonDataToString( style, tempInfo, crossSection, productFrame, multiplicity = None, energy_in_unit = None, weight = None ) :
+def commonDataToString( comment, style, tempInfo, crossSection, productFrame, multiplicity = None, energy_in_unit = None, weight = None,
+        photonFrame = standardsModule.frames.labToken ) :
 
     reactionSuite = tempInfo['reactionSuite']
-    projectileName = reactionSuite.projectile.name
+    projectileName = reactionSuite.projectile
     projectileGroupBoundaries = style.transportables[projectileName].group
     productName = tempInfo['productName']
     productGroupBoundaries = style.transportables[productName].group
-    flux = style.flux
-
-    if( energy_in_unit is not None ) :
-        flux = [ fluxOrder.convertAxisToUnit( 1, energy_in_unit ) for fluxOrder in flux ]
 
     s  = "outputLegendreOrder: %d\n" % style.lMax
+    if( comment is not None ) : s += "Comment: %s\n" % comment
+
     masses = tempInfo['masses']
     for particle, mass in masses.items( ) :
         if( mass is not None ) : s += "%s's mass: %s\n" % ( particle, floatToString( masses[particle] ) )
@@ -620,10 +637,10 @@ def commonDataToString( style, tempInfo, crossSection, productFrame, multiplicit
     s += GBToString( 'Projectile', projectileGroupBoundaries, energy_in_unit )
     maximumEnergy_in = projectileGroupBoundaries.boundaries.values[-1]
     s += GBToString( 'Product', productGroupBoundaries, energy_in_unit )
-    s += fluxToString( flux )
+    s += fluxToString( style.flux, energy_in_unit )
     if( crossSection is not None ) : s += crossSectionToString( style, crossSection, energy_in_unit )
     if( multiplicity is not None ) : s += multiplicityToString( style, multiplicity, energy_in_unit = energy_in_unit )
-    if( productName == 'gamma' ) : productFrame = standardsModule.frames.labToken     # BRB, hardwired??????
+    if( productName == IDsPoPsModule.photon ) : productFrame = photonFrame
     s += "\nProduct Frame: %s\n" % productFrame
     if( weight is not None ) : s += startOfNewData + '\n'.join( twoDToString( "weight", weight, addExtraBlankLine = False ) )
     return( s )
@@ -638,33 +655,31 @@ def GBToString( name, gb, energy_in_unit ) :
     s += oneDToString( boundaries.values, factor )
     return( s )
 
-def fluxToString( flux ) :
+def fluxToString( flux, energy_in_unit ) :
 
-    if( len( flux ) != 1 ) : raise Exception( 'FIXME' )
-    interpolationStr, s = twoDToString( "", flux[0], addHeader = False )
-    s  = [ "Fluxes: n = %d" % len( flux[0] ) ]
+    flux0 = flux.getFluxAtLegendreOrder( 0 )
+    if( energy_in_unit is not None ) : flux0 = flux0.convertAxisToUnit( 1, energy_in_unit )
+    interpolationStr, s = twoDToString( "", flux0, addHeader = False )
+    s  = [ "Fluxes: n = %d" % len( flux0 ) ]
     s.append( interpolationStr )
-    for Ein, Cls in flux[0] :
+    for Ein, Cls in flux0 :
         s.append( 'Ein: ' + ( doubleFmt % Ein ) + ': n = 1' )
         s.append( '  ' + ( doubleFmt % Cls ) )
     return( startOfNewData + '\n'.join( s ) )
 
 def crossSectionToString( style, crossSection, energy_in_unit = None ) :
 
-    form = style.findFormMatchingDerivedStyles( crossSection )
-    if( isinstance( form, crossSectionModule.reference ) ) : form = style.findFormMatchingDerivedStyles( form.link )
-    if( isinstance( form, crossSectionModule.regions1d ) ) : form = form.toPointwise_withLinearXYs( 1e-8, 1e-8 )
-    if( energy_in_unit is not None ) : form = form.convertAxisToUnit( 1, energy_in_unit )
-    return( startOfNewData + '\n'.join( twoDToString( "Cross section", form ) ) )
+    if( energy_in_unit is not None ) : crossSection = crossSection.copy( ).convertAxisToUnit( 1, energy_in_unit )
+    return( startOfNewData + '\n'.join( twoDToString( "Cross section", crossSection ) ) )
 
 def multiplicityToString( style, _multiplicity, energy_in_unit = None ) :
 
-    form = style.findFormMatchingDerivedStyles( _multiplicity )
-    multiplicity = form.toPointwise_withLinearXYs( 1e-8, 1e-8 )
-    if( energy_in_unit is not None ) : multiplicity = multiplicity.convertAxisToUnit( 1, energy_in_unit )
+    form = style.findFormMatchingDerivedStyle( _multiplicity )
+    multiplicity = form.toPointwise_withLinearXYs( accuracy = 1e-5, upperEps = 1e-8 )
+    if( energy_in_unit is not None ) : multiplicity = multiplicity.copy( ).convertAxisToUnit( 1, energy_in_unit )
     return( startOfNewData + '\n'.join( twoDToString( "Multiplicity", multiplicity ) ) )
 
-def angularToString( angularData, crossSection, weight = None, twoBody = False ) :
+def angularToString( angularData, crossSection, weight = None, twoBody = False, changeInterpolationQualifierWarning = False ) :
 
     weightString = ''
     if( weight is not None ) : weightString = startOfNewData + '\n'.join( twoDToString( "weight", weight, addExtraBlankLine = False ) ) + '\n'
@@ -673,7 +688,7 @@ def angularToString( angularData, crossSection, weight = None, twoBody = False )
         s = "Angular data: n = 2\n"
         s += 'Incident energy interpolation: %s %s\n' % ( linlin, GND2ProcessingInterpolationQualifiers[""] )
         s += 'Outgoing cosine interpolation: %s\n' % linlin
-        for x in [ crossSection.domainMin( ), crossSection.domainMax( ) ] : s += " %s : n = 2\n   -1 0.5\n   1 0.5\n" % ( doubleFmt % x )
+        for x in [ crossSection.domainMin, crossSection.domainMax ] : s += " %s : n = 2\n   -1 0.5\n   1 0.5\n" % ( doubleFmt % x )
 
     elif( isinstance( angularData, angularModule.XYs2d ) ) :
         if( isinstance( angularData[0], angularModule.XYs1d ) ) :
@@ -685,7 +700,7 @@ def angularToString( angularData, crossSection, weight = None, twoBody = False )
             if( angularData.interpolation not in [ linlin, flat ] ) :
                 _angularData = angularData.copy( )
                 _angularData.interpolation = linlin
-                print 'WARNING: interpolation %s is ignored, treated as %s' % ( angularData.interpolation, _angularData.interpolation )
+                if( changeInterpolationQualifierWarning ) : print 'WARNING: interpolation %s is ignored, treated as %s' % ( angularData.interpolation, _angularData.interpolation )
 
             if( twoBody ) :
                 s += 'Incident energy interpolation: %s %s\n' % \
@@ -713,7 +728,7 @@ def angularToString( angularData, crossSection, weight = None, twoBody = False )
             if( interpolation not in [ linlin, flat ] ) :
                 _angularData = angularData.copy( )
                 _angularData.interpolation = linlin
-                print 'WARNING: ignoring interpolation "%s" and using "%s" instead' % ( angularData.interpolation, _angularData.interpolation )
+                if( changeInterpolationQualifierWarning ) : print 'WARNING: ignoring interpolation "%s" and using "%s" instead' % ( angularData.interpolation, _angularData.interpolation )
                 angularData = _angularData
 
             s = [ "Legendre coefficients: n = %s" % len( angularData ) ]
@@ -732,7 +747,6 @@ def angularToString( angularData, crossSection, weight = None, twoBody = False )
             raise Exception( "angular data = %s not supported" % angularData[0].moniker )
 
     else :
-        brb.objectoutline( angularData )
         raise Exception( "angular data = %s not supported" % angularData.moniker )
 
     return( startOfNewData + weightString + s )
@@ -747,51 +761,43 @@ def energyFunctionToString( energyData, weight = None ) :
         for x, y in _linlin : sData.append( '%s %s' % ( x, y ) )
         return( sData )
 
-    from fudge.gnd.productData.distributions import energy
-
     sData = []
-    if( isinstance( energyData, ( energy.simpleMaxwellianFissionSpectrum, energy.evaporationSpectrum, energy.WattSpectrum ) ) ) :
+    if( isinstance( energyData, ( energyModule.simpleMaxwellianFissionSpectrum, energyModule.evaporationSpectrum, energyModule.WattSpectrum ) ) ) :
         sData.append( 'U: %s' % energyData.U.getValueAs( energyData.parameter1.data.axes[-1].unit ) )
 
-    if( isinstance( energyData.parameter1.data, regionsModule.regions1d ) ) :
-        parameter1 = energyData.parameter1.data.toPointwise_withLinearXYs( 1e-5, lowerEps = lowerEps, upperEps = upperEps )
-    else :
-        parameter1 = energyData.parameter1.data.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
+    parameter1 = energyData.parameter1.data.toPointwise_withLinearXYs( accuracy = 1e-5, lowerEps = lowerEps, upperEps = upperEps )
 
     if( energyData.parameter2 is not None ) :
-        if( isinstance( energyData.parameter2.data, regionsModule.regions1d ) ) :
-            parameter2 = energyData.parameter2.data.toPointwise_withLinearXYs( 1e-5, lowerEps = lowerEps, upperEps = upperEps )
-        else :
-            parameter2 = energyData.parameter2.data.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
+        parameter2 = energyData.parameter2.data.toPointwise_withLinearXYs( accuracy = 1e-5, lowerEps = lowerEps, upperEps = upperEps )
 
     if( weight is None ) :
         axes = axesModule.axes( )
-        weight = XYsModule.XYs1d( data = [ [ parameter1.domainMin( ), 1. ], [ parameter1.domainMax( ), 1. ] ], axes = axes, accuracy = 1e-6 )
+        weight = XYsModule.XYs1d( data = [ [ parameter1.domainMin, 1. ], [ parameter1.domainMax, 1. ] ], axes = axes )
     else :
         weight = weight.weight
     sData += twoDToString( "weight", weight, addExtraBlankLine = False )
 
-    if( isinstance( energyData, energy.generalEvaporationSpectrum ) ) :
+    if( isinstance( energyData, energyModule.generalEvaporationSpectrum ) ) :
         sProcess = 'Process: general evaporation\n'
         sSpecific = ''
         sData += getParameter( parameter1, 'Theta' )
         sData += getParameter( parameter2, 'g' )
-    elif( isinstance( energyData, energy.simpleMaxwellianFissionSpectrum ) ) :
+    elif( isinstance( energyData, energyModule.simpleMaxwellianFissionSpectrum ) ) :
         sProcess = 'Process: Maxwell spectrum\n'
         sSpecific = ''
         sData += getParameter( parameter1, 'Theta' )
-    elif( isinstance( energyData, energy.evaporationSpectrum ) ) :
+    elif( isinstance( energyData, energyModule.evaporationSpectrum ) ) :
         sProcess = 'Process: Evaporation spectrum\n'
         sSpecific = 'Interpolate Eout integrals: false\n'
         sSpecific += 'Quadrature method: Gauss6\n'
         sData += getParameter( parameter1, 'Theta' )
-    elif( isinstance( energyData, energy.WattSpectrum ) ) :
+    elif( isinstance( energyData, energyModule.WattSpectrum ) ) :
         sProcess = 'Process: Watt spectrum\n'
         sSpecific = 'Interpolate Eout integrals: false\n'
         sSpecific += 'Conserve: number\n'
         sData += getParameter( parameter1, 'a' )
         sData += getParameter( parameter2, 'b' )
-    elif( isinstance( energyData, energy.MadlandNix ) ) :
+    elif( isinstance( energyData, energyModule.MadlandNix ) ) :
         sProcess = 'Process: Madland-Nix spectrum\n'
         sSpecific  = 'Quadrature method: adaptive\n'
         sSpecific += 'Interpolate Eout integrals: false\n'
@@ -804,15 +810,16 @@ def energyFunctionToString( energyData, weight = None ) :
     sData.append( '' )
     return( sProcess, sSpecific, startOfNewData + '\n'.join( sData ) )
 
-def EEpPDataToString( EEpPData ) :
-
-    from fudge.gnd.productData.distributions import energy as energyModule
+def EEpPDataToString( EEpPData, changeInterpolationQualifierWarning = False ) :
 
     s  = startOfNewData
     s += "EEpPData: n = %d\n" % len( EEpPData )
 
     qualifier = EEpPData.interpolationQualifier
-    if( qualifier == standardsModule.interpolation.noneQualifierToken ) : qualifier = standardsModule.interpolation.unitBaseToken
+    if( qualifier == standardsModule.interpolation.noneQualifierToken ) :
+        if( EEpPData.interpolation != standardsModule.interpolation.flatToken ):
+            if( changeInterpolationQualifierWarning ) : print '    WARNING: changing interpolation qualifier from None to unitbase'
+            qualifier = standardsModule.interpolation.unitBaseToken
     s += 'Incident energy interpolation: %s %s\n' % ( EEpPData.interpolation, GND2ProcessingInterpolationQualifiers[qualifier] )
 
     linearizeXYs = False
@@ -842,12 +849,11 @@ def LEEpPDataToString( LEEpPData ) :
     s += 'Outgoing energy interpolation: %s\n' % linlin
     for l_EEpP in LEEpPData :
         s += startOfNewSubData + '\n'
-        EEpP = l_EEpP.EpP
-        s += "  l = %d: n = %d\n" % ( l_EEpP.l, len( EEpP ) )
-        s += threeDToString( EEpP )
+        s += "  l = %d: n = %d\n" % ( int( l_EEpP.value ), len( l_EEpP ) )
+        s += threeDToString( l_EEpP )
     return( s )
 
-def LegendreDataToString( LegendreData ) :
+def LegendreDataToString( LegendreData, changeInterpolationQualifierWarning = False ) :
 
     s = [ 'Legendre data by incident energy:  n = %d' % len( LegendreData ) ]
 
@@ -860,7 +866,7 @@ def LegendreDataToString( LegendreData ) :
     if( interpolation in [ linlin, flat ] ) :
         s.append( 'Outgoing energy interpolation: %s' % interpolation )
     else :
-        print '    WARNING: converting interpolation from "%s" to "%s".' % ( interpolation, linlin )
+        if( changeInterpolationQualifierWarning ) : print '    WARNING: converting interpolation from "%s" to "%s".' % ( interpolation, linlin )
         s.append( 'Outgoing energy interpolation: %s' % linlin )
 
     for EEpCl in LegendreData :
@@ -961,10 +967,16 @@ def twoDToString( label, data, addHeader = True, addExtraBlankLine = True ) :
         if( data.interpolation not in [ linlin, flat ] ) :
             data = data.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
         interpolationStr = 'Interpolation: %s' % data.interpolation
+    elif( isinstance( data, regionsModule.regions1d ) ) :
+        data = data.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
+        interpolationStr = 'Interpolation: %s' % data.interpolation
     else :
-        print '======== HI =========', __file__
-        brb.objectoutline( data )
-        raise 'hell'
+        print 'ERROR from', __file__
+        try :
+            brb.objectoutline( data )
+        except :
+            pass
+        raise TypeError( 'Unsupported data type: see prior output' )
     fmt = " %s %s" % ( doubleFmt, doubleFmt )
     a = [ fmt % ( x, y ) for x, y in data ]
     if( not( addHeader ) ) : return( interpolationStr, a )
@@ -986,7 +998,7 @@ def threeDToString( data, linearizeXYs = False ) :
         else :
             w = w_xy.value
             xy = w_xy
-            if( linearizeXYs ) : xy = w_xy.toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = 1e-8, upperEps = 1e-8 )
+            if( linearizeXYs ) : xy = w_xy.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-8 )
         a.append( wFmt % ( w, len( xy ) ) )
         for x, y in xy : a.append( xyFmt % ( x, y ) )
     a.append( "" )
@@ -1000,7 +1012,7 @@ def threeDListToString( data, linearizeXYs = False ) :
     for w_xy in data :
         a.append( startOfNewSubData )
         w = w_xy.value
-        if( linearizeXYs ) : w_xy = w_xy.toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = 1e-8, upperEps = 1e-8 )
+        if( linearizeXYs ) : w_xy = w_xy.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-8 )
         a.append( wFmt % ( w, len( w_xy ) ) )
         for x, y in w_xy : a.append( xyFmt % ( x, y ) )
     a.append( "" )

@@ -61,15 +61,24 @@
 # 
 # <<END-copyright>>
 
-import fudge.gnd.covariances.covarianceSuite as covarianceSuiteModule
-import fudge.gnd.covariances.section as sectionModule
-import fudge.gnd.covariances.distributions as distributionsModule
-from .. import endfFormats
+from PoPs import misc as miscPoPsModule
+from PoPs.families import nuclearLevel as nuclearLevelModule
+
+from fudge.legacy.converting import endf_endl as endf_endlModule
+from fudge.gnd.covariances import covarianceSuite as covarianceSuiteModule
+from fudge.gnd.covariances import section as sectionModule
+from fudge.gnd.covariances import distributions as distributionsModule
+
+from .. import endfFormats as endfFormatsModule
 
 def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
-    """ go back to ENDF format """
+    """Convert to ENDF format."""
+
+    reactionSuite = targetInfo['reactionSuite']
+
     ZAM, AWT = targetInfo['ZA'], targetInfo['mass']
-    NIS, ABN = 1,1.0; ZAI=ZAM  # assuming one isotope/file
+    NIS, ABN = 1, 1.0;
+    ZAI = ZAM  # assuming one isotope/file
     MTL = 0 # mtl=1 sections are handled in lumpedCovariance
 
     for section_ in self.modelParameterCovariances:
@@ -91,65 +100,64 @@ def toENDF6(self, endfMFList, flags, targetInfo, verbosityIndent=''):
         idx += len(thisMFMT)
 
         if mf in (31,33):
-            endf = [endfFormats.endfHeadLine( ZAM, AWT, 0, MTL, 0, len(thisMFMT) )]
+            endf = [endfFormatsModule.endfHeadLine( ZAM, AWT, 0, MTL, 0, len(thisMFMT) )]
         elif mf==34:
             if isinstance( thisMFMT[0][ targetInfo['style'] ], distributionsModule.LegendreOrderCovarianceForm ): LTT = 1
             NMT1 = len(thisMFMT)
-            endf = [endfFormats.endfHeadLine( ZAM, AWT, 0, LTT, 0, NMT1 )]
+            endf = [endfFormatsModule.endfHeadLine( ZAM, AWT, 0, LTT, 0, NMT1 )]
         elif mf==35:
-            endf = [endfFormats.endfHeadLine( ZAM, AWT, 0, MTL, len(thisMFMT), 0 )]
+            endf = [endfFormatsModule.endfHeadLine( ZAM, AWT, 0, MTL, len(thisMFMT), 0 )]
         elif mf==40:
-            endf = [endfFormats.endfHeadLine( ZAM, AWT, 0, 0, len(thisMFMT), 0 )]
+            endf = [endfFormatsModule.endfHeadLine( ZAM, AWT, 0, 0, len(thisMFMT), 0 )]
         for section_ in thisMFMT:
             MAT1 = 0
             form = section_[ targetInfo['style'] ]
             if section_.columnData and isinstance(section_.columnData.link, sectionModule.externalReaction):
                 otherTarget = section_.columnData.link.target
-                from fudge.legacy.converting import endf_endl
-                ZA, MAT1 = endf_endl.ZAAndMATFromParticleName( otherTarget )
+                ZA, MAT1 = endf_endlModule.ZAAndMATFromParticleName( otherTarget )
             if mf==34:
                 L1s = [subsec.L1 for subsec in form]
                 L2s = [subsec.L2 for subsec in form]
                 NL = len( set(L1s) );  NL1 = len( set(L2s) )
                 if section_.columnData: raise NotImplemented # cross-reaction or cross-material
                 MT1 = mt
-                endf += [ endfFormats.endfHeadLine( 0.0, 0.0, MAT1, MT1, NL, NL1 ) ]
+                endf += [ endfFormatsModule.endfHeadLine( 0.0, 0.0, MAT1, MT1, NL, NL1 ) ]
             if mf==40:
                 rowData = section_.rowData
-                if type(rowData) is str: raise Exception("Don't string me along!") # FIXME
+                if( isinstance( rowData, str ) ) :
+                    raise Exception( "Don't string me along!" ) # FIXME
                 else:
                     quant = rowData.link
-                    if isinstance(quant, sectionModule.reactionSum):
-                        quant = quant.reactions[0].link
                     product = quant.findAttributeInAncestry('outputChannel')[0]
                     QI = quant.findAttributeInAncestry('getQ')('eV')
                     LFS, level = 0, 0.
-                    if( hasattr( product.particle, 'getLevelIndex' ) ) :
-                        LFS = product.particle.getLevelIndex()
-                        level = product.getLevelAsFloat( 'eV' )
+                    particle = reactionSuite.PoPs[product.id]
+                    if( isinstance( particle, nuclearLevelModule.particle ) ) :
+                        LFS = particle.intIndex
+                        level = particle.energy[0].float( 'eV' )
                     QM = QI + level
-                    IZAP = product.particle.getZ_A_SuffixAndZA()[-1]
+                    IZAP = miscPoPsModule.ZA( reactionSuite.PoPs[product.id] )
                     NL = 1
-                    endf += [endfFormats.endfHeadLine( QM, QI, IZAP, LFS, 0, NL ) ]
+                    endf += [endfFormatsModule.endfHeadLine( QM, QI, IZAP, LFS, 0, NL ) ]
                     XMF1, XLFS1, NC, NI = 10,LFS, 0,1
-                    endf += [endfFormats.endfHeadLine( XMF1,XLFS1,MAT1,mt,NC,NI )]
+                    endf += [endfFormatsModule.endfHeadLine( XMF1,XLFS1,MAT1,mt,NC,NI )]
             targetInfo['MAT1'] = MAT1
             targetInfo['dataPointer'] = [section_.rowData,section_.columnData]
             endf += form.toENDF6(flags, targetInfo)
-            targetInfo.dict.pop('dataPointer')
-            targetInfo.dict.pop('MAT1')
-        endf.append( endfFormats.endfSENDLineNumber() )
+            targetInfo.pop( 'dataPointer' )
+            targetInfo.pop( 'MAT1' )
+        endf.append( endfFormatsModule.endfSENDLineNumber() )
         if mt not in endfMFList[mf]:
             endfMFList[mf][mt] = []
         endfMFList[mf][mt] += endf
     # also add ENDF-style pointers for lumped covariance data:
-    for reactionSum in self.reactionSums:
-        MT1 = reactionSum.ENDF_MFMT[1]
-        if MT1 not in range(850,872): continue
-        for link in reactionSum.reactions:
-            mf,mt = map(int, link['ENDF_MFMT'].split(','))
-            endfMFList[mf][mt] = [endfFormats.endfHeadLine(ZAM,AWT,0,MT1,0,0),
-                    endfFormats.endfSENDLineNumber() ]
+    for reactionSum in targetInfo['reactionSuite'].sums.crossSections:
+        MT1 = reactionSum.ENDF_MT
+        if MT1 not in xrange(851,872): continue
+        for summand in reactionSum.summands:
+            mt = summand.link.findAttributeInAncestry('ENDF_MT')
+            endfMFList[33][mt] = [endfFormatsModule.endfHeadLine(ZAM,AWT,0,MT1,0,0),
+                    endfFormatsModule.endfSENDLineNumber() ]
     return
 
 covarianceSuiteModule.covarianceSuite.toENDF6 = toENDF6

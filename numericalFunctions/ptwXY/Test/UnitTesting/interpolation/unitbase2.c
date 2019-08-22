@@ -130,7 +130,7 @@ int unitbase2s( statusMessageReporting *smr, int n1, double *xy1, int n2, double
     int errCount = 0;
     int64_t i;
     ptwXYPoints *pXY1, *pXY2, *ub;
-    double accuracy = 1e-3, x1, y1, x2, y2;
+    double accuracy = 1e-3, x1, x2, y2;
     ptwXY_interpolation interpolation = ptwXY_interpolationLinLin;
 
     if( ( pXY1 = ptwXY_create( smr, interpolation, NULL, 5, accuracy, 10, 10, n1, xy1, 0 ) ) == NULL ) 
@@ -159,7 +159,6 @@ int unitbase2s( statusMessageReporting *smr, int n1, double *xy1, int n2, double
             if( x2 == x1 ) ++errCount;
         }
         x1 = x2;
-        y1 = y2;
     }
 
     if( verbose ) {

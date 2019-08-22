@@ -64,7 +64,8 @@
 SOURCE_DIRS = ptwC ptwX ptwXY nf_Legendre nf_specialFunctions nf_integration
 SUB_DIRS = include lib $(SOURCE_DIRS) Doc _Src
 
-.PHONY: default purgeIncludeAndLib includeAndLib $(SOURCE_DIRS) check checke clean realclean doTarget
+.PHONY: default purgeIncludeAndLib includeAndLib $(SOURCE_DIRS) python check checke checkPython checkePython \
+	collectSources clean realclean doTarget
 
 SMR_PATH = $(abspath ../statusMessageReporting)
 SMR_INCLUDE_PATH = $(SMR_PATH)/include

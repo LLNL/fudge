@@ -61,8 +61,11 @@
 # 
 # <<END-copyright>>
 
-import fudge.gnd.tokens as tokensModule
-import fudge.gnd.product as productModule
+from PoPs import misc as miscPoPsModule
+from PoPs import IDs as IDsPoPsModule
+
+from fudge.gnd import tokens as tokensModule
+from fudge.gnd import product as productModule
 from fudge.gnd.productData.distributions import unspecified as unspecifiedModule 
 
 def toENDF6( self, MT, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
@@ -83,28 +86,38 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
         elif( self.getAttribute( 'emissionMode' ) == 'total' ) :
                 targetInfo['totalNubar'] = getPromptOrTotalNubar( self )
 
-    if( flags['verbosity'] >= 10 ) : print '%s%s: label = %s: to ENDF6:' % ( verbosityIndent, self.name, self.label )
+    if( flags['verbosity'] >= 10 ) : print '%s%s: label = %s: to ENDF6:' % ( verbosityIndent, self.id, self.label )
     priorMF6flag = targetInfo['doMF4AsMF6']
     if( self.attributes.get( 'ENDFconversionFlag' ) == 'MF6' ) :
         targetInfo['doMF4AsMF6'] = True # flag was set in reaction.py, but may need to be overwritten
-    if( len( self.distribution ) ) :        # This should now always be true.
+
+    gammasPresent = False
+    if( self.outputChannel is not None ) :
+        for product in self.outputChannel : gammasPresent = gammasPresent or ( product.id == IDsPoPsModule.photon )
+    if( len( self.distribution ) or gammasPresent ) :        # First part should now always be true.
         distribution = self.distribution[targetInfo['style']]
-        if( not( isinstance( distribution, unspecifiedModule.form ) ) ) :
-            targetInfo['zapID'] = self.particle.name
-            if( hasattr( self.particle,'groundState' ) ) :  # ENDF wants ground state mass:
-                targetInfo['particleMass'] = self.particle.groundState.getMass( 'eV/c**2' )
-            else:
-                targetInfo['particleMass'] = self.getMass( 'eV/c**2' )
+        doDistribution = True
+        if( isinstance( distribution, unspecifiedModule.form ) ) :
+            if( ( MT not in [ 527, 528 ] ) or ( self.id != IDsPoPsModule.electron ) ) : doDistribution = False
+        if( doDistribution ) :
+            targetInfo['zapID'] = self.id
+            particle = targetInfo['reactionSuite'].PoPs[self.id]
+            ZA = miscPoPsModule.ZA( particle )
+            try :
+                targetInfo['particleMass'] = targetInfo['massTracker'].getMassAWR( ZA, asTarget = False )
+            except :
+                pass
             targetInfo['multiplicity'] = self.multiplicity
-            self.distribution.toENDF6( MT, endfMFList, flags, targetInfo )
-    if( not( self.outputChannel is None ) ) :
+            if not (self.getAttribute('ENDFconversionFlag') == 'implicitProduct'):
+                self.distribution.toENDF6( MT, endfMFList, flags, targetInfo )
+    if( self.outputChannel is not None ) :
         priorIndex, priorToken, priorLabel = targetInfo['productIndex'], targetInfo['productToken'], targetInfo['productLabel']
         for index, product in enumerate( self.outputChannel ) :
-            if( product.name == 'gamma' ) :
+            if( product.id == IDsPoPsModule.photon ) :
                 targetInfo['gammas'].append( product )
                 continue
             targetInfo['productIndex'] = "%s.%s" % ( priorIndex, index )
-            targetInfo['productToken'] = product.name
+            targetInfo['productToken'] = product.id
             targetInfo['productLabel'] = product.label
             product.toENDF6( MT, endfMFList, flags, targetInfo, verbosityIndent = verbosityIndent + '    ' )
         targetInfo['productIndex'], targetInfo['productToken'], targetInfo['productLabel'] = priorIndex, priorToken, priorLabel

@@ -211,7 +211,7 @@ def endl_C_yosMultiplicity( C, yi ) :
     nYos = 7
     yosMultiplicities = nYos * [ 0 ]
     yos = endl_C_yoInfo( C )
-    if( yos == None ) :
+    if( yos is None ) :
         return( None )
     elif( yos[0] == yoUnknown ) :
         return( nYos * [ None ] )

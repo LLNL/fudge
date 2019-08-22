@@ -1,0 +1,220 @@
+\documentclass[11pt]{report}
+%\documentclass[11pt]{article}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+%\usetikzlibrary{arrows}
+\usepackage{hyperref}
+
+\textheight=21cm
+\textwidth=15cm
+\hoffset=0pt
+\oddsidemargin=20pt
+
+% change the chapter head
+% See /usr/local/texlive/2015/texmf-dist/tex/latex/base/report.cls
+\makeatletter
+\renewcommand{\@makechapterhead}[1]{%
+  \vspace*{20\p@}%
+  {\parindent \z@ \raggedright \normalfont
+    \ifnum \c@secnumdepth >\m@ne
+        \LARGE\bfseries \space \thechapter
+    \fi
+    \interlinepenalty\@M
+    \LARGE \bfseries \hspace{20pt}#1\par\nobreak
+    \vskip 30\p@
+  }}
+\makeatother
+
+%for input file entries
+\newcommand{\Input}[2]{\indent%
+ \qquad \texttt{#1} \textrm{#2}\hfil}
+
+\newcommand{\expon}[1]{\exp\left\{#1\right\}}
+\newcommand{\erf}[1]{\text{erf}\left\{#1\right\}}
+\newcommand{\xndfgen}{\texttt{fudge}}
+\newcommand{\gettransfer}{\texttt{merced}}
+\newcommand{\ndfgen}{\texttt{ndfgen}}
+\newcommand{\clyde}{\texttt{clyde}}
+\newcommand{\fete}{\texttt{fete}}
+\newcommand{\mcnp}{\texttt{mcnp}}
+\newcommand{\ENDL}{\textsf{ENDL}}
+\newcommand{\NJOY}{\textsf{NJOY}}
+\newcommand{\xendl}{\textsf{GND}}
+\newcommand{\EPDL}{\textsf{EPDL}}
+\newcommand{\EADL}{\textsf{EADL}}
+\newcommand{\ENDF}{\textsf{ENDF/B-VII}}
+\newcommand{\ENDFdata}{\textsf{ENDF/B-VII.1}}
+\newcommand{\calE}{{\cal E}}
+\newcommand{\calA}{{\cal A}}
+\newcommand{\calB}{{\cal B}}
+\newcommand{\calD}{{\cal D}}
+\newcommand{\calG}{{\cal G}}
+\newcommand{\calH}{{\cal H}}
+\newcommand{\calI}{{\cal I}}
+\newcommand{\calJ}{{\cal J}}
+\newcommand{\calK}{{\cal K}}
+\newcommand{\calR}{{\cal R}}
+\newcommand{\calU}{{\cal U}}
+\newcommand{\calV}{{\cal V}}
+\newcommand{\Etrans}{E_{\text{trans}}}
+\newcommand{\Vtrans}{\textbf{V}_{\text{trans}}}
+\newcommand{\vtrans}{V_{\text{trans}}}
+\newcommand{\Ecm}{E_{\text{cm}}}
+\newcommand{\Vcm}{\textbf{V}_{\text{cm}}}
+\newcommand{\vcm}{V_{\text{cm}}}
+\newcommand{\mucm}{\mu_{\text{cm}}}
+\newcommand{\mulab}{\mu_{\text{lab}}}
+\newcommand{\mucmj}{\mu_{\text{cm},j}}
+\newcommand{\mucmjm}{\mu_{\text{cm}, j-1}}
+\newcommand{\picm}{\pi_{\text{cm}}}
+\newcommand{\Elab}{E_{\text{lab}}}
+\newcommand{\Ebin}{E_{\text{bin}}}
+\newcommand{\Vlab}{\textbf{V}_{\text{lab}}}
+\newcommand{\vlab}{V_{\text{lab}}}
+\newcommand{\vbin}{V_{\text{bin}}}
+\newcommand{\Emax}{E_{\text{max}}}
+\newcommand{\Emin}{E_{\text{min}}}
+\newcommand{\Emaxzero}{E_{0,\text{max}}}
+\newcommand{\Eminzero}{E_{0,\text{min}}}
+\newcommand{\Emaxone}{E_{1,\text{max}}}
+\newcommand{\Eminone}{E_{1,\text{min}}}
+\newcommand{\Emaxi}{E_{i,\text{max}}}
+\newcommand{\Emini}{E_{i,\text{min}}}
+\newcommand{\Ehat}{\widehat E}
+\newcommand{\pihat}{\widehat \pi}
+\newcommand{\Eyo}{E_{\text{yo}}}
+\newcommand{\myi}{m_{\text{yi}}}
+\newcommand{\myo}{m_{\text{yo}}}
+\newcommand{\mtarg}{m_{\text{targ}}}
+\newcommand{\mres}{m_{\text{res}}}
+\newcommand{\Inum}{\calI^{\text{num}}}
+\newcommand{\Ien}{\calI^{\text{en}}}
+\newcommand{\Estar}{{E^*}}
+\newcommand{\mystrut}{\vrule height 9pt depth 4 pt}
+
+% formatting of the input options, no longer used
+\newcommand{\Lentrylabel}[1]{%
+%  \makebox[\leftmargin][l]{\qquad \texttt{#1:}}%
+  \makebox{\qquad \texttt{#1:}}%
+  \hfil\relax}
+\newenvironment{Lentry}
+  {\setlength{\parsep}{0pt}%
+   \setlength{\itemsep}{0pt}%
+   \setlength{\parskip}{0pt}%
+   \renewcommand{\makelabel}{\Lentrylabel}%
+   \begin{description}}
+  {\end{description}}
+
+%\includeonly{doubleDiffTable, doubleDiffFormula}
+%\includeonly{interpolate}
+
+\begin{document}
+
+\title{An explanation of the \gettransfer\ code}
+\author{Gerald Hedstrom\\
+  Nuclear Theory \& Data Group\\
+  Lawrence Livermore National Laboratory}
+\date{14 June 2017}
+\maketitle
+
+\pagenumbering{roman}
+\tableofcontents
+
+\include{summary}
+\include{transfer}
+\include{interpolate}
+\include{two_body}
+\include{isotropic}
+\include{uncorrelated}
+\include{legendre-lab}
+\include{legendre-cm}
+\include{doubleDiffTable}
+\include{doubleDiffFormula}
+\include{gammas}
+\include{usage}
+\appendix
+\include{relativity}
+\include{assertion}
+
+\begin{thebibliography}{99}
+\frenchspacing
+
+\bibitem{GND} C.~M. Mattoon et al.,
+``Generalized Nuclear Data: a New Structure (with Supporting Infrastructure) 
+for Handling Nuclear Data'',
+\textit{Nuclear Data Sheets} \textbf{113} (2012) 2145.
+
+\bibitem{xndfgen} B.~R. Beck,
+``The \xndfgen\ data processing code'',
+\textit{AIP Conf. Proc.} \textbf{769} (2004) 503.
+
+\bibitem{Lewis} E.~E. Lewis and W.~F. Miller,
+\textit{Computational methods of neutron transport},
+Wiley, New York, 1984.
+
+\bibitem{Omega} R. J. Howerton, R.~E. Dye, P.~C. Giles,
+J.~R. Kimlinger, S.~T. Perkins, and E.~F. Plechaty,
+``Omega: a Cray~1 executive code for LLNL nuclear data
+libraries'',
+Report UCRL-50400 Vol.~25, 
+Lawrence Livermore National Laboratory, Livermore, California,
+1983.
+
+\bibitem{ndfgen} G. W. Hedstrom, ``An explanation of
+\ndfgen'', Report PD-211, Nuclear Data Group,
+Lawrence Livermore National Laboratory, Livermore, California,
+2000.
+
+\bibitem{Gander} W. Gander and W. Gautschi,
+``Adaptive quadrature---revisited'', \textit{BIT} \textbf{40} (2000) 84--101.
+
+\bibitem{ENDFB} M.~Herman, A.~Trkov, and D.\ A.\ Brown,
+``ENDF-6 Formats Manual;
+Data Formats and Procedures for the Evaluated Nuclear Data Files ENDF/B-VI and ENDF/B-VII'',
+Report BNL-90365-2009 Rev.~2,
+National Nuclear Data Center,
+Brookhaven National Laboratory,
+Upton, New York, 2012.
+
+\bibitem{interpolation} G. W. Hedstrom, 
+``Interpolation of nuclear reaction energy distributions'', 
+\textit{J. Nucl. Sci. Tech.}, to appear.
+
+\bibitem{ENDFdata} M.~B. Chadwick \textit{et al.,}
+``ENDF/B-VII.1 Nuclear Data for Science and Technology: Cross Sections, Covariances, Fission Product Yields and Decay Data'',
+\textit{Nuclear Data Sheets} \textbf{112} (2011) 2887--2996.
+
+%\bibitem{NJOY} R.~E. MacFarlane, \textit{et al.,}
+%``The NJOY Nuclear Data Processing System, Version 2012,
+%Report LA-UR-12-27079, Los Alamos National Laboratory, Los Alamos,
+%New Mexico, 2012.
+
+\bibitem{endep} G. W. Hedstrom, ``An explanation of
+the \textsf{ENDEP} code'', Report PD-210, Nuclear Data Group,
+Lawrence Livermore National Laboratory, Livermore, California,
+1999.
+
+\bibitem{Madland} D.~G. Madland and J.~R. Nix,
+``New calculation of prompt fission neutron spectra
+and average prompt neutron multiplicities'',
+\textit{Nucl.\ Sci.\ Eng.\ \textbf{81}} (1982), 213--271.
+
+\bibitem{Kalbach} C. Kalbach, 
+``Systematics of continuum angular distributions: 
+Extensions to higher energies'',
+\textit{Phys.\ Rev.~C} \textbf{37} (1988) 2350--2369.
+
+\bibitem{photo-nuc} M.~B. Chadwick, P.~G. Young, and S.~Chiba,
+``Angular distribution systematics in the pseudodeuteron regime'',
+\textit{J. Nucl. Sci. Tech.,} \textbf{32} (1995) 1154.
+
+%\bibitem{MCNP} X-9 Monte Carlo Team,
+%``MCNP--A General Monte Carlo N-Particle Transport Code'',
+%Version~5, Los Alamos National Laboratory, Los Alamos,
+%New Mexico, 2003.
+
+
+\end{thebibliography}
+
+\end{document}

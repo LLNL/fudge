@@ -63,10 +63,10 @@
 
 __metaclass__ = type
 
+import string
 import abc
-import xData.ancestry as ancestryModule
 
-from fudge.core.utilities import brb
+import xData.ancestry as ancestryModule
 
 class suite( ancestryModule.ancestry ) :
     """
@@ -88,17 +88,26 @@ class suite( ancestryModule.ancestry ) :
             if( item.label == label ) : return( True )
         return( False )
 
+    def __delitem__( self, key ) :
+
+        if( isinstance( key, int ) ) :
+            del self.__items[key]
+            return
+        status = self.remove( key )
+        if( not( status ) ) : KeyError( 'key not in suite' )
+
     def __getitem__( self, label ) :
 
-        if( isinstance( label, int ) ) : return( self.__items[label] )   # BRB - FIXME, Temp fix until Caleb gets neutrons/n-017_Cl_035.endf working without it.
+        if( isinstance( label, int ) ) : return( self.__items[label] )
         if( not( isinstance( label, str ) ) ) : raise TypeError( "label must be a string" )
         for item in self :
             if( item.label == label ) : return( item )
+
         # requested style not found, but what about styles it derives from?
         requestedStyle = self.getRootAncestor().styles[ label ]
-        for dstyle in requestedStyle.derivedStyles:
-            for item in self :
-                if( item.label == dstyle.label ) : return( item )
+
+        for item in self :
+            if( item.label == requestedStyle.label ) : return( item )
         raise KeyError( "item with label '%s' not found in suite '%s'" % ( label, self.moniker ) )
 
     def __iter__( self ) :
@@ -121,7 +130,13 @@ class suite( ancestryModule.ancestry ) :
         return( self.__replace )
 
     def add( self, newItem ) :
+        """
+        Add newItem to the suite. If another item in the suite has the same label as newItem, raise KeyError
+        :param newItem:
+        :return:
+        """
 
+        if( not( isinstance( newItem.label, str ) ) ) : IndexError( '''Item's label must be a string''' )
         found = False
         for cls in self.__allowedClasses :
             if( isinstance( newItem, cls ) ) :
@@ -141,13 +156,49 @@ class suite( ancestryModule.ancestry ) :
         newItem.setAncestor( self, attribute = 'label' )
         self.__items.insert( index, newItem )
 
+    def convertUnits( self, unitMap ) :
+        "See documentation for reactionSuite.convertUnits."
+
+        for index, item in enumerate( self.__items ) : item.convertUnits( unitMap )
+
+    def checkAncestry( self, verbose = 0, level = 0 ) :
+
+        for item in self : item.checkAncestry( verbose = verbose, level = level )
+
+    def pop( self, label, *args ) :
+        """
+        Remove item by label, and return it. If the label is not found, raise KeyError
+        :param label:
+        :param args:
+        :return:
+        """
+
+        if( len( args ) > 2 ) : raise Exception( 'Only one default value is allowed: got %s' % len( args ) )
+        for i1, item in enumerate( self.__items ) :
+            if( item.label == label ) : return( self.__items.pop( i1 ) )
+        if( len( args ) == 1 ) : return( args[0] )
+        raise KeyError( label )
+
     def remove( self, label ) :
+        """
+        Remove item by label. Returns True if label was present, otherwise returns False
+        :param label: str
+        :return: bool
+        """
 
         for i1, item in enumerate( self.__items ) :
             if( item.label == label ) :
                 del self.__items[i1]
                 return( True )
         return( False )
+
+    def clear( self ):
+        """
+        Remove all members of the suite
+        :return:
+        """
+        for idx in range( len( self.__items ) ):
+            self.__items.pop()
 
     def toXML( self, indent = "", **kwargs ) :
 
@@ -162,6 +213,42 @@ class suite( ancestryModule.ancestry ) :
         for item in self : xmlString += item.toXMLList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return( xmlString )
+
+    def uniqueLabel( self, item ) :
+        """
+        If item's label is the same as another item's label in self, construct a new unique label
+        based on item's label appended with '__' and one or more lower case letters (i.e., 'a' to 'z').
+        """
+
+        def incrementSuffix( suffix ) :
+
+            if( len( suffix ) == 0 ) : return( 'a' )
+            index = string.ascii_lowercase.find( suffix[-1] ) + 1
+            if( index != 26 ) : return( suffix[:-1] + string.ascii_lowercase[index] )
+            return( incrementSuffix( suffix[:-1] ) + 'a' )
+
+        if( item.label in self ) :
+            label = item.label
+            label__ = label + '__'
+            n1 = len( label__ )
+            l1 = 0
+            suffixes = []
+            for _item in self :          # Find list of longest labels that start with label__.
+                if( _item.label[:n1] == label__ ) :
+                    suffix = _item.label[n1:]
+                    if( not( suffix.islower( ) ) ) : continue       # Ignore non-standard labels.
+                    l2 = len( suffix )
+                    if( l2 < l1 ) : continue
+                    if( l2 > l1 ) :
+                        l1 = l2
+                        suffixes = []
+                    suffixes.append( suffix )
+            if( len( suffixes ) == 0 ) :
+                suffix = 'a'
+            else :
+                suffix = incrementSuffix( sorted( suffixes )[-1] )
+            item.label = label__ + suffix
+        return( item )
 
     def parseXMLNode( self, element, xPath, linkData ):
 
@@ -186,19 +273,38 @@ class reactions( suite ) :
     def __init__( self ) :
 
         from fudge.gnd.reactions import reaction as reactionModule
-        from fudge.gnd.reactions import production as productionModule
 
-        suite.__init__( self, [reactionModule.reaction, productionModule.production] )
+        suite.__init__( self, [ reactionModule.reaction ] )
 
-class sums( suite ) :
+class orphanProducts( suite ) :
 
-    moniker = 'sums'
+    moniker = 'orphanProducts'
+
+    def __init__( self ) :
+
+        from fudge.gnd.reactions import reaction as reactionModule
+
+        suite.__init__( self, [ reactionModule.reaction ] )
+
+class crossSections( suite ) :
+
+    moniker = 'crossSections'
 
     def __init__( self ) :
 
         from fudge.gnd import sums as sumsModule
 
-        suite.__init__( self, [sumsModule.crossSectionSum, sumsModule.multiplicitySum] )
+        suite.__init__( self, [sumsModule.crossSectionSum] )
+
+class multiplicities( suite) :
+
+    moniker = 'multiplicities'
+
+    def __init__( self ) :
+
+        from fudge.gnd import sums as sumsModule
+
+        suite.__init__( self, [sumsModule.multiplicitySum] )
 
 class productions( suite ) :
 

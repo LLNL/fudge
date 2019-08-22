@@ -76,14 +76,16 @@ from xData import values as valuesModule
 from pqu import PQU
 
 __metaclass__ = type
+lowerEps = 1e-8
+upperEps = 1e-8
 
 class covarianceMatrix( ancestryModule.ancestry ):
     """
-    Base class for all covariances. covarianceMatrix contains a label, a 'gridded' container with
+    Base class for all covariances. covarianceMatrix contains a label, a 'gridded2d' container with
     the matrix data + axes and a list of energy boundaries, and a covariance 'type' which might be 'absolute',
     'relative' or 'correlation'. Some details :
 
-        * Matrix data is stored in an :py:class:`xData.gridded.gridded` class. May be diagonal, symmetric, sparse, etc
+        * Matrix data is stored in an :py:class:`xData.gridded.gridded2d` class. May be diagonal, symmetric, sparse, etc
         * Symmetric matrices only require one set of energy bounds, but asymmetric
           matrices require bounds for both axes.
     """
@@ -99,7 +101,7 @@ class covarianceMatrix( ancestryModule.ancestry ):
         :param energyBounds: stores the incident energy range of validity for a PFNS covariance matrix
         :type energyBounds: tuple( :py:class:`PQU.PQU`, :py:class:`PQU.PQU` )
         :param matrix: the covariance matrix itself
-        :type matrix: :py:class:`xData.gridded.gridded`
+        :type matrix: :py:class:`xData.gridded.gridded2d`
         :param ENDFconversionFlag:  yes, this is a crutch to help when converting back to ENDF
         :type ENDFconversionFlag: bool
         :return:
@@ -110,7 +112,7 @@ class covarianceMatrix( ancestryModule.ancestry ):
         self.__label = label
         self.type = type #: 'relative' or 'absolute'
         self.energyBounds = energyBounds
-        self.matrix = matrix #: a :py:class:`xData.gridded.gridded` instance containing the matrix
+        self.matrix = matrix #: a :py:class:`xData.gridded.gridded2d` instance containing the matrix
         self.matrix.ancestor = self
         self.ENDFconversionFlag = ENDFconversionFlag #: yes, this is a crutch to help when converting back to ENDF
 
@@ -128,22 +130,25 @@ class covarianceMatrix( ancestryModule.ancestry ):
 
     def getValue( self, x, y ):
         ix = self.matrix.axes[2].getIndexOfValue(x)
+# BRB6 hardwired
         if self.matrix.axes[1].style=='link': iy=self.matrix.axes[2].getIndexOfValue(y)
         else: iy=self.matrix.axes[1].getIndexOfValue(y)
         return self.matrix.array.constructArray()[ix,iy]
 
     def getRowBounds(self,unit=None):
-        '''Get the bounds of the row.  If unit is specified, return the bounds in that unit.'''
-        return (
-            PQU.PQU(self.matrix.axes[-1].values[0],  self.matrix.axes[-1].unit),
-            PQU.PQU(self.matrix.axes[-1].values[-1], self.matrix.axes[-1].unit))
+        """Get the bounds of the row.  If unit is specified, return the bounds in that unit."""
+        factor = 1
+        if unit:
+            factor = PQU.PQU(1, self.matrix.axes[-1].unit).getValueAs(unit)
+        return( self.matrix.axes[-1].values[0] * factor, self.matrix.axes[-1].values[-1] * factor )
 
     def getColumnBounds(self,unit=None):
-        '''Get the bounds of the column.  If unit is specified, return the bounds in that unit.'''
+        """Get the bounds of the column.  If unit is specified, return the bounds in that unit."""
         if self.matrix.axes[-2].style=='link': return self.getRowBounds(unit)
-        return (
-            PQU.PQU(self.matrix.axes[-2].values[0],  self.matrix.axes[-2].unit),
-            PQU.PQU(self.matrix.axes[-2].values[-1], self.matrix.axes[-2].unit))
+        factor = 1
+        if unit:
+            factor = PQU.PQU(1, self.matrix.axes[-1].unit).getValueAs(unit)
+        return( self.matrix.axes[-1].values[0] * factor, self.matrix.axes[-1].values[-1] * factor )
 
     def isSymmetric(self):
         """
@@ -159,13 +164,24 @@ class covarianceMatrix( ancestryModule.ancestry ):
         return numpy.all( arr==arr.T )
 
     def convertAxesToUnits( self, units ):
-        '''
+        """
         Converts all the axes' units.
         The parameter ``units`` should be a list of units with the same length as self.axes
-        '''
-        if not type( units ) in [ list, tuple ]: raise TypeError()
-        if len( units ) != len( self.matrix.axes ): raise ValueError()
-        for i,a in enumerate( self.matrix.axes ): a.convertToUnit( units[i] )
+        """
+        if not type( units ) in [ list, tuple ]: raise TypeError("units argument must be a list or tuple of strings")
+        if len( units ) != len( self.matrix.axes ): raise ValueError("requested units list has a different length than the number of axes")
+        for i,a in enumerate( self.matrix.axes ):
+            if isinstance(a,axesModule.grid): a.convertToUnit( units[i] )
+            elif isinstance(a,axesModule.axis): a.unit=units[i]
+            else: raise TypeError()
+
+    def convertUnits( self, unitMap ):
+
+        self.matrix.axes.convertUnits(unitMap)
+        if self.type == 'absolute':
+            factor = self.matrix.axes[0].convertUnits( unitMap )
+            if factor != 1:
+                self.matrix.offsetScaleValues( 0, factor )
 
     def toCovarianceMatrix( self ):
         """
@@ -175,19 +191,19 @@ class covarianceMatrix( ancestryModule.ancestry ):
         return copy.copy( self ) # copy.deepcopy( self )
         
     def getCorrelationMatrix( self ):
-        '''
+        """
         Returns the correlation matrix generated from self's covariance matrix.  This is
         essentially a copy of self, but renormalized by the uncertainty:
-        
+
             correlation[i,j] = covariance[i,j]/sqrt(covariance[i,i])/sqrt(covariance[j,j])
-        
+
         We reuse the covariance matrix class so that we can do plotting, etc.  If you have
-        a correlation matrix, you can safely recover it provided you have the uncertainty 
+        a correlation matrix, you can safely recover it provided you have the uncertainty
         vector.
-        
-        Currently only works for a square covariance matrix and not a off-diagonal part of 
+
+        Currently only works for a square covariance matrix and not a off-diagonal part of
         another covariance.
-        '''
+        """
         # Check if is full, square covariance matrix
         if not self.isSymmetric():
             raise TypeError( "Can only extract correlation matrices from symmetric covariance matrices" )
@@ -203,8 +219,8 @@ class covarianceMatrix( ancestryModule.ancestry ):
 
         # Return the result
         tridata = theCorrelationMatrix[numpy.tri(theCorrelationMatrix.shape[0])==1.0].tolist()
-        correlation = griddedModule.gridded(
-                axes=self.matrix.axes.copy(),
+        correlation = griddedModule.gridded2d(
+                axes=self.matrix.axes.copy(),#FIXME: unresolvedLinks still unresolved!
                 array=arrayModule.full(shape=theCorrelationMatrix.shape, data=tridata, symmetry=arrayModule.symmetryLowerToken) )
         correlation.axes[0].unit = ''
         return correlation
@@ -229,30 +245,39 @@ class covarianceMatrix( ancestryModule.ancestry ):
         if self.type==tokens.absoluteToken: return result
 
         # Make sure we have usable row data to rescale with
-        if rowData is None: 
-            rowData = self.ancestor.rowData.link.toPointwise_withLinearXYs()
+        if rowData is None:
+            rowData=copy.copy(self.ancestor.ancestor.rowData.link).toPointwise_withLinearXYs(lowerEps=lowerEps, upperEps=upperEps)
         if not isinstance( rowData, XYsModule.XYs1d ):
             raise TypeError( 'rowData must be of type XYs1d, found %s' % type(rowData) )
         gRowData = rowData.group( self.matrix.axes[2].values )
 
         # Only generate the column rescaling if we need to
         if not self.matrix.axes[1].style=='link':
-            if colData is None: 
-                colData = self.ancestor.columnData.link.toPointwise_withLinearXYs()
+            if colData is None:
+                colData = copy.copy(self.ancestor.ancestor.colData.link).toPointwise_withLinearXYs(lowerEps=lowerEps, upperEps=upperEps)
             if not isinstance( colData, XYsModule.XYs1d ):
                 raise TypeError( 'colData must be of type XYs1d, found %s' % type(colData) )
             gColData = colData.group( self.matrix.axes[1].values )
-        else: gColData = gRowData
-        
+        else:
+            colData=rowData
+            gColData=gRowData
+
         # Rescale!
         newData = []
-        for i,row in enumerate(self.matrix.array.constructArray()):
+        for i,row in enumerate(self.matrix.array.constructArray()[0:len(gRowData)]):
             newRow = []
-            for j, cell in enumerate(row):
-                newRow.append( gRowData[i][1]*gColData[j][1]*cell )
+            for j, cell in enumerate(row[0:len(gColData)]):
+                newRow.append( gRowData[i]*gColData[j]*cell )
             newData.append( newRow )
         result.matrix.data = newData
         result.type=tokens.absoluteToken
+
+        # Set the final units
+        if rowData.axes[0].unit == colData.axes[0].unit:
+            if rowData.axes[0].unit!='': result.matrix.axes[0].unit = rowData.axes[0].unit+'**2'
+        else:
+            result.matrix.axes[0].unit = rowData.axes[0].unit+'*'+colData.axes[0].unit
+
         return result
         
     def toRelative( self, rowData=None, colData=None ): 
@@ -276,7 +301,7 @@ class covarianceMatrix( ancestryModule.ancestry ):
 
         # Make sure we have usable row data to rescale with
         if rowData is None: 
-            rowData = self.ancestor.rowData.link.toPointwise_withLinearXYs(1e-8,1e-8)
+            rowData = copy.copy(self.ancestor.ancestor.rowData.link).toPointwise_withLinearXYs(lowerEps=lowerEps, upperEps=upperEps)
         if not isinstance( rowData, XYsModule.XYs1d ):
             raise TypeError( 'rowData must be of type XYs1d, found %s' % type(rowData) )
         gRowData = rowData.group( self.matrix.axes[2].values )
@@ -284,7 +309,7 @@ class covarianceMatrix( ancestryModule.ancestry ):
         # Only generate the column rescaling if we need to
         if not self.matrix.axes[1].style=='link':
             if colData is None: 
-                colData = self.ancestor.columnData.link.toPointwise_withLinearXYs(1e-8,1e-8)
+                colData = copy.copy(self.ancestor.ancestor.columnData.link).toPointwise_withLinearXYs(lowerEps=lowerEps, upperEps=upperEps)
             if not isinstance( colData, XYsModule.XYs1d ):
                 raise TypeError( 'colData must be of type XYs1d, found %s' % type(colData) )
             gColData = colData.group( self.matrix.axes[1].values )
@@ -295,10 +320,14 @@ class covarianceMatrix( ancestryModule.ancestry ):
         for i,row in enumerate(self.matrix.array.constructArray()):
             newRow = []
             for j, cell in enumerate(row):
-                newRow.append( cell/gRowData[i][1]/gColData[j][1] )
+                newRow.append( cell/gRowData[i]/gColData[j] )
             newData.append( newRow )
         result.matrix.data = newData
         result.type=tokens.relativeToken
+
+        # Set the final units
+        result.matrix.axes[0].unit = ''
+
         return result
         
     def check( self, info ): 
@@ -405,6 +434,8 @@ class covarianceMatrix( ancestryModule.ancestry ):
         :param groupUnit: a 2 element list containing the units in which group boundaries are 
                           specified for the rows and columns (respectively) of the covariance 
                           to be regrouped
+
+        :returns: the regrouped matrix (an xData.array.full as the array in a gridded2d.matrix)
             
         .. note::  We still need to do flux weighting
             
@@ -494,7 +525,7 @@ class covarianceMatrix( ancestryModule.ancestry ):
         basis1 = XYsModule.XYs1d( axes=axes1_, data=[ ( x, 0.0 ) for x in self.matrix.axes[axis1index].values ], interpolation='flat' )
         basis2 = basis2.convertAxisToUnit( 1, groupUnit[0] )
         basis1 = basis1.convertAxisToUnit( 1, groupUnit[1] )
-    
+
         # build the regrouping matrices for the two bases
         w0 = []
         for idx in range( self.matrix.array.shape[0] ):
@@ -521,31 +552,39 @@ class covarianceMatrix( ancestryModule.ancestry ):
         grouped.matrix.array = arrayModule.full(shape=gdata.shape,data=trigdata,symmetry=arrayModule.symmetryLowerToken)
         return grouped
 
-    def removeExtraZeros(self):
+    def removeExtraZeros(self, verbose=False):
         """
         Remove all extra zeros from the underlying matrix
         :return:
         """
-        matrix = self.matrix.array.constructArray()
+        theMatrix = self.matrix.array.constructArray()
         rowStart, colStart = 0,0
-        rowEnd, colEnd = matrix.shape
-        while numpy.all(matrix[rowStart,:]==0):
-            rowStart += 1
-        while numpy.all(matrix[:,colStart]==0):
-            colStart += 1
-        while numpy.all(matrix[rowEnd-1,:]==0):
-            rowEnd -= 1
-        while numpy.all(matrix[:,colEnd-1]==0):
-            colEnd -= 1
+        rowEnd, colEnd = theMatrix.shape
 
-        matrix = matrix[rowStart:rowEnd, colStart:colEnd]
+        if verbose: print 'before',theMatrix
+
+        # Figure out which end rows/columns are full of zeros.  We can remove those
+        while numpy.all(theMatrix[rowStart,:]==0): rowStart += 1
+        while numpy.all(theMatrix[:,colStart]==0): colStart += 1
+        while numpy.all(theMatrix[rowEnd-1,:]==0): rowEnd -= 1
+        while numpy.all(theMatrix[:,colEnd-1]==0): colEnd -= 1
+
+        theMatrix = theMatrix[rowStart:rowEnd, colStart:colEnd]
+
+        if verbose: print 'after',theMatrix
+
+        if verbose: print 'before',self.matrix.axes[-1].toXML(), self.matrix.axes[-2].toXML()
+
         if self.matrix.axes[-2].style=='link':
             assert (rowStart,rowEnd) == (colStart,colEnd)
-            self.matrix.axes[-1].__values = self.matrix.axes[-1].values[rowStart:rowEnd]
+            self.matrix.axes[-1].values.values = self.matrix.axes[-1].values[rowStart:rowEnd+1]
         else:
-            self.matrix.axes[-1].__values = self.matrix.axes[-1].values[rowStart:rowEnd]
-            self.matrix.axes[-2].__values = self.matrix.axes[-2].values[colStart:colEnd]
-        self.matrix.array = arrayModule.full(shape=matrix.shape,data=matrix[numpy.tri(matrix.shape[0])==1.0].tolist(),symmetry=arrayModule.symmetryLowerToken)
+            self.matrix.axes[-1].values.values = self.matrix.axes[-1].values[rowStart:rowEnd+1]
+            self.matrix.axes[-2].values.values = self.matrix.axes[-2].values[colStart:colEnd+1]
+
+        if verbose: print 'after',self.matrix.axes[-1].toXML(), self.matrix.axes[-2].toXML()
+
+        self.matrix.array = arrayModule.full(shape=theMatrix.shape,data=theMatrix[numpy.tri(theMatrix.shape[0])==1.0].tolist(),symmetry=arrayModule.symmetryLowerToken)
 
     def getUncertaintyVector( self, theData=None, relative=True ):
         """ 
@@ -576,16 +615,15 @@ class covarianceMatrix( ancestryModule.ancestry ):
         axes_ = axesModule.axes(
                                  labelsUnits={1:('energy_in',self.matrix.axes[2].unit),
                                               0:('uncertainty',yunit)} )
-        uncert = XYsModule.XYs1d( zip(energies,copy.deepcopy(diag)), axes=axes_, interpolation='flat',
-                                accuracy=0.0001, )    # what should accuracy be set to?
-        uncert = uncert.changeInterpolation('lin-lin',None,1e-8,1e-8)
+        uncert = XYsModule.XYs1d( zip( energies, copy.deepcopy( diag ) ), axes = axes_, interpolation = 'flat' )
+        uncert = uncert.changeInterpolation('lin-lin',accuracy=1e-3,lowerEps=1e-8,upperEps=1e-8)
 
         # do we need to convert absolute->relative or vice versa?
         if (relative and self.type==tokens.absoluteToken) or (not relative and self.type==tokens.relativeToken):
             if theData is None:
-                theData = self.ancestor.rowData.link.toPointwise_withLinearXYs(1e-8,1e-8)
+                theData = self.ancestor.rowData.link.toPointwise_withLinearXYs( lowerEps = 1e-8, upperEps = 1e-8 )
             try:
-                theData = theData.toPointwise_withLinearXYs(1e-8,1e-8)
+                theData = theData.toPointwise_withLinearXYs( lowerEps = 1e-8, upperEps = 1e-8 )
                 uncert, theData = uncert.mutualify(1e-8, 1e-8, False, theData, 1e-8, 1e-8, False)
                 if relative: #convert absolute to relative
                     uncert /= theData
@@ -611,14 +649,16 @@ class covarianceMatrix( ancestryModule.ancestry ):
         import matplotlib.pyplot as plt
         import numpy as np
         from matplotlib.collections import QuadMesh
-        
-        x = self.axes[0].data
-        if self.axes[1].mirrorOtherAxis:    y = self.axes[0].data 
-        else:                               y = self.axes[1].data 
 
-        X, Y = np.meshgrid( x, y )        
+        # determine where to get the settings for the potentially mirrored second axis
+        if self.matrix.axes[1].style == 'link': axis1index = 2
+        else:                                   axis1index = 1
+        x = self.matrix.axes[2].values
+        y = self.matrix.axes[axis1index].values
+
+        X, Y = np.meshgrid( x, y )
         XY = np.hstack((X.ravel()[:,np.newaxis], Y.ravel()[:,np.newaxis]))
-        Z = (np.array(self.matrix.data)).ravel()
+        Z = (self.matrix.array.constructArray()).ravel()
         
         ax = plt.subplot(1,1,1)
         if title is None: title = str( self.toXLink() )
@@ -643,15 +683,14 @@ class covarianceMatrix( ancestryModule.ancestry ):
         if xlog: ax.set_xscale( 'log' )
         if ylog: ax.set_yscale( 'log' )
 
-        xlabel = self.axes[0].label + ' (' + self.axes[0].unit +')'
-        if self.axes[1].mirrorOtherAxis:    ylabel = xlabel 
-        else:                               ylabel = self.axes[1].label + ' (' + self.axes[1].unit +')'
+        xlabel = self.matrix.axes[2].label + ' (' + self.matrix.axes[2].unit +')'
+        ylabel = self.matrix.axes[axis1index].label + ' (' + self.matrix.axes[axis1index].unit +')'
 
         ax.set_xlabel( xlabel )
         ax.set_ylabel( ylabel )
         cbar = plt.colorbar(qc)
         if scalelabel is not None: cbar.set_label(scalelabel)
-        else: cbar.set_label(str(self.type)+' covariance ('+str(self.axes[2].unit)+')')
+        else: cbar.set_label(str(self.type)+' covariance ('+str(self.matrix.axes[0].unit)+')')
         plt.show()
 
     def toXMLList( self, indent = '', **kwargs ) :
@@ -686,7 +725,7 @@ class covarianceMatrix( ancestryModule.ancestry ):
         energyBounds = None
         if element.get('energyBounds'):
             raise NotImplementedError("need to add support for incident energy bounds")
-        matrix_ = griddedModule.gridded.parseXMLNode( element[0], xPath, linkData )
+        matrix_ = griddedModule.gridded2d.parseXMLNode( element[0], xPath, linkData )
         CM = covarianceMatrix( label = element.get( 'label' ), type=element.get('type'), matrix=matrix_,
                 energyBounds=energyBounds, ENDFconversionFlag=element.get("ENDFconversionFlag") )
         xPath.pop()

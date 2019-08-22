@@ -63,14 +63,15 @@
 # 
 # <<END-copyright>>
 
-import sys, os, argparse
-import site_packages.legacy.toENDF6.toENDF6     # this import adds 'toENDF6' methods to many GND classes
-import site_packages.legacy.toENDF6.reactionSuite as rs
-import fudge.gnd.covariances.covarianceSuite as cs
+import argparse
+from fudge.gnd import reactionSuite
+from fudge.gnd.covariances import covarianceSuite
+import site_packages.legacy.toENDF6.toENDF6
+
+FIRSTLINE=" $Rev:: 700      $  $Date:: 2016-01-13#$                             1 0  0    0"
 
 def process_args():
-    # see http://docs.python.org/lib/optparse-tutorial.html
-    import argparse
+    '''Process command line options'''
     parser = argparse.ArgumentParser(description="translates GND formatted files back into the ENDF format")
     parser.add_argument('evaluation', help="evaluation to translate")
     parser.add_argument('-c', dest='covariance', default=None, help='optional covariance file')
@@ -78,10 +79,11 @@ def process_args():
     parser.add_argument("-q", action="store_false", dest="verbose", help="disable verbose output")
     return parser.parse_args()
 
-
 if __name__=="__main__":
     args=process_args()
-    gnd=rs.reactionSuiteModule.readXML( args.evaluation )
-    if args.covariance is not None: cov=cs.readXML( args.covariance )
+    gnd=reactionSuite.readXML( args.evaluation )
+    if args.covariance is not None: cov=covarianceSuite.readXML( args.covariance )
     else: cov=None
-    open( args.evaluation.replace('.gnd.xml','.endf'), mode='w' ).write(gnd.toENDF6( 'eval', {'verbosity':10}, covarianceSuite = cov ) )
+    outLines = gnd.toENDF6( 'eval', {'verbosity':args.verbose*10}, covarianceSuite = cov ).split('\n')
+    endfTxt='\n'.join([FIRSTLINE,outLines[1].replace('-1',' 8')]+outLines[2:])
+    open( args.evaluation.replace('.gnd.xml','.endf'), mode='w' ).write(endfTxt)

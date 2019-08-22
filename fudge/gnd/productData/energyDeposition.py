@@ -66,14 +66,19 @@ import xData.XYs as XYsModule
 import xData.regions as regionsModule
 from xData import gridded as griddedModule
 
-from fudge.processing import group as groupModule
-
 from fudge.gnd import tokens as tokensModule
 from fudge.gnd import abstractClasses as abstractClassesModule
 
 __metaclass__ = type
 
 averageProductEnergyToken = 'averageProductEnergy'
+
+def defaultAxes( energyUnit ) :
+
+    axes = axesModule.axes( rank = 2 )
+    axes[0] = axesModule.axis( averageProductEnergyToken, 0, energyUnit )
+    axes[1] = axesModule.axis( 'energy_in', 1, energyUnit )
+    return( axes )
 
 class baseEnergyDepositionForm( abstractClassesModule.form ) :
 
@@ -86,23 +91,13 @@ class XYs1d( baseEnergyDepositionForm, XYsModule.XYs1d ) :
         baseEnergyDepositionForm.__init__( self )
         XYsModule.XYs1d.__init__( self, **kwargs )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
         from fudge.processing import miscellaneous as miscellaneousModule
 
-        if( tempInfo['verbosity'] > 2 ) : print '%sProcessing XYs1d cross section' % indent
+        if( tempInfo['verbosity'] > 2 ) : print '%sMulti-grouping XYs1d average energy' % indent
 
-        energyDepositionGrouped = miscellaneousModule.groupOneFunctionAndFlux( style, tempInfo, self )
-        return( groupModule.toMultiGroup1d( multiGroup, style, tempInfo, self.axes, energyDepositionGrouped ) )
-
-    @staticmethod
-    def defaultAxes( energyUnit = 'eV', energyDepositionName = averageProductEnergyToken, energyDepositionUnit = None ) :
-
-        if( energyDepositionUnit is None ) : energyDepositionUnit = energyUnit
-        axes = axesModule.axes( rank = 2 )
-        axes[0] = axesModule.axis( energyDepositionName, 0, energyDepositionUnit )
-        axes[1] = axesModule.axis( 'energy_in', 1, energyUnit )
-        return( axes )
+        return( miscellaneousModule.groupFunctionCrossSectionAndFlux( gridded1d, style, tempInfo, self ) )
 
 class regions1d( baseEnergyDepositionForm, regionsModule.regions1d ) :
 
@@ -111,22 +106,25 @@ class regions1d( baseEnergyDepositionForm, regionsModule.regions1d ) :
         baseEnergyDepositionForm.__init__( self )
         regionsModule.regions1d.__init__( self, **kwargs )
 
+    def processMultiGroup( self, style, tempInfo, indent ) :
+
+        linear = self.toPointwise_withLinearXYs( accuracy = 1e-5, upperEps = 1e-8 )
+        return( linear.processMultiGroup( style, tempInfo, indent ) )
+
+    def toLinearXYsClass( self ) :
+
+        return( XYs1d )
+
     @staticmethod
     def allowedSubElements( ) :
 
         return( ( XYs1d, ) )
 
-    @staticmethod
-    def defaultAxes( energyUnit = 'eV', energyDepositionName = averageProductEnergyToken, energyDepositionUnit = None ) :
-
-        return( XYs1d.defaultAxes( energyUnit = energyUnit, energyDepositionName = energyDepositionName,
-                energyDepositionUnit = energyDepositionUnit ) )
-
-class multiGroup( baseEnergyDepositionForm, griddedModule.gridded ) :
+class gridded1d( baseEnergyDepositionForm, griddedModule.gridded1d ) :
 
     def __init__( self, **kwargs ) :
 
-        griddedModule.gridded.__init__( self, **kwargs )
+        griddedModule.gridded1d.__init__( self, **kwargs )
 #
 # energyDeposition component
 #
@@ -136,4 +134,4 @@ class component( abstractClassesModule.component ) :
 
     def __init__( self ) :
 
-        abstractClassesModule.component.__init__( self, ( XYs1d, regions1d, multiGroup ) )
+        abstractClassesModule.component.__init__( self, ( XYs1d, regions1d, gridded1d ) )

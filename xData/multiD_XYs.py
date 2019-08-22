@@ -94,6 +94,7 @@ from pqu import PQU
 class XYsnd( baseModule.xDataFunctional ) :
 
     __metaclass__ = abc.ABCMeta
+    ancestryMembers = ( '[functionals', )
 
     def __init__( self, interpolation = standardsModule.interpolation.linlinToken, axes = None,
             index = None, valueType = standardsModule.types.float64Token, value = None, label = None, 
@@ -102,7 +103,7 @@ class XYsnd( baseModule.xDataFunctional ) :
         Abstract base class constructor for XYsnd class.
         """
 
-        baseModule.xDataFunctional.__init__( self, self.moniker, self.dimension, axes, index = index, valueType = valueType,
+        baseModule.xDataFunctional.__init__( self, self.moniker, axes, index = index, valueType = valueType,
                 value = value, label = label )
 
         if( not( isinstance( interpolation, str ) ) ) : raise TypeError( 'interpolation must be a string' )
@@ -131,17 +132,17 @@ class XYsnd( baseModule.xDataFunctional ) :
                 raise ValueError( 'functional.value = %s is >= next functional.value = %s' % ( functional_.value, self.functionals[index_+1].value ) )
             self.functionals[index_] = functional_
 
-    def append( self, functional, makeCopy = True ) :
+    def append( self, functional ) :
 
-        self.insert( len( self ), functional, makeCopy = makeCopy )
+        self.insert( len( self ), functional )
 
-    def insert( self, index, functional, value = None, makeCopy = True ) :
+    def insert( self, index, functional, value = None ) :
         """
         Inserts functional at index. If value is None, value is take from the value of functional.
         """
 
         if( value is None ) : value = functional.value
-        index_, functional_ = self._set_insertCommon( index, value, functional, makeCopy = makeCopy )
+        index_, functional_ = self._set_insertCommon( index, value, functional )
         if( index_ is not None ) :
             if( ( index_ > 0 ) and ( value <= self.functionals[index_-1].value ) ) :
                 raise Exception( 'value = %s is <= prior functionals.value = %s' % ( value, self.functionals[index_-1].value ) )
@@ -149,7 +150,7 @@ class XYsnd( baseModule.xDataFunctional ) :
                 raise Exception( 'value = %s is >= next functionals.value = %s. index = %d' % ( value, self.functionals[index_].value, index_ ) )
             self.functionals.insert( index_, functional_ )
 
-    def insertAtValue( self, functional, value = None, makeCopy = True ) :
+    def insertAtValue( self, functional, value = None ) :
         """
         Inserts functional at the appropriate index for value. The inserted functional instance will have value value, 
         even if functional as a value.
@@ -167,13 +168,13 @@ class XYsnd( baseModule.xDataFunctional ) :
                 del self.functionals[index]
             elif( functional_.value < value ) :     # Happens when value is greater than last items value.
                 index += 1
-        self.insert( index, functional, value = value, makeCopy = makeCopy )
+        self.insert( index, functional, value = value )
 
     def pop( self, index ):
 
-        self.functionals.pop( index )
+        return self.functionals.pop( index )
 
-    def _set_insertCommon( self, index, value, functional, makeCopy = True ) :
+    def _set_insertCommon( self, index, value, functional ) :
         """For internal use only."""
 
         if( not( isinstance( functional, self.allowedSubElements( ) ) ) ) :
@@ -189,7 +190,6 @@ class XYsnd( baseModule.xDataFunctional ) :
         index_ = index
         if( index_ < 0 ) : index_ += n1
         if( index_ < 0 ) : raise IndexError( 'index = %s' % index )
-        if( makeCopy ) : functional = functional.copy( value = value, index = None )
         functional.setAncestor( self )
         if( n1 == 0 ) :
             self.functionals.append( functional )
@@ -201,26 +201,30 @@ class XYsnd( baseModule.xDataFunctional ) :
             return( None, None )
         return( ( index_, functional ) )
 
-    def copy( self, index = None, value = None, axes = None ) :
+    def convertUnits( self, unitMap ) :
+        """
+        unitMap is a dictionary of the for { 'eV' : 'MeV', 'b' : 'mb' }.
+        """
 
-        if( index is None ) : index = self.index
-        if( value is None ) : value = self.value
-        if( axes is None ) : axes = self.axes
-        multid_xys = self.__class__( interpolation = self.interpolation, index = index,
-                        value = value, axes = axes, interpolationQualifier = self.interpolationQualifier )
-        for i1, functional in enumerate( self ) : multid_xys[i1] = functional   # __setitem__ makes a copy.
+        for functional in self : functional.convertUnits( unitMap )
+        factors = self.axes.convertUnits( unitMap )
+        self.fixValuePerUnitChange( factors )
+
+    def copy( self ) :
+
+        axes = self.axes
+        if( axes is not None ) : axes = axes.copy( )
+        multid_xys = self.__class__( interpolation = self.interpolation, index = self.index,
+                value = self.value, axes = axes, interpolationQualifier = self.interpolationQualifier )
+        for i1, functional in enumerate( self ) : multid_xys[i1] = functional.copy( )
         return( multid_xys )
 
     __copy__ = copy
     __deepcopy__ = __copy__
 
-    def copyDataToNestedLists( self, *units ) :
+    def copyDataToNestedLists( self ) :
 
-        if( 0 ) :       # This needs to be fixed.
-            unitTo = None
-            if( len( units ) > 0 ) : unitTo = units[0]
-            return( [ [ subData.getValue( unitTo ), subData.copyDataToNestedLists( *units[1:] ) ] for subData in self ] )
-        return( [ [ subData.getValue( ), subData.copyDataToNestedLists( *units[1:] ) ] for subData in self ] )
+        return( [ [ subData.value, subData.copyDataToNestedLists( ) ] for subData in self ] )
 
     def evaluate( self, domainValue, extrapolation = standardsModule.noExtrapolationToken, epsilon = 0 ) :
         """
@@ -238,16 +242,19 @@ class XYsnd( baseModule.xDataFunctional ) :
         if( position is None ) : raise Exception( "No data to interpolate" )
 
         if( frac <= epsilon ) :             # If close to first point pick it.
-            function = function1.copy( value = value )
+            function = function1.copy( )
+            function.value = value
         if( ( 1 - frac ) <= epsilon ) :     # If close to second point pick it.
-            function = function2.copy( value = value )
+            function = function2.copy( )
+            function.value = value
         else :
             if( position in ( '=', '<', '>' ) ) :
                 if( position != '=' ) :
                     if( extrapolation != standardsModule.flatExtrapolationToken ) :
                         raise Exception( "evaluation point = %s %s than %s" % 
                                 ( value, { '<' : 'less', '>' : 'greater' }[position], self[0].value ) )
-                function = function1.copy( value = value )
+                function = function1.copy( )
+                function.value = value
             else :
                 if( not( isinstance( function1, XYsModule.XYs1d ) ) ) :      # FIXME, accuracy, lowerEps and upperEps should not be hardwired.
                     function1 = function1.toPointwise_withLinearXYs( accuracy = 1e-4, lowerEps = 1e-6, upperEps = 1e-6 )
@@ -264,11 +271,6 @@ class XYsnd( baseModule.xDataFunctional ) :
                     xy = f * function1 + ( 1. - f ) * function2
                 function = function1.returnAsClass( function1, xy, value = value )
         return( function )
-
-    def getValue( self, unitTo ) :
-
-        if( self.value is None ) : return( self.value )
-        return( self.domainUnitConversionFactor( unitTo ) * self.value )
 
     def integrate( self, **limits ):
         """
@@ -315,17 +317,24 @@ class XYsnd( baseModule.xDataFunctional ) :
         if( len( self ) == 0 ) : raise Exception( "No data to interpolate" )
         if( value < self[0].value ) :
             if( extrapolation == standardsModule.flatExtrapolationToken ) :
-                return( self[0].copy( value = value ) )
+                function = self[0].copy( )
+                function.value = value
+                return( function )
             else :
                 raise Exception( "Interpolation point = %s less than %s" % ( value, self[0].value ) )
         if( value > self[-1].value ) :
             if( extrapolation == standardsModule.flatExtrapolationToken ) :
-                return( self[-1].copy( value = value ) )
+                function = self[-1].copy( )
+                function.value = value
+                return( function )
             else :
                 raise Exception( "Interpolation point = %s greater than %s" % ( value, self[-1].value ) )
         for index, functional2 in enumerate( self ) :
             if( functional2.value >= value ) : break
-        if( value == functional2.value ) : return( functional2.copy( value = value ) )
+        if( value == functional2.value ) :
+            function = functional2.copy( )
+            function.value = value
+            return( function )
         functional1 = self[index-1]
 # FIXME: following logic only works if functional1 and functional2 are both XYs1d:
         if( unitBase ) :
@@ -368,39 +377,91 @@ class XYsnd( baseModule.xDataFunctional ) :
             for functional in multid_xys.functionals : functional.normalize( insitu = True, dimension = dimension )
         return( multid_xys )
 
-    def domainUnitConversionFactor( self, unitTo ) :
+    @property
+    def domainMin( self ) :
 
-        if( unitTo is None ) : return( 1. )
-        return( PQU.PQU( '1 ' + self.domainUnit( ) ).getValueAs( unitTo ) )
+        return( self.functionals[0].value )
 
-    def domainMin( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainMax( self ) :
 
-        return( PQU.valueOrPQ( self.functionals[0].value, unitFrom = self.getAxisUnitSafely( self.dimension ), unitTo = unitTo, asPQU = asPQU ) )
+        return( self.functionals[-1].value )
 
-    def domainMax( self, unitTo = None, asPQU = False ) :
-
-        return( PQU.valueOrPQ( self.functionals[-1].value, unitFrom = self.getAxisUnitSafely( self.dimension ), unitTo = unitTo, asPQU = asPQU ) )
-
-    def domain( self, unitTo = None, asPQU = False ) :
-
-        return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
-
-    def domainGrid( self, unitTo = None ) :
-
-        scale = self.domainUnitConversionFactor( unitTo )
-        return( [ scale * functional.value for functional in self ] )
-
+    @property
     def domainUnit( self ) :
 
         return( self.getAxisUnitSafely( self.dimension ) )
 
-    def rangeMin( self, unitTo = None, asPQU = False ) :
+    def domainUnitConversionFactor( self, unitTo ) :
 
-        return( min( [ func.rangeMin( unitTo = unitTo, asPQU = asPQU ) for func in self ] ) )
+        if( unitTo is None ) : return( 1. )
+        return( PQU.PQU( '1 ' + self.domainUnit ).getValueAs( unitTo ) )
 
-    def rangeMax( self, unitTo = None, asPQU = False ) :
+    @property
+    def domainGrid( self ) :
 
-        return( max( [ func.rangeMax( unitTo = unitTo, asPQU = asPQU ) for func in self ] ) )
+        return( [ functional.value for functional in self ] )
+
+    def domainSlice( self, domainMin = None, domainMax = None, fill = 1, dullEps = 0. ) :
+        """
+        Returns a new instance with self sliced between ``domainMin`` and ``domainMax``.
+
+        :param domainMin:   [optional] the lower x-value of the slice, default is domain minimum of self,
+        :param domainMax:   [optional] the upper x-value of the slice, default is domain maximum of self,
+        :param fill:        [optional] if True, points are added at domainMin and domainMax if they are not in self,
+                                       else only existing points in the range [domainMin, domainMax] are included.
+        :param dullEps:     [optional] (Currently not implemented) the lower and upper points are dulled, default is 0.
+        """
+
+        if( domainMin is None ) : domainMin = self.domainMin
+        domainMin = max( domainMin, self.domainMin )
+        if( domainMax is None ) : domainMax = self.domainMax
+        domainMax = max( domainMax, self.domainMax )
+
+        newMultiD = self.__class__( interpolation = self.interpolation,
+            axes = self.axes.copy( ), index = self.index, valueType = self.valueType, value = self.value,
+            label = self.label, interpolationQualifier = self.interpolationQualifier )
+
+        domainGrid = [ tmp.value for tmp in self ]
+        for idx1, val in enumerate( domainGrid ) :
+            if( val >= domainMin ) : break
+        for idx2, val in enumerate( domainGrid ) :
+            if( val >= domainMax ) : break
+
+        if( domainGrid[idx1] == domainMin ) :
+            newMultiD.append( self[idx1].copy( ) )
+            idx1 += 1
+        else :
+            newMultiD.append( self.evaluate( domainMin ) )
+
+        for idx in range( idx1, idx2 ) : newMultiD.append( self[idx].copy( ) )
+
+        if( domainGrid[idx2] == domainMax ) :
+            newMultiD.append( self[idx2].copy( ) )
+        else:
+            newMultiD.append( self.evaluate( domainMax ) )
+
+        return( newMultiD )
+
+    @property
+    def rangeMin( self ) :
+
+        return( min( [ func.rangeMin for func in self ] ) )
+
+    @property
+    def rangeMax( self ) :
+
+        return( max( [ func.rangeMax for func in self ] ) )
+
+    @property
+    def rangeUnit( self ) :
+
+        return( self.getAxisUnitSafely( 0 ) )
+
+    def rangeUnitConversionFactor( self, unitTo ) :
+
+        if( unitTo is None ) : return( 1. )
+        return( PQU.PQU( '1 ' + self.rangeUnit ).getValueAs( unitTo ) )
 
     def scaleDependent( self, value, insitu = False ) :
 
@@ -408,14 +469,18 @@ class XYsnd( baseModule.xDataFunctional ) :
         if( not( insitu ) ) : multid_xys = self.copy( )
         for functional in multid_xys : functional.scaleDependent( value, insitu = True )
 
-    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0, cls = None ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
+
+        arguments = self.getArguments( kwargs, { 'cls' : None } )
+        cls = arguments['cls']
+        kwargs.pop( 'cls', None )
 
         if( cls is None ) : cls = self.__class__
         newMultiD = cls( interpolation = self.interpolation, axes = self.axes, index = self.index,
                     valueType = self.valueType, value = self.value, label = self.label, 
                     interpolationQualifier = self.interpolationQualifier )
         for subsec in self:
-            newPW = subsec.toPointwise_withLinearXYs( accuracy = accuracy, lowerEps = lowerEps, upperEps = upperEps )
+            newPW = subsec.toPointwise_withLinearXYs( **kwargs )
             newPW.value = subsec.value
             newMultiD.append( newPW )
 
@@ -475,14 +540,11 @@ class XYsnd( baseModule.xDataFunctional ) :
 
         for subElement in xDataElement :
             if( subElement.tag == axesModule.axes.moniker ) :
-                if( axes is not None ) : Exception( 'Multiple "axes" elements present' )
+                if( axes is not None ) : raise Exception( 'Multiple "axes" elements present' )
                 axes = axesModule.axes.parseXMLNode( subElement, xPath, linkData )
 
         multid_xys = cls( axes = axes, **attrs )
-        childAxes = axesModule.axes( len(axes)-1 )
         uncertainties = None
-        for adx in range(len(childAxes)):
-            childAxes[adx] = axes[adx]
         for child in xDataElement :
             if( child.tag == axesModule.axes.moniker ) :
                 continue
@@ -496,17 +558,24 @@ class XYsnd( baseModule.xDataFunctional ) :
                         subElementClass = subElement
                         break
                 if( subElementClass is None ) : raise TypeError( 'unknown sub-element "%s" in element "%s"' % ( child.tag, cls.moniker ) )
-                xdata = subElementClass.parseXMLNode( child, xPath = xPath, linkData = linkData, axes = childAxes )
+                xdata = subElementClass.parseXMLNode( child, xPath = xPath, linkData = linkData, axes = axes )
                 multid_xys.append( xdata )
         if uncertainties is not None: multid_xys.uncertainties = uncertainties
 
         xPath.pop( )
         return( multid_xys )
 
-    @staticmethod
-    def defaultAxes( labelsUnits = {} ) :
+    @classmethod
+    def defaultAxes( cls, labelsUnits ) :
+        """
+        :param labelsUnits: dictionary of form {
+                 0:('dependent label','dependent unit'),
+                 1:('1st independent label','1st independent unit'),
+                 2:('2nd independent label','2nd independent unit'), ... }
+        :return: new axes instance
+        """
 
-        return( axesModule.defaultAxes( rank = self.dimension + 1, labelsUnits = labelsUnits ) )
+        return( axesModule.axes( rank = cls.dimension + 1, labelsUnits = labelsUnits ) )
 
 class XYs2d( XYsnd ) :
 

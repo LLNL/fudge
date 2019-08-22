@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4. Digging deeper in Fudge &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="4.1. Cross sections" href="crossSections.html" />
+    <link rel="prev" title="3. Navigating" href="navigating.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="crossSections.html" title="4.1. Cross sections"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="navigating.html" title="3. Navigating"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">The Fudge Tutorial</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="digging-deeper-in-fudge">
+<h1>4. Digging deeper in <code class="docutils literal"><span class="pre">Fudge</span></code><a class="headerlink" href="#digging-deeper-in-fudge" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="crossSections.html">4.1. Cross sections</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="crossSections.html#types-of-cross-section-data">4.1.1. Types of cross section data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="crossSections.html#plotting">4.1.2. Plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="crossSections.html#integral-checks">4.1.3. Integral checks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="resonances.html">4.2. Resonances</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="resonances.html#resolved">4.2.1. Resolved</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resonances.html#unresolved">4.2.2. Unresolved</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resonances.html#resonance-reconstruction">4.2.3. Resonance reconstruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="resonances.html#angular-distributions-from-resonances">4.2.4. Angular distributions from resonances</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="outgoingDistributions.html">4.3. Outgoing Distributions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="outgoingDistributions.html#angular-distributions">4.3.1. Angular distributions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outgoingDistributions.html#energy-distributions">4.3.2. Energy distributions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outgoingDistributions.html#joint-energy-angle-distributions">4.3.3. Joint energy-angle distributions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outgoingDistributions.html#multiplicity">4.3.4. Multiplicity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outgoingDistributions.html#where-are-the-discrete-gammas">4.3.5. Where are the discrete gammas?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fission.html">4.4. Fission</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fission.html#first-second-third-chance">4.4.1. First, second, third chance, ...</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fission.html#the-cross-section">4.4.2. The cross section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fission.html#nubar">4.4.3. nubar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fission.html#pfns">4.4.4. PFNS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fission.html#gammas">4.4.5. Gammas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fission.html#energy-release">4.4.6. Energy release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fission.html#delayed-neutrons">4.4.7. Delayed neutrons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fission.html#fission-product-yields">4.4.8. Fission product yields</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="summedReactions.html">4.5. Summed Reactions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="covariances.html">4.6. Covariances</a></li>
+<li class="toctree-l1"><a class="reference internal" href="particles.html">4.7. Particles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="particles.html#nuclei-and-their-properties">4.7.1. Nuclei and their properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="particles.html#transportable-particles">4.7.2. Transportable particles</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fudgeisms.html">4.8. <code class="docutils literal"><span class="pre">Fudge</span></code> idiosyncrasies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fudgeisms.html#the-concept-of-styles">4.8.1. The concept of styles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fudgeisms.html#data-components">4.8.2. Data components</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/gnd.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="navigating.html"
+                        title="previous chapter">3. Navigating</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="crossSections.html"
+                        title="next chapter">4.1. Cross sections</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/tutorial/diggingDeeper.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="crossSections.html" title="4.1. Cross sections"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="navigating.html" title="3. Navigating"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >The Fudge Tutorial</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

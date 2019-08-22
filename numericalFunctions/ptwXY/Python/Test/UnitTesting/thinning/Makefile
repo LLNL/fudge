@@ -67,6 +67,7 @@ default:
 
 check:
 	python thin.py
+	python thinDomain.py
 
 clean:
 

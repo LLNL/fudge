@@ -93,7 +93,7 @@ def runningYSum( data, normalize = False ) :
     for xy in data :
         x2 = xy[0]
         y2 = xy[1]
-        if ( x1 == None ) :
+        if ( x1 is None ) :
             Sum = 0.
         else :
             Sum += 0.5 * ( y2 + y1 ) * ( x2 - x1 )
@@ -115,11 +115,11 @@ def ZSum( data ) :
     return endl2dmathClasses.endl2dmath( d2, checkDataType = 0 )
 
 def YSum( data ) :
-    "Returns the area under the curve y(x). Data must be list of list( x, y )."
+    """Returns the area under the curve y(x). Data must be list of list( x, y )."""
 
     x1 = None
     for x2, y2 in data :
-        if ( x1 == None ) :
+        if ( x1 is None ) :
             Sum = 0.
         else :
             Sum += ( y2 + y1 ) * ( x2 - x1 )
@@ -154,14 +154,14 @@ class fastSumOfManyAddends :
 
         n = len( self.list )
         for i in xrange( n ) :
-            if( self.list[i] == None ) :
+            if( self.list[i] is None ) :
                 self.list[i] = addend
                 addend = None
                 break
             else :
                 addend = addend + self.list[i]
                 self.list[i] = None
-        if( addend != None ) : self.list.append( addend )
+        if( addend is not None ) : self.list.append( addend )
 
     def clear( self ) :
         """Clears currently summed data."""
@@ -173,8 +173,8 @@ class fastSumOfManyAddends :
 
         s = None
         for l in self.list :
-            if( l != None ) :
-                if( s == None ) :
+            if( l is not None ) :
+                if( s is None ) :
                     s = l
                 else :
                     s = s + l

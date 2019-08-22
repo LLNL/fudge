@@ -66,7 +66,6 @@ weightedPointwiseFormToken = 'weightedPointwise'
 groupedFormToken = 'grouped'
 groupedWithCrossSectionFormToken = 'groupedWithCrossSection'
 referenceFormToken = 'reference'
-polynomialFormToken = 'polynomial'
 partialProductionFormToken = 'partialProduction'
 
 promptToken = 'prompt'

@@ -1570,10 +1570,9 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
         if version is not None:
             import warnings
             warnings.warn(
-                """The "version" argument to ArgumentParser is deprecated. """
-                """Please use """
-                """"add_argument(..., action='version', version="N", ...)" """
-                """instead""", DeprecationWarning)
+                """The "version" argument to ArgumentParser is deprecated. 
+                Please use "add_argument(..., action='version', version="N", ...)" instead
+                """, DeprecationWarning)
 
         superinit = super(ArgumentParser, self).__init__
         superinit(description=description,

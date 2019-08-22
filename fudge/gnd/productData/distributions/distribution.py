@@ -65,11 +65,16 @@
 
 from fudge.core.utilities import brb
 
+from PoPs import IDs as IDsPoPsModule
+
 from fudge.gnd import abstractClasses as abstractClassesModule
+from xData import standards as standardsModule
 
 from . import angular as angularModule
 from . import energy as energyModule
 from . import energyAngular as energyAngularModule
+from . import energyAngularMC as energyAngularMCModule
+from . import angularEnergyMC as angularEnergyMCModule
 from . import KalbachMann as KalbachMannModule
 from . import angularEnergy as angularEnergyModule
 from . import uncorrelated as uncorrelatedModule
@@ -91,11 +96,12 @@ class component( abstractClassesModule.component ) :
     def __init__( self ) :
 
         abstractClassesModule.component.__init__( self, ( angularModule.form, angularModule.twoBodyForm,
-                angularModule.CoulombExpansionForm, angularModule.NuclearPlusCoulombInterferenceForm,
-                energyModule.form, KalbachMannModule.form,
-                energyAngularModule.form, angularEnergyModule.form, angularEnergyModule.form,
+                KalbachMannModule.form,
+                energyAngularModule.form, energyAngularMCModule.form,
+                angularEnergyModule.form, angularEnergyMCModule.form,
                 angularEnergyModule.LLNLAngularEnergyForm,
                 uncorrelatedModule.form, LegendreModule.form, referenceModule.form,
+                referenceModule.CoulombElasticReferenceForm,
                 photonScatteringModule.incoherent.form, photonScatteringModule.coherent.form, 
                 multiGroupModule.form, 
                 unspecifiedModule.form, unknownModule.form ) )
@@ -107,10 +113,75 @@ class component( abstractClassesModule.component ) :
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
-        form = style.findFormMatchingDerivedStyles( self )
+        form = style.findFormMatchingDerivedStyle( self )
         if( form is None ) : raise Exception( 'No matching style' )
-#        print form.moniker
         return( form.calculateAverageProductData( style, indent = indent, **kwargs ) )
+
+    def check( self, info ):
+        """check all distribution forms"""
+        from fudge.gnd import warning
+        warnings = []
+
+        for form in self:
+
+            if info['isTwoBody']:
+                if( form.productFrame != standardsModule.frames.centerOfMassToken ) :
+                    warnings.append( warning.wrong2BodyFrame( form ) )
+
+                if form.moniker not in (angularModule.twoBodyForm.moniker,
+                                        referenceModule.form.moniker,
+                                        referenceModule.CoulombElasticReferenceForm.moniker,
+                                        unspecifiedModule.form.moniker):
+                    warnings.append( warning.wrongDistributionComponent( form.moniker, '2-body' ) )
+            else:
+                if form.moniker in (angularModule.twoBodyForm.moniker,
+                                    angularModule.form.moniker,
+                                    energyModule.form.moniker):
+                    warnings.append( warning.wrongDistributionComponent( form.moniker, 'N-body' ) )
+
+            def checkSubform( subform, contextMessage ):
+                distributionErrors = []
+                if hasattr(subform, 'domainMin') and (subform.domainMin, subform.domainMax) != info['crossSectionDomain']:
+                    domain = (subform.domainMin, subform.domainMax)
+                    # For gamma products, domainMin should be >= cross section start, upper bounds should match.
+                    if( self.getAncestor( ).id == IDsPoPsModule.photon ) :
+                        startRatio = subform.domainMin / info['crossSectionDomain'][0]
+                        endRatio = subform.domainMax / info['crossSectionDomain'][1]
+                        if (startRatio < 1-standardsModule.floats.epsilon or endRatio < 1-standardsModule.floats.epsilon
+                                or endRatio > 1+standardsModule.floats.epsilon):
+                            distributionErrors.append( warning.domain_mismatch(
+                                    *(domain + info['crossSectionDomain']), obj=subform ) )
+                    # For all other products, check lower and upper edges: only warn if they disagree by > eps
+                    else:
+                        for e1,e2 in zip(domain, info['crossSectionDomain']):
+                            ratio = e1 / e2
+                            if (ratio < 1-standardsModule.floats.epsilon or ratio > 1+standardsModule.floats.epsilon):
+                                distributionErrors.append( warning.domain_mismatch(
+                                        *(domain + info['crossSectionDomain']), obj=subform ) )
+                                break
+                    if not hasattr(subform,'check'):
+                        distributionErrors.append( warning.NotImplemented(subform.moniker, subform ) )
+                        if info['failOnException']:
+                            raise NotImplementedError("Checking distribution form '%s'" % subform.moniker)
+                else:
+                    distributionErrors += subform.check( info )
+                if distributionErrors:
+                    warnings.append( warning.context( contextMessage + " - %s:" % subform.moniker, distributionErrors) )
+
+            if isinstance(form, uncorrelatedModule.form):
+                for subformName in ('angularSubform','energySubform'):
+                    subform = getattr(form, subformName ).data
+                    checkSubform( subform, 'uncorrelated - ' + subformName.replace('Subform','') )
+
+            elif isinstance(form, KalbachMannModule.form):
+                checkSubform( form, form.moniker )
+
+            else:
+                for subform in form.subforms:
+                    checkSubform( subform, form.moniker )
+
+        return warnings
+
 
     def findEntity( self, entityName, attribute = None, value = None ):
         """
@@ -124,7 +195,7 @@ class component( abstractClassesModule.component ) :
             for entity in self:
                 if entity.moniker == entityName:
                     return entity
-        raise KeyError( "Can't find entity '%s' in distributions!" % entityName )
+        return abstractClassesModule.component.findEntity( self, entityName, attribute, value )
 
     def hasData( self ) :
         """
@@ -135,6 +206,6 @@ class component( abstractClassesModule.component ) :
             if( not( isinstance( form, ( unspecifiedModule.form, unknownModule.form ) ) ) ) : return( True )
         return( False )
 
-    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
 
-        return( self.getEvaluated( ).toPointwise_withLinearXYs( accuracy, lowerEps, upperEps ) )
+        return( self.getEvaluated( ).toPointwise_withLinearXYs( **kwargs ) )

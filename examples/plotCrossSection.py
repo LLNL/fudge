@@ -71,6 +71,7 @@ import os
 import sys
 from fudge.core.utilities import argparse
 
+from fudge.gnd import styles as stylesModule
 from fudge.gnd.reactionData import crossSection as crossSectionModule
 
 exampleDir = os.path.dirname( os.path.abspath( __file__ ) )
@@ -82,7 +83,7 @@ a GND or ENDF-formatted file """ )
 parser.add_argument('file', metavar='file', type=str, nargs=1, help='ENDF or GND file with cross section data')
 parser.add_argument('mt', metavar='mt', type=int, nargs='+', help='MT number(s) to plot')
 parser.add_argument('--temp', dest='temp', type=str, default=False, help="""Optional temperature for heating.
-Temperature should be given as a string with units. Possible values are '1200 K' or '0.1 eV' (quotes are required)""")
+Temperature should be given as a string with units. Possible values are '1200 K' or '0.1 eV/k' (quotes are required)""")
 args = parser.parse_args()
 
 filename = args.file[0]
@@ -98,23 +99,21 @@ reconstructed = False
 
 data = {}
 for MT in args.mt:
-    reac = [ r for r in (RS.reactions + RS.summedReactions) if r.ENDF_MT == MT ]
+    reac = [ r for r in RS if r.ENDF_MT == MT and hasattr(r,'crossSection') ]
     if not reac: print ("MT %i not present in the file" % MT); continue
     reac = reac[0]
 
-    if( isinstance( reac.crossSection.evaluated, crossSectionModule.resonancesWithBackground ) and not reconstructed ) :
-        RS.reconstructResonances( styleName='reconstructed', accuracy=0.001 )
-        reconstructed = True
-
     if args.temp:
-        import pqu
-        data[MT] = reac.crossSection.heat( pqu.PQU(args.temp), pqu.PQU('1e-5 eV') )
-    elif 'pointwise' in reac.crossSection.forms:
-        data[MT] = reac.crossSection['pointwise']
+        from fudge.gnd import physicalQuantity
+        from pqu import PQU
+        temp = PQU.PQU( args.temp )
+        heatedStyle = stylesModule.heated( 'heated', derivedFrom=RS.styles.getEvaluatedStyle().label,
+                temperature=physicalQuantity.temperature( temp.value, temp.unit ) )
+        data[MT] = reac.crossSection.heat( heatedStyle, EMin=PQU.PQU(1e-5,'eV') )
     else:
-        xsc = [form for form in reac.crossSection.forms.values() if hasattr(form, 'toPointwise_withLinearXYs')]
+        xsc = [form for form in reac.crossSection if hasattr(form, 'toPointwise_withLinearXYs')]
         if len(xsc)>0:
-            data[MT] = xsc[0].toPointwise_withLinearXYs(1e-8,0)
+            data[MT] = xsc[0].toPointwise_withLinearXYs( accuracy = 1e-3, lowerEps = 1e-8 )
         else: print("Don't know how to plot cross section form(s): %s" % reac.crossSection.forms.keys())
 
     

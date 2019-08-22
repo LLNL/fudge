@@ -80,13 +80,14 @@ class TestPointwise( unittest.TestCase ):
         ptwise_const=XYs1d(axes=XYs1d.defaultAxes(labelsUnits={ \
                 XYs.yAxisIndex : ( 'crossSection', 'b' ), \
                 XYs.xAxisIndex : ( 'energy_in', 'eV' ) }), data=[ [1e-5,1.0], [20.0e6,1.0] ] )
-        self.assertEqual(ptwise_const.domainUnit( ), 'eV' )
+        self.assertEqual(ptwise_const.domainUnit, 'eV' )
         self.assertEqual(ptwise_const.toXMLList(), [\
             '<XYs1d>',\
             '  <axes>',\
             '    <axis index="1" label="energy_in" unit="eV"/>',\
             '    <axis index="0" label="crossSection" unit="b"/></axes>',\
-            '  <values length="4">1e-5 1 2e7 1</values></XYs1d>'] )
+            '  <values length="4">',
+            '    1.00000000e-05 1.000000e+00 2.00000000e+07 1.000000e+00</values></XYs1d>'] )
             
     def test_group(self):
         ptwise=XYs1d(axes=XYs1d.defaultAxes(), data=[
@@ -130,7 +131,7 @@ class TestCrossSection( unittest.TestCase ):
         self.assertTrue( isinstance( self.xs_const, component ) )
         self.assertEqual( self.xs_const.attribute, None )
         self.assertEqual( self.xs_const.moniker, 'crossSection' )
-        self.assertEqual( self.xs_const.domainUnit(), 'eV' )
+        self.assertEqual( self.xs_const.domainUnit, 'eV' )
         
     def test_xlink(self):
         self.assertEqual( self.xs_const.toRelativeXLink(), '' )
@@ -153,7 +154,7 @@ class TestCrossSection( unittest.TestCase ):
         pass
 
     def test_forms(self):
-        self.assertItemsEqual( [x.moniker for x in self.xs_const.allowedClasses], ['XYs1d','regions1d','gridded','resonanceRegion','resonancesWithBackground', 'weightedPointwise', 'reference'] )
+        self.assertItemsEqual( [x.moniker for x in self.xs_const.allowedClasses], ['XYs1d','regions1d','gridded1d','resonanceRegion','resonancesWithBackground', 'weightedPointwise', 'reference'] )
         self.xs_const.remove('gridded')
 
     def test_evaluated(self):
@@ -163,19 +164,22 @@ class TestCrossSection( unittest.TestCase ):
         
     def test_domains(self):
         for form in self.xs_const:
-            self.assertEqual(form.domainMax(), 20e6 )
-            self.assertEqual(form.domainMax(), 20.0e6 )
-            self.assertEqual(form.domainMin(), 1.0e-5 )
+            self.assertEqual(form.domainMax, 20e6 )
+            self.assertEqual(form.domainMax, 20.0e6 )
+            self.assertEqual(form.domainMin, 1.0e-5 )
             self.assertEqual(form.domainUnitConversionFactor('MeV'), 1e-6 )
-            self.assertEqual(form.domain(), (1e-05, 20000000.0) )
-            self.assertEqual(form.domainUnit(), 'eV' )
-        self.assertEqual( self.xs_const.domainMax(), 20.0e6 )
-        self.assertEqual( self.xs_const.domainMin(), 1.0e-5 )
+            self.assertEqual(form.domainMin, 1e-05 )
+            self.assertEqual(form.domainMax, 20000000.0 )
+            self.assertEqual(form.domainUnit, 'eV' )
+        self.assertEqual( self.xs_const.domainMax, 20.0e6 )
+        self.assertEqual( self.xs_const.domainMin, 1.0e-5 )
         self.assertEqual( self.xs_const.domainUnitConversionFactor('MeV'), 1e-6 )
-        self.assertEqual( self.xs_const.domain(), (1e-05, 20000000.0) )
-        self.assertEqual( self.xs_const.domainUnit(), 'eV' )
+        self.assertEqual( self.xs_const.domainMin, 1e-05 )
+        self.assertEqual( self.xs_const.domainMax, 20000000.0 )
+        self.assertEqual( self.xs_const.domainUnit, 'eV' )
 
     def test_check(self):
+        from pqu import PQU
         info = {'Q':1.0,'kinematicFactor':1.0,'dThreshold':PQU.PQU('1e-4 b'),'crossSectionEnergyMax':PQU.PQU('20.0 MeV'),'CoulombChannel':False}
         self.assertEqual( self.xs_const.check(info), [] )
 
@@ -187,7 +191,8 @@ class TestCrossSection( unittest.TestCase ):
             '    <axes>',
             '      <axis index="1" label="energy_in" unit="eV"/>',
             '      <axis index="0" label="crossSection" unit="b"/></axes>',
-            '    <values length="4">1e-5 1 2e7 1</values></XYs1d></crossSection>'] )
+            '    <values length="4">',
+            '      1.00000000e-05 1.000000e+00 2.00000000e+07 1.000000e+00</values></XYs1d></crossSection>'] )
     
 
 

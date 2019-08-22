@@ -1,0 +1,47 @@
+The data in this directory is Legendre expansions of energy-angle
+probability densities, and the format is that of ENDF.  The data is
+given in the laboratory frame for most of these files.
+
+The various versions are as follows.
+
+in.ENDFLegendre-Fe56: a file with interpolation by cumulative points.
+  It integrates using adaptive quadrature.  Its output
+  is out.Legendre-Fe56.  The Monte Carlo code MC_merced produces
+  the output out.Legendre-Fe56.MC.
+
+in.ENDFLegendre-Fe56.Gauss2: specifies that 2nd-order Gaussian quadrature
+  be used.  Its timing is virtually the same as the adaptive version,
+  and the accuracy is not great.  The output is out.Legendre-Fe56.Gauss2.
+
+in.ENDFLegendre-Fe56.Gauss4: specifies that 4th-order Gaussian quadrature
+  be used.  Its timing is virtually the same as the adaptive version,
+  and the accuracy is not bad.  The output is out.Legendre-Fe56.Gauss2.
+
+ENDFLegendre-Fe56.high: a file to test whether the code properly handles
+  data with threshold above 20 MeV.
+
+in.unitbase-Ti49: a file with unit-base interpolation for incident energy
+  and linear-linear for outgoing energy.  The output is out.unitbase-Ti49.
+  The output from the Monte Carlo code is out.unitbase-Ti49.MC.
+
+in.direct-Ti49: a file with linear-linear direct interpolation for incident energy
+  and linear-linear for outgoing energy.  The output is out.direct-Ti49.
+
+in.cumpoints-Ti49: a file with linear-linear cumulative points interpolation for
+  incident energy and linear-linear for outgoing energy.  The output is
+  out.cumpoints-Ti49.
+
+in.Fm255_n_3n.cm: a file with Legendre coefficients given in the center-of-mass
+  frame.  The interpolation in outgoing energy is linear-linear.  The output
+  is out.Fm255_n_3n.cm.  The Monte Carlo code MC_merced produces the output
+  out.Fm255_n_3n.cm.MC.
+
+in.Mo92.cm: Legendre coefficients in the center-of-mass frame, but with
+  histogram interpolation in outgoing energy.  The output file is out.Mo92.cm.
+  The Monte Carlo code MC_merced produces the output out.Mo92.cm.MC.
+
+in.Fe56-flat: The same data as in ENDFLegendre-Fe56, but it uses histogram
+  interpolation in incident energy.  Its output is out.Fe56-flat.
+
+Fe56-linlin: a file almost equivalent to Fe56-flat.  Instead of histograms,
+  it uses linear-linear interpolation in incident energy with steep ramps.

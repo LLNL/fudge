@@ -69,11 +69,10 @@ import fudge
 from fudge.core.math import fudgemath
 from fudge.core.utilities import brb
 
+from PoPs import IDs as IDsPoPsModule
+
 import xData.standards as standardsModule
 import xData.ancestry as ancestryModule
-
-from fudge.gnd.productData import energyDeposition as energyDepositionModule
-from fudge.gnd.productData import momentumDeposition as momentumDepositionModule
 
 import angular as angularModule
 import energy as energyModule
@@ -83,6 +82,8 @@ from . import base as baseModule
 __metaclass__ = type
 
 class subform( ancestryModule.ancestry ) :
+
+    ancestryMembers = ( 'data', )
 
     def __init__( self, data, dataSubform ) :
 
@@ -96,6 +97,15 @@ class subform( ancestryModule.ancestry ) :
 
         return( self.getAncestor( ).productFrame )
 
+    def convertUnits( self, unitMap ) :
+        "See documentation for reactionSuite.convertUnits."
+
+        self.data.convertUnits( unitMap )
+
+    def copy( self ) :
+
+        return( self.__class__( self.data.copy( ) ) )
+
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
@@ -104,6 +114,12 @@ class subform( ancestryModule.ancestry ) :
         xmlStringList += self.data.toXMLList( indent2, **kwargs )
         xmlStringList[-1] += "</%s>" % self.moniker
         return( xmlStringList )
+
+    def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
+
+        data = self.data.to_xs_pdf_cdf1d( style, tempInfo, indent )
+        if( data is None ) : return( None )
+        return( self.__class__( data ) )
 
 class angularSubform( subform ) :
 
@@ -129,8 +145,9 @@ class form( baseModule.form ) :
 
     moniker = 'uncorrelated'
     subformAttributes = ( 'angularSubform', 'energySubform' )
+    ancestryMembers = subformAttributes
 
-    def __init__( self, label, productFrame, _angularSubform, _energySubform, makeCopy = True ) :
+    def __init__( self, label, productFrame, _angularSubform, _energySubform ) :
 
         if( not isinstance( _angularSubform, angularSubform ) ) : raise TypeError( "Needed angular distribution subform, got %s" %str(_angularSubform.__class__) )
         if( not isinstance( _energySubform, energySubform ) ) : raise TypeError( "Needed energy distribution subform, got %s" % str(_energySubform.__class__) )
@@ -141,13 +158,13 @@ class form( baseModule.form ) :
 
         if( isinstance( self.angularSubform.data, angularModule.regions2d ) ) :
             raise Exception( 'regions2d angular is currently not supported' )
-        if( isinstance( self.energySubform.data, energyModule.regions2d ) ) :
 
+        if( isinstance( self.energySubform.data, energyModule.regions2d ) ) :
             aveEnergies = []
             aveMomenta = []
             EMax = kwargs['EMax']
             for i1, energySubform in enumerate( self.energySubform.data ) :
-                kwargs['EMax'] = energySubform.domainMax( )
+                kwargs['EMax'] = energySubform.domainMax
                 if( i1 == ( len( self.energySubform.data ) - 1 ) ) : kwargs['EMax'] = EMax
                 aveEnergy, aveMomentum = calculateAverageProductData( self.productFrame, self.angularSubform.data, energySubform,
                         style, indent, **kwargs )
@@ -174,7 +191,19 @@ class form( baseModule.form ) :
         elif self.angularSubform.moniker == entityName: return self.angularSubform
         return ancestryModule.ancestry.findEntity( self, entityName, attribute, value )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMC( self, style, tempInfo, indent ) :
+
+        _angularSubform = self.angularSubform.to_xs_pdf_cdf1d( style, tempInfo, indent )
+        _energySubform = self.energySubform.to_xs_pdf_cdf1d( style, tempInfo, indent )
+        if( ( _angularSubform is not None ) or ( _energySubform is not None ) ) :
+            if( _angularSubform is None ) : _angularSubform = self.angularSubform.copy( )
+            if( _energySubform is None ) : _energySubform = self.energySubform.copy( )
+            _form = form( style.label, self.productFrame, _angularSubform, _energySubform )
+        else :
+            _form = None
+        return( _form )
+
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
         from fudge.processing import group as groupModule
         from fudge.processing.deterministic import transferMatrices as transferMatricesModule
@@ -192,11 +221,12 @@ class form( baseModule.form ) :
 
         crossSection = tempInfo['crossSection']
         product = tempInfo['product']
-        if( isinstance( energySubform, energyModule.constant ) ) :
-            if( product.name == 'gamma' ) :
+        if( isinstance( energySubform, energyModule.discreteGamma ) ) :
+            if( product.id == IDsPoPsModule.photon ) :
                 Ep = float( energySubform.value )
                 TM_1, TM_E = transferMatricesModule.discreteGammaAngularData( style, tempInfo, Ep, crossSection,
-                        angularSubform, 1., comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % productLabel )
+                        angularSubform, multiplicity = product.multiplicity.evaluated,
+                        comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % productLabel )
             else :
                 raise Exception( 'See Bret' )
         else :
@@ -213,18 +243,17 @@ class form( baseModule.form ) :
 
         return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
 
-    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
+    def toPointwise_withLinearXYs( self, **kwargs ) :
 
         import angularEnergy
 
-        angularSubform = self.angularSubform.toPointwise_withLinearXYs( accuracy = accuracy, lowerEps = lowerEps, upperEps = upperEps )
-        energySubform = self.energySubform.toPointwise_withLinearXYs( accuracy = accuracy, lowerEps = lowerEps, upperEps = upperEps )
-        grid = angularSubform.domainGrid( )
-        for e in energySubform.domainGrid( ) :
+        angularSubform = self.angularSubform.toPointwise_withLinearXYs( **kwargs )
+        energySubform = self.energySubform.toPointwise_withLinearXYs( **kwargs )
+        grid = angularSubform.domainGrid
+        for e in energySubform.domainGrid :
             if( e not in grid ) : grid.append( e )
         grid.sort( )
-        axes = angularEnergy.XYs3d.defaultAxes( energyUnit = energySubform.axes[2].unit, energy_outUnit = energySubform.axes[1].unit,
-            probabilityUnit = energySubform.axes[0].unit )
+        axes = angularEnergy.defaultAxes( energyUnit = energySubform.axes[-1].unit )
         f_E_mu_Ep = angularEnergy.XYs3d( axes = axes )
         for e in grid :
             f_mu_Ep = angularEnergy.XYs2d( value = e )
@@ -267,8 +296,7 @@ class form( baseModule.form ) :
                 _energySubform = energySubform( energyModule.form.parseXMLNode( child[0], xPath, linkData ) )
             else :
                 raise ValueError( 'unsupported tag = "%s"' % child.tag )
-        uncorrelated = form( element.get( 'label' ), element.get( 'productFrame' ),
-                _angularSubform, _energySubform, makeCopy=False )
+        uncorrelated = form( element.get( 'label' ), element.get( 'productFrame' ), _angularSubform, _energySubform )
         xPath.pop( )
         return( uncorrelated )
 
@@ -289,7 +317,7 @@ def calculateAverageProductData( productFrame, angularSubform, energySubform, st
             A_Ein = self.massRatio * Ein
             if( not( self.angularSubform.isIsotropic( ) ) ) : averageEp += 2 * math.sqrt( A_Ein * averageEp ) * self.angularSubform.averageMu( Ein )
             averageEp += A_Ein
-        averageEp *= self.multiplicity.getValue( Ein )
+        averageEp *= self.multiplicity.evaluate( Ein )
         return( averageEp )
 
     def calculateAverageMomentum( self, Ein ) :
@@ -297,13 +325,13 @@ def calculateAverageProductData( productFrame, angularSubform, energySubform, st
         pp, averageMu = 0., self.angularSubform.averageMu( E )
         if( averageMu != 0. ) : pp = energySubform.sqrtEp_AverageAtE( E ) * averageMu
         if( self.productFrame == standardsModule.frames.centerOfMassToken ) : pp += math.sqrt( self.massRatio * Ein )
-        return( multiplicity.getValue( E ) * math.sqrt( 2. * self.productMass ) * pp )
+        return( multiplicity.evaluate( E ) * math.sqrt( 2. * self.productMass ) * pp )
 
     def calculateAverageMomentumForPhoton( self, Ein ) :
 
         muAverage = angularSubform.averageMu( E )
         if( muAverage == 0. ) : return( 0. )
-        return( multiplicity.getValue( E ) * energySubform.averageEp( E ) * muAverage )
+        return( multiplicity.evaluate( E ) * energySubform.averageEp( E ) * muAverage )
 
     class calculateDepositionInfo :
 
@@ -349,22 +377,21 @@ def calculateAverageProductData( productFrame, angularSubform, energySubform, st
             return( [ EMin, EMax ] )
 
     energyUnit = kwargs['incidentEnergyUnit']
-    momentumDepositionUnit = energyUnit + '/c'
-    massUnit = energyUnit + '/c**2'
+    massUnit = kwargs['massUnit']
     multiplicity = kwargs['multiplicity']               # BRB - FIXME; Handle gamma data with 1 point for multiplicity weight until it is fixed.
     energyAccuracy = kwargs['energyAccuracy']
     momentumAccuracy = kwargs['momentumAccuracy']
-    reactionSuite = kwargs['reactionSuite']
-    projectileMass = reactionSuite.projectile.getMass( massUnit )
-    targetMass = reactionSuite.target.getMass( massUnit )
+    projectileMass = kwargs['projectileMass']
+    targetMass = kwargs['targetMass']
     product = kwargs['product']
-    productMass = product.getMass( massUnit )
+    productMass = kwargs['productMass']
+
     EMin = kwargs['EMin']
     EMax = kwargs['EMax']
 
     massRatio = projectileMass * productMass / ( projectileMass + targetMass )**2
 
-    if( product.name == 'gamma' ) : productFrame = standardsModule.frames.labToken  # All gamma data treated as in lab frame.
+    if( product.id == IDsPoPsModule.photon ) : productFrame = standardsModule.frames.labToken  # All gamma data treated as in lab frame.
     if( isinstance( energySubform, energyModule.NBodyPhaseSpace ) ) :
         Q = kwargs['reaction'].getQ( energyUnit, final = False, groundStateQ = True )
         energySubform = NBodyPhaseSpace( energySubform, massUnit, projectileMass, targetMass, productMass, Q )
@@ -376,7 +403,7 @@ def calculateAverageProductData( productFrame, angularSubform, energySubform, st
     if( Es[-1] is None ) : Es[-1] = EMax
     if( EMin < Es[0] ) : EMin = Es[0]
     if( EMax > Es[-1] ) : EMax = Es[-1]
-    Es = sorted( set( energySubform.getEnergyArray( EMin, EMax ) + multiplicity.domainGrid( ) ) )
+    Es = sorted( set( energySubform.getEnergyArray( EMin, EMax ) + multiplicity.domainGrid ) )
     fixLimits( EMin, EMax, Es )
     calculationData.setEvaluateAtX( calculateAverageEnergy )
     aveEnergy = [ [ E, calculationData.evaluateAtX( E ) ] for E in Es ]
@@ -387,7 +414,7 @@ def calculateAverageProductData( productFrame, angularSubform, energySubform, st
     if( isinstance( angularSubform, angularModule.isotropic ) and ( productFrame == standardsModule.frames.labToken ) ) :
         aveMomentum = [ [ aveEnergy[0][0], 0. ], [ aveEnergy[-1][0], 0. ] ]
     else :
-        if( product.name == 'gamma' ) :
+        if( product.id == IDsPoPsModule.photon ) :
             calculationData.setEvaluateAtX( calculateAverageMomentumForPhoton )
         else :
             calculationData.setEvaluateAtX( calculateAverageMomentum )

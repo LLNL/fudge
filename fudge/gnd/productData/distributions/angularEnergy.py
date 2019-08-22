@@ -67,20 +67,33 @@ import math
 import fudge
 from fudge.core.utilities import brb
 
+from PoPs import IDs as IDsPoPsModule
+
 from xData import standards as standardsModule
 from xData import axes as axesModule
 from xData import XYs as XYsModule
 from xData import multiD_XYs as multiD_XYsModule
 
-from fudge.gnd.productData import energyDeposition as energyDepositionModule
+from fudge.processing import group as groupModule
+
 from fudge.gnd.productData import momentumDeposition as momentumDepositionModule
 
 from . import miscellaneous as miscellaneousModule
 
 from . import base as baseModule
 from . import angular as angularModule
+from . import angularEnergyMC as angularEnergyMCModule
 
 __metaclass__ = type
+
+def defaultAxes( energyUnit, probabilityLabel = 'P(mu,energy_out|energy_in)' ) :
+
+    axes = axesModule.axes( rank = 4 )
+    axes[3] = axesModule.axis( 'energy_in', 3, energyUnit )
+    axes[2] = axesModule.axis( 'mu', 2, '' )
+    axes[1] = axesModule.axis( 'energy_out', 1, energyUnit )
+    axes[0] = axesModule.axis( probabilityLabel, 0, '1/' + energyUnit )
+    return( axes )
 
 class XYs1d( XYsModule.XYs1d ) :
 
@@ -136,14 +149,14 @@ class XYs3d( subform, multiD_XYsModule.XYs3d ) :
             if abs(integral - 1.0) > info['normTolerance']:
                 warnings.append( warning.unnormalizedDistribution( PQU.PQU(energy_in.value, self.axes[0].unit),
                     index, integral, self.toXLink() ) )
-            if energy_in.domainMin() != -1 or energy_in.domainMax() != 1 :
+            if( energy_in.domainMin != -1 ) or ( energy_in.domainMax != 1 ) :
                 warnings.append( warning.incompleteDistribution( PQU.PQU(energy_in.value, self.axis[0].unit),
-                        energy_in.domainMin(), energy_in.domainMax(), energy_in.value, self.toXLink() ) )
+                        energy_in.domainMin, energy_in.domainMax, energy_in ) )
             for mu in energy_in:
-                if mu.domainMin() < 0:
+                if( mu.domainMin < 0 ) :
                     warnings.append( warning.valueOutOfRange("Negative outgoing energy for energy_in=%s!"
-                        % PQU.PQU(energy_in.value, self.axes[0].unit), mu.domainMin(), 0, 'inf', self.toXLink() ) )
-                if mu.rangeMin() < 0:
+                        % PQU.PQU(energy_in.value, self.axes[0].unit), mu.domainMin, 0, 'inf', self.toXLink() ) )
+                if( mu.rangeMin < 0 ) :
                     warnings.append( warning.negativeProbability( PQU.PQU(energy_in.value, self.axes[-1].unit),
                         mu=mu.value, obj=mu ) )
 
@@ -151,27 +164,19 @@ class XYs3d( subform, multiD_XYsModule.XYs3d ) :
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
-        verbosity = kwargs['verbosity']
-        indent2 = indent + kwargs['incrementalIndent']
-        energyUnit = kwargs['incidentEnergyUnit']
-        momentumDepositionUnit = energyUnit + '/c'
-        massUnit = energyUnit + '/c**2'
         multiplicity = kwargs['multiplicity']
-        productMass = kwargs['product'].getMass( massUnit )
-        energyAccuracy = kwargs['energyAccuracy']
-        momentumAccuracy = kwargs['momentumAccuracy']
-        productFrame = kwargs['productFrame']
+        productMass = kwargs['productMass']
 
         aveEnergy = []
         for pdfOfMuEpAtE in self :
             energy = pdfOfMuEpAtE.value
-            aveEnergy.append( [ energy, multiplicity.getValue( energy ) * pdfOfMuEpAtE.averageEnergy( ) ] )
+            aveEnergy.append( [ energy, multiplicity.evaluate( energy ) * pdfOfMuEpAtE.averageEnergy( ) ] )
 
         const = math.sqrt( 2. * productMass )
         aveMomentum = []
         for pdfOfMuEpAtE in self :
             energy = pdfOfMuEpAtE.value
-            momemtum = const * multiplicity.getValue( energy ) * pdfOfMuEpAtE.averageMomentum( )
+            momemtum = const * multiplicity.evaluate( energy ) * pdfOfMuEpAtE.averageMomentum( )
             if( momemtum < 1e-12 ) : momemtum = 0.          # This should be less arbitrary????????
             aveMomentum.append( [ energy, momemtum ] )
 
@@ -186,9 +191,8 @@ class XYs3d( subform, multiD_XYsModule.XYs3d ) :
             for muEpPs in E_MuEpPs : muEpPs.setData( muEpPs / sum )
         return( n )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
-        from fudge.processing import group as groupModule
         from fudge.processing.deterministic import transferMatrices as transferMatricesModule
 
         verbosity = tempInfo['verbosity']
@@ -200,56 +204,66 @@ class XYs3d( subform, multiD_XYsModule.XYs3d ) :
 
         return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
 
-    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
+    def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
 
-        return( V_W_XYs.V_W_XYs.toPointwise_withLinearXYs( self, accuracy, lowerEps = lowerEps, upperEps = upperEps, cls = XYs3d ) )
+        angular = angularModule.XYs2d( axes = self.axes )
+        for PofEpGivenMu in self :
+            data = angularModule.XYs1d( [ [ PofEp.value, float( PofEp.integrate( ) ) ] for PofEp in PofEpGivenMu ] )
+            angular.append( angularModule.xs_pdf_cdf1d.fromXYs( angularModule.XYs1d( data ),
+                    value = PofEpGivenMu.value ) )
+
+        xys3d = angularEnergyMCModule.XYs3d( axes = self.axes )
+        for PofEpGivenMu in self :
+            xys2d = angularEnergyMCModule.XYs2d( value = PofEpGivenMu.value )
+            for PofEp in PofEpGivenMu :
+                _PofEp = PofEp.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-8 )
+                xys2d.append( angularEnergyMCModule.xs_pdf_cdf1d.fromXYs( _PofEp, PofEp.value ) )
+            xys3d.append( xys2d )
+
+        return( angularEnergyMCModule.angular( angular ), angularEnergyMCModule.angularEnergy( xys3d ) )
 
     @staticmethod
     def allowedSubElements( ) :
 
         return( ( XYs2d, ) )
 
-    @staticmethod
-    def defaultAxes( energyUnit = 'eV', energy_outUnit = 'eV', probabilityUnit = '1/eV', probabilityLabel = 'P(mu,energy_out|energy_in)' ) :
-
-        axes = axesModule.axes( rank = 4 )
-        axes[3] = axesModule.axis( 'energy_in', 3, energyUnit )
-        axes[2] = axesModule.axis( 'mu', 2, '' )
-        axes[1] = axesModule.axis( 'energy_out', 1, energy_outUnit )
-        axes[0] = axesModule.axis( probabilityLabel, 0, probabilityUnit )
-        return( axes )
-
 class LLNLAngularOfAngularEnergySubform( baseModule.subform ) :
 
     moniker = 'LLNLAngularOfAngularEnergy'
 
-    def __init__( self, angularSubform, makeCopy = True ) :
+    def __init__( self, data ) :
 
-        if( not( isinstance( angularSubform, angularModule.XYs2d ) ) ) : raise TypeError( 'instance is not an angular.XYs2d' )
-        if( makeCopy ) : angularSubform = angularSubform.copy( )
+        if( not( isinstance( data, angularModule.XYs2d ) ) ) : raise TypeError( 'instance is not an angular.XYs2d' )
         baseModule.subform.__init__( self )
-        self.angularSubform = angularSubform
+        self.data = data
+
+    def convertUnits( self, unitMap ) :
+        "See documentation for reactionSuite.convertUnits."
+
+        self.data.convertUnits( unitMap )
 
     def copy( self ) :
 
-        return( LLNLAngularOfAngularEnergySubform( self.angularSubform, makeCopy = True ) )
+        return( LLNLAngularOfAngularEnergySubform( self.data.copy ) )
+
+    def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
+
+        return( angularEnergyMCModule.angular( self.data.to_xs_pdf_cdf1d( style, tempInfo, indent ) ) )
 
     def toXMLList( self, indent = "", **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
         xmlStringList = [ '%s<%s>' % ( indent, self.moniker ) ]
-        xmlStringList += self.angularSubform.toXMLList( indent = indent2, **kwargs )
+        xmlStringList += self.data.toXMLList( indent = indent2, **kwargs )
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
 
     @staticmethod
     def parseXMLNode( element, xPath, linkData ) :
 
-        import fudge.gnd.productData.distributions.angular as angularModule
-
         xPath.append( element.tag )
-        angularSubform = angularModule.XYs2d.parseXMLNode( element[0], xPath, linkData )
-        result = LLNLAngularOfAngularEnergySubform( angularSubform, makeCopy=False )
+        data = angularModule.XYs2d.parseXMLNode( element[0], xPath, linkData )
+        result = LLNLAngularOfAngularEnergySubform( data )
         xPath.pop( )
         return( result )
 
@@ -257,22 +271,30 @@ class LLNLAngularEnergyOfAngularEnergySubform( baseModule.subform ) :
 
     moniker = 'LLNLAngularEnergyOfAngularEnergy'
 
-    def __init__( self, angularEnergySubform, makeCopy = True ) :
+    def __init__( self, data ) :
 
-        if( not( isinstance( angularEnergySubform, XYs3d ) ) ) : raise TypeError( 'instance is not an angularEnergy.XYs3d' )
-        if( makeCopy ) : angularEnergySubform = angularEnergySubform.copy( )
+        if( not( isinstance( data, XYs3d ) ) ) : raise TypeError( 'instance is not an angularEnergy.XYs3d' )
         baseModule.subform.__init__( self )
-        self.angularEnergySubform = angularEnergySubform
+        self.data = data
+
+    def convertUnits( self, unitMap ) :
+        "See documentation for reactionSuite.convertUnits."
+
+        self.data.convertUnits( unitMap )
 
     def copy( self ) :
 
-        return( LLNLAngularEnergyOfAngularEnergySubform( self.angularEnergySubform, makeCopy = True ) )
+        return( LLNLAngularEnergyOfAngularEnergySubform( self.data.copy( ) ) )
+
+    def to_xs_pdf_cdf1d( self, style, tempInfo, indent ) :
+
+        return( self.data.to_xs_pdf_cdf1d( style, tempInfo, indent ) )
 
     def toXMLList( self, indent = "", **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
         xmlStringList = [ '%s<%s>' % ( indent, self.moniker ) ]
-        xmlStringList += self.angularEnergySubform.toXMLList( indent = indent2, **kwargs )
+        xmlStringList += self.data.toXMLList( indent = indent2, **kwargs )
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
 
@@ -280,8 +302,8 @@ class LLNLAngularEnergyOfAngularEnergySubform( baseModule.subform ) :
     def parseXMLNode( element, xPath, linkData ) :
 
         xPath.append( element.tag )
-        angularEnergySubform = XYs3d.parseXMLNode( element[0], xPath, linkData )
-        result = LLNLAngularEnergyOfAngularEnergySubform( angularEnergySubform, makeCopy=False )
+        data = XYs3d.parseXMLNode( element[0], xPath, linkData )
+        result = LLNLAngularEnergyOfAngularEnergySubform( data )
         xPath.pop( )
         return( result )
 
@@ -291,17 +313,15 @@ class LLNLAngularEnergyForm( baseModule.form ) :
     moniker = 'LLNLAngularEnergy'
     subformAttributes = ( 'angularSubform', 'angularEnergySubform' )
 
-    def __init__( self, label, productFrame, angularSubform, angularEnergySubform, makeCopy = True ) :
+    def __init__( self, label, productFrame, angularSubform, angularEnergySubform ) :
 
         if( not( isinstance( angularSubform, LLNLAngularOfAngularEnergySubform ) ) ) :
             raise TypeError( 'instance is not an LLNLAngularOfAngularEnergySubform subform' )
         if( not( isinstance( angularEnergySubform, LLNLAngularEnergyOfAngularEnergySubform ) ) ) :
             raise TypeError( 'instance is not an LLNLAngularEnergyOfAngularEnergySubform subform' )
-        if( makeCopy ) : angularSubform = angularSubform.copy( )
-        if( makeCopy ) : angularEnergySubform = angularEnergySubform.copy( )
         baseModule.form.__init__( self, label, productFrame, ( angularSubform, angularEnergySubform ) )
 
-    def calculateDepositionData( self, style, indent = '', **kwargs ) :
+    def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
         from fudge.core.math import fudgemath
 
@@ -309,7 +329,7 @@ class LLNLAngularEnergyForm( baseModule.form ) :
 
             f = ( mu - parameters.mu1 ) / ( parameters.mu2 - parameters.mu1 )
             P_mu = ( 1 - f ) * parameters.P1 + f * parameters.P2
-            EpP = parameters.muEpPs.interpolateAtW( mu, unitBase = True, extrapolation = W_XYs.flatExtrapolationToken )
+            EpP = parameters.muEpPs.interpolateAtValue( mu, unitBase = True, extrapolation = standardsModule.flatExtrapolationToken )
             Ep = EpP.integrateWithWeight_sqrt_x( )
             return( mu * P_mu * Ep )
 
@@ -351,21 +371,21 @@ class LLNLAngularEnergyForm( baseModule.form ) :
                 muEpPs = self.angularEnergySubform.interpolateAtV( E, unitBase = True )
                 return( calculateDepositionMomentum( muPs, muEpPs ) )
 
-        verbosity = kwargs['verbosity']
         energyUnit = kwargs['incidentEnergyUnit']
-        momentumDepositionUnit = energyUnit + '/c'
-        massUnit = energyUnit + '/c**2'
+        momentumDepositionUnit = kwargs['momentumDepositionUnit']
         multiplicity = kwargs['multiplicity']
         energyAccuracy = kwargs['energyAccuracy']
         momentumAccuracy = kwargs['momentumAccuracy']
+        product = kwargs['product']
+        productMass = kwargs['productMass']
 
-        angularSubform = self.angularSubform
-        angularEnergySubform = self.angularEnergySubform
+        angularSubform = self.angularSubform.data
+        angularEnergySubform = self.angularEnergySubform.data
 
         depEnergy = miscellaneousModule.calculateDepositionEnergyFromAngular_angularEnergy( style, 
                 angularSubform, angularEnergySubform, multiplicity, accuracy = energyAccuracy )
 
-        if( kwargs['product'].name == 'gamma' ) :
+        if( product.id == IDsPoPsModule.photon ) :
             depMomentum = miscellaneousModule.calculateDepositionEnergyFromAngular_angularEnergy( style, 
                     angularSubform, angularEnergySubform, multiplicity, True, accuracy = momentumAccuracy )
         else :
@@ -374,38 +394,42 @@ class LLNLAngularEnergyForm( baseModule.form ) :
             for indexE, muPs in enumerate( angularSubform ) :
                 depMomentum.append( [ muPs.value, calculateDepositionMomentum( muPs, angularEnergySubform[indexE] ) ] )
 #            depMomentum = fudgemath.thickenXYList( depMomentum, calculateDepositionMomentumThicken( angularSubform, angularEnergySubform, relativeTolerance, absoluteTolerance ) )
-            const = math.sqrt( 2. * kwargs['product'].getMass( massUnit ) )
-            for EMomenutem in depMomentum : EMomenutem[1] *= const * multiplicity.getValue( EMomenutem[0] )
+            const = math.sqrt( 2. * productMass )
+            for EMomenutem in depMomentum : EMomenutem[1] *= const * multiplicity.evaluate( EMomenutem[0] )
 
-        axes = momentumDepositionModule.XYs1d.defaultAxes( energyUnit = energyUnit, momentumDepositionUnit = momentumDepositionUnit )
+        axes = momentumDepositionModule.defaultAxes( energyUnit = energyUnit, momentumDepositionUnit = momentumDepositionUnit )
         depMomentum = momentumDepositionModule.XYs1d( data = depMomentum, axes = axes,
-                        label = style.label, accuracy = momentumAccuracy )
+                        label = style.label )
 
-        return( depEnergy, depMomentum )
+        return( [ depEnergy ], [ depMomentum ] )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def convertUnits( self, unitMap ) :
+        "See documentation for reactionSuite.convertUnits."
 
-#    def process( self, processInfo, tempInfo, verbosityIndent ) :
+        self.angularSubform.convertUnits( unitMap )
+        self.angularEnergySubform.convertUnits( unitMap )
 
-        raise Exception( 'need to implement' )
-        import angular 
-        from fudge.processing.deterministic import transferMatrices
-        from fudge.gnd import miscellaneous as miscellaneousModule
+    def processMC( self, style, tempInfo, indent ) :
 
-        newForms = []
-        angularSubform = self.angularSubform
-        angularEnergySubform = self.angularEnergySubform
+        angular = self.angularSubform.to_xs_pdf_cdf1d( style, tempInfo, indent )
+        dummy, angularEnergy = self.angularEnergySubform.to_xs_pdf_cdf1d( style, tempInfo, indent )
+        return( angularEnergyMCModule.form( style.label, self.productFrame, angular, angularEnergy ) )
 
-        if( 'LLNL_Pn' in processInfo['styles'] ) :
-            if( processInfo.verbosity >= 30 ) : print '%sGrouping %s' % ( verbosityIndent, self.moniker )
-            outputChannel = tempInfo['reaction'].outputChannel
-            projectile, product = processInfo.getProjectileName( ), tempInfo['product'].particle.name
-            TM_1, TM_E = transferMatrices.EMuEpP_TransferMatrix( processInfo, projectile, product, 
-                tempInfo['crossSection'], angularSubform, angularEnergySubform, tempInfo['multiplicity'],
-                comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
-            miscellaneousModule.TMs2Form( processInfo, tempInfo, newForms, TM_1, TM_E, angularSubform.axes )
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
-        return( newForms )
+        from fudge.processing.deterministic import transferMatrices as transferMatricesModule
+
+        verbosity = tempInfo['verbosity']
+        if( verbosity > 2 ) : print '%sGrouping %s' % ( indent, self.moniker )
+
+        angularSubform = self.angularSubform.data
+        angularEnergySubform = self.angularEnergySubform.data
+
+        TM_1, TM_E = transferMatricesModule.ENDLEMuEpP_TransferMatrix( style, tempInfo, tempInfo['crossSection'], self.productFrame, 
+            angularSubform, angularEnergySubform, tempInfo['multiplicity'],
+            comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
+
+        return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
 
     def toXMLList( self, indent = "", **kwargs ) : 
 
@@ -435,7 +459,9 @@ class LLNLAngularEnergyForm( baseModule.form ) :
                 angularEnergySubform = LLNLAngularEnergyOfAngularEnergySubform.parseXMLNode( child, xPath, linkData )
             else :
                 raise ValueError( 'Encountered unexpected child element "%s"' % child.tag )
-        component = LLNLAngularEnergyForm( element.get( 'label' ), element.get( 'productFrame' ), angularSubform, angularEnergySubform )
+        component = LLNLAngularEnergyForm( element.get( 'label' ), element.get( 'productFrame' ), 
+                angularSubform, angularEnergySubform )
+
         xPath.pop( )
         return( component )
 
@@ -443,11 +469,11 @@ class form(  baseModule.form ) :
 
     moniker = 'angularEnergy'
     subformAttributes = ( 'angularEnergySubform', )
+    ancestryMembers = subformAttributes
 
-    def __init__( self, label, productFrame, angularEnergySubform, makeCopy = True ) :
+    def __init__( self, label, productFrame, angularEnergySubform ) :
 
         if( not( isinstance( angularEnergySubform, subform ) ) ) : raise TypeError( 'instance is not an angularEnergy subform' )
-        if( makeCopy ) : angularEnergySubform = angularEnergySubform.copy( )
         baseModule.form.__init__( self, label, productFrame, ( angularEnergySubform, ) )
 
     def calculateAverageProductData( self, style, indent = '', **kwargs ) :
@@ -459,10 +485,20 @@ class form(  baseModule.form ) :
         aveEnergy, aveMomentum = self.angularEnergySubform.calculateAverageProductData( style, indent = indent, **kwargs )
         return( [ aveEnergy ], [ aveMomentum ] )
 
-    def processSnMultiGroup( self, style, tempInfo, indent ) :
+    def convertUnits( self, unitMap ) :
+        "See documentation for reactionSuite.convertUnits."
+
+        self.angularEnergySubform.convertUnits( unitMap )
+
+    def processMC( self, style, tempInfo, indent ) :
+
+        angular, angularEnergy = self.angularEnergySubform.to_xs_pdf_cdf1d( style, tempInfo, indent )
+        return( angularEnergyMCModule.form( style.label, self.productFrame, angular, angularEnergy ) )
+
+    def processMultiGroup( self, style, tempInfo, indent ) :
 
         tempInfo['productFrame'] = self.productFrame
-        return( self.angularEnergySubform.processSnMultiGroup( style, tempInfo, indent ) )
+        return( self.angularEnergySubform.processMultiGroup( style, tempInfo, indent ) )
 
     @staticmethod
     def parseXMLNode( element, xPath, linkData ):

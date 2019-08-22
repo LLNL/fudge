@@ -65,58 +65,33 @@
 This module adds the method toACE to the classes in the fudge.gnd.productData.distributions.energyAngular module.
 """
 
-from xData import axes
-from fudge.gnd.productData.distributions import energyAngular
+from fudge.core.utilities import brb
 
-def toACE( self, label, offset, weight, **kwargs ) :
+from xData import standards as standardsModule
 
-    header = [ 0, 44, offset + len( weight ) + 4 ] + weight
-    e_inFactor, e_outFactor = self.domainUnitConversionFactor( 'MeV' ), self.axes[1].unitConversionFactor( 'MeV' )
-
-    independent, dependent, qualifier = self.axes[0].interpolation.getInterpolationTokens( )
-    if( independent != dependent != axes.linearToken ) : raise Exception( 'interpolation = %s and %s not supported' % ( independent, dependent ) )
-
-    NE, e_ins, Ls, epData = len( self ), [], [], []
-    offset += len( header ) + 1 + 1 + 2 * NE + 1        # header length plus NR, NE, Es, Ls, (1-based).
-    for energy_coefficients in self :
-        pdf, Rs, As = self.getFRAatEnergy_asLinearPointwise( energy_coefficients.value )
-        pdf_, Rs, As = pdf.commonXGrid( [ Rs, As ] )
-        e_ins.append( energy_coefficients.value * e_inFactor )
-        Ls.append( offset + len( epData ) )
-        pdf_ = pdf_.normalize( )
-        cdf = pdf_.runningIntegral( )
-        eps, pdf = [], []
-        for x1, y1 in pdf_ :
-            eps.append( e_outFactor * x1 )
-            pdf.append( y1 / e_outFactor )
-        Rs = [ r for x, r in Rs ]
-        As = [ a for x, a in As ]
-        cdf[-1] = 1.
-        epData += [ 2, len( eps ) ] + eps + pdf + cdf + Rs + As
-    return( header + [ 0, NE ] + e_ins + Ls + epData )
-
-energyAngular.KalbachMann.toACE = toACE
+from fudge.gnd.productData.distributions import energyAngular as energyAngularModule
 
 def toACE( self, label, offset, weight, **kwargs ) :
 
     header = [ 0, 61, offset + len( weight ) + 4 ] + weight
-    e_inFactor, e_outFactor = self.domainUnitConversionFactor( 'MeV' ), self.axes[1].unitConversionFactor( 'MeV' )
+    e_inFactor = self.domainUnitConversionFactor( 'MeV' )
+    e_outFactor = self[0].domainUnitConversionFactor( 'MeV' )
 
     INTE = -1
-    independent, dependent, qualifier = self.axes[0].interpolation.getInterpolationTokens( )
-    if( dependent == axes.flatToken ) :
+    interpolation = self.interpolation
+    if( interpolation == standardsModule.interpolation.flatToken ) :
         INTE = 1
-    elif( independent == dependent == axes.linearToken ) :
+    elif( interpolation == standardsModule.interpolation.linlinToken ) :
         INTE = 2
-    if( INTE == -1 ) : raise Exception( 'Interpolation "%s, %s" not supported for incident energy' % ( independent, dependent ) )
+    if( INTE == -1 ) : raise Exception( 'Interpolation "%s" not supported for incident energy' % interpolation )
 
     INTT = -1
-    independent, dependent, qualifier = self.axes[1].interpolation.getInterpolationTokens( )
-    if( dependent == axes.flatToken ) :
+    interpolation = self[0].interpolation
+    if( interpolation == standardsModule.interpolation.flatToken ) :
         INTT = 1
-    elif( independent == dependent == axes.linearToken ) :
+    elif( interpolation == standardsModule.interpolation.linlinToken ) :
         INTT = 2
-    if( INTT == -1 ) : raise Exception( 'Interpolation "%s, %s" not supported for outgoing energy' % ( independent, dependent ) )
+    if( INTT == -1 ) : raise Exception( 'Interpolation "%s" not supported for outgoing energy' % interpolation )
 
     NE, e_ins, Ls, epData = len( self ), [], [], []
     offset += len( header ) + 3 + 1 + 2 * NE + 1        # header length plus NR, NE, Es, Ls, (1-based).
@@ -126,11 +101,11 @@ def toACE( self, label, offset, weight, **kwargs ) :
         EOuts, pdfOfEOuts, cdfOfEOuts, LCs, muPData = [], [], [], [], []
         NP = len( w_xys )
         offset_LC = Ls[-1] + 1 + 4 * NP
-        for i1, xys_ in enumerate( w_xys ) :
-            x2 = xys_.value * e_outFactor
+        for i1, _xys in enumerate( w_xys ) :
+            x2 = _xys.value * e_outFactor
             EOuts.append( x2 )
 
-            norm = xys_.integrate( )
+            norm = _xys.integrate( )
             y2 = norm / e_outFactor
             pdfOfEOuts.append( y2 )
 
@@ -148,7 +123,9 @@ def toACE( self, label, offset, weight, **kwargs ) :
             if( norm == 0 ) :
                 muData = [ 1, 2, -1.0, 1.0, 0.5, 0.5, 0.0, 1.0 ]
             else :
-                xys = xys_.normalize( )
+                if( not( isinstance( _xys, energyAngularModule.XYs1d ) ) ) :
+                    _xys = _xys.toPointwise_withLinearXYs( accuracy = 1e-3, upperEps = 1e-6 )
+                xys = _xys.normalize( )
                 cdfOfMus = xys.runningIntegral( )
                 mus, pdfOfMus = [], []
                 for mu1, pdf1 in xys :
@@ -165,4 +142,4 @@ def toACE( self, label, offset, weight, **kwargs ) :
 
     return( header + [ 1, NE, INTE, NE ] + e_ins + Ls + epData )
 
-energyAngular.pointwise.toACE = toACE
+energyAngularModule.XYs3d.toACE = toACE

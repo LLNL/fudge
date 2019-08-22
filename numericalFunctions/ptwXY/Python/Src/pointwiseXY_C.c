@@ -246,6 +246,7 @@ static PyObject *pointwiseXY_C_setUserFlag( pointwiseXY_CPy *self, PyObject *arg
 static PyObject *pointwiseXY_C_showInteralStructure( pointwiseXY_CPy *self, PyObject *args, PyObject *keywords );
 static PyObject *pointwiseXY_C_thicken( pointwiseXY_CPy *self, PyObject *args, PyObject *keywords );
 static PyObject *pointwiseXY_C_thin( pointwiseXY_CPy *self, PyObject *args );
+static PyObject *pointwiseXY_C_thinDomain( pointwiseXY_CPy *self, PyObject *args );
 static PyObject *pointwiseXY_C_trim( pointwiseXY_CPy *self );
 static PyObject *pointwiseXY_C_toString( pointwiseXY_CPy *self, PyObject *args, PyObject *keywords );
 static PyObject *pointwiseXY_C_toString2( pointwiseXY_CPy *self, int pairsPerLine, char *format, char *pairSeparator );
@@ -258,6 +259,7 @@ static PyObject *pointwiseXY_C_domain( pointwiseXY_CPy *self );
 static PyObject *pointwiseXY_C_domainMin( pointwiseXY_CPy *self );
 static PyObject *pointwiseXY_C_domainMax( pointwiseXY_CPy *self );
 static PyObject *pointwiseXY_C_domainSlice( pointwiseXY_CPy *self, PyObject *args, PyObject *keywords );
+static PyObject *pointwiseXY_C_range( pointwiseXY_CPy *self );
 static PyObject *pointwiseXY_C_rangeMin( pointwiseXY_CPy *self );
 static PyObject *pointwiseXY_C_rangeMax( pointwiseXY_CPy *self );
 static int pointwiseXY_C_domainMinMax( pointwiseXY_CPy *self, double *domainMin, double *domainMax );
@@ -2519,6 +2521,31 @@ static PyObject *pointwiseXY_C_thin( pointwiseXY_CPy *self, PyObject *args ) {
 /*
 ************************************************************
 */
+static PyObject *pointwiseXY_C_thinDomain( pointwiseXY_CPy *self, PyObject *args ) {
+
+    double epsilon;
+    ptwXYPoints *n;
+    pointwiseXY_CPy *nPy;
+    statusMessageReporting *smr = &(self->smr);
+
+    if( pointwiseXY_C_checkStatus( self ) != 0 ) return( NULL );
+
+    if( !PyArg_ParseTuple( args, "d", &epsilon ) ) return( NULL );
+
+    if( ( n = ptwXY_thinDomain( smr, self->ptwXY, epsilon ) ) == NULL ) {
+        pointwiseXY_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
+    }
+    if( ( nPy = pointwiseXY_CNewInitialize( self->infill, self->safeDivide ) ) == NULL ) {
+        ptwXY_free( n );
+        return( NULL );
+    }
+    nPy->ptwXY = n;
+    return( (PyObject *) nPy );
+}
+/*
+************************************************************
+*/
 static PyObject *pointwiseXY_C_toString( pointwiseXY_CPy *self, PyObject *args, PyObject *keywords ) {
 
     int pairsPerLine = 1;
@@ -2700,6 +2727,7 @@ static PyObject *pointwiseXY_C_scaleOffsetXAndY(  pointwiseXY_CPy *self, PyObjec
         pointwiseXY_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
         return( NULL );
     }
+    if( insitu ) Py_INCREF( (PyObject *) self );    /* FIXME: Why is this needed when insitu if True? Or is it? */
     return( (PyObject *) nPy );
 }
 /*
@@ -2819,6 +2847,18 @@ static PyObject *pointwiseXY_C_domainSlice( pointwiseXY_CPy *self, PyObject *arg
 /*
 ************************************************************
 */
+static PyObject *pointwiseXY_C_range( pointwiseXY_CPy *self ) {
+
+    double rangeMin, rangeMax;
+
+    if( pointwiseXY_C_checkStatus( self ) != 0 ) return( NULL );
+
+    if( pointwiseXY_C_rangeMinMax( self, &rangeMin, &rangeMax ) == -1 ) return( NULL );
+    return( Py_BuildValue( "(d,d)", rangeMin, rangeMax ) );
+}
+/*
+************************************************************
+*/
 static PyObject *pointwiseXY_C_rangeMin( pointwiseXY_CPy *self ) {
 
     double rangeMin;
@@ -2869,21 +2909,16 @@ static int pointwiseXY_C_domainMinMax( pointwiseXY_CPy *self, double *domainMin,
 static int pointwiseXY_C_rangeMinMax( pointwiseXY_CPy *self, double *rangeMin, double *rangeMax ) {
 
     statusMessageReporting *smr = &(self->smr);
+    double _rangeMin, _rangeMax;
 
-    if( isOkayAndHasData( self ) == -1 ) return( 1 );
-    if( rangeMin != NULL ) {
-        if( ptwXY_rangeMin( smr, self->ptwXY, rangeMin ) != nfu_Okay ) {
-            pointwiseXY_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
-            return( -1 );
-        }
-    }
+    if( isOkayAndHasData( self ) == -1 ) return( -1 );
 
-    if( rangeMax != NULL ) {
-        if( ptwXY_rangeMax( smr, self->ptwXY, rangeMax ) != nfu_Okay ) {
-            pointwiseXY_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
-            return( -1 );
-        }
+    if( ptwXY_range( smr, self->ptwXY, &_rangeMin, &_rangeMax ) != nfu_Okay ) {
+        pointwiseXY_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( -1 );
     }
+    if( rangeMin != NULL ) *rangeMin = _rangeMin;
+    if( rangeMax != NULL ) *rangeMax = _rangeMax;
 
     return( 0 );
 }
@@ -3746,7 +3781,16 @@ static PyMethodDef pointwiseXY_CPyMethods[] = {
             "sectionSubdivideMax    maximum number of points to insert between consecutive points (default 1),\n" \
             "dDomainMax                  minimum dx step (default 0),\n" \
             "fDomainMax                  minimum fractional step (default 1)." },
-    { "thin", (PyCFunction) pointwiseXY_C_thin, METH_VARARGS, "Returns a new instance with points of self thinned to accuracy of argument one." },
+    { "thin", (PyCFunction) pointwiseXY_C_thin, METH_VARARGS, 
+        "Returns a new instance of self thinned to accuracy (i.e., points are removed if possible).\n" \
+        "\nArguments are:\n" \
+        "   accuracy        The accuracy to maintain for the function when thinning.\n" },
+    { "thinDomain", (PyCFunction) pointwiseXY_C_thinDomain, METH_VARARGS, 
+        "Returns a new instance of self with fractional x-spacing between points of at least\n" \
+        "epsilon. Points are removed if needed. Fractional x-spacing is defined as\n" \
+        "       ( x_{i+1} - x_i ) / ( fabs( x_{i+1} ) - fabs( x_i ) ).\n" \
+        "\nArguments are:\n" \
+        "   epsilon      The fraction minimum distance between sequential x-value.\n" },
     { "toString", (PyCFunction) pointwiseXY_C_toString, METH_VARARGS | METH_KEYWORDS, "Returns a string representation of self." \
         " This method has three keyword parameters:\npairsPerLine, format and pairSeparator which are defined as,\n" \
         "    pairsPerLine    the number of pairs to put on each line\n" \
@@ -3776,6 +3820,7 @@ static PyMethodDef pointwiseXY_CPyMethods[] = {
         "   fill    [o] if True, points are added at domainMin and domainMax if they are not in self,\n" \
         "               else only existing points in the range [domainMin, domainMax] are included.\n" \
         "   dullEps [o] (Currently not implemented) the lower and upper points are dulled, default is 0." },
+    { "range",    (PyCFunction)    pointwiseXY_C_range, METH_NOARGS, "Returns the minimum and maximum y-values in self or 0 if self is empty." },
     { "rangeMin", (PyCFunction) pointwiseXY_C_rangeMin, METH_NOARGS, "Returns the minimum y-value in self or 0 if self is empty." },
     { "rangeMax", (PyCFunction) pointwiseXY_C_rangeMax, METH_NOARGS, "Returns the maximum y-value in self or 0 if self is empty." },
     { NULL, NULL, 0, NULL }        /* Sentinel (i.e., the end of the list) */

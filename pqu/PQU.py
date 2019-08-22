@@ -2923,3 +2923,19 @@ def printPredefinedUnits( ) :
         units.append( s )
     units.sort( )
     for unit in units : print unit
+
+def convertUnits( unit, unitMap ) :
+
+    PU = _findUnit( unit )
+    unitString = ''
+    operator = ''
+    for _unit in PU.symbols :
+        try :
+            __unit = unitMap[_unit]
+        except :
+            __unit = _unit
+        unitString += "%s%s**%d" % ( operator, __unit, PU.symbols[_unit] )
+        operator = ' * '
+    newUnit = _findUnit( unitString )
+    factor = PU.conversionFactorTo( newUnit )
+    return( newUnit.symbol( ), factor )

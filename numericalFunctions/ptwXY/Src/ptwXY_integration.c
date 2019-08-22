@@ -508,7 +508,7 @@ nfu_status ptwXY_integrateWithWeight_sqrt_x( statusMessageReporting *smr, ptwXYP
     for( i = 0, point = ptwXY->points; i < n; ++i, ++point ) {
         if( point->x >= domainMin ) break;
     }
-    if( i == n ) return( 0. );
+    if( i == n ) return( nfu_Okay );
     x2 = point->x;
     y2 = point->y;
     if( i > 0 ) {
@@ -948,13 +948,15 @@ nfu_status ptwXY_integrateWithFunction( statusMessageReporting *smr, ptwXYPoints
     ptwXYPoint *point;
     nfu_status status;
 
+    *value = 0;
+
     if( ptwXY_simpleCoalescePoints( smr, ptwXY ) != nfu_Okay ) {
         smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
         return( nfu_Error );
     }
 
-    if( domainMin == domainMax ) return( 0. );
-    if( n1 < 2 ) return( 0. );
+    if( domainMin == domainMax ) return( nfu_Okay );
+    if( n1 < 2 ) return( nfu_Okay );
 
     if( domainMin > domainMax ) {
         sign = domainMin;
@@ -962,8 +964,8 @@ nfu_status ptwXY_integrateWithFunction( statusMessageReporting *smr, ptwXYPoints
         domainMax = sign;
         sign = -1.;
     }
-    if( domainMin >= ptwXY->points[n1-1].x ) return( 0. );
-    if( domainMax <= ptwXY->points[0].x ) return( 0. );
+    if( domainMin >= ptwXY->points[n1-1].x ) return( nfu_Okay );
+    if( domainMax <= ptwXY->points[0].x ) return( nfu_Okay );
 
     for( i1 = 0; i1 < ( n1 - 1 ); i1++ ) {
         if( ptwXY->points[i1+1].x > domainMin ) break;
@@ -1030,4 +1032,86 @@ static nfu_status ptwXY_integrateWithFunction3( double x, double *y, void *argLi
         *y *= yf;
     }
     return( status );
+}
+/*
+************************************************************
+*/
+ptwXPoints *ptwXY_equalProbableBins( statusMessageReporting *smr, ptwXYPoints *ptwXY, int numberOfBins ) {
+
+    int index = 1;
+    int64_t i1, length = ptwXY->length;
+    double x1, y1, x2, y2, integral, runningIntegral1 = 0., runningIntegral2, nextCDF, dIntegral;
+    double dx, temp, norm;
+    ptwXYPoint *point;
+    ptwXPoints *equalProbableBins = NULL;
+
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Bad self." );
+        goto Err;
+    }
+
+    switch( ptwXY->interpolation ) {
+        case ptwXY_interpolationLinLin :
+        case ptwXY_interpolationFlat :
+            break;
+        default :
+            smr_setReportError2( smr, nfu_SMR_libraryID, nfu_unsupportedInterpolation,
+                    "interpolation = %d not supported", ptwXY->interpolation );
+            goto Err;
+    }
+
+    if( length < 2 ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_tooFewPoints, "number of points = %lld < 2", length );
+        goto Err;
+    }
+
+    if( numberOfBins < 1 ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badInput, "numberOfBins = %d < 1", numberOfBins );
+        goto Err;
+    }
+    if( ( equalProbableBins = ptwX_new( smr, numberOfBins ) ) == NULL ) goto Err;
+
+    if( ptwXY_integrateDomain( smr, ptwXY, &norm ) != nfu_Okay ) goto Err;
+    if( norm <= 0 ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badNorm, "norm = %e <= 0", norm );
+        goto Err;
+    }
+
+    point = ptwXY->points;
+    x1 = point->x;
+    y1 = point->y;
+    ++point;
+    if( ptwX_setPointAtIndex( smr, equalProbableBins, 0, x1 ) != nfu_Okay ) goto Err;
+    for( i1 = 1; i1 < length; ++i1, ++point ) {
+        x2 = point->x;
+        y2 = point->y;
+        if( ptwXY_f_integrate( smr, ptwXY->interpolation, x1, y1, x2, y2, &integral ) != nfu_Okay ) goto Err;
+        runningIntegral2 = runningIntegral1 + integral;
+        while( index < numberOfBins ) {
+            nextCDF = norm * index / (double) numberOfBins;
+            if( runningIntegral2 < nextCDF ) break;
+            dIntegral = nextCDF - runningIntegral1;
+
+            if( ptwXY->interpolation == ptwXY_interpolationLinLin ) {
+                temp = ( y2 - y1 ) / ( x2 - x1 );                       /* slope. */
+                dx = 2. * dIntegral / ( y1 + sqrt( y1 * y1 + 2. * temp * dIntegral ) ); }
+            else {
+                dx = dIntegral / y1;
+            }
+
+            if( ptwX_setPointAtIndex( smr, equalProbableBins, index, dx + x1 ) != nfu_Okay ) goto Err;
+            ++index;
+        }
+        runningIntegral1 = runningIntegral2;
+
+        x1 = x2;
+        y1 = y2;
+    }
+    if( ptwX_setPointAtIndex( smr, equalProbableBins, index, x2 ) != nfu_Okay ) goto Err;
+
+    return( equalProbableBins );
+
+Err:
+    if( equalProbableBins != NULL ) ptwX_free( equalProbableBins );
+    return( NULL );
 }

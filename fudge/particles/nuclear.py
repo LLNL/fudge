@@ -191,6 +191,7 @@ def getZandAFromName( name ) :
     for i, l in enumerate( name ) :
         if( l.isdigit( ) ) : break
     symbol, AStr = name[:i], name[i:]
+    if '_' in AStr: AStr=AStr.split('_')[0]
     Z = elementsSymbolZ[symbol]
     for i, l in enumerate( AStr ) :
         if( not( l.isdigit( ) ) ) : break

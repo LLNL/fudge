@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.legacy.endl &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.legacy.endl</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">from</span> <span class="nn">endlProject</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">endl2</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">endlZA</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">fudgemiscLegacy</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">fudge.core.utilities.fudgeExceptions</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">fudge.vis.gnuplot.fudgeMultiPlots</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">endl1dmathClasses</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">endl2dmathClasses</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">endl3dmathClasses</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">endl4dmathClasses</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">fudge.core.math.fudgemath</span> <span class="k">import</span> <span class="n">isNumber</span>
+<span class="kn">from</span> <span class="nn">endlmath</span> <span class="k">import</span> <span class="n">fastSumOfManyAddends</span>
+<span class="kn">from</span> <span class="nn">fudge.core.fudgemisc</span> <span class="k">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="readOnly"><a class="viewcode-back" href="../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.readOnly">[docs]</a><span class="k">def</span> <span class="nf">readOnly</span><span class="p">(</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Sets Fudge&#39;s internal readonly flag which causes fudge to not create working directories</span>
+<span class="sd">    for the isotopes read in. Note, you cannot unset this flag once readOnly has been called.&quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">fudge</span> <span class="k">import</span> <span class="n">fudgeParameters</span>
+
+    <span class="n">fudgeParameters</span><span class="o">.</span><span class="n">ReadOnly</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="verbose"><a class="viewcode-back" href="../../../fudge/fudge.legacy.endl.html#fudge.legacy.endl.verbose">[docs]</a><span class="k">def</span> <span class="nf">verbose</span><span class="p">(</span> <span class="n">mode</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Sets Fudge&#39;s internal verbose flag to mode. Mode = 0 suppress all informational messages.&quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">fudge</span> <span class="k">import</span> <span class="n">fudgeParameters</span>
+
+    <span class="n">fudgeParameters</span><span class="o">.</span><span class="n">VerboseMode</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span> <span class="n">mode</span> <span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../index.html">
+              <img class="logo" src="../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

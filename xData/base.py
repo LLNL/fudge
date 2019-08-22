@@ -65,15 +65,22 @@
 This module contains the xData class that must be the base class for all xData classes.
 """
 
+import abc
+
 __metaclass__ = type
 
 import ancestry as ancestryModule
 import standards as standardsModule
 from pqu import PQU as PQUModule
 
+def getArguments( kwargs, arguments ) :
+
+    for argument in arguments : arguments[argument] = kwargs.get( argument, arguments[argument] )
+    return( arguments )
+
 class xData( ancestryModule.ancestry ) :
 
-    def __init__( self, moniker ) :
+    def __init__( self ) :
 
         ancestryModule.ancestry.__init__( self )
 
@@ -81,7 +88,7 @@ class xDataCoreMembers( xData ) :
 
     def __init__( self, moniker, index = None, label = None ) :
 
-        xData.__init__( self, moniker )
+        xData.__init__( self )
 
         if( index is not None ) : index = int( index )
         self.index = index
@@ -117,24 +124,19 @@ class xDataCoreMembers( xData ) :
             if( not( isinstance( value, str ) ) ) : raise TypeError( 'label must be a string, got %s' % type(value) )
         self.__label = value
 
+    @staticmethod
+    def getArguments( kwargs, arguments ) :
+
+        return( getArguments( kwargs, arguments ) )
+
 class xDataFunctional( xDataCoreMembers ) :
 
-    def __init__( self, moniker, dimension, axes, index = None, valueType = standardsModule.types.float64Token, 
+    ancestryMembers = ( '', ) # 'axes', )       # BRB, ignore axes until it is improved. Probably should have each sub-function have its own axes copy.
+
+    def __init__( self, moniker, axes, index = None, valueType = standardsModule.types.float64Token, 
                 value = None, label = None ) :
 
-        import xData.axes as axesModule
-
         xDataCoreMembers.__init__( self, moniker, index = index, label = label )
-
-        self.__dimension = int( dimension )
-
-        if( axes is None ) : 
-            self.__axes = None
-        else :
-            if( not( isinstance( axes, axesModule.axes ) ) ) : raise TypeError( 'axes in not an axes instance' )
-            if( len( axes ) <= dimension ) : raise Exception( 'len( axes ) = %d != ( dimension + 1 ) = %d' % ( len( axes ), ( dimension + 1 ) ) )
-            self.__axes = axes.copy( )
-            self.__axes.setAncestor( self )
 
         if( valueType is None ) : valueType = standardsModule.types.float64Token
         if( not( isinstance( valueType, str ) ) ) : raise TypeError( 'valueType must be a string' )
@@ -143,12 +145,14 @@ class xDataFunctional( xDataCoreMembers ) :
         if( value is not None ) : value = float( value )
         self.__value = value
 
-        self.uncertainties = []
+        self.axes = axes
 
-    def addUncertainties( self, uncertainty ) :
+        self.uncertainties = None
 
-        raise TypeError( 'uncertainty other than "None" currently not supported' )
-        self.uncertainties.append( uncertainty )       # BRB need to check for valid uncertainties.
+    @abc.abstractproperty
+    def dimension( self ) :
+
+        pass
 
     def attributesToXMLAttributeStr( self ) :
 
@@ -160,15 +164,20 @@ class xDataFunctional( xDataCoreMembers ) :
     def axes( self ) :
         """Returns self's axes."""
 
-        if( self.__axes is not None ) : return self.__axes
-        while( self.isPrimaryXData( ) ) : return( None )
-        return( self.ancestor.axes )
+        return( self.__axes )
 
-    @property
-    def dimension( self ) :
-        """Returns self's xData dimension."""
+    @axes.setter
+    def axes( self, _axes ) :
 
-        return( self.__dimension )
+        import xData.axes as axesModule
+
+        if( _axes is not None ) : 
+            if( not( isinstance( _axes, ( axesModule.axes, axesModule.referenceAxes ) ) ) ) :
+                raise TypeError( 'axes in not an axes or referenceAxes instance' )
+            if( len( _axes ) <= self.dimension ) : raise Exception( 'len( axes ) = %d != ( self.dimension + 1 ) = %d' % ( len( _axes ), ( self.dimension + 1 ) ) )
+            _axes = _axes.copy( )
+            _axes.setAncestor( self )
+        self.__axes = _axes
 
     @property
     def value( self ) :
@@ -180,6 +189,10 @@ class xDataFunctional( xDataCoreMembers ) :
 
         if( value is not None ) : value = float( value )
         self.__value = value
+
+    def fixValuePerUnitChange( self, factors ) :
+
+        if( self.__value is not None ) : self.__value *= factors[self.dimension+1]
 
     def getAxisIndexByIndexOrName( self, indexOrName ) :
 
@@ -208,6 +221,9 @@ class xDataFunctional( xDataCoreMembers ) :
         if( ancestry is None ) : return( True )
         return( not( isinstance( ancestry, xDataFunctional ) ) )
 
+    @abc.abstractmethod
+    def toXMLList( self ): return []
+
     def toXML( self, indent = '', **kwargs ) :
 
         return( '\n'.join( self.toXMLList( indent = indent, **kwargs ) ) )
@@ -225,7 +241,7 @@ def getDomainValue( value, unit, default ) :
 
 def getDomainLimits( self, domainMin, domainMax, unit ) :
 
-    defaultMin, defaultMax = self.domain( )
+    defaultMin, defaultMax = self.domainMin, self.domainMax
     return( getDomainValue( domainMin, unit, defaultMin ), getDomainValue( domainMax, unit, defaultMax ) )
 
 def processUnits( unit1, unit2, operator ) :

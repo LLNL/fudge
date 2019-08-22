@@ -61,8 +61,14 @@
 # 
 # <<END-copyright>>
 
+def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
+    """
+    mimics the math.isclose function introduced in Python3
+    """
+    return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+
 def shiftFloatABit( f, s, r_eps, a_eps, z_eps ) :
-    "Only for internal use by shiftFloatDownABit and shiftFloatUpABit."
+    """Only for internal use by shiftFloatDownABit and shiftFloatUpABit."""
 
     if( a_eps is None ) : a_eps = r_eps
     if( z_eps is None ) : z_eps = r_eps

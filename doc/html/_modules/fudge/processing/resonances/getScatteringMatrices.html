@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>fudge.processing.resonances.getScatteringMatrices &#8212; Fudge and GND 4.2.2 beta documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '4.2.2 beta',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fudge.processing.resonances.getScatteringMatrices</h1><div class="highlight"><pre>
+<span></span><span class="c1"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
+<span class="c1"># &lt;&lt;END-copyright&gt;&gt;</span>
+
+<span class="kn">import</span> <span class="nn">_getScatteringMatrices</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="c1"># #### Functions &amp; Classes ###########################################</span>
+
+<div class="viewcode-block" id="getScatteringMatrices"><a class="viewcode-back" href="../../../../fudge/fudge.processing.resonances.html#fudge.processing.resonances.getScatteringMatrices.getScatteringMatrices">[docs]</a><span class="k">def</span> <span class="nf">getScatteringMatrices</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">Eres</span><span class="p">,</span> <span class="n">captureWidth</span><span class="p">,</span> <span class="n">widths</span><span class="p">,</span> <span class="n">penetrabilities</span><span class="p">):</span>
+	<span class="c1"># .... Check arguments:</span>
+	<span class="k">for</span> <span class="n">dat</span> <span class="ow">in</span> <span class="p">(</span><span class="n">E</span><span class="p">,</span><span class="n">Eres</span><span class="p">,</span><span class="n">captureWidth</span><span class="p">,</span><span class="n">widths</span><span class="p">,</span><span class="n">penetrabilities</span><span class="p">):</span>
+		<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span> <span class="o">!=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;All inputs must be numpy arrays!&quot;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">dat</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;All inputs must be float arrays&quot;</span><span class="p">)</span>
+	<span class="c1"># check dimensions. Row or column is fine for incident energy:</span>
+	<span class="n">NE</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">E</span><span class="p">)</span>
+	<span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">widths</span><span class="p">)</span>
+	<span class="n">nRes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">Eres</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">E</span><span class="o">.</span><span class="n">shape</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">((</span><span class="n">NE</span><span class="p">,),(</span><span class="n">NE</span><span class="p">,</span><span class="mi">1</span><span class="p">)):</span>
+		<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;E has wrong shape: </span><span class="si">%s</span><span class="s2">, should be </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">E</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="n">NE</span><span class="p">,)))</span>
+	<span class="k">if</span> <span class="n">Eres</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">nRes</span><span class="p">,):</span>
+		<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Eres has wrong shape: </span><span class="si">%s</span><span class="s2">, should be </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">Eres</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="n">nRes</span><span class="p">,)))</span>
+	<span class="k">if</span> <span class="n">captureWidth</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">nRes</span><span class="p">,):</span>
+		<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;captureWidth has wrong shape: </span><span class="si">%s</span><span class="s2">, should be </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">captureWidth</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="n">nRes</span><span class="p">,)))</span>
+	<span class="k">if</span> <span class="n">widths</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">nRes</span><span class="p">):</span>
+		<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;widths have wrong shape: </span><span class="si">%s</span><span class="s2">, should be </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">widths</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">nRes</span><span class="p">)))</span>
+	<span class="k">if</span> <span class="n">penetrabilities</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">NE</span><span class="p">):</span>
+		<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;penetrabilities have wrong shape: </span><span class="si">%s</span><span class="s2">, should be </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">penetrabilities</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">NE</span><span class="p">)))</span>
+		
+	<span class="c1"># .... Call C extension function, and reshape results into 3d arrays:</span>
+	<span class="n">R</span><span class="p">,</span><span class="n">S</span> <span class="o">=</span> <span class="n">_getScatteringMatrices</span><span class="o">.</span><span class="n">getScatteringMatrices</span><span class="p">(</span><span class="n">E</span><span class="p">,</span><span class="n">Eres</span><span class="p">,</span><span class="n">captureWidth</span><span class="p">,</span><span class="n">widths</span><span class="p">,</span><span class="n">penetrabilities</span><span class="p">)</span>
+	<span class="n">R</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">NE</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
+	<span class="n">S</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">NE</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
+	<span class="k">return</span> <span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">S</span><span class="p">)</span></div>
+
+<span class="c1"># #### Run test(s) ##################################################</span>
+<span class="c1">#</span>
+<span class="c1"># Note: these tests are replicated in tests/test_getScatteringMatrices.py (DAB 8/13/2013)</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="c1">#==== Tests ==============================</span>
+
+    <span class="k">def</span> <span class="nf">python_getScatteringMatrices</span><span class="p">(</span><span class="n">E</span><span class="p">,</span><span class="n">Eres</span><span class="p">,</span><span class="n">captureWidth</span><span class="p">,</span><span class="n">widths</span><span class="p">,</span><span class="n">penetrabilities</span><span class="p">):</span>
+        <span class="n">NE</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">E</span><span class="p">)</span>
+        <span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">widths</span><span class="p">)</span>
+        <span class="n">dE</span> <span class="o">=</span> <span class="n">Eres</span> <span class="o">-</span> <span class="n">E</span><span class="p">[:,</span><span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="n">DEN</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">dE</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">captureWidth</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">captOverDEN</span> <span class="o">=</span> <span class="n">captureWidth</span><span class="o">*</span><span class="n">DEN</span>
+        <span class="n">dEoverDEN</span> <span class="o">=</span> <span class="n">dE</span><span class="o">*</span><span class="n">DEN</span>
+        <span class="k">del</span> <span class="n">dE</span><span class="p">,</span> <span class="n">DEN</span>
+
+        <span class="n">R</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">NE</span><span class="p">,</span><span class="n">dim</span><span class="p">,</span><span class="n">dim</span><span class="p">))</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">NE</span><span class="p">,</span><span class="n">dim</span><span class="p">,</span><span class="n">dim</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dim</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dim</span><span class="p">):</span>
+                <span class="n">width_ij</span> <span class="o">=</span> <span class="n">widths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">widths</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">p_ij</span> <span class="o">=</span> <span class="n">penetrabilities</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">penetrabilities</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">R</span><span class="p">[:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_ij</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">width_ij</span> <span class="o">*</span> <span class="n">captOverDEN</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">S</span><span class="p">[:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_ij</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span> <span class="n">width_ij</span> <span class="o">*</span> <span class="n">dEoverDEN</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="c1"># symmetrize:</span>
+                <span class="n">R</span><span class="p">[:,</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">R</span><span class="p">[:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">S</span><span class="p">[:,</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">S</span><span class="p">[:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">R</span><span class="p">,</span><span class="n">S</span>
+
+    <span class="kn">import</span> <span class="nn">unittest</span>
+    
+    <span class="k">class</span> <span class="nc">Test_Driver</span><span class="p">(</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span> <span class="p">):</span>
+    
+        <span class="k">def</span> <span class="nf">test_getScatteringMatrices</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+            <span class="n">E</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.025</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">])</span>
+            <span class="n">Eres</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.35</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">,</span> <span class="mf">7.8</span><span class="p">])</span>
+            <span class="n">captureWidth</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.08</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">])</span>
+            <span class="n">widths</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.01</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.7</span><span class="p">],</span>
+                                <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">1.2e-4</span><span class="p">]])</span>
+            <span class="n">penetrabilities</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.55</span><span class="p">],</span>
+                                        <span class="p">[</span><span class="mf">0.05</span><span class="p">,</span><span class="mf">0.15</span><span class="p">,</span><span class="mf">0.25</span><span class="p">,</span><span class="mf">0.35</span><span class="p">,</span><span class="mf">0.45</span><span class="p">,</span><span class="mf">0.55</span><span class="p">]])</span>
+
+            <span class="n">R</span><span class="p">,</span><span class="n">S</span> <span class="o">=</span> <span class="n">getScatteringMatrices</span><span class="p">(</span><span class="n">E</span><span class="p">,</span><span class="n">Eres</span><span class="p">,</span><span class="n">captureWidth</span><span class="p">,</span><span class="n">widths</span><span class="p">,</span><span class="n">penetrabilities</span><span class="p">)</span>
+            <span class="n">R1</span><span class="p">,</span><span class="n">S1</span> <span class="o">=</span> <span class="n">python_getScatteringMatrices</span><span class="p">(</span><span class="n">E</span><span class="p">,</span><span class="n">Eres</span><span class="p">,</span><span class="n">captureWidth</span><span class="p">,</span><span class="n">widths</span><span class="p">,</span><span class="n">penetrabilities</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span> <span class="n">R</span><span class="p">,</span><span class="n">R1</span> <span class="p">)</span> <span class="ow">and</span> <span class="n">numpy</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span> <span class="n">S</span><span class="p">,</span><span class="n">S1</span> <span class="p">)</span> <span class="p">)</span>
+
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../../../../index.html">
+              <img class="logo" src="../../../../_static/gnd.png" alt="Logo"/>
+            </a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">Fudge and GND 4.2.2 beta documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

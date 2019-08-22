@@ -63,7 +63,7 @@
 
 .PHONY: default check checke clean realclean
 
-TARGETS = setting.py pop.py domain.py
+TARGETS = setting.py pop.py domain.py range.py
 
 default:
 
