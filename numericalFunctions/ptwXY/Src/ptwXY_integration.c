@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -60,7 +84,8 @@ static nfu_status ptwXY_integrateWithFunction3( double x, double *y, void *argLi
 /*
 ************************************************************
 */
-nfu_status ptwXY_f_integrate( ptwXY_interpolation interpolation, double x1, double y1, double x2, double y2, double *value ) {
+nfu_status ptwXY_f_integrate( statusMessageReporting *smr, ptwXY_interpolation interpolation, double x1, double y1, 
+        double x2, double y2, double *value ) {
 
     nfu_status status = nfu_Okay;
     double r;
@@ -70,8 +95,10 @@ nfu_status ptwXY_f_integrate( ptwXY_interpolation interpolation, double x1, doub
     case ptwXY_interpolationLinLin :                            /* x linear, y linear */
         *value = 0.5 * ( y1 + y2 ) * ( x2 - x1 );
         break;
-    case ptwXY_interpolationLinLog :                            /* x linear, y log */
+    case ptwXY_interpolationLogLin :                            /* x linear, y log */
         if( ( y1 <= 0. ) || ( y2 <= 0. ) ) {
+            smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badIntegrationInput, 
+                    "0 or negative values for log-y integration: y1 = %.17e, y2 = %.17e", y1, y2 );
             status = nfu_badIntegrationInput; }
         else {
             r = y2 / y1;
@@ -83,8 +110,10 @@ nfu_status ptwXY_f_integrate( ptwXY_interpolation interpolation, double x1, doub
             }
         }
         break;
-    case ptwXY_interpolationLogLin :                            /* x log, y linear */
+    case ptwXY_interpolationLinLog :                            /* x log, y linear */
         if( ( x1 <= 0. ) || ( x2 <= 0. ) ) {
+            smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badIntegrationInput, 
+                    "0 or negative values for log-x integration: x1 = %.17e, x2 = %.17e", x1, x2 );
             status = nfu_badIntegrationInput; }
         else {
             r = x2 / x1;
@@ -99,6 +128,9 @@ nfu_status ptwXY_f_integrate( ptwXY_interpolation interpolation, double x1, doub
         break;
     case ptwXY_interpolationLogLog :                            /* x log, y log */
         if( ( x1 <= 0. ) || ( x2 <= 0. ) || ( y1 <= 0. ) || ( y2 <= 0. ) ) {
+            smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badIntegrationInput, 
+                    "0 or negative values for log-x and log-y integration: x1 = %.17e, y1 = %.17e, x2 = %.17e, y2 = %.17e", 
+                    x1, y1, x2, y2 );
             status = nfu_badIntegrationInput; }
         else {
             int i, n;
@@ -137,6 +169,7 @@ nfu_status ptwXY_f_integrate( ptwXY_interpolation interpolation, double x1, doub
         *value = y1 * ( x2 - x1 );
         break;
     case ptwXY_interpolationOther :
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Other interpolation not supported for integration." );
         status = nfu_otherInterpolation;
     }
     return( status );
@@ -144,15 +177,25 @@ nfu_status ptwXY_f_integrate( ptwXY_interpolation interpolation, double x1, doub
 /*
 ************************************************************
 */
-double ptwXY_integrate( ptwXYPoints *ptwXY, double domainMin, double domainMax, nfu_status *status ) {
+nfu_status ptwXY_integrate( statusMessageReporting *smr, ptwXYPoints *ptwXY, double domainMin, double domainMax, double *value ) {
 
     int64_t i, n = ptwXY->length;
-    double sum = 0., dSum, x, y, x1, x2, y1, y2, _sign = 1.;
+    double dSum, x, y, x1, x2, y1, y2, _sign = 1.;
     ptwXYPoint *point;
+    nfu_status status;
 
-    if( ( *status = ptwXY->status ) != nfu_Okay ) return( 0. );
-    *status = nfu_otherInterpolation;
-    if( ptwXY->interpolation == ptwXY_interpolationOther ) return( 0. );
+    *value = 0.;
+
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+        return( nfu_badSelf );
+    }
+    if( ptwXY->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Other interpolation not supported for integration." );
+        return( nfu_otherInterpolation );
+    }
+
+    if( n < 2 ) return( nfu_Okay );
 
     if( domainMax < domainMin ) {
         x = domainMin;
@@ -160,28 +203,40 @@ double ptwXY_integrate( ptwXYPoints *ptwXY, double domainMin, double domainMax, 
         domainMax = x;
         _sign = -1.;
     }
-    if( n < 2 ) return( 0. );
 
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( 0. );
+    if( ( status = ptwXY_simpleCoalescePoints( smr, ptwXY ) ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+        return( status );
+    }
+
     for( i = 0, point = ptwXY->points; i < n; i++, point++ ) {
         if( point->x >= domainMin ) break;
     }
-    if( i == n ) return( 0. );
+    if( i == n ) return( nfu_Okay );
+
     x2 = point->x;
     y2 = point->y;
     if( i > 0 ) {
         if( x2 > domainMin ) {
             x1 = point[-1].x;
             y1 = point[-1].y;
-            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, domainMin, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
+            if( ( status = ptwXY_interpolatePoint( smr, ptwXY->interpolation, domainMin, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) {
+                smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+                return( status );
+            }
             if( x2 > domainMax ) {
                 double rangeMax;
 
-                if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, domainMax, &rangeMax, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
-                if( ( *status = ptwXY_f_integrate( ptwXY->interpolation, domainMin, y, domainMax, rangeMax, &sum ) ) != nfu_Okay ) return( 0. );
-                return( sum ); }
+                if( ( status = ptwXY_interpolatePoint( smr, ptwXY->interpolation, domainMax, &rangeMax, x1, y1, x2, y2 ) ) == nfu_Okay ) {
+                    status = ptwXY_f_integrate( smr, ptwXY->interpolation, domainMin, y, domainMax, rangeMax, value );
+                }
+                if( status != nfu_Okay ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+                return( status ); }
             else {
-                if( ( *status = ptwXY_f_integrate( ptwXY->interpolation, domainMin, y, x2, y2, &sum ) ) != nfu_Okay ) return( 0. );
+                if( ( status = ptwXY_f_integrate( smr, ptwXY->interpolation, domainMin, y, x2, y2, value ) ) != nfu_Okay ) {
+                    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+                    return( status );
+                }
             }
         }
     }
@@ -193,71 +248,132 @@ double ptwXY_integrate( ptwXYPoints *ptwXY, double domainMin, double domainMax, 
         x2 = point->x;
         y2 = point->y;
         if( x2 > domainMax ) {
-            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, domainMax, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
-            if( ( *status = ptwXY_f_integrate( ptwXY->interpolation, x1, y1, domainMax, y, &dSum ) ) != nfu_Okay ) return( 0. );
-            sum += dSum;
+            if( ( status = ptwXY_interpolatePoint( smr, ptwXY->interpolation, domainMax, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) {
+                smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+                return( status );
+            }
+            if( ( status = ptwXY_f_integrate( smr, ptwXY->interpolation, x1, y1, domainMax, y, &dSum ) ) != nfu_Okay ) {
+                smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+                return( status );
+            }
+            *value += dSum;
             break;
         }
-        if( ( *status = ptwXY_f_integrate( ptwXY->interpolation, x1, y1, x2, y2, &dSum ) ) != nfu_Okay ) return( 0. );
-        sum += dSum;
+        if( ( status = ptwXY_f_integrate( smr, ptwXY->interpolation, x1, y1, x2, y2, &dSum ) ) != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( status );
+        }
+        *value += dSum;
     }
 
-    return( _sign * sum );
+    *value *= _sign;
+
+    return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-double ptwXY_integrateDomain( ptwXYPoints *ptwXY, nfu_status *status ) {
+nfu_status ptwXY_integrateDomain( statusMessageReporting *smr, ptwXYPoints *ptwXY, double *value ) {
 
-    if( ( *status = ptwXY->status ) != nfu_Okay ) return( 0. );
-    if( ptwXY->length > 0 ) return( ptwXY_integrate( ptwXY, ptwXY_domainMin( ptwXY ), ptwXY_domainMax( ptwXY ), status ) );
-    return( 0. );
-}
-/*
-************************************************************
-*/
-nfu_status ptwXY_normalize( ptwXYPoints *ptwXY ) {
-/*
-*   This function assumes ptwXY_integrateDomain checks status and coalesces the points.
-*/
+    nfu_status status = nfu_Okay;
 
-    int64_t i;
-    nfu_status status; 
-    double sum = ptwXY_integrateDomain( ptwXY, &status );
+    *value = 0;
 
-    if( status != nfu_Okay ) return( status );
-    if( sum == 0. ) {
-        status = nfu_badNorm; }
-    else {
-        for( i = 0; i < ptwXY->length; i++ ) ptwXY->points[i].y /= sum;
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+        return( nfu_badSelf );
+    }
+
+    if( ptwXY->length > 0 ) {
+        double domainMin, domainMax;
+
+        if( ptwXY_domainMin( smr, ptwXY, &domainMin ) != nfu_Okay ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+        if( ptwXY_domainMax( smr, ptwXY, &domainMax ) != nfu_Okay ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+        if( ( status = ptwXY_integrate( smr, ptwXY, domainMin, domainMax, value ) ) != nfu_Okay )
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
     }
     return( status );
 }
 /*
 ************************************************************
 */
-double ptwXY_integrateDomainWithWeight_x( ptwXYPoints *ptwXY, nfu_status *status ) {
+nfu_status ptwXY_normalize( statusMessageReporting *smr, ptwXYPoints *ptwXY ) {
+/*
+*   This function assumes ptwXY_integrateDomain coalesces the points.
+*/
+    int64_t i1;
+    nfu_status status = nfu_Okay;
+    double sum;
 
-    if( ( *status = ptwXY->status ) != nfu_Okay ) return( 0. );
-    if( ptwXY->length < 2 ) return( 0. );
-    return( ptwXY_integrateWithWeight_x( ptwXY, ptwXY_domainMin( ptwXY ), ptwXY_domainMax( ptwXY ), status ) );
+    if( status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+        return( nfu_badSelf );
+    }
+
+    if( ( status = ptwXY_integrateDomain( smr, ptwXY, &sum ) ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+        return( status );
+    }
+
+    if( sum == 0. ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badNorm, "Cannot normalize curve with 0 norm." );
+        status = nfu_badNorm; }
+    else {
+        for( i1 = 0; i1 < ptwXY->length; i1++ ) ptwXY->points[i1].y /= sum;
+    }
+    return( status );
 }
 /*
 ************************************************************
 */
-double ptwXY_integrateWithWeight_x( ptwXYPoints *ptwXY, double domainMin, double domainMax, nfu_status *status ) {
+nfu_status ptwXY_integrateDomainWithWeight_x( statusMessageReporting *smr, ptwXYPoints *ptwXY, double *value ) {
+
+    nfu_status status = nfu_Okay;
+    double domainMin, domainMax;
+
+    *value = 0.;
+
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+        return( nfu_badSelf );
+    }
+
+    if( ptwXY->length < 2 ) return( nfu_Okay );
+
+    if( ptwXY_domainMin( smr, ptwXY, &domainMin ) != nfu_Okay ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+    if( ptwXY_domainMax( smr, ptwXY, &domainMax ) != nfu_Okay ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+    if( ( status = ptwXY_integrateWithWeight_x( smr, ptwXY, domainMin, domainMax, value ) ) != nfu_Okay )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+    return( status );
+}
+/*
+************************************************************
+*/
+nfu_status ptwXY_integrateWithWeight_x( statusMessageReporting *smr, ptwXYPoints *ptwXY, double domainMin, double domainMax, 
+        double *value ) {
 
     int64_t i, n = ptwXY->length;
     double sum = 0., x, y, x1, x2, y1, y2, _sign = 1., a1, inv_a1, a1x1, a1x2;
     ptwXYPoint *point;
+    nfu_status status;
 
-    if( ( *status = ptwXY->status ) != nfu_Okay ) return( 0. );
-    *status = nfu_unsupportedInterpolation;
-    if( ( ptwXY->interpolation != ptwXY_interpolationLinLin ) && 
-        ( ptwXY->interpolation != ptwXY_interpolationLinLog ) &&
-        ( ptwXY->interpolation != ptwXY_interpolationFlat ) ) return( 0. );
+    *value = 0.;
 
-    if( n < 2 ) return( 0. );
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+        return( nfu_badSelf );
+    }
+
+    if(     ( ptwXY->interpolation != ptwXY_interpolationLinLin ) && 
+            ( ptwXY->interpolation != ptwXY_interpolationLogLin ) &&
+            ( ptwXY->interpolation != ptwXY_interpolationFlat ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_unsupportedInterpolation,
+            "Unsupported interpolation = '%s'", ptwXY->interpolationString );
+        return( nfu_unsupportedInterpolation );
+    }
+
+    if( n < 2 ) return( nfu_Okay );
+
     if( domainMax < domainMin ) {
         x = domainMin;
         domainMin = domainMax;
@@ -265,16 +381,24 @@ double ptwXY_integrateWithWeight_x( ptwXYPoints *ptwXY, double domainMin, double
         _sign = -1.;
     }
 
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( 0. );
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( nfu_Error );
+    }
+
     for( i = 0, point = ptwXY->points; i < n; ++i, ++point ) {
         if( point->x >= domainMin ) break;
     }
-    if( i == n ) return( 0. );
+    if( i == n ) return( nfu_Okay );
+
     x2 = point->x;
     y2 = point->y;
     if( i > 0 ) {
         if( x2 > domainMin ) {
-            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, domainMin, &y, point[-1].x, point[-1].y, x2, y2 ) ) != nfu_Okay ) return( 0. );
+            if( ( status = ptwXY_interpolatePoint( smr, ptwXY->interpolation, domainMin, &y, point[-1].x, point[-1].y, x2, y2 ) ) != nfu_Okay ) {
+                smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+                return( status );
+            }
             x2 = domainMin;
             y2 = y;
             --i;
@@ -289,7 +413,10 @@ double ptwXY_integrateWithWeight_x( ptwXYPoints *ptwXY, double domainMin, double
         x2 = point->x;
         y2 = point->y;
         if( x2 > domainMax ) {
-            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, domainMax, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
+            if( ( status = ptwXY_interpolatePoint( smr, ptwXY->interpolation, domainMax, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) {
+                smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+                return( status );
+            }
             x2 = domainMax;
             y2 = y;
         }
@@ -300,7 +427,7 @@ double ptwXY_integrateWithWeight_x( ptwXYPoints *ptwXY, double domainMin, double
         case ptwXY_interpolationLinLin :
             sum += ( x2 - x1 ) * ( y1 * ( 2 * x1 + x2 ) + y2 * ( x1 + 2 * x2 ) ) / 6.;
             break;
-        case ptwXY_interpolationLinLog :
+        case ptwXY_interpolationLogLin :
             inv_a1 = ( x2 - x1 ) / log( y2 / y1 );
             a1 = 1 / inv_a1;
             a1x1 = a1 * x1;
@@ -313,32 +440,59 @@ double ptwXY_integrateWithWeight_x( ptwXYPoints *ptwXY, double domainMin, double
         if( x2 == domainMax ) break;
     }
 
-    return( _sign * sum );
-}
-/*
-************************************************************
-*/
-double ptwXY_integrateDomainWithWeight_sqrt_x( ptwXYPoints *ptwXY, nfu_status *status ) {
+    *value = _sign * sum;
 
-    if( ( *status = ptwXY->status ) != nfu_Okay ) return( 0. );
-    if( ptwXY->length < 2 ) return( 0. );
-    return( ptwXY_integrateWithWeight_sqrt_x( ptwXY, ptwXY_domainMin( ptwXY ), ptwXY_domainMax( ptwXY ), status ) );
+    return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-double ptwXY_integrateWithWeight_sqrt_x( ptwXYPoints *ptwXY, double domainMin, double domainMax, nfu_status *status ) {
+nfu_status ptwXY_integrateDomainWithWeight_sqrt_x( statusMessageReporting *smr, ptwXYPoints *ptwXY, double *value ) {
+
+    nfu_status status;
+    double domainMin, domainMax;
+
+    *value = 0.;
+
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+        return( nfu_badSelf );
+    }
+
+    if( ptwXY->length < 2 ) return( nfu_Okay );
+
+    if( ptwXY_domainMin( smr, ptwXY, &domainMin ) != nfu_Okay ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+    if( ptwXY_domainMax( smr, ptwXY, &domainMax ) != nfu_Okay ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+    if( ( status = ptwXY_integrateWithWeight_sqrt_x( smr, ptwXY, domainMin, domainMax, value ) ) != nfu_Okay )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+    return( status );
+}
+/*
+************************************************************
+*/
+nfu_status ptwXY_integrateWithWeight_sqrt_x( statusMessageReporting *smr, ptwXYPoints *ptwXY, double domainMin, double domainMax, 
+        double *value ) {
 
     int64_t i, n = ptwXY->length;
     double sum = 0., x, y, x1, x2, y1, y2, _sign = 1., sqrt_x1, sqrt_x2, inv_apb, c;
     ptwXYPoint *point;
+    nfu_status status;
 
-    if( ( *status = ptwXY->status ) != nfu_Okay ) return( 0. );
-    *status = nfu_unsupportedInterpolation;
-    if( ( ptwXY->interpolation != ptwXY_interpolationLinLin ) &&
-        ( ptwXY->interpolation != ptwXY_interpolationFlat ) ) return( 0. );
+    *value = 0.;
 
-    if( n < 2 ) return( 0. );
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via." );
+        return( nfu_badSelf );
+    }
+
+    if(     ( ptwXY->interpolation != ptwXY_interpolationLinLin ) &&
+            ( ptwXY->interpolation != ptwXY_interpolationFlat ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_unsupportedInterpolation,
+            "Unsupported interpolation = '%s'", ptwXY->interpolationString );
+        return( nfu_unsupportedInterpolation );
+    }
+
+    if( n < 2 ) return( nfu_Okay );
     if( domainMax < domainMin ) {
         x = domainMin;
         domainMin = domainMax;
@@ -346,7 +500,11 @@ double ptwXY_integrateWithWeight_sqrt_x( ptwXYPoints *ptwXY, double domainMin, d
         _sign = -1.;
     }
 
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( 0. );
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( nfu_Error );
+    }
+
     for( i = 0, point = ptwXY->points; i < n; ++i, ++point ) {
         if( point->x >= domainMin ) break;
     }
@@ -355,7 +513,10 @@ double ptwXY_integrateWithWeight_sqrt_x( ptwXYPoints *ptwXY, double domainMin, d
     y2 = point->y;
     if( i > 0 ) {
         if( x2 > domainMin ) {
-            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, domainMin, &y, point[-1].x, point[-1].y, x2, y2 ) ) != nfu_Okay ) return( 0. );
+            if( ( status = ptwXY_interpolatePoint( smr, ptwXY->interpolation, domainMin, &y, point[-1].x, point[-1].y, x2, y2 ) ) != nfu_Okay ) {
+                smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+                return( status );
+            }
             x2 = domainMin;
             y2 = y;
             --i;
@@ -372,7 +533,10 @@ double ptwXY_integrateWithWeight_sqrt_x( ptwXYPoints *ptwXY, double domainMin, d
         x2 = point->x;
         y2 = point->y;
         if( x2 > domainMax ) {
-            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, domainMax, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
+            if( ( status = ptwXY_interpolatePoint( smr, ptwXY->interpolation, domainMax, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) {
+                smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+                return( status );
+            }
             x2 = domainMax;
             y2 = y;
         }
@@ -392,41 +556,62 @@ double ptwXY_integrateWithWeight_sqrt_x( ptwXYPoints *ptwXY, double domainMin, d
         if( x2 == domainMax ) break;
     }
 
-    return( 2. / 15. * _sign * sum );
+    *value = 2. / 15. * _sign * sum;
+
+    return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-ptwXPoints *ptwXY_groupOneFunction( ptwXYPoints *ptwXY, ptwXPoints *groupBoundaries, ptwXY_group_normType normType, ptwXPoints *ptwX_norm, nfu_status *status ) {
+ptwXPoints *ptwXY_groupOneFunction( statusMessageReporting *smr, ptwXYPoints *ptwXY, ptwXPoints *groupBoundaries, 
+        ptwXY_group_normType normType, ptwXPoints *ptwX_norm ) {
 
     int64_t i, igs, ngs;
     double x1, y1, x2, y2, y2p, xg1, xg2, sum;
     ptwXYPoints *f;
     ptwXPoints *groupedData = NULL;
 
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( NULL );
-    if( ( *status = groupBoundaries->status ) != nfu_Okay ) return( NULL );
-    *status = nfu_otherInterpolation;
-    if( ptwXY->interpolation == ptwXY_interpolationOther ) return( NULL );
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
+    if( groupBoundaries->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via: groupBoundaries." );
+        return( NULL );
+    }
+    if( ptwXY->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Other interpolation not supported for integration." );
+        return( NULL );
+    }
 
-    ngs = ptwX_length( groupBoundaries ) - 1;
+    ngs = ptwX_length( smr, groupBoundaries ) - 1;
     if( normType == ptwXY_group_normType_norm ) {
         if( ptwX_norm == NULL ) {
-            *status = nfu_badNorm;
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badNorm, "Norm function required but is NULL." );
             return( NULL );
         }
-        *status = ptwX_norm->status;
-        if( ptwX_norm->status != nfu_Okay ) return( NULL );
-        if( ptwX_length( ptwX_norm ) != ngs ) {
-            *status = nfu_badNorm;
+        if( ptwX_norm->status != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via: norm." );
+            return( NULL );
+        }
+        if( ptwX_length( smr, ptwX_norm ) != ngs ) {
+            smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badNorm, "Norm length = %d but there are %d groups.",
+                    (int) ptwX_length( NULL, ptwX_norm ), (int) ngs );
             return( NULL );
         }
     }
 
-    if( ( f = ptwXY_intersectionWith_ptwX( ptwXY, groupBoundaries, status ) ) == NULL ) return( NULL );
-    if( f->length == 0 ) return( ptwX_createLine( ngs, ngs, 0, 0, status ) );
+    if( ( f = ptwXY_intersectionWith_ptwX( smr, ptwXY, groupBoundaries ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
+    if( f->length == 0 ) {
+        groupedData = ptwX_createLine( smr, ngs, ngs, 0, 0 );
+        if( groupedData == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( groupedData );
+    }
 
-    if( ( groupedData = ptwX_new( ngs, status ) ) == NULL ) goto err;
+    if( ( groupedData = ptwX_new( smr, ngs ) ) == NULL ) goto Err;
     xg1 = groupBoundaries->points[0];
     x1 = f->points[0].x;
     y1 = f->points[0].y;
@@ -447,8 +632,8 @@ ptwXPoints *ptwXY_groupOneFunction( ptwXYPoints *ptwXY, ptwXPoints *groupBoundar
                 sum /= ( xg2 - xg1 ); }
             else if( normType == ptwXY_group_normType_norm ) {
                 if( ptwX_norm->points[igs] == 0. ) {
-                    *status = nfu_divByZero;
-                    goto err;
+                    smr_setReportError2( smr, nfu_SMR_libraryID, nfu_divByZero, "Divide by 0. Norm at index %d is 0.", (int) igs );
+                    goto Err;
                 }
                 sum /= ptwX_norm->points[igs];
             }
@@ -461,7 +646,8 @@ ptwXPoints *ptwXY_groupOneFunction( ptwXYPoints *ptwXY, ptwXPoints *groupBoundar
     ptwXY_free( f );
     return( groupedData );
 
-err:
+Err:
+    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
     ptwXY_free( f );
     if( groupedData != NULL ) ptwX_free( groupedData );
     return( NULL );
@@ -469,47 +655,70 @@ err:
 /*
 ************************************************************
 */
-ptwXPoints *ptwXY_groupTwoFunctions( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, ptwXPoints *groupBoundaries, ptwXY_group_normType normType, 
-        ptwXPoints *ptwX_norm, nfu_status *status ) {
+ptwXPoints *ptwXY_groupTwoFunctions( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, 
+        ptwXPoints *groupBoundaries, ptwXY_group_normType normType, ptwXPoints *ptwX_norm ) {
 
     int64_t i, igs, ngs;
     double x1, fy1, gy1, x2, fy2, gy2, fy2p, gy2p, xg1, xg2, sum;
     ptwXYPoints *f = NULL, *ff, *g = NULL, *gg = NULL;
     ptwXPoints *groupedData = NULL;
 
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY1 ) ) != nfu_Okay ) return( NULL );
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY2 ) ) != nfu_Okay ) return( NULL );
-    if( ( *status = groupBoundaries->status ) != nfu_Okay ) return( NULL );
-    *status = nfu_otherInterpolation;
-    if( ptwXY1->interpolation == ptwXY_interpolationOther ) return( NULL );
-    if( ptwXY2->interpolation == ptwXY_interpolationOther ) return( NULL );
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY1 ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via: source1." );
+        return( NULL );
+    }
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY2 ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via: source2." );
+        return( NULL );
+    }
+    if( groupBoundaries->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via: groupBoundaries." );
+        return( NULL );
+    }
 
-    ngs = ptwX_length( groupBoundaries ) - 1;
+    if( ptwXY1->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, 
+                "Other interpolation not supported for integration: source1." );
+        return( NULL );
+    }
+    if( ptwXY2->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, 
+                "Other interpolation not supported for integration: source2." );
+        return( NULL );
+    }
+
+    ngs = ptwX_length( smr, groupBoundaries ) - 1;
     if( normType == ptwXY_group_normType_norm ) {
         if( ptwX_norm == NULL ) {
-            *status = nfu_badNorm;
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badNorm, "Norm function required but is NULL." );
             return( NULL );
         }
-        if( ( *status = ptwX_norm->status ) != nfu_Okay ) return( NULL );
-        if( ptwX_length( ptwX_norm ) != ngs ) {
-            *status = nfu_badNorm;
+        if( ptwX_norm->status != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via: norm." );
+            return( NULL );
+        }
+        if( ptwX_length( smr, ptwX_norm ) != ngs ) {
+            smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badNorm, "Norm length = %d but there are %d groups.",
+                    (int) ptwX_length( NULL, ptwX_norm ), (int) ngs );
             return( NULL );
         }
     }
 
-    if( ( ff = ptwXY_intersectionWith_ptwX( ptwXY1, groupBoundaries, status ) ) == NULL ) return( NULL );
-    if( ( gg = ptwXY_intersectionWith_ptwX( ptwXY2, groupBoundaries, status ) ) == NULL ) goto err;
+    if( ( ff = ptwXY_intersectionWith_ptwX( smr, ptwXY1, groupBoundaries ) ) == NULL ) goto Err;
+    if( ( gg = ptwXY_intersectionWith_ptwX( smr, ptwXY2, groupBoundaries ) ) == NULL ) goto Err;
     if( ( ff->length == 0 ) || ( gg->length == 0 ) ) {
         ptwXY_free( ff );
         ptwXY_free( gg );
-        return( ptwX_createLine( ngs, ngs, 0, 0, status ) );
+        groupedData = ptwX_createLine( smr, ngs, ngs, 0, 0 );
+        if( groupedData == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( groupedData );
     }
 
-    if( ( *status = ptwXY_tweakDomainsToMutualify( ff, gg, 4, 0 ) ) != nfu_Okay ) goto err;
-    if( ( f = ptwXY_union( ff, gg, status, ptwXY_union_fill ) ) == NULL ) goto err;
-    if( ( g = ptwXY_union( gg, f, status, ptwXY_union_fill ) ) == NULL ) goto err;
+    if( ptwXY_tweakDomainsToMutualify( smr, ff, gg, 4, 0 ) != nfu_Okay ) goto Err;
+    if( ( f = ptwXY_union( smr, ff, gg, ptwXY_union_fill ) ) == NULL ) goto Err;
+    if( ( g = ptwXY_union( smr, gg, f,  ptwXY_union_fill ) ) == NULL ) goto Err;
 
-    if( ( groupedData = ptwX_new( ngs, status ) ) == NULL ) goto err;
+    if( ( groupedData = ptwX_new( smr, ngs ) ) == NULL ) goto Err;
     xg1 = groupBoundaries->points[0];
     x1 = f->points[0].x;
     fy1 = f->points[0].y;
@@ -533,8 +742,8 @@ ptwXPoints *ptwXY_groupTwoFunctions( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, p
                 sum /= ( xg2 - xg1 ); }
             else if( normType == ptwXY_group_normType_norm ) {
                 if( ptwX_norm->points[igs] == 0. ) {
-                    *status = nfu_divByZero;
-                    goto err;
+                    smr_setReportError2( smr, nfu_SMR_libraryID, nfu_divByZero, "Divide by 0. Norm at index %d is 0.", (int) igs );
+                    goto Err;
                 }
                 sum /= ptwX_norm->points[igs];
             }
@@ -550,8 +759,9 @@ ptwXPoints *ptwXY_groupTwoFunctions( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, p
     ptwXY_free( gg );
     return( groupedData );
 
-err:
-    ptwXY_free( ff );
+Err:
+    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    if( ff != NULL ) ptwXY_free( ff );
     if( gg != NULL ) ptwXY_free( gg );
     if( f != NULL ) ptwXY_free( ff );
     if( g != NULL ) ptwXY_free( g );
@@ -561,50 +771,82 @@ err:
 /*
 ************************************************************
 */
-ptwXPoints *ptwXY_groupThreeFunctions( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, ptwXYPoints *ptwXY3, ptwXPoints *groupBoundaries, 
-        ptwXY_group_normType normType, ptwXPoints *ptwX_norm, nfu_status *status ) {
+ptwXPoints *ptwXY_groupThreeFunctions( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, 
+        ptwXYPoints *ptwXY3, ptwXPoints *groupBoundaries, ptwXY_group_normType normType, ptwXPoints *ptwX_norm ) {
 
     int64_t i, igs, ngs;
     double x1, fy1, gy1, hy1, x2, fy2, gy2, hy2, fy2p, gy2p, hy2p, xg1, xg2, sum;
     ptwXYPoints *f = NULL, *ff, *fff = NULL, *g = NULL, *gg = NULL, *h = NULL, *hh = NULL;
     ptwXPoints *groupedData = NULL;
 
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY1 ) ) != nfu_Okay ) return( NULL );
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY2 ) ) != nfu_Okay ) return( NULL );
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY3 ) ) != nfu_Okay ) return( NULL );
-    if( ( *status = groupBoundaries->status ) != nfu_Okay ) return( NULL );
-    *status = nfu_otherInterpolation;
-    if( ptwXY1->interpolation == ptwXY_interpolationOther ) return( NULL );
-    if( ptwXY2->interpolation == ptwXY_interpolationOther ) return( NULL );
-    if( ptwXY3->interpolation == ptwXY_interpolationOther ) return( NULL );
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY1 ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via: source1." );
+        return( NULL );
+    }
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY2 ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via: source2." );
+        return( NULL );
+    }
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY3 ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via: source3." );
+        return( NULL );
+    }
+    if( groupBoundaries->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via: groupBoundaries." );
+        return( NULL );
+    }
 
-    ngs = ptwX_length( groupBoundaries ) - 1;
+    if( ptwXY1->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Other interpolation not supported for integration: source1." );
+        return( NULL );
+    }
+    if( ptwXY2->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Other interpolation not supported for integration: source2." );
+        return( NULL );
+    }
+    if( ptwXY3->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Other interpolation not supported for integration: source3." );
+        return( NULL );
+    }
+
+    ngs = ptwX_length( smr, groupBoundaries ) - 1;
     if( normType == ptwXY_group_normType_norm ) {
         if( ptwX_norm == NULL ) {
-            *status = nfu_badNorm;
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badNorm, "Norm function required but is NULL." );
             return( NULL );
         }
-        if( ( *status = ptwX_norm->status ) != nfu_Okay ) return( NULL );
-        if( ptwX_length( ptwX_norm ) != ngs ) {
-            *status = nfu_badNorm;
+        if( ptwX_norm->status != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Via: norm." );
+            return( NULL );
+        }
+        if( ptwX_length( smr, ptwX_norm ) != ngs ) {
+            smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badNorm, "Norm length = %d but there are %d groups.",
+                    (int) ptwX_length( NULL, ptwX_norm ), (int) ngs );
             return( NULL );
         }
     }
 
-    if( ( ff = ptwXY_intersectionWith_ptwX( ptwXY1, groupBoundaries, status ) ) == NULL ) return( NULL );
-    if( ( gg = ptwXY_intersectionWith_ptwX( ptwXY2, groupBoundaries, status ) ) == NULL ) goto err;
-    if( ( hh = ptwXY_intersectionWith_ptwX( ptwXY3, groupBoundaries, status ) ) == NULL ) goto err;
-    if( ( ff->length == 0 ) || ( gg->length == 0 ) || ( hh->length == 0 ) ) return( ptwX_createLine( ngs, ngs, 0, 0, status ) );
+    if( ( ff = ptwXY_intersectionWith_ptwX( smr, ptwXY1, groupBoundaries ) ) == NULL ) goto Err;
+    if( ( gg = ptwXY_intersectionWith_ptwX( smr, ptwXY2, groupBoundaries ) ) == NULL ) goto Err;
+    if( ( hh = ptwXY_intersectionWith_ptwX( smr, ptwXY3, groupBoundaries ) ) == NULL ) goto Err;
+    if( ( ff->length == 0 ) || ( gg->length == 0 ) || ( hh->length == 0 ) ) {
+        ptwXY_free( ff );
+        ptwXY_free( gg );
+        ptwXY_free( hh );
+        groupedData = ptwX_createLine( smr, ngs, ngs, 0, 0 );
+        if( groupedData == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( groupedData );
+    }
 
-    if( ( *status = ptwXY_tweakDomainsToMutualify( ff, gg, 4, 0 ) ) != nfu_Okay ) goto err;
-    if( ( *status = ptwXY_tweakDomainsToMutualify( ff, hh, 4, 0 ) ) != nfu_Okay ) goto err;
-    if( ( *status = ptwXY_tweakDomainsToMutualify( gg, hh, 4, 0 ) ) != nfu_Okay ) goto err;
-    if( ( fff = ptwXY_union(  ff,  gg, status, ptwXY_union_fill ) ) == NULL ) goto err;
-    if( (   h = ptwXY_union(  hh, fff, status, ptwXY_union_fill ) ) == NULL ) goto err;
-    if( (   f = ptwXY_union( fff,   h, status, ptwXY_union_fill ) ) == NULL ) goto err;
-    if( (   g = ptwXY_union(  gg,   h, status, ptwXY_union_fill ) ) == NULL ) goto err;
+    if( ptwXY_tweakDomainsToMutualify( smr, ff, gg, 4, 0 ) != nfu_Okay ) goto Err;
+    if( ptwXY_tweakDomainsToMutualify( smr, ff, hh, 4, 0 ) != nfu_Okay ) goto Err;
+    if( ptwXY_tweakDomainsToMutualify( smr, gg, hh, 4, 0 ) != nfu_Okay ) goto Err;
+    if( ( fff = ptwXY_union( smr,  ff,  gg, ptwXY_union_fill ) ) == NULL ) goto Err;
+    if( (   h = ptwXY_union( smr,  hh, fff, ptwXY_union_fill ) ) == NULL ) goto Err;
+    if( (   f = ptwXY_union( smr, fff,   h, ptwXY_union_fill ) ) == NULL ) goto Err;
+    if( (   g = ptwXY_union( smr,  gg,   h, ptwXY_union_fill ) ) == NULL ) goto Err;
 
-    if( ( groupedData = ptwX_new( ngs, status ) ) == NULL ) goto err;
+    if( ( groupedData = ptwX_new( smr, ngs ) ) == NULL ) goto Err;
     xg1 = groupBoundaries->points[0];
     x1 = f->points[0].x;
     fy1 = f->points[0].y;
@@ -631,8 +873,8 @@ ptwXPoints *ptwXY_groupThreeFunctions( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2,
                 sum /= ( xg2 - xg1 ); }
             else if( normType == ptwXY_group_normType_norm ) {
                 if( ptwX_norm->points[igs] == 0. ) {
-                    *status = nfu_divByZero;
-                    goto err;
+                    smr_setReportError2( smr, nfu_SMR_libraryID, nfu_divByZero, "Divide by 0. Norm at index %d is 0.", (int) igs );
+                    goto Err;
                 }
                 sum /= ptwX_norm->points[igs];
             }
@@ -651,9 +893,10 @@ ptwXPoints *ptwXY_groupThreeFunctions( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2,
     ptwXY_free( fff );
     return( groupedData );
 
-err:
-    ptwXY_free( ff );
+Err:
+    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
     if( fff != NULL ) ptwXY_free( fff );
+    if( ff != NULL ) ptwXY_free( ff );
     if( gg != NULL ) ptwXY_free( gg );
     if( hh != NULL ) ptwXY_free( hh );
     if( f != NULL ) ptwXY_free( f );
@@ -665,46 +908,53 @@ err:
 /*
 ************************************************************
 */
-ptwXPoints *ptwXY_runningIntegral( ptwXYPoints *ptwXY, nfu_status *status ) {
+ptwXPoints *ptwXY_runningIntegral( statusMessageReporting *smr, ptwXYPoints *ptwXY ) {
 
     int i;
     ptwXPoints *runningIntegral = NULL;
     double integral = 0., sum;
 
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( NULL );
-    if( ( runningIntegral = ptwX_new( ptwXY->length, status ) ) == NULL ) goto err;
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
 
-    if( ( *status = ptwX_setPointAtIndex( runningIntegral, 0, 0. ) ) != nfu_Okay ) goto err;
+    if( ( runningIntegral = ptwX_new( smr, ptwXY->length ) ) == NULL ) goto Err;
+
+    if( ptwX_setPointAtIndex( smr, runningIntegral, 0, 0. ) != nfu_Okay ) goto Err;
     for( i = 1; i < ptwXY->length; i++ ) {
-        if( ( *status = ptwXY_f_integrate( ptwXY->interpolation, ptwXY->points[i-1].x, ptwXY->points[i-1].y, 
-            ptwXY->points[i].x, ptwXY->points[i].y, &sum ) ) != nfu_Okay ) goto err;
+        if( ptwXY_f_integrate( smr, ptwXY->interpolation, ptwXY->points[i-1].x, ptwXY->points[i-1].y, 
+            ptwXY->points[i].x, ptwXY->points[i].y, &sum ) != nfu_Okay ) goto Err;
         integral += sum;
-        if( ( *status = ptwX_setPointAtIndex( runningIntegral, i, integral ) ) != nfu_Okay ) goto err;
+        if( ptwX_setPointAtIndex( smr, runningIntegral, i, integral ) != nfu_Okay ) goto Err;
     }
     return( runningIntegral );
 
-err:
+Err:
+    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
     if( runningIntegral != NULL ) ptwX_free( runningIntegral );
     return( NULL );
 }
 /*
 ************************************************************
 */
-double ptwXY_integrateWithFunction( ptwXYPoints *ptwXY, ptwXY_createFromFunction_callback func, void *argList,
-        double domainMin, double domainMax, int degree, int recursionLimit, double tolerance, nfu_status *status ) {
+nfu_status ptwXY_integrateWithFunction( statusMessageReporting *smr, ptwXYPoints *ptwXY, ptwXY_createFromFunction_callback func, 
+        void *argList, double domainMin, double domainMax, int degree, int recursionLimit, double tolerance, double *value ) {
 
     int64_t i1, i2, n1 = ptwXY->length;
     long evaluations;
     double integral = 0., integral_, sign = -1., xa, xb;
     ptwXY_integrateWithFunctionInfo integrateWithFunctionInfo;
     ptwXYPoint *point;
+    nfu_status status;
 
-    if( ( *status = ptwXY->status ) != nfu_Okay ) return( 0. );
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( nfu_Error );
+    }
 
     if( domainMin == domainMax ) return( 0. );
     if( n1 < 2 ) return( 0. );
-
-    ptwXY_simpleCoalescePoints( ptwXY );
 
     if( domainMin > domainMax ) {
         sign = domainMin;
@@ -739,14 +989,18 @@ double ptwXY_integrateWithFunction( ptwXYPoints *ptwXY, ptwXY_createFromFunction
         integrateWithFunctionInfo.y2 = point->y;
         xb = point->x;
         if( xb > domainMax ) xb = domainMax;
-        *status = nf_GnG_adaptiveQuadrature( ptwXY_integrateWithFunction2, ptwXY_integrateWithFunction3, &integrateWithFunctionInfo,
+        status = nf_GnG_adaptiveQuadrature( ptwXY_integrateWithFunction2, ptwXY_integrateWithFunction3, &integrateWithFunctionInfo,
             xa, xb, recursionLimit, tolerance, &integral_, &evaluations );
-        if( *status != nfu_Okay ) return( 0. );
+        if( status != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via. Error from nf_GnG_adaptiveQuadrature." );
+            return( status );
+        }
         integral += integral_;
         xa = xb;
     }
+    *value = integral;
 
-    return( integral );
+    return( nfu_Okay );
 }
 /*
 ************************************************************
@@ -769,10 +1023,10 @@ static nfu_status ptwXY_integrateWithFunction3( double x, double *y, void *argLi
     ptwXY_integrateWithFunctionInfo *integrateWithFunctionInfo = (ptwXY_integrateWithFunctionInfo *) argList;
     nfu_status status;
 
-    if( ( status = ptwXY_interpolatePoint( integrateWithFunctionInfo->interpolation, x, &yf, 
+    if( ( status = ptwXY_interpolatePoint( NULL, integrateWithFunctionInfo->interpolation, x, &yf, 
             integrateWithFunctionInfo->x1, integrateWithFunctionInfo->y1, 
             integrateWithFunctionInfo->x2, integrateWithFunctionInfo->y2 ) ) == nfu_Okay ) {
-        status = integrateWithFunctionInfo->func( x, y, integrateWithFunctionInfo->argList );
+        status = integrateWithFunctionInfo->func( NULL, x, y, integrateWithFunctionInfo->argList );
         *y *= yf;
     }
     return( status );

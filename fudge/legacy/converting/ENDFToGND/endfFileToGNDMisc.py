@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 import copy, sys
@@ -86,8 +110,8 @@ def ENDFInterpolationToGND1d( interpolation ) :
 
     if( interpolation == 1 ) : return( standardsModule.interpolation.flatToken )
     if( interpolation == 2 ) : return( standardsModule.interpolation.linlinToken )
-    if( interpolation == 3 ) : return( standardsModule.interpolation.loglinToken )
-    if( interpolation == 4 ) : return( standardsModule.interpolation.linlogToken )
+    if( interpolation == 3 ) : return( standardsModule.interpolation.linlogToken )
+    if( interpolation == 4 ) : return( standardsModule.interpolation.loglinToken )
     if( interpolation == 5 ) : return( standardsModule.interpolation.loglogToken )
     if( interpolation == 6 ) : return( standardsModule.interpolation.chargedParticleToken )
     raise Exception( 'Unsupport 2d interpolation = %d' % interpolation )
@@ -316,7 +340,8 @@ def getTAB2_Lists( startLine, dataLines, logFile = sys.stderr ) :
     TAB2['Lists'] = Lists
     return( lineNumber, TAB2 )
 
-def getTAB1Regions( startLine, dataLines, allowInterpolation6 = False, logFile = sys.stderr, dimension = 1, axes = None ) :
+def getTAB1Regions( startLine, dataLines, allowInterpolation6 = False, logFile = sys.stderr, dimension = 1, axes = None,
+        cls = XYsModule.XYs1d ) :
 
     endLine, TAB1 = getTAB1( startLine, dataLines, logFile = logFile )
     n1, i1, mode, data = TAB1['NR'], 0, 0, TAB1['data']
@@ -385,7 +410,7 @@ def getTAB1Regions( startLine, dataLines, allowInterpolation6 = False, logFile =
                 if( i3 < n3 ) : x2, y2 = regionData[i3]
             value = None
             if( dimension > 1 ) : value = TAB1['C2']
-            regions.append( XYsModule.XYs( data = regionData[:i3], accuracy = ENDF_Accuracy, value = value,
+            regions.append( cls( data = regionData[:i3], accuracy = ENDF_Accuracy, value = value,
                     interpolation = ENDFInterpolationToGND1d( interpolation ), axes = axes ) )
             regionData = regionData[i3:]
             for i3 in xrange( 1, len( regionData ) ) :
@@ -463,15 +488,18 @@ def getMFDataInMFList( MFs, MFData ) :
 def toEnergyFunctionalData( info, dataLine, MF5Data, LF, moniker, unit, xLabel = 'energy_in', xUnit = 'eV' ) :
 
     import fudge.gnd.productData.distributions.energy as energyModule
-# FIXME: BRB each type of energy functional data should have its own class.
 
     axes = axesModule.axes( labelsUnits = { 0 : ( moniker , unit ), 1 : ( xLabel, xUnit ) } )
     dataLine, TAB1, data = getTAB1Regions( dataLine, MF5Data, logFile = info.logs, axes = axes )
+    EFclass = None
+    for tmp in ( energyModule.a, energyModule.b, energyModule.theta, energyModule.g, energyModule.T_M ):
+        if ( tmp.moniker == moniker ):
+            EFclass = tmp
 
     if( len( data ) == 1 ) :
         oneD = data[0]
     else :
-        oneD = regionsModule.regions( 1, axes = data[0].axes )
+        oneD = regionsModule.regions1d( axes = data[0].axes )
         for datum in data : oneD.append( datum )
 
-    return( dataLine, TAB1, energyModule.energyFunctionalData( moniker, oneD ) )
+    return( dataLine, TAB1, EFclass( oneD ) )

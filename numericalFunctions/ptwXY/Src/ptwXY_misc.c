@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -46,14 +70,14 @@
 
 #include "ptwXY.h"
 
-static nfu_status ptwXY_createFromFunctionBisect( ptwXYPoints *ptwXY, double x1, double y1, double x2, double y2, ptwXY_createFromFunction_callback func,
-        void *argList, int level, int checkForRoots, double eps );
-static nfu_status ptwXY_createFromFunctionZeroCrossing( ptwXYPoints *ptwXY, double x1, double y1, double x2, double y2, 
-        ptwXY_createFromFunction_callback func, void *argList, double eps );
-static nfu_status ptwXY_applyFunction2( ptwXYPoints *ptwXY1, double y1, double y2, ptwXYPoint *p1, ptwXYPoint *p2, ptwXY_applyFunction_callback func, 
-    void *argList, int level, int checkForRoots );
-static nfu_status ptwXY_applyFunctionZeroCrossing( ptwXYPoints *ptwXY1, double y1, double y2, ptwXYPoint *p1, ptwXYPoint *p2, 
-    ptwXY_applyFunction_callback func, void *argList );
+static nfu_status ptwXY_createFromFunctionBisect( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x1, double y1, 
+        double x2, double y2, ptwXY_createFromFunction_callback func, void *argList, int level, int checkForRoots, double eps );
+static nfu_status ptwXY_createFromFunctionZeroCrossing( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x1, double y1, 
+        double x2, double y2, ptwXY_createFromFunction_callback func, void *argList, double eps );
+static nfu_status ptwXY_applyFunction2( statusMessageReporting *smr, ptwXYPoints *ptwXY1, double y1, double y2, 
+        ptwXYPoint *p1, ptwXYPoint *p2, ptwXY_applyFunction_callback func, void *argList, int level, int checkForRoots );
+static nfu_status ptwXY_applyFunctionZeroCrossing( statusMessageReporting *smr, ptwXYPoints *ptwXY1, double y1, double y2, 
+        ptwXYPoint *p1, ptwXYPoint *p2, ptwXY_applyFunction_callback func, void *argList );
 /*
 ************************************************************
 */
@@ -75,41 +99,49 @@ void ptwXY_update_biSectionMax( ptwXYPoints *ptwXY1, double oldLength ) {
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_createFromFunction( int n, double *xs, ptwXY_createFromFunction_callback func, void *argList, double accuracy, int checkForRoots, 
-    int biSectionMax, nfu_status *status ) {
+ptwXYPoints *ptwXY_createFromFunction( statusMessageReporting *smr, int n, double *xs, ptwXY_createFromFunction_callback func, 
+        void *argList, double accuracy, int checkForRoots, int biSectionMax ) {
 
     int64_t i;
     double x1, y1, x2, y2, eps = ClosestAllowXFactor * DBL_EPSILON;
     ptwXYPoints *ptwXY;
     ptwXYPoint *p1, *p2;
 
-    *status = nfu_Okay;
-    if( n < 2 ) { *status = nfu_tooFewPoints; return( NULL ); }
-    for( i = 1; i < n; i++ ) {
-        if( xs[i-1] >= xs[i] ) *status = nfu_XNotAscending;
+    if( n < 2 ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_tooFewPoints, "Too few point = %d.", (int) n );
+        return( NULL );
     }
-    if( *status == nfu_XNotAscending ) return( NULL );
+    for( i = 1; i < n; i++ ) {
+        if( xs[i-1] >= xs[i] ) {
+            smr_setReportError2( smr, nfu_SMR_libraryID, nfu_XNotAscending, 
+                    "Non-ascending domain values: xs[%d] = %.17e >= xs[%d] = %.17e.", 
+                    (int) (i-1), xs[i-1], (int) i, xs[i] );
+            return( NULL );
+        }
+    }
 
     x1 = xs[0];
-    if( ( *status = func( x1, &y1, argList ) ) != nfu_Okay ) return( NULL );
-    if( ( ptwXY = ptwXY_new( ptwXY_interpolationLinLin, NULL, biSectionMax, accuracy, 500, 50, status, 0 ) ) == NULL ) return( NULL );
+    if( func( smr, x1, &y1, argList ) != nfu_Okay ) {
+        return( NULL );
+    }
+    if( ( ptwXY = ptwXY_new( smr, ptwXY_interpolationLinLin, NULL, biSectionMax, accuracy, 500, 50, 0 ) ) == NULL ) goto Err;
     for( i = 1; i < n; i++ ) {
-        if( ( *status = ptwXY_setValueAtX_overrideIfClose( ptwXY, x1, y1, eps, 0 ) ) != nfu_Okay ) goto err;
+        if( ptwXY_setValueAtX_overrideIfClose( smr, ptwXY, x1, y1, eps, 0 ) != nfu_Okay ) goto Err;
         x2 = xs[i];
-        if( ( *status = func( x2, &y2, argList ) ) != nfu_Okay ) goto err;
-        if( ( *status = ptwXY_createFromFunctionBisect( ptwXY, x1, y1, x2, y2, func, argList, 0, checkForRoots, eps ) ) != nfu_Okay ) goto err;
+        if( func( smr, x2, &y2, argList ) != nfu_Okay ) goto Err;
+        if( ptwXY_createFromFunctionBisect( smr, ptwXY, x1, y1, x2, y2, func, argList, 0, checkForRoots, eps ) != nfu_Okay ) goto Err;
         x1 = x2;
         y1 = y2;
     }
-    if( ( *status = ptwXY_setValueAtX_overrideIfClose( ptwXY, x2, y2, eps, 1 ) ) != nfu_Okay ) goto err;
+    if( ptwXY_setValueAtX_overrideIfClose( smr, ptwXY, x2, y2, eps, 1 ) != nfu_Okay ) goto Err;
 
     if( checkForRoots ) {
-        if( ( *status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) goto err;
+        if( ptwXY_simpleCoalescePoints( NULL, ptwXY ) != nfu_Okay ) goto Err;
         for( i = ptwXY->length - 1, p2 = NULL; i >= 0; i--, p2 = p1 ) { /* Work backward so lower points are still valid if a new point is added. */
             p1 = &(ptwXY->points[i]);
             if( p2 != NULL ) {
                 if( ( p1->y * p2->y ) < 0. ) {
-                    if( ( *status = ptwXY_createFromFunctionZeroCrossing( ptwXY, p1->x, p1->y, p2->x, p2->y, func, argList, eps ) ) != nfu_Okay ) goto err;
+                    if( ptwXY_createFromFunctionZeroCrossing( smr, ptwXY, p1->x, p1->y, p2->x, p2->y, func, argList, eps ) != nfu_Okay ) goto Err;
                 }
             }
         }
@@ -117,23 +149,28 @@ ptwXYPoints *ptwXY_createFromFunction( int n, double *xs, ptwXY_createFromFuncti
 
     return( ptwXY );
 
-err:
-    ptwXY_free( ptwXY );
+Err:
+    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    if( ptwXY != NULL ) ptwXY_free( ptwXY );
     return( NULL );
 }
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_createFromFunction2( ptwXPoints *xs, ptwXY_createFromFunction_callback func, void *argList, double accuracy, int checkForRoots, 
-    int biSectionMax, nfu_status *status ) {
+ptwXYPoints *ptwXY_createFromFunction2( statusMessageReporting *smr, ptwXPoints *xs, ptwXY_createFromFunction_callback func, 
+        void *argList, double accuracy, int checkForRoots, int biSectionMax ) {
 
-    return( ptwXY_createFromFunction( (int) xs->length, xs->points, func, argList, accuracy, checkForRoots, biSectionMax, status ) );
+    ptwXYPoints *ptwXY = ptwXY_createFromFunction( smr, (int) xs->length, xs->points, func, argList, accuracy, 
+            checkForRoots, biSectionMax );
+
+    if( ptwXY == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( ptwXY );
 }
 /*
 ************************************************************
 */
-static nfu_status ptwXY_createFromFunctionBisect( ptwXYPoints *ptwXY, double x1, double y1, double x2, double y2, ptwXY_createFromFunction_callback func,
-        void *argList, int level, int checkForRoots, double eps ) {
+static nfu_status ptwXY_createFromFunctionBisect( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x1, double y1, 
+        double x2, double y2, ptwXY_createFromFunction_callback func, void *argList, int level, int checkForRoots, double eps ) {
 
     nfu_status status;
     double x, y, f;
@@ -141,18 +178,21 @@ static nfu_status ptwXY_createFromFunctionBisect( ptwXYPoints *ptwXY, double x1,
     if( ( x2 - x1 ) < ClosestAllowXFactor * DBL_EPSILON * ( fabs( x1 ) + fabs( x2 ) ) ) return( nfu_Okay );
     if( level >= ptwXY->biSectionMax ) return( nfu_Okay );
     x = 0.5 * ( x1 + x2 );
-    if( ( status = ptwXY_interpolatePoint( ptwXY->interpolation, x, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) return( status );
-    if( ( status = func( x, &f, argList ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_interpolatePoint( smr, ptwXY->interpolation, x, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( status );
+    }
+    if( ( status = func( smr, x, &f, argList ) ) != nfu_Okay ) return( status );
     if( fabs( f - y ) <= 0.8 * fabs( f * ptwXY->accuracy ) ) return( nfu_Okay );
-    if( ( status = ptwXY_createFromFunctionBisect( ptwXY, x1, y1, x, f, func, argList, level + 1, checkForRoots, eps ) ) ) return( status );
-    if( ( status = ptwXY_setValueAtX_overrideIfClose( ptwXY, x, f, eps, 0 ) ) != nfu_Okay ) return( status );
-    return( ptwXY_createFromFunctionBisect( ptwXY, x, f, x2, y2, func, argList, level + 1, checkForRoots, eps ) );
+    if( ptwXY_createFromFunctionBisect( smr, ptwXY, x1, y1, x, f, func, argList, level + 1, checkForRoots, eps ) ) return( status );
+    if( ptwXY_setValueAtX_overrideIfClose( smr, ptwXY, x, f, eps, 0 ) != nfu_Okay ) return( status );
+    return( ptwXY_createFromFunctionBisect( smr, ptwXY, x, f, x2, y2, func, argList, level + 1, checkForRoots, eps ) );
 }
 /*
 ************************************************************
 */
-static nfu_status ptwXY_createFromFunctionZeroCrossing( ptwXYPoints *ptwXY, double x1, double y1, double x2, double y2, 
-        ptwXY_createFromFunction_callback func, void *argList, double eps ) {
+static nfu_status ptwXY_createFromFunctionZeroCrossing( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x1, double y1, 
+        double x2, double y2, ptwXY_createFromFunction_callback func, void *argList, double eps ) {
 
     int i;
     double x, y;
@@ -163,7 +203,7 @@ static nfu_status ptwXY_createFromFunctionZeroCrossing( ptwXYPoints *ptwXY, doub
         x = ( y2 * x1 - y1 * x2 ) / ( y2 - y1 );
         if( x <= x1 ) x = x1 + 0.1 * ( x2 - x1 );
         if( x >= x2 ) x =  x2 - 0.1 * ( x2 - x1 );
-        if( ( status = func( x, &y, argList ) ) != nfu_Okay ) return( status );
+        if( ( status = func( smr, x, &y, argList ) ) != nfu_Okay ) return( status );
         if( y == 0 ) break;
         if( y1 * y < 0 ) {
             x2 = x;
@@ -173,12 +213,13 @@ static nfu_status ptwXY_createFromFunctionZeroCrossing( ptwXYPoints *ptwXY, doub
             y1 = y;
         }
     }
-    return( ptwXY_setValueAtX_overrideIfClose( ptwXY, x, 0., eps, 1 ) );
+    return( ptwXY_setValueAtX_overrideIfClose( smr, ptwXY, x, 0., eps, 1 ) );
 }
 /*
 ************************************************************
 */
-nfu_status ptwXY_applyFunction( ptwXYPoints *ptwXY1, ptwXY_applyFunction_callback func, void *argList, int checkForRoots ) {
+nfu_status ptwXY_applyFunction( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwXY_applyFunction_callback func, 
+        void *argList, int checkForRoots ) {
 
     int64_t i, originalLength = ptwXY1->length, notFirstPass = 0;
     double y1, y2 = 0;
@@ -186,16 +227,26 @@ nfu_status ptwXY_applyFunction( ptwXYPoints *ptwXY1, ptwXY_applyFunction_callbac
     ptwXYPoint p1, p2;
 
     checkForRoots = checkForRoots && ptwXY1->biSectionMax;
-    if( ptwXY1->status != nfu_Okay ) return( ptwXY1->status );
-    if( ptwXY1->interpolation == ptwXY_interpolationOther ) return( nfu_otherInterpolation );
-    if( ptwXY1->interpolation == ptwXY_interpolationFlat ) return( nfu_invalidInterpolation );
-    if( ( status = ptwXY_simpleCoalescePoints( ptwXY1 ) ) != nfu_Okay ) return( status );
+
+    if( ptwXY1->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Other interpolation not allowed." );
+        return( ptwXY1->status = nfu_otherInterpolation );
+    }
+    if( ptwXY1->interpolation == ptwXY_interpolationFlat ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_flatInterpolation, "Flat interpolation not allowed." );
+        return( ptwXY1->status = nfu_flatInterpolation );
+    }
+
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY1 ) != nfu_Okay ) goto Err;
     for( i = originalLength - 1; i >= 0; i-- ) {
         y1 = ptwXY1->points[i].y;
-        if( ( status = func( &(ptwXY1->points[i]), argList ) ) != nfu_Okay ) return( status );
+        if( ( status = func( smr, &(ptwXY1->points[i]), argList ) ) != nfu_Okay ) {
+            if( ptwXY1->status == nfu_Okay ) ptwXY1->status = status;
+            return( status );
+        }
         p1 = ptwXY1->points[i];
         if( notFirstPass ) {
-            if( ( status = ptwXY_applyFunction2( ptwXY1, y1, y2, &p1, &p2, func, argList, 0, checkForRoots ) ) != nfu_Okay ) return( status );
+            if( ptwXY_applyFunction2( smr, ptwXY1, y1, y2, &p1, &p2, func, argList, 0, checkForRoots ) != nfu_Okay ) goto Err;
         }
         notFirstPass = 1;
         p2 = p1;
@@ -203,12 +254,17 @@ nfu_status ptwXY_applyFunction( ptwXYPoints *ptwXY1, ptwXY_applyFunction_callbac
     }
     ptwXY_update_biSectionMax( ptwXY1, (double) originalLength );
     return( status );
+
+Err:
+    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    if( ptwXY1->status == nfu_Okay ) ptwXY1->status = nfu_Error;
+    return( nfu_Error );
 }
 /*
 ************************************************************
 */
-static nfu_status ptwXY_applyFunction2( ptwXYPoints *ptwXY1, double y1, double y2, ptwXYPoint *p1, ptwXYPoint *p2, ptwXY_applyFunction_callback func, 
-        void *argList, int level, int checkForRoots ) {
+static nfu_status ptwXY_applyFunction2( statusMessageReporting *smr, ptwXYPoints *ptwXY1, double y1, double y2, 
+        ptwXYPoint *p1, ptwXYPoint *p2, ptwXY_applyFunction_callback func, void *argList, int level, int checkForRoots ) {
 
     double y;
     ptwXYPoint p;
@@ -217,24 +273,28 @@ static nfu_status ptwXY_applyFunction2( ptwXYPoints *ptwXY1, double y1, double y
     if( ( p2->x - p1->x ) < ClosestAllowXFactor * DBL_EPSILON * ( fabs( p1->x ) + fabs( p2->x ) ) ) return( nfu_Okay );
     if( level >= ptwXY1->biSectionMax ) goto checkForZeroCrossing;
     p.x = 0.5 * ( p1->x + p2->x );
-    if( ( status = ptwXY_interpolatePoint( ptwXY1->interpolation, p.x, &y, p1->x, y1, p2->x, y2 ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_interpolatePoint( smr, ptwXY1->interpolation, p.x, &y, p1->x, y1, p2->x, y2 ) ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( status );
+    }
     p.y = y;
-    if( ( status = func( &p, argList ) ) != nfu_Okay ) return( status );
+    if( ( status = func( smr, &p, argList ) ) != nfu_Okay ) return( status );
     if( fabs( ( p.x - p1->x ) * ( p2->y - p1->y ) + ( p2->x - p1->x ) * ( p1->y - p.y ) ) <= 0.8 * fabs( ( p2->x - p1->x ) * p.y * ptwXY1->accuracy ) ) 
         goto checkForZeroCrossing;
-    if( ( status = ptwXY_setValueAtX( ptwXY1, p.x, p.y ) ) != nfu_Okay ) return( status );
-    if( ( status = ptwXY_applyFunction2( ptwXY1, y1, y, p1, &p, func, argList, level + 1, checkForRoots ) ) ) return( status );
-    return( ptwXY_applyFunction2( ptwXY1, y, y2, &p, p2, func, argList, level + 1, checkForRoots ) );
+    if( ( status = ptwXY_setValueAtX( smr, ptwXY1, p.x, p.y ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_applyFunction2( smr, ptwXY1, y1, y, p1, &p, func, argList, level + 1, checkForRoots ) ) ) return( status );
+    return( ptwXY_applyFunction2( smr, ptwXY1, y, y2, &p, p2, func, argList, level + 1, checkForRoots ) );
 
 checkForZeroCrossing:
-    if( checkForRoots && ( ( p1->y * p2->y ) < 0. ) ) return( ptwXY_applyFunctionZeroCrossing( ptwXY1, y1, y2, p1, p2, func, argList ) );
+    if( checkForRoots && ( ( p1->y * p2->y ) < 0. ) )
+        return( ptwXY_applyFunctionZeroCrossing( smr, ptwXY1, y1, y2, p1, p2, func, argList ) );
     return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-static nfu_status ptwXY_applyFunctionZeroCrossing( ptwXYPoints *ptwXY1, double y1, double y2, ptwXYPoint *p1, ptwXYPoint *p2, 
-        ptwXY_applyFunction_callback func, void *argList ) {
+static nfu_status ptwXY_applyFunctionZeroCrossing( statusMessageReporting *smr, ptwXYPoints *ptwXY1, double y1, double y2, 
+        ptwXYPoint *p1, ptwXYPoint *p2, ptwXY_applyFunction_callback func, void *argList ) {
 
     int i;
     double y, x1 = p1->x, x2 = p2->x, nY1 = p1->y, nY2 = p2->y, refY = 0.5 * ( fabs( p1->y ) + fabs( p2->y ) );
@@ -246,9 +306,12 @@ static nfu_status ptwXY_applyFunctionZeroCrossing( ptwXYPoints *ptwXY1, double y
         p.x = ( nY2 * x1 - nY1 * x2 ) / ( nY2 - nY1 );
         if( p.x <= x1 ) p.x = 0.5 * ( x1 + x2 );
         if( p.x >= x2 ) p.x = 0.5 * ( x1 + x2 );
-        if( ( status = ptwXY_interpolatePoint( ptwXY1->interpolation, p.x, &y, p1->x, y1, p2->x, y2 ) ) != nfu_Okay ) return( status );
+        if( ( status = ptwXY_interpolatePoint( smr, ptwXY1->interpolation, p.x, &y, p1->x, y1, p2->x, y2 ) ) != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( status );
+        }
         p.y = y;
-        if( ( status = func( &p, argList ) ) != nfu_Okay ) return( status );
+        if( ( status = func( smr, &p, argList ) ) != nfu_Okay ) return( status );
         if( p.y == 0 ) break;
         if( 0.5 * refY < fabs( p.y ) ) break;
         refY = fabs( p.y );
@@ -260,25 +323,28 @@ static nfu_status ptwXY_applyFunctionZeroCrossing( ptwXYPoints *ptwXY1, double y
             nY1 = p.y;
         }
     }
-    return( ptwXY_setValueAtX( ptwXY1, p.x, 0. ) );
+    return( ptwXY_setValueAtX( smr, ptwXY1, p.x, 0. ) );
 }
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_fromString( char const *str, char sep, ptwXY_interpolation interpolation, char const *interpolationString,
-    double biSectionMax, double accuracy, char **endCharacter, nfu_status *status ) {
+ptwXYPoints *ptwXY_fromString( statusMessageReporting *smr, char const *str, char sep, ptwXY_interpolation interpolation, 
+        char const *interpolationString, double biSectionMax, double accuracy, char **endCharacter ) {
 
     int64_t numberConverted;
     double  *doublePtr;
     ptwXYPoints *ptwXY = NULL;
 
-    if( ( doublePtr = nfu_stringToListOfDoubles( str, sep, &numberConverted, endCharacter, status ) ) == NULL ) return( NULL );
-    *status = nfu_oddNumberOfValues;
-    if( ( numberConverted % 2 ) == 0 ) {
-        *status = nfu_Okay;
-        ptwXY = ptwXY_create( interpolation, interpolationString, biSectionMax, accuracy, numberConverted, 10, numberConverted / 2, doublePtr, status, 0 );
+    if( ( doublePtr = nfu_stringToListOfDoubles( smr, str, sep, &numberConverted, endCharacter ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
     }
-    nfu_free( doublePtr );
+    if( ( numberConverted % 2 ) == 0 ) {
+        ptwXY = ptwXY_create( NULL, interpolation, interpolationString, biSectionMax, accuracy, numberConverted, 10, numberConverted / 2, doublePtr, 0 ); }
+    else {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_oddNumberOfValues, "Odd number = %d of float for ptwXY.", (int) numberConverted );
+    }
+    smr_freeMemory2( doublePtr );
     return( ptwXY );
 }
 /*
@@ -286,9 +352,11 @@ ptwXYPoints *ptwXY_fromString( char const *str, char sep, ptwXY_interpolation in
 */
 void ptwXY_showInteralStructure( ptwXYPoints *ptwXY, FILE *f, int printPointersAsNull ) {
 
-    int64_t i, n = ptwXY_getNonOverflowLength( ptwXY );
+    int64_t i, n1;
     ptwXYPoint *point = ptwXY->points;
     ptwXYOverflowPoint *overflowPoint;
+
+    n1 = ptwXY_getNonOverflowLength( NULL, ptwXY );
 
     fprintf( f, "status = %d  interpolation = %d  length = %d  allocatedSize = %d\n", 
         (int) ptwXY->status, (int) ptwXY->interpolation, (int) ptwXY->length, (int) ptwXY->allocatedSize );
@@ -298,7 +366,7 @@ void ptwXY_showInteralStructure( ptwXYPoints *ptwXY, FILE *f, int printPointersA
     fprintf( f, "  overflowLength = %d  overflowAllocatedSize = %d  mallocFailedSize = %d\n", 
         (int) ptwXY->overflowLength, (int) ptwXY->overflowAllocatedSize, (int) ptwXY->mallocFailedSize );
     fprintf( f, "  Points data, points = %20p\n", ( printPointersAsNull ? NULL : ptwXY->points ) );
-    for( i = 0; i < n; i++,  point++ ) fprintf( f, "    %14.7e %14.7e\n", point->x, point->y );
+    for( i = 0; i < n1; i++,  point++ ) fprintf( f, "    %14.7e %14.7e\n", point->x, point->y );
     fprintf( f, "  Overflow points data; %20p\n", ( printPointersAsNull ? NULL : &(ptwXY->overflowHeader) ) );
     for( overflowPoint = ptwXY->overflowHeader.next; overflowPoint != &(ptwXY->overflowHeader); overflowPoint = overflowPoint->next ) {
         fprintf( f, "    %14.7e %14.7e %8d %20p %20p %20p\n", overflowPoint->point.x, overflowPoint->point.y, (int) overflowPoint->index, 
@@ -307,27 +375,27 @@ void ptwXY_showInteralStructure( ptwXYPoints *ptwXY, FILE *f, int printPointersA
     }
     fprintf( f, "  Points in order\n" );
     for( i = 0; i < ptwXY->length; i++ ) {
-        point = ptwXY_getPointAtIndex( ptwXY, i );
+        point = ptwXY_getPointAtIndex_Unsafely( ptwXY, i );
         fprintf( f, "    %14.7e %14.7e\n", point->x, point->y );
     }
 }
 /*
 ************************************************************
 */
-void ptwXY_simpleWrite( ptwXYPoints *ptwXY, FILE *f, char *format ) {
+void ptwXY_simpleWrite( ptwXYPoints *ptwXY, FILE *f, char const *format ) {
 
     int64_t i;
     ptwXYPoint *point;
 
     for( i = 0; i < ptwXY->length; i++ ) {
-        point = ptwXY_getPointAtIndex( ptwXY, i );
+        point = ptwXY_getPointAtIndex_Unsafely( ptwXY, i );
         fprintf( f, format, point->x, point->y );
     }
 }
 /*
 ************************************************************
 */
-void ptwXY_simplePrint( ptwXYPoints *ptwXY, char *format ) {
+void ptwXY_simplePrint( ptwXYPoints *ptwXY, char const *format ) {
 
     ptwXY_simpleWrite( ptwXY, stdout, format );
 }

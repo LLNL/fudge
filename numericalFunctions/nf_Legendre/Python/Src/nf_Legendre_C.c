@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -62,6 +86,7 @@ staticforward PyTypeObject nf_Legendre_CPyType;
 
 typedef struct nf_Legendre_CPy_s {
     PyObject_HEAD
+    statusMessageReporting smr;
     nf_Legendre *nfL;
 } nf_Legendre_CPy;
 
@@ -88,8 +113,10 @@ static PyObject *nf_Legendre_C_toString2( nf_Legendre_CPy *self, char *format, c
 static char *nf_Legendre_C_toString_isFormatForDouble( char *format, int returnFormat );
 static int nf_Legendre_C_pythonDoubleListToCList( PyObject *PyDoubleList, double **ds );
 static int nf_Legendre_C_PyNumberToFloat( PyObject *n, double *d );
+static void nf_Legendre_C_SetPyErrorExceptionFromSMR( PyObject *type, statusMessageReporting *smr );
 static PyObject *nf_Legendre_C_SetPyErrorExceptionReturnNull( const char *s, ... );
 static int nf_Legendre_C_SetPyErrorExceptionReturnMinusOne( const char *s, ... );
+static int nf_Legendre_C_checkStatus( nf_Legendre_CPy *self );
 
 static PyObject *nf_Legendre_C_from_pointwiseXY_C( PyObject *self, PyObject *args );
 static PyObject *nf_Legendre_C_getMaxMaxOrder( PyObject *self );
@@ -103,6 +130,7 @@ static nf_Legendre_CPy *nf_Legendre_CNewInitialize( void ) {
     nf_Legendre_CPy *self = (nf_Legendre_CPy *) PyObject_New( nf_Legendre_CPy, &nf_Legendre_CPyType );
 
     if( self ) {
+        smr_initialize( &(self->smr), smr_status_Ok );
         self->nfL = NULL;
     }
     return( self );
@@ -114,7 +142,6 @@ static int nf_Legendre_C__init__( nf_Legendre_CPy *self, PyObject *args, PyObjec
 
     int initialSize = 0, maxOrder = -1;
     double *Cls = NULL;
-    nfu_status status_nf;
     static char *kwlist[] = { "Cls", "initialSize", NULL };
     PyObject *ClsPy = NULL;
 
@@ -125,7 +152,7 @@ static int nf_Legendre_C__init__( nf_Legendre_CPy *self, PyObject *args, PyObjec
         if( ( maxOrder = nf_Legendre_C_pythonDoubleListToCList( ClsPy, &Cls ) ) < 0 ) return( -1 );
         maxOrder--;
     }
-    if( ( self->nfL = nf_Legendre_new( 0, maxOrder, Cls, &status_nf ) ) == NULL ) {
+    if( ( self->nfL = nf_Legendre_new( NULL, 0, maxOrder, Cls ) ) == NULL ) {
         if( Cls != NULL ) free( Cls );
         PyErr_NoMemory( );
         return( -1 );
@@ -150,6 +177,8 @@ static void nf_Legendre_C_dealloc( PyObject *self ) {
 */
 static PyObject *nf_Legendre_C__repr__( nf_Legendre_CPy *self ) {
 
+    if( nf_Legendre_C_checkStatus( self ) != 0 ) return( NULL );
+
     return( nf_Legendre_C_toString2( self, "%16.8e", " " ) );
 }
 /*
@@ -157,44 +186,59 @@ static PyObject *nf_Legendre_C__repr__( nf_Legendre_CPy *self ) {
 */
 static Py_ssize_t nf_Legendre_C__len__( nf_Legendre_CPy *self ) {
 
-    return( (Py_ssize_t) nf_Legendre_maxOrder( self->nfL ) + 1 );
+    int maxOrder;
+
+    if( nf_Legendre_C_checkStatus( self ) != 0 ) return( -1 );
+
+    nf_Legendre_maxOrder( NULL, self->nfL, &maxOrder );
+
+    return( (Py_ssize_t) maxOrder + 1 );
 }
 /*
 ************************************************************
 */
 static PyObject *nf_Legendre_C__getitem__( nf_Legendre_CPy *self, Py_ssize_t l ) {
 
-    nfu_status status_nf;
-    double d;
+    int maxOrder;
+    double Cl;
+    statusMessageReporting *smr = &(self->smr);
 
-    if( l < 0 ) l += nf_Legendre_maxOrder( self->nfL ) + 1;
-    d = nf_Legendre_getCl( self->nfL, (int) l, &status_nf );
+    if( nf_Legendre_C_checkStatus( self ) != 0 ) return( NULL );
 
-    if( status_nf != nfu_Okay ) {
-        PyErr_SetString( PyExc_IndexError, "index out of range" );
+    nf_Legendre_maxOrder( NULL, self->nfL, &maxOrder );
+
+    if( l < 0 ) l += maxOrder + 1;
+    if( nf_Legendre_getCl( smr, self->nfL, (int) l, &Cl ) != nfu_Okay ) {
+        nf_Legendre_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
         return( NULL );
     }
 
-    return( (PyObject *) Py_BuildValue( "d", d ) );
+    return( (PyObject *) Py_BuildValue( "d", Cl ) );
 }
 /*
 ************************************************************
 */
-static int nf_Legendre_C__setitem__( nf_Legendre_CPy *self, Py_ssize_t l_, PyObject *value ) {
+static int nf_Legendre_C__setitem__( nf_Legendre_CPy *self, Py_ssize_t _l, PyObject *value ) {
 /*
-*   This routine can be called either when "self[l_] = number" or "del self[l_]".
+*   This routine can be called either when "self[l] = number" or "del self[l]".
 */
-    int l = (int) l_;
+    int l = (int) _l, maxOrder;
     double Cl;
+    statusMessageReporting *smr = &(self->smr);
 
-    if( l < 0 ) l += nf_Legendre_maxOrder( self->nfL ) + 1;
+    if( nf_Legendre_C_checkStatus( self ) != 0 ) return( -1 );
+
+    nf_Legendre_maxOrder( NULL, self->nfL, &maxOrder );
+    if( l < 0 ) l += maxOrder + 1;
 
     if( value == NULL ) {                   /* Currently, deleting a coefficient is not supported. */
         return( 0 ); }
     else {
         if( nf_Legendre_C_PyNumberToFloat( value, &Cl ) < 0 ) return( -1 );
-        if( nf_Legendre_setCl( self->nfL, l, Cl ) != nfu_Okay )
-            return( nf_Legendre_C_SetPyErrorExceptionReturnMinusOne( "l = %d out of range", l_ ) );
+        if( nf_Legendre_setCl( smr, self->nfL, l, Cl ) != nfu_Okay ) {
+            nf_Legendre_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+            return( -1 );
+        }
     }
     return( 0 );
 }
@@ -218,7 +262,13 @@ static PySequenceMethods nf_Legendre_CPy_sequence = {
 */
 static PyObject *nf_Legendre_C_getMaxOrder( nf_Legendre_CPy *self ) {
 
-    return( Py_BuildValue( "i", nf_Legendre_maxOrder( self->nfL ) ) );
+    int maxOrder;
+
+    if( nf_Legendre_C_checkStatus( self ) != 0 ) return( NULL );
+
+    nf_Legendre_maxOrder( NULL, self->nfL, &maxOrder );
+
+    return( Py_BuildValue( "i", maxOrder ) );
 }
 /*
 ************************************************************
@@ -226,16 +276,24 @@ static PyObject *nf_Legendre_C_getMaxOrder( nf_Legendre_CPy *self ) {
 static PyObject *nf_Legendre_C_normalize( nf_Legendre_CPy *self ) {
 
     nf_Legendre *nfL;
-    nfu_status status_nf;
     nf_Legendre_CPy *nfL_Py;
+    statusMessageReporting *smr = &(self->smr);
 
-    if( ( nfL = nf_Legendre_clone( (nf_Legendre *) self->nfL, &status_nf ) ) == NULL )
-        return( nf_Legendre_C_SetPyErrorExceptionReturnNull( "Error from nf_Legendre_clone: %s", nfu_statusMessage( status_nf ) ) );
-    if( ( status_nf = nf_Legendre_normalize( nfL ) ) != nfu_Okay ) {
-        nf_Legendre_free( nfL );
-        return( nf_Legendre_C_SetPyErrorExceptionReturnNull( "Error from nf_Legendre_clone: %s", nfu_statusMessage( status_nf ) ) );
+    if( nf_Legendre_C_checkStatus( self ) != 0 ) return( NULL );
+
+    if( ( nfL = nf_Legendre_clone( smr, (nf_Legendre *) self->nfL ) ) == NULL ) {
+        nf_Legendre_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
     }
-    if( ( nfL_Py = nf_Legendre_CNewInitialize( ) ) == NULL ) return( NULL );
+    if( nf_Legendre_normalize( smr, nfL ) != nfu_Okay ) {
+        nf_Legendre_free( nfL );
+        nf_Legendre_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
+    }
+    if( ( nfL_Py = nf_Legendre_CNewInitialize( ) ) == NULL ) {
+        nf_Legendre_free( nfL );
+        return( NULL );
+    }
     nfL_Py->nfL = nfL;
     return( (PyObject *) nfL_Py );
 }
@@ -247,13 +305,17 @@ static PyObject *nf_Legendre_C_toPointwiseLinear( nf_Legendre_CPy *self, PyObjec
     int biSectionMax = 16, checkForRoots = 0, infill = 1, safeDivide = 1;
     double accuracy;
     static char *kwlist[] = { "accuracy", "biSectionMax", "checkForRoots", "infill", "safeDivide", NULL };
-    nfu_status status_nf;
     ptwXYPoints *ptwXY;
+    statusMessageReporting *smr = &(self->smr);
+
+    if( nf_Legendre_C_checkStatus( self ) != 0 ) return( NULL );
 
     if( !PyArg_ParseTupleAndKeywords( args, keywords, "d|iiii", kwlist, &accuracy, &biSectionMax, &checkForRoots, &infill, &safeDivide ) ) return( NULL );
 
-    if( ( ptwXY = nf_Legendre_to_ptwXY( self->nfL, accuracy, biSectionMax, checkForRoots, &status_nf ) ) == NULL ) 
-        return( nf_Legendre_C_SetPyErrorExceptionReturnNull( "Error from nf_Legendre_to_ptwXY: %s", nfu_statusMessage( status_nf ) ) );
+    if( ( ptwXY = nf_Legendre_to_ptwXY( smr, self->nfL, accuracy, biSectionMax, checkForRoots ) ) == NULL ) {
+        nf_Legendre_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
+    }
 
     return( pointwiseXY_C_factory_create( ptwXY, infill, safeDivide ) );
 }
@@ -264,6 +326,8 @@ static PyObject *nf_Legendre_C_toString( nf_Legendre_CPy *self, PyObject *args, 
 
     char *format = "%16.8e", *sep = " ";
     static char *kwlist[] = { "format", "sep", NULL };
+
+    if( nf_Legendre_C_checkStatus( self ) != 0 ) return( NULL );
 
     if( !PyArg_ParseTupleAndKeywords( args, keywords, "|ss", kwlist, &format, &sep ) ) return( NULL );
     return( nf_Legendre_C_toString2( self, format, sep ) );
@@ -279,9 +343,11 @@ static PyObject *nf_Legendre_C_toString2( nf_Legendre_CPy *self, char *format, c
     nf_Legendre *nfL = self->nfL;
     char *s, *e, *p, dummy[1024];
     PyObject *str;
-    nfu_status status_nf;
 
-    if( ( length = nf_Legendre_maxOrder( nfL ) ) < 0 ) return( PyString_FromString( "" ) );
+    if( nf_Legendre_C_checkStatus( self ) != 0 ) return( NULL );
+
+    nf_Legendre_maxOrder( NULL, self->nfL, &length );
+    if( length < 0 ) return( PyString_FromString( "" ) );
     length++;
 
     s = nf_Legendre_C_toString_isFormatForDouble( format, 0 );
@@ -298,7 +364,7 @@ static PyObject *nf_Legendre_C_toString2( nf_Legendre_CPy *self, char *format, c
     }
     s[0] = 0;
     for( l = 0, e = s; l < length; l++ ) {
-        d = nf_Legendre_getCl( nfL, l, &status_nf );
+        nf_Legendre_getCl( NULL, nfL, l, &d );
         dummyLen = sprintf( e, format, d );
         e += dummyLen;
         if( l < length - 1 ) {
@@ -377,6 +443,14 @@ static int nf_Legendre_C_PyNumberToFloat( PyObject *n, double *d ) {
 /*
 ************************************************************
 */
+static void nf_Legendre_C_SetPyErrorExceptionFromSMR( PyObject *type, statusMessageReporting *smr ) {
+
+    PyErr_SetString( type, smr_getMessage( smr_firstReport( smr ) ) );
+    smr_release( smr );
+}
+/*
+************************************************************
+*/
 static PyObject *nf_Legendre_C_SetPyErrorExceptionReturnNull( const char *s, ... ) {
 
     va_list args;
@@ -402,6 +476,18 @@ static int nf_Legendre_C_SetPyErrorExceptionReturnMinusOne( const char *s, ... )
     Str[sizeof( Str ) - 1] = 0;
     PyErr_SetString( PyExc_Exception, Str );
     va_end( args );
+    return( -1 );
+}
+/*
+************************************************************
+*/
+static int nf_Legendre_C_checkStatus( nf_Legendre_CPy *self ) {
+
+    nfu_status status_nf = self->nfL->status;
+
+    if( status_nf == nfu_Okay ) return( 0 );
+    nf_Legendre_C_SetPyErrorExceptionReturnMinusOne(
+        "listOfDoubles_C object had a prior error and is not usable: status = %d", status_nf, nfu_statusMessage( status_nf ) );
     return( -1 );
 }
 /*
@@ -485,17 +571,21 @@ static PyTypeObject nf_Legendre_CPyType = {
 static PyObject *nf_Legendre_C_from_pointwiseXY_C( PyObject *self, PyObject *args ) {
 
     int maxOrder;
-    nfu_status status_nf;
     ptwXYPoints *ptwXY;
     PyObject *ptwXY_Py;
     nf_Legendre *nfL;
     nf_Legendre_CPy *nfL_Py;
+    statusMessageReporting smr;
+
+    smr_initialize( &smr, smr_status_Ok );
 
     if( !PyArg_ParseTuple( args, "Oi", &ptwXY_Py, &maxOrder ) ) return( NULL );
     if( ( ptwXY = pointwiseXY_C_factory_get_ptwXYPoints( ptwXY_Py ) ) == NULL ) return( NULL );
 
-    if( ( nfL = nf_Legendre_from_ptwXY( ptwXY, maxOrder, &status_nf ) ) == NULL )
-        return( nf_Legendre_C_SetPyErrorExceptionReturnNull( "Error from nf_Legendre_from_ptwXY: %s", nfu_statusMessage( status_nf ) ) );
+    if( ( nfL = nf_Legendre_from_ptwXY( &smr, ptwXY, maxOrder ) ) == NULL ) {
+        nf_Legendre_C_SetPyErrorExceptionFromSMR( PyExc_Exception, &smr );
+        return( NULL );
+    }
 
     if( ( nfL_Py = nf_Legendre_CNewInitialize( ) ) == NULL ) {
         nf_Legendre_free( nfL ); }

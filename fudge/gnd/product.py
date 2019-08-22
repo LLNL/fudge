@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 """
@@ -86,18 +110,20 @@ from .productData.distributions import KalbachMann as KalbachMannModule
 from .productData import multiplicity as multiplicityModule
 from .productData import energyDeposition as energyDepositionModule
 from .productData import momentumDeposition as momentumDepositionModule
-from . import channels
+from . import channels as channelsModule
 from . import productData
 
 __metaclass__ = type
 
 class product( ancestryModule.ancestry ) :
-    """This is the class for a gnd particle. A gnd particle can decay (i.e., breakup), the decay
-    formula is defined via the decayChannel member."""
+    """
+    This is the class for a gnd particle. A gnd particle can decay (i.e., breakup), the decay
+    formula is defined via the outputChannel member.
+    """
 
     moniker = 'product'
 
-    def __init__( self, particle, label = None, attributes = {}, decayChannel = None ) :
+    def __init__( self, particle, label = None, attributes = {}, outputChannel = None ) :
         """Creates a new product object."""
 
         ancestryModule.ancestry.__init__( self )
@@ -105,8 +131,8 @@ class product( ancestryModule.ancestry ) :
         self.__label = label
         self.attributes = {}
         for q in attributes : self.addAttribute( q, attributes[q] )
-        self.decayChannel = None
-        if( decayChannel is not None ) : self.addDecayChannel( decayChannel )
+        self.outputChannel = None
+        if( outputChannel is not None ) : self.addOutputChannel( outputChannel )
 
         self.multiplicity = multiplicityModule.component( )
         self.multiplicity.setAncestor( self )
@@ -125,8 +151,8 @@ class product( ancestryModule.ancestry ) :
 
         if( self.name < other.name ) : return( -1 )
         if( self.name > other.name ) : return(  1 )
-        if( self.decayChannel < other.decayChannel ) : return( -1 )
-        if( self.decayChannel > other.decayChannel ) : return(  1 )
+        if( self.outputChannel < other.outputChannel ) : return( -1 )
+        if( self.outputChannel > other.outputChannel ) : return(  1 )
         return( 0 )
 
     def  __str__( self ) :
@@ -153,18 +179,14 @@ class product( ancestryModule.ancestry ) :
         self.__label = value
 
 
-    def addDecayChannel( self, decayChannel ) :
-        """Adds decayChannel to particle."""
+    def addOutputChannel( self, outputChannel ) :
+        """Adds outputChannel to particle."""
 
-        if( isinstance( decayChannel, channels.channel ) ) :
-            decayChannel.setAncestor( self )
-            self.decayChannel = decayChannel
+        if( isinstance( outputChannel, channelsModule.channel ) ) :
+            outputChannel.setAncestor( self )
+            self.outputChannel = outputChannel
         else :
-            raise Exception( 'Invalid decay channel = %s' % brb.getType( decayChannel ) )
-
-    def addDistributionComponent( self, component ) : 
-
-        self.distribution.addComponent( component )
+            raise Exception( 'Invalid decay channel = %s' % brb.getType( outputChannel ) )
 
     def addAttribute( self, name, value ) :
         """Add name and value to attribute list."""
@@ -173,11 +195,11 @@ class product( ancestryModule.ancestry ) :
 
     def checkProductFrame( self ) :
         """
-        Calls checkProductFrame for self's distributions and if present for its decayChannel.
+        Calls checkProductFrame for self's distributions and if present for its outputChannel.
         """
 
         self.distribution.checkProductFrame( )
-        if( self.decayChannel is not None ) : self.decayChannel.checkProductFrame( )
+        if( self.outputChannel is not None ) : self.outputChannel.checkProductFrame( )
 
     def domainMin( self, unitTo = None, asPQU = False ) :
 
@@ -207,56 +229,83 @@ class product( ancestryModule.ancestry ) :
         if( name in self.attributes ) : return( self.attributes[name] )
         return( None )
 
-    def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
+    def calculateAverageProductData( self, style, indent, **kwargs ) :
 
-        if( processInfo.verbosity >= 20 ) :
-            print '%s%s: label = %s: calculating deposition data' % ( verbosityIndent, self.name, self.label )
+        verbosity = kwargs['verbosity']
+        indent2 = indent  + kwargs['incrementalIndent']
+        indent3 = indent2 + kwargs['incrementalIndent']
+        energyUnit = kwargs['incidentEnergyUnit']
+        momentumDepositionUnit = energyUnit + '/c'
+        energyAccuracy = kwargs['energyAccuracy']
+        momentumAccuracy = kwargs['momentumAccuracy']
+
+        if( verbosity > 1 ) :
+            print '%s%s: label = %s: calculating average product data' % ( indent, self.name, self.label )
         if( len( self.distribution ) > 0 ) :
-            tempInfo['multiplicity'] = self.multiplicity
-            tempInfo['product'] = self
-            for newData in self.distribution.calculateDepositionData( processInfo, tempInfo, verbosityIndent ) :
-                if isinstance( newData, productData.energyDeposition.pointwise ):
-                    self.energyDeposition.add( newData )
-                elif isinstance( newData, productData.momentumDeposition.pointwise ):
-                    self.momentumDeposition.add( newData )
-        if( self.decayChannel is not None ) :
-            for product in self.decayChannel :
-                product.calculateDepositionData( processInfo, tempInfo, verbosityIndent + processInfo.verbosityIndentStep )
+            multiplicity = style.findFormMatchingDerivedStyles( self.multiplicity )
+            kwargs['multiplicity'] = multiplicity.toPointwise_withLinearXYs( 1e-8, 1e-8 )
+            kwargs['product'] = self
+            energyData, momentumData = self.distribution.calculateAverageProductData( style, indent = indent2, **kwargs )
+            if( energyData is not None ) :
+                axes = energyDepositionModule.XYs1d.defaultAxes( energyUnit = energyUnit, energyDepositionUnit = energyUnit )
+                if( len( energyData ) == 1 ) :
+                    averageEnergy = energyDepositionModule.XYs1d( data = energyData[0], axes = axes, label = style.label, 
+                            accuracy = energyAccuracy ) 
+                else :
+                    averageEnergy = energyDepositionModule.regions1d( axes = axes, label = style.label )
+                    for energyDataRegion in energyData :
+                        averageEnergyRegion = energyDepositionModule.XYs1d( data = energyDataRegion, axes = axes, 
+                                accuracy = energyAccuracy )
+                        averageEnergy.append( averageEnergyRegion )
+                self.energyDeposition.add( averageEnergy )
+            if( momentumData is not None ) :
+                axes = momentumDepositionModule.XYs1d.defaultAxes( energyUnit = energyUnit, momentumDepositionUnit = momentumDepositionUnit )
+                if( len( momentumData ) == 1 ) :
+                    averageMomentum = momentumDepositionModule.XYs1d( data = momentumData[0], axes = axes, label = style.label, 
+                            accuracy = energyAccuracy ) 
+                else :
+                    averageMomentum = momentumDepositionModule.regions1d( axes = axes, label = style.label ) 
+                    for momentumDataRegion in momentumData :
+                        averageMomentumRegion = momentumDepositionModule.XYs1d( data = momentumDataRegion, axes = axes, 
+                                accuracy = momentumAccuracy ) 
+                        averageMomentum.append( averageMomentumRegion )
+                self.momentumDeposition.add( averageMomentum )
+        if( self.outputChannel is not None ) : self.outputChannel.calculateAverageProductData( style, indent = indent3, **kwargs )
 
-    def process( self, processInfo, tempInfo, verbosityIndent ) :
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
 
-        doProcess = True
-        if( 'LLNL_Pn' in processInfo['styles'] ) :
-            if( not( processInfo.isProcessParticle( self.name ) ) ) : doProcess = False
+        indent2 = indent + tempInfo['incrementalIndent']
+        verbosity = tempInfo['verbosity']
+        status = 0
 
-        processInfo['workFile'].append( self.label )
-        if( doProcess ) :
-            if( processInfo.verbosity >= 20 ) : print '%s%s: label = %s: processing: (%s)' % \
-                ( verbosityIndent, self.name, self.label, self.distribution.nativeData )
+        tempInfo['workFile'].append( self.label )
+
+        if( self.particle.name in style.transportables ) :
+            if( verbosity > 1 ) :
+                print '%s%s: label = %s: Sn processing' % ( indent, self.name, self.label )
 
             productMass = tempInfo['masses']['Product']             # Save to restore later
             tempInfo['masses']['Product'] = self.getMass( tempInfo['massUnit'] )
+            tempInfo['product'] = self
+            tempInfo['multiplicity'] = self.multiplicity
 
-            if( self.distribution.nativeData not in [ distributionsModule.base.unspecifiedComponentToken, distributionsModule.base.unknownGenre ] ) :
-                tempInfo['product'] = self
-                tempInfo['multiplicity'] = self.multiplicity
-                self.multiplicity.process( processInfo, tempInfo, verbosityIndent + processInfo.verbosityIndentStep )
-                try :
-                    self.distribution.process( processInfo, tempInfo, verbosityIndent + processInfo.verbosityIndentStep )
-                except :
-                    if( processInfo['logFile'] is None ) :
-                        raise
-                    else :
-                        import traceback
-                        processInfo['logFile'].write( '\n' + self.toXLink() + ':\n' + traceback.format_exc( ) + '\n' )
-                for genre in self.data :
-                    self.data[genre].process( processInfo, tempInfo, verbosityIndent + processInfo.verbosityIndentStep )
+            self.multiplicity.processSnMultiGroup( style, tempInfo, indent )
+            self.energyDeposition.processSnMultiGroup( style, tempInfo, indent )
+            self.momentumDeposition.processSnMultiGroup( style, tempInfo, indent )
+            try :
+                self.distribution.processSnMultiGroup( style, tempInfo, indent )
+            except :
+                if( tempInfo['logFile'] is None ) :
+                    raise
+                else :
+                    import traceback
+                    tempInfo['logFile'].write( '\n' + self.toXLink() + ':\n' + traceback.format_exc( ) + '\n' )
+                    status = 1
             tempInfo['masses']['Product'] = productMass
 
-        if( self.decayChannel is not None ) :
-            for product in self.decayChannel :
-                product.process( processInfo, tempInfo, verbosityIndent + processInfo.verbosityIndentStep )
-        del processInfo['workFile'][-1]
+        if( self.outputChannel is not None ) : status += self.outputChannel.processSnMultiGroup( style, tempInfo, indent2 )
+        del tempInfo['workFile'][-1]
+        return( status )
 
     def check( self, info ):
         """ check product and distributions """
@@ -324,11 +373,10 @@ class product( ancestryModule.ancestry ) :
                 for subform in form.subforms:
                     checkForm( subform )
 
-        if self.decayChannel is not None:
-            from fudge import gnd
+        if self.outputChannel is not None:
             parentIsTwoBody = info['isTwoBody']
-            info['isTwoBody'] = (self.decayChannel.genre is gnd.channels.twoBodyGenre)
-            for decayProduct in self.decayChannel:
+            info['isTwoBody'] = isinstance( self.outputChannel, channelsModule.twoBodyOutputChannel )
+            for decayProduct in self.outputChannel:
                 decayWarnings = decayProduct.check( info )
                 if decayWarnings:
                     warnings.append( warning.context("Decay product: %s" % decayProduct.label, decayWarnings) )
@@ -346,16 +394,16 @@ class product( ancestryModule.ancestry ) :
                 attributeString += ' %s="%s"' % ( q, self.attributes[q].toString( keepPeriod = False ) )
             else :
                 attributeString += ' %s="%s"' % ( q, self.attributes[q] )
-        xmlString = [ '%s<product name="%s" label="%s"%s>' % ( indent, self.name, self.label, attributeString ) ]
+        xmlString = [ '%s<%s name="%s" label="%s"%s>' % ( indent, self.moniker, self.name, self.label, attributeString ) ]
 
         xmlString += self.multiplicity.toXMLList( indent2, **kwargs )
         xmlString += self.distribution.toXMLList( indent2, **kwargs )
         xmlString += self.energyDeposition.toXMLList( indent2, **kwargs )
         xmlString += self.momentumDeposition.toXMLList( indent2, **kwargs )
 
-        if( not ( self.decayChannel is None ) ) :
-            xmlString += self.decayChannel.toXMLList( indent2, **kwargs )
-        xmlString[-1] += '</product>'
+        if( not ( self.outputChannel is None ) ) :
+            xmlString += self.outputChannel.toXMLList( indent2, **kwargs )
+        xmlString[-1] += '</%s>' % self.moniker
         return( xmlString )
 
     def toString( self, simpleString = False, exposeGammaMultiplicity = False ) :
@@ -389,7 +437,7 @@ class product( ancestryModule.ancestry ) :
                 c = ', '
             if( len( qs ) > 0 ) : qs += ']'
             s = '%s%s' % ( s, qs )
-            if( self.decayChannel is not None ) : s = '(%s -> %s)' % ( s, self.decayChannel )
+            if( self.outputChannel is not None ) : s = '(%s -> %s)' % ( s, self.outputChannel )
         return( s )
 
     @staticmethod
@@ -402,19 +450,19 @@ class product( ancestryModule.ancestry ) :
         prod = product( particle, label = attrs.pop( 'label' ) )
         prod.multiplicity.parseXMLNode( productElement.find( multiplicityModule.component.moniker ), xPath, linkData )
         prod.distribution.parseXMLNode( productElement.find( distributionModule.component.moniker ), xPath, linkData )
-        decayChannel = productElement.find( channels.decayChannelToken )
-        if( decayChannel ) :
-            prod.addDecayChannel( channels.parseXMLNode( decayChannel, xPath, linkData ) )
+        outputChannel = productElement.find( channelsModule.outputChannelToken )
+        if( outputChannel ) :
+            prod.addOutputChannel( channelsModule.parseXMLNode( outputChannel, xPath, linkData ) )
         for attr in ( 'decayRate', 'primary', 'discrete' ) :
             if( attr in attrs ) :
                 from pqu import PQU
                 attrs[attr] = PQU.PQU( attrs[attr] )
         prod.attributes = attrs
 
-        depositionEnergyToken = productData.base.energyDepositionToken
+        depositionEnergyToken = energyDepositionModule.component.moniker
         if( productElement.find( depositionEnergyToken ) is not None ) :
             prod.energyDeposition.parseXMLNode( productElement.find( depositionEnergyToken ), xPath, linkData )
-        depositionMomentumToken = productData.base.momentumDepositionToken
+        depositionMomentumToken = productData.momentumDeposition.component.moniker
         if( productElement.find( depositionMomentumToken ) is not None ) :
             prod.momentumDeposition.parseXMLNode( productElement.find( depositionMomentumToken ), xPath, linkData )
         xPath.pop( )
@@ -428,16 +476,38 @@ class products( suitesModule.suite ) :
 
         suitesModule.suite.__init__( self, ( product, ) )
 
-    def add( self, product ) :
+    def uniqueLabel( self, product ) :
+        """
+        If product's label is the same as another product's label in self, construct a new unique label
+        based on product's name appended with '__' and one or more lower case letters (i.e., 'a' to 'z').
+        """
+
+        def incrementSuffix( suffix ) :
+
+            if( len( suffix ) == 0 ) : return( 'a' )
+            index = string.ascii_lowercase.find( suffix[-1] ) + 1
+            if( index != 26 ) : return( suffix[:-1] + string.ascii_lowercase[index] )
+            return( incrementSuffix( suffix[:-1] ) + 'a' )
 
         if( product.label is None ) : product.__label = product.name
         if( product.label in self ) :
-            name = product.name
-            index = len( [ _product for _product in self if _product.name == name ] )
-            suffixCharacters = string.ascii_lowercase
-            suffix = ''
-            while( index > 0 ) :
-                index, index1 = divmod( index - 1, 26 )
-                suffix = suffixCharacters[index1] + suffix
-            product.label = name + '__' + suffix
-        suitesModule.suite.add( self, product )
+            name__ = product.name + '__'
+            n1 = len( name__ )
+            l1 = 0
+            suffixes = []
+            for _product in self :          # Find list of longest labels that start with name__.
+                if( _product.label[:n1] == name__ ) :
+                    suffix = _product.label[n1:]
+                    if( not( suffix.islower( ) ) ) : continue       # Ignore non-standard labels.
+                    l2 = len( suffix )
+                    if( l2 < l1 ) : continue
+                    if( l2 > l1 ) :
+                        l1 = l2
+                        suffixes = []
+                    suffixes.append( suffix )
+            if( len( suffixes ) == 0 ) :
+                suffix = 'a'
+            else :
+                suffix = incrementSuffix( sorted( suffixes )[-1] )
+            product.label = name__ + suffix
+        return( product )

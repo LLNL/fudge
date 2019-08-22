@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 import math
@@ -43,7 +67,6 @@ import gndToENDF6
 from pqu import PQU as PQUModule
 import fudge.gnd.resonances as resonancesModule
 
-
 #
 # resonances
 #
@@ -51,17 +74,17 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
 
     ZAM, AWT = targetInfo['ZA'], targetInfo['mass']
     NIS, ABN = 1, 1.0; ZAI=ZAM  # assuming only one isotope per file
-        
+
     # get target spin from the particle list:
     target = targetInfo['reactionSuite'].getParticle( targetInfo['reactionSuite'].target.name )
     targetInfo['spin'] = target.getSpin().value
-        
+
     endf = [endfFormatsModule.endfHeadLine( ZAM, AWT, 0, 0, NIS, 0)]
     resolvedCount, unresolvedCount = 0, 0
     # resolved may have multiple energy regions:
     if self.resolved is not None: resolvedCount = max(1,len(self.resolved.regions))
     if self.unresolved is not None: unresolvedCount = 1
-        
+
     # resonances may only contain a scattering radius:
     if not (resolvedCount + unresolvedCount) and self.scatteringRadius:
         scatRadius = self.scatteringRadius.form
@@ -79,7 +102,7 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
     # LFW is a pain: only applies to unresolved, but must be written at the start of MF2
     LRFurr, LFW = 0,0
     if unresolvedCount != 0:
-        LRF_LFW = self.unresolved.nativeData.ENDFconversionFlag
+        LRF_LFW = self.unresolved.evaluated.ENDFconversionFlag
         LRFurr, LFW = map(int, LRF_LFW.split('=')[-1].split(',') )
     NER = resolvedCount + unresolvedCount
     endf.append( endfFormatsModule.endfHeadLine( ZAI, ABN, 0, LFW, NER, 0 ) )
@@ -91,24 +114,25 @@ def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
                 resonancesModule.MLBW.moniker:2,
                 resonancesModule.RM.moniker:3,
                 resonancesModule.RMatrix.moniker:7
-              }[region.nativeData.moniker]
+              }[region.evaluated.moniker]
         EL, EH = region.lowerBound.getValueAs('eV'), region.upperBound.getValueAs('eV')
         if LRF==7: NRO = 0
-        else: NRO = region.nativeData.scatteringRadius.isEnergyDependent()
-        NAPS = not( region.nativeData.calculateChannelRadius )
+        else: NRO = region.evaluated.scatteringRadius.isEnergyDependent()
+        NAPS = not( region.evaluated.calculateChannelRadius )
         endf.append(endfFormatsModule.endfHeadLine( EL,EH,LRU,LRF,NRO,NAPS ) )
-        endf += region.nativeData.toENDF6( flags, targetInfo, verbosityIndent )
+        endf += region.evaluated.toENDF6( flags, targetInfo, verbosityIndent )
     if unresolvedCount != 0:
         LRU = 2 #unresolved
         region = self.unresolved
         EL, EH = region.lowerBound.getValueAs('eV'), region.upperBound.getValueAs('eV')
         NRO, NAPS = 0,0
+        if region.evaluated.scatteringRadius.isEnergyDependent(): NRO = 1
         endf.append(endfFormatsModule.endfHeadLine( EL,EH,LRU,LRFurr,NRO,NAPS ) )
         # pass LFW/LRF so we don't have to calculate twice:
         targetInfo['unresolved_LFW'] = LFW
         targetInfo['unresolved_LRF'] = LRFurr
         targetInfo['regionEnergyBounds'] = (region.lowerBound, region.upperBound)
-        endf += region.nativeData.toENDF6( flags, targetInfo, verbosityIndent )
+        endf += region.evaluated.toENDF6( flags, targetInfo, verbosityIndent )
     endf.append( endfFormatsModule.endfSENDLineNumber() )
     endfMFList[2][151] = endf
 
@@ -136,7 +160,7 @@ def toENDF6( self, flags, targetInfo, verbosityIndent='' ):
     LAD = getattr(self, 'computeAngularDistribution') or 0
     NLSC = getattr(self, 'LvaluesNeededForConvergence') or 0
     endf += [endfFormatsModule.endfHeadLine( targetInfo['spin'], AP, LAD, 0, NLS, NLSC )]
-        
+
     table = [ self.resonanceParameters.table.getColumn('energy',units='eV'),
             self.resonanceParameters.table.getColumn('J') ]
     NE = len(table[0])
@@ -177,7 +201,7 @@ def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
     KRM = {'SLBW':1, 'MLBW':2, 'Reich_Moore':3, 'Full R-Matrix':4} [self.approximation]
     endf = [endfFormatsModule.endfHeadLine(0,0,self.reducedWidthAmplitudes,KRM,
         len(self.spinGroups),self.relativisticKinematics)]
-        
+
     # first describe all the particle pairs (two-body output channels)
     NPP = len(self.channels)
     endf.append( endfFormatsModule.endfHeadLine(0,0,NPP,0,12*NPP,2*NPP) )
@@ -186,13 +210,18 @@ def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
         # ENDF combines spin & parity UNLESS spin==0. Then it wants (0,+/-1)
         if spin.value: return (spin.value * parity.value, 0)
         else: return (spin.value, parity.value)
-        
+
     def MZIP( p ):  # helper: extract mass, z, spin and parity from particle list
-        mass = p.getMass( 'amu' ) / targetInfo['reactionSuite'].getParticle( 'n' ).getMass( 'amu' )
+        #mass = p.getMass( 'amu' ) / targetInfo['reactionSuite'].getParticle( 'n' ).getMass( 'amu' )
+        try:
+            nMass = targetInfo['reactionSuite'].getParticle( 'n' ).getMass( 'amu' )
+        except:
+            nMass = 1.00866491578 # From ENDF102 manual, Appendix H.4
+        mass = p.getMass( 'amu' ) / nMass
         Z = p.getZ_A_SuffixAndZA()[0]
         I,P = getENDFtuple( p.getSpin(), p.getParity() )
         return mass, Z, I, P
-        
+
     for pp in self.channels:
         pA,pB = pp.name.split(' + ')
         # get the xParticle instances for pA and pB:
@@ -214,7 +243,7 @@ def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
         if MT==102: Q = 0
         endf.append( endfFormatsModule.endfDataLine( [MA,MB,ZA,ZB,IA,IB] ) )
         endf.append( endfFormatsModule.endfDataLine( [Q,PNT,SHF,MT,PA,PB] ) )
-        
+
     for spingrp in self.spinGroups:
         AJ,PJ = getENDFtuple( spingrp.spin, spingrp.parity )
         KBK = spingrp.background
@@ -231,7 +260,7 @@ def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
             L = attr['L']
             SCH = attr['channelSpin']
             # some data may have been moved up to the channel list:
-            BND = attr.get('boundaryCondition') or self.boundaryCondition
+            BND = float(attr.get('boundaryCondition') or self.boundaryCondition)
 
             channelOverride = resonancesModule.channelOverride( openChannel.label )
             if openChannel.label in spingrp.overrides:
@@ -267,17 +296,29 @@ resonancesModule.RMatrix.toENDF6 = toENDF6
 #
 def toENDF6( self, flags, targetInfo, verbosityIndent = ''):
 
-    AP = self.scatteringRadius.form.value.inUnitsOf('10*fm').value
+    endf = []
+    AP = self.scatteringRadius
+    if AP.isEnergyDependent():
+        scatRadius = AP.form
+        NR, NP = 1, len(scatRadius)
+        endf.append( endfFormatsModule.endfHeadLine( 0,0,0,0, NR,NP ) )
+        endf += endfFormatsModule.endfInterpolationList( (NP,
+            gndToENDF6.gndToENDFInterpolationFlag( scatRadius.interpolation ) ) )
+        endf += endfFormatsModule.endfNdDataList( scatRadius.convertAxisToUnit( 0, '10*fm' ) )
+        AP = 0
+    else :
+        AP = AP.getValueAs( '10*fm' )
+
     NLS = len(self.L_values)
     LFW = targetInfo['unresolved_LFW']; LRF = targetInfo['unresolved_LRF']
-        
+
     def v(val): # get value back from PhysicalQuantityWithUncertainty
         if type(val)==type(None): return
         return val.getValueAs('eV')
-        
+
     if LFW==0 and LRF==1:   # 'Case A' from ENDF 2010 manual pg 70
-        endf = [endfFormatsModule.endfHeadLine( targetInfo['spin'], AP, 
-            self.forSelfShieldingOnly,0,NLS,0) ]
+        endf.append( endfFormatsModule.endfHeadLine( targetInfo['spin'], AP,
+            self.forSelfShieldingOnly,0,NLS,0) )
         for Lval in self.L_values:
             NJS = len(Lval.J_values)
             endf.append(endfFormatsModule.endfHeadLine( targetInfo['mass'], 0, Lval.L, 0, 6*NJS, NJS ))
@@ -286,12 +327,12 @@ def toENDF6( self, flags, targetInfo, verbosityIndent = ''):
                 ave = Jval.constantWidths
                 endf.append( endfFormatsModule.endfDataLine([v(ave.levelSpacing),Jval.J.value,
                     Jval.neutronDOF,v(ave.neutronWidth),v(ave.captureWidth),0]) )
-        
+
     elif LFW==1 and LRF==1: # 'Case B'
         energies = self.L_values[0].J_values[0].energyDependentWidths.getColumn('energy',units='eV')
         NE = len(energies)
-        endf = [endfFormatsModule.endfHeadLine( targetInfo['spin'], AP,
-            self.forSelfShieldingOnly, 0, NE, NLS )]
+        endf.append( endfFormatsModule.endfHeadLine( targetInfo['spin'], AP,
+            self.forSelfShieldingOnly, 0, NE, NLS ) )
         nlines = int(math.ceil(NE/6.0))
         for line in range(nlines):
             endf.append( endfFormatsModule.endfDataLine( energies[line*6:line*6+6] ) )
@@ -306,10 +347,10 @@ def toENDF6( self, flags, targetInfo, verbosityIndent = ''):
                 fissWidths = Jval.energyDependentWidths.getColumn('fissionWidthA',units='eV')
                 for line in range(nlines):
                     endf.append( endfFormatsModule.endfDataLine( fissWidths[line*6:line*6+6] ) )
-        
+
     elif LRF==2:            # 'Case C', most common in ENDF
-        endf = [endfFormatsModule.endfHeadLine( targetInfo['spin'], AP, 
-            self.forSelfShieldingOnly,0,NLS,0) ]
+        endf.append( endfFormatsModule.endfHeadLine( targetInfo['spin'], AP,
+            self.forSelfShieldingOnly,0,NLS,0) )
         INT = gndToENDF6.gndToENDFInterpolationFlag( self.interpolation )
         for Lval in self.L_values:
             NJS = len(Lval.J_values)

@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -45,6 +69,7 @@
 #include <math.h>
 #include <stdarg.h>
 
+#include <nfut_utilities.h>
 #include <ptwXY.h>
 
 #define size 1001
@@ -60,9 +85,11 @@ int main( int argc, char **argv ) {
 
     int i, n, iarg, echo = 0;
     ptwXYPoints *u, *v, *y, *e;
-    double xy2[2*2], x, dx, u1, v1;
-    nfu_status status;
+    double xy2[2*2], x, dx, u1, v1, domainMaxY, domainMaxE;
     FILE *ff;
+    statusMessageReporting smr;
+
+    smr_initialize( &smr, smr_status_Ok );
 
     for( iarg = 1; iarg < argc; iarg++ ) {
         if( strcmp( "-e", argv[iarg] ) == 0 ) {
@@ -88,11 +115,11 @@ int main( int argc, char **argv ) {
         xy2[3] = getDouble( argv[4] );
     }
 
-    if( ( u = ptwXY_create( ptwXY_interpolationLinLin, NULL, 5, 1e-3, 10, 10, 2, xy2, &status, 0 ) ) == NULL ) printMsg( "u creation: status = %d: %s", 
-        status, nfu_statusMessage( status ) );
+    if( ( u = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 5, 1e-3, 10, 10, 2, xy2, 0 ) ) == NULL )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
     xy2[3] = -1.0;
-    if( ( v = ptwXY_create( ptwXY_interpolationLinLin, NULL, 5, 1e-3, 10, 10, 2, xy2, &status, 0 ) ) == NULL ) printMsg( "v creation: status = %d: %s", 
-        status, nfu_statusMessage( status ) );
+    if( ( v = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 5, 1e-3, 10, 10, 2, xy2, 0 ) ) == NULL )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
 
     ff = fopen( "curve_u.dat", "w" );
     ptwXY_simpleWrite( u, ff, "%g, %g\n" );
@@ -102,28 +129,30 @@ int main( int argc, char **argv ) {
     ptwXY_simpleWrite( v, ff, "%g, %g\n" );
     fclose( ff );
 
-    if( ( y = ptwXY_mul2_ptwXY( u, v, &status ) ) == NULL ) printMsg( "y creation: status = %d: %s", status, nfu_statusMessage( status ) );
+    if( ( y = ptwXY_mul2_ptwXY( &smr, u, v ) ) == NULL ) nfut_printSMRErrorExit2p( &smr, "Via." );
 
     ff = fopen( "u_times_v.dat", "w" );
     ptwXY_simpleWrite( y, ff, "%g, %g\n" );
     fclose( ff );
 
     n = 1000;
-    x = ptwXY_domainMin( y );
-    dx = ( ptwXY_domainMax( y ) - x ) / n;
-    if( ( e = ptwXY_new( ptwXY_interpolationLinLin, NULL, 5, 1e-3, 10, 10, &status, 0 ) ) == NULL ) printMsg( "e creation: status = %d: %s", 
-        status, nfu_statusMessage( status ) );
+    if( ptwXY_domainMin( &smr, y, &x  ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
+    if( ptwXY_domainMax( &smr, y, &domainMaxY ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
+    dx = ( domainMaxY - x ) / n;
+    if( ( e = ptwXY_new( &smr, ptwXY_interpolationLinLin, NULL, 5, 1e-3, 10, 10, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
     for( i = 0; i < n; i++ ) {
-        ptwXY_getValueAtX( u, x, &u1 );
-        ptwXY_getValueAtX( v, x, &v1 );
-        ptwXY_setValueAtX( e, x, u1 * v1 );
+        if( ptwXY_getValueAtX( &smr, u, x, &u1 ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
+        if( ptwXY_getValueAtX( &smr, v, x, &v1 ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
+        if( ptwXY_setValueAtX( &smr, e, x, u1 * v1 ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
         x += dx;
     }
-    if( ptwXY_domainMax( e ) < ptwXY_domainMax( y ) ) {
-        x = ptwXY_domainMax( y );
-        ptwXY_getValueAtX( u, x, &u1 );
-        ptwXY_getValueAtX( v, x, &v1 );
-        ptwXY_setValueAtX( e, x, u1 * v1 );
+    if( ptwXY_domainMax( &smr, e, &domainMaxE ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
+    if( domainMaxE < domainMaxY ) {
+        x = domainMaxY;
+        if( ptwXY_getValueAtX( &smr, u, x, &u1 ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
+        if( ptwXY_getValueAtX( &smr, v, x, &v1 ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
+        if( ptwXY_setValueAtX( &smr, e, x, u1 * v1 ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
     }
     ff = fopen( "exact.dat", "w" );
     ptwXY_simpleWrite( e, ff, "%g, %g\n" );

@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 from fudge.core.utilities import brb
@@ -66,8 +90,8 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
         NM = 0
         frame = self.productFrame
         if( frame is None ) : frame = self.ancestor.productFrame  # Happens for uncorrelated distribution.
-        if( isinstance( angularSubform, multiD_XYsModule.multiD_XYs ) ) :
-            if( isinstance( angularSubform[0], XYsModule.XYs ) ) :
+        if( isinstance( angularSubform, multiD_XYsModule.XYs2d ) ) :
+            if( isinstance( angularSubform[0], XYsModule.XYs1d ) ) :
                 LI, LTT, MF4 = toAngularPointwise( angularSubform, targetInfo, not( doMF4AsMF6 ) )
             elif( isinstance( angularSubform[0], series1dModule.LegendreSeries ) ) :
                 interpolation, numberOfPoints, LI, LTT, NM, MF4Sub = toAngularLegendre( angularSubform, targetInfo, not( doMF4AsMF6 ) )
@@ -76,7 +100,7 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
                 MF4 += MF4Sub
             else :
                 raise 'hell - fix me'
-        elif( isinstance( angularSubform, regionsModule.regions ) ) :
+        elif( isinstance( angularSubform, regionsModule.regions2d ) ) :
             LTT, MF4, numberOfPoints, LegendreInterpolations, LegendreData  = None, [], 0, [], []
             for ridx, region in enumerate(angularSubform) :
                 targetInfo['skipFirstEnergy'] = False
@@ -88,13 +112,13 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
                             targetInfo['skipFirstEnergy'] = True
                     else:
                         raise NotImplementedError
-                if( isinstance( region, multiD_XYsModule.multiD_XYs ) ) :
+                if( isinstance( region, angularModule.XYs2d ) ) :
                     if( isinstance( region[0], series1dModule.LegendreSeries ) ) :
                         interpolation, numberOfPointsSub, LI, LTTSub, NMtmp, MF4Sub = toAngularLegendre( region, targetInfo, not( doMF4AsMF6 ) )
                         numberOfPoints += numberOfPointsSub
                         NM = max(NM,NMtmp)
                         LegendreInterpolations += [ numberOfPoints, interpolation ]
-                    elif( isinstance( region[0], XYsModule.XYs ) ) :
+                    elif( isinstance( region[0], XYsModule.XYs1d ) ) :
                         LI, LTTSub, MF4Sub = toAngularPointwise( region, targetInfo, not( doMF4AsMF6 ) )
                     else :
                         raise 'hell - fix me'
@@ -216,13 +240,13 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
     LTP = 1                     # indicates this is a nuclear + interference section
     target, projectile = targetInfo['reactionSuite'].target, targetInfo['reactionSuite'].projectile
     LIDP = target==projectile
-    if( isinstance( self.nuclear_term, angularModule.pointwise ) ) :
+    if( isinstance( self.nuclear_term, angularModule.XYs2d ) ) :
         for ridx in xrange( len( self.nuclear_term ) ) :
             counts += 1
             nuclear, interferenceReal, interferenceImaginary = self.nuclear_term[ridx], self.interferenceReal_term[ridx], self.interferenceImaginary_term[ridx]
             LTP_oneSubParsing( LTP, LIDP, nuclear, interferenceReal, interferenceImaginary, lineData )
         interpolationFlagsList += [ counts, gndToENDF6Module.gndToENDFInterpolationFlag( self.nuclear_term.interpolation ) ]
-    elif( isinstance( self.nuclear_term, angularModule.piecewise ) ) :
+    elif( isinstance( self.nuclear_term, angularModule.regions2d ) ) :
         for regionIndex, region in enumerate( self.nuclear_term ) :
             interferenceReal, interferenceImaginary = self.interferenceReal_term[regionIndex], self.interferenceImaginary_term[regionIndex]
             for energyIndex, nuclear in enumerate( region ) :
@@ -286,7 +310,7 @@ def toENDF6( self, flags, targetInfo ) :
 angularModule.recoil.toENDF6 = toENDF6
 
 #
-# pointwise
+#XYs2d 
 #
 def toENDF6( self, flags, targetInfo ) :
 
@@ -294,7 +318,7 @@ def toENDF6( self, flags, targetInfo ) :
     interpolation = gndToENDF6Module.gndToENDF2PlusDInterpolationFlag( self.interpolation, self.interpolationQualifier )
     ENDFDataList += endfFormatsModule.endfInterpolationList( [ len( self ), interpolation ] )
     for energy_in in self : 
-        if( isinstance( energy_in, XYsModule.XYs ) ) :
+        if( isinstance( energy_in, XYsModule.XYs1d ) ) :
             ENDFDataList += gndToENDF6Module.angularPointwiseEnergy2ENDF6( energy_in, targetInfo )
         elif( isinstance( energy_in, series1dModule.LegendreSeries ) ) :
             ENDFDataList += gndToENDF6Module.angularLegendreEnergy2ENDF6( energy_in, targetInfo )
@@ -303,13 +327,13 @@ def toENDF6( self, flags, targetInfo ) :
     if( not( targetInfo['doMF4AsMF6'] ) ) : ENDFDataList.append( endfFormatsModule.endfSENDLineNumber( ) )
     return( 0, 2, ENDFDataList )
 
-angularModule.pointwise.toENDF6 = toENDF6
+angularModule.XYs2d.toENDF6 = toENDF6
 
 #
-# piecewise
+# regions2d
 #
 def toENDF6( self, flags, targetInfo ) :
 
     raise 'hell - not implemented'
 
-angularModule.piecewise.toENDF6 = toENDF6
+angularModule.regions2d.toENDF6 = toENDF6

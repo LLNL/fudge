@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -43,21 +67,27 @@
 
 #include "ptwXY.h"
 
-static nfu_status ptwXY_pow_callback( ptwXYPoint *point, void *argList );
-static nfu_status ptwXY_exp_s( ptwXYPoints *ptwXY, double x1, double y1, double z1, double x2, double y2, double z2, int level );
-static nfu_status ptwXY_convolution2( ptwXYPoints *f1, ptwXYPoints *f2, double y, double rangeMin, double *c );
-static nfu_status ptwXY_convolution3( ptwXYPoints *convolute, ptwXYPoints *f1, ptwXYPoints *f2, double y1, double c1, double y2, double c2, double rangeMin );
+static nfu_status ptwXY_pow_callback( statusMessageReporting *smr, ptwXYPoint *point, void *argList );
+static nfu_status ptwXY_exp_s( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x1, double y1, double z1, 
+        double x2, double y2, double z2, int level );
+static nfu_status ptwXY_convolution2( statusMessageReporting *smr, ptwXYPoints *f1, ptwXYPoints *f2, double y, 
+        double rangeMin, double *c );
+static nfu_status ptwXY_convolution3( statusMessageReporting *smr, ptwXYPoints *convolute, ptwXYPoints *f1, ptwXYPoints *f2, 
+        double y1, double c1, double y2, double c2, double rangeMin );
 /*
 ************************************************************
 */
-nfu_status ptwXY_pow( ptwXYPoints *ptwXY, double v ) { 
+nfu_status ptwXY_pow( statusMessageReporting *smr, ptwXYPoints *ptwXY, double v ) { 
 
-    return( ptwXY_applyFunction( ptwXY, ptwXY_pow_callback, (void *) &v, 0 ) );
+    nfu_status status = ptwXY_applyFunction( smr, ptwXY, ptwXY_pow_callback, (void *) &v, 0 );
+
+    if( status != nfu_Okay ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( status );
 }
 /*
 ************************************************************
 */
-static nfu_status ptwXY_pow_callback( ptwXYPoint *point, void *argList ) {
+static nfu_status ptwXY_pow_callback( statusMessageReporting *smr, ptwXYPoint *point, void *argList ) {
 
     nfu_status status = nfu_Okay;
     double *v = (double *) argList;
@@ -69,7 +99,7 @@ static nfu_status ptwXY_pow_callback( ptwXYPoint *point, void *argList ) {
 /*
 ************************************************************
 */
-nfu_status ptwXY_exp( ptwXYPoints *ptwXY, double a ) { 
+nfu_status ptwXY_exp( statusMessageReporting *smr, ptwXYPoints *ptwXY, double a ) { 
 
     int64_t i, length;
     nfu_status status;
@@ -77,10 +107,17 @@ nfu_status ptwXY_exp( ptwXYPoints *ptwXY, double a ) {
 
     length = ptwXY->length;
     if( length < 1 ) return( ptwXY->status );
-    if( ptwXY->interpolation == ptwXY_interpolationFlat ) return( nfu_invalidInterpolation );
-    if( ptwXY->interpolation == ptwXY_interpolationOther ) return( nfu_otherInterpolation );
 
-    if( ( status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( status );
+    if( ptwXY->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Other interpolation not allowed." );
+        return( ptwXY->status = nfu_otherInterpolation );
+    }
+    if( ptwXY->interpolation == ptwXY_interpolationFlat ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_flatInterpolation, "Flat interpolation not allowed." );
+        return( ptwXY->status = nfu_flatInterpolation );
+    }
+
+    if( ( status = ptwXY_simpleCoalescePoints( smr, ptwXY ) ) != nfu_Okay ) goto Err;
     x2 = ptwXY->points[length-1].x;
     y2 = a * ptwXY->points[length-1].y;
     z2 = ptwXY->points[length-1].y = exp( y2 );
@@ -88,16 +125,22 @@ nfu_status ptwXY_exp( ptwXYPoints *ptwXY, double a ) {
         x1 = ptwXY->points[i].x;
         y1 = a * ptwXY->points[i].y;
         z1 = ptwXY->points[i].y = exp( y1 );
-        if( ( status = ptwXY_exp_s( ptwXY, x1, y1, z1, x2, y2, z2, 0 ) ) != nfu_Okay ) return( status );
+        if( ( status = ptwXY_exp_s( smr, ptwXY, x1, y1, z1, x2, y2, z2, 0 ) ) != nfu_Okay ) goto Err;
         x2 = x1;
         y2 = y1;
     }
+    return( status );
+
+Err:
+    if( status != nfu_Okay ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    if( ptwXY->status != nfu_Okay ) ptwXY->status = status;
     return( status );
 }
 /*
 ************************************************************
 */
-static nfu_status ptwXY_exp_s( ptwXYPoints *ptwXY, double x1, double y1, double z1, double x2, double y2, double z2, int level ) { 
+static nfu_status ptwXY_exp_s( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x1, double y1, double z1, 
+        double x2, double y2, double z2, int level ) { 
 
     nfu_status status;
     double x, y, dx, dy, z, zp, s;
@@ -114,15 +157,14 @@ static nfu_status ptwXY_exp_s( ptwXYPoints *ptwXY, double x1, double y1, double 
     zp = ( z2 - z1 ) / ( y2 - y1 );
 
     if( fabs( z - zp ) < fabs( z * ptwXY->accuracy ) ) return( nfu_Okay );
-    if( ( status = ptwXY_setValueAtX( ptwXY, x, z ) ) != nfu_Okay ) return( status );
-    if( ( status = ptwXY_exp_s( ptwXY, x, y, z, x2, y2, z2, level ) ) != nfu_Okay ) return( status );
-    if( ( status = ptwXY_exp_s( ptwXY, x1, y1, z1, x, y, z, level ) ) != nfu_Okay ) return( status );
-    return( status );
+    if( ( status = ptwXY_setValueAtX( smr, ptwXY, x, z ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_exp_s( smr, ptwXY, x, y, z, x2, y2, z2, level ) ) != nfu_Okay ) return( status );
+    return( ptwXY_exp_s( smr, ptwXY, x1, y1, z1, x, y, z, level ) );
 }
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_convolution( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_status *status, int mode ) {
+ptwXYPoints *ptwXY_convolution( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, int mode ) {
 /*
 *   Currently, only supports linear-linear interpolation.
 *
@@ -133,23 +175,38 @@ ptwXYPoints *ptwXY_convolution( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_st
     ptwXYPoints *f1 = ptwXY1, *f2 = ptwXY2, *convolute;
     double accuracy = ptwXY1->accuracy, rangeMin, rangeMax, c, y, dy;
 
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY1 ) ) != nfu_Okay ) return( NULL );
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY2 ) ) != nfu_Okay ) return( NULL );
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY1 ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via (source1)." );
+        return( NULL );
+    }
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY2 ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via (source2)." );
+        return( NULL );
+    }
 
-    *status = nfu_unsupportedInterpolation;
-    if( ( ptwXY1->interpolation != ptwXY_interpolationLinLin ) || ( ptwXY2->interpolation != ptwXY_interpolationLinLin ) ) return( NULL );
-    *status = nfu_Okay;
+    if( ptwXY1->interpolation != ptwXY_interpolationLinLin ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_unsupportedInterpolation, 
+            "Source1: unsupported interpolation = '%s'", ptwXY1->interpolationString );
+        return( NULL );
+    }
+    if( ptwXY2->interpolation != ptwXY_interpolationLinLin ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_unsupportedInterpolation, 
+            "Source2: unsupported interpolation = '%s'", ptwXY2->interpolationString );
+        return( NULL );
+    }
 
     n1 = f1->length;
     n2 = f2->length;
 
     if( ( n1 == 0 ) || ( n2 == 0 ) ) {
-        convolute = ptwXY_new( ptwXY_interpolationLinLin, NULL, 1., accuracy, 0, 0, status, 0 );
+        convolute = ptwXY_new( smr, ptwXY_interpolationLinLin, NULL, 1., accuracy, 0, 0, 0 );
+        if( convolute == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
         return( convolute );
     }
 
     if( ( n1 == 1 ) || ( n2 == 1 ) ) {
-        *status = nfu_tooFewPoints;
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_tooFewPoints,
+                "Too few points: len( source1 ) = %d, len( source1 ) = %d.", (int) n1, (int) n2 );
         return( NULL );
     }
 
@@ -160,18 +217,21 @@ ptwXYPoints *ptwXY_convolution( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_st
         if( n > 1000 ) mode = -1;
     }
     if( n > 100000 ) mode = -1;
-    if( ( convolute = ptwXY_new( ptwXY_interpolationLinLin, NULL, 1., accuracy, 400, 40, status, 0 ) ) == NULL ) return( NULL );
+    if( ( convolute = ptwXY_new( smr, ptwXY_interpolationLinLin, NULL, 1., accuracy, 400, 40, 0 ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
 
     rangeMin = f1->points[0].x + f2->points[0].x;
     rangeMax = f1->points[n1 - 1].x + f2->points[n2 - 1].x;
 
-    if( ( *status = ptwXY_setValueAtX( convolute, rangeMin, 0. ) ) != nfu_Okay ) goto Err;
+    if( ptwXY_setValueAtX( smr, convolute, rangeMin, 0. ) != nfu_Okay ) goto Err;
 
     if( mode < 0 ) {
         dy = ( rangeMax - rangeMin ) / 400;
         for( y = rangeMin + dy; y < rangeMax; y += dy ) {
-            if( ( *status = ptwXY_convolution2( f1, f2, y, rangeMin, &c ) ) != nfu_Okay ) goto Err;
-            if( ( *status = ptwXY_setValueAtX( convolute, y, c ) ) != nfu_Okay ) goto Err;
+            if( ptwXY_convolution2( smr, f1, f2, y, rangeMin, &c ) != nfu_Okay ) goto Err;
+            if( ptwXY_setValueAtX( smr, convolute, y, c ) != nfu_Okay ) goto Err;
         } }
     else {
         for( i1 = 0; i1 < n1; i1++ ) {
@@ -179,28 +239,29 @@ ptwXYPoints *ptwXY_convolution( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_st
                 y = rangeMin + ( f1->points[i1].x - f1->points[0].x ) + ( f2->points[i2].x - f2->points[0].x );
                 if( y <= rangeMin ) continue;
                 if( y >= rangeMax ) continue;
-                if( ( *status = ptwXY_convolution2( f1, f2, y, rangeMin, &c ) ) != nfu_Okay ) goto Err;
-                if( ( *status = ptwXY_setValueAtX( convolute, y, c ) ) != nfu_Okay ) goto Err;
+                if( ptwXY_convolution2( smr, f1, f2, y, rangeMin, &c ) != nfu_Okay ) goto Err;
+                if( ptwXY_setValueAtX( smr, convolute, y, c ) != nfu_Okay ) goto Err;
             }
         }
     }
-    if( ( *status = ptwXY_setValueAtX( convolute, rangeMax, 0. ) ) != nfu_Okay ) goto Err;
-    if( ( *status = ptwXY_simpleCoalescePoints( convolute ) ) != nfu_Okay ) goto Err;
+    if( ptwXY_setValueAtX( smr, convolute, rangeMax, 0. ) != nfu_Okay ) goto Err;
+    if( ptwXY_simpleCoalescePoints( smr, convolute ) != nfu_Okay ) goto Err;
     for( i1 = convolute->length - 1; i1 > 0; i1-- ) {
-        if( ( *status = ptwXY_convolution3( convolute, f1, f2, convolute->points[i1 - 1].x, convolute->points[i1 - 1].y, 
-            convolute->points[i1].x, convolute->points[i1].y, rangeMin ) ) != nfu_Okay ) goto Err;
+        if( ptwXY_convolution3( smr, convolute, f1, f2, convolute->points[i1 - 1].x, convolute->points[i1 - 1].y, 
+            convolute->points[i1].x, convolute->points[i1].y, rangeMin ) != nfu_Okay ) goto Err;
     }
 
     return( convolute );
 
 Err:
     ptwXY_free( convolute );
+    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
     return( NULL );
 }
 /*
 ************************************************************
 */
-static nfu_status ptwXY_convolution2( ptwXYPoints *f1, ptwXYPoints *f2, double y, double rangeMin, double *c ) {
+static nfu_status ptwXY_convolution2( statusMessageReporting *smr, ptwXYPoints *f1, ptwXYPoints *f2, double y, double rangeMin, double *c ) {
 
     int64_t i1 = 0, i2 = 0, n1 = f1->length, n2 = f2->length, mode;
     double dx1, dx2, x1MinP, x1Min, x2Max;
@@ -217,7 +278,10 @@ static nfu_status ptwXY_convolution2( ptwXYPoints *f1, ptwXYPoints *f2, double y
     if( x1Min < x1MinP ) x1Min = x1MinP;
     *c = 0.;
 
-    switch( legx = ptwXY_getPointsAroundX( f1, x1Min, &lessThanEqualXPoint, &greaterThanXPoint ) ) {
+    switch( legx = ptwXY_getPointsAroundX( smr, f1, x1Min, &lessThanEqualXPoint, &greaterThanXPoint ) ) {
+    case ptwXY_lessEqualGreaterX_Error :
+        return( nfu_Error );
+        break;
     case ptwXY_lessEqualGreaterX_empty :                                /* These three should not happen. */
     case ptwXY_lessEqualGreaterX_lessThan :
     case ptwXY_lessEqualGreaterX_greater :
@@ -232,12 +296,16 @@ static nfu_status ptwXY_convolution2( ptwXYPoints *f1, ptwXYPoints *f2, double y
         f1x2 = f1->points[i1].x;
         f1y2 = f1->points[i1].y;
         if( legx == ptwXY_lessEqualGreaterX_between ) {
-            if( ( status = ptwXY_interpolatePoint( f1->interpolation, x1Min, &f1y1p, f1x1, f1y1, f1x2, f1y2 ) ) != nfu_Okay ) return( status );
+            if( ( status = ptwXY_interpolatePoint( smr, f1->interpolation, x1Min, &f1y1p, f1x1, f1y1, f1x2, f1y2 ) ) != nfu_Okay )
+                return( status );
         }
         break;
     }
 
-    switch( legx = ptwXY_getPointsAroundX( f2, x2Max, &lessThanEqualXPoint, &greaterThanXPoint ) ) {
+    switch( legx = ptwXY_getPointsAroundX( smr, f2, x2Max, &lessThanEqualXPoint, &greaterThanXPoint ) ) {
+    case ptwXY_lessEqualGreaterX_Error :
+        return( nfu_Error );
+        break;
     case ptwXY_lessEqualGreaterX_empty :                                /* These three should not happen. */
     case ptwXY_lessEqualGreaterX_lessThan :
     case ptwXY_lessEqualGreaterX_greater :
@@ -252,7 +320,8 @@ static nfu_status ptwXY_convolution2( ptwXYPoints *f1, ptwXYPoints *f2, double y
         f2x1 = f2->points[i2].x;
         f2y1 = f2->points[i2].y;
         if( legx == ptwXY_lessEqualGreaterX_between ) {
-            if( ( status = ptwXY_interpolatePoint( f2->interpolation, x2Max, &f2y2p, f2x1, f2y1, f2x2, f2y2 ) ) != nfu_Okay ) return( status );
+            if( ( status = ptwXY_interpolatePoint( smr, f2->interpolation, x2Max, &f2y2p, f2x1, f2y1, f2x2, f2y2 ) ) != nfu_Okay )
+                return( status );
         }
         break;
     }
@@ -274,7 +343,8 @@ static nfu_status ptwXY_convolution2( ptwXYPoints *f1, ptwXYPoints *f2, double y
                 f2x1p = f2x2;
                 f2y1p = f2y2; }
             else {
-                if( ( status = ptwXY_interpolatePoint( f2->interpolation, f2x1p, &f2y1p, f2x1, f2y1, f2x2, f2y2 ) ) != nfu_Okay ) return( status );
+                if( ( status = ptwXY_interpolatePoint( smr, f2->interpolation, f2x1p, &f2y1p, f2x1, f2y1, f2x2, f2y2 ) ) != nfu_Okay )
+                    return( status );
             }
             *c += ( ( f1y1p + f1y2p ) * ( f2y1p + f2y2p ) + f1y1p * f2y2p + f1y2p * f2y1p ) * dx1; /* Note the reversing of f2y1p and f2y2p. */
             i1++;
@@ -292,7 +362,8 @@ static nfu_status ptwXY_convolution2( ptwXYPoints *f1, ptwXYPoints *f2, double y
                 f1x2p = f1x2;
                 f1y2p = f1y2; }
             else {
-                if( ( status = ptwXY_interpolatePoint( f1->interpolation, f1x2p, &f1y2p, f1x1, f1y1, f1x2, f1y2 ) ) != nfu_Okay ) return( status );
+                if( ( status = ptwXY_interpolatePoint( smr, f1->interpolation, f1x2p, &f1y2p, f1x1, f1y1, f1x2, f1y2 ) ) != nfu_Okay )
+                    return( status );
             }
             *c += ( ( f1y1p + f1y2p ) * ( f2y1p + f2y2p ) + f1y1p * f2y2p + f1y2p * f2y1p ) * dx2;  /* Note the reversing of f2y1p and f2y2p. */
             if( i2 == 0 ) break;
@@ -320,47 +391,66 @@ static nfu_status ptwXY_convolution2( ptwXYPoints *f1, ptwXYPoints *f2, double y
 /*
 ************************************************************
 */
-static nfu_status ptwXY_convolution3( ptwXYPoints *convolute, ptwXYPoints *f1, ptwXYPoints *f2, double y1, double c1, double y2, double c2, double rangeMin ) {
+static nfu_status ptwXY_convolution3( statusMessageReporting *smr, ptwXYPoints *convolute, ptwXYPoints *f1, ptwXYPoints *f2, 
+        double y1, double c1, double y2, double c2, double rangeMin ) {
 
     nfu_status status;
     double rangeMid = 0.5 * ( y1 + y2 ), cMid = 0.5 * ( c1 + c2 ), c;
+    double domainMin, domainMax;
 
-    if( ( y2 - rangeMid ) <= 1e-5 * ( ptwXY_domainMax( convolute ) - ptwXY_domainMin( convolute ) ) ) return( nfu_Okay );
-    if( ( status = ptwXY_convolution2( f1, f2, rangeMid, rangeMin, &c ) ) != nfu_Okay ) return( status );
+    if( ptwXY_domainMin( smr, convolute, &domainMin ) != nfu_Okay ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    if( ptwXY_domainMax( smr, convolute, &domainMax ) != nfu_Okay ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+
+    if( ( y2 - rangeMid ) <= 1e-5 * ( domainMax - domainMin ) ) return( nfu_Okay );
+    if( ( status = ptwXY_convolution2( smr, f1, f2, rangeMid, rangeMin, &c ) ) != nfu_Okay ) return( status );
     if( fabs( c - cMid ) <= convolute->accuracy * 0.5 * ( fabs( c ) + fabs( cMid ) ) ) return( nfu_Okay );
-    if( ( status = ptwXY_setValueAtX( convolute, rangeMid, c ) ) != nfu_Okay ) return( status );
-    if( ( status = ptwXY_convolution3( convolute, f1, f2, y1, c1, rangeMid, c, rangeMin ) ) != nfu_Okay ) return( status );
-    return( ptwXY_convolution3( convolute, f1, f2, rangeMid, c, y2, c2, rangeMin ) );
+    if( ( status = ptwXY_setValueAtX( smr, convolute, rangeMid, c ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_convolution3( smr, convolute, f1, f2, y1, c1, rangeMid, c, rangeMin ) ) != nfu_Okay ) return( status );
+    return( ptwXY_convolution3( smr, convolute, f1, f2, rangeMid, c, y2, c2, rangeMin ) );
 }
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_inverse( ptwXYPoints *ptwXY, nfu_status *status ) {
+ptwXYPoints *ptwXY_inverse( statusMessageReporting *smr, ptwXYPoints *ptwXY ) {
 
-    int64_t length = ptwXY_length( ptwXY );
+    int64_t length;
     ptwXY_interpolation interpolation;
     ptwXYPoints *ptwXYInverse;
 
-    *status = nfu_invalidInterpolation;
-    if( ptwXY->interpolation == ptwXY_interpolationFlat ) return( NULL );
-    *status = nfu_otherInterpolation;
-    if( ptwXY->interpolation == ptwXY_interpolationOther ) return( NULL );
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( NULL );
+    length = ptwXY_length( NULL, ptwXY );
+
+    if( ptwXY->interpolation == ptwXY_interpolationFlat ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_flatInterpolation, "flat interpolation not allowed." );
+        return( NULL );
+    }
+
+    if( ptwXY->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Other interpolation not allowed." );
+        return( NULL );
+    }
+
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
 
     switch( ptwXY->interpolation ) {
-    case ptwXY_interpolationLinLog :
-        interpolation = ptwXY_interpolationLogLin;
-        break;
     case ptwXY_interpolationLogLin :
         interpolation = ptwXY_interpolationLinLog;
+        break;
+    case ptwXY_interpolationLinLog :
+        interpolation = ptwXY_interpolationLogLin;
         break;
     default :
         interpolation = ptwXY->interpolation;
         break;
     }
 
-    if( ( ptwXYInverse = ptwXY_new( interpolation, NULL, ptwXY_getBiSectionMax( ptwXY ), ptwXY_getAccuracy( ptwXY ), 
-            length, 10, status, 0 ) ) == NULL ) return( NULL );
+    if( ( ptwXYInverse = ptwXY_new( smr, interpolation, NULL, ptwXY_getBiSectionMax( ptwXY ), ptwXY_getAccuracy( ptwXY ), 
+            length, 10, 0 ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
 
     if( length == 1 ) {
         ptwXYInverse->points[0] = ptwXY->points[0]; }
@@ -377,13 +467,14 @@ ptwXYPoints *ptwXY_inverse( ptwXYPoints *ptwXY, nfu_status *status ) {
             ptwXYInverse->points[i1].x = ptwXY->points[start].y;
             ptwXYInverse->points[i1].y = ptwXY->points[start].x;
             if( ptwXYInverse->points[i1-1].x >= ptwXYInverse->points[i1].x ) {
+                smr_setReportError2( smr, nfu_SMR_libraryID, nfu_XNotAscending,
+                        "Non-ascending domain values: x[%d] = %.17e >= x[%d] = %.17e.",
+                        (int) (i1-1), ptwXYInverse->points[i1-1].x, (int) i1, ptwXYInverse->points[i1].x );
                 ptwXY_free( ptwXYInverse );
-                *status = nfu_XNotAscending;
                 return( NULL );
             }
         }
     }
     ptwXYInverse->length = length;
-    *status = nfu_Okay;
     return( ptwXYInverse );
 }

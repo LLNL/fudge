@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,34 +18,60 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 __metaclass__ = type
 
+import abc
+
+from pqu import PQU as PQUModule
+
 import base as baseModule
-import values as valuesModule
 import standards as standardsModule
+import values as valuesModule
 import axes as axesModule
 import XYs as XYsModule
-from pqu import PQU
 
 try :
     from numericalFunctions import Legendre as Legendre_C
@@ -83,7 +110,7 @@ class series( baseModule.xDataFunctional ) :
     is the Legendre coefficient for Legendre order l and P_l(mu) is the Legendre polynomial of order l.
     """
 
-    moniker = 'series'
+    __metaclass__ = abc.ABCMeta
 
     def __init__( self, coefficients, domainMin, domainMax, lowerIndex = 0, axes = None,
             index = None, valueType = standardsModule.types.float64Token, value = None, label = None, sep = ' ' ) :
@@ -91,7 +118,7 @@ class series( baseModule.xDataFunctional ) :
         baseModule.xDataFunctional.__init__( self, self.moniker, 1, axes, index = index, valueType = valueType,
                 value = value, label = label )
 
-        if( not( isinstance( sep, str ) ) ) : raise TypeError( 'sep must be of type str' )
+        if( not( isinstance( sep, str ) ) ) : raise TypeError( 'sep must be a str instance' )
         if( len( sep ) != 1 ) : raise TypeError( 'sep length must be 1 not %d' % len( sep ) )
         self.__sep = sep
 
@@ -157,10 +184,7 @@ class series( baseModule.xDataFunctional ) :
         for l, c_l in enumerate( self ) : c_ls[l] *= value
         return( c_ls )
 
-    def __rmul__( self, value ) :
-        "returns self.__mul__( value )."
-
-        return( self.__mul__( value ) )
+    __rmul__ = __mul__
 
     def __str__( self ) :
         """Returns a string representation of the Legendre coefficients of self."""
@@ -170,12 +194,14 @@ class series( baseModule.xDataFunctional ) :
     def checkSameSeriesType( self, other ) :
 
         if( not( isinstance( other, series ) ) ) : raise TypeError( 'other of type "%s"' % type( other ) )
-        if( self.function != other.function ) : raise TypeError( 'Cannot %s series %s to series %s' % ( operator, self.moniker, other.moniker ) )
+        if( self.moniker != other.moniker ) : raise TypeError( 'Cannot %s series %s to series %s' % ( operator, self.moniker, other.moniker ) )
 
     def copy( self, data = None, index = None, value = None ) :
-        """Creates a new series that is a copy of self. The new 
+        """
+        Creates a new series that is a copy of self. The new 
         instance's index and value members are changes if index or value arguments are not None 
-        respectively."""
+        respectively.
+        """
 
         if( data is None ) : data = self.coefficients
         if( index is None ) : index = self.index
@@ -215,6 +241,11 @@ class series( baseModule.xDataFunctional ) :
 
         return( self.__sep )
 
+    def domainUnitConversionFactor( self, unitTo ) :
+
+        if( unitTo is None ) : return( 1. )
+        return( PQUModule.PQU( '1 ' + self.domainUnit( ) ).getValueAs( unitTo ) )
+
     def getCoefficientSafely( self, l ) :
         """
         Returns the (l+1)^th Legendre coefficient. Returns 0 if l is greater than lMax. This is like
@@ -225,8 +256,10 @@ class series( baseModule.xDataFunctional ) :
         return( self.coefficients[l] )
 
     def invert( self ) :
-        """This method returns a series instance that is the mirror of self about mu = 0.
-        That is, returns a Legendre series which represent self's pdf(-mu)."""
+        """
+        This method returns a series instance that is the mirror of self about mu = 0.
+        That is, returns a Legendre series which represent self's pdf(-mu).
+        """
 
         series_ = self.copy( )
         for l in xrange( 1, len( series_ ), 2 ) : series_.coefficients[l] *= -1
@@ -269,8 +302,8 @@ class series( baseModule.xDataFunctional ) :
         # FIXME: converting self.coefficients to values for printing. Should it be stored as values in the first place?
         coefs = valuesModule.values( self.coefficients, valueType = self.valueType, sep = self.__sep )
 
-        XMLList = [ '%s<%s function="%s"%s>' % ( indent, self.moniker, self.function, attributesStr ) ]
-        if( self.isPrimaryXData( ) ) :
+        XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributesStr ) ]
+        if( self.isPrimaryXData( ) and ( self.axes is not None ) ) :
             XMLList += self.axes.toXMLList( indent2, **kwargs )
             XMLList += coefs.toXMLList( indent2, **kwargs )
             XMLList[-1] += '</%s>' % self.moniker
@@ -287,7 +320,7 @@ class series( baseModule.xDataFunctional ) :
             index = index, valueType = self.valueType, value = value, label = self.label, sep = self.__sep ) )
 
     @classmethod
-    def parseXMLNode( cls, xDataElement, xPath = [], linkData = {}, axes = None, **kwargs ) :
+    def parseXMLNode( cls, xDataElement, xPath, linkData, axes = None, **kwargs ) :
         """
         Translate a series XML element into its python xData class.
         """
@@ -295,17 +328,15 @@ class series( baseModule.xDataFunctional ) :
         xPath.append( xDataElement.tag )
 
         domainMin, domainMax = cls.fixedDomain( )
-        attrs = { 'label' : None, 'index' : None, 'function' : None, 'value' : None, 'domainMin' : domainMin, 'domainMax' : domainMax, 'lowerIndex' : 0 }
-        attributes = { 'label' : str, 'index' : int, 'function' : str, 'value' : float, 'domainMin' : float, 'domainMax' : float, 'lowerIndex' : int }
+        attrs = { 'label' : None, 'index' : None, 'value' : None, 'domainMin' : domainMin, 'domainMax' : domainMax, 'lowerIndex' : 0 }
+        attributes = { 'label' : str, 'index' : int, 'value' : float, 'domainMin' : float, 'domainMax' : float, 'lowerIndex' : int }
         if xDataElement.find('axes') is not None:
-            attrs['axes'] = axesModule.axes.parseXMLNode( xDataElement.find('axes') )
+            attrs['axes'] = axesModule.axes.parseXMLNode( xDataElement.find('axes'), xPath, linkData )
         for key, item in xDataElement.items( ) :
             if( key not in attributes ) : raise TypeError( 'Invalid attribute "%s"' % key )
             attrs[key] = attributes[key]( item )
         if( attrs['domainMin'] == None ) : raise ValueError( 'missing attribute "domainMin"' )
         if( attrs['domainMax'] == None ) : raise ValueError( 'missing attribute "domainMax"' )
-        function = attrs.pop('function')
-        if( function != cls.function ) : raise TypeError( 'Incorrect type: %s should be %s' % (function, cls.function))
         coefficients = map( float, xDataElement.find('values').text.split() )
         series = cls( coefficients = coefficients, **attrs )
         xPath.pop( )
@@ -316,7 +347,7 @@ class series( baseModule.xDataFunctional ) :
 
         from xml.etree import cElementTree
 
-        return( cls.parseXMLNode( cElementTree.fromstring( XMLString ) ) )
+        return( cls.parseXMLNode( cElementTree.fromstring( XMLString ), [], [] ) )
 
     @staticmethod
     def fixedDomain( ) :
@@ -325,7 +356,8 @@ class series( baseModule.xDataFunctional ) :
 
 class LegendreSeries( series ) :
 
-    function = 'Legendre'
+    moniker = 'Legendre'
+    dimension = 1
 
     def __init__( self, coefficients = [], domainMin = -1, domainMax = 1, lowerIndex = 0, axes = None,
             index = None, valueType = standardsModule.types.float64Token, value = None, label = None, sep = ' ' ) :
@@ -335,7 +367,7 @@ class LegendreSeries( series ) :
         series.__init__( self, coefficients, -1, 1, axes = axes, index = index, valueType = valueType, value = value, 
                 label = label, sep = sep )
 
-    def getValue( self, mu ) :
+    def evaluate( self, mu ) :
         """Using the Legendre coefficients, this method calculates f(mu) and returns it."""
 
         P = 0.
@@ -351,7 +383,7 @@ class LegendreSeries( series ) :
 
     def normalize( self, insitu = False, dimension = 1 ) :
         """
-        The dimension argument is ignored. Only here to be compatable with calling from multiD_XYs.normalize.
+        The dimension argument is ignored. Only here to be compatable with calling from XYsnd.normalize.
         """
 
         norm = self.coefficients[0]
@@ -363,29 +395,26 @@ class LegendreSeries( series ) :
 
     def toLinearXYsClass( self ) :
 
-        return( XYsModule.XYs )
+        return( XYsModule.XYs1d )
 
     def toPointwise_withLinearXYs( self, accuracy, biSectionMax = 16, **kwargs ) :
         """
-        This method constructs the pdf(mu) versus mu and returns it as a XYs instance. The accuracy of the 
-        reconstruction (hence the number of points in the returned XYs) is determined by the accuracy argument.
+        This method constructs the pdf(mu) versus mu and returns it as a XYs1d instance. The accuracy of the 
+        reconstruction (hence the number of points in the returned XYs1d) is determined by the accuracy argument.
         """
-
-        import XYs as XYsModule
 
         if( accuracy < 1e-6 ) : accuracy = 1e-6
         if( accuracy > 0.1 ) : accuracy = 0.1
 
         try :
-            from numericalFunctions import Legendre
             L = Legendre_C.Series( self.coefficients )
             P = L.toPointwiseLinear( accuracy, biSectionMax = biSectionMax, checkForRoots = True )
         except :
             P, n = [], 400
             for i in xrange( n ) :
                 mu = -1. + ( 2. * i ) / n
-                P.append( [ mu, self.getValue( mu ) ] )
-            P.append( [ 1., self.getValue( 1. ) ] )
+                P.append( [ mu, self.evaluate( mu ) ] )
+            P.append( [ 1., self.evaluate( 1. ) ] )
         axes = axesModule.axes( )
         unit = self.getAxisUnitSafely( 0 )
         axes[0] = axesModule.axis( 'P(mu)', 0, unit )
@@ -399,9 +428,10 @@ class LegendreSeries( series ) :
 
         return( -1, 1 )
 
-class polynomial( series ) :
+class polynomial1d( series ) :
 
-    function = 'polynomial'
+    moniker = 'polynomial1d'
+    dimension = 1
 
     def __init__( self, coefficients = [], domainMin = None, domainMax = None, lowerIndex = 0, axes = None,
             index = None, valueType = standardsModule.types.float64Token, value = None, label = None, sep = ' ' ) :
@@ -410,21 +440,23 @@ class polynomial( series ) :
         series.__init__( self, coefficients, domainMin, domainMax, lowerIndex = lowerIndex, axes = axes, index = index, 
                 valueType = valueType, value = value, label = label, sep = sep )
 
-    def getValue( self, x ) :
+    def evaluate( self, x ) :
         """Using the polynomial coefficients, this method calculates p(x) and returns it."""
 
         P = 0.
         for c_l in reversed( self.coefficients ) : P = c_l  + x * P
         return( P )
 
+    def toLinearXYsClass( self ) :
+
+        return( XYsModule.XYs1d )
+
     def toPointwise_withLinearXYs( self, accuracy, biSectionMax = 16, **kwargs ) :
         """
-        This method constructs the y(x) versus x and returns it as a XYs instance. The accuracy of the 
-        reconstruction (hence the number of points in the returned XYs) is determined by the accuracy argument.
+        This method constructs the y(x) versus x and returns it as a XYs1d instance. The accuracy of the 
+        reconstruction (hence the number of points in the returned XYs1d) is determined by the accuracy argument.
         Currently, accuracy is not implemented.
         """
-
-        import XYs as XYsModule
 
         if( accuracy < 1e-6 ) : accuracy = 1e-6
         if( accuracy > 0.1 ) : accuracy = 0.1
@@ -432,7 +464,7 @@ class polynomial( series ) :
         P, n = [], 1000
         for i in xrange( n + 1 ) :
             x = ( ( n - i ) * self.domainMin + self.domainMax * i ) / n
-            P.append( [ x, self.getValue( x ) ] )
+            P.append( [ x, self.evaluate( x ) ] )
         axes = axesModule.axes( )
         yUnit = self.getAxisUnitSafely( 0 )
         xUnit = self.getAxisUnitSafely( 1 )

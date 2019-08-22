@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 """
@@ -85,8 +109,8 @@ def getXYInterpolation( data ) :
 
     if( data.columns != 2 ) : raise Exception( 'Only 2 column data supported, # of columns = %s for %s' % ( data.columns, str( data ) ) )
     if( data.interpolation == 0 ) : return( standardsModule.interpolation.linlinToken )
-    if( data.interpolation == 1 ) : return( standardsModule.interpolation.loglinToken )
-    if( data.interpolation == 2 ) : return( standardsModule.interpolation.linlogToken )
+    if( data.interpolation == 1 ) : return( standardsModule.interpolation.linlogToken )
+    if( data.interpolation == 2 ) : return( standardsModule.interpolation.loglinToken )
     if( data.interpolation == 3 ) : return( standardsModule.interpolation.loglogToken )
     raise Exception( 'Unsupported interpolation = "%s" for %s' % ( data.interpolation, str( data ) ) )
 
@@ -177,18 +201,18 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
 
         def angular( data ) :
 
-            axes = angularModule.pointwise.defaultAxes( energyUnit = 'MeV' )
-            subform = angularModule.pointwise( axes = axes )
+            axes = angularModule.XYs2d.defaultAxes( energyUnit = 'MeV' )
+            subform = angularModule.XYs2d( axes = axes )
             for i1, EMuP in enumerate( data.data ) :
                 E1, muP = EMuP
-                subform[i1] = angularModule.pdfOfMu.pointwise( data = muP, accuracy = ENDL_Accuracy, value = E1 )
+                subform[i1] = angularModule.XYs1d( data = muP, accuracy = ENDL_Accuracy, value = E1 )
             return( subform )
 
         def energy( data ) :
 
-            axes = energyModule.pointwise.defaultAxes( energyUnit = 'MeV' )
-            subform = energyModule.pointwise( axes = axes, interpolationQualifier = standardsModule.interpolation.unitBaseToken )
-            for E1, EpP in data.data[0][1] : subform.append( energyModule.pdfOfEp.pointwise( data = EpP, accuracy = ENDL_Accuracy, value = E1 ) )
+            axes = energyModule.XYs2d.defaultAxes( energyUnit = 'MeV' )
+            subform = energyModule.XYs2d( axes = axes, interpolationQualifier = standardsModule.interpolation.unitBaseToken )
+            for E1, EpP in data.data[0][1] : subform.append( energyModule.XYs1d( data = EpP, accuracy = ENDL_Accuracy, value = E1 ) )
             return( subform )
 
         def LLNLLegendrePointwise( data ) :
@@ -203,14 +227,14 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
             axes1D[0] = axes[0]
             axes1D[1] = axes[1]
             for l, EEpPs in data.data :
-                w_xys = multiD_XYsModule.multiD_XYs( dimension = 2, axes = axes2D, value = l )
+                w_xys = multiD_XYsModule.XYs2d( axes = axes2D, value = l )
                 for index, E_EpPs in enumerate( EEpPs ) :
                     xPrior = -1
                     E1, EpPs = E_EpPs
                     for xy in EpPs :
                         if( xy[0] == xPrior ) : xy[0] *= ( 1 + FUDGE_EPS )
                         xPrior = xy[0]
-                    w_xys.append( XYsModule.XYs( data = EpPs, axes = axes1D, accuracy = ENDL_Accuracy, value = E1 ) )
+                    w_xys.append( XYsModule.XYs1d( data = EpPs, axes = axes1D, accuracy = ENDL_Accuracy, value = E1 ) )
                 subform.append( w_xys )
             return( subform )
 
@@ -218,21 +242,21 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
             """Has only L=0 form, can be converted to uncorrelated angular (isotropic) and energy distributions."""
 
             angularSubform = angularModule.isotropic( )
-            axes = energyModule.pointwise.defaultAxes( energyUnit = 'MeV' )
-            energySubform = energyModule.pointwise( axes = axes, interpolationQualifier = standardsModule.interpolation.unitBaseToken )
+            axes = energyModule.XYs2d.defaultAxes( energyUnit = 'MeV' )
+            energySubform = energyModule.XYs2d( axes = axes, interpolationQualifier = standardsModule.interpolation.unitBaseToken )
             for index, ( energy, probability_list ) in enumerate( data.data[0][1] ) :
-                energySubform.append( energyModule.pdfOfEp.pointwise( data = probability_list, accuracy = ENDL_Accuracy, value = energy ) )
+                energySubform.append( energyModule.XYs1d( data = probability_list, accuracy = ENDL_Accuracy, value = energy ) )
             return( uncorrelated( info.style, standardsModule.frames.labToken, angularSubform, energySubform ) )
 
         def LLNLAngularEnergy( data ) :
 
-            axes = angularEnergyModule.pointwise.defaultAxes( energyUnit = "MeV", energy_outUnit = 'MeV', probabilityUnit = '1/MeV',
+            axes = angularEnergyModule.XYs3d.defaultAxes( energyUnit = "MeV", energy_outUnit = 'MeV', probabilityUnit = '1/MeV',
                     probabilityLabel = 'P(energy_out|energy_in,mu)' )
-            subform = angularEnergyModule.pointwise( axes = axes, interpolationQualifier = standardsModule.interpolation.unitBaseToken  )
+            subform = angularEnergyModule.XYs3d( axes = axes, interpolationQualifier = standardsModule.interpolation.unitBaseToken  )
             for i, E_MuEpPs in enumerate( data.data ) :
-                w_xys = angularEnergyModule.pdfOfMuAndEp.pointwise( dimension = 2, value = E_MuEpPs[0] )
+                w_xys = angularEnergyModule.XYs2d( value = E_MuEpPs[0] )
                 for j, Mu_EpPs in enumerate( E_MuEpPs[1] ) :
-                    w_xys.append( angularEnergyModule.pdfOfEp.pointwise( data = Mu_EpPs[1], accuracy = ENDL_Accuracy, value = Mu_EpPs[0] ) )
+                    w_xys.append( angularEnergyModule.XYs1d( data = Mu_EpPs[1], accuracy = ENDL_Accuracy, value = Mu_EpPs[0] ) )
                 subform.append( w_xys )
             return( subform )
 
@@ -302,20 +326,20 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
                         particle.addAttribute( 'emissionMode', gnd.tokens.promptToken )
                 interpolation = getXYInterpolation( data )
                 if( data.I in [ 7, 9 ] ) : 
-                    axes = gnd.productData.multiplicity.pointwise.defaultAxes( energyUnit = 'MeV')
+                    axes = gnd.productData.multiplicity.XYs1d.defaultAxes( energyUnit = 'MeV')
                     particle.multiplicity.remove( info.style )
-                    particle.multiplicity.add( gnd.productData.multiplicity.pointwise( data = data.data, label = info.style, 
+                    particle.multiplicity.add( gnd.productData.multiplicity.XYs1d( data = data.data, label = info.style, 
                             axes = axes, accuracy = ENDL_Accuracy, interpolation = interpolation ) )
                 else :          # for I = 10 and 13
                     if( data.I == 10 ) :
-                        axes = gnd.productData.energyDeposition.pointwise.defaultAxes( energyUnit = 'MeV' )
-                        dataForm = gnd.productData.energyDeposition.pointwise( label = info.style, axes = axes, 
+                        axes = gnd.productData.energyDeposition.XYs1d.defaultAxes( energyUnit = 'MeV' )
+                        dataForm = gnd.productData.energyDeposition.XYs1d( label = info.style, axes = axes, 
                                 data = data.data, accuracy = ENDL_Accuracy, interpolation = interpolation )
                         particle.energyDeposition.add( dataForm )
                     elif( data.I == 13 ) :
-                        axes = gnd.productData.momentumDeposition.pointwise.defaultAxes( energyUnit = 'MeV', 
+                        axes = gnd.productData.momentumDeposition.XYs1d.defaultAxes( energyUnit = 'MeV', 
                                 momentumDepositionUnit = 'MeV/c' )
-                        dataForm = gnd.productData.momentumDeposition.pointwise( label = info.style, axes = axes, 
+                        dataForm = gnd.productData.momentumDeposition.XYs1d( label = info.style, axes = axes, 
                                 data = data.data, accuracy = ENDL_Accuracy, interpolation = interpolation )
                         particle.momentumDeposition.add( dataForm )
                 del datas[idx]
@@ -340,15 +364,15 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
             if( len( decayChannelInfo ) > 0 ) :
                 if( decayChannelInfo[0] == i ) : decayChannel = decayChannelInfo[1]
             if( m > 1 ) :
-                particle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, ZA ), multiplicity = m, decayChannel = decayChannel )
+                particle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, ZA ), multiplicity = m, outputChannel = decayChannel )
             elif( ( specialCase == 'unknown level' ) and ( i == 1 ) ) :
-                particle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, ZA, level = 0.0, levelIndex = levelIndex ), decayChannel = decayChannel )
+                particle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, ZA, level = 0.0, levelIndex = levelIndex ), outputChannel = decayChannel )
             elif( ( specialCase == 'Am_242_m1' ) and ( ZA == 95242 ) ) :
-                particle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, ZA, level = level, levelIndex = 2 ), decayChannel = decayChannel )
+                particle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, ZA, level = level, levelIndex = 2 ), outputChannel = decayChannel )
             elif( ( specialCase == 'Sc_45_m1' ) and ( ZA == 21046 ) ) :
-                particle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, ZA, level = level, levelIndex = 2 ), decayChannel = decayChannel )
+                particle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, ZA, level = level, levelIndex = 2 ), outputChannel = decayChannel )
             else :
-                particle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, ZA ), decayChannel = decayChannel )
+                particle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, ZA ), outputChannel = decayChannel )
             s = ' + '
             if( ZA in ZAsYos ) :
                 if( ( specialCase == 'S8' ) and ( ZA == 1 ) ) :
@@ -357,7 +381,7 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
                     yo = ZAsYos[ZA]
                     if( ( i == n ) and ( yosDatas[yo] == [] ) ) : yo += 10
                 addDistributionDataAndRemove( particle, yo, yosDatas )
-            channel.products.add( particle )
+            channel.products.add( channel.products.uniqueLabel( particle ) )
             i += 1
         return( channel )
 
@@ -442,9 +466,9 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
                 maxDate = max( date, maxDate )
     maxDate = str( maxDate )
     maxDate = '%s-%s-%s' % ( maxDate[:4], maxDate[4:6], maxDate[6:] )
-    evaluatedStyle = gnd.styles.evaluated( info.style, maxDate, 
+    evaluatedStyle = gnd.styles.evaluated( info.style, 
             PQU.PQU( PQU.pqu_float.surmiseSignificantDigits( I0.getTemperature( ) ), 'MeV/k' ),
-            evaluationLibrary, evaluationVersion )
+            evaluationLibrary, evaluationVersion, date = maxDate )
 
     reactionSuite = gnd.reactionSuite.reactionSuite( projectile, target, 
             style = evaluatedStyle, particleList = info.particleList )
@@ -473,7 +497,6 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
             if( 0.9e-12 < I0.getX1( ) > 2.1e-12 ) : continue
         c_Or_s_Level = 'c'
         if( ( S == 0 ) and ( 1 not in CsAndSs[C] ) ) : c_Or_s_Level = 's'
-        info.newIndices( )
         maxReactionDate = 0
         I0, I12, I20 = None, None, None
         specialCase = None
@@ -617,7 +640,7 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
 
             firstParticle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, 1 ) )
             addDistributionDataAndRemove( firstParticle, 1, yosDatas )
-            outputChannel.products.add( firstParticle )
+            outputChannel.products.add( outputChannel.products.uniqueLabel( firstParticle ) )
 
             for yo in yosDatas : yosDatas[yo] = []
         elif( ( yos[0] > 0 ) and ( C not in [ 71, 72, 73, 74 ] ) ) :  # Reactions that are two-body, two-body + break-up or discrete N-body except C = 71 - 74.
@@ -640,9 +663,9 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
                         if( 7 in yos ) : print '7 in yos'
 
                         if( yosDatas[7] != [] ) :
-                            decayChannel = gnd.channels.NBodyDecayChannel( )
+                            decayChannel = gnd.channels.NBodyOutputChannel( )
                             decayChannel.Q.add( returnConstantQ( info.style, I0.getX1( ) ) )  # Assume residual returns to ground.
-                            decayChannel.products.add( resParticle )                          # state, hence Q = getX1( )
+                            decayChannel.products.add( decayChannel.products.uniqueLabel( resParticle ) )  # state, hence Q = getX1( )
                             gammaParticle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, 7 ) )
                             Is_ = sorted( [ data.I for data in yosDatas[7] ] )
                             if( Is_ == [ 10, 13 ] ) :
@@ -650,13 +673,13 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
                                 yosDatas[7] = []
                             else :
                                 addDistributionDataAndRemove( gammaParticle, 7, yosDatas )
-                            decayChannel.products.add( gammaParticle )
+                            decayChannel.products.add( decayChannel.products.uniqueLabel( gammaParticle ) )
 
                         level = I0.getX1( )
                         levelIndex = residualExcitationIndexLevels[residuals[0]][level]
                         if( levelIndex is None ) : level = None
                         secondParticle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, residuals[0], level = level, levelIndex = levelIndex ), 
-                            decayChannel = decayChannel )
+                            outputChannel = decayChannel )
                     else :
                         decayChannel, level, levelIndex = None, None, None
                         if( S == 0 ) :
@@ -664,20 +687,20 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
                             if( C not in [ 8, 9, 10 ] ) :
                                 levelIndex = c_Or_s_Level
                                 if( ( yosDatas[7] != [] ) and ( residuals[0] != 7 ) ) :
-                                    decayChannel = gnd.channels.NBodyDecayChannel( )
+                                    decayChannel = gnd.channels.NBodyOutputChannel( )
                                     decayChannel.Q.add( returnConstantQ( info.style, I0.getX1( ) ) )
                                     resParticle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, residuals[0] ) )       # Residual in ground state.
                                     addDistributionDataAndRemove( resParticle, resYo, yosDatas )
-                                    decayChannel.products.add( resParticle )
+                                    decayChannel.products.add( decayChannel.products.uniqueLabel( resParticle ) )
                                     gammaParticle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, 7 ) )
                                     addDistributionDataAndRemove( gammaParticle, 7, yosDatas )
-                                    decayChannel.products.add( gammaParticle )
+                                    decayChannel.products.add( decayChannel.products.uniqueLabel( gammaParticle ) )
                             elif( I0.getELevel( ) != 0 ) :            # Elastic scattering off an isomer
                                 levelIndex = residualExcitationIndexLevels[residuals[0]][level]
                             if( ( level == 0.0 ) and ( levelIndex is None ) ) : level = None
                         if( residuals[0] <= 2004 ) : level, levelIndex = None, None
                         secondParticle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, residuals[0], level = level, levelIndex = levelIndex ), 
-                            decayChannel = decayChannel )
+                            outputChannel = decayChannel )
                         addDistributionDataAndRemove( secondParticle, resYo, yosDatas )
                 else :                                          # Two-body with residual breaking up.
                     if( verbose > 0 ) : print 'w/breakup',
@@ -693,14 +716,14 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
                         levelIndex, level = 1, I0.getX1( )
                     Q_MeV = endl2.reactionQByZAs( [ endl2.yoToZA( self.yi ), targetZA ], [ yos[0], residualZA ] ) - level
                     residualName = toGNDMiscModule.getTypeName( info, residualZA, level = level, levelIndex = levelIndex )
-                    decayChannel = makeNBodyChannelFrom_mYos( gnd.channels.NBodyDecayChannel, mYos, ZAsYos, yosDatas, I0.getQ( ) - Q_MeV, 
+                    decayChannel = makeNBodyChannelFrom_mYos( gnd.channels.NBodyOutputChannel, mYos, ZAsYos, yosDatas, I0.getQ( ) - Q_MeV, 
                         specialCase = specialCase )
-                    secondParticle = toGNDMiscModule.newGNDParticle( info, residualName, decayChannel = decayChannel )
+                    secondParticle = toGNDMiscModule.newGNDParticle( info, residualName, outputChannel = decayChannel )
                     Q = returnConstantQ( info.style, Q_MeV )
                 outputChannel = gnd.channels.twoBodyOutputChannel( )
                 outputChannel.Q.add( Q )
-                outputChannel.products.add( firstParticle )
-                outputChannel.products.add( secondParticle )
+                outputChannel.products.add( outputChannel.products.uniqueLabel( firstParticle ) )
+                outputChannel.products.add( outputChannel.products.uniqueLabel( secondParticle ) )
             else :                                              # Mutli-particle breakup (i.e., not two body).
                 if( verbose > 0 ) : print 'NBody',
                 mYos = getMultiplicityYos( self, yos, residuals, yosDatas )
@@ -717,21 +740,21 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
                 elif( ( mYos[-1] == [ 1, 4008 ] ) and ( yosDatas[16] != [] ) ) :                # Note_Be_9: Special case for breakup of Be_8 into two He_4's.
                     raise Exception( 'See note "Note_Be_9"' )
                     if( ( yosDatas[6] != [] ) and ( yosDatas[16] != [] ) ) :                    # This elif is probably not used anymore, replaced by
-                        decayChannel = gnd.channels.NBodyDecayChannel( )                        # prior if.
+                        decayChannel = gnd.channels.NBodyOutputChannel( )                        # prior if.
 
                         He4Particle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, 2004 ) )
                         addDistributionDataAndRemove( He4Particle, 6, yosDatas )
-                        decayChannel.products.add( He4Particle )
+                        decayChannel.products.add( decayChannel.products.uniqueLabel( He4Particle ) )
 
                         He4Particle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, 2004 ) ) 
                         addDistributionDataAndRemove( He4Particle, 16, yosDatas )
-                        decayChannel.products.add( He4Particle )
+                        decayChannel.products.add( decayChannel.products.uniqueLabel( He4Particle ) )
                         decayChannelInfo = [ len( mYos ) - 1, decayChannel ]
                     else :
                         He4Particle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, 2004 ), multiplicity = 2 )
                         addDistributionDataAndRemove( He4Particle, 16, yosDatas )
-                        decayChannel = gnd.channels.NBodyDecayChannel( )
-                        decayChannel.products.add( He4Particle )
+                        decayChannel = gnd.channels.NBodyOutputChannel( )
+                        decayChannel.products.add( decayChannel.products.uniqueLabel( He4Particle ) )
                         decayChannelInfo = [ len( mYos ) - 1, decayChannel ]
                         specialCase = None
                 if( ( S == 0 ) and ( C in [ 11, 40, 41, 42, 44, 45 ] ) ) : specialCase = 'unknown level'
@@ -746,7 +769,7 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
                 outputChannel.Q.add( returnConstantQ( info.style, I0.getQ( ) ) )
                 particle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, 1 ) )
                 addDistributionDataAndRemove( particle, 1, yosDatas )
-                outputChannel.products.add( particle )
+                outputChannel.products.add( outputChannel.products.uniqueLabel( particle ) )
                 decayRates = delayedNeutrons.keys( )
                 decayRates.sort( )
                 decayRates.reverse( )
@@ -766,11 +789,11 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
                         if( verbose ) : print '  delayed neutron has I = 7, 10 and 13 but no others',
                     else :
                         addDistributionDataAndRemove( delayedParticle, 1, delayedData, promptNeutronParticle = particle )
-                    outputChannel.products.add( delayedParticle )
+                    outputChannel.products.add( outputChannel.products.uniqueLabel( delayedParticle ) )
                 if( yosDatas[7] != [] ) :
                     gammaParticle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, 7 ) )
                     addDistributionDataAndRemove( gammaParticle, 7, yosDatas )
-                    outputChannel.products.add( gammaParticle )
+                    outputChannel.products.add( outputChannel.products.uniqueLabel( gammaParticle ) )
             elif( I0.C in [ 71, 72, 74 ] ) :
                 if( verbose > 0 ) : print "7[124]",
                 qualifier = { 71 : 'coherent', 72 : 'incoherent', 74 : 'pair production' }[I0.C]
@@ -786,16 +809,16 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
                 else :
                     outputChannel = gnd.channels.NBodyOutputChannel( )
                 outputChannel.Q.add( returnConstantQ( info.style, I0.getQ( ) ) )
-                outputChannel.products.add( firstParticle )
-                outputChannel.products.add( secondParticle )
+                outputChannel.products.add( outputChannel.products.uniqueLabel( firstParticle ) )
+                outputChannel.products.add( outputChannel.products.uniqueLabel( secondParticle ) )
             elif( I0.C == 73 ) :
                 if( verbose > 0 ) : print "73",
                 firstParticle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, 9 ), attributes = { 'scattering' : 'photo-electric' } )
                 secondParticle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, residuals[0] ) )
                 outputChannel = gnd.channels.NBodyOutputChannel( )
                 outputChannel.Q.add( returnConstantQ( info.style, I0.getQ( ) ) )
-                outputChannel.products.add( firstParticle )
-                outputChannel.products.add( secondParticle )
+                outputChannel.products.add( outputChannel.products.uniqueLabel( firstParticle ) )
+                outputChannel.products.add( outputChannel.products.uniqueLabel( secondParticle ) )
             else :
                 if( ( I0.C >= 50 ) and ( I0.C < 57 ) ) : 
                     if( verbose > 0 ) : print "production",
@@ -804,7 +827,7 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
                     particle = toGNDMiscModule.newGNDParticle( info, toGNDMiscModule.getTypeName( info, yos[1] ), multiplicity = multiplicity )
                     addDistributionDataAndRemove( particle, ZAsYos[yos[1]], yosDatas )
                     outputChannel = gnd.channels.productionChannel( )
-                    outputChannel.products.add( particle )
+                    outputChannel.products.add( outputChannel.products.uniqueLabel( particle ) )
                 else :
                     if( verbose > 0 ) : print
                     print "NONO:", I0
@@ -823,13 +846,13 @@ def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, ver
             channelList.append( s )
 
         if( I12 is not None ) : 
-            axes = gnd.channelData.Q.pointwise.defaultAxes( energyUnit = 'MeV', QUnit = 'MeV' )
-            Q = gnd.channelData.Q.pointwise( label = info.style, data = I12.data, axes = axes, 
+            axes = gnd.channelData.Q.XYs1d.defaultAxes( energyUnit = 'MeV', QUnit = 'MeV' )
+            Q = gnd.channelData.Q.XYs1d( label = info.style, data = I12.data, axes = axes, 
                     accuracy = ENDL_Accuracy, interpolation = getXYInterpolation( I12 ) )
             outputChannel.Q.add( Q )
 
         axes = gnd.reactionData.crossSection.defaultAxes( energyUnit = 'MeV' )
-        crossSection = gnd.reactionData.crossSection.pointwise( data = I0.data, label = info.style, 
+        crossSection = gnd.reactionData.crossSection.XYs1d( data = I0.data, label = info.style, 
                 interpolation = getXYInterpolation( I0 ), axes = axes, accuracy = ENDL_Accuracy )
 
         CCounts = len( self.findDatas( C = I0.C, I = 0 ) )

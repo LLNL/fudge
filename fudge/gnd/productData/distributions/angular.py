@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 """Angular distribution classes with forms form, twoBodyForm and CoulombElasticForm."""
@@ -56,6 +80,7 @@ from xData import regions as regionsModule
 from xData import link as linkModule
 
 from fudge.gnd import abstractClasses as abstractClassesModule
+
 from fudge.gnd.productData import energyDeposition as energyDepositionModule
 from fudge.gnd.productData import momentumDeposition as momentumDepositionModule
 
@@ -63,35 +88,41 @@ from . import base as baseModule
 
 __metaclass__ = type
 
-class pdfOfMu :
+class XYs1d( XYsModule.XYs1d ) :
 
-    class pointwise( XYsModule.XYs ) :
+    def averageMu( self ) :
 
-        def averageMu( self ) :
+        allowedInterpolations = [ standardsModule.interpolation.linlinToken,
+                                  standardsModule.interpolation.flatToken ]
+        xys = self.changeInterpolationIfNeeded( allowedInterpolations = allowedInterpolations )
+        return( xys.integrateWithWeight_x( ) )
 
-            allowedInterpolations = [ standardsModule.interpolation.linlinToken,
-                                      standardsModule.interpolation.flatToken ]
-            xys = self.changeInterpolationIfNeeded( allowedInterpolations = allowedInterpolations )
-            return( xys.integrateWithWeight_x( ) )
+    def invert( self ) :
 
-        def isIsotropic( self ) :
+        reflected = self.copy( )
+        pdf = [ [ -x, y ] for x, y in self ]
+        pdf.reverse( )
+        reflected.setData( pdf )
+        return( reflected )
 
-            return( self.rangeMin( ) == self.rangeMax( ) )
+    def isIsotropic( self ) :
 
-        def toLinearXYsClass( self ) :
+        return( self.rangeMin( ) == self.rangeMax( ) )
 
-            return( pdfOfMu.pointwise )
+    def toLinearXYsClass( self ) :
+
+        return( XYs1d )
 
 
-    class Legendre( series1dModule.LegendreSeries ) :
+class Legendre( series1dModule.LegendreSeries ) :
 
-        def averageMu( self ) :
+    def averageMu( self ) :
 
-            return( self.getCoefficientSafely( 1 ) )
+        return( self.getCoefficientSafely( 1 ) )
 
-        def toLinearXYsClass( self ) :
+    def toLinearXYsClass( self ) :
 
-            return( pdfOfMu.pointwise )
+        return( XYs1d )
 
 class subform( baseModule.subform ) :
     """Abstract base class for angular subforms."""
@@ -137,7 +168,7 @@ class isotropic( subform ) :
 
     def invert( self ) :
 
-        return( self.toPointwise_withLinearXYs( ) )
+        return( self.copy( ) )
 
     def isIsotropic( self ) :
 
@@ -153,9 +184,9 @@ class isotropic( subform ) :
 
     def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
-        ptw = pointwise( axes = pointwise.defaultAxes( energyUnit = self.domainUnit( ) ) )
-        ptw.append( pdfOfMu.pointwise( [ [ -1, 0.5 ], [ 1, 0.5 ] ], value = self.domainMin( ), accuracy = 1e-6 ) )
-        ptw.append( pdfOfMu.pointwise( [ [ -1, 0.5 ], [ 1, 0.5 ] ], value = self.domainMax( ), accuracy = 1e-6 ) )
+        ptw = XYs2d( axes = XYs2d.defaultAxes( energyUnit = self.domainUnit( ) ) )
+        ptw.append( XYs1d( [ [ -1, 0.5 ], [ 1, 0.5 ] ], value = self.domainMin( ), accuracy = 1e-6 ) )
+        ptw.append( XYs1d( [ [ -1, 0.5 ], [ 1, 0.5 ] ], value = self.domainMax( ), accuracy = 1e-6 ) )
         return( ptw )
 
     def toXMLList( self, indent = "", **kwargs ) :
@@ -223,13 +254,13 @@ class forward( subform ) :
     def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0, invert = False ) :
 
         eps = 1e-6
-        ptw = pointwise( pointwise.defaultAxes( energyUnit = self.domainUnit( ) ) )
+        ptw = XYs2d( XYs2d.defaultAxes( energyUnit = self.domainUnit( ) ) )
         if( invert ) :
-            ptw.append( XYsModule.XYs( [ [ -1, 2 / eps ], [ eps - 1, 0. ] ], value = self.domainMin( ), accuracy = 1e-6 ) )
-            ptw.append( XYsModule.XYs( [ [ -1, 2 / eps ], [ eps - 1, 0. ] ], value = self.domainMax( ), accuracy = 1e-6 ) )
+            ptw.append( XYsModule.XYs1d( [ [ -1, 2 / eps ], [ eps - 1, 0. ] ], value = self.domainMin( ), accuracy = 1e-6 ) )
+            ptw.append( XYsModule.XYs1d( [ [ -1, 2 / eps ], [ eps - 1, 0. ] ], value = self.domainMax( ), accuracy = 1e-6 ) )
         else :
-            ptw.append( XYsModule.XYs( [ [ 1 - eps, 0. ], [ 1, 2 / eps ] ], value = self.domainMin( ), accuracy = 1e-6 ) )
-            ptw.append( XYsModule.XYs( [ [ 1 - eps, 0. ], [ 1, 2 / eps ] ], value = self.domainMax( ), accuracy = 1e-6 ) )
+            ptw.append( XYsModule.XYs1d( [ [ 1 - eps, 0. ], [ 1, 2 / eps ] ], value = self.domainMin( ), accuracy = 1e-6 ) )
+            ptw.append( XYsModule.XYs1d( [ [ 1 - eps, 0. ], [ 1, 2 / eps ] ], value = self.domainMax( ), accuracy = 1e-6 ) )
         return( ptw )
 
     def toXMLList( self, indent = "", **kwargs ) :
@@ -245,7 +276,7 @@ class recoil( linkModule.link, subform ) :
 
     moniker = 'recoil'
 
-    def __init__( self, link, root = None, path = None ) :
+    def __init__( self, link, root = None, path = None, relative = False ) :
         """
         Distributions for this particle can be computed from its recoil partner using kinematics.
         Only meant for angular 2-body reactions.
@@ -255,27 +286,18 @@ class recoil( linkModule.link, subform ) :
         :type link: distribution.base.form
         :param root: filename where recoil partner is defined (usually None)
         :param path: xpath to recoil partner (usually will be computed from the link)
+        :param relative: whether to write xpath as relative or absolute
         :return:
         """
 
-        linkModule.link.__init__( self, link=link, root=root, path=path )
+        linkModule.link.__init__( self, link=link, root=root, path=path, relative=relative )
         subform.__init__( self )
-
-    @property
-    def axes( self ) :
-
-        return( self.partner.axes )
 
     @property
     def partner( self ) :
 
         if( self.link is None ) : raise Exception( "Encountered unresolved link!" )
         return( self.link )
-
-    @property
-    def partnersForm( self ) :
-
-        return( self.partner.angularSubform )
 
     def copy( self ):
 
@@ -285,20 +307,20 @@ class recoil( linkModule.link, subform ) :
 
     def getNumericalDistribution( self ) :
 
-        partnerForm = self.partnersForm.invert( )
+        partnerForm = self.partner.invert( )
         return( partnerForm )
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
 
-        return( self.partnersForm.getEnergyArray( EMin = EMin, EMax = EMax ) )
+        return( self.partner.getEnergyArray( EMin = EMin, EMax = EMax ) )
 
     def isIsotropic( self ) :
 
-        return( self.partnersForm.isIsotropic( ) )
+        return( self.partner.isIsotropic( ) )
 
     def averageMu( self, E, accuracy = None ) :
 
-        return( -self.partnersForm.averageMu( E, accuracy = accuracy ) )
+        return( -self.partner.averageMu( E, accuracy = accuracy ) )
 
     def check( self, info ) :
 
@@ -312,15 +334,13 @@ class recoil( linkModule.link, subform ) :
 
     def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
-        return( self.partnersForm.invert( ).toPointwise_withLinearXYs( accuracy = accuracy, lowerEps = lowerEps, upperEps = upperEps ) )
+        return( self.partner.invert( ).toPointwise_withLinearXYs( accuracy = accuracy, lowerEps = lowerEps, upperEps = upperEps ) )
 
-class pointwise( subform, multiD_XYsModule.multiD_XYs ) :
+class XYs2d( subform, multiD_XYsModule.XYs2d ) :
 
     def __init__( self, **kwargs ) :
 
-        if( 'dimension' not in kwargs ) : kwargs['dimension'] = 2
-        if( kwargs['dimension'] != 2 ) : raise ValueError( 'Dimension = %s != 2' % ( kwargs['dimension'] ) )
-        multiD_XYsModule.multiD_XYs.__init__( self, **kwargs )
+        multiD_XYsModule.XYs2d.__init__( self, **kwargs )
         subform.__init__( self )
 
     def getAtEnergy( self, energy ) :
@@ -329,12 +349,8 @@ class pointwise( subform, multiD_XYsModule.multiD_XYs ) :
 
     def invert( self ) :
 
-        ptw = pointwise( self.axes )
-        for index, xys in enumerate( ptw ) :
-            n_xys = xys.copyDataToXYs( ) 
-            reverse( n_xys )
-            for xy in n_xys  : xy[0] = -xy[0]
-            ptw[index] = XYsModule.XYs( n_xys, accuracy = xys.getAccuracy( ), value = xys.value, index = index, parent = ptw )
+        ptw = XYs2d( axes = self.axes.copy( ) )
+        for POfMu in self : ptw.append( POfMu.invert( ) )
         return( ptw )
 
     def isIsotropic( self ) :
@@ -388,13 +404,13 @@ class pointwise( subform, multiD_XYsModule.multiD_XYs ) :
 
     def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
-        return( multiD_XYsModule.multiD_XYs.toPointwise_withLinearXYs( self, accuracy = accuracy, lowerEps = lowerEps,
-            upperEps = upperEps, cls = pointwise ) )
+        return( multiD_XYsModule.XYs2d.toPointwise_withLinearXYs( self, accuracy = accuracy, lowerEps = lowerEps,
+            upperEps = upperEps, cls = XYs2d ) )
 
     @staticmethod
     def allowedSubElements( ) :
 
-        return( ( pdfOfMu.pointwise, pdfOfMu.Legendre ) )
+        return( ( XYs1d, Legendre ) )
 
     @staticmethod
     def defaultAxes( energyUnit = 'eV', probabilityUnit = '', asLegendre = False ) :
@@ -409,13 +425,11 @@ class pointwise( subform, multiD_XYsModule.multiD_XYs ) :
         axes[2] = axesModule.axis( 'energy_in', 2, energyUnit )
         return( axes )
 
-class piecewise( subform, regionsModule.regions ) :
+class regions2d( subform, regionsModule.regions2d ) :
 
     def __init__( self, **kwargs ) :
 
-        if( 'dimension' not in kwargs ) : kwargs['dimension'] = 2
-        if( kwargs['dimension'] != 2 ) : raise ValueError( 'Dimension = %s != 2' % ( kwargs['dimension'] ) )
-        regionsModule.regions.__init__( self, **kwargs )
+        regionsModule.regions2d.__init__( self, **kwargs )
         subform.__init__( self )
 
     def check( self, info ):
@@ -430,29 +444,25 @@ class piecewise( subform, regionsModule.regions ) :
 
         return warnings
 
-    def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
+    def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
-        energyUnit = tempInfo['incidentEnergyUnit']
+        verbosity = kwargs.get( 'verbosity', 0 )
+        energyUnit = kwargs['incidentEnergyUnit']
         momentumDepositionUnit = energyUnit + '/c'
+        energyAccuracy = kwargs['energyAccuracy']
+        momentumAccuracy = kwargs['momentumAccuracy']
 
-        axes = energyDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit, 
-                energyDepositionUnit = energyUnit )
-        energyDeposition = energyDepositionModule.piecewise( axes = axes, label = processInfo.style.label )
-
-        axes = momentumDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit, 
-                momentumDepositionUnit = momentumDepositionUnit )
-        momentumDeposition = momentumDepositionModule.piecewise( axes = axes, label = processInfo.style.label )
-
-        EMin, EMax = tempInfo['EMin'], tempInfo['EMax']
+        EMax = kwargs['EMax']
+        aveEnergies = []
+        aveMomenta = []
         for i1, region in enumerate( self ) :
-            tempInfo['EMax'] = region.domainMax( )
-            if( i1 == ( len( self ) - 1 ) ) : tempInfo['EMax'] = EMax
-            energyDep, momentumDep = calculateDepositionData( region, processInfo, tempInfo, verbosityIndent ) 
-            energyDeposition.append( energyDep )
-            momentumDeposition.append( momentumDep )
-            tempInfo['EMin'] = tempInfo['EMax']
-        tempInfo['EMin'], tempInfo['EMax'] = EMin, EMax
-        return( ( energyDeposition, momentumDeposition ) )
+            kwargs['EMax'] = region.domainMax( )
+            if( i1 == ( len( self ) - 1 ) ) : kwargs['EMax'] = EMax
+            aveEnergy, aveMomentum = calculateAverageProductData( region, style, indent, **kwargs ) 
+            kwargs['EMin'] = kwargs['EMax']
+            aveEnergies.append( aveEnergy[0] )
+            aveMomentum.append( aveMomentum[0] )
+        return( aveEnergies, aveMomenta )
 
     def isIsotropic( self ) :
 
@@ -478,19 +488,52 @@ class piecewise( subform, regionsModule.regions ) :
                 return region.averageMu( E, accuracy )
         return self[-1].averageMu( E, accuracy )
 
+    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
+
+        for region in self :
+            if( region.interpolation != standardsModule.interpolation.linlinToken ) :
+                print ( '    WARNING: ignoring interpolation "%s" for toPointwise_withLinearXYs' % region.interpolation )
+        if( ( lowerEps < 0 ) or ( upperEps < 0 ) ) :
+            raise ValueError( 'lowerEps = %s and upperEps = %s must be >= 0.' % ( lowerEps, upperEps ) )
+        if( lowerEps == upperEps == 0 ) : raise ValueError( 'lowerEps and upperEps cannot both be 0.' )
+
+        minEps = 5e-16
+        if( lowerEps != 0 ) : lowerEps = max( minEps, lowerEps )
+        if( upperEps != 0 ) : upperEps = max( minEps, upperEps )
+
+        axes = XYs2d.defaultAxes(  )
+        axes[2].unit = self.axes[2].unit
+        linear = self.toLinearXYsClass( )( axes = axes )
+        n1 = len( self )
+        for i1, region in enumerate( self ) :
+            _region = region.toPointwise_withLinearXYs( accuracy = accuracy, lowerEps = lowerEps, upperEps = upperEps )
+            if( i1 < n1 - 1 ) :
+                if( lowerEps > 0  ) : _region[-1].value = _region[-1].value * ( 1 - lowerEps )
+            if( i1 > 0 ) :
+                if( upperEps > 0  ) : _region[0].value = _region[0].value * ( 1 + upperEps )
+            for xys in _region : linear.append( xys )
+        return( linear )
+
+    def toLinearXYsClass( self ) :
+
+        return( XYs2d )
+
     @staticmethod
     def allowedSubElements( ) :
 
-        return( ( pointwise, ) )
+        return( ( XYs2d, ) )
 
 """
 # BRB need to implement
     def getAtEnergy( self, energy ) :
     def invert( self ) :
-    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 """
 
 class form( baseModule.form ) :
+    """
+    This class only seems to be used in site_packages/legacy/toENDF6/productData/distributions/uncorrelated.py
+    to write GND structure to ENDF6. This class should be deprecated.
+    """
 
     moniker = 'angular'
     subformAttributes = ( 'angularSubform', )
@@ -502,48 +545,56 @@ class form( baseModule.form ) :
 
         baseModule.form.__init__( self, label, productFrame, ( angularSubform, ) )
 
-    def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
+    def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
-        product = tempInfo['product']
-        if( product.name != 'gamma' ) :
-            raise Exception( 'For form %s, calculateDepositionData is only for gammas, not %s' % ( self.moniker, product.name ) )
+        raise 'FIXME, when am I called'
 
-        energyUnit = tempInfo['incidentEnergyUnit']
+        energyUnit = kwargs['incidentEnergyUnit']
         momentumDepositionUnit = energyUnit + '/c'
         massUnit = energyUnit + '/c**2'
-        energyAccuracy, momentumAccuracy = processInfo.energyAccuracy, processInfo.momentumAccuracy
+        energyAccuracy = kwargs['energyAccuracy']
+        momentumAccuracy = kwargs['momentumAccuracy']
+        product = kwargs['product']
+        reactionSuite = kwargs['reactionSuite']
+
+        if( product.name != 'gamma' ) :
+            raise Exception( 'For form %s, calculateAverageProductData is only for gammas, not %s' % ( self.moniker, product.name ) )
 
         depData = []
         angularSubform = self.angularSubform
 
-        Es = angularSubform.getEnergyArray( tempInfo['EMin'], tempInfo['EMax'] )
-        projectileName, productName = processInfo.getProjectileName( ), product.name
+        Es = angularSubform.getEnergyArray( kwargs['EMin'], kwargs['EMax'] )
         if( ( 'discrete' in product.attributes ) or ( 'primary' in product.attributes ) ) :
             massRatio = 0.
             if( 'discrete' in product.attributes ) :
                 Eg = product.attributes['discrete'].getValueAs( energyUnit )
             else :
                 Eg = product.attributes['primary'].getValueAs( energyUnit )
-                projectile, target = tempInfo['reactionSuite'].projectile, tempInfo['reactionSuite'].target
-                mass1, mass2 = projectile.getMass( massUnit ), target.getMass( massUnit )
+                mass1 = reactionSuite.projectile.getMass( massUnit )
+                mass2 = reactionSuite.target.getMass( massUnit )
                 massRatio = mass2 / ( mass1 + mass2 )
             depEnergy = [ [ E, Eg + massRatio * E ] for E in Es ]
             depMomentum = [ [ E, ( Eg + massRatio * E ) * angularSubform.averageMu( E, accuracy = 0.1 * momentumAccuracy ) ] for E in Es ]
         else :
             raise Exception( 'Unsupported gamma; gamma must be "discrete" or "primary"' )
 
-        axes = fudge.gnd.productData.energyDeposition.pointwise.defaultAxes( energyUnit = energyUnit, energyDepositionUnit = energyUnit )
-        depData.append( fudge.gnd.productData.energyDeposition.pointwise( data = depEnergy, axes = axes,
-                label = processInfo.style.label, accuracy = energyAccuracy ) )
-        axes = momentumDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit, momentumDepositionUnit = momentumDepositionUnit )
-        depData.append( momentumDepositionModule.pointwise( data = depMomentum, axes = axes,
-                label = processInfo.style.label, accuracy = momentumAccuracy ) )
+        axes = energyDepositionModule.XYs1d.defaultAxes( energyUnit = energyUnit, energyDepositionUnit = energyUnit )
+        depData.append( energyDepositionModule.XYs1d( data = depEnergy, axes = axes,
+                label = style.label, accuracy = energyAccuracy ) )
+        axes = momentumDepositionModule.XYs1d.defaultAxes( energyUnit = energyUnit, momentumDepositionUnit = momentumDepositionUnit )
+        depData.append( momentumDepositionModule.XYs1d( data = depMomentum, axes = axes,
+                label = style.label, accuracy = momentumAccuracy ) )
 
         return( depData )
 
-    def process( self, processInfo, tempInfo, verbosityIndent ) :
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
 
-        from fudge.processing.deterministic import transferMatrices
+        raise Exception( 'need to implement' )
+
+#    def process( self, processInfo, tempInfo, verbosityIndent ) :
+
+        from fudge.gnd import miscellaneous as miscellaneousModule
+        from fudge.processing.deterministic import transferMatrices as transferMatricesModule
 
         product = tempInfo['product']
         if( product.name != 'gamma' ) : raise Exception( 'For form %s, process is only for gammas, not %s' % ( self.moniker, product.name ) )
@@ -559,18 +610,18 @@ class form( baseModule.form ) :
             projectileName, productName = processInfo.getProjectileName( ), product.name
             if( 'discrete' in product.attributes ) :
                 Eg = product.attributes['discrete'].getValueAs( energyUnit )
-                TM_1, TM_E = transferMatrices.discreteGammaAngularData( processInfo, projectileName, productName, Eg, crossSection,
+                TM_1, TM_E = transferMatricesModule.discreteGammaAngularData( processInfo, projectileName, productName, Eg, crossSection,
                    angularSubform, 1., comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
             elif( 'primary' in product.attributes ) :
                 projectile, target = tempInfo['reactionSuite'].projectile, tempInfo['reactionSuite'].target
                 mass1, mass2 = projectile.getMass( massUnit ), target.getMass( massUnit )
                 massRatio = mass2 / ( mass1 + mass2 )
                 ELevel = product.attributes['primary'].getValueAs( energyUnit )
-                TM_1, TM_E = transferMatrices.primaryGammaAngularData( processInfo, projectileName, productName, ELevel, massRatio, crossSection,
+                TM_1, TM_E = transferMatricesModule.primaryGammaAngularData( processInfo, projectileName, productName, ELevel, massRatio, crossSection,
                    angularSubform, 1., comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
             else :
                 raise Exception( 'Unsupported gamma; gamma must be "discrete" or "primary"' )
-            fudge.gnd.miscellaneous.TMs2Form( processInfo, tempInfo, newForms, TM_1, TM_E, crossSection.axes )
+            miscellaneousModule.TMs2Form( processInfo, tempInfo, newForms, TM_1, TM_E, crossSection.axes )
 
         return( newForms )
 
@@ -580,10 +631,10 @@ class form( baseModule.form ) :
 
         xPath.append( angularElement.tag )
         subformClass = {
-                isotropic.moniker : isotropic,
-                forward.moniker :   forward,
-                pointwise.moniker : pointwise,
-                piecewise.moniker : piecewise,
+                isotropic.moniker   : isotropic,
+                forward.moniker     : forward,
+                XYs2d.moniker       : XYs2d,
+                regions2d.moniker   : regions2d,
             }.get( angularElement.tag )
         if( subformClass is None ) : raise Exception( "encountered unknown angular subform: %s" % angularElement.tag )
         angularSubform = subformClass.parseXMLNode( angularElement, xPath, linkData )
@@ -601,34 +652,59 @@ class twoBodyForm( baseModule.form ) :
         if( makeCopy ) : angularSubform = angularSubform.copy( )
         baseModule.form.__init__( self, label, productFrame, ( angularSubform, ) )
 
-    def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
+    def averageMu( self, E, accuracy = None ) :
+ 
+        return( self.angularSubform.averageMu( E, accuracy = accuracy ) )
 
-        return( calculateDepositionData( self.angularSubform, processInfo, tempInfo, verbosityIndent ) )
+    def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
-    def process( self, processInfo, tempInfo, verbosityIndent ) :
+        kwargs['productFrame'] = self.productFrame
+        return( calculateAverageProductData( self.angularSubform, style, indent, **kwargs ) )
 
-        from fudge.processing.deterministic import transferMatrices
+    def getEnergyArray( self, EMin = None, EMax = None ) :
 
-        newForms = []
+        return( self.angularSubform.getEnergyArray( EMin = EMin, EMax = EMax ) )
+
+    def invert( self ) :
+
+        return( self.angularSubform.invert( ) )
+
+    def isIsotropic( self ) :
+
+        return( self.angularSubform.isIsotropic( ) )
+
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
+
+        from fudge.processing import group as groupModule
+        from fudge.processing.deterministic import transferMatrices as transferMatricesModule
+
+        verbosity = tempInfo['verbosity']
+        indent2 = indent + tempInfo['incrementalIndent']
+        productLabel = tempInfo['productLabel']
+        outputChannel = tempInfo['reaction'].outputChannel
+
+        if( verbosity > 2 ) : print '%sGrouping %s' % ( indent, self.moniker )
+
         crossSection = tempInfo['crossSection']
         angularSubform = self.angularSubform
+        if( isinstance( angularSubform, recoil ) ) :
+            if( isinstance( angularSubform.link, CoulombExpansionForm ) ) : return( None )
+            angularSubform = angularSubform.getNumericalDistribution( )
 
-        if( 'LLNL_Pn' in processInfo['styles'] ) :
-            outputChannel = tempInfo['outputChannel'].outputChannel
-            if( processInfo.verbosity >= 30 ) : print '%sGrouping %s' % ( verbosityIndent, self.moniker )
-            projectileName, productGroupName, productLabel = processInfo.getProjectileName( ), tempInfo['productGroupToken'], tempInfo['productLabel']
-            projectile, target = tempInfo['reactionSuite'].projectile, tempInfo['reactionSuite'].target
-            Q = tempInfo['outputChannel'].getQ( tempInfo['incidentEnergyUnit'], final = False, groundStateQ = True )
-            residual = outputChannel.products[1]
-            if( tempInfo['productIndex'] == '1' ) : residual = outputChannel.products[0]
-            residualMass = tempInfo['masses']['Residual']
-            tempInfo['masses']['Residual'] = residual.getMass( tempInfo['massUnit'] )
-            TM_1, TM_E = transferMatrices.twoBodyTransferMatrix( processInfo, projectileName, productGroupName, crossSection, angularSubform, 
-                tempInfo['masses'], Q, comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % productLabel )
-            tempInfo['masses']['Residual'] = residualMass
-            fudge.gnd.miscellaneous.TMs2Form( processInfo, tempInfo, newForms, TM_1, TM_E, crossSection.axes )
+        Q = outputChannel.Q['eval']
+        Q = Q.getValue( Q.domainMin( ), unit = tempInfo['incidentEnergyUnit'] )
+        residual = outputChannel.products[1]
+        if( tempInfo['productIndex'] == '1' ) : residual = outputChannel.products[0]
+        residualMass = tempInfo['masses']['Residual']
+        tempInfo['masses']['Residual'] = residual.getMass( tempInfo['massUnit'] )
+        TM_1, TM_E = transferMatricesModule.twoBodyTransferMatrix( style, tempInfo, self.productFrame, crossSection, angularSubform, 
+                Q, comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % productLabel )
+        tempInfo['masses']['Residual'] = residualMass
+        return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
 
-        return( newForms )
+    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
+
+        return( self.angularSubform.toPointwise_withLinearXYs( accuracy = accuracy, lowerEps = lowerEps, upperEps = upperEps ) )
 
     @staticmethod
     def parseXMLNode( angularElement, xPath, linkData ) :
@@ -639,10 +715,10 @@ class twoBodyForm( baseModule.form ) :
         xPath.append( angularElement.tag )
 
         subformElement = angularElement[0]
-        subformClass = {   isotropic.moniker   : isotropic,
-                        recoil.moniker      : recoil,
-                        pointwise.moniker   : pointwise,
-                        piecewise.moniker   : piecewise,
+        subformClass = {    isotropic.moniker   : isotropic,
+                            recoil.moniker      : recoil,
+                            XYs2d.moniker       : XYs2d,
+                            regions2d.moniker   : regions2d,
             }.get( subformElement.tag )
         if( subformClass is None ) : raise Exception( 'unknown angular subform "%s"' % subformElement.tag )
         angularSubform = subformClass.parseXMLNode( subformElement, xPath, linkData )
@@ -663,19 +739,25 @@ class CoulombExpansionForm( baseModule.form ) :
             nuclear_term = nuclear_term.copy()
             interferenceReal_term = interferenceReal_term.copy()
             interferenceImaginary_term = interferenceImaginary_term.copy()
-        if( isinstance( nuclear_term, pointwise ) ) :
-            assert isinstance( interferenceReal_term, pointwise ) and isinstance( interferenceImaginary_term, pointwise )
-        elif( isinstance( nuclear_term, piecewise ) ) :
-            assert isinstance( interferenceReal_term, piecewise ) and isinstance( interferenceImaginary_term, piecewise )
+        if( isinstance( nuclear_term, XYs2d ) ) :
+            assert isinstance( interferenceReal_term, XYs2d ) and isinstance( interferenceImaginary_term, XYs2d )
+        elif( isinstance( nuclear_term, regions2d) ) :
+            assert isinstance( interferenceReal_term, regions2d ) and isinstance( interferenceImaginary_term, regions2d )
         else :
-            raise Exception( 'Only pointwise and piecewise are currently supported, not %s' % brb.getType( nuclear_term ) )
+            raise Exception( 'Only XYs2d and regions2d are currently supported, not %s' % brb.getType( nuclear_term ) )
         baseModule.form.__init__( self, label, productFrame, ( nuclear_term, interferenceReal_term, interferenceImaginary_term ) )
         self.nuclear_term.label = 'nuclear_term'
         self.interferenceReal_term.label = 'interferenceReal_term'
         self.interferenceImaginary_term.label = 'interferenceImaginary_term'
 
-    def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ):
-        raise CoulombDepositionNotSupported("Can't compute deposition for %s distribution" % self.moniker)
+    def calculateAverageProductData( self, style, indent = '', **kwargs ) :
+
+        raise CoulombDepositionNotSupported( "Cannot compute average product data for %s distribution" % self.moniker )
+
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
+
+        print '    processSnMultiGroup not implemented for distribution form %s.' % self.moniker
+        return( None )
     
     def toXMLList( self, indent = "", **kwargs ):
 
@@ -693,9 +775,8 @@ class CoulombExpansionForm( baseModule.form ) :
         xPath.append( element.tag )
         kwargs = {}
         for subformElement in element:
-            subformClass = {
-                    pointwise.moniker: pointwise,
-                    piecewise.moniker: piecewise,
+            subformClass = {    XYs2d.moniker       : XYs2d,
+                                regions2d.moniker   : regions2d,
                 }.get( subformElement.tag )
             if( subformClass is None ) : raise Exception( "encountered unknown CoulombElastic subform: %s" % subformElement.tag )
             kwargs[ subformElement.get('label') ] = subformClass.parseXMLNode( subformElement, xPath, linkData )
@@ -712,13 +793,19 @@ class NuclearPlusCoulombInterferenceForm( baseModule.form ) :
 
     def __init__( self, label, productFrame, angularSubform, makeCopy = True ) :
 
-        if( not( isinstance( angularSubform, ( pointwise, piecewise ) ) ) ) : raise TypeError( 'instance is not an angular subform' )
+        if( not( isinstance( angularSubform, ( XYs2d, regions2d ) ) ) ) : raise TypeError( 'instance is not an angular subform' )
         if( makeCopy ) : angularSubform = angularSubform.copy( )
         baseModule.form.__init__( self, label, productFrame, ( angularSubform, ) )
 
-    def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ):
-        raise CoulombDepositionNotSupported("Can't compute deposition for %s distribution" % self.moniker)
+    def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
+        raise CoulombDepositionNotSupported( "Cannot compute average product data for %s distribution" % self.moniker )
+
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
+
+        print '    processSnMultiGroup not implemented for distribution form %s.' % self.moniker
+        return( None )
+    
     def toXMLList( self, indent = "", **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
@@ -735,7 +822,7 @@ class NuclearPlusCoulombInterferenceForm( baseModule.form ) :
 
         xPath.append( element.tag )
         angularSubformClass = {
-            pointwise.moniker: pointwise
+            XYs2d.moniker : XYs2d 
         }.get( element[0].tag )
         angularSubform = angularSubformClass.parseXMLNode( element[0], xPath, linkData )
         npci = NuclearPlusCoulombInterferenceForm( element.get( 'label' ), element.get('productFrame'),
@@ -747,7 +834,10 @@ class CoulombDepositionNotSupported( Exception ):
     """ Custom Exception, returned when calculatedDepositionData() called for CoulombExpansion or NuclearPlusCoulomb """
     pass
 
-def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
+def calculateAverageProductData( self, style, indent, **kwargs ) :
+    """
+    This function calculates average product data for two-body reactions.
+    """
 
     def calculateDepositionEnergyAtE( angularData, E, parameters ) :
 
@@ -805,30 +895,34 @@ def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
 
             return( self.func( self.angular, E, self.parameters ) )
 
-    if( hasattr( self, 'calculateDepositionData' ) ) :
-        return( self.calculateDepositionData( processInfo, tempInfo, verbosityIndent ) )
+    if( hasattr( self, 'calculateAverageProductData' ) ) :      # This happends when, for example, the angular is a regions2d form.
+        return( self.calculateAverageProductData( style, indent = indent, **kwargs ) )
 
-    energyUnit = tempInfo['incidentEnergyUnit']
+    energyUnit = kwargs['incidentEnergyUnit']
     momentumDepositionUnit = energyUnit + '/c'
     massUnit = energyUnit + '/c**2'
-    energyAccuracy, momentumAccuracy = processInfo.energyAccuracy, processInfo.momentumAccuracy
+    multiplicity = kwargs['multiplicity']
+    productMass = kwargs['product'].getMass( massUnit )
+    energyAccuracy = kwargs['energyAccuracy']
+    momentumAccuracy = kwargs['momentumAccuracy']
+    reactionSuite = kwargs['reactionSuite']
+    reaction = kwargs['reaction']
+    outputChannel = kwargs['outputChannel']
+    productIndex = kwargs['productIndex']
 
-    depData = []
-
-    projectile, target = tempInfo['reactionSuite'].projectile, tempInfo['reactionSuite'].target
-    outputChannel = tempInfo['outputChannel'].outputChannel
-    mass1 = projectile.getMass( massUnit )
-    mass2 = target.getMass( massUnit )
+    mass1 = reactionSuite.projectile.getMass( massUnit )
+    mass2 = reactionSuite.target.getMass( massUnit )
     massx = outputChannel.products[0].getMass( massUnit )
     massy = outputChannel.products[1].getMass( massUnit )
-    if( tempInfo['productIndex'] == '1' ) : massx, massy = massy, massx
+
+    if( productIndex == '1' ) : massx, massy = massy, massx
     m12, mxy = mass1 + mass2, massx + massy
     b1x, a1x, a2y = mass1 * massx / m12, mass1 * massx / ( m12 * m12 ), mass2 * massy / ( m12 * mxy )
     Qm = m12 - mxy
-    Q = tempInfo['outputChannel'].getQ( energyUnit, final = False, groundStateQ = True )
-    Qp = -( Q ) * m12 / mass2    # This is the threshold in the COM frame.
+    Q = reaction.getQ( energyUnit, final = False, groundStateQ = True )
+    Qp = -float( Q ) * m12 / mass2              # This is the threshold in the COM frame.
 
-    if( mass1 == 0. ) :         # Photo as projectile
+    if( mass1 == 0. ) :                         # Photo as projectile
         energyFunc = calculateDepositionEnergyAtEForPhotoProjectile
         momentumFunc = calculateDepositionMomentumAtEForPhotoProjectile
         parameters = { 'm2' : mass2, 'mx' : massx, 'my' : massy, 'Q' : Q }
@@ -837,18 +931,13 @@ def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
         momentumFunc = calculateDepositionMomentumAtE
         parameters = { 'm1' : mass1, 'mx' : massx, 'a1x' : a1x, 'a2y' : a2y, 'b1x' : b1x, 'Qp' : Qp }
 
-    Es = self.getEnergyArray( tempInfo['EMin'], tempInfo['EMax'] )
-    depEnergy = [ [ E, energyFunc( self, E, parameters ) ] for E in Es ]
-    depEnergy = fudgemath.thickenXYList( depEnergy, calculateDepositionEnergyThicken( depEnergy, self, energyFunc, parameters, energyAccuracy, 1e-10 ) )
-    axes = energyDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit, energyDepositionUnit = energyUnit )
-    depData.append( energyDepositionModule.pointwise( data = depEnergy, axes = axes,
-            label = processInfo.style.label, accuracy = energyAccuracy ) )
+    Es = self.getEnergyArray( kwargs['EMin'], kwargs['EMax'] )
+    aveEnergy = [ [ E, energyFunc( self, E, parameters ) ] for E in Es ]
+    aveEnergy = fudgemath.thickenXYList( aveEnergy, calculateDepositionEnergyThicken( aveEnergy, self, energyFunc, 
+            parameters, energyAccuracy, 1e-10 ) )
 
-    depMomentum = [ [ E, momentumFunc( self, E, parameters ) ] for E in Es ]
-    depMomentum = fudgemath.thickenXYList( depMomentum, calculateDepositionMomentumThicken( depMomentum, self, momentumFunc, 
-        parameters, momentumAccuracy, 1e-10 ) )
-    axes = momentumDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit, momentumDepositionUnit = momentumDepositionUnit )
-    depData.append( momentumDepositionModule.pointwise( data = depMomentum, axes = axes,
-        label = processInfo.style.label, accuracy = momentumAccuracy ) )
+    aveMomentum = [ [ E, momentumFunc( self, E, parameters ) ] for E in Es ]
+    aveMomentum = fudgemath.thickenXYList( aveMomentum, calculateDepositionMomentumThicken( aveMomentum, self, momentumFunc, 
+            parameters, momentumAccuracy, 1e-10 ) )
 
-    return( depData )
+    return( [ aveEnergy ], [ aveMomentum ] )

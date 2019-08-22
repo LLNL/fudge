@@ -76,20 +76,29 @@ static double biginv =  2.22044604925031308085e-16;
 /*
 ************************************************************
 */
-double nf_incompleteGammaFunctionComplementary( double a, double x, nfu_status *status ) {
+nfu_status nf_incompleteGammaFunctionComplementary( statusMessageReporting *smr, double a, double x, double *value ) {
 
+    nfu_status status;
     double ans, ax, c, yc, r, t, y, z;
     double pk, pkm1, pkm2, qk, qkm1, qkm2;
 
-    *status = nfu_badInput;
-    if( !isfinite( x ) ) return( x );
-    *status = nfu_Okay;
+    *value = 0.;
+
+    if( !isfinite( x ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badInput, "Invalid input (x = %e).", x );
+        return( nfu_badInput );
+    }
 
     if( ( x <= 0 ) || ( a <= 0 ) ) return( 1.0 );
-    if( ( x < 1.0 ) || ( x < a ) ) return( nf_gammaFunction( a, status ) - nf_incompleteGammaFunction( a, x, status ) );
+    if( ( x < 1.0 ) || ( x < a ) ) {
+        if( ( status = nf_gammaFunction( smr, a, value ) ) != nfu_Okay ) return( status );
+        if( ( status = nf_incompleteGammaFunction( smr, a, x, &ans ) ) != nfu_Okay ) return( status );
+        *value -= ans;
+        return( nfu_Okay );
+    }
 
     ax = exp( a * log( x ) - x );
-    if( ax == 0. ) return( 0.0 );
+    if( ax == 0. ) return( nfu_Okay );
 
     if( x < 10000. ) {
         y = 1.0 - a;                        /* continued fraction */
@@ -138,12 +147,13 @@ double nf_incompleteGammaFunctionComplementary( double a, double x, nfu_status *
         } while( fabs( c ) > 100 * ans * DBL_EPSILON );
     }
 
-    return( ans * ax );
+    *value = ans * ax;
+    return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-double nf_incompleteGammaFunction( double a, double x, nfu_status *status ) {
+nfu_status nf_incompleteGammaFunction( statusMessageReporting *smr, double a, double x, double *value ) {
 /* left tail of incomplete gamma function:
 *
 *          inf.      k
@@ -153,16 +163,25 @@ double nf_incompleteGammaFunction( double a, double x, nfu_status *status ) {
 *          k=0   | (a+k+1)
 */
     double ans, ax, c, r;
+    nfu_status status;
 
-    *status = nfu_badInput;
-    if( !isfinite( x ) ) return( x );
-    *status = nfu_Okay;
+    *value = 0.;
 
-    if( ( x <= 0 ) || ( a <= 0 ) ) return( 0.0 );
-    if( ( x > 1.0 ) && ( x > a ) ) return( nf_gammaFunction( a, status ) - nf_incompleteGammaFunctionComplementary( a, x, status ) );
+    if( !isfinite( x ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badInput, "Invalid input (x = %e).", x );
+        return( nfu_badInput );
+    }
+
+    if( ( x <= 0 ) || ( a <= 0 ) ) return( nfu_Okay );
+    if( ( x > 1.0 ) && ( x > a ) ) {
+        if( ( status = nf_gammaFunction( smr, a, value ) ) != nfu_Okay ) return( status );
+        if( ( status = nf_incompleteGammaFunctionComplementary( smr, a, x, &ans ) ) != nfu_Okay ) return( status );
+        *value -= ans;
+        return( nfu_Okay );
+    }
 
     ax = exp( a * log( x ) - x );       /* Compute  x**a * exp(-x) */
-    if( ax == 0. ) return( 0.0 );
+    if( ax == 0. ) return( nfu_Okay );
 
     r = a;                                                      /* power series */
     c = 1.0;
@@ -173,5 +192,6 @@ double nf_incompleteGammaFunction( double a, double x, nfu_status *status ) {
         ans += c;
     } while( c > ans * DBL_EPSILON );
 
-    return( ans * ax / a );
+    *value = ans * ax / a;
+    return( nfu_Okay );
 }

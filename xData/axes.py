@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 __metaclass__ = type
@@ -70,7 +94,7 @@ class axis( ancestryModule.ancestry ) :
 
         self.__index = int( index )
 
-        self.setUnit( unit )
+        self.unit = unit
 
     def __str__( self ) :
 
@@ -109,19 +133,20 @@ class axis( ancestryModule.ancestry ) :
 
         return( self.__unit )
 
+    @unit.setter
+    def unit( self, value ) :
+        """Sets self's unit. Only checks that unit is a string. If unit is None, it is set to an empty string (i.e., '')."""
+
+        if( value is None ) : value = ''
+        if( not( isinstance( value, str ) ) ) : raise TypeError( 'unit type "%s" is not a string' % type( value ) )
+        self.__unit = value.strip( )
+
     def plotLabel( self ) :
 
         label = self.label
         if( label == '' ) : label = 'unknown'
         if( self.unit != '' ) : label += ' (%s)' % self.unit
         return( label )
-
-    def setUnit( self, unit ) :
-        """Sets self's unit. Only checks that unit is a string. If unit is None, it is set to an empty string (i.e., '')."""
-
-        if( unit is None ) : unit = ''
-        if( not( isinstance( unit, str ) ) ) : raise TypeError( 'unit type "%s" is not a string' % type( unit ) )
-        self.__unit = unit.strip( )
 
     def toXML( self, indent = '', **kwargs ) :
 
@@ -133,7 +158,7 @@ class axis( ancestryModule.ancestry ) :
         return( [ self.toXML( indent = indent, **kwargs ) ] )
 
     @staticmethod
-    def parseXMLNode( element, xPath ) :
+    def parseXMLNode( element, xPath, linkData ) :
 
         xPath.append( '%s[@index="%s"]' % ( axis.moniker, element.get( 'index' ) ) )
 
@@ -152,7 +177,7 @@ class grid( axis ) :
 
     moniker = 'grid'
 
-    def __init__( self, label, index, unit, style, grid, uncertainty = None, pdf = normalPDF, interpolation = None ) :
+    def __init__( self, label, index, unit, style, values, uncertainty = None, pdf = normalPDF, interpolation = None ) :
         """
         Returns a new instance of grid.
         """
@@ -160,16 +185,16 @@ class grid( axis ) :
         axis.__init__( self, label, index, unit )
 
         if( style == linkGridToken ) :
-            if( not isinstance( grid, link ) ):
-                raise TypeError( "style = 'link' not consistent with grid type '%s'" % type( grid ) )
+            if( not isinstance( values , link ) ):
+                raise TypeError( "style = 'link' not consistent with grid '%s'" % values.moniker )
         else :
             if( style not in [ pointsGridToken, boundariesGridToken, parametersGridToken ] ) :
                 raise ValueError( 'style = %s not supported' % style )
-            if( not( isinstance( grid, valuesModule.values ) ) ) : TypeError( 'grid not values instance.' )
+            if( not( isinstance( values, valuesModule.values ) ) ) : raise TypeError( 'grid not values instance.' )
 
         self.__style = style
-        self.grid = grid
-        self.grid.setAncestor( self )
+        self.__values = values
+        self.values.setAncestor( self )
 
         self.interpolation = interpolation
 
@@ -183,21 +208,37 @@ class grid( axis ) :
 
         return( self.__style )
 
+    @property
+    def values( self ) :
+
+        return( self.__values )
+
     def convertToUnit( self, unit ) :
 
+        if self.style=='link': return
         factor = self.unitConversionFactor( unit )
-        self.setUnit( unit )
-        self.grid = valuesModule.values( [ factor * value for value in self.grid ] )
+        self.unit = unit
+        self.__value = valuesModule.values( [ factor * value for value in self.values ] )
 
     def copy( self, index = None ) :
         """Returns a new grid instance that is a copy of self."""
 
-        if( index is None ) : index = self.__index
-        return( grid( self.label, index, self.unit, self.style, self.grid, uncertainty = self.uncertainty, 
+        if( index is None ) : index = self.index
+        return( grid( self.label, index, self.unit, self.style, self.values, uncertainty = self.uncertainty, 
                 pdf = self.pdf, interpolation = self.interpolation ) )
 
     __copy__ = copy
     __deepcopy__ = __copy__
+
+    def getIndexOfValue(self,v):
+        """
+        Get the index of the value in values where x would fit
+        :param v:
+        :return:
+        """
+        for ival,val in enumerate(self.values[:-1]):
+            if v >= val and v <= self.values[ival+1]: return ival
+        return None
 
     def toXML( self, indent = '', **kwargs ) :
 
@@ -213,12 +254,12 @@ class grid( axis ) :
             attributeStr += ' uncertainty="%s"' % self.uncertainty
             attributeStr += ' pdf="%s"' % self.pdf
         XMLStrList = [ '%s<%s index="%d" label="%s" unit="%s"%s>' % ( indent, self.moniker, self.index, self.label, self.unit, attributeStr ) ]
-        XMLStrList += self.grid.toXMLList( indent2, **kwargs )
+        XMLStrList += self.values.toXMLList( indent2, **kwargs )
         XMLStrList[-1] += '</%s>' % self.moniker
         return( XMLStrList )
 
     @staticmethod
-    def parseXMLNode( element, xPath ) :
+    def parseXMLNode( element, xPath, linkData ) :
 
         xPath.append( '%s[@index="%s"]' % ( grid.moniker, element.get( 'index' ) ) )
 
@@ -229,7 +270,7 @@ class grid( axis ) :
         }.get( style )
         if( gridClass is None ) : raise Exception( "grid style '%s' not yet supported" % style )
 
-        gridData = gridClass.parseXMLNode( element[0] )
+        gridData = gridClass.parseXMLNode( element[0], xPath, linkData )
         _grid = grid( element.get( 'label' ), element.get( 'index' ), element.get( 'unit' ), style, gridData )
 
         xPath.pop()
@@ -326,7 +367,7 @@ class axes( ancestryModule.ancestry ) :
         return( XMLList )
 
     @staticmethod
-    def parseXMLNode( axesElement, xPath ) :
+    def parseXMLNode( axesElement, xPath, linkData ) :
         """Parse XML element with tag '<axes>'."""
 
         xPath.append( axesElement.tag )
@@ -337,14 +378,14 @@ class axes( ancestryModule.ancestry ) :
                 if childClass is None:
                     raise TypeError("Unexpected child element '%s' encountered in axes" % child.tag)
                 index = child.get( "index" )
-                axes_[index] = childClass.parseXMLNode( child, xPath )
+                axes_[index] = childClass.parseXMLNode( child, xPath, linkData )
         else :
             raise Exception( 'Invalid tag "%s" for axes' % ( axesElement.tag ) )
         xPath.pop()
         return( axes_ )
 
     @staticmethod
-    def parseXMLString( axisString, xPath ) :
+    def parseXMLString( axisString, xPath, linkData ) :
 
         from xml.etree import cElementTree
-        return( axes.parseXMLNode( cElementTree.fromstring( axisString ), xPath = xPath ) )
+        return( axes.parseXMLNode( cElementTree.fromstring( axisString ), xPath = xPath, linkData = linkData ) )

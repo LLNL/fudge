@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -46,6 +70,7 @@
 #include <math.h>
 #include <time.h>
 
+#include <nfut_utilities.h>
 #include <ptwXY.h>
 #include <nf_utilities.h>
 #include <ptwXY_utilities.h>
@@ -56,8 +81,9 @@ static int verbose = 0, mode = 0, doBruteForce = 0, timing = 0;
 static char *fmtXY = "%25.17e %25.17e\n";
 static FILE *infoF;
 
-static int checkConvolution( const char * const label, ptwXYPoints *ptwXY1, ptwXYPoints* ptwXY2, int deleteXYs, double accuracy, double area );
-static void bruteForce( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, double accuracy );
+static int checkConvolution( statusMessageReporting *smr, const char * const label, ptwXYPoints *ptwXY1, 
+        ptwXYPoints* ptwXY2, int deleteXYs, double accuracy, double area );
+static void bruteForce( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, double accuracy );
 static void compareDoubles( double d1, double d2, double eps, const char * const funcName );
 static void printIfVerbose( ptwXYPoints *data );
 /*
@@ -67,7 +93,6 @@ int main( int argc, char **argv ) {
 
     int iarg, errCount = 0, echo = 0;
     ptwXYPoints *wedgeXY, *box1XY, *box2XY, *triangle1XY, *triangle2XY, *gaussian1XY, *gaussian2XY;
-    nfu_status status;
     double sigma, accuracy = 1e-3;
 /*                      x1               x2       x3      x4       x5             x6 */
     double box1[] = { -1.5, 0., -1.49999999, 1., 0.5, 1., 2., 1., 2.2, 1, 2.20000001, 0 };
@@ -80,6 +105,9 @@ int main( int argc, char **argv ) {
     double triangle1[] = { 1.0, 0., 2.0, 2., 3.0, 0. }, triangle2[] = { -2, 0., -0.0, 3., 2., 0. };
     double triangle3[] = { 1.0, 0., 1.5, 2., 3.0, 0. }, triangle4[] = { -5, 0., -0.5, 3., 2., 0. };
     int nTriangles = 3;
+    statusMessageReporting smr;
+
+    smr_initialize( &smr, smr_status_Ok );
 
     infoF = stdout;
 
@@ -102,67 +130,73 @@ int main( int argc, char **argv ) {
     }
     if( echo ) printf( "%s\n", __FILE__ );
 
-    if( ( box1XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nBox1, box1, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: box1 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( box2XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nBox2, box2, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: box2 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    checkConvolution( "box 1 & 2", box1XY, box2XY, 1, accuracy, 3.7 );
+    if( ( box1XY = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nBox1, box1, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    if( ( box2XY = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nBox2, box2, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    checkConvolution( &smr, "box 1 & 2", box1XY, box2XY, 1, accuracy, 3.7 );
+exit( 0 );
 
-    if( ( box1XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nBox1, box1, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: box1 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( wedgeXY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, 3, wedge, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: box1 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    checkConvolution( "box 1 + wedge", box1XY, wedgeXY, 1, accuracy, 1.85 );
+    if( ( box1XY = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nBox1, box1, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    if( ( wedgeXY = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, 3, wedge, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    checkConvolution( &smr, "box 1 + wedge", box1XY, wedgeXY, 1, accuracy, 1.85 );
 
-    if( ( wedgeXY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, 3, wedge, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: wedge creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    checkConvolution( "wedge + wedge", wedgeXY, wedgeXY, 1, accuracy, 0.25 );
+    if( ( wedgeXY = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, 3, wedge, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    checkConvolution( &smr, "wedge + wedge", wedgeXY, wedgeXY, 1, accuracy, 0.25 );
 
-    if( ( triangle1XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: triangle creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( box1XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nBox1, box1, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: box1 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    checkConvolution( "box 1 + triangle", triangle1XY, box1XY, 1, accuracy, 3.70 );
+    if( ( triangle1XY = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    if( ( box1XY = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nBox1, box1, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    checkConvolution( &smr, "box 1 + triangle", triangle1XY, box1XY, 1, accuracy, 3.70 );
 
-    if( ( triangle1XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: triangle creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( wedgeXY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, 3, wedge, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: wedge creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    checkConvolution( "triangle + wedge", triangle1XY, wedgeXY, 1, accuracy, 0.5 );
+    if( ( triangle1XY = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    if( ( wedgeXY = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, 3, wedge, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    checkConvolution( &smr, "triangle + wedge", triangle1XY, wedgeXY, 1, accuracy, 0.5 );
 
-    if( ( triangle1XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle1, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: triangle1 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( triangle2XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle2, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: triangle2 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    checkConvolution( "triangles 1 & 2", triangle1XY, triangle2XY, 0, accuracy, 12. );
-    ptwXY_thicken( triangle1XY, 100, 1e-5, 1. + 1e-5 );
-    ptwXY_thicken( triangle2XY, 100, 1e-5, 1. + 1e-5 );
-    checkConvolution( "triangles 1 & 2 thickened", triangle1XY, triangle2XY, 1, accuracy, 12. );
+    if( ( triangle1XY = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle1, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    if( ( triangle2XY = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle2, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    checkConvolution( &smr, "triangles 1 & 2", triangle1XY, triangle2XY, 0, accuracy, 12. );
+    if( ptwXY_thicken( &smr, triangle1XY, 100, 1e-5, 1. + 1e-5 ) != nfu_Okay )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+   if(  ptwXY_thicken( &smr, triangle2XY, 100, 1e-5, 1. + 1e-5 ) != nfu_Okay ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    checkConvolution( &smr, "triangles 1 & 2 thickened", triangle1XY, triangle2XY, 1, accuracy, 12. );
 
-    if( ( triangle1XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle3, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: triangle3 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( triangle2XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle4, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: triangle4 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    checkConvolution( "triangles 3 & 4", triangle2XY, triangle1XY, 0, accuracy, 21.0 );
-    ptwXY_thicken( triangle1XY, 100, 1e-5, 1. + 1e-5 );
-    ptwXY_thicken( triangle2XY, 100, 1e-5, 1. + 1e-5 );
-    checkConvolution( "triangles 3 & 4 thickened", triangle1XY, triangle2XY, 1, accuracy, 21.0 );
+    if( ( triangle1XY = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle3, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    if( ( triangle2XY = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle4, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    checkConvolution( &smr, "triangles 3 & 4", triangle2XY, triangle1XY, 0, accuracy, 21.0 );
+    if( ptwXY_thicken( &smr, triangle1XY, 100, 1e-5, 1. + 1e-5 ) != nfu_Okay ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    if( ptwXY_thicken( &smr, triangle2XY, 100, 1e-5, 1. + 1e-5 ) != nfu_Okay ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    checkConvolution( &smr, "triangles 3 & 4 thickened", triangle1XY, triangle2XY, 1, accuracy, 21.0 );
 
     sigma = 3.;
     accuracy = 2e-3;
-    if( ( gaussian1XY = ptwXY_createGaussian( accuracy, 0., sigma, 1.0 / ( M_SQRT2PI * sigma ), -4. * sigma, 4. * sigma, 0., &status ) ) == NULL )
-            nfu_printErrorMsg( "ERROR %s: gaussian1XY, status = %d, '%s'", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( gaussian1XY = ptwXY_createGaussian( &smr, accuracy, 0., sigma, 1.0 / ( M_SQRT2PI * sigma ), -4. * sigma, 4. * sigma, 0. ) ) == NULL )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
     sigma = 4.;
-    if( ( gaussian2XY = ptwXY_createGaussian( accuracy, 0., sigma, 1.0 / ( M_SQRT2PI * sigma ), -4. * sigma, 4. * sigma, 0., &status ) ) == NULL )
-            nfu_printErrorMsg( "ERROR %s: gaussian2XY, status = %d, '%s'", __FILE__, status, nfu_statusMessage( status ) );
-    checkConvolution( "Gaussian", gaussian1XY, gaussian2XY, 1, accuracy, 1. );
+    if( ( gaussian2XY = ptwXY_createGaussian( &smr, accuracy, 0., sigma, 1.0 / ( M_SQRT2PI * sigma ), -4. * sigma, 4. * sigma, 0. ) ) == NULL )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    checkConvolution( &smr, "Gaussian", gaussian1XY, gaussian2XY, 1, accuracy, 1. );
 
     exit( errCount );
 }
 /*
 ************************************************************
 */
-static int checkConvolution( const char * const label, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, int deleteXYs, double accuracy, double area ) {
+static int checkConvolution( statusMessageReporting *smr, const char * const label, ptwXYPoints *ptwXY1, 
+        ptwXYPoints *ptwXY2, int deleteXYs, double accuracy, double area ) {
 
     int errCount = 0;
     ptwXYPoints *convolute;
@@ -178,26 +212,25 @@ static int checkConvolution( const char * const label, ptwXYPoints *ptwXY1, ptwX
     printIfVerbose( ptwXY1 );
     printIfVerbose( ptwXY2 );
     time0 = clock( );
-    convolute = ptwXY_convolution( ptwXY1, ptwXY2, &status, mode );
+    convolute = ptwXY_convolution( smr, ptwXY1, ptwXY2, mode );
     if( timing ) printf( "# %s: time = %.4f sec", label, ( clock( ) - time0 ) / ( (double) CLOCKS_PER_SEC ) );
     if( convolute == NULL ) {
         if( timing ) printf( "\n" );
         errCount++;
-        nfu_printMsg( "ERROR %s: %s convolution status = %d: %s", __FILE__, label, status, nfu_statusMessage( status ) ); }
+        nfut_printSMRError2p( smr, "Via." ); }
     else {
         if( timing ) printf( ", length = %d\n", (int) convolute->length );
         printIfVerbose( convolute );
-        calculatedArea = ptwXY_integrateDomain( convolute, &status );
-        if( status != nfu_Okay ) {
+        if( ( status = ptwXY_integrateDomain( smr, convolute, &calculatedArea ) ) != nfu_Okay ) {
             errCount++;
-            nfu_printMsg( "ERROR %s: %s convolution status = %d: %s", __FILE__, label, status, nfu_statusMessage( status ) );
+            nfut_printSMRError2p( smr, "Via." );
         }
         if( verbose ) fprintf( infoF, "# Area = %.6g\n", calculatedArea );
         compareDoubles( area, calculatedArea, 1e-3, label );
         ptwXY_free( convolute );
     }
 
-    if( doBruteForce ) bruteForce( ptwXY1, ptwXY2, accuracy );
+    if( doBruteForce ) bruteForce( smr, ptwXY1, ptwXY2, accuracy );
 
     if( deleteXYs ) {
         if( ptwXY2 != ptwXY1 ) ptwXY_free( ptwXY1 );
@@ -208,13 +241,18 @@ static int checkConvolution( const char * const label, ptwXYPoints *ptwXY1, ptwX
 /*
 ************************************************************
 */
-static void bruteForce( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, double accuracy ) {
+static void bruteForce( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, double accuracy ) {
 
     int64_t i, j, k, n = 101;
     double s, ds, sMin, sMax, x11, x12, t, v;
-    double x1Min = ptwXY_domainMin( ptwXY1 ), x1Max = ptwXY_domainMax( ptwXY1 ), x2Min = ptwXY_domainMin( ptwXY2 ), x2Max = ptwXY_domainMax( ptwXY2 );
+    double x1Min, x1Max, x2Min, x2Max;
     nfu_status status;
     ptwXYPoints *f2, *clone, *mulXY, *bfXY, *d1, *d2;
+
+    if( ptwXY_domainMin( smr, ptwXY1, &x1Min ) != nfu_Okay ) nfut_printSMRErrorExit2p( smr, "Via." );
+    if( ptwXY_domainMax( smr, ptwXY1, &x1Max ) != nfu_Okay ) nfut_printSMRErrorExit2p( smr, "Via." );
+    if( ptwXY_domainMin( smr, ptwXY2, &x2Min ) != nfu_Okay ) nfut_printSMRErrorExit2p( smr, "Via." );
+    if( ptwXY_domainMax( smr, ptwXY2, &x2Max ) != nfu_Okay ) nfut_printSMRErrorExit2p( smr, "Via." );
 
     sMin = x1Min + x2Min;
     sMax = x1Max + x2Max;
@@ -230,20 +268,17 @@ static void bruteForce( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, double accurac
     }
 
 
-    if( ( d1 = ptwXY_clone( ptwXY1, &status ) ) == NULL )
-        nfu_printErrorMsg( "ERROR %s: clone = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( status = ptwXY_dullEdges( d1, 1e-14, 1e-14, 0 ) ) != nfu_Okay )
-        nfu_printErrorMsg( "ERROR %s: dullEdges = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( d2 = ptwXY_clone( ptwXY2, &status ) ) == NULL )
-        nfu_printErrorMsg( "ERROR %s: clone = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( status = ptwXY_dullEdges( d2, 1e-14, 1e-14, 0 ) ) != nfu_Okay )
-        nfu_printErrorMsg( "ERROR %s: dullEdges = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( d1 = ptwXY_clone( smr, ptwXY1 ) ) == NULL ) nfut_printSMRErrorExit2p( smr, "Via." );
+    if( ( status = ptwXY_dullEdges( smr, d1, 1e-14, 1e-14, 0 ) ) != nfu_Okay )
+        nfut_printSMRErrorExit2p( smr, "Via." );
+    if( ( d2 = ptwXY_clone( smr, ptwXY2 ) ) == NULL ) nfut_printSMRErrorExit2p( smr, "Via." );
+    if( ( status = ptwXY_dullEdges( smr, d2, 1e-14, 1e-14, 0 ) ) != nfu_Okay )
+        nfut_printSMRErrorExit2p( smr, "Via." );
 
-    if( ( bfXY = ptwXY_new( ptwXY_interpolationLinLin, NULL, 10., accuracy, n, 10, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: brute new status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( bfXY = ptwXY_new( smr, ptwXY_interpolationLinLin, NULL, 10., accuracy, n, 10, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( smr, "Via." );
 
-    if( ( status = ptwXY_setValueAtX( bfXY, sMin, 0. ) ) != nfu_Okay )
-        nfu_printErrorMsg( "ERROR %s: ptwXY_setValueAtX status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ptwXY_setValueAtX( smr, bfXY, sMin, 0. ) != nfu_Okay ) nfut_printSMRErrorExit2p( smr, "Via." );
     for( i = 1; i < n - 1; i++ ) {
         s = sMin + i * ds;
         if( s > sMax ) break;
@@ -253,8 +288,7 @@ static void bruteForce( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, double accurac
         x12 = x1Min + ( s - sMin );
         if( x12 > x1Max ) x12 = x1Max;
 
-        if( ( clone = ptwXY_clone( d2, &status ) ) == NULL )
-            nfu_printErrorMsg( "ERROR %s: clone = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+        if( ( clone = ptwXY_clone( smr, d2 ) ) == NULL ) nfut_printSMRErrorExit2p( smr, "Via." );
         for( k = 0, j = clone->length - 1; k < j; k++, j-- ) {
             t = s - clone->points[k].x;
             clone->points[k].x = s - clone->points[j].x;
@@ -264,21 +298,17 @@ static void bruteForce( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, double accurac
             clone->points[j].y = t;
         }
         if( ( 2 * ( clone->length / 2 ) ) != clone->length ) clone->points[k].x = s - clone->points[k].x;
-        if( ( f2 = ptwXY_domainSlice( clone, x11, x12, 10, 1, &status ) ) == NULL )
-            nfu_printErrorMsg( "ERROR %s: domainSlice = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+        if( ( f2 = ptwXY_domainSlice( smr, clone, x11, x12, 10, 1 ) ) == NULL )
+            nfut_printSMRErrorExit2p( smr, "Via." );
         ptwXY_free( clone );
 
-        if( ( mulXY = ptwXY_mul2_ptwXY( d1, f2, &status ) ) == NULL )
-            nfu_printErrorMsg( "ERROR %s: mulXY = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-        v = ptwXY_integrateDomain( mulXY, &status );
-        if( status != nfu_Okay ) nfu_printErrorMsg( "ERROR %s: ptwXY_integrateDomain = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+        if( ( mulXY = ptwXY_mul2_ptwXY( smr, d1, f2 ) ) == NULL ) nfut_printSMRErrorExit2p( smr, "Via." );
+        if( ( status = ptwXY_integrateDomain( smr, mulXY, &v ) ) != nfu_Okay ) nfut_printSMRError2p( smr, "Via." );
 
-        if( ( status = ptwXY_setValueAtX( bfXY, s, v ) ) != nfu_Okay )
-            nfu_printErrorMsg( "ERROR %s: ptwXY_setValueAtX status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+        if( ptwXY_setValueAtX( smr, bfXY, s, v ) != nfu_Okay ) nfut_printSMRErrorExit2p( smr, "Via." );
         ptwXY_free( f2 );
     }
-    if( ( status = ptwXY_setValueAtX( bfXY, sMax, 0. ) ) != nfu_Okay )
-        nfu_printErrorMsg( "ERROR %s: ptwXY_setValueAtX status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ptwXY_setValueAtX( smr, bfXY, sMax, 0. ) != nfu_Okay ) nfut_printSMRErrorExit2p( smr, "Via." );
     printIfVerbose( bfXY );
 }
 /*
@@ -301,7 +331,7 @@ static void compareDoubles( double d1, double d2, double eps, const char * const
 static void printIfVerbose( ptwXYPoints *data ) {
 
     if( !verbose ) return;
-    fprintf( infoF, "# length = %d\n", (int) ptwXY_length( data ) );
+    fprintf( infoF, "# length = %d\n", (int) ptwXY_length( NULL, data ) );
     ptwXY_simpleWrite( data, infoF, fmtXY );
     fprintf( infoF, "\n\n" );
 }

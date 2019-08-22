@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 """
@@ -139,9 +163,12 @@ def process_args():
 
 if __name__ == '__main__':
     from fudge.gnd import reactionSuite as reactionSuiteModule, sums as sumsModule
+    from fudge.gnd.reactionData import crossSection
     from fudge.legacy.converting import endfFileToGND
 
     args = process_args()
+
+    reconstructedStyle = 'tmp_reconstructed'
 
     def getReactionSuite( filename, singleMTOnly = None ):
         try:
@@ -153,7 +180,7 @@ if __name__ == '__main__':
             except:
                 print "File %s doesn't seem to be a legal ENDF or GND file!" % filename
                 sys.exit()
-        RS.attributes['originalFile'] = filename
+        RS.originalFile = filename
         return RS
 
     def getXS( reactionSuite, MT, sumsOnly = False ):
@@ -162,33 +189,33 @@ if __name__ == '__main__':
             allReacs += list(reactionSuite.reactions)
         reac = [r for r in allReacs if r.ENDF_MT == MT]
         if len(reac) != 1:
-            print "Couldn't find unique reaction for MT%d in %s" % (MT,reactionSuite.attributes['originalFile'])
+            print "Couldn't find unique reaction for MT%d in %s" % (MT,reactionSuite.originalFile)
         xsc = reac[0].crossSection
-        if xsc.evaluated.moniker == 'resonancesWithBackground':
-            reactionSuite.reconstructResonances( styleName='reconstructed', accuracy=args.tolerance )
-            pwxs = xsc['reconstructed']
+        if isinstance( xsc.evaluated, crossSection.resonancesWithBackground ):
+            reactionSuite.reconstructResonances( styleName=reconstructedStyle, accuracy=args.tolerance )
+            pwxs = xsc[ reconstructedStyle ]
         else:
             try:
                 pwxs = xsc.toPointwise_withLinearXYs( 1e-08 )
             except:
                 pwxs = xsc.toPointwise_withLinearXYs( 1e-10, 1e-10 )
-        return pwxs
+        return pwxs.convertAxisToUnit(1,'eV').convertAxisToUnit(0,'b')
 
     if args.summed:
         RS = getReactionSuite( args.file1 )
         xs1 = getXS(RS, args.mt, sumsOnly = True)
         summedReac = [r for r in (RS.sums) if isinstance(r, sumsModule.crossSectionSum) and int( r.ENDF_MT ) == args.mt]
         if len(summedReac) != 1:
-            print "Couldn't find unique summed reaction for MT%d in %s" % (args.mt,RS.attributes['originalFile'])
+            print "Couldn't find unique summed reaction for MT%d in %s" % (args.mt,RS.originalFile)
             sys.exit(1)
         summedReac = summedReac[0]
-        if 'reconstructed' in summedReac.summands[0].link:
-            summedXsc = summedReac.summands[0].link['reconstructed']
+        if reconstructedStyle in summedReac.summands[0].link:
+            summedXsc = summedReac.summands[0].link[ reconstructedStyle ]
         else:
             summedXsc = summedReac.summands[0].link.toPointwise_withLinearXYs( 1e-08 )
         for summand in summedReac.summands[1:]:
-            if 'reconstructed' in summand.link:
-                newXsc = summand.link['reconstructed']
+            if reconstructedStyle in summand.link:
+                newXsc = summand.link[ reconstructedStyle ]
             else:
                 newXsc = summand.link.toPointwise_withLinearXYs( 1e-08 )
             summedXsc, newXsc = summedXsc.mutualify( 1e-8,1e-8,0, newXsc, 1e-8,1e-8,0 )
@@ -196,8 +223,10 @@ if __name__ == '__main__':
         xs2 = summedXsc
         l1,l2 = ('tabulated sum','calculated sum')
     else:
-        xs1 = getXS( getReactionSuite(args.file1, singleMTOnly=args.mt), args.mt )
-        xs2 = getXS( getReactionSuite(args.file2, singleMTOnly=args.mt), args.mt )
+        rs1 = getReactionSuite(args.file1, singleMTOnly=args.mt)
+        xs1 = getXS( rs1, args.mt )
+        rs2 = getReactionSuite(args.file2, singleMTOnly=args.mt)
+        xs2 = getXS( rs2, args.mt )
         l1,l2 = args.file1, args.file2
 
     if args.legend: l1,l2 = args.legend

@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -46,58 +70,58 @@
 #include "ptwXY.h"
 
 /* Need to change these when conversion to Fudge3 is complete. */
-static char const linLinInterpolationString[] = "lin,lin";
-static char const linLogInterpolationString[] = "lin,log";
-static char const logLinInterpolationString[] = "log,lin";
-static char const logLogInterpolationString[] = "log,log";
+static char const linLinInterpolationString[] = "lin-lin";
+static char const logLinInterpolationString[] = "log-lin";
+static char const linLogInterpolationString[] = "lin-log";
+static char const logLogInterpolationString[] = "log-log";
 static char const flatInterpolationString[] = "flat";
 
+static nfu_status ptwXY_mergeFrom( statusMessageReporting *smr, ptwXYPoints *ptwXY, int incY, int length, double *xs, double *ys );
 static void ptwXY_initialOverflowPoint( ptwXYOverflowPoint *overflowPoint, ptwXYOverflowPoint *prior, ptwXYOverflowPoint *next );
-static nfu_status ptwXY_mergeFrom( ptwXYPoints *ptwXY, int incY, int length, double *xs, double *ys );
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_new( ptwXY_interpolation interpolation, char const *interpolationString, double biSectionMax, 
-    double accuracy, int64_t primarySize, int64_t secondarySize, nfu_status *status, int userFlag ) {
+ptwXYPoints *ptwXY_new( statusMessageReporting *smr, ptwXY_interpolation interpolation, char const *interpolationString, 
+        double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize, int userFlag ) {
 
-    ptwXYPoints *ptwXY = (ptwXYPoints *) nfu_calloc( sizeof( ptwXYPoints ), 1 );
+    ptwXYPoints *ptwXY = (ptwXYPoints *) smr_malloc2( smr, sizeof( ptwXYPoints ), 1, "ptwXY" );
 
-    *status = nfu_mallocError;
     if( ptwXY == NULL ) return( NULL );
-    ptwXY_setup( ptwXY, interpolation, interpolationString, biSectionMax, accuracy, primarySize, 
-        secondarySize, userFlag );
-    if( ( *status = ptwXY->status ) != nfu_Okay ) {
-        ptwXY = (ptwXYPoints *) nfu_free( ptwXY );
+    if( ptwXY_initialize( smr, ptwXY, interpolation, interpolationString, biSectionMax, accuracy, primarySize, secondarySize, userFlag ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        smr_freeMemory2( ptwXY );
     }
     return( ptwXY );
 }
 /*
 ************************************************************
 */
-nfu_status ptwXY_setup( ptwXYPoints *ptwXY, ptwXY_interpolation interpolation, char const *interpolationString,
-    double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize, int userFlag ) {
+nfu_status ptwXY_initialize( statusMessageReporting *smr, ptwXYPoints *ptwXY, ptwXY_interpolation interpolation, 
+        char const *interpolationString, double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize, 
+        int userFlag ) {
 
     ptwXY->status = nfu_Okay;
-    ptwXY->typeX =  ptwXY_sigma_none;
-    ptwXY->typeY =  ptwXY_sigma_none;
     ptwXY->interpolation = interpolation;
     ptwXY->interpolationString = NULL;
     switch( interpolation ) {
     case ptwXY_interpolationLinLin :
         ptwXY->interpolationString = linLinInterpolationString; break;
-    case ptwXY_interpolationLinLog :
-        ptwXY->interpolationString = linLogInterpolationString; break;
     case ptwXY_interpolationLogLin :
         ptwXY->interpolationString = logLinInterpolationString; break;
+    case ptwXY_interpolationLinLog :
+        ptwXY->interpolationString = linLogInterpolationString; break;
     case ptwXY_interpolationLogLog :
         ptwXY->interpolationString = logLogInterpolationString; break;
     case ptwXY_interpolationFlat :
         ptwXY->interpolationString = flatInterpolationString; break;
     case ptwXY_interpolationOther :         /* For ptwXY_interpolationOther, interpolationString must be defined. */
-        if( interpolationString == NULL ) {              
-                ptwXY->status = nfu_otherInterpolation; }
+        if( interpolationString == NULL ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation,
+                    "Invalid other interplation. interpolationString is NULL, it must be a defined string" );
+            ptwXY->status = nfu_Error; }
         else {
-            if( ( ptwXY->interpolationString = strdup( interpolationString ) ) == NULL ) ptwXY->status = nfu_mallocError;
+            if( ( ptwXY->interpolationString = smr_allocateCopyString2( smr, interpolationString, "interpolationString" ) ) == NULL ) 
+                    ptwXY->status = nfu_Error;
         }
     }
     ptwXY->userFlag = 0;
@@ -118,42 +142,45 @@ nfu_status ptwXY_setup( ptwXYPoints *ptwXY, ptwXY_interpolation interpolation, c
     ptwXY->points = NULL;
     ptwXY->overflowPoints = NULL;
 
-    ptwXY_reallocatePoints( ptwXY, primarySize, 0 );
-    ptwXY_reallocateOverflowPoints( ptwXY, secondarySize );
-    if( ptwXY->status != nfu_Okay ) ptwXY_release( ptwXY );
+    if( ptwXY_reallocatePoints( smr, ptwXY, primarySize, 0 ) == nfu_Okay )
+        ptwXY_reallocateOverflowPoints( smr, ptwXY, secondarySize );
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        ptwXY_release( smr, ptwXY );
+    }
     return( ptwXY->status );
 }
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_create( ptwXY_interpolation interpolation, char const *interpolationString,
+ptwXYPoints *ptwXY_create( statusMessageReporting *smr, ptwXY_interpolation interpolation, char const *interpolationString,
     double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize, int64_t length, double const *xy, 
-    nfu_status *status, int userFlag ) {
+    int userFlag ) {
 
     ptwXYPoints *ptwXY;
 
     if( primarySize < length ) primarySize = length;
-    if( ( ptwXY = ptwXY_new( interpolation, interpolationString, biSectionMax, accuracy, primarySize, 
-            secondarySize, status, userFlag ) ) != NULL ) {
-        if( ( *status = ptwXY_setXYData( ptwXY, length, xy ) ) != nfu_Okay ) {
-            ptwXY = ptwXY_free( ptwXY );
-        }
+    if( ( ptwXY = ptwXY_new( smr, interpolation, interpolationString, biSectionMax, accuracy, primarySize, 
+            secondarySize, userFlag ) ) != NULL ) {
+        if( ptwXY_setXYData( smr, ptwXY, length, xy ) != nfu_Okay ) ptwXY = ptwXY_free( ptwXY );
     }
+
+    if( ptwXY == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
     return( ptwXY );
 }
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_createFrom_Xs_Ys( ptwXY_interpolation interpolation, char const *interpolationString,
+ptwXYPoints *ptwXY_createFrom_Xs_Ys( statusMessageReporting *smr, ptwXY_interpolation interpolation, char const *interpolationString,
     double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize, int64_t length, double const *Xs, 
-    double const *Ys, nfu_status *status, int userFlag ) {
+    double const *Ys, int userFlag ) {
 
     int i;
     ptwXYPoints *ptwXY;
 
     if( primarySize < length ) primarySize = length;
-    if( ( ptwXY = ptwXY_new( interpolation, interpolationString, biSectionMax, accuracy, primarySize, 
-            secondarySize, status, userFlag ) ) != NULL ) {
+    if( ( ptwXY = ptwXY_new( smr, interpolation, interpolationString, biSectionMax, accuracy, primarySize, 
+            secondarySize, userFlag ) ) != NULL ) {
         for( i = 0; i < length; i++ ) {
             ptwXY->points[i].x = Xs[i];
             ptwXY->points[i].y = Ys[i];
@@ -161,34 +188,53 @@ ptwXYPoints *ptwXY_createFrom_Xs_Ys( ptwXY_interpolation interpolation, char con
         ptwXY->length = length;
     }
 
+    if( ptwXY == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
     return( ptwXY );
 }
 /*
 ************************************************************
 */
-nfu_status ptwXY_copy( ptwXYPoints *dest, ptwXYPoints *src ) {
+nfu_status ptwXY_copy( statusMessageReporting *smr, ptwXYPoints *dest, ptwXYPoints *src ) {
 
-    int64_t i, nonOverflowLength = ptwXY_getNonOverflowLength( src );
+    int64_t i, nonOverflowLength;
     ptwXYPoint *pointFrom, *pointTo;
     ptwXYOverflowPoint *o, *overflowHeader = &(src->overflowHeader);
 
-    if( dest->status != nfu_Okay ) return( dest->status );
-    if( src->status != nfu_Okay ) return( src->status );
+    if( dest->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid destination." );
+        return( dest->status );
+    }
+    if( src->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( src->status );
+    }
 
-    ptwXY_clear( dest );
+    nonOverflowLength = ptwXY_getNonOverflowLength( smr, src );     /* No need to check return value. */
+
+    if( ptwXY_clear( smr, dest ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( dest->status );
+    }
     if( dest->interpolation == ptwXY_interpolationOther ) {
         if( dest->interpolationString != NULL ) {
-            dest->interpolationString= (char const *) nfu_free( (void *) dest->interpolationString );
+            dest->interpolationString = (char const *) smr_freeMemory2( dest->interpolationString );
         }
     }
     dest->interpolation = ptwXY_interpolationLinLin; /* This and prior lines are in case interpolation is 'other' and ptwXY_reallocatePoints fails. */
-    if( dest->allocatedSize < src->length ) ptwXY_reallocatePoints( dest, src->length, 0 );
+    if( dest->allocatedSize < src->length ) {
+        if( ptwXY_reallocatePoints( smr, dest, src->length, 0 ) != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( dest->status );
+        }
+    }
     if( dest->status != nfu_Okay ) return( dest->status );
     dest->interpolation = src->interpolation;
     if( dest->interpolation == ptwXY_interpolationOther ) {
         if( src->interpolationString != NULL ) {
-            if( ( dest->interpolationString = strdup( src->interpolationString ) ) == NULL ) 
-                return( dest->status = nfu_mallocError );
+            if( ( dest->interpolationString = smr_allocateCopyString2( smr, src->interpolationString, "interpolationString" ) ) == NULL ) {
+                smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+                return( dest->status = nfu_Error );
+            }
         } }
     else {
         dest->interpolationString = src->interpolationString;
@@ -224,31 +270,97 @@ nfu_status ptwXY_copy( ptwXYPoints *dest, ptwXYPoints *src ) {
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_clone( ptwXYPoints *ptwXY, nfu_status *status ) {
+nfu_status ptwXY_copyDataOnly( statusMessageReporting *smr, ptwXYPoints *dest, ptwXYPoints *src ) {
 
-    return( ptwXY_slice( ptwXY, 0, ptwXY->length, ptwXY->overflowAllocatedSize, status ) );
+    int64_t i, nonOverflowLength;
+    ptwXYPoint *pointFrom, *pointTo;
+    ptwXYOverflowPoint *o, *overflowHeader = &(src->overflowHeader);
+
+    if( dest->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid destination." );
+        return( dest->status );
+    }
+    if( src->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( src->status );
+    }
+
+    nonOverflowLength = ptwXY_getNonOverflowLength( smr, src );     /* No need to check return value. */
+
+    if( ptwXY_clear( smr, dest ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( dest->status );
+    }
+
+    if( dest->allocatedSize < src->length ) {
+        if( ptwXY_reallocatePoints( smr, dest, src->length, 0 ) != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( dest->status );
+        }
+    }
+    pointFrom = src->points;
+    o = src->overflowHeader.next;
+    pointTo = dest->points;
+    i = 0;
+    while( o != overflowHeader ) {
+        if( i < nonOverflowLength ) {
+            if( pointFrom->x < o->point.x ) {
+                *pointTo = *pointFrom;
+                i++;
+                pointFrom++; }
+            else {
+                *pointTo = o->point;
+                o = o->next;
+            } }
+        else {
+            *pointTo = o->point;
+            o = o->next;
+        }
+        pointTo++;
+    }
+    for( ; i < nonOverflowLength; i++, pointFrom++, pointTo++ ) *pointTo = *pointFrom;
+    dest->length = src->length;
+    return( dest->status );
 }
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_cloneToInterpolation( ptwXYPoints *ptwXY, ptwXY_interpolation interpolationTo, nfu_status *status ) {
+ptwXYPoints *ptwXY_clone( statusMessageReporting *smr, ptwXYPoints *ptwXY ) {
+
+    ptwXYPoints *ptwXY2 = ptwXY_slice( smr, ptwXY, 0, ptwXY->length, ptwXY->overflowAllocatedSize );
+
+    if( ptwXY2 == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( ptwXY2 );
+}
+/*
+************************************************************
+*/
+ptwXYPoints *ptwXY_cloneToInterpolation( statusMessageReporting *smr, ptwXYPoints *ptwXY, ptwXY_interpolation interpolationTo ) {
 
     ptwXYPoints *n1;
 
-    if( interpolationTo == ptwXY_interpolationOther ) {
-        *status = nfu_otherInterpolation;
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
         return( NULL );
     }
-    if( ( n1 = ptwXY_clone( ptwXY, status ) ) != NULL ) {
-        if( n1->interpolation == ptwXY_interpolationOther ) nfu_free( (void *) n1->interpolationString );
+
+/* Other interpolation should probably be allowed. */
+    if( interpolationTo == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Other interpolation not allowed." );
+        return( NULL );
+    }
+    if( ( n1 = ptwXY_clone( smr, ptwXY ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." ); }
+    else {
+        if( n1->interpolation == ptwXY_interpolationOther ) smr_freeMemory2( n1->interpolationString );
         n1->interpolation = interpolationTo;
         switch( interpolationTo ) {
             case ptwXY_interpolationLinLin :
                 n1->interpolationString = linLinInterpolationString; break;
-            case ptwXY_interpolationLinLog :
-                n1->interpolationString = linLogInterpolationString; break;
             case ptwXY_interpolationLogLin :
                 n1->interpolationString = logLinInterpolationString; break;
+            case ptwXY_interpolationLinLog :
+                n1->interpolationString = linLogInterpolationString; break;
             case ptwXY_interpolationLogLog :
                 n1->interpolationString = logLogInterpolationString; break;
             case ptwXY_interpolationFlat :
@@ -262,25 +374,33 @@ ptwXYPoints *ptwXY_cloneToInterpolation( ptwXYPoints *ptwXY, ptwXY_interpolation
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_slice( ptwXYPoints *ptwXY, int64_t index1, int64_t index2, int64_t secondarySize, nfu_status *status ) {
+ptwXYPoints *ptwXY_slice( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t index1, int64_t index2, int64_t secondarySize ) {
 
     int64_t i, length;
     ptwXYPoints *n;
 
-    *status = nfu_badSelf;
-    if( ptwXY->status != nfu_Okay ) return( NULL );
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( NULL );
+    }
 
-    *status = nfu_badIndex;
-    if( index2 < index1 ) return( NULL );
-    if( index1 < 0 ) index1 = 0;
-    if( index2 > ptwXY->length ) index2 = ptwXY->length;
+    if( ( index1 < 0 ) || ( index2 < index1 ) || ( index2 > ptwXY->length ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badIndex, "Indices = %d, %d out of bounds: length = %d",
+                (int) index1, (int) index2, (int) ptwXY->length );
+        return( NULL );
+    }
 
     length = index2 - index1;
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( NULL );
-    if( ( n = ptwXY_new( ptwXY->interpolation, ptwXY->interpolationString, ptwXY->biSectionMax, 
-        ptwXY->accuracy, length, secondarySize, status, ptwXY->userFlag ) ) == NULL ) return( NULL );
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
+    if( ( n = ptwXY_new( smr, ptwXY->interpolation, ptwXY->interpolationString, ptwXY->biSectionMax, 
+            ptwXY->accuracy, length, secondarySize, ptwXY->userFlag ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
 
-    *status = n->status = ptwXY->status;
     for( i = index1; i < index2; i++ ) n->points[i - index1] = ptwXY->points[i];
     n->length = length;
     return( n );
@@ -288,29 +408,47 @@ ptwXYPoints *ptwXY_slice( ptwXYPoints *ptwXY, int64_t index1, int64_t index2, in
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_domainSlice( ptwXYPoints *ptwXY, double domainMin, double domainMax, int64_t secondarySize, int fill, nfu_status *status ) {
+ptwXYPoints *ptwXY_domainSlice( statusMessageReporting *smr, ptwXYPoints *ptwXY, double domainMin, double domainMax, 
+        int64_t secondarySize, int fill ) {
 
     int64_t i, i1, i2;
-    double y;
+    double y, _domainMin, _domainMax;
     ptwXYPoints *n = NULL;
 
-    if( ( *status = ptwXY->status ) != nfu_Okay ) return( NULL );
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( NULL );
+    }
 
-    if( ( ptwXY->length == 0 ) || ( ptwXY_domainMin( ptwXY ) >= domainMax ) || ( ptwXY_domainMax( ptwXY ) <= domainMin ) ) {
-        n = ptwXY_new( ptwXY->interpolation, ptwXY->interpolationString, ptwXY->biSectionMax, 
-            ptwXY->accuracy, 0, secondarySize, status, ptwXY->userFlag ); }
+    if( ptwXY_domainMin( smr, ptwXY, &_domainMin ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
+    if( ptwXY_domainMax( smr, ptwXY, &_domainMax ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
+
+    if( ( ptwXY->length == 0 ) || ( _domainMin >= domainMax ) || ( _domainMax <= domainMin ) ) {
+        if( ( n = ptwXY_new( smr, ptwXY->interpolation, ptwXY->interpolationString, ptwXY->biSectionMax, 
+                ptwXY->accuracy, 0, secondarySize, ptwXY->userFlag ) ) == NULL ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        } }
     else {
-        if( ( n = ptwXY_clone( ptwXY, status ) ) == NULL ) return( NULL );
+        if( ( n = ptwXY_clone( smr, ptwXY ) ) == NULL ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( NULL );
+        }
         if( ( n->points[0].x < domainMin ) || ( n->points[n->length - 1].x > domainMax ) ) {
             if( fill && ( n->points[n->length - 1].x > domainMax ) ) {
-                if( ( *status = ptwXY_getValueAtX( n, domainMax, &y ) ) != nfu_Okay ) goto Err;
-                if( ( *status = ptwXY_setValueAtX( n, domainMax,  y ) ) != nfu_Okay ) goto Err;
+                if( ptwXY_getValueAtX( smr, n, domainMax, &y ) != nfu_Okay ) goto Err;
+                if( ptwXY_setValueAtX( smr, n, domainMax,  y ) != nfu_Okay ) goto Err;
             }
             if( fill && ( n->points[0].x < domainMin ) ) {
-                if( ( *status = ptwXY_getValueAtX( n, domainMin, &y ) ) != nfu_Okay ) goto Err;
-                if( ( *status = ptwXY_setValueAtX( n, domainMin,  y ) ) != nfu_Okay ) goto Err;
+                if( ptwXY_getValueAtX( smr, n, domainMin, &y ) != nfu_Okay ) goto Err;
+                if( ptwXY_setValueAtX( smr, n, domainMin,  y ) != nfu_Okay ) goto Err;
             }
-            ptwXY_coalescePoints( n, n->length + n->overflowAllocatedSize, NULL, 0 );
+            if( ptwXY_coalescePoints( smr, n, n->length + n->overflowAllocatedSize, NULL, 0 ) != nfu_Okay ) goto Err;
             for( i1 = 0; i1 < n->length; i1++ ) if( n->points[i1].x >= domainMin ) break;
             for( i2 = n->length - 1; i2 > 0; i2-- ) if( n->points[i2].x <= domainMax ) break;
             i2++;
@@ -323,30 +461,45 @@ ptwXYPoints *ptwXY_domainSlice( ptwXYPoints *ptwXY, double domainMin, double dom
     return( n );
 
 Err:
+    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
     if( n != NULL ) ptwXY_free( n );
     return( NULL );
 }
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_domainMinSlice( ptwXYPoints *ptwXY, double domainMin, int64_t secondarySize, int fill, nfu_status *status ) {
+ptwXYPoints *ptwXY_domainMinSlice( statusMessageReporting *smr, ptwXYPoints *ptwXY, double domainMin, int64_t secondarySize, int fill ) {
 
     double domainMax = 1.1 * domainMin + 1;
+    ptwXYPoints *ptwXY2;
 
     if( domainMin < 0 ) domainMax = 0.9 * domainMin + 1;
-    if( ptwXY->length > 0 ) domainMax = ptwXY_domainMax( ptwXY );
-    return( ptwXY_domainSlice( ptwXY, domainMin, domainMax, secondarySize, fill, status ) );
+    if( ptwXY->length > 0 ) {
+        if( ptwXY_domainMax( smr, ptwXY, &domainMax ) != nfu_Okay )
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    }
+    if( ( ptwXY2 = ptwXY_domainSlice( smr, ptwXY, domainMin, domainMax, secondarySize, fill ) ) == NULL )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( ptwXY2 );
 }
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_domainMaxSlice( ptwXYPoints *ptwXY, double domainMax, int64_t secondarySize, int fill, nfu_status *status ) {
+ptwXYPoints *ptwXY_domainMaxSlice( statusMessageReporting *smr, ptwXYPoints *ptwXY, double domainMax, int64_t secondarySize, int fill ) {
 
     double domainMin = 0.9 * domainMax - 1;
+    ptwXYPoints *ptwXY2;
 
     if( domainMax < 0 ) domainMin = 1.1 * domainMax - 1;
-    if( ptwXY->length > 0 ) domainMin = ptwXY_domainMin( ptwXY );
-    return( ptwXY_domainSlice( ptwXY, domainMin, domainMax, secondarySize, fill, status ) );
+    if( ptwXY->length > 0 ) {
+        if( ptwXY_domainMin( smr, ptwXY, &domainMin ) != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( NULL );
+        }
+    }
+    if( ( ptwXY2 = ptwXY_domainSlice( smr, ptwXY, domainMin, domainMax, secondarySize, fill ) ) == NULL )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( ptwXY2 );
 }
 /*
 ************************************************************
@@ -422,19 +575,22 @@ double ptwXY_setBiSectionMax( ptwXYPoints *ptwXY, double biSectionMax ) {
 /*
 ************************************************************
 */
-nfu_status ptwXY_reallocatePoints( ptwXYPoints *ptwXY, int64_t size, int forceSmallerResize ) {
+nfu_status ptwXY_reallocatePoints( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t size, int forceSmallerResize ) {
 /*
 *   This is for allocating/reallocating the primary data memory.
 */
-    if( ptwXY->status != nfu_Okay ) return( ptwXY->status );
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( ptwXY->status );
+    }
 
     if( size < ptwXY_minimumSize ) size = ptwXY_minimumSize;                      /* ptwXY_minimumSize must be > 0. */
     if( size < ptwXY->length ) size = ptwXY->length;
     if( size != ptwXY->allocatedSize ) {
         if( size > ptwXY->allocatedSize ) {                                        /* Increase size of allocated points. */
-            ptwXY->points = (ptwXYPoint *) nfu_realloc( (size_t) size * sizeof( ptwXYPoint ), ptwXY->points ); }
+            ptwXY->points = (ptwXYPoint *) smr_realloc2( smr, ptwXY->points, (size_t) size * sizeof( ptwXYPoint ), "ptwXY->points" ); }
         else if( ( ptwXY->allocatedSize > 2 * size ) || forceSmallerResize ) {     /* Decrease size, if at least 1/2 size reduction or if forced to. */
-            ptwXY->points = (ptwXYPoint *) nfu_realloc( (size_t) size * sizeof( ptwXYPoint ), ptwXY->points ); }
+            ptwXY->points = (ptwXYPoint *) smr_realloc2( smr, ptwXY->points, (size_t) size * sizeof( ptwXYPoint ), "ptwXY->points" ); }
         else {
             size = ptwXY->allocatedSize;                                           /* Size is < ptwXY->allocatedSize, but realloc not called. */
         }
@@ -451,51 +607,61 @@ nfu_status ptwXY_reallocatePoints( ptwXYPoints *ptwXY, int64_t size, int forceSm
 /*
 ************************************************************
 */
-nfu_status ptwXY_reallocateOverflowPoints( ptwXYPoints *ptwXY, int64_t size ) {
+nfu_status ptwXY_reallocateOverflowPoints( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t size ) {
 /*
 *   This is for allocating/reallocating the secondary data memory.
 */
-    nfu_status status = nfu_Okay;
-
-    if( ptwXY->status != nfu_Okay ) return( ptwXY->status );
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( ptwXY->status );
+    }
 
     if( size < ptwXY_minimumOverflowSize ) size = ptwXY_minimumOverflowSize;      /* ptwXY_minimumOverflowSize must be > 0. */
-    if( size < ptwXY->overflowLength ) status = ptwXY_coalescePoints( ptwXY, ptwXY->length + ptwXY->overflowAllocatedSize, NULL, 0 );
-    if( status == nfu_Okay ) {
-        if( size != ptwXY->overflowAllocatedSize ) {
-            ptwXY->overflowPoints = (ptwXYOverflowPoint *) nfu_realloc( (size_t) size * sizeof( ptwXYOverflowPoint ), ptwXY->overflowPoints );
-            if( ptwXY->overflowPoints == NULL ) {
-                ptwXY->length = 0;
-                ptwXY->overflowLength = 0;
-                ptwXY->mallocFailedSize = size;
-                size = 0;
-                ptwXY->status = nfu_mallocError;
-            }
+    if( size < ptwXY->overflowLength ) {
+        if( ptwXY_coalescePoints( smr, ptwXY, ptwXY->length + ptwXY->overflowAllocatedSize, NULL, 0 ) != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( ptwXY->status );
         }
-        ptwXY->overflowAllocatedSize = size; }
-    else {
-        ptwXY->status = status;
     }
+    if( size != ptwXY->overflowAllocatedSize ) {
+        ptwXY->overflowPoints = (ptwXYOverflowPoint *) smr_realloc2( smr, ptwXY->overflowPoints, 
+                (size_t) size * sizeof( ptwXYOverflowPoint ), "ptwXY->overflowPoints" );
+        if( ptwXY->overflowPoints == NULL ) {
+            ptwXY->length = 0;
+            ptwXY->overflowLength = 0;
+            ptwXY->mallocFailedSize = size;
+            size = 0;
+            ptwXY->status = nfu_mallocError;
+        }
+    }
+    ptwXY->overflowAllocatedSize = size;
     return( ptwXY->status );
 }
 /*
 ************************************************************
 */
-nfu_status ptwXY_coalescePoints( ptwXYPoints *ptwXY, int64_t size, ptwXYPoint *newPoint, int forceSmallerResize ) {
+nfu_status ptwXY_coalescePoints( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t size, 
+        ptwXYPoint *newPoint, int forceSmallerResize ) {
 
     int addNewPoint;
     int64_t length = ptwXY->length + ( ( newPoint != NULL ) ? 1 : 0 );
     ptwXYOverflowPoint *last = ptwXY->overflowHeader.prior;
     ptwXYPoint *pointsFrom, *pointsTo;
 
-    if( ptwXY->status != nfu_Okay ) return( ptwXY->status );
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( ptwXY->status );
+    }
     if( ptwXY->overflowLength == 0 ) return( nfu_Okay );
 
     if( size < length ) size = length;
     if( size > ptwXY->allocatedSize ) {
-        if( ptwXY_reallocatePoints( ptwXY, size, forceSmallerResize ) != nfu_Okay ) return( ptwXY->status );
+        if( ptwXY_reallocatePoints( smr, ptwXY, size, forceSmallerResize ) != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( ptwXY->status );
+        }
     }
-    pointsFrom = &(ptwXY->points[ptwXY_getNonOverflowLength( ptwXY ) - 1]);
+    pointsFrom = &(ptwXY->points[ptwXY_getNonOverflowLength( smr, ptwXY ) - 1]);
     pointsTo = &(ptwXY->points[length - 1]);
     while( last != &(ptwXY->overflowHeader) ) {
         addNewPoint = 0;
@@ -541,16 +707,21 @@ nfu_status ptwXY_coalescePoints( ptwXYPoints *ptwXY, int64_t size, ptwXYPoint *n
 /*
 ************************************************************
 */
-nfu_status ptwXY_simpleCoalescePoints( ptwXYPoints *ptwXY ) {
+nfu_status ptwXY_simpleCoalescePoints( statusMessageReporting *smr, ptwXYPoints *ptwXY ) {
 
-    return( ptwXY_coalescePoints( ptwXY, ptwXY->length, NULL, 0 ) );
+    if( ptwXY_coalescePoints( smr, ptwXY, ptwXY->length, NULL, 0 ) != nfu_Okay )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( ptwXY->status );
 }
 /*
 ************************************************************
 */
-nfu_status ptwXY_clear( ptwXYPoints *ptwXY ) {
+nfu_status ptwXY_clear( statusMessageReporting *smr, ptwXYPoints *ptwXY ) {
 
-    if( ptwXY->status != nfu_Okay ) return( ptwXY->status );
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( ptwXY->status );
+    }
 
     ptwXY->length = 0;
     ptwXY->overflowLength = 0;
@@ -561,23 +732,23 @@ nfu_status ptwXY_clear( ptwXYPoints *ptwXY ) {
 /*
 ************************************************************
 */
-nfu_status ptwXY_release( ptwXYPoints *ptwXY ) {
+nfu_status ptwXY_release( statusMessageReporting *smr, ptwXYPoints *ptwXY ) {
 /*
 *   Note, this routine does not free ptwXY (i.e., it does not undo all of ptwXY_new).
 */
 
     if( ptwXY->interpolation == ptwXY_interpolationOther ) {
         if( ptwXY->interpolationString != NULL ) 
-            ptwXY->interpolationString = (char const *) nfu_free( (void *) ptwXY->interpolationString );
+            ptwXY->interpolationString = (char const *) smr_freeMemory2( ptwXY->interpolationString );
     }
     ptwXY->interpolation = ptwXY_interpolationLinLin;
     ptwXY->length = 0;
     ptwXY->allocatedSize = 0;
-    ptwXY->points = (ptwXYPoint *) nfu_free( ptwXY->points );
+    ptwXY->points = (ptwXYPoint *) smr_freeMemory2( ptwXY->points );
 
     ptwXY->overflowLength = 0;
     ptwXY->overflowAllocatedSize = 0;
-    ptwXY->overflowPoints = (ptwXYOverflowPoint *) nfu_free( ptwXY->overflowPoints );
+    ptwXY->overflowPoints = (ptwXYOverflowPoint *) smr_freeMemory2( ptwXY->overflowPoints );
 
     return( nfu_Okay );
 }
@@ -586,49 +757,68 @@ nfu_status ptwXY_release( ptwXYPoints *ptwXY ) {
 */
 ptwXYPoints *ptwXY_free( ptwXYPoints *ptwXY ) {
 
-    if( ptwXY != NULL ) ptwXY_release( ptwXY );
-    nfu_free( ptwXY );
+    if( ptwXY != NULL ) {
+        ptwXY_release( NULL, ptwXY );
+        smr_freeMemory2( ptwXY );
+    }
     return( (ptwXYPoints *) NULL );
 }
 /*
 ************************************************************
 */
-int64_t ptwXY_length( ptwXYPoints *ptwXY ) {
+int64_t ptwXY_length( statusMessageReporting *smr, ptwXYPoints *ptwXY ) {
+
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( -ptwXY->status );
+    }
 
     return( ptwXY->length );
 }
 /*
 ************************************************************
 */
-int64_t ptwXY_getNonOverflowLength( ptwXYPoints const *ptwXY ) {
+int64_t ptwXY_getNonOverflowLength( statusMessageReporting *smr, ptwXYPoints const *ptwXY ) {
+
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( -ptwXY->status );
+    }
 
     return( ptwXY->length - ptwXY->overflowLength );
 }
 /*
 ************************************************************
 */
-nfu_status ptwXY_setXYData( ptwXYPoints *ptwXY, int64_t length, double const *xy ) {
+nfu_status ptwXY_setXYData( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t length, double const *xy ) {
 
-    nfu_status status = nfu_Okay;
-    int64_t i;
+    int64_t index;
     ptwXYPoint *p;
     double const *d = xy;
-    double xOld = 0.;
+    double priorX = 0.;
+
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( ptwXY->status );
+    }
 
     if( length > ptwXY->allocatedSize ) {
-        status = ptwXY_reallocatePoints( ptwXY, length, 0 );
-        if( status != nfu_Okay ) return( status );
+        if( ptwXY_reallocatePoints( smr, ptwXY, length, 0 ) != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( ptwXY->status );
+        }
     }
-    for( i = 0, p = ptwXY->points; i < length; i++, p++ ) {
-        if( i != 0 ) {
-            if( *d <= xOld ) {
-                status = nfu_XNotAscending;
+    for( index = 0, p = ptwXY->points; index < length; index++, p++ ) {
+        if( index != 0 ) {
+            if( *d <= priorX ) {
+                smr_setReportError2( smr, nfu_SMR_libraryID, nfu_XNotAscending, 
+                        "X value at index = %d of %.17e is <= prior value of %.17e", (int) index, *d, priorX );
                 ptwXY->status = nfu_XNotAscending;
                 length = 0;
                 break;
             }
         }
-        xOld = *d;
+        priorX = *d;
         p->x = *(d++);
         p->y = *(d++);
     }
@@ -636,26 +826,33 @@ nfu_status ptwXY_setXYData( ptwXYPoints *ptwXY, int64_t length, double const *xy
     ptwXY->overflowHeader.prior = &(ptwXY->overflowHeader);
     ptwXY->overflowLength = 0;
     ptwXY->length = length;
-    return( ptwXY->status = status );
+    return( ptwXY->status );
 }
 /*
 ************************************************************
 */  
-nfu_status ptwXY_setXYDataFromXsAndYs( ptwXYPoints *ptwXY, int64_t length, double const *x, double const *y ) {
+nfu_status ptwXY_setXYDataFromXsAndYs( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t length, 
+        double const *x, double const *y ) {
 
-    nfu_status status;
     int64_t i;
     ptwXYPoint *p;
     double xOld = 0.;
 
-    if( ( status = ptwXY_clear( ptwXY ) ) != nfu_Okay ) return( status );
+    if( ptwXY_clear( smr, ptwXY ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( ptwXY->status );
+    }
+
     if( length > ptwXY->allocatedSize ) {
-        if( ( status = ptwXY_reallocatePoints( ptwXY, length, 0 ) ) != nfu_Okay ) return( status );
+        if( ptwXY_reallocatePoints( smr, ptwXY, length, 0 ) != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( ptwXY->status );
+        }
     }
     for( i = 0, p = ptwXY->points; i < length; i++, p++, x++, y++ ) {
         if( i != 0 ) {
             if( *x <= xOld ) {
-                status = ptwXY->status = nfu_XNotAscending;
+                ptwXY->status = nfu_XNotAscending;
                 length = 0;
                 break;
             }
@@ -665,17 +862,26 @@ nfu_status ptwXY_setXYDataFromXsAndYs( ptwXYPoints *ptwXY, int64_t length, doubl
         p->y = *y;
     }
     ptwXY->length = length;
-    return( status );
+    return( ptwXY->status );
 }
 /*
 ************************************************************
 */  
-nfu_status ptwXY_deletePoints( ptwXYPoints *ptwXY, int64_t i1, int64_t i2 ) {
+nfu_status ptwXY_deletePoints( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t i1, int64_t i2 ) {
 
     int64_t n = ptwXY->length - ( i2 - i1 );
 
-    if( ( ptwXY->status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( ptwXY->status );
-    if( ( i1 < 0 ) || ( i1 > i2 ) || ( i2 > ptwXY->length ) ) return( nfu_badIndex );
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( ptwXY->status );
+    }
+
+    if( ( i1 < 0 ) || ( i2 < i1 ) || ( i2 > ptwXY->length ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badIndex, "Indices = %d, %d out of bounds: length = %d",
+                (int) i1, (int) i2, (int) ptwXY->length );
+        return( ptwXY->status = nfu_badIndex );
+    }
+
     if( i1 != i2 ) {
         for( ; i2 < ptwXY->length; i1++, i2++ ) ptwXY->points[i1] = ptwXY->points[i2];
         ptwXY->length = n;
@@ -685,9 +891,40 @@ nfu_status ptwXY_deletePoints( ptwXYPoints *ptwXY, int64_t i1, int64_t i2 ) {
 /*
 ************************************************************
 */
-ptwXYPoint *ptwXY_getPointAtIndex( ptwXYPoints *ptwXY, int64_t index ) {
+nfu_status ptwXY_getLowerIndexBoundingX( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x, int64_t *index ) {
 
-    if( ptwXY->status != nfu_Okay ) return( NULL );
+    int64_t i1, length = ptwXY->length;
+
+    *index = -1;
+
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( ptwXY->status );
+    }
+
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( ptwXY->status );
+    }
+
+    if( x < ptwXY->points[0].x ) return( nfu_Okay );
+    if( x > ptwXY->points[length-1].x ) return( nfu_Okay );
+    for( i1 = 1; i1 < length; ++i1 ) {
+        if( x < ptwXY->points[i1].x ) break;
+    }
+    *index = i1 - 1;
+    return( ptwXY->status );
+}
+/*
+************************************************************
+*/
+ptwXYPoint *ptwXY_getPointAtIndex( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t index ) {
+
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( NULL );
+    }
+
     if( ( index < 0 ) || ( index >= ptwXY->length ) ) return( NULL );
     return( ptwXY_getPointAtIndex_Unsafely( ptwXY, index ) );
 }
@@ -708,11 +945,14 @@ ptwXYPoint *ptwXY_getPointAtIndex_Unsafely( ptwXYPoints *ptwXY, int64_t index ) 
 /*
 ************************************************************
 */
-nfu_status ptwXY_getXYPairAtIndex( ptwXYPoints *ptwXY, int64_t index, double *x, double *y ) {
+nfu_status ptwXY_getXYPairAtIndex( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t index, double *x, double *y ) {
 
-    ptwXYPoint *p = ptwXY_getPointAtIndex( ptwXY, index );
+    ptwXYPoint *p = ptwXY_getPointAtIndex( smr, ptwXY, index );
 
-    if( p == NULL ) return( nfu_badIndex );
+    if( p == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( ptwXY->status );
+    }
     *x = p->x;
     *y = p->y;
     return( nfu_Okay );
@@ -720,112 +960,138 @@ nfu_status ptwXY_getXYPairAtIndex( ptwXYPoints *ptwXY, int64_t index, double *x,
 /*
 ************************************************************
 */
-ptwXY_lessEqualGreaterX ptwXY_getPointsAroundX( ptwXYPoints *ptwXY, double x, ptwXYOverflowPoint *lessThanEqualXPoint, ptwXYOverflowPoint *greaterThanXPoint ) {
+ptwXY_lessEqualGreaterX ptwXY_getPointsAroundX( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x,  
+        ptwXYOverflowPoint *lessThanEqualXPoint, ptwXYOverflowPoint *greaterThanXPoint ) {
 
     int closeIsEqual;
     ptwXYPoint *closePoint;
+    ptwXY_lessEqualGreaterX lessEqualGreaterX;
 
-    return( ptwXY_getPointsAroundX_closeIsEqual( ptwXY, x, lessThanEqualXPoint, greaterThanXPoint, 0, &closeIsEqual, &closePoint ) );
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( ptwXY_lessEqualGreaterX_Error );
+    }
+
+    lessEqualGreaterX = ptwXY_getPointsAroundX_closeIsEqual( smr, ptwXY, x, lessThanEqualXPoint, greaterThanXPoint, 
+            0, &closeIsEqual, &closePoint );
+    if( lessEqualGreaterX == ptwXY_lessEqualGreaterX_Error ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( lessEqualGreaterX );
 }
 /*
 ************************************************************
 */
-ptwXY_lessEqualGreaterX ptwXY_getPointsAroundX_closeIsEqual( ptwXYPoints *ptwXY, double x, ptwXYOverflowPoint *lessThanEqualXPoint, 
-        ptwXYOverflowPoint *greaterThanXPoint, double eps, int *closeIsEqual, ptwXYPoint **closePoint ) {
+ptwXY_lessEqualGreaterX ptwXY_getPointsAroundX_closeIsEqual( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x, 
+        ptwXYOverflowPoint *lessThanEqualXPoint, ptwXYOverflowPoint *greaterThanXPoint, double eps, int *closeIsEqual, 
+        ptwXYPoint **closePoint ) {
 
-    int64_t overflowIndex, nonOverflowLength = ptwXY_getNonOverflowLength( ptwXY );
+    int64_t overflowIndex, nonOverflowLength = ptwXY_getNonOverflowLength( smr, ptwXY );
     int64_t indexMin, indexMid, indexMax;
     ptwXY_dataFrom domainMinFrom, domainMaxFrom;
-    double domainMin = ptwXY_domainMinAndFrom( ptwXY, &domainMinFrom ), domainMax = ptwXY_domainMaxAndFrom( ptwXY, &domainMaxFrom );
+    double domainMin, domainMax;
     ptwXYOverflowPoint *overflowPoint, *overflowHeader = &(ptwXY->overflowHeader);
     ptwXY_lessEqualGreaterX status = ptwXY_lessEqualGreaterX_empty;
     ptwXYPoint *lowerPoint = NULL, *upperPoint = NULL;
 
+    if( nonOverflowLength < 0 ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( ptwXY_lessEqualGreaterX_Error );
+    }
+
+    *closeIsEqual = 0;
+    if( ptwXY->length == 0 ) return( status );
+
+    if( ptwXY_domainMinAndFrom( smr, ptwXY, &domainMinFrom, &domainMin ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( ptwXY_lessEqualGreaterX_Error );
+    }
+        
+    if( ptwXY_domainMaxAndFrom( smr, ptwXY, &domainMaxFrom, &domainMax ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( ptwXY_lessEqualGreaterX_Error );
+    }
+
     ptwXY_initialOverflowPoint( lessThanEqualXPoint, overflowHeader, NULL );
     ptwXY_initialOverflowPoint( greaterThanXPoint, overflowHeader, NULL );
-    if( ptwXY->length != 0 ) {
-        if( x < domainMin ) {
-            status = ptwXY_lessEqualGreaterX_lessThan;
-            if( domainMinFrom == ptwXY_dataFrom_Points ) {
-                greaterThanXPoint->prior = overflowHeader;
-                greaterThanXPoint->index = 0;
-                greaterThanXPoint->point = ptwXY->points[0];
-                *closePoint = &(ptwXY->points[0]); }
-            else {
-                *greaterThanXPoint = *(overflowHeader->next);
-                *closePoint = &(overflowHeader->next->point);
-            } }
-        else if( x > domainMax ) {
-            status = ptwXY_lessEqualGreaterX_greater;
-            if( domainMaxFrom == ptwXY_dataFrom_Points ) {
-                lessThanEqualXPoint->prior = overflowHeader->prior;
-                lessThanEqualXPoint->index = nonOverflowLength - 1;
-                lessThanEqualXPoint->point = ptwXY->points[lessThanEqualXPoint->index];
-                *closePoint = &(ptwXY->points[lessThanEqualXPoint->index]); }
-            else {
-                *lessThanEqualXPoint = *(overflowHeader->prior);
-                *closePoint = &(overflowHeader->prior->point);
-            } }
-        else {                                                  /* domainMin <= x <= domainMax */
-            status = ptwXY_lessEqualGreaterX_between;           /* Default for this condition, can only be between or equal. */
-            for( overflowPoint = overflowHeader->next, overflowIndex = 0; overflowPoint != overflowHeader; 
-                overflowPoint = overflowPoint->next, overflowIndex++ ) if( overflowPoint->point.x > x ) break;
-            overflowPoint = overflowPoint->prior;
-            if( ( overflowPoint != overflowHeader ) && ( overflowPoint->point.x == x ) ) {
-                status = ptwXY_lessEqualGreaterX_equal;
-                *lessThanEqualXPoint = *overflowPoint; }
-            else if( ptwXY->length == 1 ) {                    /* If here and length = 1, then ptwXY->points[0].x == x. */
-                status = ptwXY_lessEqualGreaterX_equal;
-                lessThanEqualXPoint->index = 0;
-                lessThanEqualXPoint->point = ptwXY->points[0]; }
-            else {                                              /* ptwXY->length > 1 */
-                indexMin = 0;
-                indexMax = nonOverflowLength - 1;
-                indexMid = ( indexMin + indexMax ) >> 1;
-                while( ( indexMin != indexMid ) && ( indexMid != indexMax ) ) {
-                    if( ptwXY->points[indexMid].x > x ) {
-                        indexMax = indexMid; }
-                    else {
-                        indexMin = indexMid;
-                    }
-                    indexMid = ( indexMin + indexMax ) >> 1;
+    if( x < domainMin ) {
+        status = ptwXY_lessEqualGreaterX_lessThan;
+        if( domainMinFrom == ptwXY_dataFrom_Points ) {
+            greaterThanXPoint->prior = overflowHeader;
+            greaterThanXPoint->index = 0;
+            greaterThanXPoint->point = ptwXY->points[0];
+            *closePoint = &(ptwXY->points[0]); }
+        else {
+            *greaterThanXPoint = *(overflowHeader->next);
+            *closePoint = &(overflowHeader->next->point);
+        } }
+    else if( x > domainMax ) {
+        status = ptwXY_lessEqualGreaterX_greater;
+        if( domainMaxFrom == ptwXY_dataFrom_Points ) {
+            lessThanEqualXPoint->prior = overflowHeader->prior;
+            lessThanEqualXPoint->index = nonOverflowLength - 1;
+            lessThanEqualXPoint->point = ptwXY->points[lessThanEqualXPoint->index];
+            *closePoint = &(ptwXY->points[lessThanEqualXPoint->index]); }
+        else {
+            *lessThanEqualXPoint = *(overflowHeader->prior);
+            *closePoint = &(overflowHeader->prior->point);
+        } }
+    else {                                                  /* domainMin <= x <= domainMax */
+        status = ptwXY_lessEqualGreaterX_between;           /* Default for this condition, can only be between or equal. */
+        for( overflowPoint = overflowHeader->next, overflowIndex = 0; overflowPoint != overflowHeader; 
+            overflowPoint = overflowPoint->next, overflowIndex++ ) if( overflowPoint->point.x > x ) break;
+        overflowPoint = overflowPoint->prior;
+        if( ( overflowPoint != overflowHeader ) && ( overflowPoint->point.x == x ) ) {
+            status = ptwXY_lessEqualGreaterX_equal;
+            *lessThanEqualXPoint = *overflowPoint; }
+        else if( ptwXY->length == 1 ) {                    /* If here and length = 1, then ptwXY->points[0].x == x. */
+            status = ptwXY_lessEqualGreaterX_equal;
+            lessThanEqualXPoint->index = 0;
+            lessThanEqualXPoint->point = ptwXY->points[0]; }
+        else {                                              /* ptwXY->length > 1 */
+            indexMin = 0;
+            indexMax = nonOverflowLength - 1;
+            indexMid = ( indexMin + indexMax ) >> 1;
+            while( ( indexMin != indexMid ) && ( indexMid != indexMax ) ) {
+                if( ptwXY->points[indexMid].x > x ) {
+                    indexMax = indexMid; }
+                else {
+                    indexMin = indexMid;
                 }
-                if( ptwXY->points[indexMin].x == x ) {
-                    status = ptwXY_lessEqualGreaterX_equal;
+                indexMid = ( indexMin + indexMax ) >> 1;
+            }
+            if( ptwXY->points[indexMin].x == x ) {
+                status = ptwXY_lessEqualGreaterX_equal;
+                lessThanEqualXPoint->index = indexMin;
+                lessThanEqualXPoint->point = ptwXY->points[indexMin]; }
+            else if( ptwXY->points[indexMax].x == x ) {
+                status = ptwXY_lessEqualGreaterX_equal;
+                lessThanEqualXPoint->index = indexMax;
+                lessThanEqualXPoint->point = ptwXY->points[indexMax]; }
+            else {
+                if( ptwXY->points[indexMin].x > x ) indexMax = 0;
+                if( ptwXY->points[indexMax].x < x ) indexMin = indexMax;
+                if( ( overflowPoint == overflowHeader ) ||     /* x < domainMin of overflow points. */
+                        ( ( ptwXY->points[indexMin].x > overflowPoint->point.x ) && ( ptwXY->points[indexMin].x < x ) ) ) {
+                    if( overflowPoint != overflowHeader ) lessThanEqualXPoint->prior = overflowPoint;
+                    lowerPoint = &(ptwXY->points[indexMin]);
                     lessThanEqualXPoint->index = indexMin;
                     lessThanEqualXPoint->point = ptwXY->points[indexMin]; }
-                else if( ptwXY->points[indexMax].x == x ) {
-                    status = ptwXY_lessEqualGreaterX_equal;
-                    lessThanEqualXPoint->index = indexMax;
-                    lessThanEqualXPoint->point = ptwXY->points[indexMax]; }
                 else {
-                    if( ptwXY->points[indexMin].x > x ) indexMax = 0;
-                    if( ptwXY->points[indexMax].x < x ) indexMin = indexMax;
-                    if( ( overflowPoint == overflowHeader ) ||     /* x < domainMin of overflow points. */
-                            ( ( ptwXY->points[indexMin].x > overflowPoint->point.x ) && ( ptwXY->points[indexMin].x < x ) ) ) {
-                        if( overflowPoint != overflowHeader ) lessThanEqualXPoint->prior = overflowPoint;
-                        lowerPoint = &(ptwXY->points[indexMin]);
-                        lessThanEqualXPoint->index = indexMin;
-                        lessThanEqualXPoint->point = ptwXY->points[indexMin]; }
-                    else {
-                        lowerPoint = &(overflowPoint->point);
-                        *lessThanEqualXPoint = *overflowPoint;
-                    }
-                    if( ( overflowPoint->next == overflowHeader ) ||     /* x > domainMax of overflow points. */
-                            ( ( ptwXY->points[indexMax].x < overflowPoint->next->point.x ) && ( ptwXY->points[indexMax].x > x ) ) ) {
-                        upperPoint = &(ptwXY->points[indexMax]);
-                        greaterThanXPoint->index = indexMax;
-                        greaterThanXPoint->point = ptwXY->points[indexMax]; }
-                    else {
-                        upperPoint = &(overflowPoint->next->point);
-                        *greaterThanXPoint = *(overflowPoint->next);
-                    }
+                    lowerPoint = &(overflowPoint->point);
+                    *lessThanEqualXPoint = *overflowPoint;
+                }
+                if( ( overflowPoint->next == overflowHeader ) ||     /* x > domainMax of overflow points. */
+                        ( ( ptwXY->points[indexMax].x < overflowPoint->next->point.x ) && ( ptwXY->points[indexMax].x > x ) ) ) {
+                    upperPoint = &(ptwXY->points[indexMax]);
+                    greaterThanXPoint->index = indexMax;
+                    greaterThanXPoint->point = ptwXY->points[indexMax]; }
+                else {
+                    upperPoint = &(overflowPoint->next->point);
+                    *greaterThanXPoint = *(overflowPoint->next);
                 }
             }
         }
     }
 
-    *closeIsEqual = 0;
     if( eps > 0 ) {
         double absX = fabs( x );
 
@@ -854,15 +1120,18 @@ ptwXY_lessEqualGreaterX ptwXY_getPointsAroundX_closeIsEqual( ptwXYPoints *ptwXY,
 /*
 ************************************************************
 */
-nfu_status ptwXY_getValueAtX( ptwXYPoints *ptwXY, double x, double *y ) {
+nfu_status ptwXY_getValueAtX( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x, double *y ) {
 
     nfu_status status = nfu_XOutsideDomain;
     ptwXYOverflowPoint lessThanEqualXPoint, greaterThanXPoint;
-    ptwXY_lessEqualGreaterX legx = ptwXY_getPointsAroundX( ptwXY, x, &lessThanEqualXPoint, &greaterThanXPoint );
+    ptwXY_lessEqualGreaterX legx = ptwXY_getPointsAroundX( smr, ptwXY, x, &lessThanEqualXPoint, &greaterThanXPoint );
 
     *y = 0.;
-    if( ptwXY->status != nfu_Okay ) return( ptwXY->status );
     switch( legx ) {
+    case ptwXY_lessEqualGreaterX_Error :
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( ptwXY->status );
+        break;
     case ptwXY_lessEqualGreaterX_empty :
     case ptwXY_lessEqualGreaterX_lessThan :
     case ptwXY_lessEqualGreaterX_greater :
@@ -872,7 +1141,7 @@ nfu_status ptwXY_getValueAtX( ptwXYPoints *ptwXY, double x, double *y ) {
         *y = lessThanEqualXPoint.point.y;
         break;
     case ptwXY_lessEqualGreaterX_between :
-        status = ptwXY_interpolatePoint( ptwXY->interpolation, x, y, lessThanEqualXPoint.point.x, lessThanEqualXPoint.point.y, 
+        status = ptwXY_interpolatePoint( smr, ptwXY->interpolation, x, y, lessThanEqualXPoint.point.x, lessThanEqualXPoint.point.y, 
                 greaterThanXPoint.point.x, greaterThanXPoint.point.y );
         break;
     }
@@ -881,33 +1150,42 @@ nfu_status ptwXY_getValueAtX( ptwXYPoints *ptwXY, double x, double *y ) {
 /*
 ************************************************************
 */
-nfu_status ptwXY_setValueAtX( ptwXYPoints *ptwXY, double x, double y ) {
+nfu_status ptwXY_setValueAtX( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x, double y ) {
 
-    return( ptwXY_setValueAtX_overrideIfClose( ptwXY, x, y, 0., 0 ) );
+    if( ptwXY_setValueAtX_overrideIfClose( smr, ptwXY, x, y, 0., 0 ) != nfu_Okay )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( ptwXY->status );
 }
 /*
 ************************************************************
 */
-nfu_status ptwXY_setValueAtX_overrideIfClose( ptwXYPoints *ptwXY, double x, double y, double eps, int override ) {
+nfu_status ptwXY_setValueAtX_overrideIfClose( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x, double y, 
+        double eps, int override ) {
 
     int closeIsEqual;
-    int64_t nonOverflowLength = ptwXY_getNonOverflowLength( ptwXY ), i;
-    nfu_status status = nfu_Okay;
+    int64_t nonOverflowLength = ptwXY_getNonOverflowLength( smr, ptwXY ), i;
     ptwXY_lessEqualGreaterX legx;
     ptwXYPoint *point = NULL, newPoint = { x, y };
     ptwXYOverflowPoint *overflowPoint, *p, *overflowHeader = &(ptwXY->overflowHeader);
     ptwXYOverflowPoint lessThanEqualXPoint, greaterThanXPoint;
     ptwXYPoint *closePoint;
 
-    if( ptwXY->status != nfu_Okay ) return( ptwXY->status );
+    if( nonOverflowLength < 0 ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( nfu_Error );
+    }
 
-    legx = ptwXY_getPointsAroundX_closeIsEqual( ptwXY, x, &lessThanEqualXPoint, &greaterThanXPoint, eps, &closeIsEqual, &closePoint );
+    legx = ptwXY_getPointsAroundX_closeIsEqual( smr, ptwXY, x, &lessThanEqualXPoint, &greaterThanXPoint, eps, &closeIsEqual, &closePoint );
     switch( legx ) {
+    case ptwXY_lessEqualGreaterX_Error :
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( nfu_Error );
+        break;
     case ptwXY_lessEqualGreaterX_lessThan :
     case ptwXY_lessEqualGreaterX_greater :
     case ptwXY_lessEqualGreaterX_between :
         if( closeIsEqual ) {
-            if( !override ) return( status );
+            if( !override ) return( nfu_Okay );
             point = closePoint;
             legx = ptwXY_lessEqualGreaterX_equal;
             x = point->x; }
@@ -915,8 +1193,11 @@ nfu_status ptwXY_setValueAtX_overrideIfClose( ptwXYPoints *ptwXY, double x, doub
             if( ( legx == ptwXY_lessEqualGreaterX_greater ) && ( nonOverflowLength < ptwXY->allocatedSize ) ) {
                 point = &(ptwXY->points[nonOverflowLength]); }
             else {
-                if( ptwXY->overflowLength == ptwXY->overflowAllocatedSize ) 
-                    return( ptwXY_coalescePoints( ptwXY, ptwXY->length + ptwXY->overflowAllocatedSize, &newPoint, 0 ) );
+                if( ptwXY->overflowLength == ptwXY->overflowAllocatedSize ) {
+                    if( ptwXY_coalescePoints( smr, ptwXY, ptwXY->length + ptwXY->overflowAllocatedSize, &newPoint, 0 ) != nfu_Okay )
+                        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+                    return( ptwXY->status );
+                }
                 overflowPoint = &(ptwXY->overflowPoints[ptwXY->overflowLength]);
                 if( legx == ptwXY_lessEqualGreaterX_lessThan ) {
                     overflowPoint->prior = greaterThanXPoint.prior;
@@ -953,7 +1234,7 @@ nfu_status ptwXY_setValueAtX_overrideIfClose( ptwXYPoints *ptwXY, double x, doub
         point = ptwXY->points;                 /* ptwXY_minimumSize must be > 0 so there is always space here. */
         break;
     case ptwXY_lessEqualGreaterX_equal :
-        if( closeIsEqual && !override ) return( status );
+        if( closeIsEqual && !override ) return( nfu_Okay );
         if( lessThanEqualXPoint.next == NULL ) {
             point = &(ptwXY->points[lessThanEqualXPoint.index]); }
         else {
@@ -961,51 +1242,67 @@ nfu_status ptwXY_setValueAtX_overrideIfClose( ptwXYPoints *ptwXY, double x, doub
         }
         break;
     }
-    if( status == nfu_Okay ) {
-        point->x = x;
-        point->y = y;
-        if( legx != ptwXY_lessEqualGreaterX_equal ) ptwXY->length++;
-    }
-    return( status );
-}
-/*
-************************************************************
-*/
-nfu_status ptwXY_mergeFromXsAndYs( ptwXYPoints *ptwXY, int length, double *xs, double *ys ) {
 
-    return( ptwXY_mergeFrom( ptwXY, 1, length, xs, ys ) );
+    point->x = x;
+    point->y = y;
+    if( legx != ptwXY_lessEqualGreaterX_equal ) ptwXY->length++;
+    return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-nfu_status ptwXY_mergeFromXYs( ptwXYPoints *ptwXY, int length, double *xys ) {
+nfu_status ptwXY_mergeFromXsAndYs( statusMessageReporting *smr, ptwXYPoints *ptwXY, int length, double *xs, double *ys ) {
+
+    if( ptwXY_mergeFrom( smr, ptwXY, 1, length, xs, ys ) != nfu_Okay )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( ptwXY->status );
+}
+/*
+************************************************************
+*/
+nfu_status ptwXY_mergeFromXYs( statusMessageReporting *smr, ptwXYPoints *ptwXY, int length, double *xys ) {
 
     int i;
     double *xs, *p1, *p2;
-    nfu_status status;
 
-    if( length < 0 ) return( nfu_badInput );
     if( length == 0 ) return( nfu_Okay );
-    if( ( xs = (double *) nfu_malloc( length * sizeof( double ) ) ) == NULL ) return( nfu_mallocError );
-    for( i = 0, p1 = xs, p2 = xys; i < length; i++, p1++, p2 += 2 ) *p1 = *p2;
-    status = ptwXY_mergeFrom( ptwXY, 2, length, xs, xys );
-    nfu_free( xs );
+    if( length < 0 ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badInput, "Negative length = %d.", length );
+        return( nfu_badInput );
+    }
 
-    return( status );
+    if( ( xs = (double *) smr_malloc2( smr, length * sizeof( double ), 0, "xs" ) ) == NULL ) return( nfu_mallocError );
+    for( i = 0, p1 = xs, p2 = xys; i < length; i++, p1++, p2 += 2 ) *p1 = *p2;
+    if( ptwXY_mergeFrom( smr, ptwXY, 2, length, xs, xys ) != nfu_Okay )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    smr_freeMemory2( xs );
+
+    return( ptwXY->status );
 }
 /*
 ************************************************************
 */
-static nfu_status ptwXY_mergeFrom( ptwXYPoints *ptwXY, int incY, int length, double *xs, double *ys ) {
+static nfu_status ptwXY_mergeFrom( statusMessageReporting *smr, ptwXYPoints *ptwXY, int incY, int length, double *xs, double *ys ) {
 
     int i1, j1,  n1 = 0;
     double *p1, priorX;
-    nfu_status status;
     ptwXYPoint *point1, *point2;
 
-    if( length < 0 ) return( nfu_badInput );
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( ptwXY->status );
+    }
+
     if( length == 0 ) return( nfu_Okay );
-    if( ( status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( status );
+    if( length < 0 ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badInput, "Negative length = %d.", length );
+        return( nfu_badInput );
+    }
+
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( ptwXY->status );
+    }
 
     if( xs[0] < 0 ) {
         priorX = 1.1 * xs[0]; }
@@ -1026,7 +1323,10 @@ static nfu_status ptwXY_mergeFrom( ptwXYPoints *ptwXY, int incY, int length, dou
     }
     n1 = length + (int) ptwXY->length - n1;
 
-    if( ( status = ptwXY_reallocatePoints( ptwXY, n1, 0 ) ) == nfu_Okay ) {
+    if( ptwXY_reallocatePoints( smr, ptwXY, n1, 0 ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        n1 = 0; }
+    else {
         point1 = &(ptwXY->points[n1-1]);            /* Go backwards through arrays. */
         point2 = &(ptwXY->points[ptwXY->length-1]);
         p1 = &(xs[length-1]);
@@ -1053,19 +1353,33 @@ static nfu_status ptwXY_mergeFrom( ptwXYPoints *ptwXY, int incY, int length, dou
     }
     ptwXY->length = n1;
 
-    return( status );
+    return( ptwXY->status );
 }
 /*
 ************************************************************
 */
-nfu_status ptwXY_appendXY( ptwXYPoints *ptwXY, double x, double y ) {
+nfu_status ptwXY_appendXY( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x, double y ) {
 
-    int64_t nonOverflowLength = ptwXY_getNonOverflowLength( ptwXY );
+    int64_t nonOverflowLength = ptwXY_getNonOverflowLength( smr, ptwXY );
     ptwXY_dataFrom dataFrom;
 
+    if( nonOverflowLength < 0 ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( nfu_Error );
+    }
+
     if( ptwXY->length != 0 ) {
-        double domainMax = ptwXY_domainMaxAndFrom( ptwXY, &dataFrom );
-        if( domainMax >= x ) return( nfu_XNotAscending );
+        double domainMax;
+        nfu_status status;
+
+        if( ( status = ptwXY_domainMaxAndFrom( smr, ptwXY, &dataFrom, &domainMax ) ) != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( status );
+        }
+        if( domainMax >= x ) {
+            smr_setReportError2( smr, nfu_SMR_libraryID, nfu_XNotAscending, "domainMax = %17.e >= x = %.17e", domainMax, x );
+            return( ptwXY->status = nfu_XNotAscending );
+        }
     }
 
     if( nonOverflowLength < ptwXY->allocatedSize ) {      /* Room at end of points. Also handles the case when length = 0. */
@@ -1074,7 +1388,9 @@ nfu_status ptwXY_appendXY( ptwXYPoints *ptwXY, double x, double y ) {
     else {
         if( ptwXY->overflowLength == ptwXY->overflowAllocatedSize ) {
             ptwXYPoint newPoint = { x, y };
-            return( ptwXY_coalescePoints( ptwXY, ptwXY->length + ptwXY->overflowAllocatedSize, &newPoint, 0 ) ); }
+            if( ptwXY_coalescePoints( smr, ptwXY, ptwXY->length + ptwXY->overflowAllocatedSize, &newPoint, 0 ) != nfu_Okay ) {
+                smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+                return( ptwXY->status ); } }
         else {                                              /* Add to end of overflow. */
             ptwXYOverflowPoint *overflowPoint = &(ptwXY->overflowPoints[ptwXY->overflowLength]);
 
@@ -1094,14 +1410,22 @@ nfu_status ptwXY_appendXY( ptwXYPoints *ptwXY, double x, double y ) {
 /*
 ************************************************************
 */
-nfu_status ptwXY_setXYPairAtIndex( ptwXYPoints *ptwXY, int64_t index, double x, double y ) {
+nfu_status ptwXY_setXYPairAtIndex( statusMessageReporting *smr, ptwXYPoints *ptwXY, int64_t index, double x, double y ) {
 
     int64_t i, ip1;
     ptwXYOverflowPoint *overflowPoint, *pm1, *pp1;
 
-    if( ptwXY->status != nfu_Okay ) return( ptwXY->status );
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( ptwXY->status );
+    }
 
-    if( ( index < 0 ) || ( index >= ptwXY->length ) ) return( nfu_badIndex );
+    if( ( index < 0 ) || ( index >= ptwXY->length ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badIndex, "Index = %d, out of bounds: length = %d",
+                (int) index, (int) ptwXY->length );
+        return( ptwXY->status = nfu_badIndex );
+    }
+
     for( overflowPoint = ptwXY->overflowHeader.next, i = 0; overflowPoint != &(ptwXY->overflowHeader); overflowPoint = overflowPoint->next, i++ ) {
         if( overflowPoint->index >= index ) break;
     }
@@ -1135,17 +1459,29 @@ nfu_status ptwXY_setXYPairAtIndex( ptwXYPoints *ptwXY, int64_t index, double x, 
 /*
 ************************************************************
 */
-nfu_status ptwXY_getSlopeAtX( ptwXYPoints *ptwXY, double x, const char side, double *slope ) {
+nfu_status ptwXY_getSlopeAtX( statusMessageReporting *smr, ptwXYPoints *ptwXY, double x, const char side, double *slope ) {
 
     nfu_status status  = nfu_Okay;
     ptwXYOverflowPoint lessThanEqualXPoint, greaterThanXPoint;
-    ptwXY_lessEqualGreaterX legx = ptwXY_getPointsAroundX( ptwXY, x, &lessThanEqualXPoint, &greaterThanXPoint );
+    ptwXY_lessEqualGreaterX legx = ptwXY_getPointsAroundX( smr, ptwXY, x, &lessThanEqualXPoint, &greaterThanXPoint );
     ptwXYPoint *point;
 
     *slope = 0.;
-    if( ( side != '-' ) && ( side != '+' ) ) return( nfu_badInput );
+
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( ptwXY->status );
+    }
+    if( ( side != '-' ) && ( side != '+' ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid side = '%c'.", side );
+        return( nfu_badInput );
+    }
 
     switch( legx ) {
+    case ptwXY_lessEqualGreaterX_Error :
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( nfu_Error );
+        break;
     case ptwXY_lessEqualGreaterX_empty :
     case ptwXY_lessEqualGreaterX_lessThan :
     case ptwXY_lessEqualGreaterX_greater :
@@ -1178,83 +1514,118 @@ nfu_status ptwXY_getSlopeAtX( ptwXYPoints *ptwXY, double x, const char side, dou
 /*
 ************************************************************
 */
-double ptwXY_domainMinAndFrom( ptwXYPoints *ptwXY, ptwXY_dataFrom *dataFrom ) {
+nfu_status ptwXY_domainMinAndFrom( statusMessageReporting *smr, ptwXYPoints *ptwXY, ptwXY_dataFrom *dataFrom, double *domainMin ) {
 
-    int64_t nonOverflowLength = ptwXY_getNonOverflowLength( ptwXY );
-    double domainMin = nfu_getNAN( );
+    int64_t nonOverflowLength = ptwXY_getNonOverflowLength( smr, ptwXY );
 
+    *domainMin  = 0;
     *dataFrom = ptwXY_dataFrom_Unknown;
+
+    if( nonOverflowLength < 0 ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( nfu_Error );
+    }
+
     if( ptwXY->overflowLength > 0 ) {
         *dataFrom = ptwXY_dataFrom_Overflow;
-        domainMin = ptwXY->overflowHeader.next->point.x;
+        *domainMin = ptwXY->overflowHeader.next->point.x;
         if( nonOverflowLength >= 0 ) {
-            if( domainMin > ptwXY->points[0].x ) {
+            if( *domainMin > ptwXY->points[0].x ) {
                 *dataFrom = ptwXY_dataFrom_Points;
-                domainMin = ptwXY->points[0].x;
+                *domainMin = ptwXY->points[0].x;
             }
         } }
     else if( nonOverflowLength > 0 ) {
         *dataFrom = ptwXY_dataFrom_Points;
-        domainMin = ptwXY->points[0].x;
+        *domainMin = ptwXY->points[0].x; }
+    else {
+        return( nfu_empty );
     }
-    return( domainMin );
+    return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-double ptwXY_domainMin( ptwXYPoints *ptwXY ) {
+nfu_status ptwXY_domainMin( statusMessageReporting *smr, ptwXYPoints *ptwXY, double *domainMin ) {
 
     ptwXY_dataFrom dataFrom;
+    nfu_status status;
+    
+    if( ( status = ptwXY_domainMinAndFrom( smr, ptwXY, &dataFrom, domainMin ) ) != nfu_Okay ) {
+        if( status == nfu_empty ) return( status );
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( nfu_Error );
+    }
 
-    return( ptwXY_domainMinAndFrom( ptwXY, &dataFrom ) );
+    return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-double ptwXY_domainMaxAndFrom( ptwXYPoints *ptwXY, ptwXY_dataFrom *dataFrom ) {
+nfu_status ptwXY_domainMaxAndFrom( statusMessageReporting *smr, ptwXYPoints *ptwXY, ptwXY_dataFrom *dataFrom, double *domainMax ) {
 
-    int64_t nonOverflowLength = ptwXY_getNonOverflowLength( ptwXY );
-    double domainMax = nfu_getNAN( );
+    int64_t nonOverflowLength = ptwXY_getNonOverflowLength( smr, ptwXY );
 
+    *domainMax  = 0;
     *dataFrom = ptwXY_dataFrom_Unknown;
+
+    if( nonOverflowLength < 0 ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( nfu_Error );
+    }
+
     if( ptwXY->overflowLength > 0 ) {
         *dataFrom = ptwXY_dataFrom_Overflow;
-        domainMax = ptwXY->overflowHeader.prior->point.x;
+        *domainMax = ptwXY->overflowHeader.prior->point.x;
         if( ( nonOverflowLength > 0 ) ) {
-            if( domainMax < ptwXY->points[nonOverflowLength-1].x ) {
+            if( *domainMax < ptwXY->points[nonOverflowLength-1].x ) {
                 *dataFrom = ptwXY_dataFrom_Points;
-                domainMax = ptwXY->points[nonOverflowLength-1].x;
+                *domainMax = ptwXY->points[nonOverflowLength-1].x;
             }
         } }
     else if( ptwXY->length > 0 ) {
         *dataFrom = ptwXY_dataFrom_Points;
-        domainMax = ptwXY->points[nonOverflowLength-1].x;
+        *domainMax = ptwXY->points[nonOverflowLength-1].x; }
+    else {
+        return( nfu_empty );
     }
-    return( domainMax );
+    return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-double ptwXY_domainMax( ptwXYPoints *ptwXY ) {
+nfu_status ptwXY_domainMax( statusMessageReporting *smr, ptwXYPoints *ptwXY, double *domainMax ) {
 
     ptwXY_dataFrom dataFrom;
+    nfu_status status;
 
-    return( ptwXY_domainMaxAndFrom( ptwXY, &dataFrom ) );
+    if( ( status = ptwXY_domainMaxAndFrom( smr, ptwXY, &dataFrom, domainMax ) ) != nfu_Okay ) {
+        if( status == nfu_empty ) return( status );
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( nfu_Error );
+    }
+    return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-nfu_status ptwXY_range( ptwXYPoints *ptwXY, double *rangeMin, double *rangeMax ) {
+nfu_status ptwXY_range( statusMessageReporting *smr, ptwXYPoints *ptwXY, double *rangeMin, double *rangeMax ) {
 
-    int64_t i, n = ptwXY_getNonOverflowLength( ptwXY  );
+    int64_t i, nonOverflowLength = ptwXY_getNonOverflowLength( smr, ptwXY  );
     ptwXYPoint *p = ptwXY->points;
     ptwXYOverflowPoint *overflowPoint = ptwXY->overflowHeader.next;
 
     *rangeMin = *rangeMax = 0.;
+
+    if( nonOverflowLength < 0 ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( nfu_Error );
+    }
+
     if( ptwXY->length == 0 ) return( nfu_empty );
-    if( n > 0 ) {
+    if( nonOverflowLength > 0 ) {
         *rangeMin = *rangeMax = p->y;
-        for( i = 1, p++; i < n; i++, p++ ) {
+        for( i = 1, p++; i < nonOverflowLength; i++, p++ ) {
             *rangeMin = ( ( *rangeMin < p->y ) ? *rangeMin : p->y );
             *rangeMax = ( ( *rangeMax > p->y ) ? *rangeMax : p->y );
         } }
@@ -1266,54 +1637,60 @@ nfu_status ptwXY_range( ptwXYPoints *ptwXY, double *rangeMin, double *rangeMax )
         *rangeMax = ( ( *rangeMax < overflowPoint->point.y ) ? *rangeMax : overflowPoint->point.y );
     }
     return( nfu_Okay );
-
-
-
-
-
-
 }
 /*
 ************************************************************
 */
-double ptwXY_rangeMin( ptwXYPoints *ptwXY ) {
+nfu_status ptwXY_rangeMin( statusMessageReporting *smr, ptwXYPoints *ptwXY, double *rangeMin ) {
 
-    int64_t i, n = ptwXY_getNonOverflowLength( ptwXY  );
+    int64_t i, nonOverflowLength = ptwXY_getNonOverflowLength( smr, ptwXY  );
     ptwXYPoint *p = ptwXY->points;
     ptwXYOverflowPoint *overflowPoint = ptwXY->overflowHeader.next;
-    double rangeMin;
 
-    if( ptwXY->length == 0 ) return( 0. );
-    if( n > 0 ) {
-        rangeMin = p->y;
-        for( i = 1, p++; i < n; i++, p++ ) rangeMin = ( ( rangeMin < p->y ) ? rangeMin : p->y ); }
+    *rangeMin = 0.;
+
+    if( nonOverflowLength < 0 ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( nfu_Error );
+    }
+
+    if( ptwXY->length == 0 ) return( nfu_empty );
+    if( nonOverflowLength > 0 ) {
+        *rangeMin = p->y;
+        for( i = 1, p++; i < nonOverflowLength; i++, p++ ) *rangeMin = ( ( *rangeMin < p->y ) ? *rangeMin : p->y ); }
     else {
-        rangeMin = overflowPoint->point.y;
+        *rangeMin = overflowPoint->point.y;
     }
     for( ; overflowPoint != &(ptwXY->overflowHeader); overflowPoint = overflowPoint->next ) 
-        rangeMin = ( ( rangeMin < overflowPoint->point.y ) ? rangeMin : overflowPoint->point.y );
-    return( rangeMin );
+        *rangeMin = ( ( *rangeMin < overflowPoint->point.y ) ? *rangeMin : overflowPoint->point.y );
+    return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-double ptwXY_rangeMax( ptwXYPoints *ptwXY ) {
+nfu_status ptwXY_rangeMax( statusMessageReporting *smr, ptwXYPoints *ptwXY, double *rangeMax ) {
 
-    int64_t i, n = ptwXY_getNonOverflowLength( ptwXY  );
+    int64_t i, nonOverflowLength = ptwXY_getNonOverflowLength( smr, ptwXY  );
     ptwXYPoint *p = ptwXY->points;
     ptwXYOverflowPoint *overflowPoint = ptwXY->overflowHeader.next;
-    double rangeMax;
 
-    if( ptwXY->length == 0 ) return( 0. );
-    if( n > 0 ) {
-        rangeMax = p->y;
-        for( i = 1, p++; i < n; i++, p++ ) rangeMax = ( ( rangeMax > p->y ) ? rangeMax : p->y ); }
+    *rangeMax = 0.;
+
+    if( nonOverflowLength < 0 ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( nfu_Error );
+    }
+
+    if( ptwXY->length == 0 ) return( nfu_empty );
+    if( nonOverflowLength > 0 ) {
+        *rangeMax = p->y;
+        for( i = 1, p++; i < nonOverflowLength; i++, p++ ) *rangeMax = ( ( *rangeMax > p->y ) ? *rangeMax : p->y ); }
     else {
-        rangeMax = overflowPoint->point.y;
+        *rangeMax = overflowPoint->point.y;
     }
     for( ; overflowPoint != &(ptwXY->overflowHeader); overflowPoint = overflowPoint->next )
-        rangeMax = ( ( rangeMax > overflowPoint->point.y ) ? rangeMax : overflowPoint->point.y );
-    return( rangeMax );
+        *rangeMax = ( ( *rangeMax > overflowPoint->point.y ) ? *rangeMax : overflowPoint->point.y );
+    return( nfu_Okay );
 }
 /*
 ************************************************************

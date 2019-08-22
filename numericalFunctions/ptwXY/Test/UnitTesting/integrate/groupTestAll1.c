@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -45,6 +69,7 @@
 #include <string.h>
 #include <math.h>
 
+#include <nfut_utilities.h>
 #include <ptwXY.h>
 #include <nf_utilities.h>
 #include <ptwXY_utilities.h>
@@ -52,25 +77,27 @@
 static int verbose = 0;
 static char *fmtX = "%18.11e\n", *fmtXY = "%18.11e %18.11e\n";
 
-static void compareResults( ptwXPoints *groupedData, const char * const fileName );
-static void compareNone2dx( ptwXPoints *groupBoundaries, ptwXPoints *fluxGrouped_None, ptwXPoints *groupedData, char *sData );
-static void compareNone2Normed( ptwXPoints *groupNorm, ptwXPoints *groupedData_None, ptwXPoints *groupedData_Norm, char *sData );
+static void compareResults( statusMessageReporting *smr, ptwXPoints *groupedData, const char * const fileName );
+static void compareNone2dx( statusMessageReporting *smr, ptwXPoints *groupBoundaries, ptwXPoints *fluxGrouped_None, ptwXPoints *groupedData, char *sData );
+static void compareNone2Normed( statusMessageReporting *smr, ptwXPoints *groupNorm, ptwXPoints *groupedData_None, ptwXPoints *groupedData_Norm, char *sData );
 static void compareDoubles( int index, double d1, double d2, double eps, char *sData, char *s );
-static ptwXPoints *getGroupBoundaries( void );
-static ptwXYPoints *getFluxData( void );
-static ptwXYPoints *getCrossSectionData( void );
-static ptwXYPoints *getMultiplicityData( void );
+static ptwXPoints *getGroupBoundaries( statusMessageReporting *smr );
+static ptwXYPoints *getFluxData( statusMessageReporting *smr );
+static ptwXYPoints *getCrossSectionData( statusMessageReporting *smr );
+static ptwXYPoints *getMultiplicityData( statusMessageReporting *smr );
 static void writeXYDataOnVerbosity( ptwXYPoints *data, const char * const fileName );
-static void writeXDataOnVerbosity( ptwXPoints *data, const char * const fileName );
+static void writeXDataOnVerbosity( statusMessageReporting *smr, ptwXPoints *data, const char * const fileName );
 /*
 ************************************************************
 */
 int main( int argc, char **argv ) {
 
     int iarg, errCount = 0, echo = 0;
-    nfu_status status;
     ptwXYPoints *flux, *crossSection, *multiplicity;
     ptwXPoints *groupBoundaries, *groupedData, *fluxGrouped_None, *crossSectionGrouped_None, *multiplicityGrouped_None;
+    statusMessageReporting smr;
+
+    smr_initialize( &smr, smr_status_Ok );
 
     for( iarg = 1; iarg < argc; iarg++ ) {
         if( strcmp( "-v", argv[iarg] ) == 0 ) {
@@ -83,67 +110,76 @@ int main( int argc, char **argv ) {
     }
     if( echo ) printf( "%s\n", __FILE__ );
 
-    groupBoundaries = getGroupBoundaries( );
-    writeXDataOnVerbosity( groupBoundaries, "groupBoundaries.dat" );
+    groupBoundaries = getGroupBoundaries( &smr );
+    writeXDataOnVerbosity( &smr, groupBoundaries, "groupBoundaries.dat" );
 
-    flux = getFluxData( );
+    flux = getFluxData( &smr );
     writeXYDataOnVerbosity( flux, "flux.dat" );
 
-    crossSection = getCrossSectionData( );
+    crossSection = getCrossSectionData( &smr );
     writeXYDataOnVerbosity( crossSection, "crossSection.dat" );
 
-    multiplicity = getMultiplicityData( );
+    multiplicity = getMultiplicityData( &smr );
     writeXYDataOnVerbosity( multiplicity, "multiplicity.dat" );
 
 /*
 *   ptwXY_groupOneFunction testing.
 */
-    fluxGrouped_None = ptwXY_groupOneFunction( flux, groupBoundaries, ptwXY_group_normType_none, NULL, &status );
-    writeXDataOnVerbosity( fluxGrouped_None, "flux_None.dat" );
-    compareResults( fluxGrouped_None, "Data/flux_None.dat" );
+    if( ( fluxGrouped_None = ptwXY_groupOneFunction( &smr, flux, groupBoundaries, ptwXY_group_normType_none, NULL ) ) == NULL )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    writeXDataOnVerbosity( &smr, fluxGrouped_None, "flux_None.dat" );
+    compareResults( &smr, fluxGrouped_None, "Data/flux_None.dat" );
 
-    groupedData = ptwXY_groupOneFunction( flux, groupBoundaries, ptwXY_group_normType_dx, NULL, &status );
-    compareNone2dx( groupBoundaries, fluxGrouped_None, groupedData, "flux" );
-    writeXDataOnVerbosity( groupedData, "flux_dx.dat" );
+    if( ( groupedData = ptwXY_groupOneFunction( &smr, flux, groupBoundaries, ptwXY_group_normType_dx, NULL ) ) == NULL )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    compareNone2dx( &smr, groupBoundaries, fluxGrouped_None, groupedData, "flux" );
+    writeXDataOnVerbosity( &smr, groupedData, "flux_dx.dat" );
     ptwX_free( groupedData );
 
-    groupedData = ptwXY_groupOneFunction( flux, groupBoundaries, ptwXY_group_normType_norm, fluxGrouped_None, &status );
-    compareNone2Normed( fluxGrouped_None, fluxGrouped_None, groupedData, "flux" );
-    writeXDataOnVerbosity( groupedData, "flux_norm.dat" );
+    if( ( groupedData = ptwXY_groupOneFunction( &smr, flux, groupBoundaries, ptwXY_group_normType_norm, fluxGrouped_None ) ) == NULL )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    compareNone2Normed( &smr, fluxGrouped_None, fluxGrouped_None, groupedData, "flux" );
+    writeXDataOnVerbosity( &smr, groupedData, "flux_norm.dat" );
     ptwX_free( groupedData );
 
 /*
 *   ptwXY_groupTwoFunctions testing.
 */
-    crossSectionGrouped_None = ptwXY_groupTwoFunctions( crossSection, flux, groupBoundaries, ptwXY_group_normType_none, NULL, &status );
-    writeXDataOnVerbosity( crossSectionGrouped_None, "crossSection_None.dat" );
-    compareResults( crossSectionGrouped_None, "Data/crossSection_None.dat" );
+    if( ( crossSectionGrouped_None = ptwXY_groupTwoFunctions( &smr, crossSection, flux, groupBoundaries, ptwXY_group_normType_none, NULL ) ) == NULL )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    writeXDataOnVerbosity( &smr, crossSectionGrouped_None, "crossSection_None.dat" );
+    compareResults( &smr, crossSectionGrouped_None, "Data/crossSection_None.dat" );
 
-    groupedData = ptwXY_groupTwoFunctions( crossSection, flux, groupBoundaries, ptwXY_group_normType_dx, NULL, &status );
-    compareNone2dx( groupBoundaries, crossSectionGrouped_None, groupedData, "cross section" );
-    writeXDataOnVerbosity( groupedData, "crossSection_dx.dat" );
+    if( ( groupedData = ptwXY_groupTwoFunctions( &smr, crossSection, flux, groupBoundaries, ptwXY_group_normType_dx, NULL ) ) == NULL )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    compareNone2dx( &smr, groupBoundaries, crossSectionGrouped_None, groupedData, "cross section" );
+    writeXDataOnVerbosity( &smr, groupedData, "crossSection_dx.dat" );
     ptwX_free( groupedData );
 
-    groupedData = ptwXY_groupTwoFunctions( crossSection, flux, groupBoundaries, ptwXY_group_normType_norm, fluxGrouped_None, &status );
-    compareNone2Normed( fluxGrouped_None, crossSectionGrouped_None, groupedData, "cross section" );
-    writeXDataOnVerbosity( groupedData, "crossSection_norm.dat" );
+    if( ( groupedData = ptwXY_groupTwoFunctions( &smr, crossSection, flux, groupBoundaries, ptwXY_group_normType_norm, fluxGrouped_None ) ) == NULL )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    compareNone2Normed( &smr, fluxGrouped_None, crossSectionGrouped_None, groupedData, "cross section" );
+    writeXDataOnVerbosity( &smr, groupedData, "crossSection_norm.dat" );
     ptwX_free( groupedData );
 
 /*
 *   ptwXY_groupThreeFunctions testing.
 */
-    multiplicityGrouped_None = ptwXY_groupThreeFunctions( crossSection, multiplicity, flux, groupBoundaries, ptwXY_group_normType_none, NULL, &status );
-    writeXDataOnVerbosity( multiplicityGrouped_None, "multiplicity_None.dat" );
-    compareResults( multiplicityGrouped_None, "Data/multiplicity_None.dat" );
+    if( ( multiplicityGrouped_None = ptwXY_groupThreeFunctions( &smr, crossSection, multiplicity, flux, groupBoundaries, ptwXY_group_normType_none, NULL ) ) == NULL )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    writeXDataOnVerbosity( &smr, multiplicityGrouped_None, "multiplicity_None.dat" );
+    compareResults( &smr, multiplicityGrouped_None, "Data/multiplicity_None.dat" );
 
-    groupedData = ptwXY_groupThreeFunctions( crossSection, multiplicity, flux, groupBoundaries, ptwXY_group_normType_dx, NULL, &status );
-    compareNone2dx( groupBoundaries, multiplicityGrouped_None, groupedData, "multiplcity" );
-    writeXDataOnVerbosity( groupedData, "multiplicity_dx.dat" );
+    if( ( groupedData = ptwXY_groupThreeFunctions( &smr, crossSection, multiplicity, flux, groupBoundaries, ptwXY_group_normType_dx, NULL ) ) == NULL )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    compareNone2dx( &smr, groupBoundaries, multiplicityGrouped_None, groupedData, "multiplcity" );
+    writeXDataOnVerbosity( &smr, groupedData, "multiplicity_dx.dat" );
     ptwX_free( groupedData );
 
-    groupedData = ptwXY_groupThreeFunctions( crossSection, multiplicity, flux, groupBoundaries, ptwXY_group_normType_norm, fluxGrouped_None, &status );
-    compareNone2Normed( fluxGrouped_None, multiplicityGrouped_None, groupedData, "multiplicity" );
-    writeXDataOnVerbosity( groupedData, "multiplicity_norm.dat" );
+    if( ( groupedData = ptwXY_groupThreeFunctions( &smr, crossSection, multiplicity, flux, groupBoundaries, ptwXY_group_normType_norm, fluxGrouped_None ) ) == NULL )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    compareNone2Normed( &smr, fluxGrouped_None, multiplicityGrouped_None, groupedData, "multiplicity" );
+    writeXDataOnVerbosity( &smr, groupedData, "multiplicity_norm.dat" );
     ptwX_free( groupedData );
 
     ptwX_free( groupBoundaries );
@@ -159,16 +195,15 @@ int main( int argc, char **argv ) {
 /*
 ************************************************************
 */
-static void compareResults( ptwXPoints *groupedData, const char * const fileName ) {
+static void compareResults( statusMessageReporting *smr, ptwXPoints *groupedData, const char * const fileName ) {
 
-    int i, j, n = (int) ptwX_length( groupedData );
+    int i, j, n = (int) ptwX_length( smr, groupedData );
     ptwXPoints *old;
     FILE *f;
     double x1, x2, s, d, r;
-    nfu_status status;
 
-    if( ( old = ptwX_new( n, &status ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: old creation in compareResults, status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( old = ptwX_new( smr, n ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( smr, "Via." );
     if( ( f = fopen( fileName, "r" ) ) == NULL ) nfu_printErrorMsg( "ERROR %s: could not open file '%s' for comparison", __FILE__, fileName );
     for( i = 0; i < n; i++ ) {
         if( ( j = fscanf( f, "%le", &d ) ) != 1 ) nfu_printErrorMsg( "ERROR %s: reading double at line %d of file '%s' for comparison", 
@@ -190,9 +225,9 @@ static void compareResults( ptwXPoints *groupedData, const char * const fileName
 /*
 ************************************************************
 */
-static void compareNone2dx( ptwXPoints *groupBoundaries, ptwXPoints *groupedData_None, ptwXPoints *groupedData, char *sData ) {
+static void compareNone2dx( statusMessageReporting *smr, ptwXPoints *groupBoundaries, ptwXPoints *groupedData_None, ptwXPoints *groupedData, char *sData ) {
 
-    int i, n = ptwX_length( groupedData_None );
+    int i, n = ptwX_length( smr, groupedData_None );
     double dx, d1, d2;
 
     for( i = 0; i < n; i++ ) {
@@ -205,9 +240,9 @@ static void compareNone2dx( ptwXPoints *groupBoundaries, ptwXPoints *groupedData
 /*
 ************************************************************
 */
-static void compareNone2Normed( ptwXPoints *groupNorm, ptwXPoints *groupedData_None, ptwXPoints *groupedData_Norm, char *sData ) {
+static void compareNone2Normed( statusMessageReporting *smr, ptwXPoints *groupNorm, ptwXPoints *groupedData_None, ptwXPoints *groupedData_Norm, char *sData ) {
 
-    int i, n = ptwX_length( groupedData_None );
+    int i, n = ptwX_length( smr, groupedData_None );
     double norm, d1, d2;
 
     for( i = 0; i < n; i++ ) {
@@ -233,7 +268,7 @@ static void compareDoubles( int index, double d1, double d2, double eps, char *s
 /*
 ************************************************************
 */
-static ptwXPoints *getGroupBoundaries( void ) {
+static ptwXPoints *getGroupBoundaries( statusMessageReporting *smr ) {
 
     double data[] = {
         1.30680e-09, 2.09080e-08, 1.30680e-07, 3.34530e-07, 1.17610e-06, 2.09080e-06, 5.65780e-06, 1.30680e-05, 2.07460e-05, 5.12300e-05,
@@ -247,16 +282,15 @@ static ptwXPoints *getGroupBoundaries( void ) {
         1.44070e+01, 1.46830e+01, 1.51860e+01, 1.57540e+01, 1.63340e+01, 1.69230e+01, 1.81340e+01, 2.00000e+01 };
     int nData = sizeof( data ) / sizeof( double );
     ptwXPoints *groupBoundaries;
-    nfu_status status;
 
-    if( ( groupBoundaries = ptwX_create( nData, nData, data, &status ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: group boundaries creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( groupBoundaries = ptwX_create( smr, nData, nData, data ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( smr, "Via." );
     return( groupBoundaries );
 }
 /*
 ************************************************************
 */
-static ptwXYPoints *getFluxData( void ) {
+static ptwXYPoints *getFluxData( statusMessageReporting *smr ) {
 
     double data[] = {  
         0.0000000e+00, 5.4598150e+01, 5.9634465e+00, 5.6305711e+00, 8.2124320e+00, 2.3903851e+00, 9.6171596e+00, 1.3997871e+00, 1.0649959e+01, 9.4447384e-01,
@@ -271,30 +305,28 @@ static ptwXYPoints *getFluxData( void ) {
         2.0624179e+01, 2.1134888e-02, 2.0753480e+01, 2.0119061e-02, 2.0878669e+01, 1.9182082e-02, 2.1000000e+01, 1.8315639e-02 };
     int nData = sizeof( data ) / ( 2 * sizeof( double ) );
     ptwXYPoints *flux;
-    nfu_status status;
 
-    if( ( flux = ptwXY_create( ptwXY_interpolationLinLin, NULL, 6, 1e-3, 10, 10, nData, data, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: flux creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( flux = ptwXY_create( smr, ptwXY_interpolationLinLin, NULL, 6, 1e-3, 10, 10, nData, data, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( smr, "Via." );
     return( flux );
 }
 /*
 ************************************************************
 */
-static ptwXYPoints *getCrossSectionData( void ) {
+static ptwXYPoints *getCrossSectionData( statusMessageReporting *smr ) {
 
 #include "Data/crossSection.dat.h"     /* This lines include data. */
     int nData = sizeof( data ) / ( 2 * sizeof( double ) );
     ptwXYPoints *crossSection;
-    nfu_status status;
 
-    if( ( crossSection = ptwXY_create( ptwXY_interpolationLinLin, NULL, 6, 1e-3, 10, 10, nData, data, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: cross section creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( crossSection = ptwXY_create( smr, ptwXY_interpolationLinLin, NULL, 6, 1e-3, 10, 10, nData, data, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( smr, "Via." );
     return( crossSection);
 }
 /*
 ************************************************************
 */
-static ptwXYPoints *getMultiplicityData( void ) {
+static ptwXYPoints *getMultiplicityData( statusMessageReporting *smr ) {
 
     double data[] = {  
             1.00000000e-11,  3.95456000e+00, 2.00000000e-02,  3.95456000e+00, 3.00000000e-02,  3.95403000e+00, 4.00000000e-02,  3.95466000e+00,
@@ -312,10 +344,9 @@ static ptwXYPoints *getMultiplicityData( void ) {
             1.80000000e+01,  4.90964000e+00, 1.90000000e+01,  4.87693000e+00, 2.00000000e+01,  4.86958000e+00 };
     int nData = sizeof( data ) / ( 2 * sizeof( double ) );
     ptwXYPoints *multiplicity;
-    nfu_status status;
 
-    if( ( multiplicity = ptwXY_create( ptwXY_interpolationLinLin, NULL, 6, 1e-3, 10, 10, nData, data, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: multiplicity creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( multiplicity = ptwXY_create( smr, ptwXY_interpolationLinLin, NULL, 6, 1e-3, 10, 10, nData, data, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( smr, "Via." );
     return( multiplicity );
 }
 /*
@@ -327,21 +358,21 @@ static void writeXYDataOnVerbosity( ptwXYPoints *data, const char * const fileNa
 
     if( !verbose ) return;
     if( ( f = fopen( fileName, "w" ) ) == NULL ) nfu_printErrorMsg( "ERROR %s: could not open file %s\n", __FILE__, fileName );
-    fprintf( f, "# length = %d\n", (int) ptwXY_length( data ) );
+    fprintf( f, "# length = %d\n", (int) ptwXY_length( NULL, data ) );
     ptwXY_simpleWrite( data, f, fmtXY );
     fclose( f );
 }
 /*
 ************************************************************
 */
-static void writeXDataOnVerbosity( ptwXPoints *data, const char * const fileName ) {
+static void writeXDataOnVerbosity( statusMessageReporting *smr, ptwXPoints *data, const char * const fileName ) {
 
     int64_t i;
     FILE *f;
 
     if( !verbose ) return;
     if( ( f = fopen( fileName, "w" ) ) == NULL ) nfu_printErrorMsg( "ERROR %s: could not open file %s\n", __FILE__, fileName );
-    fprintf( f, "# length = %d\n", (int) ptwX_length( data ) );
-    for( i = 0; i < ptwX_length( data ); i++ ) fprintf( f, fmtX, ptwX_getPointAtIndex_Unsafely( data, i ) );
+    fprintf( f, "# length = %d\n", (int) ptwX_length( smr, data ) );
+    for( i = 0; i < ptwX_length( smr, data ); i++ ) fprintf( f, fmtX, ptwX_getPointAtIndex_Unsafely( data, i ) );
     fclose( f );
 }

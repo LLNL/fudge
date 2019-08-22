@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,27 +18,50 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
-""" energy distribution (spectra) classes """
+"""Energy distribution classes."""
 
 import math
 import base, miscellaneous
@@ -56,39 +80,38 @@ from . import base as baseModule
 
 __metaclass__ = type
 
-class pdfOfEp :
 
-    class pointwise( XYsModule.XYs ) :
+class XYs1d( XYsModule.XYs1d ) :
 
-        def averageEnergy( self ) :
+    def averageEnergy( self ) :
 
-            allowedInterpolations = [ standardsModule.interpolation.linlinToken,
+        allowedInterpolations = [ standardsModule.interpolation.linlinToken,
                                       standardsModule.interpolation.flatToken ]
-            xys = self.changeInterpolationIfNeeded( allowedInterpolations = allowedInterpolations )
-            return( xys.integrateWithWeight_x( ) )
+        xys = self.changeInterpolationIfNeeded( allowedInterpolations = allowedInterpolations )
+        return( xys.integrateWithWeight_x( ) )
 
-    class piecewise( regionsModule.regions ) :
+class regions1d( regionsModule.regions1d ) :
 
-        def averageEnergy( self ) :
+    def averageEnergy( self ) :
 
-            averageEnergy = 0
-            for region in self : averageEnergy += region.averageEnergy( )
-            return( averageEnergy )
+        averageEnergy = 0
+        for region in self : averageEnergy += region.averageEnergy( )
+        return( averageEnergy )
 
-        def integrateWithWeight_x( self ) :
+    def integrateWithWeight_x( self ) :
 
-            sum = 0
-            for region in self : sum += region.integrateWithWeight_x( )
-            return( sum )
+        sum = 0
+        for region in self : sum += region.integrateWithWeight_x( )
+        return( sum )
 
-        def toLinearXYsClass( self ) :
+    def toLinearXYsClass( self ) :
 
-            return pdfOfEp.pointwise
+        return( XYs1d )
 
-        @staticmethod
-        def allowedSubElements():
+    @staticmethod
+    def allowedSubElements():
 
-            return (pdfOfEp.pointwise,)
+        return( XYs1d, )
 
 class subform( baseModule.subform ) :
     """Abstract base class for energy forms."""
@@ -193,21 +216,19 @@ class primaryGamma( subform ) :
         value = energyElement.get( 'value' )
         return primaryGamma( value )
 
-class pointwise( subform, multiD_XYsModule.multiD_XYs ) :
+class XYs2d( subform, multiD_XYsModule.XYs2d ) :
 
     def __init__( self, **kwargs ):
         """
-        >epointwise = pointwise( )
+        >pointwise = XYs2d( )
         followed by:
-        >epointwise[ 0 ] = XYs_data_1
-        >epointwise[ 1 ] = XYs_data_2
+        >pointwise[ 0 ] = XYs_data_1
+        >pointwise[ 1 ] = XYs_data_2
         > ...
-        >epointwise[ n-1 ] = XYs_data_n
+        >pointwise[ n-1 ] = XYs_data_n
         """
 
-        if( 'dimension' not in kwargs ) : kwargs['dimension'] = 2
-        if( kwargs['dimension'] != 2 ) : raise ValueError( 'Dimension = %s != 2' % ( kwargs['dimension'] ) )
-        multiD_XYsModule.multiD_XYs.__init__( self, **kwargs )
+        multiD_XYsModule.XYs2d.__init__( self, **kwargs )
         subform.__init__( self )
 
     def getAtEnergy( self, energy ) :
@@ -275,8 +296,8 @@ class pointwise( subform, multiD_XYsModule.multiD_XYs ) :
 
     def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
-        return( multiD_XYsModule.multiD_XYs.toPointwise_withLinearXYs( self, accuracy, lowerEps = lowerEps,
-            upperEps = upperEps, cls = pointwise ) )
+        return( multiD_XYsModule.XYs2d.toPointwise_withLinearXYs( self, accuracy, lowerEps = lowerEps,
+            upperEps = upperEps, cls = XYs2d ) )
 
     @staticmethod
     def defaultAxes( energyUnit = 'eV' ) :
@@ -290,15 +311,13 @@ class pointwise( subform, multiD_XYsModule.multiD_XYs ) :
     @staticmethod
     def allowedSubElements( ) :
 
-        return( ( pdfOfEp.pointwise, pdfOfEp.piecewise ) )
+        return( ( XYs1d, regions1d ) )
 
-class piecewise( subform, regionsModule.regions ) :
+class regions2d( subform, regionsModule.regions2d ) :
 
     def __init__( self, **kwargs ):
 
-        if( 'dimension' not in kwargs ) : kwargs['dimension'] = 2
-        if( kwargs['dimension'] != 2 ) : raise ValueError( 'Dimension = %s != 2' % ( kwargs['dimension'] ) )
-        regionsModule.regions.__init__( self, **kwargs )
+        regionsModule.regions2d.__init__( self, **kwargs )
         subform.__init__( self )
 
     def check( self, info ) :
@@ -314,51 +333,72 @@ class piecewise( subform, regionsModule.regions ) :
 
     def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
-        return( regionsModule.regions.toPointwise_withLinearXYs( self, accuracy, lowerEps = lowerEps,
-            upperEps = upperEps, cls = pointwise ) )
+        return( regionsModule.regions2d.toPointwise_withLinearXYs( self, accuracy, lowerEps = lowerEps,
+            upperEps = upperEps, cls = XYs2d ) )
 
     @staticmethod
     def allowedSubElements( ) :
 
-        return( ( pointwise, ) )
+        return( ( XYs2d, ) )
 
     @staticmethod
     def defaultAxes( energyUnit = 'eV' ) :
 
-        return( pointwise.defaultAxes( energyUnit = energyUnit ) )
+        return( XYs2d.defaultAxes( energyUnit = energyUnit ) )
 
 class energyFunctionalData( ancestryModule.ancestry ) :
 
-    def __init__( self, moniker, data ) :
+    def __init__( self, data ) :
 
-        if( moniker not in [ 'theta', 'a', 'b', 'g', 'T_M' ] ) : raise Exception( 'Invalid moniker = "%s"' % moniker )
-        self.moniker = moniker
         ancestryModule.ancestry.__init__( self )
         self.data = data
-        self.data.label = moniker
 
-    def copy( self ):
+    @classmethod
+    def copy( cls, self ):
 
-        return energyFunctionalData( self.moniker, self.data )
+        return cls( self.data )
 
     __copy__ = __deepcopy__ = copy
 
     def toXMLList( self, indent = '', **kwargs ) :
 
-        return self.data.toXMLList( indent, **kwargs )
+        xml = ['%s<%s>' % (indent, self.moniker)]
+        xml += self.data.toXMLList( indent + '  ', **kwargs )
+        xml[-1] += '</%s>' % self.moniker
+        return xml
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ):
+    @classmethod
+    def parseXMLNode( cls, element, xPath, linkData ):
 
         xPath.append( element.tag )
         subClass = {
-            XYsModule.XYs.moniker:  XYsModule.XYs,
-            regionsModule.regions.moniker:  regionsModule.regions,
-        }.get( element.tag )
+            XYsModule.XYs1d.moniker         : XYsModule.XYs1d,
+            regionsModule.regions1d.moniker : regionsModule.regions1d,
+        }.get( element[0].tag )
         if( subClass is None ) : raise Exception( "encountered unknown energy functional subform: %s" % element[0].tag )
-        EFD = energyFunctionalData( element.get('label'), subClass.parseXMLNode( element, xPath, linkData ) )
+        EFD = cls( subClass.parseXMLNode( element[0], xPath, linkData ) )
         xPath.pop()
         return EFD
+
+class a( energyFunctionalData ) :
+
+    moniker = 'a'
+
+class b( energyFunctionalData ) :
+
+    moniker = 'b'
+
+class theta( energyFunctionalData ) :
+
+    moniker = 'theta'
+
+class g( energyFunctionalData ) :
+
+    moniker = 'g'
+
+class T_M( energyFunctionalData ) :
+
+    moniker = 'T_M'
 
 class functionalBase( subform ) :
 
@@ -402,7 +442,7 @@ class functionalBase( subform ) :
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
 
-        if( isinstance( self.parameter1.data, regionsModule.regions ) ) :
+        if( isinstance( self.parameter1.data, regionsModule.regions1d ) ) :
             Es = []
             for region in self.parameter1.data :
                 Es = Es[:-1] + [ E for E, p in region ]
@@ -456,12 +496,12 @@ class generalEvaporationSpectrum( functionalBase ) :
 
     def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
-        pwl = pointwise( axes = pointwise.defaultAxes( ) )
+        pwl = XYs2d( axes = XYs2d.defaultAxes( ) )
         thetas = self.parameter1.data.toPointwise_withLinearXYs( accuracy = None, lowerEps = lowerEps, upperEps = upperEps )
         gs = self.parameter2.data.toPointwise_withLinearXYs( accuracy = None, lowerEps = lowerEps, upperEps = upperEps )
         for E_in, theta in thetas :
             data = [ [ theta * x, y / theta ] for x, y in gs ]
-            data = pdfOfEp.pointwise( data, accuracy = accuracy, value = E_in )
+            data = XYs1d( data, accuracy = accuracy, value = E_in )
             data.normalize( insitu = True )
             pwl.append( data )
         return( pwl )
@@ -471,9 +511,10 @@ class generalEvaporationSpectrum( functionalBase ) :
         """Translate <generalEvaporation> element from xml."""
 
         xPath.append( element.tag )
-        theta, g = [ energyFunctionalData.parseXMLNode( node, xPath, linkData ) for node in element ]
+        theta_ = theta.parseXMLNode( element.find(theta.moniker), xPath, linkData )
+        g_ = g.parseXMLNode( element.find(g.moniker), xPath, linkData )
         U = PQU.PQU( element.get( "U" ) )
-        GES = generalEvaporationSpectrum( U, theta, g )
+        GES = generalEvaporationSpectrum( U, theta_, g_ )
         xPath.pop()
         return GES
 
@@ -518,9 +559,9 @@ class simpleMaxwellianFissionSpectrum( functionalBase ) :
     def parseXMLNode( MFelement, xPath, linkData ) :
 
         xPath.append( MFelement.tag )
-        theta = energyFunctionalData.parseXMLNode( MFelement[0], xPath, linkData )
+        theta_ = theta.parseXMLNode( MFelement.find(theta.moniker), xPath, linkData )
         U = PQU.PQU( MFelement.get("U") )
-        SMF = simpleMaxwellianFissionSpectrum( U, theta )
+        SMF = simpleMaxwellianFissionSpectrum( U, theta_ )
         xPath.pop()
         return SMF
 
@@ -534,7 +575,7 @@ class evaporationSpectrum( functionalBase ) :
 
     def averageEp( self, E ) :
 
-        if( isinstance( self.parameter1.data, regionsModule.regions ) ) :
+        if( isinstance( self.parameter1.data, regionsModule.regions1d ) ) :
             for region in self.parameter1.data :
                 if( E <= region[-1][0] ) : break
             theta = region.evaluate( E )
@@ -567,9 +608,9 @@ class evaporationSpectrum( functionalBase ) :
     def parseXMLNode( evapElement, xPath, linkData ) :
 
         xPath.append( evapElement.tag )
-        theta = energyFunctionalData.parseXMLNode( evapElement[0], xPath, linkData )
+        theta_ = theta.parseXMLNode( evapElement.find(theta.moniker), xPath, linkData )
         U = PQU.PQU( evapElement.get( "U" ) )
-        ES = evaporationSpectrum( U, theta )
+        ES = evaporationSpectrum( U, theta_ )
         xPath.pop()
         return ES
 
@@ -626,12 +667,13 @@ class WattSpectrum( functionalBase ) :
 
     @staticmethod
     def parseXMLNode( WattElement, xPath, linkData ):
-        """ translate <Watt> element from xml """
+        """Translate <Watt> element from xml."""
 
         xPath.append( WattElement.tag )
-        a, b = [energyFunctionalData.parseXMLNode(node,xPath,linkData) for node in WattElement]
+        _a = a.parseXMLNode( WattElement.find(a.moniker), xPath, linkData )
+        _b = b.parseXMLNode( WattElement.find(b.moniker), xPath, linkData )
         U = PQU.PQU( WattElement.get( "U" ) )
-        WS = WattSpectrum( U, a, b )
+        WS = WattSpectrum( U, _a, _b )
         xPath.pop()
         return WS
 
@@ -696,29 +738,32 @@ class MadlandNix( functionalBase ) :
             return( 0.5 * ( g( Ep, EFL, T_M ) + g( Ep, EFH, T_M ) ) )
 
         if( accuracy is None ) : accuracy = 1e-3
-        axes = pointwise.defaultAxes( )
-        pwl = pointwise( axes )
+        axes = XYs2d.defaultAxes( energyUnit = self.parameter1.data.axes[0].unit )
+        pwl = XYs2d( axes = axes )
         E_in_unit = self.parameter1.data.axes[-1].unit
         EFL, EFH = self.EFL.getValueAs( E_in_unit ), self.EFH.getValueAs( E_in_unit )
         factor = PQU.PQU( 1, 'eV' ).getValueAs( E_in_unit )
         xs_ = [ 1e-5, 1e-3, 1e-1, 1e1, 1e3, 1e5, 3e7 ]
         xs = [ factor * x for x in xs_ ]
+        axes1d = axesModule.axes( )
+        axes1d[0] = axes[0]
+        axes1d[1] = axes[1]
         for E, T_M in self.parameter1.data :        # This logic ignores the interpolation of parameter1 as the only two subforms in ENDF/B-VII shows 
             parameters = [ EFL, EFH, T_M ]          # that linear-linear is better than the 'log-log' given in the ENDF/B-VII/data.
-            g_Ep = pdfOfEp.pointwise.createFromFunction( xs, MadlandNixFunc, parameters, accuracy, biSectionMax = 12 )
-            g_Ep.value = E                          # ????????? Class XYs does not the a proper setValue method. One should be added.
+            g_Ep = XYs1d.createFromFunction( axes1d, xs, MadlandNixFunc, parameters, accuracy, biSectionMax = 12 )
+            g_Ep.value = E                          # ????????? Class XYs1d does not the a proper setValue method. One should be added.
             g_Ep.normalize( insitu = True )
             pwl.append( g_Ep )
         return( pwl )
 
     @staticmethod
     def parseXMLNode( MNelement, xPath, linkData ):
-        """ translate <MadlandNix> element from xml """
+        """Translate <MadlandNix> element from xml."""
 
         xPath.append( MNelement.tag )
-        T_M = energyFunctionalData.parseXMLNode( MNelement[0], xPath, linkData )
+        T_M_ = T_M.parseXMLNode( MNelement.find(T_M.moniker), xPath, linkData )
         EFL, EFH = [PQU.PQU(tmp) for tmp in (MNelement.get("EFL"),MNelement.get("EFH") )]
-        MN = MadlandNix( EFL, EFH, T_M )
+        MN = MadlandNix( EFL, EFH, T_M_ )
         xPath.pop()
         return MN
 
@@ -794,8 +839,8 @@ class NBodyPhaseSpace( subform ) :
         c = self.findClassInAncestry( channels.channel )
         Q = c.Q.getConstantAs( energyUnit )
 
-        axes = pointwise.defaultAxes( standardsModule.frames.centerOfMassToken, energyUnit = energyUnit )
-        pwl = pointwise( axes )
+        axes = XYs2d.defaultAxes( standardsModule.frames.centerOfMassToken, energyUnit = energyUnit )
+        pwl = XYs2d( axes )
 
         t = tester( accuracy, 1e-10, self.numberOfProducts )
         n = 21
@@ -809,7 +854,7 @@ class NBodyPhaseSpace( subform ) :
             t.setEMax_i( EMax_i )
             t.absoluteTolerance = 1e-10 * t.evaluateAtX( 0.5 * EMax_i )
             data = fudgemath.thickenXYList( [ [ 0., 0. ], [ EMax_i, 0. ] ], t, biSectionMax = 10 )
-            data = pdfOfEp.pointwise( data, accuracy = accuracy, value = E_in )
+            data = XYs1d( data, accuracy = accuracy, value = E_in )
             data.normalize( insitu = True )
             pwl.append( data )
         return( pwl )
@@ -921,8 +966,10 @@ class weightedFunctionals( subform ) :
         return( Ep )
 
     def sqrtEp_AverageAtE( self, E ) :
-        """This method has not been implemented. It returns None so the method uncorrelated.calculateDepositionData will still work
-        when calculating the momentum deposition for isotropic scattering in the lab frame, but will execute a raise otherwise."""
+        """
+        This method has not been implemented. It returns None so the method uncorrelated.calculateAverageProductData will still work
+        when calculating the momentum deposition for isotropic scattering in the lab frame, but will execute a raise otherwise.
+        """
 
         return( None )
 
@@ -948,7 +995,7 @@ class weightedFunctionals( subform ) :
             for x in e :
                 if( x.value not in E_ins ) : E_ins.append( x.value )
         E_ins.sort( )
-        pwl = pointwise( axes = pointwise.defaultAxes() )
+        pwl = XYs2d( axes = XYs2d.defaultAxes() )
         for E_in in E_ins :
             wv1, ev1 = data[0]
             wv2, ev2 = data[1]
@@ -981,17 +1028,17 @@ class weightedFunctionals( subform ) :
         WF = weightedFunctionals( )
         for weightSection in WFelement :
             weights, functional = weightSection
-            weight_ = XYsModule.XYs.parseXMLNode( weights, xPath, linkData )
+            _weight = XYsModule.XYs1d.parseXMLNode( weights, xPath, linkData )
             subformClass = {
-                    pointwise.moniker :                         pointwise,
-                    generalEvaporationSpectrum.moniker :        generalEvaporationSpectrum,
-                    WattSpectrum.moniker :                      WattSpectrum,
-                    MadlandNix.moniker :                        MadlandNix,
-                    simpleMaxwellianFissionSpectrum.moniker :   simpleMaxwellianFissionSpectrum,
-                    evaporationSpectrum.moniker :               evaporationSpectrum,
+                    XYs2d.moniker                           : XYs2d,
+                    generalEvaporationSpectrum.moniker      : generalEvaporationSpectrum,
+                    WattSpectrum.moniker                    : WattSpectrum,
+                    MadlandNix.moniker                      : MadlandNix,
+                    simpleMaxwellianFissionSpectrum.moniker : simpleMaxwellianFissionSpectrum,
+                    evaporationSpectrum.moniker             : evaporationSpectrum,
                 }.get( functional.tag )
             functional = subformClass.parseXMLNode( functional, xPath, linkData )
-            WF.weights.append( weighted( weight_, functional ) )
+            WF.weights.append( weighted( _weight, functional ) )
         xPath.pop( )
         return WF
 
@@ -1029,8 +1076,8 @@ class energyFunctionalDataToPointwise :
                 self.p2 = p2
 
         parameter1 = self.data.parameter1.data.toPointwise_withLinearXYs( accuracy = None, lowerEps = lowerEps, upperEps = upperEps )
-        axes = pointwise.defaultAxes( )
-        pwl = pointwise( axes = axes )
+        axes = XYs2d.defaultAxes( )
+        pwl = XYs2d( axes = axes )
         one_eV = PQU.PQU( '1 eV' ).getValueAs( axes[-1].unit )
 
         t = tester( accuracy, 1e-10, self.evaluateAtX )
@@ -1060,16 +1107,16 @@ class energyFunctionalDataToPointwise :
                     if( data[1][0] > 1e3 * one_eV ) : data.insert( 1,  [ 1e3 * one_eV, t.evaluateAtX( 1e3 * one_eV ) ] )
                     if( data[1][0] > one_eV ) : data.insert( 1,  [ one_eV, t.evaluateAtX( one_eV ) ] )
                 data = fudgemath.thickenXYList( data, t, biSectionMax = 10 )
-            data = pdfOfEp.pointwise( data = data, value = E_in )
+            data = XYs1d( data = data, value = E_in )
             data.normalize( insitu = True )
             pwl.append( data )
         return( pwl )
 
-class energyLoss( subform, XYsModule.XYs ) :
+class energyLoss( subform, XYsModule.XYs1d ) :
 
     def __init__( self, **kwargs ) :
 
-        XYsModule.XYs.__init__( self, **kwargs )
+        XYsModule.XYs1d.__init__( self, **kwargs )
         subform.__init__( self )
 
     @staticmethod
@@ -1103,8 +1150,8 @@ class form( baseModule.form ) :
         subformClass = {
                 constant.moniker :                          constant,
                 primaryGamma.moniker :                      primaryGamma,
-                pointwise.moniker :                         pointwise,
-                piecewise.moniker :                         piecewise,
+                XYs2d.moniker :                             XYs2d,
+                regions2d.moniker :                         regions2d,
                 generalEvaporationSpectrum.moniker :        generalEvaporationSpectrum,
                 WattSpectrum.moniker :                      WattSpectrum,
                 MadlandNix.moniker :                        MadlandNix,

@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -59,10 +83,12 @@
 #include <math.h>
 #include <stdarg.h>
 
+#include <nfut_utilities.h>
 #include <ptwXY.h>
 
 static int verbose = 0;
 
+nfu_status getStatus( statusMessageReporting *smr );
 void printMsg( char const *fmt, ... );
 /*
 ****************************************************************
@@ -74,9 +100,11 @@ int main( int argc, char **argv ) {
     double uXY[] = { 1.0, 11.0, 2.66, 1.7, 3.14, 3.12, 3.66, -1.6, 7.66, 1.5 };
     double vXY[] = { 3.732, 1.760, 5.598, 4.349, 5.679, 7.934, 6.459, 4.288, 6.557, 6.787, 6.838, -0.92423, 7.1138, 6.5695 };
     int nuXY = sizeof( uXY ) / ( 2 * sizeof( double ) ), nvXY = sizeof( vXY ) / ( 2 * sizeof( double ) );
-    nfu_status status;
     FILE *ff;
     char *fmt = "%10.5f %12.5f\n";
+    statusMessageReporting smr;
+
+    smr_initialize( &smr, smr_status_Ok );
 
     nfu_setMemoryDebugMode( 0 );
 
@@ -91,11 +119,10 @@ int main( int argc, char **argv ) {
     }
     if( echo ) printf( "%s\n", __FILE__ );
 
-
-    if( ( u = ptwXY_create( ptwXY_interpolationLinLin, NULL, 3, 1e-3, 10, 10, nuXY, uXY, &status, 0 ) ) == NULL ) printMsg( "u creation: status = %d: %s", 
-        status, nfu_statusMessage( status ) );
-    if( ( v = ptwXY_create( ptwXY_interpolationLinLin, NULL, 3, 1e-3, 10, 10, nvXY, vXY, &status, 0 ) ) == NULL ) printMsg( "v creation: status = %d: %s", 
-        status, nfu_statusMessage( status ) );
+    if( ( u = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 3, 1e-3, 10, 10, nuXY, uXY, 0 ) ) == NULL )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    if( ( v = ptwXY_create( &smr, ptwXY_interpolationLinLin, NULL, 3, 1e-3, 10, 10, nvXY, vXY, 0 ) ) == NULL )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
 
     ff = fopen( "curve_u.dat", "w" );
     ptwXY_simpleWrite( u, ff, fmt );
@@ -112,42 +139,57 @@ int main( int argc, char **argv ) {
     ff = fopen( "curve_o.dat", "w" );
 
 Test = 1;                               /* This must produce a nfu_domainsNotMutual error. */
-    if( ( m = ptwXY_mul2_ptwXY( u, v, &status ) ) == NULL ) {
-        if( status != nfu_domainsNotMutual ) printMsg( "Test %d multiplication: status = %d: %s", Test, status, nfu_statusMessage( status ) ); }
+#ifdef DEBUG
+printf( "Test %d\n", Test );
+#endif
+    if( ( m = ptwXY_mul2_ptwXY( &smr, u, v ) ) == NULL ) {
+        if( getStatus( &smr ) != nfu_domainsNotMutual ) nfut_printSMRError2p( &smr, "Via." );
+        smr_release( &smr ); }
     else {
         printMsg( "Test %d multiplication: should have failed with '%s'", Test, nfu_statusMessage( nfu_domainsNotMutual ) );
         ptwXY_free( m );
     }
 
 Test = 2;                               /* This must produce a nfu_domainsNotMutual error. */
-    ptwXY_setValueAtX( v, vXY[0], 0. );
+#ifdef DEBUG
+printf( "Test %d\n", Test );
+#endif
+    if( ptwXY_setValueAtX( &smr, v, vXY[0], 0. ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
     if( verbose ) ptwXY_simpleWrite( v, stdout, fmt );
     if( verbose ) printf( "\n" );
-    if( ( m = ptwXY_mul2_ptwXY( u, v, &status ) ) == NULL ) {
-        if( status != nfu_domainsNotMutual ) printMsg( "Test %d multiplication: status = %d: %s", Test, status, nfu_statusMessage( status ) ); }
+    if( ( m = ptwXY_mul2_ptwXY( &smr, u, v ) ) == NULL ) {
+        if( getStatus( &smr ) != nfu_domainsNotMutual ) nfut_printSMRError2p( &smr, "Via." );
+        smr_release( &smr ); }
     else {
         printMsg( "Test %d multiplication: should have failed with: %s", Test, nfu_statusMessage( nfu_domainsNotMutual ) );
         ptwXY_free( m );
     }
 
 Test = 3;                               /* This must produce a nfu_domainsNotMutual error. */
-    ptwXY_setValueAtX( v, vXY[0], 1. );
-    ptwXY_setValueAtX( v, vXY[2 * ( nvXY - 1 )], 0. );
+#ifdef DEBUG
+printf( "Test %d\n", Test );
+#endif
+    if( ptwXY_setValueAtX( &smr, v, vXY[0], 1. ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
+    if( ptwXY_setValueAtX( &smr, v, vXY[2 * ( nvXY - 1 )], 0. ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
     if( verbose ) ptwXY_simpleWrite( v, stdout, fmt );
     if( verbose ) printf( "\n" );
-    if( ( m = ptwXY_mul2_ptwXY( u, v, &status ) ) == NULL ) {
-        if( status != nfu_domainsNotMutual ) printMsg( "Test %d multiplication: status = %d: %s", Test, status, nfu_statusMessage( status ) ); }
+    if( ( m = ptwXY_mul2_ptwXY( &smr, u, v ) ) == NULL ) {
+        if( getStatus( &smr ) != nfu_domainsNotMutual ) nfut_printSMRError2p( &smr, "Via." );
+        smr_release( &smr ); }
     else {
         printMsg( "Test %d multiplication: should have failed with: %s", Test, nfu_statusMessage( nfu_domainsNotMutual ) );
         ptwXY_free( m );
     }
 
 Test = 4;                               /* This must work. */
-    ptwXY_setValueAtX( v, vXY[0], 0. );
+#ifdef DEBUG
+printf( "Test %d\n", Test );
+#endif
+    if( ptwXY_setValueAtX( &smr, v, vXY[0], 0. ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
     if( verbose ) ptwXY_simpleWrite( v, stdout, fmt );
     if( verbose ) printf( "\n" );
-    if( ( m = ptwXY_mul2_ptwXY( u, v, &status ) ) == NULL ) {
-        printMsg( "Test %d multiplication: status = %d: %s", Test, status, nfu_statusMessage( status ) ); }
+    if( ( m = ptwXY_mul2_ptwXY( &smr, u, v ) ) == NULL ) {
+        nfut_printSMRError2p( &smr, "Via." ); }
     else {
         ptwXY_simpleWrite( m, ff, fmt );
         fprintf( ff, "\n" );
@@ -157,16 +199,23 @@ Test = 4;                               /* This must work. */
     }
 
 Test = 5;                               /* This must cause a nfu_divByZero error. */
-    if( ( m = ptwXY_div_ptwXY( v, u, &status, 0 ) ) == NULL ) {
-        if( status != nfu_divByZero ) printMsg( "Test %d division: status = %d: %s", Test, status, nfu_statusMessage( status ) ); }
+#ifdef DEBUG
+printf( "Test %d\n", Test );
+#endif
+    if( ( m = ptwXY_div_ptwXY( &smr, v, u, 0 ) ) == NULL ) {
+        if( getStatus( &smr ) != nfu_divByZero ) nfut_printSMRError2p( &smr, "Via." );
+        smr_release( &smr ); }
     else {
         printMsg( "Test %d division: should have failed with: %s", Test, nfu_statusMessage( nfu_divByZero ) );
         ptwXY_free( m );
     }
 
 Test = 6;                               /* This must work. */
-    if( ( m = ptwXY_div_ptwXY( v, u, &status, 1 ) ) == NULL ) {
-        printMsg( "Test %d division: status = %d: %s", Test, status, nfu_statusMessage( status ) ); }
+#ifdef DEBUG
+printf( "Test %d\n", Test );
+#endif
+    if( ( m = ptwXY_div_ptwXY( &smr, v, u, 1 ) ) == NULL ) {
+        nfut_printSMRError2p( &smr, "Via." ); }
     else {
         ptwXY_simpleWrite( m, ff, fmt );
         fprintf( ff, "\n" );
@@ -176,17 +225,25 @@ Test = 6;                               /* This must work. */
     }
 
 Test = 7;                               /* This must cause a nfu_XOutsideDomain error. */
-    if( ( m = ptwXY_div_ptwXY( u, v, &status, 1 ) ) == NULL ) {
-        if( status != nfu_XOutsideDomain ) printMsg( "Test %d division: status = %d: %s", Test, status, nfu_statusMessage( status ) ); }
+#ifdef DEBUG
+printf( "Test %d\n", Test );
+#endif
+    if( ( m = ptwXY_div_ptwXY( &smr, u, v, 1 ) ) == NULL ) {
+        if( getStatus( &smr ) != nfu_XOutsideDomain ) nfut_printSMRError2p( &smr, "Via." );
+        smr_release( &smr ); }
     else {
         printMsg( "Test %d division: should have failed with: %s", Test, nfu_statusMessage( nfu_XOutsideDomain ) );
         ptwXY_free( m );
     }
 
 Test = 8;                               /* This must cause a nfu_domainsNotMutual error. */
-    ptwXY_setValueAtX( v, vXY[0], 1. );
-    if( ( m = ptwXY_div_ptwXY( v, u, &status, 1 ) ) == NULL ) {
-        if( status != nfu_domainsNotMutual ) printMsg( "Test %d division: status = %d: %s", Test, status, nfu_statusMessage( status ) ); }
+#ifdef DEBUG
+printf( "Test %d\n", Test );
+#endif
+    if( ptwXY_setValueAtX( &smr, v, vXY[0], 1. ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
+    if( ( m = ptwXY_div_ptwXY( &smr, v, u, 1 ) ) == NULL ) {
+        if( getStatus( &smr ) != nfu_domainsNotMutual ) nfut_printSMRError2p( &smr, "Via." );
+        smr_release( &smr ); }
     else {
         printMsg( "Test %d division: should have failed with: %s", Test, nfu_statusMessage( nfu_domainsNotMutual ) );
         ptwXY_free( m );
@@ -197,6 +254,16 @@ Test = 8;                               /* This must cause a nfu_domainsNotMutua
     ptwXY_free( v );
 
     exit( EXIT_SUCCESS );
+}
+/*
+****************************************************************
+*/
+nfu_status getStatus( statusMessageReporting *smr ) {
+
+    statusMessageReport const *report = smr_firstReport( smr );
+
+    if( report == NULL ) return( nfu_Okay );
+    return( smr_getCode( report ) );
 }
 /*
 ****************************************************************

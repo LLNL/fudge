@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 """
@@ -191,13 +215,14 @@ class scatteringRadius( ancestryModule.ancestry ):
     def __init__( self, form=None ) :
 
         ancestryModule.ancestry.__init__( self )
+        form.setAncestor( self )
         self.form = form
 
     def __eq__(self, other):
         if not isinstance(other, scatteringRadius): return False
         return( self.form==other.form )
 
-    def __str__(self): return str( self.getXMLAttribute() )
+    def __str__(self): return self.form.moniker
 
     def __nonzero__(self): return bool(self.form)
 
@@ -205,7 +230,7 @@ class scatteringRadius( ancestryModule.ancestry ):
         return []
 
     def isEnergyDependent(self):
-        return isinstance( self.form, XYsModule.XYs )
+        return isinstance( self.form, XYsModule.XYs1d )
 
     def isLdependent(self):
         return isinstance(self.form, LdependentScatteringRadii)
@@ -223,13 +248,6 @@ class scatteringRadius( ancestryModule.ancestry ):
         else:
             return self.form.value.getValueAs( unit )
 
-    def toString(self, simpleString = False):
-        return ("Scattering radius: %s\n" % self.getXMLAttribute())
-
-    def getXMLAttribute( self ):
-        if isinstance(self.form, PQU.PQU ): return self.form.toString( keepPeriod = False )
-        else: return 'energyDependent'
-
     def toXMLList( self, indent = '', **kwargs ):
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
@@ -245,7 +263,7 @@ class scatteringRadius( ancestryModule.ancestry ):
         form = {
             constantScatteringRadius.moniker: constantScatteringRadius,
             LdependentScatteringRadii.moniker: LdependentScatteringRadii,
-            XYsModule.XYs.moniker: XYsModule.XYs,
+            XYsModule.XYs1d.moniker: XYsModule.XYs1d,
         }[ element[0].tag ].parseXMLNode( element[0], xPath, linkData )
         SR = cls( form )
         xPath.pop()
@@ -378,13 +396,13 @@ class resolved( ancestryModule.ancestry ):
 
     moniker = 'resolved'
 
-    def __init__(self, nativeData=None, lowerBound='', upperBound='', multipleRegions=False):
+    def __init__(self, formalism=None, lowerBound='', upperBound='', multipleRegions=False):
 
         ancestryModule.ancestry.__init__( self )
         if not multipleRegions:
-            setattr(self, nativeData.moniker, nativeData)
-        self.nativeData = nativeData
-        if self.nativeData is not None: self.nativeData.setAncestor( self )
+            setattr(self, formalism.moniker, formalism)
+        self.evaluated = formalism
+        if self.evaluated is not None: self.evaluated.setAncestor( self )
         self.lowerBound = lowerBound
         self.upperBound = upperBound
         self.multipleRegions = multipleRegions
@@ -394,7 +412,7 @@ class resolved( ancestryModule.ancestry ):
         if self.regions:
             return ("Resolved region with DEPRECATED multiple regions\n")
         else:
-            return ("Resolved resonances in %s form\n" % self.nativeData.moniker )
+            return ("Resolved resonances in %s form\n" % self.evaluated.moniker )
 
     def check( self, info ):
         import warning
@@ -416,8 +434,8 @@ class resolved( ancestryModule.ancestry ):
             lowerBound = self.lowerBound.toString( keepPeriod = False )
             upperBound = self.upperBound.toString( keepPeriod = False )
             xmlString[0] += ' lowerBound="%s" upperBound="%s" formalism="%s">' % (
-                    lowerBound, upperBound, self.nativeData.moniker )
-            xmlString += self.nativeData.toXMLList( indent2, **kwargs )
+                    lowerBound, upperBound, self.evaluated.moniker )
+            xmlString += self.evaluated.toXMLList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
@@ -438,13 +456,13 @@ class resolved( ancestryModule.ancestry ):
             regions = []
             for region in element.findall('region'):
                 resonanceSection = readResolved( region[0] )
-                thisRegion = energyInterval( nativeData = resonanceSection, **getAttrs( region, exclude=('formalism') ) )
+                thisRegion = energyInterval( formalism = resonanceSection, **getAttrs( region, exclude=('formalism') ) )
                 regions.append( thisRegion )
             RRR = resolved( multipleRegions = True )
             RRR.regions = regions
         else:
-            nativeData = readResolved(element[0])
-            RRR = resolved( nativeData, **getAttrs( element, exclude=('formalism',) ) )
+            formalism = readResolved(element[0])
+            RRR = resolved( formalism, **getAttrs( element, exclude=('formalism',) ) )
         xPath.pop()
         return RRR
 
@@ -453,16 +471,16 @@ class unresolved( ancestryModule.ancestry ):
 
     moniker = 'unresolved'
 
-    def __init__(self, nativeData, lowerBound, upperBound):
+    def __init__(self, formalism, lowerBound, upperBound):
         ancestryModule.ancestry.__init__( self )
-        setattr(self, nativeData.moniker, nativeData)
-        self.nativeData = nativeData
-        if isinstance( nativeData, ancestryModule.ancestry ): self.nativeData.setAncestor( self )
+        setattr(self, formalism.moniker, formalism)
+        self.evaluated = formalism
+        if isinstance( self.evaluated, ancestryModule.ancestry ): self.evaluated.setAncestor( self )
         self.lowerBound = lowerBound
         self.upperBound = upperBound
     
     def toString( self, simpleString = False ):
-        return ("Unresolved resonances in %s form\n" % self.nativeData.moniker )
+        return ("Unresolved resonances in %s form\n" % self.evaluated.moniker )
 
     def check( self, info ):
         from fudge.gnd import warning
@@ -488,8 +506,8 @@ class unresolved( ancestryModule.ancestry ):
         lowerBound = self.lowerBound.toString( keepPeriod = False )
         upperBound = self.upperBound.toString( keepPeriod = False )
         xmlString = [ '%s<%s lowerBound="%s" upperBound="%s" formalism="%s">' %
-                ( indent, self.moniker, lowerBound, upperBound, self.nativeData.moniker ) ]
-        xmlString += self.nativeData.toXMLList( indent2, **kwargs )
+                ( indent, self.moniker, lowerBound, upperBound, self.evaluated.moniker ) ]
+        xmlString += self.evaluated.toXMLList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
@@ -497,16 +515,16 @@ class unresolved( ancestryModule.ancestry ):
     def parseXMLNode( element, xPath, linkData ):
         xPath.append( element.tag )
         table = unresolvedTabulatedWidths.parseXMLNode( element.find('tabulatedWidths'), xPath, linkData )
-        URR = unresolved( nativeData = table, **getAttrs( element, exclude=('formalism',) ) )
+        URR = unresolved( formalism = table, **getAttrs( element, exclude=('formalism',) ) )
         xPath.pop()
         return URR
 
 
 class energyInterval:
     """ resolved region may be made up of multiple energy intervals (deprecated) """
-    def __init__(self,index, nativeData, lowerBound, upperBound):
+    def __init__(self,index, formalism, lowerBound, upperBound):
         self.index = index
-        self.nativeData = nativeData
+        self.evaluated = formalism
         self.lowerBound = lowerBound
         self.upperBound = upperBound
     
@@ -515,7 +533,7 @@ class energyInterval:
     
     def toString(self, simpleString = False):
         return ("%s resonances, %s to %s. Contains %i resonances" % 
-                (self.nativeData, self.lowerBound, self.upperBound, len(self.nativeData) ) )
+                (self.evaluated, self.lowerBound, self.upperBound, len(self.evaluated) ) )
     
     def toXMLList( self, indent = '', **kwargs ) :
 
@@ -525,9 +543,9 @@ class energyInterval:
         upperBound = self.upperBound.toString( keepPeriod = False )
         xmlString = [indent+
                 '<region index="%s" lowerBound="%s" upperBound="%s" formalism="%s">'
-                % ( self.index, lowerBound, upperBound, self.nativeData.moniker ) ]
-        if self.nativeData:
-            xmlString += self.nativeData.toXMLList( indent2, **kwargs )
+                % ( self.index, lowerBound, upperBound, self.evaluated.moniker ) ]
+        if self.evaluated:
+            xmlString += self.evaluated.toXMLList( indent2, **kwargs )
         else:
             raise Exception( "Resonance section contains no data!" )
         xmlString[-1] += '</region>'
@@ -823,7 +841,7 @@ class spinGroup( ancestryModule.ancestry ):
         return self.resonanceParameters[idx]
     
     def __len__(self):
-        return len(self.resonanceParameters)
+        return len(self.resonanceParameters.table)
     
     def __lt__(self, other):
         # for sorting spin groups by Jpi. group J values together

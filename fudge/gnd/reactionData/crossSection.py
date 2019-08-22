@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,40 +18,68 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 import math
 
 from pqu import PQU 
 
+from xData import ancestry as ancestryModule
+from xData import standards as standardsModule
 from xData import axes as axesModule
+from xData import link as linkModule
 from xData import XYs as XYsModule
 from xData import regions as regionsModule
-from xData import link as linkModule
-from xData import ancestry as ancestryModule
+from xData import gridded as griddedModule
+
+from fudge.processing import group as groupModule
 
 from fudge.gnd import abstractClasses as abstractClassesModule
-from . import base as baseModule
 from fudge.gnd import tokens as tokensModule
 from fudge.gnd import styles as stylesModule
+
+from . import base as baseModule
 
 __metaclass__ = type
 
@@ -62,17 +91,49 @@ upperEps = 1e-8
 #
 class baseCrossSectionForm( abstractClassesModule.form ) :
 
-    __genre = baseModule.crossSectionToken
+    pass
 
-class pointwise( baseCrossSectionForm, XYsModule.XYs ) :
+class XYs1d( baseCrossSectionForm, XYsModule.XYs1d ) :
 
     mutableYUnit = False
 
     def __init__( self, **kwargs ) :
 
-        XYsModule.XYs.__init__( self, **kwargs )
+        XYsModule.XYs1d.__init__( self, **kwargs )
 
-    def heat( self, ancestors, temperature, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.002, heatAllPoints = False, 
+    def changeInterpolation( self, interpolation, accuracy = None, lowerEps = 0, upperEps = 0, cls = None ) :
+
+        def func( x, parameters ) :
+
+            self, T, subParameters = parameters
+            x1, y1, x2, y2, f1, f2 = subParameters
+            if( ( x is None ) or ( x < x1 ) or ( x > x2 ) ) :
+                index = self.lowerIndexBoundingX( x )
+                x1, y1 = self[index]
+                if( ( index + 1 ) == len( self ) ) : return( y1 )
+                x2, y2 = self[index+1]
+                f1 = 1 / math.sqrt( x1 - T )
+                f2 = 1 / math.sqrt( x2 - T )
+                parameters[2] = [ x1, y1, x2, y2, f1, f2 ]
+
+            if( x == x1 ) : return( y1 )
+            if( x == x2 ) : return( y2 )
+            f = 1 / math.sqrt( x - T )
+            alpha = ( f - f1 ) / ( f2 - f1 )
+            return( math.pow( x1 * y1, 1 - alpha ) * math.pow( x2 * y2, alpha ) / x )
+
+        if( cls is None ) : cls =XYs1d 
+        if( self.interpolation == standardsModule.interpolation.chargedParticleToken ) :
+            if( interpolation != standardsModule.interpolation.linlinToken ) : raise TypeError( 'Only "%s" interpolation for conversion from %s' %
+                    ( standardsModule.interpolation.linlinToken, self.interpolation ) )
+            temp = self.cloneToInterpolation( )
+            parameters = [ temp, 0, [ None, None, None, None, None, None ] ]
+            return( temp.applyFunction( func, parameters, accuracy = accuracy, biSectionMax = -1, checkForRoots = False ) )
+
+        return( XYsModule.XYs1d.changeInterpolation( self, interpolation, accuracy = accuracy, lowerEps = lowerEps,
+                upperEps = upperEps, cls = cls ) )
+
+    def heat( self, ancestor, temperature, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.002, heatAllPoints = False, 
             doNotThin = True, heatBelowThreshold = True, heatAllEDomain = True ) :
         """
         Returns a linear version of the cross section heated to 'temperature'. If the current temperature of the cross section
@@ -89,21 +150,24 @@ class pointwise( baseCrossSectionForm, XYsModule.XYs ) :
         from crossSectionAdjustForHeatedTarget import heat
         from pqu import PQU
 
-        gotT = currentTemperature = ancestors.findAttributeInAncestry( 'getTemperature' )( self.label )
+        styles = ancestor.findAttributeInAncestry( 'styles' )
+        from fudge.core.utilities import brb
+        evaluated = styles.getEvaluatedStyle( )
+        gotT = currentTemperature = evaluated.temperature
         if( gotT.isTemperature( ) ) : gotT = PQU.PQU( gotT.getValueAs( 'K' ), 'K' ) * PQU.PQU( '1 k' )
         gotT = gotT.getValueAs( self.domainUnit( ) )
 
         if( isinstance( temperature, str ) ) : temperature = PQU.PQU( temperature )
-        temperature_ = temperature
+        _temperature = temperature
         if( temperature.isTemperature( ) ) :
-            temperature_ = PQU.PQU( temperature.getValueAs( 'K' ), 'K' ) * PQU.PQU( '1 k' )
-        wantedT = temperature_.getValueAs( self.domainUnit( ) )
+            _temperature = PQU.PQU( temperature.getValueAs( 'K' ), 'K' ) * PQU.PQU( '1 k' )
+        wantedT = _temperature.getValueAs( self.domainUnit( ) )
 
         dT = wantedT - gotT
         if( abs( dT ) <= 1e-2 * wantedT ) : dT = 0.
         if( dT < 0 ) : raise Exception( 'Current temperature "%s" (%.4e) higher than desired temperature "%s" (%.4e)' % ( currentTemperature, gotT, temperature, wantedT ) ) 
 
-        projectile, target = ancestors.findAttributeInAncestry( 'projectile' ), ancestors.findAttributeInAncestry( 'target' )
+        projectile, target = ancestor.findAttributeInAncestry( 'projectile' ), ancestor.findAttributeInAncestry( 'target' )
         if( projectile.getMass( 'amu' ) == 0 ) : raise Exception( 'Heating with gamma as projectile not supported.' )
         massRatio = target.getMass( 'amu' ) / projectile.getMass( 'amu' )
 
@@ -120,43 +184,32 @@ class pointwise( baseCrossSectionForm, XYsModule.XYs ) :
                 if( domainMin < 0.04 * unheated.domainMin( ) ) : lowerlimit = "threshold"
             if( upperlimit is None ) : upperlimit = 'constant'
 
-            heated = heat.crossSectionAdjustForHeatedTarget( massRatio, dT, EMin_, unheated, lowerlimit = lowerlimit, \
+            heated = heat.crossSectionAdjustForHeatedTarget( massRatio, dT, EMin_, unheated, lowerlimit = lowerlimit,
                 upperlimit = upperlimit, interpolationAccuracy = interpolationAccuracy, heatAllPoints = heatAllPoints, doNotThin = doNotThin,
                 heatAllEDomain = heatAllEDomain )
         accuracy = max( interpolationAccuracy, self.getAccuracy( ) )
-        return( pointwise( data = heated, axes = unheated.axes, accuracy = accuracy ) )
+        return( XYs1d( data = heated, axes = unheated.axes, accuracy = accuracy ) )
 
-    def process( self, component_, processInfo, tempInfo, verbosityIndent ) :
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
 
-        from fudge.processing import miscellaneousModule
+        from fudge.processing import miscellaneous as miscellaneousModule
 
-        if( processInfo.verbosity >= 20 ) : print '%sprocessing pointwise cross section' % verbosityIndent
-        projectile, target = processInfo.getProjectileName( ), processInfo.getTargetName( )
-        forms = []
+        if( tempInfo['verbosity'] > 2 ) : print '%sProcessing XYs1d cross section' % indent
 
-        if( 'LLNL_Pn' in processInfo['styles'] ) :
-            crossSection = miscellaneousModule.groupOneFunctionAndFlux( projectile, processInfo, self )
-            tempInfo['groupedCrossSectionNorm'] = crossSection
-
-            groupedFlux = tempInfo['groupedFlux']
-            crossSectionGrouped_ = [ crossSection[i] / groupedFlux[i] for i in xrange( len( crossSection ) ) ]
-
-            axes = self.axes.copy( standAlone = True )
-            forms.append( grouped( axes, crossSectionGrouped_ ) )
-
-        return( forms )
+        crossSectionGrouped = miscellaneousModule.groupOneFunctionAndFlux( style, tempInfo, self )
+        return( groupModule.toMultiGroup1d( multiGroup, style, tempInfo, self.axes, crossSectionGrouped ) )
 
     def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
 
-        ptw = XYsModule.XYs.toPointwise_withLinearXYs( self, lowerEps = lowerEps, upperEps = upperEps, cls = pointwise )
+        ptw = XYsModule.XYs1d.toPointwise_withLinearXYs( self, lowerEps = lowerEps, upperEps = upperEps, cls = XYs1d )
         ptw.label = self.label
         return( ptw )
 
     def toXMLList( self, indent = "", **kwargs ) :
 
-        return( XYsModule.XYs.toXMLList( self, indent, **kwargs ) )
+        return( XYsModule.XYs1d.toXMLList( self, indent, **kwargs ) )
 
-class piecewise( baseCrossSectionForm, regionsModule.regions ) :
+class regions1d( baseCrossSectionForm, regionsModule.regions1d ) :
     """
     This class stores a cross section in two or more regions, which may have different interpolations.
     Each region must contain at least two points. Each pair of adjacent regions must overlap at exactly one point.
@@ -164,50 +217,52 @@ class piecewise( baseCrossSectionForm, regionsModule.regions ) :
 
     def __init__( self, **kwargs ) :
 
-        if( 'dimension' not in kwargs ) : kwargs['dimension'] = 1
-        if( kwargs['dimension'] != 1 ) : raise ValueError( 'Dimension = %s != 1' % ( kwargs['dimension'] ) )
-        regionsModule.regions.__init__( self, **kwargs )
+        regionsModule.regions1d.__init__( self, **kwargs )
+
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
+
+        linear = self.toPointwise_withLinearXYs( 1e-8, 1e-8 )
+        return( linear.processSnMultiGroup( style, tempInfo, indent ) )
 
     def toLinearXYsClass( self ) :
 
-        return( pointwise )
+        return( XYs1d )
 
     def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
 
         accuracy = 1e-3
         if( len( self ) > 0 ) : accuracy = self[0].getAccuracy( )
-        xys = regionsModule.regions.toPointwise_withLinearXYs( self, accuracy, lowerEps, upperEps )
-        return( pointwise( data = xys, axes = xys.axes, accuracy = xys.getAccuracy( ) ) )
+        xys = regionsModule.regions1d.toPointwise_withLinearXYs( self, accuracy, lowerEps, upperEps )
+        return( XYs1d( data = xys, axes = xys.axes, accuracy = xys.getAccuracy( ) ) )
 
-class grouped( abstractClassesModule.multiGroup ) :
+class multiGroup( baseCrossSectionForm, griddedModule.gridded ) :
 
-    __genre = baseModule.crossSectionToken
+    def __init__( self, **kwargs ) :
 
-    def __init__( self, axes, groupData ) :
-
-        abstractClassesModule.multiGroup.__init__( self, axes, groupData )
+        griddedModule.gridded.__init__( self, **kwargs )
 
 class resonanceLink( linkModule.link ) :
 
     moniker = 'resonanceRegion'
-    __genre = baseModule.crossSectionToken
 
 class resonancesWithBackground( baseCrossSectionForm ) :
     """
     This class stores cross sections that include resonances along with a background contribution.
-    Contains a link to the resonances, and the 'background' which could be pointwise or piecewise data.
-    The full pointwise cross section can be obtained by first reconstructing resonances
+    Contains a link to the resonances, and the 'background' which could be XYs1d or regions1d data.
+    The full XYs1d cross section can be obtained by first reconstructing resonances
     and then adding the background contribution (users should use the reactionSuite.reconstructResonances method).
     """
 
     moniker = tokensModule.resonancesWithBackgroundFormToken
 
     def __init__( self, label, tabulatedData, resonanceLink ) :
-        
+
+        baseCrossSectionForm.__init__( self )
         self.link = resonanceLink
         self.tabulatedData = tabulatedData
-        self.tabulatedData.attribute = self.tabulatedData.label = None
-        self.tabulatedData.ancestor = self
+        self.tabulatedData.attribute = None
+        self.tabulatedData.label = None
+        self.tabulatedData.setAncestor( self )
 
         if( label is not None ) :
             if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must be a string' )
@@ -223,7 +278,7 @@ class resonancesWithBackground( baseCrossSectionForm ) :
 
     def findEntity( self, entityName, attribute = None, value = None ):
 
-        if entityName in (pointwise.moniker, piecewise.moniker):
+        if entityName in ( XYs1d.moniker, regions1d.moniker ) :
             return self.tabulatedData
         return ancestryModule.ancestry.findEntity( self, entityName, attribute, value )
 
@@ -263,11 +318,11 @@ class resonancesWithBackground( baseCrossSectionForm ) :
     def parseXMLNode( element, xPath, linkData ) :
 
         xPath.append( element.tag )
-        xlink = resonanceLink.parseXMLNode( element.find('resonanceRegion') )
+        xlink = resonanceLink.parseXMLNode( element.find('resonanceRegion'), xPath, linkData )
         form = element[1]
-        formClass = {pointwise.moniker: pointwise,
-                piecewise.moniker: piecewise,
-                weightedPointwise.moniker: weightedPointwise,
+        formClass = {   XYs1d.moniker               : XYs1d,
+                        regions1d.moniker           : regions1d,
+                        weightedPointwise.moniker   : weightedPointwise,
                 }.get( form.tag )
         if formClass is None: raise Exception("encountered unknown cross section form: %s" % form.tag)
         resWithBack = resonancesWithBackground( element.get( 'label' ), formClass.parseXMLNode(form,xPath,linkData), xlink )
@@ -279,9 +334,9 @@ class reference( linkModule.link, baseCrossSectionForm ) :
 
     moniker = tokensModule.referenceFormToken
 
-    def __init__( self, link = None, root = None, path = None, label = None ) :
+    def __init__( self, link = None, root = None, path = None, label = None, relative = False ) :
 
-        linkModule.link.__init__(self, link = link, root = root, path = path, label = label )
+        linkModule.link.__init__(self, link = link, root = root, path = path, label = label, relative = relative )
         baseCrossSectionForm.__init__( self )
 
     @property
@@ -316,6 +371,15 @@ class reference( linkModule.link, baseCrossSectionForm ) :
             raise Exception( 'crossSection argument must be a cross section component not type %s' % type( crossSection ) )
         self.crossSection = crossSection
 
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
+
+        addToComponent = tempInfo.get( 'addToComponent', None )
+        tempInfo['addToComponent'] = False
+        multiGroup = self.crossSection.processSnMultiGroup( style, tempInfo, indent )
+        tempInfo['addToComponent'] = addToComponent
+        if( addToComponent is None ) : del tempInfo['addToComponent']
+        return( multiGroup )
+
     def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
 
         return( self.crossSection.toPointwise_withLinearXYs( lowerEps, upperEps ) )
@@ -342,6 +406,7 @@ class weightedPointwise( baseCrossSectionForm ) :
 
     def __init__( self, label, crossSection, weights ) :
 
+        baseCrossSectionForm.__init__( self )
         self.setReference( crossSection )
         self.weights = weights
 
@@ -377,7 +442,7 @@ class weightedPointwise( baseCrossSectionForm ) :
     def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
 
         xys = self.crossSection.toPointwise_withLinearXYs( lowerEps, upperEps ) * self.weights
-        return( pointwise( data = xys, axes = xys.axes, accuracy = xys.getAccuracy( ) ) )
+        return( XYs1d( data = xys, axes = xys.axes, accuracy = xys.getAccuracy( ) ) )
 
     def toXMLList( self, indent = "", **kwargs ) :
 
@@ -395,7 +460,7 @@ class weightedPointwise( baseCrossSectionForm ) :
     def parseXMLNode( WPelement, xPath, linkData, **kwargs ) :
 
         xlink = linkModule.link.parseXMLNode(WPelement).path
-        weights = XYsModule.XYs.parseXMLNode( WPelement[0], xPath, linkData )
+        weights = XYsModule.XYs1d.parseXMLNode( WPelement[0], xPath, linkData )
         ref = weightedPointwise( None, weights )
         if 'unresolvedLinks' in linkData: linkData['unresolvedLinks'].append((xlink, ref))
         return ref
@@ -420,12 +485,11 @@ def chargeParticle_changeInterpolationSubFunction( threshold, x, x1, y1, x2, y2 
 class component( abstractClassesModule.component ) :
 
     moniker = baseModule.crossSectionToken
-    __genre = baseModule.crossSectionToken
 
     def __init__( self ) :
 
         abstractClassesModule.component.__init__( self,
-                ( pointwise, piecewise, grouped, resonanceLink, resonancesWithBackground, reference, weightedPointwise ) )
+                ( XYs1d, regions1d, multiGroup, resonanceLink, resonancesWithBackground, reference, weightedPointwise ) )
 
     def domainMin( self, unitTo = None, asPQU = False ) :
 
@@ -451,14 +515,14 @@ class component( abstractClassesModule.component ) :
     def hasLinearForm( self ) :
 
         for form in self :
-            if( isinstance( form, pointwise ) ) :
+            if( isinstance( form, XYs1d ) ) :
                 if( form.isInterpolationLinear( ) ) : return( form )
         return( None )
 
     def heat( self, temperature, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.002, 
             heatAllPoints = False, doNotThin = True, heatBelowThreshold = True, heatAllEDomain = True ) : 
         """
-        Returns the result of self.toPointwise_withLinearXYs( ).heat( ... ). See method pointwise.heat for more information.
+        Returns the result of self.toPointwise_withLinearXYs( ).heat( ... ). See method XYs1d.heat for more information.
         """
 
         return( self.toPointwise_withLinearXYs( ).heat( self, temperature, EMin, lowerlimit, upperlimit, 
@@ -523,7 +587,7 @@ class component( abstractClassesModule.component ) :
             linearCrossSection = evaluatedCrossSection.link[info['reconstructedStyle']]
 
         else:
-            # can it be converted to pointwise linear?
+            # can it be converted to XYs1d linear?
             try:
                 linearCrossSection = evaluatedCrossSection.toPointwise_withLinearXYs(0,1e-8)
             except Exception as e:
@@ -543,16 +607,6 @@ class component( abstractClassesModule.component ) :
 
         return warnings
 
-    def process( self, processInfo, tempInfo, verbosityIndent ) :
-        """
-        Process self into a form suitable for a specific application.
-        """
-
-        crossSection = self.toPointwise_withLinearXYs( )
-        forms = crossSection.process( self, processInfo, tempInfo, verbosityIndent )
-        for form in forms : self.add( form )
-        return( crossSection )
-        
     def findEntity( self, entityName, attribute = None, value = None ):
 
         for form in self :
@@ -576,34 +630,65 @@ class component( abstractClassesModule.component ) :
         ptwise = self.hasLinearForm()
         if ptwise is None: ptwise = self.toPointwise_withLinearXYs(lowerEps=lowerEps, upperEps=upperEps)
 
-        meanValue = ptwise.evaluate( E.getValueAs( ptwise.domainUnit( ) ) )
+        EinDomainUnit = E.getValueAs( ptwise.domainUnit( ) )
+        if EinDomainUnit < ptwise.domainMin() or EinDomainUnit > ptwise.domainMax(): meanValue = 0.0
+        else: meanValue = ptwise.evaluate( EinDomainUnit )
 
         # We might be done
         if not useCovariance: return PQU.PQU( meanValue, unit=ptwise.rangeUnit() )
 
         # Get that the covariance goes with the data.
+        covariance = self.getMatchingCovariance(covariance,covarianceSuite)
+
+        if covariance is None: return PQU.PQU( meanValue, unit = ptwise.rangeUnit() )
+        else:
+            return( PQU.PQU(
+                meanValue,
+                unit = ptwise.rangeUnit(),
+                uncertainty = covariance.getUncertaintyVector( self.evaluated, relative = False ).evaluate(EinDomainUnit) ) )
+
+#        if covariance is None:
+#            if hasattr(self.evaluated, 'uncertainties') and self.evaluated.uncertainties:
+#                if hasattr(self.evaluated.uncertainties[0].data,'link'):
+#                    covariance = self.evaluated.uncertainties[0].data.link['eval']
+#                elif covarianceSuite is not None:
+#                    covariance = self.evaluated.uncertainties[0].data.follow(startNode=covarianceSuite)['eval']
+#                else: return PQU.PQU( meanValue, unit = ptwise.rangeUnit() )
+#            else: return PQU.PQU( meanValue, unit = ptwise.rangeUnit() )
+#        else:
+#            if covariance is not( isinstance( covariance, covModule.covarianceMatrix ) ):
+#                raise TypeError( 'covariance must be of type covarianceMatrix, got %s'%str(type(covariance)))
+
+#        # Compute uncertainty on convolution given mean value and covariance.
+#        try:
+#            uncertainty = covariance.getUncertaintyVector( self.evaluated, relative = False ).evaluate( EinDomainUnit )
+#        except:
+#            print "WARNING: could not get uncertainty in evaluateWithUncertainty for %s" % str(covariance.__class__)
+#            return PQU.PQU( meanValue, unit = ptwise.rangeUnit() )
+#        if uncertainty is None:
+
+#        # We haven't changed units on uncertainty or the meanValue, so we can reconstruct the physical quantity easily.
+#        return( PQU.PQU( meanValue, unit = ptwise.rangeUnit(), uncertainty = uncertainty.evaluate(EinDomainUnit) ) )
+
+    def getMatchingCovariance(self, covariance = None, covarianceSuite = None):
+        '''
+        Retrieve the uncertainty that goes with this cross section, if we can find it
+        :return:
+        '''
+        import fudge.gnd.covariances.base as covModule
+
+        # Get that the covariance goes with the data.
         if covariance is None:
             if hasattr(self.evaluated, 'uncertainties') and self.evaluated.uncertainties:
                 if hasattr(self.evaluated.uncertainties[0].data,'link'):
-                    covariance = self.evaluated.uncertainties[0].data.link.forms['eval']
+                    covariance = self.evaluated.uncertainties[0].data.link['eval']
                 elif covarianceSuite is not None:
-                    covariance = self.evaluated.uncertainties[0].data.follow(startNode=covarianceSuite).forms['eval']
-                else: return PQU.PQU( meanValue, unit = ptwise.rangeUnit() )
-            else: return PQU.PQU( meanValue, unit = ptwise.rangeUnit() )
+                    covariance = self.evaluated.uncertainties[0].data.follow(startNode=covarianceSuite)['eval']
         else:
             if covariance is not( isinstance( covariance, covModule.covarianceMatrix ) ):
                 raise TypeError( 'covariance must be of type covarianceMatrix, got %s'%str(type(covariance)))
 
-        # Compute uncertainty on convolution given mean value and covariance.
-        try:
-            uncertainty = covariance.getUncertaintyVector( self.evaluated, relative = False )\
-                                                       .evaluate( E.getValueAs( ptwise.domainUnit( ) ) )
-        except:
-            print "WARNING: could not get uncertainty in evaluateWithUncertainty for %s" % str(covariance.__class__)
-            return PQU.PQU( meanValue, unit = ptwise.rangeUnit() )
-
-        # We haven't changed units on uncertainty or the meanValue, so we can reconstruct the physical quantity easily.
-        return( PQU.PQU( meanValue, unit = ptwise.rangeUnit(), uncertainty = uncertainty ) )
+        return covariance
 
     def integrateTwoFunctionsWithUncertainty( self, f2, domainMin = None, domainMax = None, useCovariance = True, covariance = None, covarianceSuite = None, normalize = False ) :
         '''
@@ -612,7 +697,7 @@ class component( abstractClassesModule.component ) :
         provided, the uncertainty on the spectrum integral will be computed.
 
         :param f2: spectrum over which to average
-        :type f2: XYs instance
+        :type f2: XYs1d instance
         :param domainMin: Lower integration limit.
             If None (the default), then the lower limit of self's domain is used
         :type domainMin: PQU or None
@@ -650,9 +735,9 @@ class component( abstractClassesModule.component ) :
 
         '''
         # Check that the inputs are of the correct type
-        if not isinstance( f2, XYsModule.XYs ): raise TypeError( "spectrum must be an XYs instance")
+        if not isinstance( f2, XYsModule.XYs1d ): raise TypeError( "spectrum must be an XYs1d instance")
 
-        # Convert the cross section to pointwise
+        # Convert the cross section toXYs1d 
         ptwise = self.hasLinearForm()
         if ptwise is None: ptwise = self.toPointwise_withLinearXYs(lowerEps=lowerEps, upperEps=upperEps)
 
@@ -666,34 +751,41 @@ class component( abstractClassesModule.component ) :
         meanValue = ptwise.integrateTwoFunctions(f2,domainMin,domainMax)
 
         # Normalize the mean if we're averaging
-        if normalize:
+        if normalize and meanValue.value != 0.0:
             norm = f2.integrate(domainMin,domainMax)
+            if norm.value == 0.0: raise ValueError('zero norm (%s) while integrating function with %s '%(str(norm),str(self.ancestor.ancestor)))
             meanValue = meanValue/norm
 
         # We might be done
         if not useCovariance: return meanValue # already a PQU
 
         # Get that the covariance goes with the data.
-        import fudge.gnd.covariances.base as covModule
-        if covariance is None:
-            if hasattr(self.evaluated, 'uncertainties') and self.evaluated.uncertainties:
-                if hasattr(self.evaluated.uncertainties[0].data,'link'):
-                    covariance = self.evaluated.uncertainties[0].data.link
-                elif covarianceSuite is not None:
-                    covariance = self.evaluated.uncertainties[0].data.follow(startNode=covarianceSuite)
-                else: return meanValue
-            else: return meanValue # already a PQU
-        else:
-            if covariance is not( isinstance( covariance, covModule.covarianceMatrix ) ):
-                raise TypeError( 'covariance must be of type covarianceMatrix, got %s'%str(type(covariance)))
+        covariance = self.getMatchingCovariance(covariance,covarianceSuite)
+
+#        # Get that the covariance goes with the data.
+#        import fudge.gnd.covariances.base as covModule
+#        if covariance is None:
+#            if hasattr(self.evaluated, 'uncertainties') and self.evaluated.uncertainties:
+#                if hasattr(self.evaluated.uncertainties[0].data,'link'):
+#                    covariance = self.evaluated.uncertainties[0].data.link
+#                elif covarianceSuite is not None:
+#                    covariance = self.evaluated.uncertainties[0].data.follow(startNode=covarianceSuite)
+#                else: return meanValue
+#            else: return meanValue # already a PQU
+#        else:
+#            if covariance is not( isinstance( covariance, covModule.covarianceMatrix ) ):
+#                raise TypeError( 'covariance must be of type covarianceMatrix, got %s'%str(type(covariance)))
+
+        if covariance is None: return meanValue
+
         try:
-            theCovariance = covariance.forms['eval'].toCovarianceMatrix() # may be redundant, but at least we'll get a usable data type
+            theCovariance = covariance['eval'].toCovarianceMatrix() # may be redundant, but at least we'll get a usable data type
         except:
-            print "WARNING: could not get covariance in integrateTwoFunctionsWithUncertainty for form %s" % str(covariance.forms['eval'].__class__)
+            print "WARNING: could not get covariance in integrateTwoFunctionsWithUncertainty for form %s" % str(covariance['eval'].__class__)
             return meanValue
 
         # Compute weighting vector from spectrum and possibly the cross section (if covariance is relative)
-        grid = theCovariance.matrix.axes[-1].grid
+        grid = theCovariance.matrix.axes[-1].values
         gridUnit = theCovariance.matrix.axes[-1].unit
         covGroupBdries = list(grid)
         if theCovariance.type == 'absolute':
@@ -709,14 +801,14 @@ class component( abstractClassesModule.component ) :
         coco = ( phi * theArray * phi.T )[0,0]
         if coco < 0.0: print "WARNING: covariance of spectrum integral is %s < 0.0"%str(coco)
         uncertainty = PQU.PQU( math.sqrt( max( coco, 0.0 ) ), unit=meanValue.unit )
-        if normalize: uncertainty = uncertainty/norm
+        if normalize and meanValue.value != 0.0: uncertainty = uncertainty/norm
 
         # it worked, return result
         return PQU.PQU( meanValue.value, unit=meanValue.unit, uncertainty=uncertainty.getValueAs(meanValue.unit) )
 
 def parseXMLNode( crossSectionElement, xPath, linkData ):
     """
-    Reads an xml <crossSection> element into fudge, including all cross section forms (pointwise, piecewise, etc.)
+    Reads an xml <crossSection> element into fudge, including all cross section forms (XYs1d, regions1d, etc.)
     contained inside the crossSection.
     """
 
@@ -725,10 +817,10 @@ def parseXMLNode( crossSectionElement, xPath, linkData ):
 
     for form in crossSectionElement :
         formClass = { 
-                pointwise.moniker :   pointwise,
-                piecewise.moniker :   piecewise,
-                reference.moniker :   reference,
-                resonancesWithBackground.moniker :   resonancesWithBackground,
+                XYs1d.moniker                       : XYs1d,
+                regions1d.moniker                   : regions1d,
+                reference.moniker                   : reference,
+                resonancesWithBackground.moniker    : resonancesWithBackground,
             }.get( form.tag )
         if( formClass is None ) : raise Exception( "unknown cross section form: %s" % form.tag )
         newForm = formClass.parseXMLNode( form, xPath = xPath, linkData = linkData )

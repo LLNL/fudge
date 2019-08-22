@@ -14,7 +14,7 @@
 
        Find definitions of some common data containers at the end of the schema. 
        For example, a crossSection element often contains pointwise or piecewise data,
-       which inherit from the 'xData_1d' and 'regionsXYs' data containers. -->
+       which inherit from the 'xData_XYs1d' and 'xData_regions_1d' data containers. -->
 
 
   <!-- We start by defining <reactionSuite>, the root element of a GND file.
@@ -170,7 +170,7 @@
       <xs:choice>
         <xs:element name="constant" type="constantScatteringRadius"/>
         <xs:element name="Ldependent"/>
-        <xs:element name="XYs" type="xData_1d_primary"/>
+        <xs:element name="XYs1d" type="xData_XYs1d_primary"/>
       </xs:choice>
       <xs:attribute name="lowerBound" type="PhysicalQuantity"/>
       <xs:attribute name="upperBound" type="PhysicalQuantity"/>
@@ -503,8 +503,8 @@
   <xs:element name="crossSection">
     <xs:complexType>
       <xs:choice maxOccurs="unbounded">
-        <xs:element name="XYs" type="xData_1d_primary"/>
-        <xs:element name="regions" type="xData_regions_1d_primary"/>
+        <xs:element name="XYs1d" type="xData_XYs1d_primary"/>
+        <xs:element name="regions1d" type="xData_regions_1d_primary"/>
         <xs:element name="resonancesWithBackground"/>
         <xs:element name="reference" type="xlink"/>
 <!--      do these still appear?
@@ -520,8 +520,8 @@
         <xs:sequence>
           <xs:element name="resonanceRegion" type="xlink"/>
           <xs:choice>
-            <xs:element name="XYs" type="xData_1d_primary"/>
-            <xs:element name="regions" type="xData_regions_1d_primary"/>
+            <xs:element name="XYs1d" type="xData_XYs1d_primary"/>
+            <xs:element name="regions1d" type="xData_regions_1d_primary"/>
           </xs:choice>
         </xs:sequence>
         <xs:attribute name="style" type="xs:string" use="required"/>
@@ -547,7 +547,7 @@
   <xs:complexType name="Q">
     <xs:choice>
       <xs:element name="constant" type="constantQValue"/>
-      <xs:element name="pointwise" type="xData_1d"/>
+      <xs:element name="pointwise" type="xData_XYs1d"/>
     </xs:choice>
   </xs:complexType>
 
@@ -559,25 +559,11 @@
     </xs:complexType>
 
   <!-- products of a reaction are listed within 'outputChannel'. If a product decays, the 
-      resulting decay products are listed within 'decayChannel' -->
+      resulting decay products are listed within another 'outputChannel' -->
     <xs:complexType name="outputChannel">
       <xs:sequence>
         <xs:element name="Q" type="Q"/>
         <xs:element minOccurs="0" name="fissionEnergyReleased" type="fissionEnergyReleased"/>
-        <xs:element name="products">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element ref="product" maxOccurs="unbounded"/>
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
-      </xs:sequence>
-      <xs:attribute name="genre" type="xs:NCName" use="required"/>
-    </xs:complexType>
-
-    <xs:complexType name="decayChannel">
-      <xs:sequence>
-        <xs:element name="Q" type="Q"/>
         <xs:element name="products">
           <xs:complexType>
             <xs:sequence>
@@ -613,13 +599,13 @@
       <xs:attribute name="label" type="xs:NCName" use="required"/>
     </xs:complexType>
 
-  <!-- outputChannel and decayChannel both contain a list of products: -->
+  <!-- outputChannel contains a list of products: -->
   <xs:element name="product">
     <xs:complexType>
       <xs:sequence>
         <xs:element name="multiplicity" type="multiplicity"/>
         <xs:element name="distribution" type="distribution"/>
-        <xs:element minOccurs="0" name="decayChannel" type="decayChannel"/>
+        <xs:element minOccurs="0" name="outputChannel" type="outputChannel"/>
         <xs:element minOccurs="0" name="depositionEnergy" type="depositionEnergy"/>
       </xs:sequence>
       <xs:attribute name="name" type="xs:string" use="required"/>
@@ -640,9 +626,9 @@
     <xs:complexType name="multiplicity">
       <xs:choice minOccurs="1">
         <xs:element name="constant" type="constantMultiplicity"/>
-        <xs:element name="XYs" type="xData_1d_primary"/>
-        <xs:element name="regions" type="xData_regions_1d_primary"/>
-        <xs:element name="series" type="xData_series_1d_primary"/>
+        <xs:element name="XYs1d" type="xData_XYs1d_primary"/>
+        <xs:element name="regions1d" type="xData_regions_1d_primary"/>
+        <xs:element name="polynomial1d" type="xData_polynomial_1d_primary"/>
         <xs:element name="reference" type="xlink"/>
         <xs:element ref="weightedReference"/>
         <xs:element name="unknown"/>
@@ -658,17 +644,9 @@
         <xs:complexType>
           <xs:sequence>
             <xs:element name="reference" type="xlink"/>
-            <xs:element name="XYs" type="xData_1d_primary"/>
+            <xs:element name="XYs1d" type="xData_XYs1d_primary"/>
           </xs:sequence>
           <xs:attribute name="label" type="xs:NCName" use="required"/>
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="weights">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="XYs" type="xData_1d_primary"/>
-          </xs:sequence>
-          <xs:attribute name="nativeData" type="xs:NCName" use="required"/>
         </xs:complexType>
       </xs:element>
 
@@ -700,8 +678,8 @@
     <!-- distribution components (angular, energy, etc) -->
     <xs:complexType name="angularTwoBody">
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element name="multiD_XYs" type="xData_2d_primary"/>
-        <xs:element name="regions" type="xData_regions_2d_primary"/>
+        <xs:element name="XYs2d" type="xData_XYs2d_primary"/>
+        <xs:element name="regions2d" type="xData_regions_2d_primary"/>
         <xs:element name="isotropic" type="isotropic"/>
         <xs:element name="recoil" type="xlink"/>
       </xs:choice>
@@ -720,15 +698,15 @@
 
     <xs:complexType name="angular_uncorrelated">
       <xs:choice maxOccurs="1">
-        <xs:element name="multiD_XYs" type="xData_2d_primary"/>
+        <xs:element name="XYs2d" type="xData_XYs2d_primary"/>
         <xs:element name="isotropic" type="isotropic"/>
       </xs:choice>
     </xs:complexType>
 
     <xs:complexType name="energy_uncorrelated">
       <xs:choice maxOccurs="1">
-        <xs:element name="multiD_XYs" type="xData_2d_primary"/>
-        <xs:element name="regions" type="xData_regions_2d_primary"/>
+        <xs:element name="XYs2d" type="xData_XYs2d_primary"/>
+        <xs:element name="regions2d" type="xData_regions_2d_primary"/>
         <xs:element name="generalEvaporation" type="generalEvaporation"/>
         <xs:element name="constant" type="constantEnergyDistribution"/>
         <xs:element name="NBodyPhaseSpace" type="NBodyPhaseSpace"/>
@@ -745,16 +723,23 @@
       <xs:complexType name="isotropic"/>
 
       <!-- uncorrelated energy distribution forms -->
+
+        <xs:complexType name="energyFunctionalData">
+          <xs:sequence>
+            <xs:element name="XYs1d" type="xData_XYs1d_primary"/>
+          </xs:sequence>
+        </xs:complexType>
+
         <xs:complexType name="evaporation">
           <xs:sequence>
-            <xs:element name="XYs" type="xData_1d_primary"/>
+            <xs:element name="theta" type="energyFunctionalData"/>
           </xs:sequence>
           <xs:attribute name="U" type="PhysicalQuantity" use="required"/>
         </xs:complexType>
 
         <xs:complexType name="MadlandNix">
           <xs:sequence>
-            <xs:element name="XYs" type="xData_1d_primary"/>
+            <xs:element name="T_M" type="energyFunctionalData"/>
           </xs:sequence>
           <xs:attribute name="EFL" type="PhysicalQuantity" use="required"/>
           <xs:attribute name="EFH" type="PhysicalQuantity" use="required"/>
@@ -762,22 +747,23 @@
 
         <xs:complexType name="Watt">
           <xs:sequence>
-            <!-- contains two XYs lists for parameters 'a' and 'b' -->
-            <xs:element name="XYs" type="xData_1d_primary" minOccurs="2" maxOccurs="2"/>
+            <xs:element name="a" type="energyFunctionalData"/>
+            <xs:element name="b" type="energyFunctionalData"/>
           </xs:sequence>
           <xs:attribute name="U" type="PhysicalQuantity" use="required"/>
         </xs:complexType>
 
         <xs:complexType name="generalEvaporation">
           <xs:sequence>
-            <xs:element name="XYs" type="xData_1d_primary" minOccurs="2" maxOccurs="2"/>
+            <xs:element name="theta" type="energyFunctionalData"/>
+            <xs:element name="g" type="energyFunctionalData"/>
           </xs:sequence>
           <xs:attribute name="U" type="PhysicalQuantity" use="required"/>
         </xs:complexType>
 
         <xs:complexType name="simpleMaxwellianFission">
           <xs:sequence>
-            <xs:element name="XYs" type="xData_1d_primary"/>
+            <xs:element name="theta" type="energyFunctionalData"/>
           </xs:sequence>
           <xs:attribute name="U" type="PhysicalQuantity" use="required"/>
         </xs:complexType>
@@ -789,7 +775,7 @@
             <xs:element maxOccurs="unbounded" name="weighted">
               <xs:complexType>
                 <xs:sequence>
-                  <xs:element name="XYs" type="xData_1d_primary"/>
+                  <xs:element name="XYs1d" type="xData_XYs1d_primary"/>
                   <xs:choice>
                     <xs:element name="evaporation"/>
                   </xs:choice>
@@ -813,7 +799,7 @@
 
     <xs:complexType name="angularEnergy">
       <xs:sequence>
-        <xs:element name="multiD_XYs" type="xData_3d_primary"/>
+        <xs:element name="XYs3d" type="xData_XYs3d_primary"/>
       </xs:sequence>
       <xs:attribute name="label" type="xs:NCName" use="required"/>
       <xs:attribute name="productFrame" type="frame" use="required"/>
@@ -821,7 +807,7 @@
 
     <xs:complexType name="energyAngular">
       <xs:sequence>
-        <xs:element name="multiD_XYs" type="xData_3d_primary"/>
+        <xs:element name="XYs3d" type="xData_XYs3d_primary"/>
       </xs:sequence>
       <xs:attribute name="label" type="xs:NCName" use="required"/>
       <xs:attribute name="productFrame" type="frame" use="required"/>
@@ -840,13 +826,13 @@
         <!-- f,r and a inside KalbachMann look the same -->
         <xs:complexType name="KalbachMann_subform">
           <xs:sequence>
-            <xs:element name="multiD_XYs" type="xData_2d_primary"/>
+            <xs:element name="XYs2d" type="xData_XYs2d_primary"/>
           </xs:sequence>
         </xs:complexType>
 
     <xs:complexType name="NuclearPlusCoulombInterference">
       <xs:choice>
-        <xs:element name="multiD_XYs" type="xData_2d_primary"/>
+        <xs:element name="XYs2d" type="xData_XYs2d_primary"/>
       </xs:choice>
       <xs:attribute name="label" type="xs:NCName" use="required"/>
       <xs:attribute name="productFrame" type="frame" use="required"/>
@@ -856,8 +842,8 @@
       <xs:sequence>
         <!-- expansion has three terms: nuclear, real interference and imaginary interference -->
         <xs:choice minOccurs="3" maxOccurs="3">
-          <xs:element name="multiD_XYs" type="xData_2d_primary"/>
-          <xs:element name="regions" type="xData_regions_2d_primary"/>
+          <xs:element name="XYs2d" type="xData_XYs2d_primary"/>
+          <xs:element name="regions2d" type="xData_regions_2d_primary"/>
         </xs:choice>
       </xs:sequence>
       <xs:attribute name="label" type="xs:NCName" use="required"/>
@@ -869,8 +855,8 @@
       <xs:sequence>
         <!-- expansion has three terms: scattering factor, real and imaginary anomalous factor -->
         <xs:choice minOccurs="3" maxOccurs="3">
-          <xs:element name="XYs" type="xData_1d_primary"/>
-          <xs:element name="regions" type="xData_regions_1d_primary"/>
+          <xs:element name="XYs1d" type="xData_XYs1d_primary"/>
+          <xs:element name="regions1d" type="xData_regions_1d_primary"/>
         </xs:choice>
       </xs:sequence>
       <xs:attribute name="label" type="xs:NCName" use="required"/>
@@ -896,10 +882,9 @@
     <!-- optional: product may have energy deposition -->
     <xs:complexType name="depositionEnergy">
       <xs:choice minOccurs="0">
-        <xs:element name="XYs" type="xData_1d_primary"/>
-        <xs:element name="regions" type="xData_regions_1d_primary"/>
+        <xs:element name="XYs1d" type="xData_XYs1d_primary"/>
+        <xs:element name="regions1d" type="xData_regions_1d_primary"/>
       </xs:choice>
-      <xs:attribute name="nativeData" type="xs:NCName" use="required"/>
     </xs:complexType>
 
 
@@ -943,34 +928,15 @@
     <xs:list itemType="xs:double"/>
   </xs:simpleType>
 
-  <!-- define attributes that must be '1', '2', '3' -->
-  <xs:simpleType name="one">
-    <xs:restriction base="xs:integer">
-      <xs:enumeration value="1" />
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="two">
-    <xs:restriction base="xs:integer">
-      <xs:enumeration value="2" />
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="three">
-    <xs:restriction base="xs:integer">
-      <xs:enumeration value="3" />
-    </xs:restriction>
-  </xs:simpleType>
-
   <!-- allowed interpolation types -->
   <xs:simpleType name="interpolation">
     <xs:restriction base="xs:string">
       <xs:enumeration value="flat"/>
       <xs:enumeration value="charged-particle"/>  <!-- FIXME... should this be here? -->
-      <xs:enumeration value="lin,lin"/>
-      <xs:enumeration value="lin,log"/>
-      <xs:enumeration value="log,lin"/>
-      <xs:enumeration value="log,log"/>
+      <xs:enumeration value="lin-lin"/>
+      <xs:enumeration value="lin-log"/>
+      <xs:enumeration value="log-lin"/>
+      <xs:enumeration value="log-log"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -985,7 +951,7 @@
   </xs:complexType>
 
   <!-- 1d data (for cross section, multiplicity, series, distribution at one incident energy, etc.) -->
-  <xs:complexType name="xData_1d_primary">
+  <xs:complexType name="xData_XYs1d_primary">
     <xs:sequence>
       <xs:element name="axes" type="axes"/>
       <xs:element name="values" type="xData_values"/>
@@ -995,7 +961,7 @@
     <xs:attribute name="interpolation" type="interpolation"/>
   </xs:complexType>
 
-  <xs:complexType name="xData_1d_inRegions">
+  <xs:complexType name="xData_XYs1d_inRegions">
     <xs:sequence>
       <xs:element name="values" type="xData_values"/>
     </xs:sequence>
@@ -1003,7 +969,7 @@
     <xs:attribute name="interpolation" type="interpolation"/>
   </xs:complexType>
 
-  <xs:complexType name="xData_1d">
+  <xs:complexType name="xData_XYs1d">
     <xs:sequence>
       <xs:element name="values" type="xData_values"/>
     </xs:sequence>
@@ -1015,88 +981,74 @@
   <xs:complexType name="xData_regions_1d_primary">
     <xs:sequence>
       <xs:element name="axes" type="axes"/>
-      <xs:element name="XYs" type="xData_1d_inRegions" minOccurs="2" maxOccurs="unbounded"/>
+      <xs:element name="XYs1d" type="xData_XYs1d_inRegions" minOccurs="2" maxOccurs="unbounded"/>
       <xs:element name="uncertainties" minOccurs="0"/>
     </xs:sequence>
     <xs:attribute name="label" type="xs:NCName"/>
-    <xs:attribute name="dimension" type="one" use="required"/>
   </xs:complexType>
 
   <xs:complexType name="xData_regions_1d">
     <xs:sequence>
-      <xs:element name="XYs" type="xData_1d_inRegions" minOccurs="2" maxOccurs="unbounded"/>
+      <xs:element name="XYs1d" type="xData_XYs1d_inRegions" minOccurs="2" maxOccurs="unbounded"/>
     </xs:sequence>
     <xs:attribute name="value" type="xs:double" use="required"/>
-    <xs:attribute name="dimension" type="one" use="required"/>
   </xs:complexType>
 
-  <!-- series data -->
-  <xs:simpleType name="seriesFunction"> <!-- restrict allowed functions -->
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Legendre"/>
-      <xs:enumeration value="polynomial"/>
-    </xs:restriction>
-  </xs:simpleType>
+  <!-- series data: Legendre expansions, polynomials -->
+  <xs:complexType name="xData_Legendre_1d">
+    <xs:sequence>
+      <xs:element name="values" type="xData_values"/>
+    </xs:sequence>
+    <xs:attribute name="value" type="xs:double" use="required"/>
+  </xs:complexType>
 
-  <xs:complexType name="xData_series_1d_primary">
+  <xs:complexType name="xData_polynomial_1d_primary">
     <xs:sequence>
       <xs:element name="axes"/>
       <xs:element name="values" type="xData_values"/>
     </xs:sequence>
     <xs:attribute name="label" type="xs:NCName" use="required"/>
-    <xs:attribute name="function" type="seriesFunction" use="required"/>
     <xs:attribute name="domainMin" type="PhysicalQuantity" use="required"/>
     <xs:attribute name="domainMax" type="PhysicalQuantity" use="required"/>
   </xs:complexType>
 
-  <xs:complexType name="xData_series">
-    <xs:sequence>
-      <xs:element name="values" type="xData_values"/>
-    </xs:sequence>
-    <xs:attribute name="function" type="seriesFunction" use="required"/>
-    <xs:attribute name="value" type="xs:double" use="required"/>
-  </xs:complexType>
-
   <!-- 2d data: energy or angular distribution -->
-  <xs:complexType name="xData_2d_primary">
+  <xs:complexType name="xData_XYs2d_primary">
     <xs:sequence>
       <xs:element name="axes" type="axes"/>
       <xs:choice maxOccurs="unbounded">
-        <xs:element name="series" type="xData_series"/>
-        <xs:element name="XYs" type="xData_1d"/>
-        <xs:element name="regions" type="xData_regions_1d"/>
+        <xs:element name="Legendre" type="xData_Legendre_1d"/>
+        <xs:element name="XYs1d" type="xData_XYs1d"/>
+        <xs:element name="regions1d" type="xData_regions_1d"/>
       </xs:choice>
       <xs:element name="uncertainties" minOccurs="0"/>
     </xs:sequence>
-    <xs:attribute name="dimension" type="two"/>
     <xs:attribute name="label" type="xs:string"/>
     <xs:attribute name="interpolation" type="interpolation"/>
     <xs:attribute name="interpolationQualifier" type="xs:string"/>
   </xs:complexType>
 
-  <xs:complexType name="xData_2d_inRegions">
+  <xs:complexType name="xData_XYs2d_inRegions">
     <xs:sequence>
       <xs:choice maxOccurs="unbounded">
-        <xs:element name="series" type="xData_series"/>
-        <xs:element name="XYs" type="xData_1d"/>
-        <xs:element name="regions" type="xData_regions_1d"/>
+        <xs:element name="Legendre" type="xData_Legendre_1d"/>
+        <xs:element name="XYs1d" type="xData_XYs1d"/>
+        <xs:element name="regions1d" type="xData_regions_1d"/>
       </xs:choice>
     </xs:sequence>
-    <xs:attribute name="dimension" type="two" use="required"/>
     <xs:attribute name="interpolation" type="interpolation"/>
     <xs:attribute name="interpolationQualifier" type="xs:string"/>
   </xs:complexType>
 
-  <xs:complexType name="xData_2d">
+  <xs:complexType name="xData_XYs2d">
     <xs:sequence>
       <xs:choice maxOccurs="unbounded">
-        <xs:element name="series" type="xData_series"/>
-        <xs:element name="XYs" type="xData_1d"/>
-        <xs:element name="regions" type="xData_regions_1d"/>
+        <xs:element name="Legendre" type="xData_Legendre_1d"/>
+        <xs:element name="XYs1d" type="xData_XYs1d"/>
+        <xs:element name="regions1d" type="xData_regions_1d"/>
       </xs:choice>
     </xs:sequence>
     <xs:attribute name="value" type="xs:double" use="required"/>
-    <xs:attribute name="dimension" type="two" use="required"/>
     <xs:attribute name="interpolation" type="interpolation"/>
     <xs:attribute name="interpolationQualifier" type="xs:string"/>
   </xs:complexType>
@@ -1105,58 +1057,53 @@
   <xs:complexType name="xData_regions_2d_primary">
     <xs:sequence>
       <xs:element name="axes" type="axes"/>
-      <xs:element name="multiD_XYs" type="xData_2d_inRegions" minOccurs="2" maxOccurs="unbounded"/>
+      <xs:element name="XYs2d" type="xData_XYs2d_inRegions" minOccurs="2" maxOccurs="unbounded"/>
       <xs:element name="uncertainties" minOccurs="0"/>
     </xs:sequence>
     <xs:attribute name="label" type="xs:NCName"/>
-    <xs:attribute name="dimension" type="two" use="required"/>
     <xs:attribute name="interpolationQualifier" type="xs:string"/>
   </xs:complexType>
 
   <xs:complexType name="xData_regions_2d">
     <xs:sequence>
-      <xs:element name="multiD_XYs" type="xData_2d_inRegions" minOccurs="2" maxOccurs="unbounded"/>
+      <xs:element name="XYs2d" type="xData_XYs2d_inRegions" minOccurs="2" maxOccurs="unbounded"/>
     </xs:sequence>
     <xs:attribute name="value" type="xs:double" use="required"/>
-    <xs:attribute name="dimension" type="two" use="required"/>
   </xs:complexType>
 
   <!-- 3d data: double-differential distribution -->
-  <xs:complexType name="xData_3d_primary">
+  <xs:complexType name="xData_XYs3d_primary">
     <xs:sequence>
       <xs:element name="axes" type="axes"/>
       <xs:choice maxOccurs="unbounded">
-        <xs:element name="multiD_XYs" type="xData_2d"/>
-        <xs:element name="regions" type="xData_regions_2d"/>
+        <xs:element name="XYs2d" type="xData_XYs2d"/>
+        <xs:element name="regions2d" type="xData_regions_2d"/>
       </xs:choice>
       <xs:element name="uncertainties" minOccurs="0"/>
     </xs:sequence>
-    <xs:attribute name="dimension" type="three" use="required"/>
     <xs:attribute name="label" type="xs:string"/>
     <xs:attribute name="interpolationQualifier" type="xs:string"/>
   </xs:complexType>
 
-  <xs:complexType name="xData_3d_inRegions">
+  <xs:complexType name="xData_XYs3d_inRegions">
     <xs:sequence>
       <xs:element name="axes" type="axes"/>
       <xs:choice maxOccurs="unbounded">
-        <xs:element name="multiD_XYs" type="xData_2d"/>
-        <xs:element name="regions" type="xData_regions_2d"/>
+        <xs:element name="XYs2d" type="xData_XYs2d"/>
+        <xs:element name="regions2d" type="xData_regions_2d"/>
       </xs:choice>
       <xs:element name="uncertainties" minOccurs="0"/>
     </xs:sequence>
     <xs:attribute name="index" type="xs:integer"/> <!-- use="required"/> -->
-    <xs:attribute name="dimension" type="three" use="required"/>
   </xs:complexType>
 
   <!-- 3d regions -->
   <xs:complexType name="xData_regions_3d_primary">
     <xs:sequence>
       <xs:element name="axes" type="axes"/>
-      <xs:element name="multiD_XYs" type="xData_3d_inRegions" minOccurs="2" maxOccurs="unbounded"/>
+      <xs:element name="XYs3d" type="xData_XYs3d_inRegions" minOccurs="2" maxOccurs="unbounded"/>
     </xs:sequence>
     <xs:attribute name="value" type="xs:double" use="required"/>
-    <xs:attribute name="dimension" type="three" use="required"/>
   </xs:complexType>
 
   <!-- uncertainties can appear inside many xData containers -->
@@ -1168,7 +1115,7 @@
 
   <xs:complexType name="uncertainty">
     <xs:choice>
-      <xs:element name="XYs" type="xData_1d_primary"/>
+      <xs:element name="XYs1d" type="xData_XYs1d_primary"/>
       <xs:element name="link" type="xlink"/>
     </xs:choice>
     <xs:attribute name="index" type="xs:integer"/>

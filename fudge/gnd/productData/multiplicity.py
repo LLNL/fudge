@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,51 +18,77 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
-from fudge.core.utilities import brb
-import base as baseModule
-from fudge.gnd import tokens as tokensModule
-from fudge.gnd.reactions import base as reactionBaseModule
-
-from fudge.gnd import abstractClasses as abstractClassesModule
-
+from xData import standards as standardsModule
 from xData import axes as axesModule
 from xData import XYs as XYsModule
 from xData import series1d as series1dModule
 from xData import regions as regionsModule
+from xData import gridded as griddedModule
 from xData import link as linkModule
-from xData import standards as standardsModule
+
+from fudge.processing import group as groupModule
+
+from fudge.core.utilities import brb
+from fudge.gnd import tokens as tokensModule
+from fudge.gnd import abstractClasses as abstractClassesModule
+
+from fudge.gnd.reactions import base as reactionBaseModule
 
 __metaclass__ = type
 
+multiplicityToken = 'multiplicity'
 energyDependentToken = 'energyDependent'
 
 class baseMultiplicityForm( abstractClassesModule.form ) :
 
-    __genre = baseModule.multiplicityToken
+    pass
 
 class unknown( baseMultiplicityForm ) :
 
-    moniker = tokensModule.unknownFormToken
+    moniker = 'unknown'
 
     def __init__( self, label ) :
 
@@ -77,7 +104,7 @@ class unknown( baseMultiplicityForm ) :
 
     def getXMLAttribute( self ) :
 
-        return( tokensModule.unknownFormToken )
+        return( self.moniker )
 
     @property
     def label( self ) :
@@ -86,13 +113,13 @@ class unknown( baseMultiplicityForm ) :
 
     def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
 
-        raise Exception( 'Linear-linear pointwise data for multiplicity form %s does not make sense' % tokensModule.unknownFormToken )
+        raise Exception( 'Linear-linear XYs1d data for multiplicity form %s does not make sense' % self.moniker )
 
     def toXMLList( self, indent = '', **kwargs ) :
 
         attributeStr = ''
         if( self.label is not None ) : attributeStr += ' label="%s"' % self.label
-        return( [ '%s<%s%s/>' % ( indent, tokensModule.unknownFormToken, attributeStr ) ] )
+        return( [ '%s<%s%s/>' % ( indent, self.moniker, attributeStr ) ] )
 
     @staticmethod
     def parseXMLNode( element, xPath, linkData ):
@@ -104,7 +131,7 @@ class unknown( baseMultiplicityForm ) :
 
 class constant( baseMultiplicityForm ) :
 
-    moniker = tokensModule.constantFormToken
+    moniker = 'constant'
 
     def __init__( self, label, value ) :
 
@@ -155,11 +182,15 @@ class constant( baseMultiplicityForm ) :
 
         return( self.__label )
 
-    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
-        """This method returns the multiplicity as linear-linear pointwise data which spans self's domain."""
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
 
-        axes = pointwise.defaultAxes( energyUnit = self.domainUnit( ) )
-        return( pointwise( data = [ [ self.domainMin( ), self.value ], [ self.domainMax( ), self.value ] ],
+        return( self.toPointwise_withLinearXYs( 1e-8, 1e-8 ).processSnMultiGroup( style, tempInfo, indent ) )
+
+    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+        """This method returns the multiplicity as linear-linear XYs1d data which spans self's domain."""
+
+        axes = XYs1d.defaultAxes( energyUnit = self.domainUnit( ) )
+        return( XYs1d( data = [ [ self.domainMin( ), self.value ], [ self.domainMax( ), self.value ] ],
                 axes = axes, accuracy = 1e-12 ) )
 
     def toXMLList( self, indent = '', **kwargs ) :
@@ -178,12 +209,12 @@ class constant( baseMultiplicityForm ) :
         xPath.pop( )
         return( multiplicity )
 
-class pointwise( baseMultiplicityForm, baseModule.XYPointwiseFormBase ) :
+class XYs1d( baseMultiplicityForm, XYsModule.XYs1d ) :
 
     def __init__( self, **kwargs ) :
 
         baseMultiplicityForm.__init__( self )
-        baseModule.XYPointwiseFormBase.__init__( self, **kwargs )
+        XYsModule.XYs1d.__init__( self, **kwargs )
 
     def getEnergyLimits( self, EMin, EMax ) :
 
@@ -193,7 +224,7 @@ class pointwise( baseMultiplicityForm, baseModule.XYPointwiseFormBase ) :
 
         if( E < self[0][0] ) : E = self[0][0]
         if( E > self[-1][0] ) : E = self[-1][0]
-        return( XYsModule.XYs.evaluate( self, E ) )
+        return( XYsModule.XYs1d.evaluate( self, E ) )
 
     def getXMLAttribute( self ) :
 
@@ -203,22 +234,29 @@ class pointwise( baseMultiplicityForm, baseModule.XYPointwiseFormBase ) :
 
         return self.rangeMin() == self.rangeMax()
 
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
+
+        from fudge.processing import miscellaneous as miscellaneousModule
+
+        if( tempInfo['verbosity'] > 2 ) : print '%sProcessing XYs1d cross section' % indent
+
+        multiplicityGrouped = miscellaneousModule.groupOneFunctionAndFlux( style, tempInfo, self )
+        return( groupModule.toMultiGroup1d( multiGroup, style, tempInfo, self.axes, multiplicityGrouped ) )
+
     @staticmethod
-    def defaultAxes( energyUnit = 'eV', multiplicityName = baseModule.multiplicityToken ) :
+    def defaultAxes( energyUnit = 'eV', multiplicityName = multiplicityToken ) :
 
         axes = axesModule.axes( rank = 2 )
         axes[0] = axesModule.axis( multiplicityName, 0, '' )
         axes[1] = axesModule.axis( 'energy_in', 1, energyUnit )
         return( axes )
 
-class piecewise( baseMultiplicityForm, regionsModule.regions ) :
+class regions1d( baseMultiplicityForm, regionsModule.regions1d ) :
 
     def __init__( self, **kwargs ) :
 
-        if( 'dimension' not in kwargs ) : kwargs['dimension'] = 1
-        if( kwargs['dimension'] != 1 ) : raise ValueError( 'Dimension = %s != 1' % ( kwargs['dimension'] ) )
         baseMultiplicityForm.__init__( self )
-        regionsModule.regions.__init__( self, **kwargs )
+        regionsModule.regions1d.__init__( self, **kwargs )
 
     def getEnergyLimits( self, EMin, EMax ) :
 
@@ -235,21 +273,25 @@ class piecewise( baseMultiplicityForm, regionsModule.regions ) :
 
         return( energyDependentToken )
 
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
+
+        return( self.toPointwise_withLinearXYs( 1e-8, 1e-8 ).processSnMultiGroup( style, tempInfo, indent ) )
+
     def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
         """See regionsXYs.toPointwise_withLinearXYs on the use of lowerEps, upperEps."""
 
         accuracy = 1e-6
         if( len( self ) > 0 ) : accuracy = self[0].getAccuracy( )
-        xys = regionsModule.regions.toPointwise_withLinearXYs( self, accuracy, lowerEps, upperEps, removeOverAdjustedPoints = True )
-        return( pointwise( axes = xys.axes, data = xys, accuracy = xys.getAccuracy( ) ) )
+        xys = regionsModule.regions1d.toPointwise_withLinearXYs( self, accuracy, lowerEps, upperEps, removeOverAdjustedPoints = True )
+        return( XYs1d( data = xys, axes = xys.axes, accuracy = xys.getAccuracy( ) ) )
 
 class reference( linkModule.link, baseMultiplicityForm ) :
 
     moniker = tokensModule.referenceFormToken
 
-    def __init__( self, link = None, root = None, path = None, label = None ) :
+    def __init__( self, link = None, root = None, path = None, label = None, relative = False ) :
 
-        linkModule.link.__init__( self, link = link, root = root, path = path, label = label )
+        linkModule.link.__init__( self, link = link, root = root, path = path, label = label, relative = relative )
         baseMultiplicityForm.__init__( self )
 
     @property
@@ -286,12 +328,12 @@ class reference( linkModule.link, baseMultiplicityForm ) :
 
         return( self.reference.getXMLAttribute( ) )
 
-class polynomial( baseMultiplicityForm, series1dModule.polynomial ) :
+class polynomial( baseMultiplicityForm, series1dModule.polynomial1d ) :
 
     def __init__( self, **kwargs ) :
 
         baseMultiplicityForm.__init__( self )
-        series1dModule.polynomial.__init__( self, **kwargs )
+        series1dModule.polynomial1d.__init__( self, **kwargs )
 
     def domainUnit( self ) :
 
@@ -305,13 +347,17 @@ class polynomial( baseMultiplicityForm, series1dModule.polynomial ) :
 
         return( energyDependentToken )
 
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
+
+        return( self.toPointwise_withLinearXYs( 1e-8, 1e-8 ).processSnMultiGroup( style, tempInfo, indent ) )
+
     def toPointwise_withLinearXYs( self, lowerEps, upperEps, accuracy = 1e-6 ) :
 
-        xys = series1dModule.polynomial.toPointwise_withLinearXYs( self, self.domainMin, self.domainMax, accuracy )
-        return( pointwise( self.axes, xys, accuracy = accuracy ) )
+        xys = series1dModule.polynomial1d.toPointwise_withLinearXYs( self, self.domainMin, self.domainMax )
+        return( XYs1d( data = xys, axes = self.axes, accuracy = accuracy ) )
 
     @staticmethod
-    def defaultAxes( energyName = 'energy_in', energyUnit = 'eV', multiplicityName = baseModule.multiplicityToken ) :
+    def defaultAxes( energyName = 'energy_in', energyUnit = 'eV', multiplicityName = multiplicityToken ) :
 
         axes = axesModule.axes( rank = 2 )
         axes[0] = axesModule.axis( "C_i(%s)" % energyName, 0, "%s^(-i)" % energyUnit )
@@ -366,29 +412,11 @@ class partialProduction( baseMultiplicityForm ) :
         xPath.pop( )
         return( multiplicity )
 
-class grouped( baseMultiplicityForm, abstractClassesModule.multiGroup ) :
+class multiGroup( baseMultiplicityForm, griddedModule.gridded ) :
 
-    moniker = tokensModule.groupedFormToken
-    __genre = baseModule.multiplicityToken
+    def __init__( self, **kwargs ) :
 
-    def __init__( self, label, axes, data ) :
-
-        baseMultiplicityForm.__init__( self )
-        abstractClassesModule.multiGroup.__init__( self, label, axes, data )
-
-    def getXMLAttribute( self ) :
-
-        return( energyDependentToken )
-
-class groupedWithCrossSection( baseMultiplicityForm, abstractClassesModule.multiGroup ) :
-
-    moniker = tokensModule.groupedFormToken
-    __genre = baseModule.multiplicityToken
-
-    def __init__( self, label, axes, data ) :
-
-        baseMultiplicityForm.__init__( self )
-        abstractClassesModule.multiGroup.__init__( self, label, axes, data )
+        griddedModule.gridded.__init__( self, **kwargs )
 
     def getXMLAttribute( self ) :
 
@@ -403,13 +431,12 @@ def parseXMLNode( multElement, xPath, linkData ) :
         formClass = {
                 unknown.moniker                 : unknown,
                 constant.moniker                : constant,
-                pointwise.moniker               : pointwise,
-                piecewise.moniker               : piecewise,
+                XYs1d.moniker                   : XYs1d,
+                regions1d.moniker               : regions1d,
                 reference.moniker               : reference,
                 polynomial.moniker              : polynomial,
                 partialProduction.moniker       : partialProduction,
-                grouped.moniker                 : grouped,
-                groupedWithCrossSection.moniker : groupedWithCrossSection,
+                multiGroup.moniker              : multiGroup
             }.get( form.tag )
         if( formClass is None ) : raise Exception( "encountered unknown multiplicity form: %s" % form.tag )
         newForm = formClass.parseXMLNode( form, xPath, linkData )
@@ -422,21 +449,12 @@ def parseXMLNode( multElement, xPath, linkData ) :
 #
 class component( abstractClassesModule.component ) :
 
-    __genre = baseModule.multiplicityToken
-    moniker = baseModule.multiplicityToken
+    moniker = multiplicityToken
 
     def __init__( self ) :
 
-        abstractClassesModule.component.__init__( self, ( unknown, constant, pointwise, piecewise, reference, polynomial, 
-                partialProduction, grouped, groupedWithCrossSection ) )
-
-    def process( self, processInfo, tempInfo, verbosityIndent ) :
-
-        keys = self.forms.keys( )
-        for form in keys :
-            if( form == tokensModule.pointwiseFormToken ) :
-                ps = self[form].process( processInfo, tempInfo, verbosityIndent )
-                for p in ps : self.addForm( p )
+        abstractClassesModule.component.__init__( self, ( unknown, constant, XYs1d, regions1d, reference, polynomial, 
+                partialProduction, multiGroup ) )
 
     def isConstant( self ) :
 
@@ -445,7 +463,7 @@ class component( abstractClassesModule.component ) :
     def getConstant( self ) :
 
         if( self.isConstant()  ) : return( self.getValue( 0 ) )
-        raise Exception( 'multiplicity type = "%s" is not single valued' % self.moniker )
+        raise Exception( 'multiplicity type = "%s" is not single valued' % self.evaluated.moniker )
 
     def domainMin( self, unitTo = None, asPQU = False ) :
 

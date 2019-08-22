@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 from pqu import PQU
@@ -52,8 +76,6 @@ import fudge.gnd.productData.distributions.energyAngular as energyAngularModule
 import fudge.gnd.productData.distributions.unspecified as unspecifiedModule
 
 import xData.standards as standardsModule
-import xData.XYs as XYsModule
-import xData.regions as regionsModule
 
 def angularPointwiseEnergy2ENDF6( self, targetInfo ) :
 
@@ -127,10 +149,10 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
         component = gamma.distribution[targetInfo['style']]
         isPrimary, isDiscrete, energySubform, angularSubform = gammaType( component )
         if( isPrimary or isDiscrete ) :
-            if( not( isinstance( angularSubform, ( angularModule.pointwise, angularModule.isotropic ) ) ) ) : raise 'hell - fix me'
+            if( not( isinstance( angularSubform, ( angularModule.XYs2d, angularModule.isotropic ) ) ) ) : raise 'hell - fix me'
             if( discreteLEP < 0 ) :
                 discreteLEP = 2
-                if( isinstance( angularSubform, angularModule.pointwise ) ) :
+                if( isinstance( angularSubform, angularModule.XYs2d ) ) :
                     if( len( angularSubform.axes ) == 3 ) :
                         if( angularSubform.interpolation == standardsModule.interpolation.flatToken ) : discreteLEP = 1
         else :
@@ -140,7 +162,7 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
                     LEP = gndToENDF2PlusDInterpolationFlag( energy1.interpolation, energy1.interpolationQualifier )
                 else :
                     EpForm = energySubform[0]
-                    if( isinstance( EpForm, energyModule.pdfOfEp.piecewise ) ) : EpForm = EpForm[0]
+                    if( isinstance( EpForm, energyModule.regions1d ) ) : EpForm = EpForm[0]
                     LEP = gndToENDF2PlusDInterpolationFlag( EpForm.interpolation, standardsModule.interpolation.noneQualifierToken )
         if( frame is None ) : frame = component.productFrame
     if( LEP < 0 ) : LEP = discreteLEP
@@ -162,10 +184,10 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
         multiplicities = [ gamma.multiplicity[targetInfo['style']] for gamma in gammas ]
         totalMultiplicity = multiplicities.pop( 0 )
         for multiplicity in multiplicities : totalMultiplicity += multiplicity
-    if( isinstance( totalMultiplicity, multiplicityModule.piecewise ) ) :
+    if( isinstance( totalMultiplicity, multiplicityModule.regions1d ) ) :
         totalMultiplicityRegions = totalMultiplicity.copy( )
     else :
-        totalMultiplicityRegions = multiplicityModule.piecewise( axes = totalMultiplicity.axes )
+        totalMultiplicityRegions = multiplicityModule.regions1d( axes = totalMultiplicity.axes )
         totalMultiplicityRegions.append( totalMultiplicity )
 
 # This data was originally a Legendre expansions with only L=0 terms, was converted to uncorrelated.
@@ -181,11 +203,11 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
             continuum = gamma
             continue
 
-        if( isinstance( multiplicity, multiplicityModule.piecewise ) ) :
+        if( isinstance( multiplicity, multiplicityModule.regions1d ) ) :
             multiplicityRegions = multiplicity.copy( )
         else :
-            if( isinstance( multiplicity, multiplicityModule.pointwise ) ) :
-                multiplicityRegions = multiplicityModule.piecewise( axes = multiplicity.axes )
+            if( isinstance( multiplicity, multiplicityModule.XYs1d ) ) :
+                multiplicityRegions = multiplicityModule.regions1d( axes = multiplicity.axes )
                 multiplicityRegions.append( multiplicity )
             else :
                 raise Exception( 'Unsupported multiplicity "%s"' % multiplicity.moniker )
@@ -210,11 +232,11 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
     continuumGammasRegions = [ {} for region in totalMultiplicityRegions ]
     if( continuum is not None ) :
         multiplicity = continuum.multiplicity[targetInfo['style']]
-        if( isinstance( multiplicity, multiplicityModule.piecewise ) ) :
+        if( isinstance( multiplicity, multiplicityModule.regions1d ) ) :
             multiplicityRegions = multiplicity.copy( )
         else :
-            if( isinstance( multiplicity, multiplicityModule.pointwise ) ) :
-                multiplicityRegions = multiplicityModule.piecewise( axes = multiplicity.axes )
+            if( isinstance( multiplicity, multiplicityModule.XYs1d ) ) :
+                multiplicityRegions = multiplicityModule.regions1d( axes = multiplicity.axes )
                 multiplicityRegions.append( multiplicity )
             else :
                 raise Exception( 'Unsupported multiplicity "%s"' % multiplicity.moniker )
@@ -225,7 +247,7 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
             energySubform = component.energySubform.data
             if( not( isinstance( angularSubform, angularModule.isotropic ) ) ) :
                 raise Exception( 'Unsupport angular form = "%s"' % angularSubform.moniker )
-            if( not( isinstance( energySubform, energyModule.piecewise ) ) ) : energySubform = [ energySubform ]
+            if( not( isinstance( energySubform, energyModule.regions2d ) ) ) : energySubform = [ energySubform ]
             interpolationEIn = gndToENDF2PlusDInterpolationFlag( energySubform[0].interpolation, energySubform[0].interpolationQualifier )
             for i1, region in enumerate( energySubform ) :
                 i2, multiplicityRegion = getTotalMultiplicityRegion( region, multiplicityRegions )
@@ -237,7 +259,7 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas ) :
                     total = totalRegion.evaluate( EIn )
                     continuumMultiplicity = multiplicityRegion.evaluate( EIn )
                     data = []
-                    if( isinstance( energyInData, energyModule.pdfOfEp.piecewise ) ) :
+                    if( isinstance( energyInData, energyModule.regions1d ) ) :
                         for region2 in energyInData :
                             for Ep, probability in region2 :
                                 if( total != 0 ) : probability *= continuumMultiplicity / total
@@ -481,7 +503,7 @@ def gammasToENDF6_MF12_13( MT, MF, endfMFList, flags, targetInfo, gammas ) :
         if( isinstance( angularSubform, angularModule.isotropic ) ) :
             MF14 = None
             LI, LTT = 1, 0
-        elif( isinstance( angularSubform, angularModule.pointwise ) ) :
+        elif( isinstance( angularSubform, angularModule.XYs2d ) ) :
             isNotIsotropic = 1
             targetInfo['doProductionGamma'] = True
             dummy, dummy, MF14 = angularSubform.toENDF6( flags, targetInfo )
@@ -495,7 +517,7 @@ def gammasToENDF6_MF12_13( MT, MF, endfMFList, flags, targetInfo, gammas ) :
         multiplicity = gamma.multiplicity.evaluated
 
         if recomputeTotal:
-            if( isinstance( multiplicity, multiplicityModule.piecewise ) ) :
+            if( isinstance( multiplicity, multiplicityModule.regions1d ) ) :
                 if( piecewise is not None ) :
                     if( len( piecewise ) != len( multiplicity ) ) :
                         raise Exception( 'MF=12/13 piecewise multiplicities must all have same number of regions' )
@@ -523,9 +545,9 @@ def gammasToENDF6_MF12_13( MT, MF, endfMFList, flags, targetInfo, gammas ) :
 
             interpolationInfo = []
             xsec_mult = []
-            if( isinstance( multiplicity, multiplicityModule.pointwise ) ) :
+            if( isinstance( multiplicity, multiplicityModule.XYs1d ) ) :
                 adjustMF13Multiplicity( interpolationInfo, xsec_mult, multiplicity, crossSection )
-            elif( isinstance( multiplicity, multiplicityModule.piecewise ) ) :
+            elif( isinstance( multiplicity, multiplicityModule.regions1d ) ) :
                 for region in multiplicity : adjustMF13Multiplicity( interpolationInfo, xsec_mult, region, crossSection )
             else :
                 raise Exception( 'Unsupport multiplicity "%s" for MF=13' % multiplicity.moniker )
@@ -545,9 +567,9 @@ def gammasToENDF6_MF12_13( MT, MF, endfMFList, flags, targetInfo, gammas ) :
 
         totalInterpolationInfo = []
         xsec_mult = []
-        if( isinstance( total, multiplicityModule.pointwise ) ) :
+        if( isinstance( total, multiplicityModule.XYs1d ) ) :
             adjustMF13Multiplicity( totalInterpolationInfo, xsec_mult, total, crossSection )
-        elif( isinstance( total, multiplicityModule.piecewise ) ) :
+        elif( isinstance( total, multiplicityModule.regions1d ) ) :
             for region in total : adjustMF13Multiplicity( totalInterpolationInfo, xsec_mult, region, crossSection )
         else:
             raise Exception( 'Unsupported total multiplicity type "%s" for MF=13' % total.moniker )
@@ -589,8 +611,8 @@ def gndToENDFInterpolationFlag( interpolation ) :
 
     if( interpolation == standardsModule.interpolation.flatToken ) : return( 1 )
     if( interpolation == standardsModule.interpolation.linlinToken ) : return( 2 )
-    if( interpolation == standardsModule.interpolation.loglinToken ) : return( 3 )
-    if( interpolation == standardsModule.interpolation.linlogToken ) : return( 4 )
+    if( interpolation == standardsModule.interpolation.linlogToken ) : return( 3 )
+    if( interpolation == standardsModule.interpolation.loglinToken ) : return( 4 )
     if( interpolation == standardsModule.interpolation.loglogToken ) : return( 5 )
     if( interpolation == standardsModule.interpolation.chargedParticleToken ) : return( 6 )
     raise ValueError( 'unsupported interpolation = "%s"' % interpolation )

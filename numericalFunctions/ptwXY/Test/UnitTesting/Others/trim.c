@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -44,13 +68,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <nfut_utilities.h>
 #include <ptwXY.h>
 #include <nf_utilities.h>
 
 static int verbose = 0;
 static char *fmtXY = "%19.12e %19.12e\n";
 
-static int checkTrim( ptwXYPoints *data );
+static int checkTrim( statusMessageReporting *smr, ptwXYPoints *data );
 static void printIfVerbose( ptwXYPoints *data );
 /*
 ************************************************************
@@ -58,9 +83,11 @@ static void printIfVerbose( ptwXYPoints *data );
 int main( int argc, char **argv ) {
 
     int i, n, iarg, echo = 0, errCount = 0;
-    nfu_status status;
     ptwXYPoints *XYs;
     double x;
+    statusMessageReporting smr;
+
+    smr_initialize( &smr, smr_status_Ok );
 
     for( iarg = 1; iarg < argc; iarg++ ) {
         if( strcmp( "-v", argv[iarg] ) == 0 ) {
@@ -73,38 +100,34 @@ int main( int argc, char **argv ) {
     }
     if( echo ) printf( "%s\n", __FILE__ );
 
-    if( ( XYs = ptwXY_new( ptwXY_interpolationLinLin, NULL, 4, 1.e-3, 10, 10, &status, 0 ) ) == NULL ) 
-            nfu_printErrorMsg( "ERROR %s: XYs creation, status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( XYs = ptwXY_new( &smr, ptwXY_interpolationLinLin, NULL, 4, 1.e-3, 10, 10, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
 
     n = 5;
     for( i = 0; i < n; i++ ) {
         x = .2 * i + .5;
-        if( ( status = ptwXY_setValueAtX( XYs, x, 0. ) ) != nfu_Okay )
-                    nfu_printErrorMsg( "ERROR %s: ptwXY_setValueAtX, status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+        if( ptwXY_setValueAtX( &smr, XYs, x, 0. ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
     }
-    errCount += checkTrim( XYs );
+    errCount += checkTrim( &smr, XYs );
 
     n += 7;
     for( ; i < n; i++ ) {
         x = .2 * i + .5;
-        if( ( status = ptwXY_setValueAtX( XYs, x, 2 * i - 20. ) ) != nfu_Okay )
-                    nfu_printErrorMsg( "ERROR %s: ptwXY_setValueAtX, status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+        if( ptwXY_setValueAtX( &smr, XYs, x, 2 * i - 20. ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
     }
     n += 3;
     for( ; i < n; i++ ) {
         x = .2 * i + .5;
-        if( ( status = ptwXY_setValueAtX( XYs, x, 0. ) ) != nfu_Okay )
-                    nfu_printErrorMsg( "ERROR %s: ptwXY_setValueAtX, status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+        if( ptwXY_setValueAtX( &smr, XYs, x, 0. ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
     }
-    errCount += checkTrim( XYs );
+    errCount += checkTrim( &smr, XYs );
 
-    ptwXY_clear( XYs );
+    if( ptwXY_clear( &smr, XYs ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
     for( i = 0; i < 12; i++ ) {
         x = .2 * i + .5;
-        if( ( status = ptwXY_setValueAtX( XYs, x, 2 * i - 20. ) ) != nfu_Okay )
-                    nfu_printErrorMsg( "ERROR %s: ptwXY_setValueAtX, status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+        if( ptwXY_setValueAtX( &smr, XYs, x, 2 * i - 20. ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
     }
-    errCount += checkTrim( XYs );
+    errCount += checkTrim( &smr, XYs );
 
     ptwXY_free( XYs );
 
@@ -113,7 +136,7 @@ int main( int argc, char **argv ) {
 /*
 ************************************************************
 */
-static int checkTrim( ptwXYPoints *data ) {
+static int checkTrim( statusMessageReporting *smr, ptwXYPoints *data ) {
 
     int allPointsZero = 0;
     int64_t i, i1;
@@ -122,10 +145,8 @@ static int checkTrim( ptwXYPoints *data ) {
     ptwXYPoint *point1, *point2;
 
     printIfVerbose( data );
-    if( ( trimmed = ptwXY_clone( data, &status ) ) == NULL )
-            nfu_printErrorMsg( "ERROR %s: data clone, status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( status = ptwXY_trim( trimmed ) ) != nfu_Okay )
-            nfu_printErrorMsg( "ERROR %s: ptwXY_trim, status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( trimmed = ptwXY_clone( smr, data ) ) == NULL ) nfut_printSMRErrorExit2p( smr, "Via." );
+    if( ptwXY_trim( smr, trimmed ) != nfu_Okay ) nfut_printSMRErrorExit2p( smr, "Via." );
     printIfVerbose( trimmed );
 
     for( i1 = 0; i1 < data->length; i1++ ) {
@@ -142,8 +163,8 @@ static int checkTrim( ptwXYPoints *data ) {
         point1 = ptwXY_getPointAtIndex_Unsafely( data, i1 );
         point2 = ptwXY_getPointAtIndex_Unsafely( trimmed, i );
         if( ( point1->x != point2->x ) || ( point1->y != point2->y ) ) {
-                nfu_printErrorMsg( "ERROR %s: ptwXY_trim at index %d, (x,y) = (%e %e) != (%e %e)", __FILE__, (int) i, 
-                    point1->x, point1->y, point2->x, point2->y );
+                nfu_printErrorMsg( "ERROR %s: point1 and point2 are not the same at index %d, (x,y) = (%e %e) != (%e %e)", 
+                        __FILE__, (int) i, point1->x, point1->y, point2->x, point2->y );
         }
         if( allPointsZero ) i1 = data->length - 2;
     }

@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,41 +18,58 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
+SMR_PATH = ../../../../../statusMessageReporting
 NUMERICALFUNCTIONS_PATH = ../../../..
-NUMERICALFUNCTIONS_INCLUDE_PATH = $(NUMERICALFUNCTIONS_PATH)/include
-NUMERICALFUNCTIONS_LIB_PATH = $(NUMERICALFUNCTIONS_PATH)/lib
-
-PTWXY_PATH = ../../..
-PTWXY_INCLUDE_PATH = $(PTWXY_PATH)/include
-PTWXY_LIB_PATH = $(PTWXY_PATH)/lib
-PTWXYUTILITIES_INCLUDE_PATH = $(PTWXY_PATH)/Test/Utilities
-PTWXYUTILITIES_LIB_PATH = $(PTWXY_PATH)/Test/Utilities
 
 CC = gcc
 CDEBUGFLAGS = -g -O0 -Wall
-ptwXYCFLAGS = -I$(NUMERICALFUNCTIONS_INCLUDE_PATH) -I$(PTWXY_INCLUDE_PATH) -L$(NUMERICALFUNCTIONS_LIB_PATH) -L$(PTWXY_LIB_PATH) \
-    -I$(PTWXYUTILITIES_INCLUDE_PATH) -L$(PTWXYUTILITIES_LIB_PATH) -lptwXY_utilities -lnumericalfunctions
-localCFLAGS = $(CDEBUGFLAGS) $(CFLAGS) $(ptwXYCFLAGS)
+ptwXYCFLAGS = -I$(NUMERICALFUNCTIONS_PATH)/include -L$(NUMERICALFUNCTIONS_PATH)/lib -lnumericalfunctions \
+              -I$(SMR_PATH)/include -L$(SMR_PATH)/lib -lstatusMessageReporting \
+              -lptwXY_utilities -lnfut_utilities
+localCFLAGS = $(CDEBUGFLAGS) $(CFLAGS) $(ptwXYCFLAGS) -lm
 
 TARGETS = xArray clip trim dullEdges mutualify mod areDomainsMutual mergeClosePoints copy
 
@@ -60,31 +78,31 @@ TARGETS = xArray clip trim dullEdges mutualify mod areDomainsMutual mergeClosePo
 default: $(TARGETS)
 
 xArray: xArray.c
-	$(CC) -o xArray xArray.c -lptwXY -lm $(localCFLAGS)
+	$(CC) -o xArray xArray.c $(localCFLAGS) -lm
 
 clip: clip.c
-	$(CC) -o clip clip.c -lptwXY -lm $(localCFLAGS)
+	$(CC) -o clip clip.c $(localCFLAGS) -lm
 
 trim: trim.c
-	$(CC) -o trim trim.c -lptwXY -lm $(localCFLAGS)
+	$(CC) -o trim trim.c $(localCFLAGS) -lm
 
 dullEdges: dullEdges.c
-	$(CC) -o dullEdges dullEdges.c -lptwXY -lm $(localCFLAGS)
+	$(CC) -o dullEdges dullEdges.c $(localCFLAGS) -lm
 
 mutualify: mutualify.c
-	$(CC) -o mutualify mutualify.c -lptwXY -lm $(localCFLAGS)
+	$(CC) -o mutualify mutualify.c $(localCFLAGS) -lm
 
 mod: mod.c
-	$(CC) -o mod mod.c -lptwXY -lm $(localCFLAGS)
+	$(CC) -o mod mod.c $(localCFLAGS) -lm
 
 areDomainsMutual: areDomainsMutual.c
-	$(CC) -o areDomainsMutual areDomainsMutual.c -lptwXY -lm $(localCFLAGS)
+	$(CC) -o areDomainsMutual areDomainsMutual.c $(localCFLAGS) -lm
 
 mergeClosePoints: mergeClosePoints.c
-	$(CC) -o mergeClosePoints mergeClosePoints.c -lptwXY -lm $(localCFLAGS)
+	$(CC) -o mergeClosePoints mergeClosePoints.c $(localCFLAGS) -lm
 
 copy: copy.c
-	$(CC) -o copy copy.c -lptwXY -lm $(localCFLAGS)
+	$(CC) -o copy copy.c $(localCFLAGS) -lm
 
 check: default
 	for f in $(TARGETS); do ./$$f $(CHECKOPTIONS); done

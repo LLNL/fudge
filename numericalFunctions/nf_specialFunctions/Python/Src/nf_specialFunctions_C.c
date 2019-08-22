@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -71,6 +95,7 @@ static PyObject *nf_amc_zbar_coefficient_C( PyObject *self, PyObject *args );
 static PyObject *nf_amc_reduced_matrix_element_C( PyObject *self, PyObject *args );
 static PyObject *nf_erf_C( PyObject *self, PyObject *args, PyObject *keywords );
 static PyObject *nf_specialFunctions_C_SetPyErrorExceptionReturnNull( const char *s, ... );
+static void nf_specialFunctions_C_SetPyErrorExceptionFromSMR( PyObject *type, statusMessageReporting *smr );
 
 DL_EXPORT( void ) initnf_specialFunctions_C( void );
 /*
@@ -80,7 +105,9 @@ static PyObject *nf_exponentialIntegral_C( PyObject *self, PyObject *args ) {
 
     int n;
     double En, x;
-    nfu_status status_nf;
+    statusMessageReporting smr;
+
+    smr_initialize( &smr, smr_status_Ok );
 
     if( !PyArg_ParseTuple( args, "id", &n, &x ) ) return( NULL );
 
@@ -88,9 +115,10 @@ static PyObject *nf_exponentialIntegral_C( PyObject *self, PyObject *args ) {
     if( x < 0 ) return( nf_specialFunctions_C_SetPyErrorExceptionReturnNull( "Invalid x: x = %e < 0", x ) );
     if( ( n < 2 ) && ( x == 0. ) ) return( nf_specialFunctions_C_SetPyErrorExceptionReturnNull( "Invalid n for x = 0.: n = %d < 2", n ) );
 
-    En = nf_exponentialIntegral( n, x, &status_nf );
-    if( status_nf != nfu_Okay ) return( nf_specialFunctions_C_SetPyErrorExceptionReturnNull( "Error from nf_exponentialIntegral: %s", 
-        nfu_statusMessage( status_nf ) ) );
+    if( nf_exponentialIntegral( &smr, n, x, &En ) != nfu_Okay ) {
+        nf_specialFunctions_C_SetPyErrorExceptionFromSMR( PyExc_Exception, &smr );
+        return( NULL );
+    }
     return( Py_BuildValue( "d", En ) );
 }
 /*
@@ -99,15 +127,18 @@ static PyObject *nf_exponentialIntegral_C( PyObject *self, PyObject *args ) {
 static PyObject *nf_gamma_C( PyObject *self, PyObject *args ) {
 
     double gamma, x;
-    nfu_status status_nf;
+    statusMessageReporting smr;
+
+    smr_initialize( &smr, smr_status_Ok );
 
     if( !PyArg_ParseTuple( args, "d", &x ) ) return( NULL );
 
     if( x <= 0 ) return( nf_specialFunctions_C_SetPyErrorExceptionReturnNull( "Invalid x: x = %e <= 0", x ) );
 
-    gamma = nf_gammaFunction( x, &status_nf );
-    if( status_nf != nfu_Okay ) return( nf_specialFunctions_C_SetPyErrorExceptionReturnNull( "Error from nf_gammaFunction: %s", 
-        nfu_statusMessage( status_nf ) ) );
+    if( nf_gammaFunction( &smr, x, &gamma ) != nfu_Okay ) {
+        nf_specialFunctions_C_SetPyErrorExceptionFromSMR( PyExc_Exception, &smr );
+        return( NULL );
+    }
     return( Py_BuildValue( "d", gamma ) );
 }
 /*
@@ -117,20 +148,25 @@ static PyObject *nf_incompleteGamma_C( PyObject *self, PyObject *args, PyObject 
 
     int doComplementary = 0;
     double gamma, x, s;
-    nfu_status status_nf;
     static char *kwlist[] = { "s", "x", "complementary", NULL };
+    statusMessageReporting smr;
+    nfu_status status_nf;
+
+    smr_initialize( &smr, smr_status_Ok );
 
     if( !PyArg_ParseTupleAndKeywords( args, keywords, "dd|i", kwlist, &s, &x, &doComplementary ) ) return( NULL );
 
     if( x < 0 ) return( nf_specialFunctions_C_SetPyErrorExceptionReturnNull( "Invalid x: x = %e < 0", x ) );
 
     if( doComplementary ) {
-        gamma = nf_incompleteGammaFunctionComplementary( s, x, &status_nf ); }
+        status_nf = nf_incompleteGammaFunctionComplementary( &smr, s, x, &gamma ); }
     else {
-        gamma = nf_incompleteGammaFunction( s, x, &status_nf );
+        status_nf = nf_incompleteGammaFunction( &smr, s, x, &gamma );
     }
-    if( status_nf != nfu_Okay ) return( nf_specialFunctions_C_SetPyErrorExceptionReturnNull( "Error from nf_incompleteGammaFunction*: %s", 
-        nfu_statusMessage( status_nf ) ) );
+    if( status_nf != nfu_Okay ) {
+        nf_specialFunctions_C_SetPyErrorExceptionFromSMR( PyExc_Exception, &smr );
+        return( NULL );
+    }
     return( Py_BuildValue( "d", gamma ) );
 }
 
@@ -260,6 +296,14 @@ static PyObject *nf_specialFunctions_C_SetPyErrorExceptionReturnNull( const char
     PyErr_SetString( PyExc_Exception, Str );
     va_end( args );
     return( NULL );
+}
+/*
+************************************************************
+*/
+static void nf_specialFunctions_C_SetPyErrorExceptionFromSMR( PyObject *type, statusMessageReporting *smr ) {
+
+    PyErr_SetString( type, smr_getMessage( smr_firstReport( smr ) ) );
+    smr_release( smr );
 }
 /*
 ************************************************************

@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 """
@@ -60,12 +84,19 @@ import fudge
 
 __metaclass__ = type
 
+class nullDevice :
+    """For internal use. Used in methods to set logFile when one is not entered."""
+
+    def write( self, **kwargs ) : pass
+
 class reactionSuite( ancestryModule.ancestry ) :
-    """This is the main class for a gnd projectile/target object. It contains
+    """
+    This is the main class for a gnd projectile/target object. It contains
         * documentation
         * a list of all particles encountered in the file
         * resonance data
-        * a list of reactions """
+        * a list of reactions
+    """
 
     moniker = 'reactionSuite'
 
@@ -101,7 +132,6 @@ class reactionSuite( ancestryModule.ancestry ) :
         self.particles = particleList
         if( self.particles is None ) : self.particles = fudge.gnd.xParticleList.xParticleList()
         self.particles.setAncestor( self )
-        self.attributes = {}
 
         self.__styles = stylesModule.styles( )
         self.__styles.setAncestor( self )
@@ -123,9 +153,10 @@ class reactionSuite( ancestryModule.ancestry ) :
 
         self.partialGammaProductions = []   # FIXME should be removed?
 
-
         self.documentation = {}
         if( documentation is not None ) : self.addDocumentation( documentation )
+
+        self._externalLinks = []    # keep track of links to external files
 
     def __iter__( self ) :
 
@@ -213,7 +244,7 @@ class reactionSuite( ancestryModule.ancestry ) :
     def check( self, **kwargs ) :
         """
         Check all data in the reactionSuite, returning a gnd.warning.context object with list of warnings.
-        
+
         Currently supported options:
             'branchingRatioSumTolerance' 1e-6        # branching ratios must sum to 1 (within this tolerance)
             'dQ'                         '1e-3 MeV'  # tolerance for comparing tabulated / calculated Q values
@@ -231,7 +262,7 @@ class reactionSuite( ancestryModule.ancestry ) :
             'fissionEnergyBalanceLimit'  0.15        # at least 85% of available energy should go to fission products
             'failOnException'            False       # if True, crash instead of converting exceptions to warnings
             'cleanUpTempFiles'           True        # remove derived data that was produced during checking
- 
+
         Currently unused options:
             'checkForEnDepData'         False
             'allowZeroE'                False
@@ -299,7 +330,7 @@ class reactionSuite( ancestryModule.ancestry ) :
             elementalTarget=True
             availableEnergy_eV=None
 
-        info = { 'reactionSuite': self, 'kinematicFactor': kinematicFactor, 'compoundZA': compoundZA, 
+        info = { 'reactionSuite': self, 'kinematicFactor': kinematicFactor, 'compoundZA': compoundZA,
                 'availableEnergy_eV': availableEnergy_eV, 'CoulombChannel': CoulombChannel, 'style': evaluatedStyle,
                 'reconstructedStyle': None, 'depositionStyle': None }
         info.update( options )
@@ -320,15 +351,14 @@ class reactionSuite( ancestryModule.ancestry ) :
                     if info['failOnException']: raise
 
         if info['checkEnergyBalance']:
-            # setup options for calculating energy deposition
-            info['depositionStyle'] = self.styles.getTempStyleNameOfClass( stylesModule.averageProductData )
-            depositionStyle = stylesModule.averageProductData( label=info['depositionStyle'], date=str(datetime.date.today()) )
-            self.styles.add( depositionStyle )
-            depositionStyle.derivedStyles.add(evaluatedStyle)
-            processInfo = processingInfoModule.processInfo2( style=depositionStyle, reactionSuite=self,
-                    verbosity=1 )   # suppress messages
-            info['processInfo'] = processInfo
-            info['tempInfo'] = { 'reactionSuite' : self }
+            # setup options for calculating average product energy and momentum
+            averageProductDataStyle = stylesModule.averageProductData(
+                label=self.styles.getTempStyleNameOfClass( stylesModule.averageProductData ) )
+            averageProductDataStyle.derivedStyles.add(evaluatedStyle)
+            self.styles.add( averageProductDataStyle )
+            info['averageProductDataStyle'] = averageProductDataStyle
+            info['averageProductDataArgs'] = { 'verbosity':1,   # additional required arguments
+                        'incrementalIndent':'  ', 'energyAccuracy':1e-6, 'momentumAccuracy':1e-6, 'reactionSuite':self }
 
         if self.projectile.name == 'n':
             # test Wick's limit: 0-degree elastic xsc >= ( total xsc * k/4pi )^2
@@ -346,15 +376,15 @@ class reactionSuite( ancestryModule.ancestry ) :
                         elastic_xsc = elastic.crossSection.toPointwise_withLinearXYs()
                         total_xsc = total.crossSection.toPointwise_withLinearXYs()
                     elastic_distribution = elastic.outputChannel.getProductWithName('n').distribution[evaluatedStyle.label].angularSubform
-                    if isinstance( elastic_distribution, fudge.gnd.productData.distributions.angular.pointwise ):
+                    if isinstance( elastic_distribution, fudge.gnd.productData.distributions.angular.XYs2d ):
                         linearized = elastic_distribution.toPointwise_withLinearXYs()
-                        forward_scattering = crossSectionModule.pointwise( axes=crossSectionModule.pointwise.defaultAxes() )
+                        forward_scattering = crossSectionModule.XYs1d( axes=crossSectionModule.XYs1d.defaultAxes() )
                         for energy_in in linearized.getEnergyArray('eV'):
                             forward_scattering.setValue( energy_in, linearized.interpolateAtValue( energy_in ).evaluate(1.0) )
-                    elif isinstance( elastic_distribution, fudge.gnd.productData.distributions.angular.piecewise ):
-                        forward_scattering = crossSectionModule.piecewise( axes=crossSectionModule.pointwise.defaultAxes() )
+                    elif isinstance( elastic_distribution, fudge.gnd.productData.distributions.angular.regions2d ):
+                        forward_scattering = crossSectionModule.regions1d( axes=crossSectionModule.XYs1d.defaultAxes() )
                         for region in elastic_distribution:
-                            ptw = crossSectionModule.pointwise()
+                            ptw = crossSectionModule.XYs1d()
                             linearized = region.toPointwise_withLinearXYs()
                             for energy_in in linearized.getEnergyArray('eV'):
                                 ptw.setValue( energy_in, linearized.interpolateAtValue( energy_in ).evaluate(1.0) )
@@ -399,8 +429,9 @@ class reactionSuite( ancestryModule.ancestry ) :
     def findEntity( self, entityName, attribute = None, value = None ):
         """
         Overrides ancestry.findEntity. reactionSuite contains several different lists,
-        so may need to descend into those to find desired entity
+        so may need to descend into those to find desired entity.
         """
+
         if entityName in ('reaction','summedReaction','fissionComponent','production','reactionSum'):
             for entity in getattr( self, entityName+'s' ):
                 if getattr( entity, attribute, None ) == value:
@@ -439,15 +470,12 @@ class reactionSuite( ancestryModule.ancestry ) :
             self.__massRatio = (M / (M+m))
         return self.__massRatio
 
-    def getAttribute( self, name ) :
-        """Returns value for attribute name if it exists; otherwise, returns None."""
-
-        if( name in self.attributes ) : return( self.attributes[name] )
-        return( None )
-
     def getIsotopeName( self, *args ):
-        """ return name of compound nucleus formed by nuc1+nuc2+...
-        if a nucleus in 'args' starts with '-', subtract instead """
+        """
+        Return name of compound nucleus formed by nuc1+nuc2+...
+        if a nucleus in 'args' starts with '-', subtract instead.
+        """
+
         def parse(name):
             if 'gamma' in name: return 1,0,0,1
             sign,symbol,A,mult = re.search(r"([-]?)([a-zA-Z]+)(_natural|[0-9]*)(?:\[multiplicity:\')?([0-9]+)?", name).groups()
@@ -471,8 +499,18 @@ class reactionSuite( ancestryModule.ancestry ) :
         Search list of reactions for a specified channel.
         The 'channel' argument should be either a reaction type ('elastic','capture','fission', etc) or
         the list of outgoing particles ('n + Pu239' for example).
+
+        If 'channel' is an int, then we assume it's an ENDF MT
+
         Raises 'KeyError' if specified channel can't be found.
         """
+
+        # If channel is an int, it might be and ENDF MT, so check those first
+        if type(channel)==int: # must be an ENDF MT
+            for reactionList in self.reactions, self.sums, self.fissionComponents, self.productions:
+                for reaction in reactionList:
+                    if reaction.ENDF_MT == channel: return reaction
+            raise KeyError( "Channel '%s' could not be found!" % channel)
 
         # translate special channel names:
         if channel=='elastic': channel = channel_tr = '%s + %s' % (self.projectile,self.target)
@@ -484,7 +522,7 @@ class reactionSuite( ancestryModule.ancestry ) :
         for reaction in self :
             if( str( reaction ) == channel ) : return( reaction )
             chStrings.append( str( reaction ) )
-        
+
         # make list containing a set() of products for each reaction. Ignore energy-dependent multiplicity
         chSets = [set(aa.split(' + ')) for aa in [a.replace('(','').replace(')','').replace('->','+').replace(
             "[multiplicity:'energyDependent']",'') for a in chStrings] ]
@@ -519,10 +557,10 @@ class reactionSuite( ancestryModule.ancestry ) :
                     prod = { 'g' : 'gamma' , 'gamma' : 'gamma', 'n' : 'n', 'p' : 'H1', 'd' : 'H2', 't' : 'H3', 'He3' : 'He3', 'a' : 'He4' }[prod]
                     if mul: prod += "[multiplicity:'%s']" % mul
                     if prod in thisChannelSet:
-                        raise KeyError, "Please specify multiplicity explicitly ('z,2n' instead of 'z,nn')"
+                        raise KeyError("Please specify multiplicity explicitly ('z,2n' instead of 'z,nn')")
                     thisChannelSet.add(prod)
                 if not thisChannelSet:
-                    raise KeyError, "Channel '%s' could not be found!" % channel
+                    raise KeyError("Channel '%s' could not be found!" % channel)
                 # also add final nucleus to the set:
                 proj, target = str( self.projectile ), str( self.target )
                 thisChannelSet.add( self.getIsotopeName( *([proj, target] + ['-'+a for a in thisChannelSet]) ) )
@@ -536,57 +574,90 @@ class reactionSuite( ancestryModule.ancestry ) :
 
         return( self.styles[style].temperature )
 
-    def calculateDepositionData( self, processInfo, verbosityIndent = '' ) :
+    def calculateAverageProductData( self, style, indent = '', **kwargs ) :
         """
         Calculate average energy and momentum data for all products of all reactions.
-        Resulting data information is stored within each product.
+        Resulting data are stored within each product. Example usage is:
+
+        from fudge.gnd import reactionSuite as reactionSuiteModule
+        from fudge.gnd import styles as stylesSuiteModule
+        reactionSuite = reactionSuiteModule.readXML( "16.xml" )
+
+        style = stylesModule.averageProductData( label = 'productData' )
+        style.derivedStyles.add( reactionSuite.styles[ 'eval' ]
+        reactionSuite.calculateAverageProductData( style )
+
+        :param style: The style to use.
+        :param indent: string; The amount to indent and verbose output.
+        :param kwargs: string; All other parameters.
+        :return:
         """
 
-        if( processInfo.verbosity >= 10 ) : print '%s%s' % ( verbosityIndent, self.inputParticlesToReactionString( suffix = " -->" ) )
-        processInfo.checkStyle( stylesModule.averageProductData )
-        self.styles.add( processInfo.style )
-        tempInfo = { 'reactionSuite' : self }
+        if( not( isinstance( style, stylesModule.averageProductData ) ) ) : raise TypeError( 'Invalid style' )
+
+        verbosity = kwargs.get( 'verbosity', 0 )
+        kwargs['verbosity'] = verbosity
+
+        incrementalIndent = kwargs.get( 'incrementalIndent', '  ' )
+        kwargs['incrementalIndent'] = incrementalIndent
+        indent2 = indent + incrementalIndent
+
+        logFile = kwargs.get( 'logFile', nullDevice( ) )
+        kwargs['logFile'] = logFile
+
+        energyAccuracy = kwargs.get( 'energyAccuracy', 1e-5 )
+        kwargs['energyAccuracy'] = energyAccuracy
+        momentumAccuracy = kwargs.get( 'momentumAccuracy', 1e-3 )
+        kwargs['momentumAccuracy'] = momentumAccuracy
+
+        if( verbosity > 0 ) : print '%s%s' % ( indent, self.inputParticlesToReactionString( suffix = " -->" ) )
+
+        self.styles.add( style )
+        kwargs['reactionSuite'] = self
         for reaction in self.reactions :
-            reaction.calculateDepositionData( processInfo, tempInfo, verbosityIndent + processInfo.verbosityIndentStep )
+            reaction.calculateAverageProductData( style, indent = indent2, **kwargs )
 
     def inputParticlesToReactionString( self, prefix = "", suffix = "" ) :
 
         return( "%s%s + %s%s" % ( prefix, str( self.projectile ), str( self.target ), suffix ) )
 
-    def process( self, processInfo, verbosityIndent = '' ) :
+    def processSnMultiGroup( self, style, verbosity = 0, indent = '', incrementalIndent = '  ', logFile = None ) :
 
-        from fudge.core.utilities import times
+        from fudge.core.utilities import times as timesModule
+        status = 0
 
-        if( processInfo.verbosity >= 10 ) : print '%s%s' % ( verbosityIndent, self.inputParticlesToReactionString( suffix = " -->" ) )
-        t0 = times.times( )
-        try :
-            logFile = processInfo.dict['logFile']
-        except :
-            logFile = None
+        if( verbosity > 0 ) : print '%s%s' % ( indent, self.inputParticlesToReactionString( suffix = " -->" ) )
+        if( not( isinstance( style, stylesModule.SnMultiGroup ) ) ) : raise( 'Instance is not a SnMultiGroup style.' )
+
+        t0 = timesModule.times( )
+
+        self.styles.add( style )
 
         tempInfo = { 'reactionSuite' : self }
-        tempInfo['incidentEnergyUnit'] = self.reactions[0].crossSection.getIncidentEnergyUnit( )
+        tempInfo['verbosity'] = verbosity
+        tempInfo['incrementalIndent'] = incrementalIndent
+        tempInfo['logFile'] = logFile
+        tempInfo['incidentEnergyUnit'] = self.reactions[0].crossSection.domainUnit( )
         tempInfo['massUnit'] = tempInfo['incidentEnergyUnit'] + '/c**2'
         tempInfo['masses'] = { 'Projectile' : self.projectile.getMass( tempInfo['massUnit'] ) }
         tempInfo['masses']['Target'] = self.target.getMass( tempInfo['massUnit'] )
         tempInfo['masses']['Product'] = None
         tempInfo['masses']['Residual'] = None
+        tempInfo['workDir'] = 'xndfgen.work'
+        tempInfo['workFile'] = []
 
-        self.reconstructResonances( styleName = 'reconstructed', accuracy = 1e-3, verbose = False )
-        processInfo['workFile'] = []
-        for channel in self :
-            channel.process( processInfo, tempInfo, verbosityIndent + processInfo.verbosityIndentStep )
-        for channel in self.fissionComponents :
-            channel.process( processInfo, tempInfo, verbosityIndent + processInfo.verbosityIndentStep )
-        if( 'LLNL_Pn' in processInfo.dict['styles'] ) :
-            subStyle = fudge.gnd.miscellaneous.subStyleLLNL_Pn( processInfo['particles'] )
-            style = fudge.gnd.miscellaneous.style( 'LLNL_Pn', subStyle = subStyle )
-            style.setAttribute( 'flux', processInfo['flux']['name'] )
-            self.styles.add( style )
-        if( logFile is not None ) : logFile.write( str( t0 ) + '\n' )
+        tempInfo['groupedFlux'] = style.flux[0].groupOneFunction( style.transportables[self.projectile.name].group.boundaries )
+
+# BRB FIXME, must have test to determine if reconstructResonances is needed.
+#        self.reconstructResonances( styleName = 'reconstructed', accuracy = 1e-3, verbose = False )
+        for reaction in self.reactions : status += reaction.processSnMultiGroup( style, tempInfo, indent + incrementalIndent )
+        logFile.write( str( t0 ) + '\n' )
+
+        return( status )
 
     def reconstructResonances( self, styleName, accuracy = None, thin = True, verbose = False ):
-        """Turn resonance parameters into pointwise cross sections, then merge the results with
+        """
+        Turn resonance parameters into pointwise cross sections, then merge the results with
         tabulated pointwise cross sections. Resulting pointwise cross sections are stored
         alongside the original 'resonancesWithBackground' data in the reactionSuite.
 
@@ -594,7 +665,8 @@ class reactionSuite( ancestryModule.ancestry ) :
             accuracy (double) - target accuracy during reconstruction. For example, 0.001
             thin (boolean) - enable/disable thinning after resonance reconstruction.
                 Disabling thinning makes it easier to check for consistency of summed cross sections.
-            verbose (boolean) - turn on/off verbosity"""
+            verbose (boolean) - turn on/off verbosity.
+        """
 
         from . import sums as sumsModule
 
@@ -639,7 +711,7 @@ class reactionSuite( ancestryModule.ancestry ) :
             RRxsec = RRxsec.toPointwise_withLinearXYs( epsilon, epsilon )
 
             background, RRxsec = background.mutualify(0,0,0, RRxsec, -epsilon,epsilon,True)
-            RRxsec = background + RRxsec    # result is a crossSection.pointwise instance
+            RRxsec = background + RRxsec    # result is a crossSection.XYs1d instance
             if RRxsec.rangeMin() < 0:
                 # turn any negative xsc to 0
                 RRxsec = RRxsec.clip( rangeMin=0 )
@@ -650,6 +722,74 @@ class reactionSuite( ancestryModule.ancestry ) :
             RRxsec.label = newStyle.label
             reaction.crossSection.add( RRxsec )
         self.styles.add( newStyle )
+
+    def reconstructResonancesAngularDistributions( self, styleName, overwrite=False, accuracy = None, thin = False, verbose = False ):
+        """
+        Turn resonance parameters into Legendre-expanded angular distributions, then merge the results with
+        tabulated angular distributions (overwriting original values in the resonance region). Resulting pointwise
+        angular distributions are stored alongside the original angular distributions in the reactionSuite.
+
+        @:param styleName: string - label for reconstructed distribution style
+        @:param overwrite: boolean - if style already in use for another distribution, overwrite it with the reconstructed distribution
+        @:param accuracy: float - giving target accuracy during reconstruction. For example, 0.001
+        @:param thin: boolean - enable/disable thinning after reconstruction
+        @:param verbose: boolean - turn on/off verbosity
+        """
+
+        if accuracy: raise NotImplementedError("Refining interpolation grid for angular distributions still TBD")
+        if thin: raise NotImplementedError("Thinning for angular distributions still TBD")
+
+        if( self.resonances is None ) : return
+        from fudge.processing.resonances import reconstructResonances
+        from fudge.gnd.productData.distributions import angular as angularModule
+
+        newStyle = stylesModule.angularDistributionReconstructed( label = styleName )
+
+        distributions = reconstructResonances.reconstructAngularDistributions( self, tolerance=accuracy, verbose=verbose )
+
+        for key in distributions:
+            reaction = self.getReaction( key )
+            # Kludgy way to discern the product's name so we can look it up
+            if key in 'elastic': productName = 'n'
+            else:
+                pairs = [ (p.particle.getMass('amu'), p.particle.name) for p in reaction.outputChannel.products ]
+                productName = min(pairs)[1] # pick's the lightest product
+            product = reaction.outputChannel.getProductWithName(productName)
+            original = product.distribution.evaluated.angularSubform
+            reconstructed = distributions[key]
+
+            merged = angularModule.regions2d(axes = angularModule.XYs2d.defaultAxes( asLegendre = True ))
+            merged.append( reconstructed )
+
+            if isinstance( original, angularModule.XYs2d ):
+                newregion = angularModule.XYs2d( axes=original.axes, interpolation=original.interpolation,
+                        interpolationQualifier=original.interpolationQualifier )
+                newregion.append( original.getAtEnergy(reconstructed.domainMax()) )
+                for val in original:
+                    if val.value <= reconstructed.domainMax(): continue
+                    newregion.append( val )
+                merged.append( newregion )
+            elif isinstance( original, angularModule.regions2d ):
+                for idx,region in enumerate(original):
+                    if region.domainMax() > reconstructed.domainMax(): break
+                if region.domainMin() != reconstructed.domainMax():
+                    newregion = angularModule.XYs2d( axes=region.axes, interpolation=region.interpolation,
+                            interpolationQualifier=region.interpolationQualifier )
+                    newregion.append( region.getAtEnergy(reconstructed.domainMax()) )
+                    for val in region:
+                        if val.value <= reconstructed.domainMax(): continue
+                        newregion.append( val )
+                    merged.append( newregion )
+                    idx += 1
+                for region in original[idx:]:
+                    merged.append( region )
+
+            newForm = angularModule.twoBodyForm( label=newStyle.label, productFrame=product.distribution.evaluated.productFrame,
+                angularSubform=merged )
+            if overwrite and newStyle.label in product.distribution:
+                product.distribution.remove( newStyle.label )
+            product.distribution.add( newForm )
+        if newStyle.label not in self.styles: self.styles.add( newStyle )
 
     def removeStyle( self, style ) :
         """
@@ -673,8 +813,8 @@ class reactionSuite( ancestryModule.ancestry ) :
             for product in reaction.outputChannel:
                 removeStyleFromComponent( style, product.energyDeposition )
                 removeStyleFromComponent( style, product.momentumDeposition )
-                if product.decayChannel is None: continue
-                for dproduct in product.decayChannel:
+                if product.outputChannel is None: continue
+                for dproduct in product.outputChannel:
                     removeStyleFromComponent( style, dproduct.energyDeposition )
                     removeStyleFromComponent( style, dproduct.momentumDeposition )
         self.styles.remove( style )
@@ -701,10 +841,8 @@ class reactionSuite( ancestryModule.ancestry ) :
         indent2 = indent + incrementalIndent
         indent3 = indent2 + incrementalIndent
 
-        attributeString = ''
-        for attribute in self.attributes : attributeString += ' %s="%s"' % ( attribute, self.attributes[attribute] )
-        xmlString = [ '%s<%s projectile="%s" target="%s" version="%s"%s xmlns:xlink="http://www.w3.org/1999/xlink" projectileFrame="%s">'
-            % ( indent, self.moniker, self.projectile.name, self.target.name, self.GND_version, attributeString, self.projectileFrame ) ]
+        xmlString = [ '%s<%s projectile="%s" target="%s" version="%s" xmlns:xlink="http://www.w3.org/1999/xlink" projectileFrame="%s">'
+            % ( indent, self.moniker, self.projectile.name, self.target.name, self.GND_version, self.projectileFrame ) ]
 
         xmlString += self.styles.toXMLList( indent2, **kwargs )
 
@@ -715,7 +853,7 @@ class reactionSuite( ancestryModule.ancestry ) :
         xmlString += self.aliases.toXMLList( indent2, **kwargs )
 
         xmlString += self.particles.toXMLList( indent2, **kwargs )
-        
+
         if self.resonances is not None:
             xmlString += self.resonances.toXMLList( indent2, **kwargs )
 
@@ -728,11 +866,6 @@ class reactionSuite( ancestryModule.ancestry ) :
 
         xmlString.append( '%s</%s>' % ( indent, self.moniker ) )
         return( xmlString )
-
-    def setAttribute( self, name, value ) :
-        """Adds attribute name and its value to the list of attributes."""
-
-        self.attributes[name] = value
 
     def toString( self, indent = '' ) :
         """Returns a string representation of an reactionSuite."""
@@ -772,7 +905,6 @@ def parseXMLNode( rsElement ):
         projectile = particles.getParticle( rsElement.get( 'projectile' ) )
         target = particles.getParticle( rsElement.get('target') )
         projectileFrame = rsElement.get( 'projectileFrame' )
-#        formatVersion = rsElement.get( 'formatVersion' ) #FIXME: obsolete? DAB 11/24/2015
         rs = reactionSuite( projectile, target, GND_version = GND_version, particleList = particles,
                             projectileFrame = projectileFrame )
 
@@ -813,6 +945,9 @@ def parseXMLNode( rsElement ):
     # Fix links.
     for quant in linkData['unresolvedLinks'] :
         if isinstance( quant, linkModule.link ) :
+            if quant.path.startswith('/covarianceSuite'):
+                rs._externalLinks.append( quant )
+                continue
             quant.link = quant.follow( rs )
         else :
             raise 'hell'

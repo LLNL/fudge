@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 """
@@ -78,9 +102,6 @@ This module contains the following channel classes::
         outputChannel                   : the base class for the following outout channels,
             twoBodyOutputChannel            : twoBody output channel.
             NBodyOutputChannel              : NBody output channel.
-        decayChannel                    : the base class for the following decay channels,
-            twoBodyDecayChannel             : twoBody decay channel.
-            NBodyDecayChannel               : NBody decay channel.
         fissionChannel                  :
         sumOfRemainingOutputChannels    :
         productionChannel               :
@@ -94,7 +115,6 @@ productionGenre = 'production'
 sumOfRemainingOutputChannelsGenre = 'sumOfRemainingOutputChannels'
 
 outputChannelToken = "outputChannel"
-decayChannelToken = "decayChannel"
 
 fissionGenreTotal = 'total'
 fissionGenreFirstChance = 'firstChance'
@@ -110,6 +130,7 @@ import xData.ancestry as ancestryModule
 import channelData
 
 from . import tokens as tokensModule
+from . import xParticle as xParticleModule
 
 from .channelData import Q as QModule
 
@@ -184,14 +205,14 @@ class channel( ancestryModule.ancestry ) :
 
         mP = []
         for particle in self :
-            if( particle.decayChannel is None ) :
+            if( particle.outputChannel is None ) :
                 try :
                     multiplicity = particle.multiplicity.getConstant( )
                 except :
                     multiplicity = "(?)"                        # ????? This needs work.
                 mP += [ [ multiplicity, particle.particle.name] ]
             else :
-                mP += particle.decayChannel.getFinalProductList( )
+                mP += particle.outputChannel.getFinalProductList( )
         return( mP )
 
     def getProductsWithName( self, name ) :
@@ -235,6 +256,41 @@ class channel( ancestryModule.ancestry ) :
     def isFission( self ) :
 
         return( not( self.fissionGenre is None ) )
+
+    def calculateAverageProductData( self, style, indent = '', **kwargs ) :
+        """
+        Calculate average product data.
+
+        :param style: The style to use.
+        :param indent: string; The amount to indent and verbose output.
+        :param kwargs: string; All other parameters.
+        :return:
+        """
+
+        kwargs['outputChannel'] = self
+        for productIndex, product in enumerate( self ) :
+            kwargs['product'] = product
+            kwargs['productIndex'] = str( productIndex )
+            product.calculateAverageProductData( style, indent = indent, **kwargs )
+
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
+
+        indent2 = indent + tempInfo['incrementalIndent']
+        status = 0
+
+        self.Q.processSnMultiGroup( style, tempInfo, indent )
+
+        tempInfo['transferMatrixComment'] = tempInfo['reactionSuite'].inputParticlesToReactionString( suffix = " --> " ) +  \
+                self.toString( simpleString = True )
+        for productIndex, product in enumerate( self ) :
+            tempInfo['productIndex'] = str( productIndex )
+            tempInfo['productName'] = product.name
+            if( isinstance( product.particle, xParticleModule.nuclearLevel ) ) :
+                tempInfo['productName'] = product.particle.groundState.name
+            tempInfo['productLabel'] = product.label
+            status += product.processSnMultiGroup( style, tempInfo, indent2 )
+
+        return( status )
 
     def toXMLList( self, indent = '', **kwargs ) :
 
@@ -339,30 +395,6 @@ class NBodyOutputChannel( outputChannel ) :
 
         outputChannel.__init__( self, NBodyGenre, process = process )
 
-class decayChannel( channel ) :
-
-    def __init__( self, genre, numberOfAllowedParticles = manyToken, process = None ) :
-
-        channel.__init__( self, genre, numberOfAllowedParticles = numberOfAllowedParticles, process = process )
-
-class twoBodyDecayChannel( decayChannel ) :
-    """A decay channel producing exactly two products: gamma or alpha decays."""
-
-    moniker = decayChannelToken
-
-    def __init__( self, process = None ) :
-
-        decayChannel.__init__( self, twoBodyGenre, numberOfAllowedParticles = 2, process = process )
-
-class NBodyDecayChannel( decayChannel ) :
-    """A decay channel producing more than two products: beta decay, spontaneous fission """
-
-    moniker = decayChannelToken
-
-    def __init__( self, process = None ) :
-
-        decayChannel.__init__( self, NBodyGenre, process = process )
-
 class fissionChannel( channel ) :
 
     def __init__( self, fissionGenre ) :
@@ -394,7 +426,7 @@ class productionChannel( channel ) :
         channel.__init__( self, productionGenre, numberOfAllowedParticles = manyToken )
 
 def parseXMLNode( channelElement, xPath, linkData ) :
-    """Translate '<outputChannel>' or '<decayChannel>' from xml."""
+    """Translate '<outputChannel>' from xml."""
 
     xPath.append( channelElement.tag )
     from fudge import gnd
@@ -402,9 +434,7 @@ def parseXMLNode( channelElement, xPath, linkData ) :
             outputChannelToken : {
                 twoBodyGenre : twoBodyOutputChannel, NBodyGenre : NBodyOutputChannel,
                 sumOfRemainingOutputChannelsGenre : sumOfRemainingOutputChannels,
-                productionGenre : productionChannel },
-            decayChannelToken : {
-                twoBodyGenre : twoBodyDecayChannel, NBodyGenre : NBodyDecayChannel }
+                productionGenre : productionChannel }
             }[channelElement.tag][channelElement.get( 'genre' )]
     outputChannel = outputChannelClass( )
     # FIXME: next lines only needed for discrete gammas. If we convert them to 'uncorrelated', this can be removed

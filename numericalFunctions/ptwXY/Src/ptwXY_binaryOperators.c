@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -45,21 +69,27 @@
 #include "ptwXY.h"
 
 static double ptwXY_mod2( double v, double m, int pythonMod );
-static nfu_status ptwXY_mul2_s_ptwXY( ptwXYPoints *n, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, double x1, double y1, double x2, double y2, int level );
-static nfu_status ptwXY_div_s_ptwXY( ptwXYPoints *n, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, double x1, double y1, double x2, double y2, 
-    int level, int isNAN1, int isNAN2 );
-static ptwXYPoints *ptwXY_div_ptwXY_forFlats( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_status *status, int safeDivide );
-static nfu_status ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXYPoints *ptwXY1, double x, double *y );
+static nfu_status ptwXY_mul2_s_ptwXY( statusMessageReporting *smr, ptwXYPoints *div, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, 
+        double x1, double y1, double x2, double y2, int level );
+static nfu_status ptwXY_div_s_ptwXY( statusMessageReporting *smr, ptwXYPoints *div, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, 
+        double x1, double y1, double x2, double y2, int level, int isNAN1, int isNAN2 );
+static ptwXYPoints *ptwXY_div_ptwXY_forFlats( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, int safeDivide );
+static nfu_status ptwXY_getValueAtX_ignore_XOutsideDomainError( statusMessageReporting *smr, ptwXYPoints *ptwXY1, double x, double *y );
+static nfu_status ptwXY_getValueAtX_signal_XOutsideDomainError( statusMessageReporting *smr, int line, 
+        char const *function, ptwXYPoints *ptwXY1, double x, double *y );
 /*
 ************************************************************
 */
-nfu_status ptwXY_slopeOffset( ptwXYPoints *ptwXY, double slope, double offset ) { 
+nfu_status ptwXY_slopeOffset( statusMessageReporting *smr, ptwXYPoints *ptwXY, double slope, double offset ) { 
 
-    int64_t i, nonOverflowLength = ptwXY_getNonOverflowLength( ptwXY );
+    int64_t i, nonOverflowLength;
     ptwXYPoint *p;
     ptwXYOverflowPoint *o, *overflowHeader = &(ptwXY->overflowHeader);
 
-    if( ptwXY->status != nfu_Okay ) return( ptwXY->status );
+    if( ( nonOverflowLength = ptwXY_getNonOverflowLength( smr, ptwXY ) ) < 0 ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( ptwXY->status );
+    }
 
     for( i = 0, p = ptwXY->points; i < nonOverflowLength; i++, p++ ) p->y = slope * p->y + offset;
     for( o = overflowHeader->next; o != overflowHeader; o = o->next ) o->point.y = slope * o->point.y + offset; 
@@ -68,34 +98,79 @@ nfu_status ptwXY_slopeOffset( ptwXYPoints *ptwXY, double slope, double offset ) 
 /*
 ************************************************************
 */
-nfu_status ptwXY_add_double( ptwXYPoints *ptwXY, double value ) { return( ptwXY_slopeOffset( ptwXY, 1., value ) ); }
-nfu_status ptwXY_sub_doubleFrom( ptwXYPoints *ptwXY, double value ) { return( ptwXY_slopeOffset( ptwXY,  1., -value ) ); }
-nfu_status ptwXY_sub_fromDouble( ptwXYPoints *ptwXY, double value ) { return( ptwXY_slopeOffset( ptwXY, -1.,  value ) ); }
-nfu_status ptwXY_mul_double( ptwXYPoints *ptwXY, double value ) { return( ptwXY_slopeOffset( ptwXY, value, 0. ) ); }
-nfu_status ptwXY_div_doubleFrom( ptwXYPoints *ptwXY, double value ) { 
+nfu_status ptwXY_add_double( statusMessageReporting *smr, ptwXYPoints *ptwXY, double value ) {
+    
+    if( ptwXY_slopeOffset( smr, ptwXY, 1., value ) != nfu_Okay )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( ptwXY->status );
+}
+/*
+************************************************************
+*/
+nfu_status ptwXY_sub_doubleFrom( statusMessageReporting *smr, ptwXYPoints *ptwXY, double value ) {
+
+    if( ptwXY_slopeOffset( smr, ptwXY,  1., -value ) != nfu_Okay )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( ptwXY->status );
+}
+/*
+************************************************************
+*/
+nfu_status ptwXY_sub_fromDouble( statusMessageReporting *smr, ptwXYPoints *ptwXY, double value ) {
+
+    if( ptwXY_slopeOffset( smr, ptwXY, -1.,  value ) != nfu_Okay )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( ptwXY->status );
+}
+/*
+************************************************************
+*/
+nfu_status ptwXY_mul_double( statusMessageReporting *smr, ptwXYPoints *ptwXY, double value ) {
+
+    if( ptwXY_slopeOffset( smr, ptwXY, value, 0. ) != nfu_Okay )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( ptwXY->status );
+}
+/*
+************************************************************
+*/
+nfu_status ptwXY_div_doubleFrom( statusMessageReporting *smr, ptwXYPoints *ptwXY, double value ) { 
 
     if( value == 0. ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_divByZero, "Divide by 0." );
         ptwXY->status = nfu_divByZero; }
     else {
-        ptwXY_slopeOffset( ptwXY, 1. / value, 0. ); 
+        if( ptwXY_slopeOffset( smr, ptwXY, 1. / value, 0. ) != nfu_Okay )
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
     }
     return( ptwXY->status );
 }
-nfu_status ptwXY_div_fromDouble( ptwXYPoints *ptwXY, double value ) {
+/*
+************************************************************
+*/
+nfu_status ptwXY_div_fromDouble( statusMessageReporting *smr, ptwXYPoints *ptwXY, double value ) {
 /*
 *   This does not do any infilling and it should?????????
 */
 
-    int64_t i, nonOverflowLength = ptwXY_getNonOverflowLength( ptwXY );
+    int64_t i, nonOverflowLength;
     ptwXYPoint *p;
     ptwXYOverflowPoint *o, *overflowHeader = &(ptwXY->overflowHeader);
 
-    if( ptwXY->status != nfu_Okay ) return( ptwXY->status );
-    if( ptwXY->interpolation == ptwXY_interpolationOther ) return( nfu_otherInterpolation );
+    if( ( nonOverflowLength = ptwXY_getNonOverflowLength( smr, ptwXY ) ) < 0 ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( ptwXY->status );
+    }
+    if( ptwXY->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Other interpolation not allowed." );
+        return( nfu_otherInterpolation );
+    }
 
     for( i = 0, p = ptwXY->points; i < nonOverflowLength; i++, p++ ) if( p->y == 0. ) ptwXY->status = nfu_divByZero;
     for( o = overflowHeader->next; o != overflowHeader; o = o->next ) if( o->point.y == 0. ) ptwXY->status = nfu_divByZero;
-    if( ptwXY->status != nfu_divByZero ) {
+    if( ptwXY->status == nfu_divByZero ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_divByZero, "Divide by 0." ); }
+    else {
         for( i = 0, p = ptwXY->points; i < nonOverflowLength; i++, p++ ) p->y = value / p->y;
         for( o = overflowHeader->next; o != overflowHeader; o = o->next ) o->point.y = value / o->point.y; 
     }
@@ -104,14 +179,21 @@ nfu_status ptwXY_div_fromDouble( ptwXYPoints *ptwXY, double value ) {
 /*
 ************************************************************
 */
-nfu_status ptwXY_mod( ptwXYPoints *ptwXY, double m, int pythonMod ) { 
+nfu_status ptwXY_mod( statusMessageReporting *smr, ptwXYPoints *ptwXY, double m, int pythonMod ) { 
 
-    int64_t i, nonOverflowLength = ptwXY_getNonOverflowLength( ptwXY );
+    int64_t i, nonOverflowLength;
     ptwXYPoint *p;
     ptwXYOverflowPoint *o, *overflowHeader = &(ptwXY->overflowHeader);
 
-    if( ptwXY->status != nfu_Okay ) return( ptwXY->status );
-    if( m == 0 ) return( ptwXY->status = nfu_divByZero );
+    if( ( nonOverflowLength = ptwXY_getNonOverflowLength( smr, ptwXY ) ) < 0 ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( ptwXY->status );
+    }
+
+    if( m == 0 ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_divByZero, "Divide by 0." );
+        ptwXY->status = nfu_divByZero;
+    }
 
     for( i = 0, p = ptwXY->points; i < nonOverflowLength; i++, p++ ) p->y = ptwXY_mod2( p->y, m, pythonMod );
     for( o = overflowHeader->next; o != overflowHeader; o = o->next ) o->point.y = ptwXY_mod2( o->point.y, m, pythonMod );
@@ -136,161 +218,196 @@ static double ptwXY_mod2( double v, double m, int pythonMod ) {
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_binary_ptwXY( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, double v1, double v2, double v1v2, nfu_status *status ) {
+ptwXYPoints *ptwXY_binary_ptwXY( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, 
+        double v1, double v2, double v1v2 ) {
 
     int64_t i;
     int unionOptions = ptwXY_union_fill | ptwXY_union_mergeClosePoints;
     double y;
-    ptwXYPoints *n;
+    ptwXYPoints *ptwXYNew;
     ptwXYPoint *p;
+    nfu_status status = nfu_Okay;
 
-    *status = nfu_otherInterpolation;
-    if( ptwXY1->interpolation == ptwXY_interpolationOther ) return( NULL );
-    if( ptwXY2->interpolation == ptwXY_interpolationOther ) return( NULL );
-    if( ( *status = ptwXY_areDomainsMutual( ptwXY1, ptwXY2 ) ) != nfu_Okay ) return( NULL );
-    if( ( ptwXY1->interpolation == ptwXY_interpolationFlat ) || ( ptwXY2->interpolation == ptwXY_interpolationFlat ) ) {
-        *status = nfu_invalidInterpolation;
-        if( ( ptwXY1->interpolation != ptwXY2->interpolation ) ) return( NULL );
+    if( ptwXY1->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Source1: Other interpolation not allowed." );
+        return( NULL );
     }
-    if( ( n = ptwXY_union( ptwXY1, ptwXY2, status, unionOptions ) ) != NULL ) {
-        for( i = 0, p = n->points; i < n->length; i++, p++ ) {
-            if( ( *status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY2, p->x, &y ) ) != nfu_Okay ) goto Err;
+    if( ptwXY2->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Source2: Other interpolation not allowed." );
+        return( NULL );
+    }
+
+    if( ptwXY1->interpolation != ptwXY2->interpolation ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_invalidInterpolation, 
+                "Source1 interpolation '%s' not same as Source2 interpolation '%s'.",
+                    ptwXY1->interpolationString, ptwXY2->interpolationString );
+        return( NULL );
+    }
+
+    if( ( status = ptwXY_areDomainsMutual( smr, ptwXY1, ptwXY2 ) ) != nfu_Okay ) {
+        double domainMin1, domainMax1, domainMin2, domainMax2;
+
+        ptwXY_domainMin( NULL, ptwXY1, &domainMin1 );
+        ptwXY_domainMax( NULL, ptwXY1, &domainMax1 );
+        ptwXY_domainMin( NULL, ptwXY2, &domainMin2 );
+        ptwXY_domainMax( NULL, ptwXY2, &domainMax2 );
+
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_domainsNotMutual, "Domains not mutual (%.17e, %.17e) vs (%.17e, %.17e).",
+                domainMin2, domainMax1, domainMin2, domainMax2 );
+        return( NULL );
+    }
+
+    if( ( ptwXYNew = ptwXY_union( smr, ptwXY1, ptwXY2, unionOptions ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." ); }
+    else {
+        for( i = 0, p = ptwXYNew->points; i < ptwXYNew->length; i++, p++ ) {
+            if( ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY2, p->x, &y ) != nfu_Okay ) goto Err;
             p->y = v1 * p->y + v2 * y + v1v2 * y * p->y;
         }
     }
-    return( n );
+    return( ptwXYNew );
 Err:
-    if( n ) ptwXY_free( n );
+    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    if( ptwXYNew ) ptwXY_free( ptwXYNew );
     return( NULL );
 }
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_add_ptwXY( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_status *status ) {
+ptwXYPoints *ptwXY_add_ptwXY( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2 ) {
 
     ptwXYPoints *sum;
 
     if( ptwXY1->length == 0 ) {
-        sum = ptwXY_clone( ptwXY2, status ); }
+        sum = ptwXY_clone( smr, ptwXY2 ); }
     else if( ptwXY2->length == 0 ) {
-        sum = ptwXY_clone( ptwXY1, status ); }
+        sum = ptwXY_clone( smr, ptwXY1 ); }
     else {
-        sum = ptwXY_binary_ptwXY( ptwXY1, ptwXY2, 1., 1., 0., status );
+        sum = ptwXY_binary_ptwXY( smr, ptwXY1, ptwXY2, 1., 1., 0. );
     }
+    if( sum == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
     return( sum );
 }
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_sub_ptwXY( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_status *status ) {
+ptwXYPoints *ptwXY_sub_ptwXY( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2 ) {
 
     ptwXYPoints *diff;
 
     if( ptwXY1->length == 0 ) {
-        diff = ptwXY_clone( ptwXY2, status );
-        if( ( *status = ptwXY_neg( diff ) ) != nfu_Okay ) diff = ptwXY_free( diff ); }
+        diff = ptwXY_clone( smr, ptwXY2 );
+        if( diff != NULL ) {
+            if( ptwXY_neg( smr, diff ) != nfu_Okay ) diff = ptwXY_free( diff );
+        } }
     else if( ptwXY2->length == 0 ) {
-        diff = ptwXY_clone( ptwXY1, status ); }
+        diff = ptwXY_clone( smr, ptwXY1 ); }
     else {
-        diff = ptwXY_binary_ptwXY( ptwXY1, ptwXY2, 1., -1., 0., status );
+        diff = ptwXY_binary_ptwXY( smr, ptwXY1, ptwXY2, 1., -1., 0. );
     }
+    if( diff == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
     return( diff );
 }
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_mul_ptwXY( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_status *status ) {
+ptwXYPoints *ptwXY_mul_ptwXY( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2 ) {
 
     ptwXYPoints *mul;
 
     if( ptwXY1->length == 0 ) {
-        mul = ptwXY_clone( ptwXY1, status ); }
+        mul = ptwXY_clone( smr, ptwXY1 ); }
     else if( ptwXY2->length == 0 ) {
-        mul = ptwXY_clone( ptwXY2, status ); }
+        mul = ptwXY_clone( smr, ptwXY2 ); }
     else {
-        mul = ptwXY_binary_ptwXY( ptwXY1, ptwXY2, 0., 0., 1., status );
+        mul = ptwXY_binary_ptwXY( smr, ptwXY1, ptwXY2, 0., 0., 1. );
     }
+    if( mul == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
     return( mul );
 }
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_mul2_ptwXY( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_status *status ) {
+ptwXYPoints *ptwXY_mul2_ptwXY( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2 ) {
 
     int64_t i, length;
-    ptwXYPoints *n = NULL;
+    ptwXYPoints *mul = NULL;
     int found;
     double x1, y1, x2, y2, u1, u2, v1, v2, xz1 = 0, xz2 = 0, x;
 
-    *status = nfu_otherInterpolation;
-    if( ptwXY1->interpolation == ptwXY_interpolationOther ) return( NULL );
-    if( ptwXY2->interpolation == ptwXY_interpolationOther ) return( NULL );
-    if( ( n = ptwXY_mul_ptwXY( ptwXY1, ptwXY2, status ) ) == NULL ) return( n );
-    if( ptwXY1->interpolation == ptwXY_interpolationFlat ) return( n );
-    if( ptwXY2->interpolation == ptwXY_interpolationFlat ) return( n );
-    length = n->length - 1;
+    if( ( mul = ptwXY_mul_ptwXY( smr, ptwXY1, ptwXY2 ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
+    if( mul->length == 0 ) return( mul );
+    if( ptwXY1->interpolation == ptwXY_interpolationFlat ) return( mul );
+    if( ptwXY2->interpolation == ptwXY_interpolationFlat ) return( mul );
+
+    length = mul->length - 1;
     if( length > 0 ) {
-        x2 = n->points[length].x;
-        for( i = length - 1; i >= 0; i-- ) {             /* Find and add y zeros not currently in n's. */
-            x1 = n->points[i].x;
-            if( ( *status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY1, x1, &u1 ) ) != nfu_Okay ) goto Err;
-            if( ( *status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY1, x2, &u2 ) ) != nfu_Okay ) goto Err;
-            if( ( *status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY2, x1, &v1 ) ) != nfu_Okay ) goto Err;
-            if( ( *status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY2, x2, &v2 ) ) != nfu_Okay ) goto Err;
+        x2 = mul->points[length].x;
+        for( i = length - 1; i >= 0; i-- ) {             /* Find and add y zeros not currently in mul's. */
+            x1 = mul->points[i].x;
+            if( ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x1, &u1 ) != nfu_Okay ) goto Err;
+            if( ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x2, &u2 ) != nfu_Okay ) goto Err;
+            if( ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY2, x1, &v1 ) != nfu_Okay ) goto Err;
+            if( ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY2, x2, &v2 ) != nfu_Okay ) goto Err;
             found = 0;
             if( u1 * u2 < 0 ) {
                 xz1 = ( u1 * x2 - u2 * x1 ) / ( u1 - u2 );
-                if( ( *status = ptwXY_setValueAtX( n, xz1, 0. ) ) != nfu_Okay ) goto Err;
+                if( ptwXY_setValueAtX( smr, mul, xz1, 0. ) != nfu_Okay ) goto Err;
                 found = 1;
             }
             if( v1 * v2 < 0 ) {
                 xz2 = ( v1 * x2 - v2 * x1 ) / ( v1 - v2 );
-                if( ( *status = ptwXY_setValueAtX( n, xz2, 0. ) ) != nfu_Okay ) goto Err;
+                if( ptwXY_setValueAtX( smr, mul, xz2, 0. ) != nfu_Okay ) goto Err;
                 found += 1;
             }
             if( found > 1 ) {
                 x = 0.5 * ( xz1 + xz2 );
-                if( ( *status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY1, x, &u1 ) ) != nfu_Okay ) goto Err;
-                if( ( *status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY2, x, &v1 ) ) != nfu_Okay ) goto Err;
-                if( ( *status = ptwXY_setValueAtX( n, x, u1 * v1 ) ) != nfu_Okay ) goto Err;
+                if( ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x, &u1 ) != nfu_Okay ) goto Err;
+                if( ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY2, x, &v1 ) != nfu_Okay ) goto Err;
+                if( ptwXY_setValueAtX( smr, mul, x, u1 * v1 ) != nfu_Okay ) goto Err;
             }
             x2 = x1;
         }
 
-        if( ( *status = ptwXY_simpleCoalescePoints( n ) ) != nfu_Okay ) goto Err;
-        length = n->length;
-        x2 = n->points[n->length-1].x;
-        y2 = n->points[n->length-1].y;
-        for( i = n->length - 2; i >= 0; i-- ) {             /* Make interpolation fit accuracy. Work backwards so new points will not mess up loop. */
-            x1 = n->points[i].x;
-            y1 = n->points[i].y;
-            if( ( *status = ptwXY_mul2_s_ptwXY( n, ptwXY1, ptwXY2, x1, y1, x2, y2, 0 ) ) != nfu_Okay ) goto Err;
+        if( ptwXY_simpleCoalescePoints( smr, mul ) != nfu_Okay ) goto Err;
+        length = mul->length;
+        x2 = mul->points[mul->length-1].x;
+        y2 = mul->points[mul->length-1].y;
+        for( i = mul->length - 2; i >= 0; i-- ) {           /* Make interpolation fit accuracy. Work backwards so new */
+            x1 = mul->points[i].x;                          /* points will not mess up loop. */
+            y1 = mul->points[i].y;
+            if( ptwXY_mul2_s_ptwXY( smr, mul, ptwXY1, ptwXY2, x1, y1, x2, y2, 0 ) != nfu_Okay ) goto Err;
             x2 = x1;
             y2 = y1;
         }
-        ptwXY_update_biSectionMax( n, (double) length );
+        ptwXY_update_biSectionMax( mul, (double) length );
     }
-    return( n );
+    return( mul );
 
 Err:
-    if( n ) ptwXY_free( n );
+    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    if( mul ) ptwXY_free( mul );
     return( NULL );
 }
 /*
 ************************************************************
 */
-static nfu_status ptwXY_mul2_s_ptwXY( ptwXYPoints *n, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, double x1, double y1, double x2, double y2, int level ) {
+static nfu_status ptwXY_mul2_s_ptwXY( statusMessageReporting *smr, ptwXYPoints *mul, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, 
+        double x1, double y1, double x2, double y2, int level ) {
 
-    nfu_status status;
     double u1, u2, v1, v2, x, y, yp, dx, a1, a2;
+    nfu_status status;
 
     if( ( x2 - x1 ) < ClosestAllowXFactor * DBL_EPSILON * ( fabs( x1 ) + fabs( x2 ) ) ) return( nfu_Okay );
-    if( level >= n->biSectionMax ) return( nfu_Okay );
+    if( level >= mul->biSectionMax ) return( nfu_Okay );
     level++;
-    if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY1, x1, &u1 ) ) != nfu_Okay ) return( status );
-    if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY1, x2, &u2 ) ) != nfu_Okay ) return( status );
-    if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY2, x1, &v1 ) ) != nfu_Okay ) return( status );
-    if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY2, x2, &v2 ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x1, &u1 ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x2, &u2 ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY2, x1, &v1 ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY2, x2, &v2 ) ) != nfu_Okay ) return( status );
     if( ( u1 == u2 ) || ( v1 == v2 ) ) return( nfu_Okay );
     a1 = u1 * v1;
     if( y1 == 0 ) a1 = 0.;                                  /* Fix rounding problem. */
@@ -299,189 +416,219 @@ static nfu_status ptwXY_mul2_s_ptwXY( ptwXYPoints *n, ptwXYPoints *ptwXY1, ptwXY
     if( ( a1 == 0. ) || ( a2 == 0. ) ) {                    /* Handle special case of 0 where accuracy can never be met. */
         x = 0.5 * ( x1 + x2 ); }
     else {
-        if( ( a1 * a2 < 0. ) ) return( nfu_Okay );  /* Assume rounding error and no point needed as zero crossings are set in ptwXY_mul2_ptwXY. */
-        a1 = sqrt( fabs( a1 ) );
+        if( ( a1 * a2 < 0. ) ) return( nfu_Okay );          /* Assume rounding error and no point needed as zero */
+        a1 = sqrt( fabs( a1 ) );                            /* crossings are set in ptwXY_mul2_ptwXY. */
         a2 = sqrt( fabs( a2 ) );
         x = ( a2 * x1 + a1 * x2 ) / ( a2 + a1 );
     }
     dx = x2 - x1;
     yp = ( u1 * v1 * ( x2 - x ) + u2 * v2 * ( x - x1 ) ) / dx;
     y = ( u1 * ( x2 - x ) + u2 * ( x - x1 ) ) * ( v1 * ( x2 - x ) + v2 * ( x - x1 ) ) / ( dx * dx );
-    if( fabs( y - yp ) < fabs( y * n->accuracy ) ) return( nfu_Okay );
-    if( ( status = ptwXY_setValueAtX( n, x, y ) ) != nfu_Okay ) return( status );
-    if( ( status = ptwXY_mul2_s_ptwXY( n, ptwXY1, ptwXY2, x, y, x2, y2, level ) ) != nfu_Okay ) return( status );
-    status = ptwXY_mul2_s_ptwXY( n, ptwXY1, ptwXY2, x1, y1, x, y, level );
-    return( status );
+    if( fabs( y - yp ) < fabs( y * mul->accuracy ) ) return( nfu_Okay );
+    if( ptwXY_setValueAtX( smr, mul, x, y ) != nfu_Okay ) return( mul->status );
+    if( ptwXY_mul2_s_ptwXY( smr, mul, ptwXY1, ptwXY2, x, y, x2, y2, level ) != nfu_Okay ) return( mul->status );
+    ptwXY_mul2_s_ptwXY( smr, mul, ptwXY1, ptwXY2, x1, y1, x, y, level );
+    return( mul->status );
 }
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_div_ptwXY( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_status *status, int safeDivide ) {
+ptwXYPoints *ptwXY_div_ptwXY( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, int safeDivide ) {
 
     int isNAN1, isNAN2;
     int64_t i, j, k, zeros = 0, length, iYs;
     double x1, x2, y1, y2, u1, u2, v1, v2, y, xz, nan = nfu_getNAN( ), s1, s2;
-    ptwXYPoints *n = NULL;
+    ptwXYPoints *div = NULL;
     ptwXYPoint *p;
+    nfu_status status;
 
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY1 ) ) != nfu_Okay ) return( NULL );
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY2 ) ) != nfu_Okay ) return( NULL );
-    *status = nfu_otherInterpolation;
-    if( ptwXY1->interpolation == ptwXY_interpolationOther ) return( NULL );
-    if( ptwXY2->interpolation == ptwXY_interpolationOther ) return( NULL );
-    if( ( ptwXY1->interpolation == ptwXY_interpolationFlat ) || ( ptwXY1->interpolation == ptwXY_interpolationFlat ) )
-        return( ptwXY_div_ptwXY_forFlats( ptwXY1, ptwXY2, status, safeDivide ) );
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY1 ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY2 ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
+
+    if( ptwXY1->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Source1: Other interpolation not allowed." );
+        return( NULL );
+    }
+    if( ptwXY2->interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Source2: Other interpolation not allowed." );
+        return( NULL );
+    }
+
+    if( ( ptwXY1->interpolation == ptwXY_interpolationFlat ) || ( ptwXY1->interpolation == ptwXY_interpolationFlat ) ) {
+        div = ptwXY_div_ptwXY_forFlats( smr, ptwXY1, ptwXY2, safeDivide );
+        if( div == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( div );
+    }
     
-    if( ( *status = ptwXY_areDomainsMutual( ptwXY1, ptwXY2 ) ) != nfu_Okay ) return( NULL );
-    if( ( n = ptwXY_union( ptwXY1, ptwXY2, status, ptwXY_union_fill | ptwXY_union_mergeClosePoints ) ) != NULL ) {
-        for( i = 0, p = n->points; i < n->length; i++, p++ ) {
-            if( ( *status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY2, p->x, &y ) ) != nfu_Okay ) goto Err;
-            if( y == 0. ) {
-                if( p->y == 0. ) {
-                    iYs = 0;
-                    y1 = 0.;
-                    y2 = 0.;
-                    if( i > 0 ) {
-                        if( ( *status = ptwXY_getSlopeAtX( ptwXY1, p->x, '-', &s1 ) ) != nfu_Okay ) {
-                            if( *status != nfu_XOutsideDomain ) goto Err;
-                            s1 = 0.;
-                        }
-                        if( ( *status = ptwXY_getSlopeAtX( ptwXY2, p->x, '-', &s2 ) ) != nfu_Okay ) goto Err;
-                        if( s2 == 0. ) {
-                            y1 = nan; }
-                        else {
-                            y1 = s1 / s2;
-                        } 
-                        iYs++;
+    if( ptwXY_areDomainsMutual( smr, ptwXY1, ptwXY2 ) != nfu_Okay ) {
+        double domainMin1, domainMax1, domainMin2, domainMax2;
+
+        ptwXY_domainMin( NULL, ptwXY1, &domainMin1 );
+        ptwXY_domainMax( NULL, ptwXY1, &domainMax1 );
+        ptwXY_domainMin( NULL, ptwXY2, &domainMin2 );
+        ptwXY_domainMax( NULL, ptwXY2, &domainMax2 );
+
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_domainsNotMutual, "Domains not mutual (%.17e, %.17e) vs (%.17e, %.17e).",
+                domainMin2, domainMax1, domainMin2, domainMax2 );
+        return( NULL );
+    }
+
+    if( ( div = ptwXY_union( smr, ptwXY1, ptwXY2, ptwXY_union_fill | ptwXY_union_mergeClosePoints ) ) == NULL ) goto Err;
+    for( i = 0, p = div->points; i < div->length; i++, p++ ) {
+        if( ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY2, p->x, &y ) != nfu_Okay ) goto Err;
+        if( y == 0. ) {
+            if( p->y == 0. ) {
+                iYs = 0;
+                y1 = 0.;
+                y2 = 0.;
+                if( i > 0 ) {
+                    if( ( status = ptwXY_getSlopeAtX( smr, ptwXY1, p->x, '-', &s1 ) ) != nfu_Okay ) {
+                        if( status != nfu_XOutsideDomain ) goto Err;
+                        s1 = 0.;
                     }
-                    if( i < ( n->length - 1 ) ) {
-                        if( ( *status = ptwXY_getSlopeAtX( ptwXY1, p->x, '+', &s1 ) ) != nfu_Okay ) {
-                            if( *status != nfu_XOutsideDomain ) goto Err;
-                            s1 = 0.;
-                        }
-                        if( ( *status = ptwXY_getSlopeAtX( ptwXY2, p->x, '+', &s2 ) ) != nfu_Okay ) goto Err;
-                        if( s2 == 0. ) {
-                            y2 = nan; }
-                        else {
-                            y2 = s1 / s2;
-                        }
-                        iYs++;
-                    }
-                    p->y = ( y1 + y2 ) / iYs; 
-                    if( nfu_isNAN( p->y ) ) zeros++; }
-                else {
-                    if( !safeDivide ) {
-                        *status = nfu_divByZero;
-                        goto Err;
-                    }
-                    zeros++;
-                    p->y = nan;
-                } }
-            else {
-                p->y /= y;
-            }
-        }
-        length = n->length - 1;
-        if( length > 0 ) {
-            x2 = n->points[length].x;
-            for( i = length - 1; i >= 0; i-- ) {             /* Find and add y zeros and NAN not currently in n's. */
-                x1 = n->points[i].x;
-                if( ( *status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY1, x1, &u1 ) ) != nfu_Okay ) goto Err;
-                if( ( *status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY1, x2, &u2 ) ) != nfu_Okay ) goto Err;
-                if( ( *status = ptwXY_getValueAtX( ptwXY2, x1, &v1 ) ) != nfu_Okay ) goto Err;
-                if( ( *status = ptwXY_getValueAtX( ptwXY2, x2, &v2 ) ) != nfu_Okay ) goto Err;
-                if( u1 * u2 < 0 ) {
-                    xz = ( u1 * x2 - u2 * x1 ) / ( u1 - u2 );
-                    if( ( *status = ptwXY_setValueAtX( n, xz, 0. ) ) != nfu_Okay ) goto Err;
-                }
-                if( v1 * v2 < 0 ) {
-                    if( !safeDivide ) {
-                        *status = nfu_divByZero;
-                        goto Err;
-                    }
-                    zeros++;
-                    xz = ( v1 * x2 - v2 * x1 ) / ( v1 - v2 );
-                    if( ( *status = ptwXY_setValueAtX( n, xz, nan ) ) != nfu_Okay ) goto Err;
-                }
-                x2 = x1;
-            }
-            if( ( *status = ptwXY_simpleCoalescePoints( n ) ) != nfu_Okay ) goto Err;
-            length = n->length;
-            x2 = n->points[n->length-1].x;
-            y2 = n->points[n->length-1].y;
-            isNAN2 = nfu_isNAN( y2 );
-            for( i = n->length - 2; i >= 0; i-- ) {             /* Make interpolation fit accuracy. Work backwards so new points will not mess up loop. */
-                x1 = n->points[i].x;
-                y1 = n->points[i].y;
-                isNAN1 = nfu_isNAN( y1 );
-                if( !isNAN1 || !isNAN2 ) {
-                    if( ( *status = ptwXY_div_s_ptwXY( n, ptwXY1, ptwXY2, x1, y1, x2, y2, 0, isNAN1, isNAN2 ) ) != nfu_Okay ) goto Err;
-                }
-                x2 = x1;
-                y2 = y1;
-                isNAN2 = isNAN1;
-            }
-            ptwXY_update_biSectionMax( n, (double) length );
-            if( zeros ) {
-                if( ( *status = ptwXY_simpleCoalescePoints( n ) ) != nfu_Okay ) goto Err;
-                for( i = 0; i < n->length; i++ ) if( !nfu_isNAN( n->points[i].y ) ) break;
-                if( nfu_isNAN( n->points[0].y ) ) {                     /* Special case for first point. */
-                    if( i == n->length ) {                              /* They are all nan's, what now? */
-                        zeros = 0;
-                        for( i = 0; i < n->length; i++ ) n->points[i].y = 0.; }
+                    if( ptwXY_getSlopeAtX( smr, ptwXY2, p->x, '-', &s2 ) != nfu_Okay ) goto Err;
+                    if( s2 == 0. ) {
+                        y1 = nan; }
                     else {
-                         n->points[0].y = 2. * n->points[i].y;
-                        zeros--;
-                    }
+                        y1 = s1 / s2;
+                    } 
+                    iYs++;
                 }
-                for( i = n->length - 1; i > 0; i-- ) if( !nfu_isNAN( n->points[i].y ) ) break;
-                if( nfu_isNAN( n->points[n->length - 1].y ) ) {         /* Special case for last point. */
-                    n->points[n->length - 1].y = 2. * n->points[i].y;
+                if( i < ( div->length - 1 ) ) {
+                    if( ( status = ptwXY_getSlopeAtX( smr, ptwXY1, p->x, '+', &s1 ) ) != nfu_Okay ) {
+                        if( status != nfu_XOutsideDomain ) goto Err;
+                        s1 = 0.;
+                    }
+                    if( ptwXY_getSlopeAtX( smr, ptwXY2, p->x, '+', &s2 ) != nfu_Okay ) goto Err;
+                    if( s2 == 0. ) {
+                        y2 = nan; }
+                    else {
+                        y2 = s1 / s2;
+                    }
+                    iYs++;
+                }
+                p->y = ( y1 + y2 ) / iYs; 
+                if( nfu_isNAN( p->y ) ) zeros++; }
+            else {
+                if( !safeDivide ) {
+                    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_divByZero, "Divide by 0." );
+                    goto Err2;
+                }
+                zeros++;
+                p->y = nan;
+            } }
+        else {
+            p->y /= y;
+        }
+    }
+    length = div->length - 1;
+    if( length > 0 ) {
+        x2 = div->points[length].x;
+        for( i = length - 1; i >= 0; i-- ) {             /* Find and add y zeros and NAN not currently in div's. */
+            x1 = div->points[i].x;
+            if( ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x1, &u1 ) != nfu_Okay ) goto Err;
+            if( ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x2, &u2 ) != nfu_Okay ) goto Err;
+            if( ptwXY_getValueAtX_signal_XOutsideDomainError( smr, __LINE__, __func__, ptwXY2, x1, &v1 ) != nfu_Okay ) goto Err;
+            if( ptwXY_getValueAtX_signal_XOutsideDomainError( smr, __LINE__, __func__, ptwXY2, x2, &v2 ) != nfu_Okay ) goto Err;
+            if( u1 * u2 < 0 ) {
+                xz = ( u1 * x2 - u2 * x1 ) / ( u1 - u2 );
+                if( ptwXY_setValueAtX( smr, div, xz, 0. ) != nfu_Okay ) goto Err;
+            }
+            if( v1 * v2 < 0 ) {
+                if( !safeDivide ) {
+                    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_divByZero, "Divide by 0." );
+                    goto Err2;
+                }
+                zeros++;
+                xz = ( v1 * x2 - v2 * x1 ) / ( v1 - v2 );
+                if( ptwXY_setValueAtX( smr, div, xz, nan ) != nfu_Okay ) goto Err;
+            }
+            x2 = x1;
+        }
+        if( ptwXY_simpleCoalescePoints( smr, div ) != nfu_Okay ) goto Err;
+        length = div->length;
+        x2 = div->points[div->length-1].x;
+        y2 = div->points[div->length-1].y;
+        isNAN2 = nfu_isNAN( y2 );
+        for( i = div->length - 2; i >= 0; i-- ) {             /* Make interpolation fit accuracy. Work backwards so new points will not mess up loop. */
+            x1 = div->points[i].x;
+            y1 = div->points[i].y;
+            isNAN1 = nfu_isNAN( y1 );
+            if( !isNAN1 || !isNAN2 ) {
+                if( ptwXY_div_s_ptwXY( smr, div, ptwXY1, ptwXY2, x1, y1, x2, y2, 0, isNAN1, isNAN2 ) != nfu_Okay ) goto Err;
+            }
+            x2 = x1;
+            y2 = y1;
+            isNAN2 = isNAN1;
+        }
+        ptwXY_update_biSectionMax( div, (double) length );
+        if( zeros ) {
+            if( ptwXY_simpleCoalescePoints( smr, div ) != nfu_Okay ) goto Err;
+            for( i = 0; i < div->length; i++ ) if( !nfu_isNAN( div->points[i].y ) ) break;
+            if( nfu_isNAN( div->points[0].y ) ) {                     /* Special case for first point. */
+                if( i == div->length ) {                              /* They are all nan's, what now? */
+                    zeros = 0;
+                    for( i = 0; i < div->length; i++ ) div->points[i].y = 0.; }
+                else {
+                     div->points[0].y = 2. * div->points[i].y;
                     zeros--;
                 }
-                if( zeros ) {
-                    for( i = 0; i < n->length; i++ ) if( nfu_isNAN( n->points[i].y ) ) break;
-                    for( k = i + 1, j = i; k < n->length; k++ ) {
-                    if( nfu_isNAN( n->points[k].y ) ) continue;
-                        n->points[j] = n->points[k];
-                        j++;
-                    }
-                    n->length = j;
+            }
+            for( i = div->length - 1; i > 0; i-- ) if( !nfu_isNAN( div->points[i].y ) ) break;
+            if( nfu_isNAN( div->points[div->length - 1].y ) ) {         /* Special case for last point. */
+                div->points[div->length - 1].y = 2. * div->points[i].y;
+                zeros--;
+            }
+            if( zeros ) {
+                for( i = 0; i < div->length; i++ ) if( nfu_isNAN( div->points[i].y ) ) break;
+                for( k = i + 1, j = i; k < div->length; k++ ) {
+                if( nfu_isNAN( div->points[k].y ) ) continue;
+                    div->points[j] = div->points[k];
+                    j++;
                 }
+                div->length = j;
             }
         }
     }
-    return( n );
+    return( div );
 
 Err:
-    if( n ) ptwXY_free( n );
+    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+Err2:
+    if( div ) ptwXY_free( div );
     return( NULL );
 }
 /*
 ************************************************************
 */
-static nfu_status ptwXY_div_s_ptwXY( ptwXYPoints *n, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, double x1, double y1, double x2, double y2, 
-        int level, int isNAN1, int isNAN2 ) {
+static nfu_status ptwXY_div_s_ptwXY( statusMessageReporting *smr, ptwXYPoints *div, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, 
+        double x1, double y1, double x2, double y2, int level, int isNAN1, int isNAN2 ) {
 
     nfu_status status;
     double u1, u2, v1, v2, v, x, y, yp, dx, a1, a2;
 
     if( ( x2 - x1 ) < ClosestAllowXFactor * DBL_EPSILON * ( fabs( x1 ) + fabs( x2 ) ) ) return( nfu_Okay );
-    if( level >= n->biSectionMax ) return( nfu_Okay );
+    if( level >= div->biSectionMax ) return( nfu_Okay );
     level++;
-    if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY1, x1, &u1 ) ) != nfu_Okay ) return( status );
-    if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY1, x2, &u2 ) ) != nfu_Okay ) return( status );
-    if( ( status = ptwXY_getValueAtX( ptwXY2, x1, &v1 ) ) != nfu_Okay ) return( status );
-    if( ( status = ptwXY_getValueAtX( ptwXY2, x2, &v2 ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x1, &u1 ) != nfu_Okay ) ) return( status );
+    if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x2, &u2 ) != nfu_Okay ) ) return( status );
+    if( ( status = ptwXY_getValueAtX_signal_XOutsideDomainError( smr, __LINE__, __func__, ptwXY2, x1, &v1 ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_getValueAtX_signal_XOutsideDomainError( smr, __LINE__, __func__, ptwXY2, x2, &v2 ) ) != nfu_Okay ) return( status );
     if( isNAN1 ) {
         x = 0.5 * ( x1 + x2 );
-        if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY1, x, &u1 ) ) != nfu_Okay ) return( status );
-        if( ( status = ptwXY_getValueAtX( ptwXY2, x, &v1 ) ) != nfu_Okay ) return( status );
+        if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x, &u1 ) != nfu_Okay ) ) return( status );
+        if( ( status = ptwXY_getValueAtX_signal_XOutsideDomainError( smr, __LINE__, __func__, ptwXY2, x, &v1 ) ) != nfu_Okay ) return( status );
         y = u1 / v1; }
     else if( isNAN2 ) {
         x = 0.5 * ( x1 + x2 );
-        if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY1, x, &u2 ) ) != nfu_Okay ) return( status );
-        if( ( status = ptwXY_getValueAtX( ptwXY2, x, &v2 ) ) != nfu_Okay ) return( status );
+        if( ( status = ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY1, x, &u2 ) != nfu_Okay ) ) return( status );
+        if( ( status = ptwXY_getValueAtX_signal_XOutsideDomainError( smr, __LINE__, __func__, ptwXY2, x, &v2 ) ) != nfu_Okay ) return( status );
         y = u2 / v2; }
     else {
         if( ( u1 == u2 ) || ( v1 == v2 ) ) return( nfu_Okay );
@@ -498,32 +645,40 @@ static nfu_status ptwXY_div_s_ptwXY( ptwXYPoints *n, ptwXYPoints *ptwXY1, ptwXYP
         if( ( v1 == 0. ) || ( v2 == 0. ) || ( v == 0. ) ) return( nfu_Okay );     /* Probably not correct, but I had to do something. */
         yp = ( u1 / v1 * ( x2 - x ) + u2 / v2 * ( x - x1 ) ) / dx;
         y = ( u1 * ( x2 - x ) + u2 * ( x - x1 ) ) / v;
-        if( fabs( y - yp ) < fabs( y * n->accuracy ) ) return( nfu_Okay );
+        if( fabs( y - yp ) < fabs( y * div->accuracy ) ) return( nfu_Okay );
     }
-    if( ( status = ptwXY_setValueAtX( n, x, y ) ) != nfu_Okay ) return( status );
-    if( ( status = ptwXY_div_s_ptwXY( n, ptwXY1, ptwXY2, x, y, x2, y2, level, 0, isNAN2 ) ) != nfu_Okay ) return( status );
-    status = ptwXY_div_s_ptwXY( n, ptwXY1, ptwXY2, x1, y1, x, y, level, isNAN1, 0 );
+    if( ( status = ptwXY_setValueAtX( smr, div, x, y ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_div_s_ptwXY( smr, div, ptwXY1, ptwXY2, x, y, x2, y2, level, 0, isNAN2 ) ) != nfu_Okay ) return( status );
+    status = ptwXY_div_s_ptwXY( smr, div, ptwXY1, ptwXY2, x1, y1, x, y, level, isNAN1, 0 );
     return( status );
 }
 /*
 ************************************************************
 */
-static ptwXYPoints *ptwXY_div_ptwXY_forFlats( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_status *status, int safeDivide ) {
+static ptwXYPoints *ptwXY_div_ptwXY_forFlats( statusMessageReporting *smr, ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, int safeDivide ) {
 
     int64_t i;
-    ptwXYPoints *n = NULL;
+    ptwXYPoints *div = NULL;
     ptwXYPoint *p;
     double y;
 
-    *status = nfu_invalidInterpolation;
-    if( ptwXY1->interpolation != ptwXY_interpolationFlat ) return( NULL );
-    if( ptwXY2->interpolation != ptwXY_interpolationFlat ) return( NULL );
-    if( ( n = ptwXY_union( ptwXY1, ptwXY2, status, ptwXY_union_fill | ptwXY_union_mergeClosePoints ) ) != NULL ) {
-        for( i = 0, p = n->points; i < n->length; i++, p++ ) {
-            if( ( *status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY2, p->x, &y ) ) != nfu_Okay ) goto Err;
+    if( ptwXY1->interpolation != ptwXY_interpolationFlat ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_invalidInterpolation, "Source1 interpolation not 'flat' but '%s'.",
+                ptwXY1->interpolationString );
+        return( NULL );
+    }
+    if( ptwXY2->interpolation != ptwXY_interpolationFlat ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_invalidInterpolation, "Source2 interpolation not 'flat' but '%s'.",
+                ptwXY2->interpolationString );
+        return( NULL );
+    }
+
+    if( ( div = ptwXY_union( smr, ptwXY1, ptwXY2, ptwXY_union_fill | ptwXY_union_mergeClosePoints ) ) != NULL ) {
+        for( i = 0, p = div->points; i < div->length; i++, p++ ) {
+            if( ptwXY_getValueAtX_ignore_XOutsideDomainError( smr, ptwXY2, p->x, &y ) != nfu_Okay ) goto Err;
             if( y == 0. ) {
                 if( ( safeDivide ) && ( p->y == 0 ) ) {
-                    *status = nfu_divByZero;
+                    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_divByZero, "Divide by 0." );
                     goto Err;
                 } }
             else {
@@ -531,19 +686,39 @@ static ptwXYPoints *ptwXY_div_ptwXY_forFlats( ptwXYPoints *ptwXY1, ptwXYPoints *
             }
         }
     }
-    return( n );
+    return( div );
 
 Err:
-    if( n ) ptwXY_free( n );
+    if( div ) ptwXY_free( div );
     return( NULL );
 }
 /*
 ************************************************************
 */
-static nfu_status ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXYPoints *ptwXY1, double x, double *y ) {
+static nfu_status ptwXY_getValueAtX_ignore_XOutsideDomainError( statusMessageReporting *smr, ptwXYPoints *ptwXY1, double x, double *y ) {
 
-    nfu_status status = ptwXY_getValueAtX( ptwXY1, x, y );
+    nfu_status status = ptwXY_getValueAtX( smr, ptwXY1, x, y );
 
     if( status == nfu_XOutsideDomain ) status = nfu_Okay;
+    return( status );
+}
+/*
+************************************************************
+*/
+static nfu_status ptwXY_getValueAtX_signal_XOutsideDomainError( statusMessageReporting *smr, int line, 
+        char const *function, ptwXYPoints *ptwXY1, double x, double *y ) {
+
+    nfu_status status = ptwXY_getValueAtX( smr, ptwXY1, x, y );
+
+    if( status == nfu_XOutsideDomain ) {
+        double domainMin, domainMax;
+
+        ptwXY_domainMin( NULL, ptwXY1, &domainMin );
+        ptwXY_domainMax( NULL, ptwXY1, &domainMax );
+
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_XOutsideDomain, "x-value = %.17e outside domain (%.17e, %.17e)",
+                x, domainMin, domainMin );
+        smr_setReportError( smr, NULL, __FILE__, line, function, nfu_SMR_libraryID, nfu_Error, "Via." );
+    }
     return( status );
 }

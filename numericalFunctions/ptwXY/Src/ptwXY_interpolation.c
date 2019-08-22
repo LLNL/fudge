@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -44,22 +68,35 @@
 
 #include "ptwXY.h"
 
-typedef nfu_status (*interpolation_func)( ptwXYPoints *desc, double x1, double y1, double x2, double y2, int depth );
+typedef nfu_status (*interpolation_func)( statusMessageReporting *smr, ptwXYPoints *desc, double x1, double y1, 
+        double x2, double y2, int depth );
 
 static double ptwXY_flatInterpolationToLinear_eps( double px, double eps );
-static nfu_status ptwXY_toOtherInterpolation2( ptwXYPoints *desc, ptwXYPoints *src, interpolation_func func );
-static nfu_status ptwXY_LogLogToLinLin( ptwXYPoints *desc, double x1, double y1, double x2, double y2, int depth );
-static nfu_status ptwXY_LinLogToLinLin( ptwXYPoints *desc, double x1, double y1, double x2, double y2, int depth );
-static nfu_status ptwXY_LogLinToLinLin( ptwXYPoints *desc, double x1, double y1, double x2, double y2, int depth );
+static nfu_status ptwXY_toOtherInterpolation2( statusMessageReporting *smr, ptwXYPoints *desc, ptwXYPoints *src, 
+        interpolation_func func );
+static nfu_status ptwXY_LogLogToLinLin( statusMessageReporting *smr, ptwXYPoints *desc, double x1, double y1, 
+        double x2, double y2, int depth );
+static nfu_status ptwXY_LogLinToLinLin( statusMessageReporting *smr, ptwXYPoints *desc, double x1, double y1, 
+        double x2, double y2, int depth );
+static nfu_status ptwXY_LinLogToLinLin( statusMessageReporting *smr, ptwXYPoints *desc, double x1, double y1, 
+        double x2, double y2, int depth );
 /*
 ************************************************************
 */
-nfu_status ptwXY_interpolatePoint( ptwXY_interpolation interpolation, double x, double *y, double x1, double y1, double x2, double y2 ) {
+nfu_status ptwXY_interpolatePoint( statusMessageReporting *smr, ptwXY_interpolation interpolation, double x, double *y, 
+        double x1, double y1, double x2, double y2 ) {
 
     nfu_status status = nfu_Okay;
 
-    if( interpolation == ptwXY_interpolationOther ) return( nfu_otherInterpolation );
-    if( ( x1 > x2 ) || ( x < x1 ) || ( x > x2 ) ) return( nfu_invalidInterpolation );
+    if( interpolation == ptwXY_interpolationOther ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_otherInterpolation, "Other interpolation not allow." );
+        return( nfu_otherInterpolation );
+    }
+    if( ( x1 > x2 ) || ( x < x1 ) || ( x > x2 ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_invalidInterpolation, 
+                "Interpolation point.x = %.17e not between function points x1 = %.17e and x2 = %.17e.", x, x1, x2 );
+        return( nfu_invalidInterpolation );
+    }
     if( y1 == y2 ) {
         *y = y1; }
     else if( x1 == x2 ) {
@@ -73,23 +110,41 @@ nfu_status ptwXY_interpolatePoint( ptwXY_interpolation interpolation, double x, 
         case ptwXY_interpolationLinLin :
             *y = ( y1 * ( x2 - x ) + y2 * ( x - x1 ) ) / ( x2 - x1 );
             break;
-        case ptwXY_interpolationLogLin :
-            if( ( x <= 0. ) || ( x1 <= 0. ) || ( x2 <= 0. ) ) return( nfu_invalidInterpolation );
+        case ptwXY_interpolationLinLog :
+            if( ( x <= 0. ) || ( x1 <= 0. ) || ( x2 <= 0. ) ) {
+                smr_setReportError2( smr, nfu_SMR_libraryID, nfu_invalidInterpolation, 
+                        "For log(x), some x-values  less than equal to 0, x1 = %.17e, x = %.17e, x2 = %.17e.", x1, x, x2 );
+                return( nfu_invalidInterpolation );
+            }
             *y = ( y1 * log( x2 / x ) + y2 * log( x / x1 ) ) / log( x2 / x1 );
             break;
-        case ptwXY_interpolationLinLog :
-            if( ( y1 <= 0. ) || ( y2 <= 0. ) ) return( nfu_invalidInterpolation );
+        case ptwXY_interpolationLogLin :
+            if( ( y1 <= 0. ) || ( y2 <= 0. ) ) {
+                smr_setReportError2( smr, nfu_SMR_libraryID, nfu_invalidInterpolation, 
+                        "For log(y), some y-values less than equal to 0, y1 = %.17e, y2 = %.17e.", y1, y2 );
+                return( nfu_invalidInterpolation );
+            }
             *y = exp( ( log( y1 ) * ( x2 - x ) + log( y2 ) * ( x - x1 ) ) / ( x2 - x1 ) );
             break;
         case ptwXY_interpolationLogLog :
-            if( ( x <= 0. ) || ( x1 <= 0. ) || ( x2 <= 0. ) ) return( nfu_invalidInterpolation );
-            if( ( y1 <= 0. ) || ( y2 <= 0. ) ) return( nfu_invalidInterpolation );
+            if( ( x <= 0. ) || ( x1 <= 0. ) || ( x2 <= 0. ) ) {
+                smr_setReportError2( smr, nfu_SMR_libraryID, nfu_invalidInterpolation, 
+                        "For log(x), some x-values  less than equal to 0, x1 = %.17e, x = %.17e, x2 = %.17e.", x1, x, x2 );
+                return( nfu_invalidInterpolation );
+            }
+            if( ( y1 <= 0. ) || ( y2 <= 0. ) ) {
+                smr_setReportError2( smr, nfu_SMR_libraryID, nfu_invalidInterpolation, 
+                        "For log(y), some y-values less than equal to 0, y1 = %.17e, y2 = %.17e.", y1, y2 );
+                return( nfu_invalidInterpolation );
+            }
             *y = exp( ( log( y1 ) * log( x2 / x ) + log( y2 ) * log( x / x1 ) ) / log( x2 / x1 ) );
             break;
         case ptwXY_interpolationFlat :
             *y = y1;
             break;
         default :
+            smr_setReportError2( smr, nfu_SMR_libraryID, nfu_invalidInterpolation,
+                    "Invalid interpolation token = %d.", interpolation );
             status = nfu_invalidInterpolation;
         }
     }
@@ -98,7 +153,7 @@ nfu_status ptwXY_interpolatePoint( ptwXY_interpolation interpolation, double x, 
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_flatInterpolationToLinear( ptwXYPoints *ptwXY, double lowerEps, double upperEps, nfu_status *status ) {
+ptwXYPoints *ptwXY_flatInterpolationToLinear( statusMessageReporting *smr, ptwXYPoints *ptwXY, double lowerEps, double upperEps ) {
 
     int64_t i, length;
     double x;
@@ -107,33 +162,50 @@ ptwXYPoints *ptwXY_flatInterpolationToLinear( ptwXYPoints *ptwXY, double lowerEp
 
 #define minEps 5e-16
 
-    if( ( *status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( NULL );
-    *status = nfu_invalidInterpolation;
-    if( ptwXY->interpolation != ptwXY_interpolationFlat ) return( NULL );
-    *status = nfu_badInput;
-    if( ( lowerEps < 0 ) || ( upperEps < 0 ) || ( ( lowerEps == 0 ) && ( upperEps == 0 ) ) ) return( NULL );
+    if( ptwXY_simpleCoalescePoints( smr, ptwXY ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
+        
+    if( ptwXY->interpolation != ptwXY_interpolationFlat ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_invalidInterpolation, "Source interpolation not 'flat' but '%s'.",
+                ptwXY->interpolationString );
+        return( NULL );
+    }
+
+    if( ( lowerEps < 0 ) || ( upperEps < 0 ) || ( ( lowerEps == 0 ) && ( upperEps == 0 ) ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badInput, "Bad epsilons: lowerEps = %.17e and upperEps = %.17e.",
+                lowerEps, upperEps );
+        return( NULL );
+    }
     if( ( lowerEps != 0 ) && ( lowerEps < minEps ) ) lowerEps = minEps;
     if( ( upperEps != 0 ) && ( upperEps < minEps ) ) upperEps = minEps;
 
     length = ptwXY->length * ( 1 + ( lowerEps == 0 ? 0 : 1 ) + ( lowerEps == 0 ? 0 : 1 ) );
-    if( ( n = ptwXY_new( ptwXY_interpolationLinLin, NULL, ptwXY->biSectionMax, ptwXY->accuracy, length, ptwXY->overflowLength, status, ptwXY->userFlag ) ) == NULL ) return( NULL );
+    if( ( n = ptwXY_new( smr, ptwXY_interpolationLinLin, NULL, ptwXY->biSectionMax, ptwXY->accuracy, length, 
+            ptwXY->overflowLength, ptwXY->userFlag ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
 
     p3 = ptwXY->points;
-    if( ptwXY->length > 0 ) ptwXY_setValueAtX( n, p3->x, p3->y );
+    if( ptwXY->length > 0 ) {
+        if( ptwXY_setValueAtX( smr, n, p3->x, p3->y ) != nfu_Okay ) goto Err;
+    }
     for( i = 0; i < ptwXY->length; i++, p3++ ) {
         if( i > 1 ) {
             if( lowerEps > 0 ) {
                 x = ptwXY_flatInterpolationToLinear_eps( p2->x, -lowerEps );
                 if( x > p1->x ) {
-                    if( ( *status = ptwXY_setValueAtX( n, x, p1->y ) ) != nfu_Okay ) goto Err;
+                    if( ptwXY_setValueAtX( smr, n, x, p1->y ) != nfu_Okay ) goto Err;
                 }
             }
-            if( lowerEps == 0 ) if( ( *status = ptwXY_setValueAtX( n, p2->x, p1->y ) ) != nfu_Okay ) goto Err;
-            if( upperEps == 0 ) if( ( *status = ptwXY_setValueAtX( n, p2->x, p2->y ) ) != nfu_Okay ) goto Err;
+            if( lowerEps == 0 ) if( ptwXY_setValueAtX( smr, n, p2->x, p1->y ) != nfu_Okay ) goto Err;
+            if( upperEps == 0 ) if( ptwXY_setValueAtX( smr, n, p2->x, p2->y ) != nfu_Okay ) goto Err;
             if( upperEps > 0 ) {
                 x = ptwXY_flatInterpolationToLinear_eps( p2->x, upperEps );
                 if( x < p3->x ) {
-                    if( ( *status = ptwXY_setValueAtX( n, x, p2->y ) ) != nfu_Okay ) goto Err;
+                    if( ptwXY_setValueAtX( smr, n, x, p2->y ) != nfu_Okay ) goto Err;
                 }
             }
         }
@@ -144,15 +216,16 @@ ptwXYPoints *ptwXY_flatInterpolationToLinear( ptwXYPoints *ptwXY, double lowerEp
         if( ( lowerEps != 0 ) && ( p1->y != p2->y ) ) {
             x = ptwXY_flatInterpolationToLinear_eps( p2->x, -lowerEps );
             if( x > p1->x ) {
-                if( ( *status = ptwXY_setValueAtX( n, x, p1->y ) ) != nfu_Okay ) goto Err;
+                if( ptwXY_setValueAtX( smr, n, x, p1->y ) != nfu_Okay ) goto Err;
             }
         }
-        if( ( *status = ptwXY_setValueAtX( n, p2->x, p2->y ) ) != nfu_Okay ) goto Err;
+        if( ptwXY_setValueAtX( smr, n, p2->x, p2->y ) != nfu_Okay ) goto Err;
     }
 
     return( n );
 
 Err:
+    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
     ptwXY_free( n );
     return( NULL );
 
@@ -177,7 +250,8 @@ static double ptwXY_flatInterpolationToLinear_eps( double px, double eps ) {
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_toOtherInterpolation( ptwXYPoints *ptwXY, ptwXY_interpolation interpolationTo, double accuracy, nfu_status *status ) {
+ptwXYPoints *ptwXY_toOtherInterpolation( statusMessageReporting *smr, ptwXYPoints *ptwXY, 
+        ptwXY_interpolation interpolationTo, double accuracy ) {
 /*
 *   This function only works when 'ptwXY->interpolation == interpolationTo' or when interpolationTo is ptwXY_interpolationLinLin.
 */
@@ -185,22 +259,26 @@ ptwXYPoints *ptwXY_toOtherInterpolation( ptwXYPoints *ptwXY, ptwXY_interpolation
     ptwXYPoints *n1;
     interpolation_func func = NULL;
 
-    if( ( *status = ptwXY->status ) != nfu_Okay ) return( NULL );
+    if( ptwXY->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( NULL );
+    }
+
     if( ptwXY->interpolation == interpolationTo ) {
-        *status = nfu_Okay;
-        return( ptwXY_clone( ptwXY, status ) ); }
+        if( ( n1 = ptwXY_clone( smr, ptwXY ) ) == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( n1 ); }
     else {
         if( interpolationTo == ptwXY_interpolationLinLin ) {
             switch( ptwXY->interpolation ) {
             case ptwXY_interpolationLogLog :
                 logX = logY = 1;
                 func = ptwXY_LogLogToLinLin; break;
-            case ptwXY_interpolationLinLog :
-                logY = 1;
-                func = ptwXY_LinLogToLinLin; break;
             case ptwXY_interpolationLogLin :
-                logX = 1;
+                logY = 1;
                 func = ptwXY_LogLinToLinLin; break;
+            case ptwXY_interpolationLinLog :
+                logX = 1;
+                func = ptwXY_LinLogToLinLin; break;
             case ptwXY_interpolationLinLin :        /* Stops compilers from complaining. */
             case ptwXY_interpolationFlat :
             case ptwXY_interpolationOther :
@@ -208,40 +286,59 @@ ptwXYPoints *ptwXY_toOtherInterpolation( ptwXYPoints *ptwXY, ptwXY_interpolation
             }
         }
     }
-    *status = nfu_unsupportedInterpolationConversion;
-    if( func == NULL ) return( NULL );
+    if( func == NULL ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_unsupportedInterpolationConversion,
+                "Interpolation conversion from '%s' to %d not supported.", ptwXY->interpolationString, interpolationTo );
+        return( NULL );
+    }
 
     if( ( logX != 0 ) || ( logY != 0 ) ) {
         ptwXYPoint *point;
 
-        if( ( *status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( NULL );
+        if( ptwXY_simpleCoalescePoints( smr, ptwXY ) != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( NULL );
+        }
 
-        *status = nfu_badLogValue;
         for( i1 = 0, point = ptwXY->points; i1 < ptwXY->length; ++i1, ++point ) {
-            if( ( logX != 0 ) && ( point->x <= 0 ) ) return( NULL );
-            if( ( logY != 0 ) && ( point->y <= 0 ) ) return( NULL );
+            if( ( logX != 0 ) && ( point->x <= 0 ) ) {
+                smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badLogValue, "At index %d x-value %.16e for log <= 0.", 
+                        (int) i1, point->x );
+                return( NULL );
+            }
+            if( ( logY != 0 ) && ( point->y <= 0 ) ) {
+                smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badLogValue, "At index %d y-value %.16e for log <= 0.", 
+                        (int) i1, point->y );
+                return( NULL );
+            }
         }
     }
 
-    *status = nfu_Okay;
-    if( ( n1 = ptwXY_cloneToInterpolation( ptwXY, interpolationTo, status ) ) == NULL ) return( NULL );
+    if( ( n1 = ptwXY_cloneToInterpolation( smr, ptwXY, interpolationTo ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
     n1->accuracy = ptwXY_limitAccuracy( accuracy );
 
-    *status = ptwXY_toOtherInterpolation2( n1, ptwXY, func );
-    if( n1->accuracy < ptwXY->accuracy ) n1->accuracy = ptwXY->accuracy;
-    if( *status != nfu_Okay ) n1 = ptwXY_free( n1 );
+    if( ptwXY_toOtherInterpolation2( smr, n1, ptwXY, func ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        n1 = ptwXY_free( n1 ); }
+    else {
+        if( n1->accuracy < ptwXY->accuracy ) n1->accuracy = ptwXY->accuracy;
+    }
     return( n1 );
 }
 /*
 ************************************************************
 */
-static nfu_status ptwXY_toOtherInterpolation2( ptwXYPoints *desc, ptwXYPoints *src, interpolation_func func ) {
+static nfu_status ptwXY_toOtherInterpolation2( statusMessageReporting *smr, ptwXYPoints *desc, ptwXYPoints *src, 
+        interpolation_func func ) {
 
     nfu_status status;
     int64_t i1;
     double x1, y1, x2, y2;
 
-    if( ( status = ptwXY_simpleCoalescePoints( src ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_simpleCoalescePoints( smr, src ) ) != nfu_Okay ) return( status );
 
     x1 = src->points[0].x;
     y1 = src->points[0].y;
@@ -249,7 +346,7 @@ static nfu_status ptwXY_toOtherInterpolation2( ptwXYPoints *desc, ptwXYPoints *s
         x2 = src->points[i1].x;
         y2 = src->points[i1].y;
         if( ( x1 != x2 ) && ( y1 != y2 ) ) {
-            if( ( status = func( desc, x1, y1, x2, y2, 0 ) ) != nfu_Okay ) break;
+            if( ( status = func( smr, desc, x1, y1, x2, y2, 0 ) ) != nfu_Okay ) break;
         }
         x1 = x2;
         y1 = y2;
@@ -259,7 +356,8 @@ static nfu_status ptwXY_toOtherInterpolation2( ptwXYPoints *desc, ptwXYPoints *s
 /*
 ************************************************************
 */
-static nfu_status ptwXY_LogLogToLinLin( ptwXYPoints *desc, double x1, double y1, double x2, double y2, int depth ) {
+static nfu_status ptwXY_LogLogToLinLin( statusMessageReporting *smr, ptwXYPoints *desc, double x1, double y1, 
+        double x2, double y2, int depth ) {
 
     nfu_status status = nfu_Okay;
     double x, y, u, u2 = x2 / x1, v2 = y2 / y1, logYXs, logXs = log( u2 ), logYs = log( v2 ), vLin, vLog, w;
@@ -283,14 +381,15 @@ static nfu_status ptwXY_LogLogToLinLin( ptwXYPoints *desc, double x1, double y1,
     if( fabs( vLog - vLin ) <= ( vLog * desc->accuracy ) ) return( status );
     x = x1 * u;
     y = y1 * vLog;
-    if( ( status = ptwXY_setValueAtX( desc, x, y ) ) != nfu_Okay ) return( status );
-    if( ( status = ptwXY_LogLogToLinLin( desc, x1, y1, x, y, depth + 1 ) ) != nfu_Okay ) return( status );
-    return( ptwXY_LogLogToLinLin( desc, x, y, x2, y2, depth + 1 ) );
+    if( ( status = ptwXY_setValueAtX( smr, desc, x, y ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_LogLogToLinLin( smr, desc, x1, y1, x, y, depth + 1 ) ) != nfu_Okay ) return( status );
+    return( ptwXY_LogLogToLinLin( smr, desc, x, y, x2, y2, depth + 1 ) );
 }
 /*
 ************************************************************
 */
-static nfu_status ptwXY_LinLogToLinLin( ptwXYPoints *desc, double x1, double y1, double x2, double y2, int depth ) {
+static nfu_status ptwXY_LogLinToLinLin( statusMessageReporting *smr, ptwXYPoints *desc, 
+        double x1, double y1, double x2, double y2, int depth ) {
 
     nfu_status status = nfu_Okay;
     double x, y, logYs = log( y2 / y1 ), yLinLin;
@@ -300,14 +399,15 @@ static nfu_status ptwXY_LinLogToLinLin( ptwXYPoints *desc, double x1, double y1,
     y = y1 * exp( logYs / ( x2 - x1 ) * ( x - x1 ) );
     yLinLin = ( y1 * ( x2 - x ) + y2 * ( x - x1 ) ) / ( x2 - x1 );
     if( fabs( y - yLinLin ) <= ( y * desc->accuracy ) ) return( status );
-    if( ( status = ptwXY_setValueAtX( desc, x, y ) ) != nfu_Okay ) return( status );
-    if( ( status = ptwXY_LinLogToLinLin( desc, x1, y1, x, y, depth + 1 ) ) != nfu_Okay ) return( status );
-    return( ptwXY_LinLogToLinLin( desc, x, y, x2, y2, depth + 1 ) );
+    if( ( status = ptwXY_setValueAtX( smr, desc, x, y ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_LogLinToLinLin( smr, desc, x1, y1, x, y, depth + 1 ) ) != nfu_Okay ) return( status );
+    return( ptwXY_LogLinToLinLin( smr, desc, x, y, x2, y2, depth + 1 ) );
 }
 /*
 ************************************************************
 */
-static nfu_status ptwXY_LogLinToLinLin( ptwXYPoints *desc, double x1, double y1, double x2, double y2, int depth ) {
+static nfu_status ptwXY_LinLogToLinLin( statusMessageReporting *smr, ptwXYPoints *desc, double x1, double y1, 
+        double x2, double y2, int depth ) {
 
     nfu_status status = nfu_Okay;
     double x = sqrt( x2 * x1 ), y, logXs = log( x2 / x1 ), yLinLin;
@@ -319,23 +419,28 @@ static nfu_status ptwXY_LogLinToLinLin( ptwXYPoints *desc, double x1, double y1,
     y = ( y2 - y1 ) * log( x / x1 ) / logXs + y1;
     yLinLin = ( y1 * ( x2 - x ) + y2 * ( x - x1 ) ) / ( x2 - x1 );
     if( fabs( y - yLinLin ) <= fabs( y * desc->accuracy ) ) return( status );
-    if( ( status = ptwXY_setValueAtX( desc, x, y ) ) != nfu_Okay ) return( status );
-    if( ( status = ptwXY_LogLinToLinLin( desc, x1, y1, x, y, depth + 1 ) ) != nfu_Okay ) return( status );
-    return( ptwXY_LogLinToLinLin( desc, x, y, x2, y2, depth + 1 ) );
+    if( ( status = ptwXY_setValueAtX( smr, desc, x, y ) ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY_LinLogToLinLin( smr, desc, x1, y1, x, y, depth + 1 ) ) != nfu_Okay ) return( status );
+    return( ptwXY_LinLogToLinLin( smr, desc, x, y, x2, y2, depth + 1 ) );
 }
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_toUnitbase( ptwXYPoints *ptwXY, nfu_status *status ) {
+ptwXYPoints *ptwXY_toUnitbase( statusMessageReporting *smr, ptwXYPoints *ptwXY, int scaleRange ) {
 
     int64_t i;
     ptwXYPoints *n;
     ptwXYPoint *p;
     double domainMin, domainMax, dx, inverseDx;
 
-    *status = nfu_tooFewPoints;
-    if( ptwXY->length < 2 ) return( NULL );
-    if( ( n = ptwXY_clone( ptwXY, status ) ) == NULL ) return( NULL );
+    if( ptwXY->length < 2 ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_tooFewPoints, "To few points %d", (int) ptwXY->length );
+        return( NULL );
+    }
+    if( ( n = ptwXY_clone( smr, ptwXY ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
 
     domainMin = n->points[0].x;
     domainMax = n->points[n->length-1].x;
@@ -343,7 +448,7 @@ ptwXYPoints *ptwXY_toUnitbase( ptwXYPoints *ptwXY, nfu_status *status ) {
     inverseDx = 1. / dx;
     for( i = 0, p = n->points; i < n->length; i++, p++ ) {
         p->x = ( p->x - domainMin ) * inverseDx;
-        p->y = p->y * dx;
+        if( scaleRange ) p->y = p->y * dx;
     }
     n->points[n->length-1].x = 1.;                          /* Make sure last point is realy 1. */
     return( n );
@@ -351,16 +456,22 @@ ptwXYPoints *ptwXY_toUnitbase( ptwXYPoints *ptwXY, nfu_status *status ) {
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_fromUnitbase( ptwXYPoints *ptwXY, double domainMin, double domainMax, nfu_status *status ) {
+ptwXYPoints *ptwXY_fromUnitbase( statusMessageReporting *smr, ptwXYPoints *ptwXY, double domainMin, double domainMax,
+        int scaleRange ) {
 
     int64_t i, length;
     ptwXYPoints *n;
     ptwXYPoint *p, *p2;
     double dx, inverseDx, xLast = 0.;
 
-    *status = nfu_tooFewPoints;
-    if( ptwXY->length < 2 ) return( NULL );
-    if( ( n = ptwXY_clone( ptwXY, status ) ) == NULL ) return( NULL );
+    if( ptwXY->length < 2 ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_tooFewPoints, "To few points %d", (int) ptwXY->length );
+        return( NULL );
+    }
+    if( ( n = ptwXY_clone( smr, ptwXY ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
 
     dx = domainMax - domainMin;
     inverseDx = 1. / dx;
@@ -373,7 +484,7 @@ ptwXYPoints *ptwXY_fromUnitbase( ptwXYPoints *ptwXY, double domainMin, double do
                 continue;
             }
         }
-        p2->y = p->y * inverseDx;
+        if( scaleRange ) p2->y = p->y * inverseDx;
         xLast = p2->x;
         ++p2;
     }
@@ -383,7 +494,8 @@ ptwXYPoints *ptwXY_fromUnitbase( ptwXYPoints *ptwXY, double domainMin, double do
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_unitbaseInterpolate( double w, double w1, ptwXYPoints *ptwXY1, double w2, ptwXYPoints *ptwXY2, nfu_status *status ) {
+ptwXYPoints *ptwXY_unitbaseInterpolate( statusMessageReporting *smr, double w, double w1, ptwXYPoints *ptwXY1, 
+        double w2, ptwXYPoints *ptwXY2, int scaleRange ) {
 /* 
 *   Should we not be checking the interpolation members???????
 */
@@ -392,32 +504,37 @@ ptwXYPoints *ptwXY_unitbaseInterpolate( double w, double w1, ptwXYPoints *ptwXY1
     ptwXYPoint *p;
     double f, g, domainMin, domainMax;
 
-    *status = nfu_XOutsideDomain;
-    if( w <= w1 ) {
-        if( w < w1 ) return( NULL );
-        return( ptwXY_clone( ptwXY1, status ) );
+    if( ( w < w1 ) || ( w > w2 ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_XOutsideDomain, "W value outside w-domain: (%.15e, %.15e)",
+                w1, w2 );
+        return( NULL );
     }
-    if( w >= w2 ) {
-        if( w > w2 ) return( NULL );
-        return( ptwXY_clone( ptwXY2, status ) );
+    if( w == w1 ) {
+        if( ( n1 = ptwXY_clone( smr, ptwXY1 ) ) == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via (source1)." );
+        return( n1 );
     }
-    if( ( n1 = ptwXY_toUnitbase( ptwXY1, status ) ) == NULL ) return( NULL );
-    if( ( n2 = ptwXY_toUnitbase( ptwXY2, status ) ) == NULL ) goto Err;
+    if( w == w2 ) {
+        if( ( n1 = ptwXY_clone( smr, ptwXY2 ) ) == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via (source2)." );
+        return( n1 );
+    }
+    if( ( n1 = ptwXY_toUnitbase( smr, ptwXY1, scaleRange ) ) == NULL ) goto Err;
+    if( ( n2 = ptwXY_toUnitbase( smr, ptwXY2, scaleRange ) ) == NULL ) goto Err;
     f = ( w - w1 ) / ( w2 - w1 );
     g = 1. - f;
     for( i = 0, p = n1->points; i < n1->length; i++, p++ ) p->y *= g;
     for( i = 0, p = n2->points; i < n2->length; i++, p++ ) p->y *= f;
-    if( ( a = ptwXY_add_ptwXY( n1, n2, status ) ) == NULL ) goto Err;
+    if( ( a = ptwXY_add_ptwXY( smr, n1, n2 ) ) == NULL ) goto Err;
 
     domainMin = g * ptwXY1->points[0].x + f * ptwXY2->points[0].x;
     domainMax = g * ptwXY1->points[ptwXY1->length-1].x + f * ptwXY2->points[ptwXY2->length-1].x;
-    if( ( r = ptwXY_fromUnitbase( a, domainMin, domainMax, status ) ) == NULL ) goto Err;
+    if( ( r = ptwXY_fromUnitbase( smr, a, domainMin, domainMax, scaleRange ) ) == NULL ) goto Err;
     ptwXY_free( n1 );
     ptwXY_free( n2 );
     ptwXY_free( a );
     return( r );
 
 Err:
+    smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
     if( n1 != NULL ) ptwXY_free( n1 );
     if( n2 != NULL ) ptwXY_free( n2 );
     if( a  != NULL ) ptwXY_free( a );

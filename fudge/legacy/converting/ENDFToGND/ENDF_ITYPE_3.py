@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 #   500 Total charged-particle stopping power       # Currently not supported (executes a raise).
@@ -88,8 +112,8 @@ photonSumLabels = { 501 : 'total', 516 : 'pair product', 522 : 'photoelectric ab
 
 def readMF27( info, MT, MF27Datas, label, warningList ) :
 
-    class_ = { 502 : photonScatteringModule.scatteringFunction, 
-               504 : photonScatteringModule.incoherent,
+    _class = { 502 : photonScatteringModule.scatteringFunction, 
+               504 : None,
                505 : photonScatteringModule.imaginaryAnomalousFactor,
                506 : photonScatteringModule.realAnomalousFactor }[MT]
 
@@ -97,17 +121,20 @@ def readMF27( info, MT, MF27Datas, label, warningList ) :
     del MF27Datas[27]
     energyUnit = 'eV'
     if( MT in [ 502, 504 ] ) : energyUnit = '1/Ang'
-    axes = class_.pointwise.defaultAxes( label, energyUnit = energyUnit )
+    axes = photonScatteringModule.scatteringFactor.defaultAxes( label, energyUnit = energyUnit )
     dataLine, TAB1, MF27s = endfFileToGNDMisc.getTAB1Regions( 1, MF27Data, axes = axes, allowInterpolation6 = True, logFile = info.logs )
     if( len( MF27s ) == 1 ) :
-        axes = class_.pointwise.defaultAxes( label )
-        return( class_.pointwise( data = MF27s[0], axes = axes, accuracy = 1e-3 ) )
-
-    axes = class_.piecewise.defaultAxes( label, energyUnit = energyUnit )
-    piecewise = class_.piecewise( dimension = 1, axes = axes )
-    for region in MF27s :
-        if( len( region ) > 1 ) : piecewise.append( region )
-    return( piecewise )
+        if( MT == 504 ) : return( photonScatteringModule.incoherent.XYs1d( data = MF27s[0], axes = axes, accuracy = 1e-3 ) )
+        data = photonScatteringModule.scatteringFactor.XYs1d( data = MF27s[0], axes = axes, accuracy = 1e-3 )
+    else :
+        if( MT == 504 ) :
+            data = photonScatteringModule.incoherent.regions1d( axes = axes )
+        else :
+            data = photonScatteringModule.scatteringFactor.regions1d( axes = axes )
+        for region in MF27s :
+            if( len( region ) > 1 ) : data.append( region )
+        if( MT == 504 ) : return( data )
+    return( _class( data ) )
 
 def extractMT505or506( info, MT, MTList, MTDatas, label ) :
 
@@ -144,7 +171,6 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
         warningList = []
         MTData = MTDatas[MT]
 
-        info.newIndices( )
         info.logs.write( '    %3d %s' % ( MT, sorted( MTData.keys( ) ) ) )
         EPE, EFL, crossSection, breakupProducts = readMF3( info, MT, MTData[23], warningList )
         del MTData[23]
@@ -169,7 +195,7 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
             if( MT in [ 502 , 504 ] ) :
                 product = toGNDMiscModule.getTypeNameGamma( info, 0 )
                 product = toGNDMiscModule.newGNDParticle( info, product )
-                outputChannel.products.add( product )
+                outputChannel.products.add( outputChannel.products.uniqueLabel( product ) )
                 if( MT == 502 ) :
                     formFactor = readMF27( info, MT, MTData, 'coherent scattering function', warningList )
                     form = photonScatteringModule.coherent.form( info.style, standardsModule.frames.labToken, 
@@ -205,18 +231,18 @@ def ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, 
             if( product is None ) :
                 product = toGNDMiscModule.getTypeNameGamma( info, { "gamma" : 0, "e+" : 8, "e-" : 9 }[name] )
                 product = toGNDMiscModule.newGNDParticle( info, product )
-            outputChannel.products.add( product )
+            outputChannel.products.add( outputChannel.products.uniqueLabel( product ) )
         if( ( MT >= 534 ) and ( reactionSuite.projectile.name == 'e-' ) ) :
             product = toGNDMiscModule.getTypeNameGamma( info, 9 )
             product = toGNDMiscModule.newGNDParticle( info, product )
-            outputChannel.products.add( product )
+            outputChannel.products.add( outputChannel.products.uniqueLabel( product ) )
 
         if( addTargetAsResidual ) :
             elementSymbol = nuclearModule.elementSymbolFromZ( info.targetZA / 1000 )
             if( MT >= 534 ) : elementSymbol += '{%s}' % MT_AtomicConfigurations[MT]
             element = xParticleModule.element( elementSymbol )
             residual = toGNDMiscModule.newGNDParticle( info, element )
-            outputChannel.products.add( residual )
+            outputChannel.products.add( outputChannel.products.uniqueLabel( residual ) )
 
         if( len( MTData ) > 0 ) : raise Exception( 'Untranslated MF data: MFs = %s' % MTData.keys( ) )
 

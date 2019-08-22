@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -45,13 +69,14 @@
 #include <string.h>
 #include <math.h>
 
+#include <nfut_utilities.h>
 #include <ptwXY.h>
 #include <nf_utilities.h>
 
 static int verbose = 0;
 static char *fmtXY = "%19.12e %19.12e\n";
 
-static int checkMod( ptwXYPoints *data, double m, double *Ys );
+static int checkMod( statusMessageReporting *smr, ptwXYPoints *data, double m, double *Ys );
 static void compareDoubles( double x, double m, double d1, double d2, double eps, const char * const funcName );
 static void printIfVerbose( ptwXYPoints *data );
 /*
@@ -60,7 +85,6 @@ static void printIfVerbose( ptwXYPoints *data );
 int main( int argc, char **argv ) {
 
     int i, iarg, echo = 0, errCount = 0;
-    nfu_status status;
     ptwXYPoints *XYs;
     double Xs[] = {  -8.3381123168917412e+01, -7.8550646919038201e+01, -7.8052706271881675e+01, -7.2676812226386218e+01, -6.7456460315920452e+01, -5.9577593804676845e+01, 
                      -3.9429862990821299e+01, -3.6983850296024201e+01, -1.9070786454251021e+01, -1.4917762730536310e+01,  6.2690762408937957e+00,  1.4018281560416000e+01,  
@@ -75,6 +99,9 @@ int main( int argc, char **argv ) {
                      -5.062110895625480e-01,  -2.777615835552659e+00,  -1.972374738640312e+00,  -5.598647003525912e-01,  -2.433192520136682e+00,  -1.002588722504733e+00, 
                      -1.049641404029202e+00,  -5.571173258616540e-01 };
     int nYs = sizeof( Xs ) / sizeof( double );
+    statusMessageReporting smr;
+
+    smr_initialize( &smr, smr_status_Ok );
 
     for( iarg = 1; iarg < argc; iarg++ ) {
         if( strcmp( "-v", argv[iarg] ) == 0 ) {
@@ -87,14 +114,13 @@ int main( int argc, char **argv ) {
     }
     if( echo ) printf( "%s\n", __FILE__ );
 
-    if( ( XYs = ptwXY_new( ptwXY_interpolationLinLin, NULL, 4, 1.e-3, 10, 10, &status, 0 ) ) == NULL ) 
-            nfu_printErrorMsg( "ERROR %s: XYs creation, status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( XYs = ptwXY_new( &smr, ptwXY_interpolationLinLin, NULL, 4, 1.e-3, 10, 10, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
     for( i = 0; i < nYs; i++ ) {
-        if( ( status = ptwXY_setValueAtX( XYs, Xs[i], Xs[i] ) ) != nfu_Okay )
-                    nfu_printErrorMsg( "ERROR %s: ptwXY_setValueAtX, status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+        if( ptwXY_setValueAtX( &smr, XYs, Xs[i], Xs[i] ) != nfu_Okay ) nfut_printSMRErrorExit2p( &smr, "Via." );
     }
-    errCount += checkMod( XYs,  M_PI, YPs );
-    errCount += checkMod( XYs, -M_PI, YNs );
+    errCount += checkMod( &smr, XYs,  M_PI, YPs );
+    errCount += checkMod( &smr, XYs, -M_PI, YNs );
 
     ptwXY_free( XYs );
 
@@ -103,7 +129,7 @@ int main( int argc, char **argv ) {
 /*
 ************************************************************
 */
-static int checkMod( ptwXYPoints *data, double m, double *Ys ) {
+static int checkMod( statusMessageReporting *smr, ptwXYPoints *data, double m, double *Ys ) {
 
     int64_t i, errCount = 0;
     nfu_status status = nfu_Okay;
@@ -112,14 +138,12 @@ static int checkMod( ptwXYPoints *data, double m, double *Ys ) {
 
     if( verbose ) printf( "# mod = %.15e\n", m );
     printIfVerbose( data );
-    if( ( moded = ptwXY_clone( data, &status ) ) == NULL )
-            nfu_printErrorMsg( "ERROR %s: data clone, status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( status = ptwXY_mod( moded, m, 0 ) ) != nfu_Okay )
-            nfu_printErrorMsg( "ERROR %s: ptwXY_mod, status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( moded = ptwXY_clone( smr, data ) ) == NULL ) nfut_printSMRErrorExit2p( smr, "Via." );
+    if( ptwXY_mod( smr, moded, m, 0 ) != nfu_Okay ) nfut_printSMRErrorExit2p( smr, "Via." );
     printIfVerbose( moded );
 
-    if( ( status = ptwXY_simpleCoalescePoints( moded ) ) != nfu_Okay ) 
-            nfu_printErrorMsg( "ERROR %s: coalescing, status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( status = ptwXY_simpleCoalescePoints( smr, moded ) ) != nfu_Okay ) 
+        nfut_printSMRErrorExit2p( smr, "Via." );
     for( i = 0; i < moded->length; i++ ) {
         x = moded->points[i].x;
         y = moded->points[i].y;
@@ -128,12 +152,10 @@ static int checkMod( ptwXYPoints *data, double m, double *Ys ) {
     }
     ptwXY_free( moded );
 
-    if( ( moded = ptwXY_clone( data, &status ) ) == NULL )
-            nfu_printErrorMsg( "ERROR %s: data clone, status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( status = ptwXY_mod( moded, m, 1 ) ) != nfu_Okay )
-            nfu_printErrorMsg( "ERROR %s: ptwXY_mod, status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( status = ptwXY_simpleCoalescePoints( moded ) ) != nfu_Okay ) 
-            nfu_printErrorMsg( "ERROR %s: coalescing, status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( moded = ptwXY_clone( smr, data ) ) == NULL ) nfut_printSMRErrorExit2p( smr, "Via." );
+    if( ptwXY_mod( smr, moded, m, 1 ) != nfu_Okay ) nfut_printSMRErrorExit2p( smr, "Via." );
+    if( ( status = ptwXY_simpleCoalescePoints( smr, moded ) ) != nfu_Okay ) 
+        nfut_printSMRErrorExit2p( smr, "Via." );
     for( i = 0; i < moded->length; i++ ) {
         x = moded->points[i].x;
         y = moded->points[i].y;

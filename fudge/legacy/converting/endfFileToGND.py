@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 import sys
@@ -84,7 +108,7 @@ class logFiles :
 def endfFileToGND( fileName, xenslIsotopes = None, useFilesQAlways = True, singleMTOnly = None,
         MTs2Skip = None, parseCrossSectionOnly = False,
         toStdOut = True, toStdErr = True, logFile = None, skipBadData = False, doCovariances = True,
-        verboseWarnings = False, deprecatedOptions = None ) :
+        verboseWarnings = False, verbose = 1, **kwargs ) :
 
     logs = logFiles( toStdOut = toStdOut, toStdErr = toStdErr, logFile = logFile, defaultIsStderrWriting = False )
     header, MAT, MTDatas = endfFileToGNDMisc.parseENDFByMT_MF( fileName, logFile = logs )
@@ -93,7 +117,6 @@ def endfFileToGND( fileName, xenslIsotopes = None, useFilesQAlways = True, singl
     reconstructedStyleName = 'recon'
 
     if MTs2Skip is None: MTs2Skip = []
-    if deprecatedOptions is None: deprecatedOptions = {}
 
     targetZA, targetMass, LRP, LFI, NLIB, NMOD = endfFileToGNDMisc.sixFunkyFloatStringsToFloats( MTDatas[451][1][0], logFile = logs )
     targetZA = int( targetZA )      # Target's ZA
@@ -121,7 +144,7 @@ def endfFileToGND( fileName, xenslIsotopes = None, useFilesQAlways = True, singl
 
     targetTemperature, dummy, LDRZ, dummy, NWD, NXC = endfFileToGNDMisc.sixFunkyFloatStringsToFloats( MTDatas[451][1][3], logFile = logs )
     LDRZ = int( LDRZ )          # Primary or special evaluation of this material
-    NWD = int( NWD )            # 
+    NWD = int( NWD )            #
     NXC = int( NXC )            #
 
     library = {
@@ -147,7 +170,7 @@ def endfFileToGND( fileName, xenslIsotopes = None, useFilesQAlways = True, singl
     transportables = [ 'n', 'gamma' ]                          # ???? Check this with Gerry?
     info = toGNDMisc.infos( styleName, xenslIsotopes, transportables = transportables )
     info.doRaise = []
-    try : 
+    try :
         Date = endfFileToGNDMisc.getENDFDate( MTDatas[451][1][4][22:33] )
     except Exception as e :
         info.doRaise.append( str(e) )
@@ -155,18 +178,18 @@ def endfFileToGND( fileName, xenslIsotopes = None, useFilesQAlways = True, singl
         Date = datetime.datetime.today().strftime("%Y-%m-%d")
     author = MTDatas[451][1][4][33:66]
 
-    evaluatedStyle = fudge.gnd.styles.evaluated( styleName, Date,
+    evaluatedStyle = fudge.gnd.styles.evaluated( styleName,
             PQU.PQU( PQU.pqu_float.surmiseSignificantDigits( targetTemperature ), 'K' ),
-            library, libraryVersion )
+            library, libraryVersion, date = Date )
 
     info.Date = Date
     info.verboseWarnings = verboseWarnings
-    info.ignoreBadNK14 = False
+    info.printBadNK14 = True
     info.continuumSpectraFix = False
-    deprecatedOptionList = [ 'ignoreBadNK14', 'continuumSpectraFix' ]
-    for options in deprecatedOptions :
-        if( options not in deprecatedOptionList ) : raise Exception( 'invalid deprecated option "%s"' % options )
-        setattr( info, options, deprecatedOptions[options] )
+    options = [ 'printBadNK14', 'continuumSpectraFix' ]
+    for option in kwargs :
+        if( option not in options ) : raise Exception( 'invalid deprecated option "%s"' % option )
+        setattr( info, option, kwargs[option] )
     info.logs = logs
     info.MAT = MAT
     info.LRP = LRP
@@ -188,7 +211,7 @@ def endfFileToGND( fileName, xenslIsotopes = None, useFilesQAlways = True, singl
     info.ZAMasses[projectileZA] = info.masses.getMassFromZA( projectileZA )
     info.ZAMasses[targetZA] = targetMass * info.masses.getMassFromZA( 1 )
     info.ZAMasses[1] = info.masses.getMassFromZA( 1 ) # always need neutron mass in table
-    
+
     info.MF12_LO2 = {}
     info.AWR_mode = None
 #    info.AWR_mode = open( 'AWR_mode.out', 'w' )  # Used by BRB to print masses for testing.
@@ -204,11 +227,11 @@ def endfFileToGND( fileName, xenslIsotopes = None, useFilesQAlways = True, singl
     if( ITYPE in [ 0, 9 ] )  :
         target = toGNDMisc.getTypeNameGamma( info, targetZA, level = info.level, levelIndex = levelIndex )
         if( ( STA != 0 ) and not isinstance( target, fudge.gnd.xParticle.nuclearLevel ) ) : target.attributes['unstable'] = True
-    elif( ITYPE == 3 )  :
+    elif( ITYPE in [ 1, 3 ] )  :
         elementSymbol = fudge.particles.nuclear.elementSymbolFromZ( targetZA / 1000 )
         target = fudge.gnd.xParticle.element( elementSymbol )
     else :
-        raise Exception( "Unsupported ITYPE = %s" % ITYPE )
+        raise ValueError( "Unsupported ITYPE = %s" % ITYPE )
 
     ZA2, MAT2 = endf_endlModule.ZAAndMATFromParticleName( target.name )
     MAT2 += LISO
@@ -216,7 +239,7 @@ def endfFileToGND( fileName, xenslIsotopes = None, useFilesQAlways = True, singl
             ( MAT, MAT2 ), stderrWriting = True )
 
     documentation = fudge.gnd.documentation.documentation( 'endfDoc', '\n'.join( MTDatas[451][1][4:4+NWD] ) )
-    reactionSuite = fudge.gnd.reactionSuite.reactionSuite( projectile, target, 
+    reactionSuite = fudge.gnd.reactionSuite.reactionSuite( projectile, target,
             particleList = info.particleList, style = evaluatedStyle, documentation = documentation, MAT = MAT )
     if( LISO != 0 ) :
         targetBaseName = target.name.split( '_' )[0]
@@ -232,11 +255,11 @@ def endfFileToGND( fileName, xenslIsotopes = None, useFilesQAlways = True, singl
     covarianceSuite = None
     if( ( ITYPE == 0 ) or ( ITYPE == 9 ) ) :
         doRaise = NSUB not in { 0 : [ 0, 10, 10010, 10020, 10030, 20030, 20040 ], 9 : [ 19 ] }[ITYPE]
-        if( doRaise ) : raise Exception( 'For ITYPE = %d, invalid NSUB = %s' % ( ITYPE, NSUB ) )
-        covarianceSuite = ENDF_ITYPE_0.ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSectionOnly, doCovariances )
+        if( doRaise ) : raise ValueError( 'For ITYPE = %d, invalid NSUB = %s' % ( ITYPE, NSUB ) )
+        covarianceSuite = ENDF_ITYPE_0.ITYPE_0( MTDatas, info, reactionSuite, singleMTOnly, MTs2Skip, parseCrossSectionOnly, doCovariances, verbose )
     elif( ITYPE == 3 )  :
         if( NSUB not in [ 3, 113 ] ) :
-            raise Exception( 'For ITYPE = %d, invalid NSUB = %s' % ( ITYPE, NSUB ) )
+            raise ValueError( 'For ITYPE = %d, invalid NSUB = %s' % ( ITYPE, NSUB ) )
         ENDF_ITYPE_3.ITYPE_3( MTDatas, info, reactionSuite, singleMTOnly, parseCrossSectionOnly, verbose = True )
 
     if( len( info.doRaise ) > 0 and not skipBadData ) :
@@ -255,7 +278,7 @@ def addUnspecifiedDistributions( info, outputChannel ) :
     for product in outputChannel :
         if( len( product.distribution ) == 0 ) :
             product.distribution.add( unspecifiedModule.form( info.style, productFrame = standardsModule.frames.labToken ) )
-        addUnspecifiedDistributions( info, product.decayChannel )
+        addUnspecifiedDistributions( info, product.outputChannel )
 
 if( __name__ == '__main__' ) :
 

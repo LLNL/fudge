@@ -1,0 +1,24 @@
+  0 <unknownID>
+  1 <tooManyIDs>
+  2 <invalidID>
+  3 <errnoID>
+  4 <statusMessageReporting>
+
+  0 <unknownID>
+  1 <tooManyIDs>
+  2 <invalidID>
+  3 <errnoID>
+  4 <statusMessageReporting>
+  5 <lib000>
+  6 <lib001>
+  7 <lib002>
+  8 <lib003>
+  9 <lib004>
+ 10 <lib005>
+ 11 <lib006>
+ 12 <lib007>
+ 13 <lib008>
+ 14 <lib009>
+
+smr1 ID =   0 libararyName = unknownID
+smr2 ID =  13 libararyName = lib008

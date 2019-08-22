@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,69 +18,82 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
-import base as baseModule
-
-from fudge.gnd import abstractClasses as abstractClassesModule
+from xData import axes as axesModule
+from xData import XYs as XYsModule
+from xData import gridded as griddedModule
 
 from fudge.gnd import miscellaneous as miscellaneousModule
 from fudge.gnd import tokens as tokensModule
-from xData import axes as axesModule
-from xData import XYs as XYsModule
+from fudge.gnd import abstractClasses as abstractClassesModule
+
+import base as baseModule
 
 __metaclass__ = type
 
 class baseAvailableEnergyForm( abstractClassesModule.form ) :
 
-    __genre = baseModule.availableEnergyToken
-
+    pass
 #
 # availableEnergy forms
 #
-class grouped( baseAvailableEnergyForm, abstractClassesModule.multiGroup ) :
+class multiGroup( baseAvailableEnergyForm, griddedModule.gridded ) :
 
-    def __init__( self, label, axes, groupData ) :
+    def __init__( self, **kwargs ) :
 
-        baseAvailableEnergyForm.__init__( self )
-        abstractClassesModule.multiGroup.__init__( self, label, axes, data )
-
-class groupedWithCrossSection( baseAvailableEnergyForm, abstractClassesModule.multiGroup ) :
-
-    def __init__( self, label, axes, groupData ) :
-
-        baseAvailableEnergyForm.__init__( self )
-        abstractClassesModule.multiGroup.__init__( self, label, axes, data )
-
+        griddedModule.gridded.__init__( self, **kwargs )
 #
 # availableEnergy component
 #
 class component( abstractClassesModule.component ) :
 
-    __genre = baseModule.availableEnergyToken
     moniker = baseModule.availableEnergyToken
 
     def __init__( self ) :
 
-        abstractClassesModule.component.__init__( self, ( grouped, groupedWithCrossSection ) )
+        abstractClassesModule.component.__init__( self, ( multiGroup, ) )
 
     def makeGrouped( self, processInfo, tempInfo ) :
 
@@ -88,7 +102,7 @@ class component( abstractClassesModule.component ) :
         energyUnit = tempInfo['crossSection'].domainUnit( )
         axes = axesModule.axes( labelsUnits = { 0 : [ 'energy_in', energyUnit ], 1 : [ 'energy', energyUnit ] } )
         domainMin, domainMax = tempInfo['crossSection'].domain( )
-        energy = XYsModule.XYs( data = [ [ domainMin, domainMin ], [ domainMax, domainMax ] ], axes = axes, accuracy = 1e-8 )
+        energy = XYsModule.XYs1d( data = [ [ domainMin, domainMin ], [ domainMax, domainMax ] ], axes = axes, accuracy = 1e-8 )
         axes, grouped_ = miscellaneousModule.makeGrouped( self, processInfo, tempInfo, energy )
         self.addForm( grouped( axes, grouped_ ) )
         axes, grouped_ = miscellaneousModule.makeGrouped( self, processInfo, tempInfo, energy, normType = 'groupedFlux' )
@@ -100,8 +114,7 @@ def parseXMLNode( element, linkData = {} ) :
     aec = component()
     for form in element:
         formClass = {
-                tokensModule.groupedFormToken :                   grouped,
-                tokensModule.groupedWithCrossSectionFormToken :   groupedWithCrossSection,
+                tokensModule.groupedFormToken :                   multiGroup,
             }.get( form.tag )
         if( formClass is None ) : raise Exception( "encountered unknown availableEnergy form: %s" % form.tag )
         try :

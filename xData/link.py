@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 __metaclass__ = type
@@ -62,12 +86,13 @@ class link( baseModule.xDataCoreMembers ) :
 
     moniker = 'link'
 
-    def __init__( self, link = None, root = None, path = None, label = None, **attributes ) :
+    def __init__( self, link = None, root = None, path = None, label = None, relative = False, **attributes ) :
 
         baseModule.xDataCoreMembers.__init__( self, self.moniker, index = None, label = label )
         self.link = link    # actual pointer to other data
         self.root = root    # file name where other data is stored, only needed if it's not the current file
         self.path = path    # self.path is an xPath expression that uniquely identifies the other data
+        self.__relative = relative      # whether to use relative link when writing out xPath
 
             # careful with nesting single/double quotes.
         if self.path is not None: self.path = self.path.replace('"',"'")
@@ -84,43 +109,18 @@ class link( baseModule.xDataCoreMembers ) :
         self.attributes[key] = value
 
     def updateXPath( self ):
-        '''ensure the xPath agrees with the linked-to data'''
-        if hasattr(self.link, 'toXLink'): self.path = self.link.toXLink()
+        """ensure the xPath agrees with the linked-to data"""
+        if self.__relative and hasattr(self, 'toRelativeXLink'):
+            self.path = self.toRelativeXLink( self.link )
+        elif hasattr(self.link, 'toXLink'):
+            self.path = self.link.toXLink()
 
     def follow( self, startNode ):
         """
-        :param startNode: instance corresponding to the beginning of self.path
+        :param startNode: instance corresponding to the beginning of self.path (must inherit from ancestry)
         :return: class instance pointed to by self.path
-
-        Uses ancestry.findEntity to find each element
         """
-        import re
-        # use regex on xPath expressions like "reaction[@label='2']"
-        regex = re.compile("([a-zA-Z_]+)\[@([a-z]+)='([a-zA-Z0-9_]+|[a-zA-Z]*\([a-zA-Z0-9_,]+\))'\]")
-
-        def follow2( xPathList, node ):
-            # recursive helper function: descend the path to find the correct element
-            if len(xPathList)==0: return node
-
-            xPathNext = xPathList[0]
-            match = regex.match(xPathNext)
-            try:
-                if match:
-                    nodeNext = node.findEntity( *match.groups() )
-                else:
-                    nodeNext = node.findEntity( xPathNext )
-            except:
-                raise UnresolvableLink()
-            return follow2(xPathList[1:], nodeNext)
-
-        xPathList = self.path.split('/')
-        while not xPathList[0]: # trim empty sections from the beginning
-            xPathList = xPathList[1:]
-        try:
-            return follow2( xPathList, startNode )
-        except UnresolvableLink:
-            raise UnresolvableLink( "Cannot locate path '%s'" % self.path )
-
+        return startNode.followXPath( self.path )
 
     def toXML( self, indent = '' , **kwargs ) :
         """Pointers show up in the attributes list on an xml element
@@ -141,7 +141,7 @@ class link( baseModule.xDataCoreMembers ) :
         return [ self.toXML( indent, **kwargs ) ]
 
     @classmethod
-    def parseXMLNode( cls, linkElement, xPath=[], linkData={} ):
+    def parseXMLNode( cls, linkElement, xPath, linkData ):
         """
         Parse the xml-represented link back to python. The resulting link points to None,
         and must be resolved by the calling function.
@@ -153,17 +153,14 @@ class link( baseModule.xDataCoreMembers ) :
         path = linkElement.get(xlink_namespace+'href')
         if '#' in path: root, path = path.split('#')
         else: root = None
+        relative = not path.startswith('/')
         # all optional (non-xlink) attributes:
         attributes = dict( [v for v in linkElement.items() if xlink_namespace not in v[0]] )
         for key in attributes:
             if key in linkData.get('typeConversion',{}):
                 attributes[key] = linkData['typeConversion'][key](attributes[key])
-        result = cls( link=None, root=root, path=path, **attributes )
+        result = cls( link=None, root=root, path=path, relative=relative, **attributes )
         if( 'unresolvedLinks' in linkData ) : linkData['unresolvedLinks'].append( result )
         xPath.pop()
 
         return result
-
-
-class UnresolvableLink( Exception ):
-    pass

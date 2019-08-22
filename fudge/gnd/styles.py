@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,33 +18,80 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
+
+import datetime
 
 from fudge.core.utilities import brb
 
-import xData.ancestry as ancestryModule
-from fudge.gnd import suites as suitesModule
 from pqu.PQU import PQU as PQUModule
 
+import xData.ancestry as ancestryModule
+
+from fudge.gnd import suites as suitesModule
+from fudge.processing import flux as fluxModule
+from fudge.processing import transportables as transportablesModule
+
 __metaclass__ = type
+
+def getClassDict():
+    classDict = {}
+    # Determine supported styles through module introspection
+    import styles as tmpStyles
+    for thing in filter(lambda x: not x.startswith('__'), dir(tmpStyles)):
+        try:
+            thingClass = tmpStyles.__dict__[thing]
+            if issubclass(thingClass, style) and thingClass!=style:
+                classDict[thingClass.moniker]=thingClass
+        except TypeError: pass # catches imported modules that are irrelevant
+    #classDict = {
+    #    evaluated.moniker : evaluated,
+    #    crossSectionReconstructed.moniker : crossSectionReconstructed,
+    #    heated.moniker : heated,
+    #    averageProductData.moniker : averageProductData,
+    #    angularDistributionReconstructed.moniker : angularDistributionReconstructed }
+    return classDict
 
 class styles( ancestryModule.ancestry ) :
     """
@@ -58,6 +106,12 @@ class styles( ancestryModule.ancestry ) :
         self.__styles = []
         ancestryModule.ancestry.__init__( self )
 
+    def __contains__( self, label ) :
+
+        for item in self :
+            if( item.label == label ) : return( True )
+        return( False )
+
     def __len__( self ) :
 
         return( len( self.__styles ) )
@@ -70,21 +124,23 @@ class styles( ancestryModule.ancestry ) :
     def __getitem__( self, label ) :
 
         if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must be a string' )
-        for style in self.__styles :
-            if( style.label == label ) : return( style )
-        raise IndexError( 'No style labelled == %s' % label )
+        for _style in self.__styles :
+            if( _style.label == label ) : return( _style )
+        raise IndexError( 'No style labelled == "%s"' % label )
 
     def add( self, _style ) :
         """
         Append a style to the list of styles.
+
+        @param _style: style instance
         """
 
         if( not( isinstance( _style, style ) ) ) : raise TypeError( 'invalid style instance' )
         if( isinstance( _style, evaluated ) ) :
             for __style in self :
-                if( isinstance( __style, evaluated ) ) : raise Exception( 'multiple %s styles not allowed' % __style.moniker )
+                if( isinstance( __style, evaluated ) ) : raise ValueError( 'multiple %s styles not allowed' % __style.moniker )
         for __style in self :
-            if( __style.label == _style.label ) : raise Exception( 'style labeled "%s" already exists' )
+            if( __style.label == _style.label ) : raise ValueError( 'style labeled "%s" already exists' % _style.label )
         self.__styles.append( _style )
         _style.setAncestor( self, 'label' )
 
@@ -92,6 +148,7 @@ class styles( ancestryModule.ancestry ) :
         """
         Remove the specified style. Accepts either a string or a style instance
         """
+
         index = None
         for idx,tmp in enumerate(self):
             if( ( tmp is _style ) or ( tmp.label == _style ) ) : index = idx
@@ -105,8 +162,8 @@ class styles( ancestryModule.ancestry ) :
         """
 
         styleList = []
-        for style in self :
-            if( isinstance( style, cls ) ) : styleList.append( style )
+        for _style in self :
+            if( isinstance( _style, cls ) ) : styleList.append( _style )
         return( styleList )
 
     def getStyleOfClass( self, cls ) :
@@ -116,13 +173,13 @@ class styles( ancestryModule.ancestry ) :
 
         styleList = self.getStylesOfClass( cls )
         if( len( styleList ) == 0 ) : return( None )
-        if( len( styleList )  > 1 ) : raise Exception( '''multiple (%d) style's of type "%s" found''' % \
+        if( len( styleList )  > 1 ) : raise KeyError( '''multiple (%d) style's of type "%s" found''' % \
                 ( len( styleList ), cls.moniker ) )
         return( styleList[0] )
 
     def getTempStyleNameOfClass( self, cls ):
 
-        styleNames = [ style.label for style in self ]
+        styleNames = [ _style.label for _style in self ]
         index = 0
         while( True ) :
             tmpLabel = 'tmp%d_%s' % ( index, cls.moniker )
@@ -138,18 +195,14 @@ class styles( ancestryModule.ancestry ) :
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
         xmlStringList = ['%s<%s>' % (indent, self.moniker)]
-        for style in self : xmlStringList += style.toXMLList( indent2, **kwargs )
+        for _style in self : xmlStringList += _style.toXMLList( indent2, **kwargs )
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
 
     def parseXMLNode( self, stylesElement, xPath, linkData ) :
 
         xPath.append( stylesElement.tag )
-        classDict = {
-            evaluated.moniker : evaluated,
-            crossSectionReconstructed.moniker : crossSectionReconstructed,
-            heated.moniker : heated,
-            averageProductData.moniker : averageProductData }
+        classDict = getClassDict()
         for styleElement in stylesElement :
             class_ = classDict.get( styleElement.tag, None )
             if class_ is None :
@@ -162,10 +215,11 @@ class style( ancestryModule.ancestry ) :
 
     # FIXME should be abstract base class
 
-    def __init__( self, label, date ) :
+    def __init__( self, label, date = None ) :
 
         ancestryModule.ancestry.__init__( self )
         self.__label = label
+        if( date is None ) : date = str( datetime.date.today( ) )
         self.__date = date
         self.__derivedStyles = derivedStyles( )
 
@@ -191,9 +245,9 @@ class style( ancestryModule.ancestry ) :
         with that style is found that component is returned. Otherwise, None is returned.
         """
 
-        for style in self.__derivedStyles :
+        for _style in self.__derivedStyles :
             for form in components :
-                if( style.label == form.label ) : return( form )
+                if( _style.label == form.label ) : return( form )
         return( None )
 
     @staticmethod
@@ -216,9 +270,9 @@ class evaluated( style ) :
 
     moniker = 'evaluated'
 
-    def __init__( self, label, date, temperature, library, version ) :
+    def __init__( self, label, temperature, library, version, date = None ) :
 
-        style.__init__( self, label, date )
+        style.__init__( self, label, date = date )
         if( not( isinstance( library, str ) ) ) : raise TypeError( 'library must be a string' )
         self.__library = library
         if( not( isinstance( version, str ) ) ) : raise TypeError( 'version must be a string' )
@@ -242,7 +296,7 @@ class evaluated( style ) :
 
     def toXMLList( self, indent = '', **kwargs ) :
 
-        xmlStringList = [ '%s<%s label="%s" library="%s" version="%s" date="%s" temperature="%s">' % 
+        xmlStringList = [ '%s<%s label="%s" library="%s" version="%s" date="%s" temperature="%s">' %
                 ( indent, self.moniker, self.label, self.library, self.version, self.date, self.temperature ) ]
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
@@ -256,9 +310,26 @@ class crossSectionReconstructed( style ) :
 
     moniker = 'crossSectionReconstructed'
 
-    def __init__( self, label, date ) :
+    def __init__( self, label, date = None ) :
 
-        style.__init__( self, label, date )
+        style.__init__( self, label, date = date )
+
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
+        xmlStringList = [ '%s<%s label="%s" date="%s">' % ( indent, self.moniker, self.label, self.date ) ]
+        xmlStringList += self.derivedStyles.toXMLList( indent2, **kwargs )
+        xmlStringList[-1] += '</%s>' % self.moniker
+        return( xmlStringList )
+
+class angularDistributionReconstructed( style ) :
+
+    moniker = 'angularDistributionReconstructed'
+
+    def __init__( self, label, date = None ) :
+
+        style.__init__( self, label, date = date )
 
     def toXMLList( self, indent = '', **kwargs ) :
 
@@ -273,9 +344,9 @@ class heated( style ) :
 
     moniker = 'heated'
 
-    def __init__( self, label, date, temperature ) :
+    def __init__( self, label, temperature, date = None ) :
 
-        style.__init__( self, label, date, temperature )
+        style.__init__( self, label, date = date )
         self.__temperature = PQUModule( temperature )
 
     def toXMLList( self, indent = '', **kwargs ) :
@@ -297,9 +368,9 @@ class averageProductData( style ) :
 
     moniker = 'averageProductData'
 
-    def __init__( self, label, date ) :
+    def __init__( self, label, date = None ) :
 
-        style.__init__( self, label, date )
+        style.__init__( self, label, date = date )
 
     def toXMLList( self, indent = '', **kwargs ) :
 
@@ -310,7 +381,51 @@ class averageProductData( style ) :
         xmlStringList[-1] += '</%s>' % self.moniker
         return( xmlStringList )
 
+class SnMultiGroup( style ) :
+
+    moniker = 'SnMultiGroup'
+
+    def __init__( self, label, lMax, flux, date = None ) :
+
+        if( not( isinstance( flux, fluxModule.flux ) ) ) : raise TypeError( 'Invalid flux instance' )
+
+        style.__init__( self, label, date = date )
+        self.__lMax = int( lMax )
+        self.__flux = flux
+        self.__transportables = transportablesModule.transportables( )
+        self.__transportables.setAncestor( self )
+
+    @property
+    def lMax( self ) :
+
+        return( self.__lMax )
+
+    @property
+    def flux( self ) :
+
+        return( self.__flux )
+
+    @property
+    def transportables( self ) :
+
+        return( self.__transportables )
+
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
+        xmlStringList = [ '%s<%s label="%s" date="%s" lMax="%s">' % ( indent, self.moniker, self.label, self.date, self.lMax ) ]
+        xmlStringList += self.derivedStyles.toXMLList( indent2, **kwargs )
+        xmlStringList += self.flux.toXMLList( indent2, **kwargs )
+        xmlStringList += self.transportables.toXMLList( indent2, **kwargs )
+        xmlStringList[-1] += '</%s>' % self.moniker
+        return( xmlStringList )
+
 class derivedStyles( suitesModule.suite ) :
+    """
+    Each dataset can be derived from other datasets. For a style instance, this class list the other styles
+    that are search to find a datasets derived datasets.
+    """
 
     moniker = 'derivedStyles'
 

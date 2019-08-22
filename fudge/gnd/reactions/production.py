@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 """
@@ -45,6 +69,7 @@ of radioactive products
 from fudge.core.utilities import fudgeExceptions
 
 import fudge
+
 from . import base as baseModule
 
 __metaclass__ = type
@@ -61,13 +86,7 @@ class production( baseModule.base_reaction ):
     def __init__( self, outputChannel, label, ENDF_MT, documentation = None, date = None ) :
         """Creates a new production reaction object."""
 
-        baseModule.base_reaction.__init__( self, label, ENDF_MT, documentation, date = date )
-
-        if( not isinstance( outputChannel, fudge.gnd.channels.channel ) ) :
-            raise fudgeExceptions.FUDGE_Exception( 'Input channel not instance of class channel.' )
-        outputChannel.setAncestor( self )
-        self.data = {}
-        self.outputChannel = outputChannel
+        baseModule.base_reaction.__init__( self, label, outputChannel, ENDF_MT, documentation, date = date )
 
     def isBasicReaction( self ) :
 
@@ -77,50 +96,6 @@ class production( baseModule.base_reaction ):
 
         return( False )
 
-    def check( self, info ) :
-
-        warnings = self.__checkCrossSection__( info )
-        return warnings
-
     def getQ( self, unit, final = True, groundStateQ = False ) :
 
         return( self.outputChannel.getConstantQAs( unit, final = final ) )
-
-    # FIXME next method nearly identical to reactions.calculateDepositionData. Define in base_reaction?
-    def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
-        """
-        Calculate average energy deposited to the outgoing product.
-
-        :param processInfo: dictionary, contains at least 'verbosity' (int), 'incidentEnergyUnit' (string) and 'reactionSuite'
-        :tempInfo: dictionary for storing intermediary data.
-        :param verbosityIndent: string, indentation level
-        :return:
-        """
-
-        if( processInfo.verbosity >= 10 ) : print '%s%s' % ( verbosityIndent, self.outputChannel.toString( simpleString = True ) )
-        tempInfo['outputChannel'] = self
-        tempInfo['EMin'], tempInfo['EMax'] = self.domain( )
-        tempInfo['incidentEnergyUnit'] = self.crossSection.domainUnit( )
-        for productIndex, product in enumerate( self.outputChannel ) :
-            tempInfo['productIndex'] = str( productIndex )
-            tempInfo['productToken'] = product.name
-            tempInfo['productLabel'] = product.label
-            product.calculateDepositionData( processInfo, tempInfo, verbosityIndent + processInfo.verbosityIndentStep )
-
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ):
-
-        xPath.append( '%s[@label="%s"]' % (element.tag, element.get('label')) )
-
-        crossSectionComponent = fudge.gnd.reactionData.crossSection.parseXMLNode( element.find( 'crossSection' ), xPath, linkData )
-        outputChannel = fudge.gnd.channels.parseXMLNode( element.find('outputChannel'), xPath, linkData )
-        MT = int( element.get('ENDF_MT') )
-        date = element.get( 'date' )
-        reac = production( outputChannel, element.get('label'), MT, date = date )
-        for crossSection in crossSectionComponent : reac.crossSection.add( crossSection )
-        if element.find('documentations'):
-            for doc in element.find('documentations'):
-                reac.addDocumentation( fudge.gnd.documentation.parseXMLNode(doc) )
-
-        xPath.pop()
-        return reac

@@ -16,19 +16,24 @@
 /*
 ************************************************************
 */
-double nf_exponentialIntegral( int n, double x, nfu_status *status ) {
+nfu_status nf_exponentialIntegral( statusMessageReporting *smr, int n, double x, double *value ) {
 
     int i, ii, nm1;
     double a, b, c, d, del, fact, h, psi;
     double ans = 0.0;
+    nfu_status status = nfu_Okay;
 
-    *status = nfu_badInput;
-    if( !isfinite( x ) ) return( x );
-    *status = nfu_Okay;
+    *value = 0.;
+
+    if( !isfinite( x ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badInput, "Invalid input (x = %e).", x );
+        return( nfu_badInput );
+    }
 
     nm1 = n - 1;
     if( ( n < 0 ) || ( x < 0.0 ) || ( ( x == 0.0 ) && ( ( n == 0 ) || ( n == 1 ) ) ) ) {
-        *status = nfu_badInput; }
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badInput, "Invalid input (n = %d, x = %e).", n, x );
+        return( nfu_badInput ); }
     else {
         if( n == 0 ) {
             ans = exp( -x ) / x; }                  /* Special case */
@@ -46,9 +51,12 @@ double nf_exponentialIntegral( int n, double x, nfu_status *status ) {
                 c = b + a / c;
                 del = c * d;
                 h *= del;
-                if( fabs( del - 1.0 ) < EPS ) return( h * exp( -x ) );
+                if( fabs( del - 1.0 ) < EPS ) {
+                    *value = h * exp( -x );
+                    return( nfu_Okay );
+                }
             }
-            *status = nfu_failedToConverge; }
+            status = nfu_failedToConverge; }
         else {
             ans = ( nm1 != 0 ) ? 1.0 / nm1 : -log(x) - EULER;   /* Set first term */
             fact = 1.0;
@@ -62,10 +70,16 @@ double nf_exponentialIntegral( int n, double x, nfu_status *status ) {
                     del = fact * ( -log( x ) + psi );
                 }
                 ans += del;
-                if( fabs( del ) < fabs( ans ) * EPS ) return( ans );
+                if( fabs( del ) < fabs( ans ) * EPS ) {
+                    *value = ans;
+                    return( nfu_Okay );
+                }
             }
-            *status = nfu_failedToConverge;
+            status = nfu_failedToConverge;
         }
     }
-    return( ans );
+    if( status != nfu_Okay ) smr_setReportError2p( smr, nfu_SMR_libraryID, status, "Failed to converge." );
+
+    *value = ans;
+    return( status );
 }

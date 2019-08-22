@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -47,6 +71,7 @@
 #include <time.h>
 
 #include <ptwXY.h>
+#include <nfut_utilities.h>
 #include <nf_utilities.h>
 #include <ptwXY_utilities.h>
 
@@ -55,8 +80,8 @@ static int verbose = 0;
 static char *fmtXY = "%25.15e %25.15e\n";
 static FILE *infoF;
 
-static void flatInterpolationToLinear( ptwXYPoints *XYs );
-static void flatInterpolationToLinear2( ptwXYPoints *XYs, double epsm, double epsp );
+static void flatInterpolationToLinear( statusMessageReporting *smr, ptwXYPoints *XYs );
+static void flatInterpolationToLinear2( statusMessageReporting *smr, ptwXYPoints *XYs, double epsm, double epsp );
 static void printIfVerbose( ptwXYPoints *data );
 /*
 ************************************************************
@@ -65,11 +90,13 @@ int main( int argc, char **argv ) {
 
     int iarg, errCount = 0, echo = 0, i;
     ptwXYPoints *fineXYs, *coarseXYs;
-    nfu_status status;
     double *fineYs, *coarseYs, accuracy = 1e-3;
     double fineXs[] = { -2.0, -1.5, -1.4, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 2.2, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0 };
     double coarseXs[] = { -2.0, 0.0, 2.0, 4.0, 6.0, 8.0, 10.0 };
     int nFineXs= sizeof( fineXs ) / ( sizeof( double ) ), nCoarseXs = sizeof( coarseXs ) / ( sizeof( double ) );
+    statusMessageReporting smr;
+
+    smr_initialize( &smr, smr_status_Ok );
 
     infoF = stdout;
 
@@ -89,19 +116,19 @@ int main( int argc, char **argv ) {
     if( ( fineYs = nfu_malloc( nFineXs * sizeof( double ) ) ) == NULL ) nfu_printErrorMsg( "ERROR %s: nfu_malloc-ing fineXYs", __FILE__ );
     for( i = 0; i < nFineXs; i++ ) fineYs[i] = 2 * i + 3;
     fineYs[nFineXs-1] = fineYs[nFineXs-2];
-    if( ( fineXYs = ptwXY_new( ptwXY_interpolationFlat, NULL, 0., accuracy, 10, 10, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: dataXY creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( status = ptwXY_setXYDataFromXsAndYs( fineXYs, nFineXs, fineXs, fineYs ) ) != nfu_Okay )
-        nfu_printErrorMsg( "ERROR %s: ptwXY_setXYDataFromXsAndYs status = %d for fineXYs: %s", __FILE__, status, nfu_statusMessage( status ) );
-    flatInterpolationToLinear( fineXYs );
+    if( ( fineXYs = ptwXY_new( &smr, ptwXY_interpolationFlat, NULL, 0., accuracy, 10, 10, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    if( ptwXY_setXYDataFromXsAndYs( &smr, fineXYs, nFineXs, fineXs, fineYs ) != nfu_Okay )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    flatInterpolationToLinear( &smr, fineXYs );
 
     if( ( coarseYs = nfu_malloc( nCoarseXs * sizeof( double ) ) ) == NULL ) nfu_printErrorMsg( "ERROR %s: nfu_malloc-ing nCoarseXs", __FILE__ );
     for( i = 0; i < nCoarseXs ; i++ ) coarseYs[i] = -i + 10;
     coarseYs[nCoarseXs-1] = coarseYs[nCoarseXs-2];
-    if( ( coarseXYs = ptwXY_new( ptwXY_interpolationFlat, NULL, 0., accuracy, 10, 10, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: coarseXYs creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( status = ptwXY_setXYDataFromXsAndYs( coarseXYs, nCoarseXs, coarseXs, coarseYs ) ) != nfu_Okay )
-        nfu_printErrorMsg( "ERROR %s: ptwXY_setXYDataFromXsAndYs status = %d for coarseXYs: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( coarseXYs = ptwXY_new( &smr, ptwXY_interpolationFlat, NULL, 0., accuracy, 10, 10, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    if( ptwXY_setXYDataFromXsAndYs( &smr, coarseXYs, nCoarseXs, coarseXs, coarseYs ) != nfu_Okay )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
 
     free( fineYs );
     free( coarseYs );
@@ -112,20 +139,19 @@ int main( int argc, char **argv ) {
 /*
 ************************************************************
 */
-static void flatInterpolationToLinear( ptwXYPoints *XYs ) {
+static void flatInterpolationToLinear( statusMessageReporting *smr, ptwXYPoints *XYs ) {
 
     double dx = 1e-2;
 
-    flatInterpolationToLinear2( XYs, 0., dx );
-    flatInterpolationToLinear2( XYs, dx, 0. );
-    flatInterpolationToLinear2( XYs, dx, dx );
+    flatInterpolationToLinear2( smr, XYs, 0., dx );
+    flatInterpolationToLinear2( smr, XYs, dx, 0. );
+    flatInterpolationToLinear2( smr, XYs, dx, dx );
 }
 /*
 ************************************************************
 */
-static void flatInterpolationToLinear2( ptwXYPoints *XYs, double epsm, double epsp ) {
+static void flatInterpolationToLinear2( statusMessageReporting *smr, ptwXYPoints *XYs, double epsm, double epsp ) {
 
-    nfu_status status;
     ptwXYPoints *linearXYs;
 
     if( verbose ) {
@@ -133,8 +159,8 @@ static void flatInterpolationToLinear2( ptwXYPoints *XYs, double epsm, double ep
         fprintf( infoF, "# epsp = %e\n", epsp );
     }
     printIfVerbose( XYs );
-    if( ( linearXYs = ptwXY_flatInterpolationToLinear( XYs, epsm, epsp, &status ) ) == NULL )
-        nfu_printErrorMsg( "ERROR %s: ptwXY_flatInterpolationToLinear: status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( linearXYs = ptwXY_flatInterpolationToLinear( smr, XYs, epsm, epsp ) ) == NULL )
+        nfut_printSMRErrorExit2p( smr, "Via." );
     printIfVerbose( linearXYs );
     ptwXY_free( linearXYs );
 }
@@ -144,7 +170,7 @@ static void flatInterpolationToLinear2( ptwXYPoints *XYs, double epsm, double ep
 static void printIfVerbose( ptwXYPoints *data ) {
 
     if( !verbose ) return;
-    fprintf( infoF, "# length = %d\n", (int) ptwXY_length( data ) );
+    fprintf( infoF, "# length = %d\n", (int) ptwXY_length( NULL, data ) );
     ptwXY_simpleWrite( data, infoF, fmtXY );
     fprintf( infoF, "\n\n" );
 }

@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 from xData.ancestry import ancestry
@@ -47,7 +71,7 @@ __metaclass__ = type
 class mixedForm( ancestry ):
     """
     Covariance for a single quantity, stored as several separate matrices that must be summed together.
-    In general, the energy bounds for these matrices can overlap (unlike piecewise cross section data). 
+    In general, the energy bounds for these matrices can overlap (unlike regions1d cross section data). 
     """
 
     moniker = 'mixed'
@@ -112,6 +136,12 @@ class mixedForm( ancestry ):
         self.components.append(covariance)
         
     def getMatchingComponent(self,rowBounds=None,columnBounds=None):
+        """
+
+        :param rowBounds:
+        :param columnBounds:
+        :return:
+        """
         gotRow = False
         for comp in self.components:
             if comp.getRowBounds() == rowBounds:
@@ -159,17 +189,19 @@ class mixedForm( ancestry ):
                 if isinstance(c1,base.covarianceMatrix): 
                     c1.removeExtraZeros()
                     itWorked = c0.getRowBounds()[1] <= c1.getRowBounds()[0] 
-        if not itWorked: 
-            print [c.getRowBounds() for c in self.components]
-            raise ValueError("Bounds between components %i and %i overlap!" %(ic,ic+1))
+        if not itWorked:
+            raise ValueError("Bounds between components %i and %i overlap: %s" %(ic,ic+1, str( [c.getRowBounds() for c in self.components])))
                 
     def getUncertaintyVector( self, theData=None, relative=True ):
         """
         Combines all subsections into single uncertainty vector, converting to relative if requested.
 
-        :returns: an XYs instance
+        :returns: an XYs1d instance
         """
         return self.toCovarianceMatrix().getUncertaintyVector(theData=theData,relative=relative)
+
+    def getCorrelationMatrix(self):
+        return self.toCovarianceMatrix().getCorrelationMatrix()
 
     def toCovarianceMatrix( self ):
         """
@@ -179,50 +211,65 @@ class mixedForm( ancestry ):
         if len( self.components ) == 1: return self.components[0].toCovarianceMatrix()
         import fudge.gnd.covariances.base as base
         import numpy
-        
+        import xData.values as valuesModule
+        import xData.array as arrayModule
+
         # set up common data using first component
         firstCovMtx = self.components[0].toCovarianceMatrix()
         commonRowAxis = copy.copy( firstCovMtx.matrix.axes[2] )
-        if firstCovMtx.matrix.axes[1].gridStyle=='link':
+        if firstCovMtx.matrix.axes[1].style=='link':
             commonColAxis = copy.copy( firstCovMtx.matrix.axes[2] )
         else:
             commonColAxis = copy.copy( firstCovMtx.matrix.axes[1] )
         commonMatrixAxis = copy.copy( firstCovMtx.matrix.axes[0] )
         commonType = firstCovMtx.type
-        
+
+        # We're going to have to merge grids, so we'll need this function to do the dirty work
+        def add_values(v1,v2):
+            v=set()
+            v.update(v1.values)
+            v.update(v2.values)
+            return valuesModule.values(sorted(v))
+
         # first pass through components is to collect bins to set up the common grid + do assorted checking
         for c in self.components[1:]:
             cc = c.toCovarianceMatrix() # a little recursion to take care of nested covariances
             if cc.type != commonType:
                 raise ValueError( "Incompatible types in %s: %s vs. %s" % (self.__class__, commonType, cc.type) )
-            cc.convertAxesToUnits( ( commonRowAxis.unit, commonColAxis.unit, commonMatrixAxis.unit ) )
-            commonRowAxis.data = commonRowAxis.data + cc.axes[0].data
-            if cc.matrix.axes[1].mirrorOtherAxis: commonColAxis.data = commonColAxis.data + cc.matrix.axes[2].data
-            else:                                 commonColAxis.data = commonColAxis.data + cc.matrix.axes[1].data
-        commonRowAxis.data = sorted( set( commonRowAxis.data ) )
-        commonColAxis.data = sorted( set( commonColAxis.data ) )
-        
+            if cc.matrix.axes[0].unit !=  commonMatrixAxis.unit: raise ValueError("covariance matrix components with different units?!? %s vs. %s"%(cc.matrix.axes[0].unit, commonMatrixAxis.unit))
+            if cc.matrix.axes[1].style != 'link': cc.matrix.axes[1].convertToUnit(commonColAxis.unit)
+            cc.matrix.axes[2].convertToUnit(commonRowAxis.unit)
+            commonRowAxis.__values = add_values(commonRowAxis.values, cc.matrix.axes[2].values)
+            if cc.matrix.axes[1].style == 'link': commonColAxis.__values = add_values(commonColAxis.values, cc.matrix.axes[2].values)
+            else:                                 commonColAxis.__values = add_values(commonColAxis.values, cc.matrix.axes[1].values)
+
         # now sum up the components
-        commonMatrix = numpy.mat( firstCovMtx.group( ( commonRowAxis.data, commonColAxis.data ), ( commonRowAxis.unit, commonColAxis.unit ) ).matrix.data )
+        commonMatrix = numpy.mat( firstCovMtx.group( ( commonRowAxis.values, commonColAxis.values ), ( commonRowAxis.unit, commonColAxis.unit ) ).matrix.array.constructArray() )
         for c in self.components[1:]:
             cc = c.toCovarianceMatrix() # a little recursion to take care of nested covariances
-            commonMatrix += numpy.mat( cc.group( ( commonRowAxis.data, commonColAxis.data ), ( commonRowAxis.unit, commonColAxis.unit ) ).matrix.data )
+            commonMatrix += numpy.mat( cc.group( ( commonRowAxis.values, commonColAxis.values ), ( commonRowAxis.unit, commonColAxis.unit ) ).matrix.array.constructArray() )
         
         # now create the instance of the resulting covarianceMatrix
-        if all( [matrix.axes[1].mirrorOtherAxis for matrix in self.components] ):
-            commonColAxis.mirrorOtherAxis = True
-            commonColAxis.data = []
-        gridded = griddedModule.gridded( axes=axesModule.axes( [commonRowAxis, commonColAxis, commonMatrixAxis] ),
-                                         array=commonMatrix.tolist(), copyArray=False, label = 'unified' )
+        if all( [component.matrix.axes[1].style == 'link' for component in self.components] ):  commonColAxis = self.components[0].matrix.axes[1].copy()
+        newAxes=axesModule.axes(
+                labelsUnits={0 : (commonMatrixAxis.label, commonMatrixAxis.unit),
+                             1 : (commonColAxis.label, commonColAxis.unit),
+                             2 : (commonRowAxis.label, commonRowAxis.unit)} )
+        newAxes[0]=commonMatrixAxis
+        newAxes[1]=commonColAxis
+        newAxes[2]=commonRowAxis
+        trigdata = commonMatrix[numpy.tri(commonMatrix.shape[0])==1.0].tolist()[0]
+        gridded = griddedModule.gridded( axes=newAxes, array=arrayModule.full(shape=commonMatrix.shape,data=trigdata,symmetry=arrayModule.symmetryLowerToken) )
+
         return base.covarianceMatrix( type=commonType, matrix=gridded )
 
     def toAbsolute( self, rowData=None, colData=None ): 
         '''
-        Rescales self (if it is a relative covariance) using XYs rowData and colData
+        Rescales self (if it is a relative covariance) using XYs1d rowData and colData
         to convert self into an absolute covariance matrix.
         
-        :param rowData: an XYs instance containing data to rescale covariance in the "row direction"
-        :param colData: an XYs instance containing data to rescale covariance in the "col direction"
+        :param rowData: an XYs1d instance containing data to rescale covariance in the "row direction"
+        :param colData: an XYs1d instance containing data to rescale covariance in the "col direction"
             
         .. note::   If the column axis is set to 'mirrorOtherAxis', only rowData is needed.  
                     If neither rowData nor colData are specified, you'd better hope that the covariance is already 
@@ -243,11 +290,11 @@ class mixedForm( ancestry ):
         
     def toRelative( self, rowData=None, colData=None ): 
         '''
-        Rescales self (if it is a absolute covariance) using XYs rowData and colData
+        Rescales self (if it is a absolute covariance) using XYs1d rowData and colData
         to convert self into a relative covariance matrix.
         
-        :param rowData: an XYs instance containing data to rescale covariance in the "row direction"
-        :param colData: an XYs instance containing data to rescale covariance in the "col direction"
+        :param rowData: an XYs1d instance containing data to rescale covariance in the "row direction"
+        :param colData: an XYs1d instance containing data to rescale covariance in the "col direction"
             
         .. note::   If the column axis is set to 'mirrorOtherAxis', only rowData is needed.  
                     If neither rowData nor colData are specified, you'd better hope that the covariance is already 
@@ -265,8 +312,7 @@ class mixedForm( ancestry ):
                 result.components.append( c.toCovarianceMatrix().toRelative( rowData, colData ) )
 #            else: result.components.append( c.toRelative( rowData, colData ) )
         return result
-        
-        
+
     def toXMLList( self, indent = '', **kwargs ) :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )

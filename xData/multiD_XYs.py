@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,28 +18,51 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 """
-This module contains the multiD_XYs class. 
+This module contains the XYsnd classes for n > 1. 
 """
 
 __metaclass__ = type
@@ -56,6 +80,8 @@ Missing methods
     plot
 """
 
+import abc
+
 import standards as standardsModule
 import base as baseModule
 import axes as axesModule
@@ -65,18 +91,18 @@ import series1d as series1dModule
 import uncertainties as uncertaintiesModule
 from pqu import PQU
 
-class multiD_XYs( baseModule.xDataFunctional ) :
+class XYsnd( baseModule.xDataFunctional ) :
 
-    moniker = 'multiD_XYs'
+    __metaclass__ = abc.ABCMeta
 
-    def __init__( self, dimension = 2, interpolation = standardsModule.interpolation.linlinToken, axes = None,
+    def __init__( self, interpolation = standardsModule.interpolation.linlinToken, axes = None,
             index = None, valueType = standardsModule.types.float64Token, value = None, label = None, 
             interpolationQualifier = standardsModule.interpolation.noneQualifierToken ) :
         """
-        Constructor for multiD_XYs class.
+        Abstract base class constructor for XYsnd class.
         """
 
-        baseModule.xDataFunctional.__init__( self, self.moniker, dimension, axes, index = index, valueType = valueType,
+        baseModule.xDataFunctional.__init__( self, self.moniker, self.dimension, axes, index = index, valueType = valueType,
                 value = value, label = label )
 
         if( not( isinstance( interpolation, str ) ) ) : raise TypeError( 'interpolation must be a string' )
@@ -100,9 +126,9 @@ class multiD_XYs( baseModule.xDataFunctional ) :
         index_, functional_ = self._set_insertCommon( index, functional.value, functional )
         if( index_ is not None ) :
             if( ( index_ > 0 ) and ( functional_.value <= self.functionals[index_-1].value ) ) :
-                raise Exception( 'functional.value = %s is <= prior functional.value = %s' % ( functional_.value, self.functionals[index_-1].value ) )
+                raise ValueError( 'functional.value = %s is <= prior functional.value = %s' % ( functional_.value, self.functionals[index_-1].value ) )
             if( ( index_ < ( len( self ) - 1 ) ) and ( functional_.value >= self.functionals[index_+1].value ) ) :
-                raise Exception( 'functional.value = %s is >= next functional.value = %s' % ( functional_.value, self.functionals[index_+1].value ) )
+                raise ValueError( 'functional.value = %s is >= next functional.value = %s' % ( functional_.value, self.functionals[index_+1].value ) )
             self.functionals[index_] = functional_
 
     def append( self, functional, makeCopy = True ) :
@@ -180,7 +206,7 @@ class multiD_XYs( baseModule.xDataFunctional ) :
         if( index is None ) : index = self.index
         if( value is None ) : value = self.value
         if( axes is None ) : axes = self.axes
-        multid_xys = self.__class__( dimension = self.dimension, interpolation = self.interpolation, index = index,
+        multid_xys = self.__class__( interpolation = self.interpolation, index = index,
                         value = value, axes = axes, interpolationQualifier = self.interpolationQualifier )
         for i1, functional in enumerate( self ) : multid_xys[i1] = functional   # __setitem__ makes a copy.
         return( multid_xys )
@@ -196,7 +222,7 @@ class multiD_XYs( baseModule.xDataFunctional ) :
             return( [ [ subData.getValue( unitTo ), subData.copyDataToNestedLists( *units[1:] ) ] for subData in self ] )
         return( [ [ subData.getValue( ), subData.copyDataToNestedLists( *units[1:] ) ] for subData in self ] )
 
-    def evaluate( self, domainValue, unitBase = False, extrapolation = standardsModule.noExtrapolationToken, epsilon = 0 ) :
+    def evaluate( self, domainValue, extrapolation = standardsModule.noExtrapolationToken, epsilon = 0 ) :
         """
         Evaluates the function at the domain point domainValue.
         Interpolation is used if domainValue is between two sub-functions. However, if one of the
@@ -211,25 +237,28 @@ class multiD_XYs( baseModule.xDataFunctional ) :
         position, function1, function2, frac = self.getBoundingSubFunctions( domainValue )
         if( position is None ) : raise Exception( "No data to interpolate" )
 
-        if( frac <= epsilon ) :
+        if( frac <= epsilon ) :             # If close to first point pick it.
             function = function1.copy( value = value )
-        if( ( 1 - frac ) <= epsilon ) :
+        if( ( 1 - frac ) <= epsilon ) :     # If close to second point pick it.
             function = function2.copy( value = value )
         else :
             if( position in ( '=', '<', '>' ) ) :
                 if( position != '=' ) :
                     if( extrapolation != standardsModule.flatExtrapolationToken ) :
-                        raise Exception( "evaluation point = %s less than %s" % 
+                        raise Exception( "evaluation point = %s %s than %s" % 
                                 ( value, { '<' : 'less', '>' : 'greater' }[position], self[0].value ) )
                 function = function1.copy( value = value )
             else :
-                if( not( isinstance( function1, XYsModule.XYs ) ) ) :      # FIXME, accuracy, lowerEps and upperEps should not be hardwired.
+                if( not( isinstance( function1, XYsModule.XYs1d ) ) ) :      # FIXME, accuracy, lowerEps and upperEps should not be hardwired.
                     function1 = function1.toPointwise_withLinearXYs( accuracy = 1e-4, lowerEps = 1e-6, upperEps = 1e-6 )
-                if( not( isinstance( function2, XYsModule.XYs ) ) ) :
+                if( not( isinstance( function2, XYsModule.XYs1d ) ) ) :
                     function2 = function2.toPointwise_withLinearXYs( accuracy = 1e-4, lowerEps = 1e-6, upperEps = 1e-6 )
-                if( unitBase ) :
+                if( self.interpolationQualifier == standardsModule.interpolation.unitBaseToken ) :
                     xy = XYsModule.pointwiseXY_C.unitbaseInterpolate( value, function1.value, function1,
-                                                                             function2.value, function2 )
+                                                                             function2.value, function2, 1 )
+                elif( self.interpolationQualifier == standardsModule.interpolation.unitBaseUnscaledToken ) :
+                    xy = XYsModule.pointwiseXY_C.unitbaseInterpolate( value, function1.value, function1,
+                                                                             function2.value, function2, 0 )
                 else :
                     f = ( function2.value - value ) / ( function2.value - function1.value )
                     xy = f * function1 + ( 1. - f ) * function2
@@ -243,9 +272,9 @@ class multiD_XYs( baseModule.xDataFunctional ) :
 
     def integrate( self, **limits ):
         """
-        Integrate a multiD_XYs function. Supports limits for each axis.
+        Integrate a XYsnd function. Supports limits for each axis.
         Example:
-        >multiD_XYs.integrate( energy_in = ('1e-5 eV', '10 eV'), energy_out = ('1 keV', '10 keV') )
+        >XYsnd.integrate( energy_in = ('1e-5 eV', '10 eV'), energy_out = ('1 keV', '10 keV') )
 
         :param limits: dictionary containing limits for each independent axis (keyed by axis label or index).
         If an independent axis is missing from the dictionary, integrate over the entire domain of that axis.
@@ -253,31 +282,31 @@ class multiD_XYs( baseModule.xDataFunctional ) :
         :return: float or PQU
         """
         domainMin, domainMax = None, None
-        if self.axes[-1].label in limits:
+        if self.axes[-1].label in limits :
             domainMin, domainMax = limits.pop( self.axes[-1].label )
-        elif self.axes[-1].index in limits:
+        elif self.axes[-1].index in limits :
             domainMin, domainMax = limits.pop( self.axes[-1].index )
 
         xys_ = []
-        for functional in self:
-            if isinstance( functional, (XYsModule.XYs, series1dModule.series) ):
-                xys_.append( [functional.value, functional.integrate( domainMin=domainMin, domainMax=domainMax ) ] )
-            elif isinstance( functional, (multiD_XYs, regionsModule.regions) ):
+        for functional in self :
+            if isinstance( functional, ( XYsModule.XYs1d, series1dModule.series ) ) :
+                xys_.append( [functional.value, functional.integrate( domainMin = domainMin, domainMax = domainMax ) ] )
+            elif isinstance( functional, ( XYsnd, regionsModule.regions ) ) :
                 xys_.append( [ functional.value, functional.integrate( **limits ) ] )
-            else:
-                raise TypeError("Unsupported class for integration: %s" % type(functional))
+            else :
+                raise TypeError( "Unsupported class for integration: %s" % type( functional ) )
         yUnit = xys_[0][1].getUnitSymbol( )
         xys = [ [ x, float( y ) ] for x, y in xys_ ]
 
         unit = self.getAxisUnitSafely( self.dimension )
         domainMin, domainMax = baseModule.getDomainLimits( self, domainMin, domainMax, unit )
-        value = float( XYsModule.XYs( xys, interpolation = self.interpolation ).integrate( domainMin, domainMax ) )
+        value = float( XYsModule.XYs1d( xys, interpolation = self.interpolation ).integrate( domainMin, domainMax ) )
         return( PQU.PQU( value, baseModule.processUnits( unit, yUnit, '*' ) ) )
 
     def interpolateAtValue( self, value, unitBase = False, extrapolation = standardsModule.noExtrapolationToken ) :
         """
         Returns a functional with dimension one less than self that is the interpolation of self at value. 
-        If value is outside the domain of self and extrapolation is 'noExtrapolationToken' a raise is executed Otherwise,
+        If value is outside the domain of self and extrapolation is 'noExtrapolationToken' a raise is executed. Otherwise,
         a flat interpolated functional is returned.  If unitBase is True, then unit base interpolation is performed on 
         the lowest dimension and the dependent data.  This method is deprecated (see evaluate).
         """
@@ -298,10 +327,10 @@ class multiD_XYs( baseModule.xDataFunctional ) :
             if( functional2.value >= value ) : break
         if( value == functional2.value ) : return( functional2.copy( value = value ) )
         functional1 = self[index-1]
-# FIXME: following logic only works if functional1 and functional2 are both XYs:
+# FIXME: following logic only works if functional1 and functional2 are both XYs1d:
         if( unitBase ) :
             xy = XYsModule.pointwiseXY_C.unitbaseInterpolate( value, functional1.value, functional1,
-                                                              functional2.value, functional2 )
+                                                              functional2.value, functional2, 1 )
         else :
             f = ( functional2.value - value ) / ( functional2.value - functional1.value )
             xy = f * functional1 + ( 1. - f ) * functional2
@@ -382,7 +411,7 @@ class multiD_XYs( baseModule.xDataFunctional ) :
     def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0, cls = None ) :
 
         if( cls is None ) : cls = self.__class__
-        newMultiD = cls( dimension = self.dimension, interpolation = self.interpolation, axes = self.axes, index = self.index,
+        newMultiD = cls( interpolation = self.interpolation, axes = self.axes, index = self.index,
                     valueType = self.valueType, value = self.value, label = self.label, 
                     interpolationQualifier = self.interpolationQualifier )
         for subsec in self:
@@ -398,8 +427,7 @@ class multiD_XYs( baseModule.xDataFunctional ) :
         outline = kwargs.get( 'outline', False )
         if( len( self ) < 6 ) : outline = False
 
-        attributeStr = ' dimension="%s"' % self.dimension
-        attributeStr += baseModule.xDataFunctional.attributesToXMLAttributeStr( self )
+        attributeStr = baseModule.xDataFunctional.attributesToXMLAttributeStr( self )
         if( self.interpolation != standardsModule.interpolation.linlinToken ) :
             attributeStr += ' interpolation="%s"' % self.interpolation
         if( self.interpolationQualifier != standardsModule.interpolation.noneQualifierToken ) :
@@ -423,9 +451,9 @@ class multiD_XYs( baseModule.xDataFunctional ) :
         return( XMLList )
 
     @classmethod
-    def parseXMLNode( cls, xDataElement, xPath = [], linkData = {}, axes = None ) :
+    def parseXMLNode( cls, xDataElement, xPath, linkData, axes = None ) :
         """
-        Translates multiD_XYs XML into the python multiD_XYs xData class.
+        Translates XYsnd XML into the python XYsnd xData class.
         """
 
         xmlAttr = False
@@ -437,9 +465,9 @@ class multiD_XYs( baseModule.xDataFunctional ) :
 
         allowedSubElements = cls.allowedSubElements( )
 
-        attrs = {      'dimension' : None, 'index' : None, 'valueType' : None, 'value' : None,  'label' : None,
+        attrs = {      'index' : None, 'valueType' : None, 'value' : None,  'label' : None,
                 'interpolation' : standardsModule.interpolation.linlinToken, 'interpolationQualifier' : standardsModule.interpolation.noneQualifierToken }
-        attributes = { 'dimension' : int,  'index' : int,  'valueType' : str,  'value' : float, 'label' : str,
+        attributes = { 'index' : int,  'valueType' : str,  'value' : float, 'label' : str,
                 'interpolation' : str,                              'interpolationQualifier' : str }
         for key, item in xDataElement.items( ) :
             if( key not in attributes ) : raise TypeError( 'Invalid attribute "%s"' % key )
@@ -448,7 +476,7 @@ class multiD_XYs( baseModule.xDataFunctional ) :
         for subElement in xDataElement :
             if( subElement.tag == axesModule.axes.moniker ) :
                 if( axes is not None ) : Exception( 'Multiple "axes" elements present' )
-                axes = axesModule.axes.parseXMLNode( subElement, xPath )
+                axes = axesModule.axes.parseXMLNode( subElement, xPath, linkData )
 
         multid_xys = cls( axes = axes, **attrs )
         childAxes = axesModule.axes( len(axes)-1 )
@@ -476,11 +504,26 @@ class multiD_XYs( baseModule.xDataFunctional ) :
         return( multid_xys )
 
     @staticmethod
-    def allowedSubElements( ) :
+    def defaultAxes( labelsUnits = {} ) :
 
-        return( ( XYsModule.XYs, series1dModule.series, multiD_XYs, regionsModule.regions ) )
+        return( axesModule.defaultAxes( rank = self.dimension + 1, labelsUnits = labelsUnits ) )
+
+class XYs2d( XYsnd ) :
+
+    moniker = 'XYs2d'
+    dimension = 2
 
     @staticmethod
-    def defaultAxes( dimension = 3, labelsUnits = {} ) :
+    def allowedSubElements( ) :
 
-        return( axesModule.defaultAxes( rank = dimension, labelsUnits = labelsUnits ) )
+        return( ( XYsModule.XYs1d, series1dModule.series, regionsModule.regions1d ) )
+
+class XYs3d( XYsnd ) :
+
+    moniker = 'XYs3d'
+    dimension = 3
+
+    @staticmethod
+    def allowedSubElements( ) :
+
+        return( ( XYs2d, regionsModule.regions2d ) )

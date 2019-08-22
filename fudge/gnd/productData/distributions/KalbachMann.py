@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 """Kalbach-Mann double differential distribution classes."""
@@ -43,6 +67,7 @@ import math
 import base, miscellaneous
 import fudge
 from fudge.core.utilities import brb
+from fudge.core.math import fudgemath as fudgemathModule
 
 from pqu import PQU
 
@@ -50,9 +75,7 @@ import xData.base as xDataBaseModule
 import xData.axes as axesModule
 import xData.XYs as XYsModule
 import xData.standards as standardsModule
-import xData.series1d as series1dModule
 import xData.multiD_XYs as multiD_XYsModule
-import xData.regions as regionsModule
 
 from fudge.gnd.productData import energyDeposition as energyDepositionModule
 from fudge.gnd.productData import momentumDeposition as momentumDepositionModule
@@ -106,7 +129,7 @@ class subform( baseModule.subform ) :
         return( axes )
 
 class fSubform( subform ) :
-    # BRB, FIXME, data should be an energyModule.pointwise instance.
+    # BRB, FIXME, data should be an energyModule.XYs2d instance.
 
     moniker = 'f'
 
@@ -177,7 +200,7 @@ class form( baseModule.form ) :
 
         return warnings
 
-    def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
+    def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
         def sqrtE_MuComAverage( f, r, a, tolerance ) :          # This still needs to be tested.?????????
 
@@ -193,41 +216,84 @@ class form( baseModule.form ) :
 
             epMin = max( f.domainMin( ), r.domainMin( ), a.domainMin( ) )
             epMax = min( f.domainMax( ), r.domainMax( ), a.domainMax( ) )
-            sqrtE_mu_com_, quadInfo = miscellaneous.GnG_adaptiveQuadrature( u_mu_func, epMin, epMax, [ f, r, a ], miscellaneous.GaussQuadrature2, tolerance )
-            return( sqrtE_mu_com_ )
+            _sqrtE_mu_com, quadInfo = miscellaneous.GnG_adaptiveQuadrature( u_mu_func, epMin, epMax, [ f, r, a ], miscellaneous.GaussQuadrature2, tolerance )
+            return( _sqrtE_mu_com )
 
-        energyUnit = tempInfo['incidentEnergyUnit']
+        def calculateAverageProductDataAtEnergy( self, Ein ) :
+
+            f, r, a = self.KalbackMannSelf.getFRAatEnergy_asLinearPointwise( Ein )
+            E_com = self.m1x * Ein
+            Ex_com = f.integrateWithWeight_x( )
+            _sqrtE_mu_com = sqrtE_MuComAverage( f, r, a, energyAccuracy )
+            E_mu = 2. * math.sqrt( self.m1x * Ein ) * _sqrtE_mu_com
+            multi = self.multiplicity.getValue( Ein )
+            return( multi * ( E_com + Ex_com + E_mu ), multi * math.sqrt( 2. * massx ) * ( math.sqrt( m1x * Ein ) + _sqrtE_mu_com ) )
+
+        class calculateDepositionInfo :
+
+            def __init__( self, KalbackMannSelf, multiplicity, massx, m1x ) :
+
+                self.KalbackMannSelf = KalbackMannSelf
+                self.multiplicity = multiplicity
+                self.massx = massx
+                self.m1x = m1x
+                self.mode = 0
+
+            def evaluateAtX( self, E ) :
+
+                Eout, pout = calculateAverageProductDataAtEnergy( self, E )
+                if( self.mode == 0 ) : return( Eout, pout )
+                if( self.mode == 1 ) : return( Eout )
+                return( pout )
+
+            def setTolerances( self, relativeTolerance, absoluteTolerance ) :
+
+                self.relativeTolerance = relativeTolerance
+                self.absoluteTolerance = absoluteTolerance
+
+        verbosity = kwargs.get( 'verbosity', 0 )
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        energyUnit = kwargs['incidentEnergyUnit']
         momentumDepositionUnit = energyUnit + '/c'
         massUnit = energyUnit + '/c**2'
-        energyAccuracy, momentumAccuracy = processInfo.energyAccuracy, processInfo.momentumAccuracy
-
-        projectile, target, product = tempInfo['reactionSuite'].projectile, tempInfo['reactionSuite'].target, tempInfo['product']
-        mass1 = projectile.getMass( massUnit )
-        mass2 = target.getMass( massUnit )
+        multiplicity = kwargs['multiplicity']
+        productMass = kwargs['product'].getMass( massUnit )
+        energyAccuracy = kwargs['energyAccuracy']
+        momentumAccuracy = kwargs['momentumAccuracy']
+        reactionSuite = kwargs['reactionSuite']
+        product = kwargs['product']
+        mass1 = reactionSuite.projectile.getMass( massUnit )
+        mass2 = reactionSuite.target.getMass( massUnit )
         massx = product.getMass( massUnit )
+        EMin = kwargs['EMin']
+        EMax = kwargs['EMax']
+        
         m1x = mass1 * massx / ( mass1 + mass2 )**2
 
-        multiplicity = tempInfo['multiplicity']
+        calculationData = calculateDepositionInfo( self, multiplicity, massx, m1x )
+
         Es = [ coefficients.value for coefficients in self.fSubform.data ]
-        depEnergy, depMomentum = [], []
+        if( EMin < Es[0] ) : EMin = Es[0]           # Fix some data issues.
+        Es = sorted( set( Es + multiplicity.domainGrid( ) ) )
+        while( Es[0] < EMin ) : del Es[0]
+        aveEnergy = []
+        aveMomentum = []
         for E in Es : 
-            f, r, a = self.getFRAatEnergy_asLinearPointwise( E )
-            E_com = m1x * E
-            Ex_com = f.integrateWithWeight_x( )
-            sqrtE_mu_com_ = sqrtE_MuComAverage( f, r, a, energyAccuracy )
-            E_mu = 2. * math.sqrt( m1x * E ) * sqrtE_mu_com_
-            multi = multiplicity.getValue( E )
-            depEnergy.append( [ E, multi * ( E_com + Ex_com + E_mu ) ] )
-            depMomentum.append( [ E, multi * math.sqrt( 2. * massx ) * ( math.sqrt( m1x * E ) + sqrtE_mu_com_ ) ] )
+            Eout, pout = calculateAverageProductDataAtEnergy( calculationData, E )
+            aveEnergy.append( [ E, Eout ] )
+            aveMomentum.append( [ E, pout ] )
 
-        axes = energyDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit, energyDepositionUnit = energyUnit )
-        depEnergy = energyDepositionModule.pointwise( data = depEnergy, axes = axes,
-                label = processInfo.style.label, accuracy = energyAccuracy )
+        calculationData.mode = 1
+        absoluteTolerance = 1e-3 * energyAccuracy * max( [ Ep for E, Ep in aveEnergy ] )
+        calculationData.setTolerances( energyAccuracy, absoluteTolerance )
+        aveEnergy = fudgemathModule.thickenXYList( aveEnergy, calculationData )
 
-        axes = momentumDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit, momentumDepositionUnit = momentumDepositionUnit )
-        depMomentum = momentumDepositionModule.pointwise( data = depMomentum, axes = axes,
-                label = processInfo.style.label, accuracy = momentumAccuracy )
-        return( [ depEnergy, depMomentum ] )
+        calculationData.mode = 2
+        absoluteTolerance = 1e-3 * momentumAccuracy * max( [ pp for E, pp in aveMomentum ] )
+        calculationData.setTolerances( momentumAccuracy, absoluteTolerance )
+        aveMomentum = fudgemathModule.thickenXYList( aveMomentum, calculationData )
+
+        return( [ aveEnergy ], [ aveMomentum ] )
 
     @staticmethod
     def calculate_S_ab_MeV( Z_AB, N_AB, Z_C, N_C, I_ab ) :
@@ -305,7 +371,7 @@ class form( baseModule.form ) :
         axes = axesModule.axes( )
         axes[0] = axesModule.axis( 'a', 0, '' )
         axes[1] = self.fSubform.data.axes[1].copy( )
-        return( XYsModule.XYs( data = a, axes = axes, accuracy = accuracy ) )
+        return( XYsModule.XYs1d( data = a, axes = axes, accuracy = accuracy ) )
 
     def copy( self ) :
 
@@ -337,7 +403,7 @@ class form( baseModule.form ) :
         return( self.axes[-1].unit )
 
     def getPointwiseLinear( self, accuracy = 1e-3 ) :
-        """Returns a pointwise represent of self in the center of mass frame. The returned data is as a W_XYs instance."""
+        """Returns a pointwise represent of self in the center of mass frame. The returned data is as a XYs2d instance."""
 
         def fOfE( accuracy, Ep, f, r, a ) :
 
@@ -369,10 +435,10 @@ class form( baseModule.form ) :
     def getFRAatEnergy_asLinearPointwise( self, E ) :
 
         epsilon, fra_accuracy = 1e-8, 1e-6
-        f = self.fSubform.data.interpolateAtValue( E )
+        f = self.fSubform.data.evaluate( E )
         f = f.changeInterpolation( standardsModule.interpolation.linlinToken, lowerEps = epsilon, upperEps = epsilon )
 
-        r = self.rSubform.data.interpolateAtValue( E )
+        r = self.rSubform.data.evaluate( E )
         r = r.changeInterpolation( standardsModule.interpolation.linlinToken, lowerEps = epsilon, upperEps = epsilon )
         if( r[-1][1] != 0. ) :
             x, y = r[-1]
@@ -383,41 +449,45 @@ class form( baseModule.form ) :
         if( self.aSubform.isEmptyASubform( ) ) :
             a = self.calculate_a( E, f.domainMin( ), f.domainMax( ), accuracy = fra_accuracy )
         else :
-            a = self.aSubform.data.interpolateAtValue( E )
+            a = self.aSubform.data.evaluate( E )
             a = a.changeInterpolation( standardsModule.interpolation.linlinToken, lowerEps = epsilon, upperEps = epsilon )
         return( f, r, a )
 
-    def process( self, processInfo, tempInfo, verbosityIndent ) :
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
 
-        from fudge.processing.deterministic import transferMatrices
+        from fudge.processing import group as groupModule
+        from fudge.processing.deterministic import transferMatrices as transferMatricesModule
+
+        verbosity = tempInfo['verbosity']
+        indent2 = indent + tempInfo['incrementalIndent']
+        projectile = tempInfo['reactionSuite'].projectile
+        target = tempInfo['reactionSuite'].target
+        product = tempInfo['product'].particle
+        productLabel = tempInfo['productLabel']
 
         energyUnit = tempInfo['incidentEnergyUnit']
         massUnit = energyUnit + '/c**2'
-        newComponents = []
 
-        if( 'LLNL_Pn' in processInfo['styles'] ) :
-            if( processInfo.verbosity >= 30 ) : print '%sGrouping %s' % ( verbosityIndent, self.moniker )
-            outputChannel = tempInfo['outputChannel'].outputChannel
-            projectile, target, product = tempInfo['reactionSuite'].projectile, tempInfo['reactionSuite'].target, tempInfo['product'].particle
-            projectileZA, targetZA = projectile.getZ_A_SuffixAndZA( )[-1], target.getZ_A_SuffixAndZA( )[-1]
-            productZA = product.getZ_A_SuffixAndZA( )[-1]
-            compoundZA = projectileZA + targetZA
-            residualZA = compoundZA - productZA
-            particlesData = { 'projectile' : { 'ZA' : projectileZA },
-                              'target'     : { 'ZA' : targetZA },
-                              'product'    : { 'ZA' : productZA },
+        if( verbosity > 2 ) : print '%sGrouping %s' % ( verbosityIndent, self.moniker )
+        projectileZA = projectile.getZ_A_SuffixAndZA( )[-1]
+        targetZA = target.getZ_A_SuffixAndZA( )[-1]
+        productZA = product.getZ_A_SuffixAndZA( )[-1]
+        compoundZA = projectileZA + targetZA
+        residualZA = compoundZA - productZA
+        particlesData = { 'projectile' : { 'ZA' : projectileZA },
+                          'target'     : { 'ZA' : targetZA },
+                          'product'    : { 'ZA' : productZA },
 # The next line is wrong.
-                              'residual'   : { 'ZA' : residualZA },             # ??????? This is wrong!
-                              'compound'   : { 'ZA' : compoundZA, 'mass' : projectile.getMass( massUnit ) + target.getMass( massUnit ) } }
-            residualMass = tempInfo['masses']['Residual']
-            tempInfo['masses']['Residual'] = target.getMass( massUnit )         # ??????? This is wrong!
-            TM_1, TM_E = transferMatrices.KalbachMann_TransferMatrix( processInfo, projectile.name, product.name, tempInfo['masses'],
-                tempInfo['crossSection'], particlesData, self, tempInfo['multiplicity'], 
+                          'residual'   : { 'ZA' : residualZA },             # ??????? This is wrong!
+                          'compound'   : { 'ZA' : compoundZA, 'mass' : projectile.getMass( massUnit ) + target.getMass( massUnit ) } }
+        residualMass = tempInfo['masses']['Residual']
+        tempInfo['masses']['Residual'] = target.getMass( massUnit )         # ??????? This is wrong!
+        TM_1, TM_E = transferMatricesModule.KalbachMann_TransferMatrix( style, tempInfo, tempInfo['crossSection'], 
+                particlesData, self, tempInfo['multiplicity'], 
                 comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
-            tempInfo['masses']['Residual'] = residualMass
-            fudge.gnd.miscellaneous.TMs2Form( processInfo, tempInfo, newComponents, TM_1, TM_E, self.axes )
 
-        return( newComponents )
+        tempInfo['masses']['Residual'] = residualMass
+        return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
 
     @staticmethod
     def parseXMLNode( element, xPath, linkData ):
@@ -425,15 +495,15 @@ class form( baseModule.form ) :
 
         xPath.append( element.tag )
         childArrays = {}
-        for child in element:
+        for child in element :
             _subformClass = None
-            for subformClass in (fSubform, rSubform, aSubform):
+            for subformClass in ( fSubform, rSubform, aSubform ) :
                 if subformClass.moniker == child.tag:
                     _subformClass = subformClass
                     break
             if _subformClass is None:
                 raise TypeError("Unexpected element '%s' encountered" % child.tag)
-            xData = multiD_XYsModule.multiD_XYs.parseXMLNode( child[0], xPath, linkData )
+            xData = multiD_XYsModule.XYs2d.parseXMLNode( child[0], xPath, linkData )
             childArrays[ '_%sSubform' % child.tag ] = _subformClass( xData )
         if '_aSubform' not in childArrays: childArrays['_aSubform'] = aSubform( None )
         KM = form( element.get('label'), element.get('productFrame'), **childArrays )

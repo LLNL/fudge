@@ -1,0 +1,1709 @@
+\documentclass[11pt]{article}
+\setlength{\textwidth}{6.5 in}
+\setlength{\oddsidemargin}{-0. in}
+\setlength{\evensidemargin}{\oddsidemargin}
+
+\newlength{\argumentOffset}
+\setlength{\argumentOffset}{0 in}
+
+\newlength{\argumentNameWidth}
+\newlength{\argumentNameOffset}
+\newcommand{\setargumentNameLengths}[1]{
+    \settowidth{\argumentNameWidth}{\tt #1: }
+    \setlength{\argumentNameOffset}{\linewidth}
+    \addtolength{\argumentNameOffset}{-1.\argumentNameWidth}
+    \addtolength{\argumentNameOffset}{-0.05\linewidth}
+}
+
+\newcommand{\highlight}[1]{{\bf #1}}
+\newcommand{\CallingCSub}[3]{\settowidth{\argumentOffset}{\tt #1 }
+    \vskip 0.1 in\noindent{\bf C declaration: #3} \\
+    \parbox[t]{\linewidth}{
+        \vskip 0.02 in \hskip 0.05\linewidth \parbox[t]{0.95\linewidth}{\raggedright \sloppy \tt #1 #2}
+    }
+\vskip 0.1 in}
+\newcommand{\CallingC}[2]{\CallingCSub{#1}{#2}{}}
+\newcommand{\CallingCLimited}[2]{\CallingCSub{#1}{#2}{ --- This function is not intended for general use. --- }}
+\newcommand{\addArgument}[1]{\hfill \\ \hskip \argumentOffset #1}
+\newcommand{\argumentBox}[2]{\noindent\parbox{1.\linewidth}{\parbox[t]
+    {0.05\linewidth}{\hfill}\parbox[t]{\argumentNameWidth}{\tt #1:}\parbox[t]{\argumentNameOffset}{#2}}\hfill}
+\newcommand{\RoutinesCalled}{\vskip .1 in \noindent {\bf Functions called: }}
+\newcommand{\Errors}{\vskip .1 in \noindent {\bf Errors: }}
+
+\title{Manual for the status message reporting package\footnote{
+This work was performed under the auspices of the U.S. Department of Energy by
+Lawrence Livermore National Laboratory under contract \#W-7405-ENG-48.}}
+\author{{Bret R. Beck}\\Lawrence Livermore National Laboratory\\UCRL-}
+
+\begin{document}
+
+\maketitle
+\pagebreak
+\tableofcontents
+\listoftables
+\pagebreak
+
+\section{Introduction}
+Unlike C++ which has throw/catch,
+Python which has try/except and other newer computer languages, C has no built-in mechanism for handling exceptions
+(e.g., allocate memory failure or a divide by zero exceptions). While simple exception handling in the form of an
+integer parameter (e.g, \textit{errno}) or an enum are often implemented in C programs, the richer types of exception reporting
+possible with newer computer languages are rarely implemented in C. The \textbf{statusMessageReporting} 
+package was created to facilitate
+rich exception reporting by C functions to their calling functions\footnote{In part, the \textbf{statusMessageReporting} package 
+was created so that
+C libraries wrapped to extend Python can report verbose messages when a Python ``raise'' is executed from within a
+wrapped C library.}
+
+The \textbf{statusMessageReporting} package allows a function, called the generator,
+to communicate an exception to its calling function using a \textit{report}. 
+The main parts of a report are 1) the level of the report called the \textbf{status} (valid levels are \texttt{smr\_status\_Ok}, 
+\texttt{smr\_status\_Info}, \texttt{smr\_status\-Warning} and \texttt{smr\_status\_Error}), 
+2) a string called the report's \textbf{message} and 3) two integer values, one representing the generator's ID, called the
+\textbf{libraryID}, and the other is the library's specific integer, called the \textbf{code}, 
+that represents the type of exception the generator is reporting.
+The code is similar to the \textit{errno} for the C standard library.
+Since libraries are often developed independent of one another, they often use the same code values to
+represent different exceptions\footnote{For example, one library may define the code 3 to be an error opening a file while another library
+may define the code 3 to be a divide-by-zero error.} which is why the libraryID is needed. That is,
+the equivalent of \textit{errno} is the combination libraryID:code. 
+To insure that each library's libraryID is unique, libraryIDs
+must be obtained from the function \textbf{smr\_registerLibrary}.
+
+The \textbf{statusMessageReporting} package defines two C struct's (\textbf{typedef statusMessageReporting} 
+and \textbf{typedef statusMessageReport)} 
+and supporting functions that can be used for creating a rich report. 
+The C \textbf{struct statusMessageReport} consists of the following members,
+
+\vskip .1 in
+\begin{center} 
+    \raisebox{.025 in}{\line(1,0){150}} \textbf{statusMessageReport} \raisebox{.025 in}{\line(1,0){150}}
+\end{center}
+\begin{description}
+\item{\bf statusMessageReport *next:} A \textbf{statusMessageReporting} object can contain many \textbf{statusMessageReport}'s.
+	A simple linked list is used to connect the reports. The first report is the first one added and the last is the last
+	one added.
+\item{\bf enum smr\_status status:} \label{statusItems} A \textbf{statusMessageReporting} defined enum 
+		which represents the report's status and can be one of the following defined enumeration constants,
+    \begin{description}
+        \item{\bf smr\_status\_Ok:} A status level indicating that no report has been added to a 
+			\textbf{statusMessageReporting} instance.
+        \item{\bf smr\_status\_Info:} A status level indicating that an informational report was added to a 
+			\textbf{statusMessageReporting} instance.
+        \item{\bf smr\_status\_Warning:} A status level indicating that a warning report was added to a 
+			\textbf{statusMessageReporting} instance.
+        \item{\bf smr\_status\_Error:} A status level indicating that an error report was added to a 
+			\textbf{statusMessageReporting} instance.
+    \end{description}
+    These enumerator constants have a ranking which from lowest to highest is smr\_status\_Ok, 
+	smr\_status\_Info, smr\_status\_Warning and smr\_status\_Error.
+    The meaning of an informational, warning and error report is not defined by this package, but is left to the report's
+    generator to define.
+\item{\bf char *message:} A string created by the report's generator which can be very descriptive. The construction of the message
+    is only limited by the computer's resources. 
+\item{\bf int libraryID:} An integer ID which represents the library that generated the report. This ID should be either 
+    the ID returned by the function \textbf{smr\_registerLibrary} or one of the following defined macros:
+    \begin{description}
+        \item{\bf smr\_unknownID:} This macro can be used by any library which does not register itself.
+        \item{\bf smr\_tooManyIDs:} This macro is returned by \textbf{smr\_registerLibrary} when all the 
+            registration slots have been taken
+			(see Section~\ref{smrRegisterLibrary}). Like \textbf{smr\_unknownID}, this ID is valid but ambiguous. 
+        \item{\bf smr\_invalidID:} This macro is used for the libraryID when one of the
+            \textbf{statusMessageReporting} functions is passed an invalid libraryID.
+        \item{\bf smr\_errnoID:} This macro can be used to indicate that the report is being generated because an error from a 
+            C standard library was detected. When this value is used, the code value shall be that of \textit{errno}.
+        \item{\bf smr\_smrID:} This macro indicates that the report is being generated from a \textbf{statusMessageReporting} function.
+            This macro in only intended for the \textbf{statusMessageReporting} functions.
+    \end{description}
+\item{\bf int code:} An integer value the report's generator sets to instruct as to the type of report. This is expected to be treated
+    like the C standard library integer \textit{errno}.
+\item{\bf char *file:} This item is expected to be the name of the file in which the report was generated; that is, the C \_\_FILE\_\_ macro.
+    However, the \textbf{statusMessageReporting} package does not force this expected behavior.
+\item{\bf int line:} This item is expected to be the line number of the file in which the report was generated; that is, the C \_\_LINE\_\_ macro. 
+    However, the \textbf{statusMessageReporting} package does not force this expected behavior.
+\item{\bf char *function:} This item is expected to be the name of the function in which the report was generated; that is, the C99 \_\_func\_\_ macro.
+    However, the \textbf{statusMessageReporting} package does not force this expected behavior.
+\end{description}
+\begin{center}
+    \raisebox{.025 in}{\line(1,0){400}}
+\end{center}
+\vskip .1 in
+
+The C \textbf{struct statusMessageReporting} consists of the following members,
+\noindent
+\vskip .1 in
+\begin{center} 
+	\raisebox{.025 in}{\line(1,0){150}} \textbf{statusMessageReporting} \raisebox{.025 in}{\line(1,0){150}}
+\end{center}
+	\begin{description}
+	\item{\bf verbosity} This item is used to limit the rank of the report that can be added to a 
+		\textbf{statusMessageReporting} instance.
+		Reports with status of rank below verbosity are not appended to the \textbf{statusMessageReporting}
+		instance. Verbosity must be one of the \textbf{enum smr\_status} enumerator constants. Verbosity is described more
+		int Section~\ref{Verbosity}.
+    \item{\bf report} The first report of this \textbf{statusMessageReporting} instance.
+	\end{description}
+\begin{center}
+	\raisebox{.025 in}{\line(1,0){400}}
+\end{center}
+\vskip .1 in
+
+The \textbf{statusMessageReporting} library contains functions for adding a report to a 
+\textbf{statusMessageReporting} instance. As example, consider the
+subroutine shown in Table~\ref{ExampleCode1} which attempt to open a file. If the open fails, information about the failure is reported 
+back to the calling function via a \textbf{statusMessageReporting} instance.
+
+\begin{table}
+\begin{verbatim}
+FILE *Lib1_OpenFile( statusMessageReporting *smr, char const *fileName ) {
+
+   FILE *fIn;
+
+   if( ( fIn = fopen( fileName, "r" ) == NULL ) ) {
+       smr_setReportError( smr, NULL, __FILE__, __LINE__, __func__, errno,
+          smr_errnoID, "Could not open file %s, errno = %d", fileName, errno );
+       smr_setReportInfo( smr, NULL, __FILE__, __LINE__, __func__, Lib1Code22,
+          Lib1ID, "Second report with libraries code and ID added." );
+       return( NULL );
+   }
+   return( fIn );
+}
+\end{verbatim}
+\caption{A subroutine that is part of a fictional library named {\bf Lib1} showing the use of the 
+    \textbf{statusMessageReporting} library to create an error report. If the \textit{smr}
+	verbosity has rank of \textbf{smr\_status\_Info}
+    or less, the second report can be used to determine the library which called fopen.} \label{ExampleCode1}
+\end{table}
+
+\begin{table}
+\begin{verbatim}
+FILE *Lib1_OpenFile( statusMessageReporting *smr, char const *fileName ) {
+
+   FILE *fIn;
+
+   if( ( fIn = fopen( fileName, "r" ) == NULL ) ) {
+      smr_setReportError( smr, NULL, __FILE__, __LINE__, __func__, Lib1Code22,
+         Lib1ID, "Could not open file %s, errno = %d", fileName, errno );
+      return( NULL );
+   }
+   return( fIn );
+}
+\end{verbatim}
+\caption{This example is similar to that is Table~\ref{ExampleCode1} but uses the calling libraries
+	code and ID using only one report.} \label{ExampleCode1p1}
+\end{table}
+
+\section{Illustration}
+Imagine that a person in Asia develops a math library called \texttt{mathSMR} that wrapps standard 
+math functions (e.g., \textit{sin}, \textit{exp}) and checks the 
+results\footnote{It would make sense to check the input before calculating the function
+but, for simplity, this example only checks the output.} and report, via a
+\textbf{statusMessageReporting} instance, if an issue occurs. A snippet of what the library
+may look like is shown in Table~\ref{ExampleCodeSimple1}.
+
+\begin{table}
+\begin{verbatim}
+#include "mathSMR.h"
+
+static int mathSMRID = smr_unknownID;
+/* ================================================= */
+int mathSMR_setup( void ) {
+
+   mathSMRID = smr_registerLibrary( "mathSMRLibrary" );
+   return( mathSMRID );
+}
+/* ================================================= */
+int mathSMR_getLibrarysID( void ) {
+
+   return( mathSMRID );
+}
+/* ================================================= */
+double mathSMR_sin( statusMessageReporting *smr, double x1 ) {
+
+   double returnValue = sin( x1 );
+
+   if( isfinite( returnValue ) == 0 ) {
+      smr_setReportError2( smr, mathSMRID, mathSMR_code_sin, 
+         "returnValue of <%25.17e> for input of <%25.17e>.", returnValue, x1 );
+   }
+   return( returnValue );
+}
+/* ================================================= */
+double mathSMR_exp( statusMessageReporting *smr, double x1 ) {
+
+   double returnValue = exp( x1 );
+
+   if( isfinite( returnValue ) == 0 ) {
+      smr_setReportError2( smr, mathSMRID, mathSMR_code_exp, 
+         "returnValue of <%25.17e> for input of <%25.17e>.", returnValue, x1 );
+   }
+   return( returnValue );
+}
+\end{verbatim}
+\caption{Section of a simple math library that checks the results for each function and returns, via a
+    \textbf{statusMessageReporting} instance, any issues.} \label{ExampleCodeSimple1}
+\end{table}
+
+Next imagine that a person in Europe develops a library called \texttt{checkMathSMR} that checks the math library. 
+A snippet of what the library may look like is shown in Table~\ref{ExampleCodeSimple2}
+
+\begin{table}
+\begin{verbatim}
+#include "checkMathSMR.h"
+
+static int checkMathSMRID = smr_unknownID;
+/* ================================================= */
+int checkMathSMR_setup( void ) {
+
+    checkMathSMRID = smr_registerLibrary( "checkMathSMRLibrary" );
+    return( checkMathSMRID );
+}
+/* ================================================= */
+int checkMathSMR_getLibrarysID( void ) {
+
+    return( checkMathSMRID );
+}
+/* ================================================= */
+int checkMathSMR_test( statusMessageReporting *smr, int verbose ) {
+
+    double x1, xMin = 1e-5, xMax = 1e5, value;
+
+    for( x1 = xMin; x1 < xMax; x1 *= 10. ) {
+        value = mathSMR_sin( smr, x1 );
+        if( smr_isOk( smr ) == 0 ) {
+            if( verbose ) smr_setReportError2p( smr, checkMathSMRID, 
+                checkMathSMR_code_sin, "Checking failed for mathSMR_sin." );
+            return( 1 );
+        }
+    }
+    for( x1 = xMin; x1 < xMax; x1 *= 10. ) {
+        value = mathSMR_exp( smr, x1 );
+        if( smr_isOk( smr ) == 0 ) {
+            if( verbose ) smr_setReportError2p( smr, checkMathSMRID, 
+                checkMathSMR_code_exp, "Checking failed for mathSMR_exp." );
+            return( 1 );
+        }
+    }
+    return( 0 );
+}
+\end{verbatim}
+\caption{Simple library that tests the \texttt{mathSMR} math library.} \label{ExampleCodeSimple2}
+\end{table}
+
+Finally, someone in Africa writes a program to use \texttt{checkMathSMR}.
+A snippet of what the program may look like is shown in Table~\ref{ExampleCodeSimple3}.
+When this program is called without any arguments, the output would look like:
+
+\begin{verbatim}
+>> number of reports = 3
+returnValue of <               inf> for input of <  1.00000000000000000e+03>.
+    At line 40 of mathSMR.c in function mathSMR_exp
+Checking math failed for mathSMR_exp.
+    At line 39 of checkMathSMR.c in function checkMathSMR_test
+Let's add one Error report at the top level for fun.
+    At line 16 of example1.c in function main
+\end{verbatim}
+
+\noindent
+When this program is called with arguments, the output would look like:
+\begin{verbatim}
+>> number of reports = 1
+returnValue of <               inf> for input of <  1.00000000000000000e+03>.
+    At line 40 of mathSMR.c in function mathSMR_exp
+\end{verbatim}
+
+\noindent
+This simple example illustates the use of \textbf{statusMessageReporting}. It allows for a
+detailed description to be returned to the calling routines and can even present a traceback-like
+output.
+
+\begin{table}
+\begin{verbatim}
+#include <stdlib.h>
+#include <statusMessageReporting.h>
+#include <checkMathSMR.h>
+
+int main( int argc, char **argv ) {
+
+    statusMessageReporting smr;
+    int libID = smr_registerLibrary( "MyMainFunction1111" );
+    int verbose = argc == 1;
+
+    smr_initialize( &smr, smr_status_Ok );
+    checkMathSMR_setup( );
+    mathSMR_setup( );
+
+    if( checkMathSMR_test( &smr, verbose ) && verbose ) {
+        smr_setReportError2p( &smr, libID, 1, 
+            "Let's add one Error report at the top level for fun." );
+    }
+
+    printf( ">> number of reports = %d\n", smr_numberOfReports( &smr ) );
+    smr_print( &smr, 1 );
+
+    smr_cleanup( );
+    exit( EXIT_SUCCESS );
+}
+\end{verbatim}
+\caption{Simple library that tests the math library.} \label{ExampleCodeSimple3}
+\end{table}
+
+
+\section{Multiple reports per statusMessageReporting instance}	\label{Append}
+The number of reports a \textbf{statusMessageReporting} instance can hold is only limited by the computer's resources.
+The number of reports contained in a
+\textbf{statusMessageReporting} instance is returned by the function \textbf{smr\_numberOfReports} 
+(see Section~\ref{smrNumberOfReports}). The function  
+\textbf{smr\_highestStatus} returns the highest ranking status for a \textbf{statusMessageReporting} instance. The functions
+\textbf{smr\_isOk}, \textbf{smr\_isInfo}, \textbf{smr\_isWarning} and \textbf{smr\_isError}
+ return true if the highest ranking status in the reports of a
+\textbf{statusMessageReporting} instance is \textbf{smr\_status\_Ok}, \textbf{smr\_status\_Info}, 
+\textbf{smr\_status\_Warning} and \textbf{smr\_status\_Error} respectively.
+Finally, the function \textbf{smr\_\-isWarningOrError} returns true if the highest ranking status in the reports of a
+\textbf{statusMessageReporting} instance is either \textbf{smr\_status\_Warning} or \textbf{smr\_\-status\_\-Error}.
+
+As an example, the code in Table~\ref{ExampleCode2} adds 4 reports to a \textbf{statusMessageReporting} instance. 
+The output of the code in Table~\ref{ExampleCode2} is:
+
+\begin{verbatim}
+>> number of reports = 4
+INFO report with code 1
+    At line 10 of example1.c in function main
+WARNING report with code 22
+    At line 11 of example1.c in function main
+ERROR report with code 3
+    At line 12 of example1.c in function main
+second ERROR report with code 33
+    At line 13 of example1.c in function main
+\end{verbatim}
+
+\begin{table}
+\begin{verbatim}
+   statusMessageReporting smr;
+   int libID = smr_registerLibrary( "anotherLibrary2222" );
+
+   smr_initialize( &smr, smr_status_Ok );
+   smr_setReportInfo2p( &smr, libID, 1, "INFO report with code 1" );
+   smr_setReportWarning2p( &smr, libID, 22, "WARNING report with code 22" );
+   smr_setReportError2p( &smr, libID, 3, "ERROR report with code 3" );
+   smr_setReportError2p( &smr, libID, 33, "second ERROR report with code 33" );
+
+   printf( ">> number of reports = %d\n", smr_numberOfReports( &smr ) );
+   smr_print( &smr, 1 );
+
+   smr_cleanup( );
+\end{verbatim}
+\caption{Code showing the use of the \textbf{statusMessageReporting} library to add multiple reports to a
+	\textbf{statusMessageReporting} instance.} \label{ExampleCode2}
+\end{table}
+
+The functions \textbf{smr\_firstReport} and \textbf{smr\_nextReport} are used to loop over all reports in a 
+\textbf{statusMessageReporting} instance. An example
+of the use of these functions is shown in Table~\ref{ExampleCode5}.
+
+\begin{table}
+\begin{verbatim}
+  void smr_write( statusMessageReporting *smr, FILE *f, int clear ) {
+
+      statusMessageReporting *report;
+
+      for( report = smr_firstReport( smr ); report != NULL; 
+          report = smr_nextReport( report ) ) smr_reportWrite( report, f );
+      if( clear ) smr_release( smr );
+  }
+\end{verbatim}
+\caption{This code is a snippet of the \textbf{smr\_write} function showing the use of \textbf{smr\_first\-Report}
+and \textbf{smr\_nextReport}.  \label{ExampleCode5}}
+\end{table}
+
+\section{Verbosity} \label{Verbosity}
+The second argument to the \textbf{smr\_initialize} function is the \textbf{statusMessageReporting} instance's verbosity flag and must be one
+of the \textbf{enum smr\_status} enumerator constants (see Sections~\ref{statusItems}).
+A report whose status ranks below a \textbf{statusMessageReporting} instance's verbosity flag is not added to the instance.
+Consider the example shown in Table~\ref{ExampleCode6} which only appends the reports with status of rank \textbf{smr\_status\_Error}.
+For this example, the ``printf'' line outputs
+\begin{verbatim}
+>> number of reports = 2
+\end{verbatim}
+and the \textbf{smr\_print} outputs the two reports added with the function \textbf{smr\_setReportError}.
+
+\begin{table}
+\begin{verbatim}
+   statusMessageReporting smr;
+
+   smr_initialize( &smr, smr_status_Error );
+   smr_setReportWarning2( smr, 0, 2, "WARNING report" );
+   smr_setReportError2( smr, 0, 3, "ERROR report" );
+   smr_setReportInfo2( smr, 0, 1, "INFO report" );
+   smr_setReportError2( smr, 0, 3, "ERROR report 2" );
+
+   printf( ">> number of reports = %d\n", smr_numberOfReports( &smr ) );
+   smr_print( &smr, 1 );
+\end{verbatim}
+\caption{Code showing a \textbf{statusMessageReporting} instance created with a verbosity of \textbf{smr\_\-status\_\-Error}.
+Only the two reports added with the function \textbf{smr\_setReport\-Error} are added to 
+\textbf{status\-MessageReporting} instance.} \label{ExampleCode6}
+\end{table}
+
+\section{The userInterface argument to smr\_setReport}
+At times a function may wish to call another function that returns part of the string to append to a report. If the returned string is
+to be owned by the calling routine, then it must free the string. As example, consider the following program
+\begin{verbatim}
+    char *str;
+
+    ...
+    /* lib1 is reporting an issue to its caller */
+    str = lib2structPointer( (void *) lib2structPointer );
+    if( str == NULL ) {
+        smr_setReportWarning2( smr, lib1_ID, lib1Code12, "%s",
+            "message from lib1" ); }
+    else {
+        smr_setReportWarning2( smr, lib1_ID, lib1Code12, "%s%s",
+            "message from lib1", str );
+        free( str );
+    }
+\end{verbatim}
+\noindent
+By implementing the userInterface argument to \textbf{smr\_setReport}, this functionality can be written with a single line as
+
+\begin{verbatim}
+    smr_setReportWarning3( smr, lib2_errorString, lib1_ID, lib1Code12, "%s",
+        "message from lib1" );
+\end{verbatim}
+
+The userInterface argument to \textbf{smr\_setReport}, and all its wrapper functions, is a pointer to a user defined struct
+and is used to add additional characters to the message if desired. 
+The user defined struct can be anything except that the first object of the pointer must be a pointer to a function defined as
+\begin{verbatim}
+    char *function( void *userData );
+\end{verbatim}
+which is called in \textbf{smr\_setReport} as
+\begin{verbatim}
+  char *extraString = NULL;
+
+  if( userInterface != NULL ) 
+    extraString = (*(smr_userInterface *) userInterface)((void *) userInterface);
+  if( extraString != NULL ) {
+      ...
+      free( extraString );
+  }
+\end{verbatim}
+That is, if userInterface is not NULL, it is treated as a pointer to a function and called with itself as its only
+argument.  The called function must return a string which is owned by \textbf{smr\_setReport} (i.e., \textbf{smr\_setReport} will free
+it). The resulting string (i.e., \textit{extraString}) is added to the end of the message.
+
+The user function called can use the functions \textbf{smr\_allocateFormatMessage} or 
+\textbf{smr\_valloc\-ate\-Format\-Message} to generate the message.
+
+\section{NULL statusMessageReporting argument}
+All non-static \textbf{statusMessageReporting} functions which take a pointer to a \textbf{statusMessage\-Reporting} or 
+\textbf{statusMessageReport} instance allow that argument to be NULL.
+The following functions return NULL when the \textbf{statusMessageReporting} or 
+\textbf{statusMessageReport} instance argument is NULL: 
+\textbf{smr\_free}, \textbf{smr\_firstReport}, \textbf{smr\_nextReport}, \textbf{smr\_getMessage}, \textbf{smr\_getFile}, 
+\textbf{smr\_getFunction}, \textbf{smr\_\-copyMessage} and \textbf{smr\_\-copyFullMessage}.
+The following functions return 0 when the instance argument is NULL: 
+\textbf{smr\_\-initialize}, \textbf{smr\_numberOf\-Reports}, \textbf{smr\_set\-Report\-Info}, 
+\textbf{smr\_vsetReport\-Info}, \textbf{smr\_setReport\-Warning}, 
+\textbf{smr\_vset\-Report\-Warning}, \textbf{smr\_set\-Report\-Error} and \textbf{smr\_vsetReport\-Error}.
+The functions \textbf{smr\_get\-Code} and \textbf{smr\_get\-Line} return -1 when the instance argument is NULL.
+The functions \textbf{smr\-\_\-highest\-Status} and \textbf{smr\_\-get\-Verbosity} 
+returns \textbf{smr\_status\_Ok} if the instance argument is NULL. 
+Finally, \textbf{smr\_isOk} and \textbf{smr\_isReportOk} returns true if the instance is NULL.
+As example, the following statement is equivalent to a no-op.
+\begin{verbatim}
+    smr_setReportWarning2( NULL, 0, 0, 
+        "This report is not logged anywhere." );
+\end{verbatim}
+
+\section{Parallel programming: MPI and threads}
+The \textbf{statusMessageReporting} package contains no support for parallel programming as it is assumed that 
+\textbf{statusMessageReporting} instances
+will not need to be passed between MPI tasks. The only requirement to use \textbf{statusMessageReporting} within an MPI
+program is that \textbf{smr\_setup} be called in each MPI task.
+
+In a program using threads, a \textbf{statusMessageReporting} instance may be needed for each thread. When a program creates a new thread, the 
+function \textbf{smr\_clone} can be called to make a copy of a \textbf{statusMessageReporting} instances. The function 
+\textbf{smr\_clone} does not copy any report data from the parent instance, only the information needed for calling \textbf{smr\_new}.
+
+\section{Memory: allocating, free-ing and ownership}
+In order to in sure that memory is not leak or freed memory is not re-freed, it is important to understand who is responsible
+for free-ing memory. In this document, the one responsible for free-ing memory is called the memory's owner (or the
+pointer's owner). Ownership includes phases similar to "string owned by", "instance is owned by", "it is owned by", 
+"the caller owns the pointer", etc.
+
+\section{Reports generated by statusMessageReporting functions}
+It is possible, although highly unlikely, that one of the functions of the \textbf{statusMessageReporting} library 
+will run into an issue. For example, each report requires the allocation of memory, which may fail.
+Currently, all issues encountered by the \textbf{statusMessageReporting} functions are associated with memory allocation.
+
+If \textbf{smr\_setReport} is unable to allocate memory for a report, the report string is printed to \textit{stderr}.
+
+\section{Package layout and building}
+
+This package contains the following directories:
+
+\begin{description}
+\item{\makebox[1.in][l]{\textbf{Doc}}} Contains this documentation.
+\item{\makebox[1.in][l]{\textbf{Examples}}} Contains some of the examples in this documentation.
+\item{\makebox[1.in][l]{\textbf{Src}}} Contains the C source and header files.
+\item{\makebox[1.in][l]{\textbf{Test}}} Contains some test programs.
+\item{\makebox[1.in][l]{\textbf{include}}} When the library is built, all required headers files are copied in to this directory.
+\item{\makebox[1.in][l]{\textbf{lib}}} When the library is built, all required library files are copied in to this directory.
+\end{description}
+
+\newpage
+\section{Functions}
+The following sub-sections describe the various functions in the \textbf{statusMessageReporting} library. The functions are
+divided into various categories.
+
+\subsection{General setup and cleanup functions}
+This section describes the functions needed to setup (i.e., initialize) the \textbf{statusMessageReporting} 
+library before most functions
+can be called as well as the functions for cleaning up the \textbf{statusMessageReporting} library at end 
+of program execution. Finally, 
+functions for handling the registration of external libraries are described.
+
+\subsubsection{smr\_setup} \label{smrSetup}
+This function must be called before any other \textbf{statusMessageReporting} function can be called as it initializes
+internal static variables.
+
+\setargumentNameLengths{s}
+\CallingC{int smr\_setup(}{void );}
+\vskip 0.05 in \noindent
+It is safe to call this function more than once 
+After the first call, subsequent calls do nothing; unless \textbf{smr\_cleanup} has been called which sets the initialization flag to false. 
+This function returns 0 if the \textbf{statusMessageReporting} library has already been initialized and 1 otherwise.
+
+\RoutinesCalled None
+
+\Errors None
+
+\subsubsection{smr\_cleanup} \label{smrCleanup}
+This function can be called to free any internal memory when the \textbf{statusMessageReporting} library is no longer needed.
+
+\setargumentNameLengths{s}
+\CallingC{int smr\_cleanup(}{void );}
+\vskip 0.05 in \noindent
+This function always returns 0.
+
+\RoutinesCalled \textbf{smr\_freeMemory}.
+
+\Errors None
+
+\subsubsection{smr\_registerLibrary} \label{smrRegisterLibrary}
+This function returns a unique integer ID for a library to use as the library's libraryID provided
+the inputted string is unique to all libraries calling \textbf{smr\_registerLibrary}.
+The argument \textit{libraryName} should be a string that uniquely defines the
+calling library from other libraries. While no library developer can guarantee that \textit{libraryName} is unique, a sufficiently long
+string (about 20 to 30 characters) that relates to the library should be adequate. If this function is called with a previously 
+registered name, the previously registered libraryID is returned.
+
+\setargumentNameLengths{libraryName}
+\CallingC{int smr\_registerLibrary(}{char const *libraryName );}
+    \argumentBox{libraryName}{The name of the library to register}
+\vskip 0.05 in \noindent
+No library shall make up its own libraryID except for the value \textbf{smr\_unknownID} = 0 (which list the library as unknown), but shall call
+\textbf{smr\_registerLibrary} for its libraryID.  If the maximum number of libraries have been registered subsequent calls 
+return the value \textbf{smr\_tooManyIDs}, which is a valid but ambiguous ID.  The maximum number of registration slots is set by the macro
+\textbf{smr\_maximumNumberOfRegisteredLibraries} of which 5 are taken by the \textbf{statusMessageReporting} library.
+If there are no errors, a positive ID value is returned. However, if an error occurs, one of the following 
+negative values is returned:
+
+-1: Memory to copy \textit{libraryName} could not be allocated.
+
+\RoutinesCalled None
+
+\Errors See above.
+
+\subsubsection{smr\_numberOfRegisteredLibraries} \label{smrNnumberOfRegisteredLibraries}
+\setargumentNameLengths{s}
+This function returns the number of registered libraries, which includes the 5 registered by the 
+\textbf{statusMessageReporting} library.
+
+\CallingC{int smr\_numberOfRegisteredLibraries(}{void );}
+\vskip 0.05 in \noindent
+
+\RoutinesCalled None
+
+\Errors None
+
+\subsubsection{smr\_getRegisteredLibrarysName} \label{smrGetRegisteredLibrarysName}
+\setargumentNameLengths{ID}
+This function returns the library's name which received the \textit{ID} from \textbf{smr\_registerLibrary}.
+
+\CallingC{char const *smr\_getRegisteredLibrarysName(}{int ID );}
+    \argumentBox{ID}{The \textit{ID} used to find a libraries name}
+\vskip 0.05 in \noindent
+If \textit{ID} is not a registered libraryID then NULL is returned.
+
+\RoutinesCalled None
+
+\Errors None
+
+\subsection{Initializing, allocating and free-ing statusMessageReporting instances}
+This section describes the functions used to create, initialize or release a \textbf{statusMessageReporting} instance.
+
+\subsubsection{smr\_new} \label{smrNew}
+This function allocates memory for a \textbf{statusMessageReporting} instance and calls \textbf{smr\_initialize} to initialize it.
+The return value is the allocated \textbf{statusMessageReporting} instance.
+
+\setargumentNameLengths{verbosity}
+\CallingC{statusMessageReporting *smr\_new(}{statusMessageReporting *smr,
+    \addArgument{enum smr\_status verbosity);}}
+    \argumentBox{smr}{A statusMessageReporting instance used to report issues found within \textbf{smr\_\-new} 
+        while it creates the new statusMessageReporting instance.}
+    \argumentBox{verbosity}{Parameter passed to \textbf{smr\_initialize}}
+\vskip 0.05 in \noindent
+
+The returned instance is owned by the caller. When the allocated \textbf{statusMessageReporting} instance is no 
+longer needed, \textbf{smr\_free} can be called to free all 
+internal memory and free the \textbf{statusMessageReporting} instance.
+
+If \textbf{smr\_new} encounters an error, NULL is returned; otherwise a pointer to the allocated \textbf{statusMessageReporting} 
+instance is returned.
+
+\RoutinesCalled \textbf{smr\_malloc2} and \textbf{smr\_initialize}.
+
+\Errors
+    Any returned by internally called functions.
+
+\subsubsection{smr\_initialize} \label{smrInitialize}
+This function initializes a \textbf{statusMessageReporting} instance. This function must be called before 
+any \textbf{statusMessageReporting} instance
+can be passed to the other \textbf{statusMessageReporting} functions. 
+
+\setargumentNameLengths{verbosity}
+\CallingC{int smr\_initialize(}{statusMessageReporting *smr,
+    \addArgument{enum smr\_status verbosity);}}
+    \argumentBox{smr}{The statusMessageReporting instance to be initialized.}
+    \argumentBox{verbosity}{The verbosity value to use for smr.}
+\vskip 0.05 in \noindent
+When the user is required to call this function, he/she should only do it once for each required 
+\textbf{statusMessageReporting} instance.
+The user is not required to call \textbf{smr\_initialize} for \textbf{statusMessageReporting} instances allocated with \textbf{smr\_new} 
+as \textbf{smr\_new} calls \textbf{smr\_initialize} before returning. Calling \textbf{smr\_initialize} on a \textbf{statusMessageReporting} instance 
+that contains messages will cause memory leaks. This function does not allocate any memory.
+
+Currently, this function always returns 0.
+
+\RoutinesCalled None.
+
+\Errors None.
+
+\subsubsection{smr\_clone} \label{smrClone}
+This function calls \textbf{smr\_new} with parameters take from smr. This function does not
+copy any report data from the parent instance, only the information needed for calling \textbf{smr\_new}.
+
+\setargumentNameLengths{smr}
+\CallingC{statusMessageReporting *smr\_clone(}{statusMessageReporting *smr );}
+    \argumentBox{smr}{The statusMessageReporting instance to be cloned.}
+\vskip 0.05 in \noindent
+Like \textbf{smr\_new}, the returned \textbf{statusMessageReporting} instance is owned by the calling 
+function and must be freed using \textbf{smr\_free}.
+
+\RoutinesCalled \textbf{smr\_new}.
+
+\Errors Any returned by internally called functions.
+
+\subsubsection{smr\_release} \label{smrRelease}
+This function releases all memory allocated for the reports of the \textbf{statusMessageReporting} instance. 
+After all memory has been released, the \textbf{statusMessageReporting} instance is re-initialized
+(re-initialization does not allocate any memory).
+
+\setargumentNameLengths{smr}
+\CallingC{void smr\_release(}{statusMessageReporting *smr );}
+    \argumentBox{smr}{The statusMessageReporting instance being released.}
+\vskip 0.05 in \noindent
+
+\RoutinesCalled \textbf{smr\_freeMemory} and \textbf{smr\_initialize}.
+
+\Errors None.
+
+\subsubsection{smr\_free} \label{smrFree}
+This function calls \textbf{smr\_release} on the \textbf{statusMessageReporting} instance and then frees the instance; that is,
+frees the instances created by \textbf{smr\_new} or \textbf{smr\_clone}.
+
+\setargumentNameLengths{smr}
+\CallingC{void *smr\_free(}{statusMessageReporting **smr );}
+    \argumentBox{smr}{The statusMessageReporting instance being freed.}
+\vskip 0.05 in \noindent
+
+\RoutinesCalled \textbf{smr\_release} and \textbf{smr\_freeMemory}.
+
+\Errors None.
+
+\subsection{Initializing, allocating and releasing a statusMessageReport instances}
+The functions in this section are not intended for external use, but are documented none the less.
+
+\subsubsection{smr\_reportNew --- Not for general use} \label{smrReportNew}
+This function allocates memory for a \textbf{statusMessageReport} instance and calls 
+\textbf{smr\_report\-Initial\-ize} to initialize it.
+The returned value is the allocated \textbf{statusMessageReport} instance.
+
+\setargumentNameLengths{report}
+\CallingCLimited{static statusMessageReport *smr\_reportNew(}{void );}
+
+\RoutinesCalled \textbf{smr\_malloc} and \textbf{smr\_reportInitialize}.
+
+\Errors Any returned by internally called functions.
+
+\subsubsection{smr\_reportInitialize --- Not for general use} \label{smrReportInitialize}
+This function initializes a \textbf{statusMessageReport} instance. This function must be called before 
+any \textbf{statusMessageReport} instance can be used.
+
+\setargumentNameLengths{report}
+\CallingCLimited{static int smr\_reportInitialize(}{statusMessageReport *report );}
+    \argumentBox{report}{The statusMessageReport instance being initialized.}
+
+This function does not allocate any memory.
+
+\RoutinesCalled None.
+
+\Errors None.
+
+\subsubsection{smr\_reportRelease --- Not for general use} \label{smrReportRelease}
+This function releases all memory allocated for the \textbf{statusMessageReport} instance. 
+After all memory has been released, the \textbf{statusMessageReport} instance is re-initialized
+(re-initialization does not allocate any memory).
+
+\setargumentNameLengths{report}
+\CallingCLimited{static void smr\_reportRelease(}{statusMessageReport *report );}
+    \argumentBox{report}{The statusMessageReport instance being released.}
+
+\RoutinesCalled \textbf{smr\_freeMemory} and \textbf{smr\_reportInitialize}.
+
+\Errors None.
+
+\subsection{Creating reports}
+The functions in this section add a report to a \textbf{statusMessageReporting} instance.
+
+\subsubsection{smr\_setReport --- Not for general use} \label{smrSetMessage}
+This function adds a new report (i.e., \textbf{statusMessageReport} instance) to a \textbf{statusMessageReporting} 
+instance when the rank of the report is equal to or greater than the
+verbosity of the \textbf{statusMessageReporting} instance.
+
+\setargumentNameLengths{userInterface}
+\CallingCLimited{static int smr\_setReport(}{statusMessageReporting *smr,
+    \addArgument{void *userInterface,}
+    \addArgument{char const *file,}
+    \addArgument{int line,}
+    \addArgument{char const *function,}
+    \addArgument{int libraryID,}
+    \addArgument{int code,}
+    \addArgument{enum smr\_status status,}
+    \addArgument{char const *fmt,}
+    \addArgument{va\_list *args );}}
+    \argumentBox{smr}{The statusMessageReporting instance the report is added to.}
+    \argumentBox{userInterface}{A user function/information used to add to the report's message.}
+    \argumentBox{file}{The name of the file which the report describes.}
+    \argumentBox{line}{The line number of the file which the report describes.}
+    \argumentBox{function}{The name of the function which the report describes.}
+    \argumentBox{libraryID}{The generator's libraryID.}
+    \argumentBox{code}{Generator library's specific integer flag specifying the report.}
+    \argumentBox{status}{The status of the report.}
+    \argumentBox{fmt}{The format string to be used by a printf type function for constructing the report's message.}
+    \argumentBox{args}{Additional arguments needed by fmt to construct the report's message.}
+\vskip 0.05 in \noindent
+This function cannot be called from user functions as it is declared {\rm static}. Instead, one must use one of the wrapper functions
+\textbf{smr\_setReportInfo}, \textbf{smr\_vset\-ReportInfo}, \textbf{smr\_setReportWarning}, 
+\textbf{smr\_vset\-ReportWarning}, \textbf{smr\_setReportError} or \textbf{smr\_vsetReportError}. These
+functions can be called directly or indirectly via one of their MACRO's (see Section~\ref{MACROS}).
+
+\RoutinesCalled \textbf{smr\_setAllocationFailure}, \textbf{smr\_release} and \textbf{smr\_vallocate\-Format\-Mess\-age}.
+
+\Errors
+    Any returned by internally called functions.
+
+\subsubsection{smr\_setAllocationFailure --- Not for general use} \label{smrSetAllocationFailure}
+This function is called internally if memory allocation failed for a report. The user's report is printed
+to \textit{stderr} and smr's report is set to an internal report.
+
+\setargumentNameLengths{function}
+\CallingCLimited{static int smr\_setAllocationFailure(}{statusMessageReport *report,
+    \addArgument{char const *file,} 
+    \addArgument{int line,}
+    \addArgument{char const *function,}
+    \addArgument{char const *fmt,}
+    \addArgument{va\_list *args );}}
+    \argumentBox{report}{The statusMessageReport instance the internal report is added to.}
+    \argumentBox{file}{The name of the file which the report describes.}
+    \argumentBox{line}{The line number of the file which the report describes.}
+    \argumentBox{function}{The name of the function which the report describes.}
+    \argumentBox{fmt}{The format string to be used by a printf type function for constructing the report's message.}
+    \argumentBox{args}{Additional arguments needed by \textit{fmt} to construct the report's message.}
+\vskip 0.05 in \noindent
+
+\RoutinesCalled None.
+
+\Errors
+    Returns 1 if \textit{smr} is not NULL; otherwise, returns -1.
+
+\subsubsection{smr\_setReportInfo} \label{smrSetMessageInfo}
+This function adds a report of rank \textbf{smr\_status\_Info} to a \textbf{statusMessageReporting} instance by calling 
+\textbf{smr\_setReport} with status set to \textbf{smr\_status\_Info}. The arguments after the \textit{fmt} argument are converted 
+to a va\_list for passage to \textbf{smr\_setReport}.
+
+\setargumentNameLengths{userInterface}
+\CallingC{int smr\_setReportInfo(}{statusMessageReporting *smr,
+    \addArgument{void *userInterface,}
+    \addArgument{char const *file,}
+    \addArgument{int line,}
+    \addArgument{char const *function,}
+    \addArgument{int libraryID,}
+    \addArgument{int code,}
+    \addArgument{char const *fmt,}
+    \addArgument{... );}}
+    \argumentBox{smr}{The statusMessageReporting instance to add report to.}
+    \argumentBox{userInterface}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{file}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{line}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{function}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{libraryID}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{code}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{fmt}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{...}{Additional arguments for \textit{fmt}.}
+\vskip 0.05 in \noindent
+Also see MACRO's \textbf{smr\_setReportInfo2}, \textbf{smr\_setReportInfo2p}, \textbf{smr\_setReportInfo3} 
+and \textbf{smr\_setReportInfo3p}.
+
+\RoutinesCalled \textbf{smr\_setReport}.
+
+\Errors
+    Any returned by internally called functions.
+
+\subsubsection{smr\_vsetReportInfo} \label{smrVsetReportInfo}
+This function is like the function \textbf{smr\_setReportInfo} except the additional arguments needed for the 
+\textit{fmt} argument are passed via a \textbf{va\_list *} argument.
+
+\CallingC{int smr\_vsetReportInfo(}{statusMessageReporting *smr,
+    \addArgument{void *userInterface,}
+    \addArgument{char const *file,}
+    \addArgument{int line,}
+    \addArgument{char const *function,}
+    \addArgument{int libraryID,}
+    \addArgument{int code,}
+    \addArgument{char const *fmt,}
+    \addArgument{va\_list *args );}}
+    \argumentBox{smr}{The statusMessageReporting instance to add report to.}
+    \argumentBox{userInterface}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{file}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{line}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{function}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{libraryID}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{code}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{fmt}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{args}{Parameter passed to \textbf{smr\_setReport}.}
+\vskip 0.05 in \noindent
+Also see MACRO's \textbf{smr\_vsetReportInfo2} and \textbf{smr\_vsetReportInfo3}.
+
+\RoutinesCalled \textbf{smr\_setReport}.
+
+\Errors
+    Any returned by internally called functions.
+
+\subsubsection{smr\_setReportWarning} \label{smrSetMessageWarning}
+This function adds a report of rank \textbf{smr\_status\_Warning} to a \textbf{statusMessageReporting} instance by 
+calling \textbf{smr\_setReport} with status set to \textbf{smr\_status\_Warning}. 
+The arguments after the \textit{fmt} argument are converted to a va\_list for passage to \textbf{smr\_setReport}.
+
+\CallingC{int smr\_setReportWarning(}{statusMessageReporting *smr,
+    \addArgument{void *userInterface,}
+    \addArgument{char const *file,}
+    \addArgument{int line,}
+    \addArgument{char const *function,}
+    \addArgument{int libraryID,}
+    \addArgument{int code,}
+    \addArgument{char const *fmt,}
+    \addArgument{... );}}
+    \argumentBox{smr}{The statusMessageReporting instance to add report to.}
+    \argumentBox{userInterface}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{file}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{line}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{function}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{libraryID}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{code}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{fmt}{The format for the message.}
+    \argumentBox{...}{Additional arguments for \textit{fmt}.}
+\vskip 0.05 in \noindent
+Also see MACRO's \textbf{smr\_setReportWarning2}, \textbf{smr\_setReportWarning2p}, \textbf{smr\_setReport\-Warning3} 
+and \textbf{smr\_setReportWarning3p}.
+
+\RoutinesCalled \textbf{smr\_setReport}.
+
+\Errors
+    Any returned by internally called functions.
+
+\subsubsection{smr\_vsetReportWarning} \label{smrVsetReportWarning}
+This function is like the function \textbf{smr\_setReportWarning} except the additional arguments needed for the 
+\textit{fmt} argument are passed via a \textbf{va\_list *} argument.
+
+\CallingC{int smr\_vsetReportWarning(}{statusMessageReporting *smr,
+    \addArgument{void *userInterface,}
+    \addArgument{char const *file,}
+    \addArgument{int line,}
+    \addArgument{char const *function,}
+    \addArgument{int libraryID,}
+    \addArgument{int code,}
+    \addArgument{char const *fmt,}
+    \addArgument{va\_list *args );}}
+    \argumentBox{smr}{The statusMessageReporting instance to add report to.}
+    \argumentBox{userInterface}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{file}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{line}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{function}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{libraryID}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{code}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{fmt}{The format for the message.}
+    \argumentBox{args}{Parameter passed to \textbf{smr\_setReport}.}
+\vskip 0.05 in \noindent
+Also see the MACRO's \textbf{smr\_vsetReportWarning2} and \textbf{smr\_vsetReportWarning3}.
+
+\RoutinesCalled \textbf{smr\_setReport}.
+
+\Errors
+    Any returned by internally called functions.
+
+\subsubsection{smr\_setReportError} \label{smrSetMessageError}
+This function adds a report of rank \textbf{smr\_status\_Error} to a \textbf{statusMessageReporting} instance by calling 
+\textbf{smr\_setReport} with status set to \textbf{smr\_status\_Error}. The arguments after the 
+\textit{fmt} argument are converted to a va\_list for passage to \textbf{smr\_setReport}.
+
+\CallingC{int smr\_setReportError(}{statusMessageReporting *smr,
+    \addArgument{void *userInterface,}
+    \addArgument{char const *file,}
+    \addArgument{int line,}
+    \addArgument{char const *function,}
+    \addArgument{int libraryID,}
+    \addArgument{int code,}
+    \addArgument{char const *fmt,}
+    \addArgument{... );}}
+    \argumentBox{smr}{The statusMessageReporting instance to add report to.}
+    \argumentBox{userInterface}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{file}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{line}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{function}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{libraryID}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{code}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{fmt}{The format for the message.}
+    \argumentBox{...}{Additional arguments for \textit{fmt}.}
+\vskip 0.05 in \noindent
+Also see MACRO's \textbf{smr\_setReportError2}, \textbf{smr\_setReportError2p}, 
+\textbf{smr\_setReportError3} and \textbf{smr\_setReportError3p}.
+
+\RoutinesCalled \textbf{smr\_setReport}.
+
+\Errors
+    Any returned by internally called functions.
+
+\subsubsection{smr\_vsetReportError} \label{smrVsetReportError}
+This function is like the function \textbf{smr\_setReportError} except the additional arguments needed for the 
+\textit{fmt} argument are passed via a \textbf{va\_list *} argument.
+
+\CallingC{int smr\_vsetReportError(}{statusMessageReporting *smr,
+    \addArgument{void *userInterface,}
+    \addArgument{char const *file,}
+    \addArgument{int line,}
+    \addArgument{char const *function,}
+    \addArgument{int libraryID,}
+    \addArgument{int code,}
+    \addArgument{char const *fmt,}
+    \addArgument{va\_list *args );}}
+    \argumentBox{smr}{The statusMessageReporting instance to add report to.}
+    \argumentBox{userInterface}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{file}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{line}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{function}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{libraryID}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{code}{Parameter passed to \textbf{smr\_setReport}.}
+    \argumentBox{fmt}{The format for the message.}
+    \argumentBox{args}{Parameter passed to \textbf{smr\_setReport}.}
+\vskip 0.05 in \noindent
+Also see the MACRO's \textbf{smr\_vsetReportError2} and \textbf{smr\_vsetReportError3}.
+
+\RoutinesCalled \textbf{smr\_setReport}.
+
+\Errors
+    Any returned by internally called functions.
+
+\subsection{Checking a report's status}
+This section describes functions that test the status of the reports in a \textbf{statusMessageReporting} instance.
+
+\subsubsection{smr\_highestStatus} \label{smrHighestStatus}
+\setargumentNameLengths{smr}
+This function returns the highest status of all the reports in a \textbf{statusMessageReporting} instance.
+
+\CallingC{enum smr\_status smr\_highestStatus(}{statusMessageReporting *smr );}
+    \argumentBox{smr}{The statusMessageReporting instance whose status is being examined.}
+\vskip 0.05 in \noindent
+If \textit{smr} is NULL, then \textbf{smr\_status\_Ok} is returned.
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsubsection{smr\_isOk} \label{smrIsOk}
+This function returns true if \textit{smr}'s status is \textbf{smr\_status\_Ok} and false otherwise.
+
+\setargumentNameLengths{smr}
+\CallingC{int smr\_isOk(}{statusMessageReporting *smr );}
+    \argumentBox{smr}{The statusMessageReporting instance whose status is being checked.}
+\vskip 0.05 in \noindent
+If \textit{smr} is NULL, then true is returned.
+
+\RoutinesCalled \textbf{smr\_highestStatus}.
+
+\Errors
+    None.
+
+\subsubsection{smr\_isInfo} \label{smrIsInfo}
+This function returns true if the highest status of all of \textit{smr} reports is \textbf{smr\_status\_Info} and false otherwise.
+
+\CallingC{int smr\_isInfo(}{statusMessageReporting *smr );}
+    \argumentBox{smr}{The statusMessageReporting instance whose status is being checked.}
+\vskip 0.05 in \noindent
+If \textit{smr} is NULL, then false is returned.
+
+\RoutinesCalled \textbf{smr\_highestStatus}.
+
+\Errors
+    None.
+
+\subsubsection{smr\_isWarning} \label{smrIsWarning}
+This function returns true if the highest status of all of \textit{smr} reports is \textbf{smr\_status\_Warning} and false otherwise.
+
+\CallingC{int smr\_isWarning(}{statusMessageReporting *smr );}
+    \argumentBox{smr}{The statusMessageReporting instance whose status is being checked.}
+\vskip 0.05 in \noindent
+If \textit{smr} is NULL, then false is returned.
+
+\RoutinesCalled \textbf{smr\_highestStatus}.
+
+\Errors
+    None.
+
+\subsubsection{smr\_isError} \label{smrIsError}
+This function returns true if the highest status of all of \textit{smr} reports is \textbf{smr\_status\_Error} and false otherwise.
+
+\CallingC{int smr\_isError(}{statusMessageReporting *smr );}
+    \argumentBox{smr}{The statusMessageReporting instance whose status is being checked.}
+\vskip 0.05 in \noindent
+If \textit{smr} is NULL, then false is returned.
+
+\RoutinesCalled \textbf{smr\_highestStatus}.
+
+\Errors
+    None.
+
+\subsubsection{smr\_isWarningOrError} \label{smrIsWarningOrError}
+This function returns true if the highest status of all of \textit{smr} reports is \textbf{smr\_status\_Warning} or
+\textbf{smr\_status\_Error} and false otherwise.
+
+\CallingC{int smr\_isWarningOrError(}{statusMessageReporting *smr );}
+    \argumentBox{smr}{The statusMessageReporting instance whose status is being checked.}
+\vskip 0.05 in \noindent
+If \textit{smr} is NULL, then false is returned.
+
+\RoutinesCalled \textbf{smr\_highestStatus}.
+
+\Errors
+    None.
+
+\subsubsection{smr\_isReportOk} \label{smrIsReportOk}
+This function returns true if \textit{report}'s status is \textbf{smr\_status\_Ok} and false otherwise.
+
+\setargumentNameLengths{report}
+\CallingC{int smr\_isReportOk(}{statusMessageReport *report );}
+    \argumentBox{report}{The statusMessageReport instance whose status is being checked.}
+\vskip 0.05 in \noindent
+Unlike \textbf{smr\_isOk} which checks \textit{smr} and all reports after it,
+\textbf{smr\_isReportOk} only checks the \textit{report} passed to it and not any other reports after it.
+If \textit{report} is NULL, then false is returned.
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsubsection{smr\_isReportInfo} \label{smrIsReportInfo}
+This function returns true if \textit{report}'s status is \textbf{smr\_status\_Info} and false otherwise.
+
+\CallingC{int smr\_isReportInfo(}{statusMessageReport *report );}
+    \argumentBox{report}{The statusMessageReport instance whose status is being checked.}
+\vskip 0.05 in \noindent
+Unlike \textbf{smr\_isInfo} which checks smr and all reports after it,
+\textbf{smr\_isReportInfo} only checks the report passed to it and not any other reports after it.
+If \textit{report} is NULL, then false is returned.
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsubsection{smr\_isReportWarning} \label{smrIsReportWarning}
+This function returns true if \textit{report}'s status is \textbf{smr\_status\_Warning} and false otherwise.
+
+\CallingC{int smr\_isReportWarning(}{statusMessageReport *report );}
+    \argumentBox{report}{The statusMessageReport instance whose status is being checked.}
+\vskip 0.05 in \noindent
+Unlike \textbf{smr\_isWarning} which checks smr and all reports after it,
+\textbf{smr\_isReportWarning} only checks the report passed to it and not any other reports after it.
+If \textit{report} is NULL, then false is returned.
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsubsection{smr\_isReportError} \label{smrIsReportError}
+This function returns true if \textit{report}'s status is \textbf{smr\_status\_Error} and false otherwise.
+
+\CallingC{int smr\_isReportError(}{statusMessageReport *report );}
+    \argumentBox{report}{The statusMessageReport instance whose status is being checked.}
+\vskip 0.05 in \noindent
+Unlike \textbf{smr\_isError} which checks smr and all reports after it,
+\textbf{smr\_isReportError} only checks the report passed to it and not any other reports after it.
+If \textit{report} is NULL, then false is returned.
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsubsection{smr\_isReportWarningOrError} \label{smrIsReportWarningOrError}
+This function returns true if \textit{report}'s status is \textbf{smr\_status\_Warning} or \textbf{smr\_status\_Error}, and false otherwise.
+
+\CallingC{int smr\_isReportWarningOrError(}{statusMessageReport *report );}
+    \argumentBox{report}{The statusMessageReport instance whose status is being checked.}
+\vskip 0.05 in \noindent
+Unlike \textbf{smr\_isWarningOrError} which checks smr and all reports after it,
+\textbf{smr\_isReport\-Warn\-ing\-Or\-Error} only checks the report passed to it and not any other reports after it.
+If \textit{report} is NULL, then false is returned.
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsection{Browsing reports in a statusMessageReporting instance}
+The functions in this section can be used to loop over the reports in a \textbf{statusMessageReporting} instance.
+
+\subsubsection{smr\_numberOfReports} \label{smrNumberOfReports}
+This function returns the number of non \textbf{smr\_status\_Ok} reports contained in smr.
+
+\setargumentNameLengths{smr}
+\CallingC{int smr\_numberOfReports(}{statusMessageReporting *smr );}
+    \argumentBox{smr}{The statusMessageReporting instance whose number of reports is counted.}
+\vskip 0.05 in \noindent
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsubsection{smr\_firstReport} \label{smrFisrtMessage}
+This function returns the first report of smr.
+
+\CallingC{statusMessageReport const *smr\_firstReport(}{statusMessageReporting const *smr );}
+    \argumentBox{smr}{The statusMessageReporting instance whose first report is returned.}
+\vskip 0.05 in \noindent
+If \textit{smr}'s status is \textbf{smr\_status\_Ok} then NULL is returned.
+Together with \textbf{smr\_nextReport}, this function can be used to loop over the reports of a \textbf{statusMessageReporting}
+instance as,
+
+\begin{verbatim}
+    statusMessageReporting smr;
+    statusMessageReport *report;
+
+    for( report = smr_firstReport( &smr ); 
+                report != NULL; 
+                report = smr_nextReport( report ) ) {
+        .
+        .
+        .
+    }
+\end{verbatim}
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsubsection{smr\_nextReport} \label{smrNextMessage}
+This function returns the next report after report.
+
+\setargumentNameLengths{report}
+\CallingC{statusMessageReport const *smr\_nextReport(}{statusMessageReport const *report );}
+    \argumentBox{report}{The statusMessageReport instance used to get the next report.}
+\vskip 0.05 in \noindent
+If report is the last in the series, then NULL is returned.  See \textbf{smr\_firstReport} for usage.
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsection{statusMessageReporting inquiring}
+The functions in this section return various quantities stored in a \textbf{statusMessageReporting} instance.
+
+\subsubsection{smr\_getVerbosity} \label{smrGetVerbosity}
+This function returns the verbosity for a \textbf{statusMessageReporting} instance.
+
+\setargumentNameLengths{smr}
+\CallingC{enum smr\_status smr\_getVerbosity(}{statusMessageReporting *smr );}
+    \argumentBox{smr}{The statusMessageReporting instance whose message is being returned.}
+\vskip 0.05 in \noindent
+If \textit{smr} is NULL then \textbf{smr\_status\_Ok} is returned. 
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsection{Report inquiring}
+The functions in this section return various quantities stored in a \textbf{statusMessageReport} instance.
+
+\subsubsection{smr\_getLibraryID} \label{smrGetLibraryID}
+This function returns the \textit{report}'s libraryID.
+
+\setargumentNameLengths{report}
+\CallingC{int smr\_getLibraryID(}{statusMessageReport *report );}
+    \argumentBox{report}{The statusMessageReport instance whose library ID is being returned.}
+\vskip 0.05 in \noindent
+If \textit{report} is NULL then 0 is returned.
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsubsection{smr\_getCode} \label{smrGetCode}
+This function returns the \textit{report}'s code.
+
+\setargumentNameLengths{report}
+\CallingC{int smr\_getCode(}{statusMessageReport *report );}
+    \argumentBox{report}{The statusMessageReport instance whose code is being returned.}
+\vskip 0.05 in \noindent
+If \textit{report} is NULL then -1 is returned.
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsubsection{smr\_getLine} \label{smrGetLine}
+This function returns the \textit{report}'s line.
+
+\setargumentNameLengths{report}
+\CallingC{int smr\_getLine(}{statusMessageReport *report );}
+    \argumentBox{report}{The statusMessageReport instance whose line is being returned.}
+\vskip 0.05 in \noindent
+If \textit{report} is NULL the -1 is returned.
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsubsection{smr\_getFile} \label{smrGetFile}
+This function returns the \textit{report}'s file.
+
+\setargumentNameLengths{report}
+\CallingC{char const *smr\_getFile(}{statusMessageReport *report );}
+    \argumentBox{report}{The statusMessageReport instance whose file is being returned.}
+\vskip 0.05 in \noindent
+If \textit{report} is NULL then NULL is returned.
+The returned pointer must not be freed as it is owned by \textit{report}.
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsubsection{smr\_getFunction} \label{smrGetFunction}
+This function returns the \textit{report}'s function.
+
+\setargumentNameLengths{report}
+\CallingC{char const *smr\_getFunction(}{statusMessageReport *report );}
+    \argumentBox{report}{The statusMessageReport instance whose function is being returned.}
+\vskip 0.05 in \noindent
+If \textit{report} is NULL then NULL is returned.
+The returned pointer must not be freed as it is owned by \textit{report}.
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsubsection{smr\_getMessage} \label{smrGetMessage}
+This function returns the \textit{report}'s message.
+
+\setargumentNameLengths{report}
+\CallingC{char const *smr\_getMessage(}{statusMessageReport *report );}
+    \argumentBox{report}{The statusMessageReport instance whose message is being returned.}
+\vskip 0.05 in \noindent
+If \textit{report} is NULL then NULL is returned. The returned pointer must not be freed as
+it is owned by \textit{report}.
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsubsection{smr\_copyMessage} \label{smrCopyMessage}
+This function returns an allocated copy of the \textit{report}'s message.
+
+\CallingC{char const *smr\_copyMessage(}{statusMessageReport *report );}
+    \argumentBox{report}{The statusMessageReport instance whose message is copied and returned.}
+\vskip 0.05 in \noindent
+This function is like \textbf{smr\_getMessage} except that the caller owns the pointer (i.e., a 
+copy of \textit{report}'s message is made and returned to the
+caller).  The caller is responsible for freeing the returned pointer. There are three conditions when NULL is returned; 1) 
+\textit{report} is a NULL, 2)
+\textit{report}'s status is \textbf{smr\_status\_Ok} or 3) memory could not be allocated for the message.
+
+\RoutinesCalled \textbf{smr\_allocateFormatMessage}.
+
+\Errors
+    None.
+
+\subsubsection{smr\_copyFullMessage} \label{smrCopyFullMessage}
+This function returns an allocated copy of the \textit{report}'s full message.
+
+\CallingC{char *smr\_copyFullMessage(}{statusMessageRepor *report );}
+    \argumentBox{report}{The statusMessageReport instance whose full message is constructed and returned.}
+\vskip 0.05 in \noindent
+The caller is responsible for freeing the returned memory. There are three conditions when NULL is returned; 1) 
+\textit{smr} is a NULL, 2)
+\textit{smr}'s status is \textbf{smr\_status\_Ok} or 3) memory could not be allocated for the full message.
+
+\RoutinesCalled \textbf{smr\_allocateFormatMessage}.
+
+\Errors
+    None.
+
+\subsection{Miscellaneous statusMessageReporting functions}
+This section contains miscellaneous functions which take a \textbf{statusMessageReporting} instance as an argument.
+
+\subsubsection{smr\_print} \label{smrPrint}
+This function prints all reports of \textit{smr} to the FILE instance \textit{stdout}.
+
+\setargumentNameLengths{clear}
+\CallingC{void smr\_print(}{statusMessageReporting *smr,
+    \addArgument{int clear );}}
+    \argumentBox{smr}{The statusMessageReporting instance whose full messages are printed.}
+    \argumentBox{clear}{If true, \textbf{smr\_release} is called on \textit{smr} after printing.}
+\vskip 0.05 in \noindent
+
+\RoutinesCalled \textbf{smr\_release} and \textbf{smr\_reportPrint}.
+
+\Errors
+    None.
+
+\subsubsection{smr\_reportPrint} \label{smrPrint2}
+This function prints a single \textit{report}'s full message to FILE instance \textit{f}.
+
+\setargumentNameLengths{report}
+\CallingC{static void smr\_reportPrint(}{statusMessageReport *report,
+    \addArgument{FILE *f );}}
+    \argumentBox{report}{The statusMessageReport instance whose full message is printed.}
+    \argumentBox{f}{The stream to print reports to.}
+\vskip 0.05 in \noindent
+
+\RoutinesCalled None.
+
+\Errors None.
+
+\subsubsection{smr\_statusToString} \label{smrStatusToString}
+This function returns an internal string representation of status.
+
+\setargumentNameLengths{status}
+\CallingC{char const *smr\_statusToString(}{enum smr\_status status );}
+    \argumentBox{status}{The status whose string is being returned.}
+\vskip 0.05 in \noindent
+The returned pointer must not be freed as it points to internal static memory.
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsection{Miscellaneous functions}
+This section contains miscellaneous functions which have nothing to do with a \textbf{statusMessageReporting} 
+or \textbf{statusMessageReport}
+instance but are used by other functions in the \textbf{statusMessageReporting} library and may be used by other libraries.
+
+\subsubsection{smr\_allocateFormatMessage} \label{smrallocateFormatMessage}
+This function converts the arguments after \textit{fmt} into a va\_list and calls \textbf{smr\_vallocateFormat\-Message}.
+
+\setargumentNameLengths{fmt}
+\CallingC{char *smr\_allocateFormatMessage(}{char const *fmt,
+    \addArgument{... );}}
+    \argumentBox{fmt}{A format string to be passed to a printf like function.}
+    \argumentBox{...}{Remaining arguments to be converted into a va\_list.}
+\vskip 0.05 in \noindent
+The returned pointer must be freed by the calling function. If memory cannot be allocated, NULL is returned.
+
+\RoutinesCalled \textbf{smr\_vallocateFormatMessage}.
+
+\Errors
+    Any returned by internally called functions.
+
+\subsubsection{smr\_vallocateFormatMessage} \label{smrVallocateFormatMessage}
+This function uses a vsnprintf like function to convert the \textit{fmt} and va\_list into a string and returns the string.
+Effectively, a string is allocated and filled with the message; however, since the initial string is not know in advance,
+the actual coding is a little more complicated and may vary between platforms.
+
+\setargumentNameLengths{args}
+\CallingC{char *smr\_vallocateFormatMessage(}{char const *fmt,
+    \addArgument{va\_list *args );}}
+    \argumentBox{fmt}{A format string to be passed to a printf like function.}
+    \argumentBox{args}{Remaining arguments required by \textit{fmt} as used in a printf like function.}
+\vskip 0.05 in \noindent
+The returned pointer must be freed by the calling function. If memory cannot be allocated, NULL is returned.
+
+\RoutinesCalled None.
+
+\Errors Memory could not be allocated.
+
+\subsubsection{smr\_malloc} \label{smrMalloc}
+This function allocates memory of size bytes and set all bytes to 0 if zero is true.
+
+\setargumentNameLengths{forItem}
+\CallingC{void *smr\_malloc(}{statusMessageReporting *smr,
+    \addArgument{size\_t size,}
+    \addArgument{int zero,}
+    \addArgument{char const *forItem,}
+    \addArgument{char const *file,}
+    \addArgument{int line,}
+    \addArgument{char const *function );}}
+    \argumentBox{smr}{The statusMessageReporting instance used to report any issues.}
+    \argumentBox{size}{The amount of memory in bytes to allocate.}
+    \argumentBox{zero}{If true all bytes are set to 0.}
+    \argumentBox{forItem}{Used in constructing a report if an issue arises.}
+    \argumentBox{file}{Used in constructing a report if an issue arises.}
+    \argumentBox{line}{Used in constructing a report if an issue arises.}
+    \argumentBox{function}{Used in constructing a report if an issue arises.}
+\vskip 0.05 in \noindent
+If an issue arises it is reported via \textit{smr}.
+
+\RoutinesCalled \textbf{smr\_realloc}.
+
+\Errors
+    Any returned by internally called functions.
+
+\subsubsection{smr\_realloc} \label{smrRealloc}
+This function reallocates memory pointed to by \textit{pOld} to be size bytes.
+
+\setargumentNameLengths{forItem}
+\CallingC{void *smr\_realloc(}{statusMessageReporting *smr,
+    \addArgument{void *pOld,}
+    \addArgument{size\_t size,}
+    \addArgument{char const *forItem,}
+    \addArgument{char const *file,}
+    \addArgument{int line,}
+    \addArgument{char const *function );}}
+    \argumentBox{smr}{The statusMessageReporting instance used to report any issues.}
+    \argumentBox{pOld}{The memory to reallocate.}
+    \argumentBox{size}{The amount of memory in bytes to allocate.}
+    \argumentBox{forItem}{Used in constructing a report if an issue arises.}
+    \argumentBox{file}{Used in constructing a report if an issue arises.}
+    \argumentBox{line}{Used in constructing a report if an issue arises.}
+    \argumentBox{function}{Used in constructing a report if an issue arises.}
+\vskip 0.05 in \noindent
+If an issue arises it is reported via \textit{smr}.
+
+\RoutinesCalled \textbf{smr\_setReportError}.
+
+\Errors
+    None.
+
+\subsubsection{smr\_freeMemory} \label{smrRreeMemory}
+This function frees the memory pointed to by \textit{*p} and set \textit{*p} to NULL.
+
+\setargumentNameLengths{p}
+\CallingC{void *smr\_freeMemory(}{void **p );}
+    \argumentBox{p}{The memory to free.}
+\vskip 0.05 in \noindent
+If \textit{*p} is NULL, free is not called; that is, it is safe to call as ``smr\_freeMemory( \&p )'' when ``p = NULL''.
+This function always returns NULL.
+
+\RoutinesCalled None.
+
+\Errors
+    None.
+
+\subsubsection{smr\_allocateCopyString} \label{smrAllocateCopyString}
+This function calls strdup to make a copy of \textit{s}. If an issue occurs it is reported via \textit{smr}.
+
+\setargumentNameLengths{forItem}
+\CallingC{char *smr\_allocateCopyString(}{statusMessageReporting *smr,
+    \addArgument{char const *s,}
+    \addArgument{char const *forItem,}
+    \addArgument{char const *file,}
+    \addArgument{int line,}
+    \addArgument{char const *function );}}
+    \argumentBox{smr}{The statusMessageReporting instance used to report any issues.}
+    \argumentBox{s}{The string to copy.}
+    \argumentBox{forItem}{Used in constructing a report if an issue arises.}
+    \argumentBox{file}{Used in constructing a report if an issue arises.}
+    \argumentBox{line}{Used in constructing a report if an issue arises.}
+    \argumentBox{function}{Used in constructing a report if an issue arises.}
+\vskip 0.05 in \noindent
+
+\RoutinesCalled \textbf{smr\_setReportError}.
+
+\Errors
+    Any returned by internally called functions.
+
+\subsubsection{smr\_allocateCopyStringN} \label{smrAllocateCopyStringN}
+This function allocates memory for the first n characters of s and copies them to the allocated memory. 
+If an issue occurs it is reported via smr.
+
+\setargumentNameLengths{forItem}
+\CallingC{char *smr\_allocateCopyStringN(}{statusMessageReporting *smr,
+    \addArgument{char const *s,}
+    \addArgument{size\_t n,}
+    \addArgument{char const *forItem,}
+    \addArgument{char const *file,}
+    \addArgument{int line,}
+    \addArgument{char const *function );}}
+    \argumentBox{smr}{The statusMessageReporting instance used to report any issues.}
+    \argumentBox{s}{The string to copy.}
+    \argumentBox{n}{The maximum number of characters to copy.}
+    \argumentBox{forItem}{Used in constructing a report if an issue arises.}
+    \argumentBox{file}{Used in constructing a report if an issue arises.}
+    \argumentBox{line}{Used in constructing a report if an issue arises.}
+    \argumentBox{function}{Used in constructing a report if an issue arises.}
+\vskip 0.05 in \noindent
+This function is like \textbf{smr\_allocateCopyString} except at most \textit{n} characters are copied.
+
+\RoutinesCalled \textbf{smr\_malloc}.
+
+\Errors
+    Any returned by internally called functions.
+
+\section{Macros}
+The following C-macros are defined in \textbf{statusMessageReporting.h}. When using the macros
+\textbf{smr\_\-set\-Report\-Info2}, \textbf{smr\_\-set\-Report\-Warning2}, 
+\textbf{smr\_\-set\-Report\-Error2}, \textbf{smr\_\-set\-Report\-Info3}, \textbf{smr\_\-set\-Report\-Warning3}
+and \textbf{smr\_\-set\-Report\-Error3},
+it is important to understand how the macro \_\_VA\_ARGS\_\_ works. The C pre-processor replaces the \_\_VA\_ARGS\_\_ macro
+with all arguments that appear at and after the `...'. For example, the C pre-processor replaces
+
+\begin{verbatim}
+    smr_setReportWarning2( smr, libID, code, "%s: %d", "abc", 123 );
+\end{verbatim}
+with
+\begin{verbatim}
+    smr_setReportWarning( smr, NULL, __FILL__, __LINE__, __func__, \
+        libID, code, "%s: %d", "abc", 123 );
+\end{verbatim}
+which is the desired coding and will compile. However, the C pre-processor replaces
+\begin{verbatim}
+    smr_setReportWarning2( smr, libID, code, "end of arguments" );
+\end{verbatim}
+with
+\begin{verbatim}
+    smr_setReportWarning( smr, NULL, __FILL__, __LINE__, __func__, \
+        libID, code, "end of arguments", );
+\end{verbatim}
+which has an extra `,' and will not compile. Therefore, \_\_VA\_ARGS\_\_ can never be blank. For the prior example, 
+the macro \textbf{smr\_setReportWarning2p} should be used as it is like \textbf{smr\_setReport\-Warning2} 
+but does not have the \_\_VA\_ARGS\_\_ argument.
+Using \textbf{smr\_setReportWarning2p}, this example becomes
+\begin{verbatim}
+    smr_setReportWarning2p( smr, libID, code, "end of arguments" );
+\end{verbatim}
+which will compile.
+
+\subsection{Macro definitions} \label{MACROS}
+\begin{verbatim}
+#define smr_malloc2( smr, size, zero, forItem ) \
+    smr_malloc( smr, size, zero, forItem, __FILE__, __LINE__, __func__ )
+
+#define smr_realloc2( smr, old, size, forItem ) \
+    smr_realloc( smr, old, size, forItem, __FILE__, __LINE__, __func__ )
+
+#define smr_allocateCopyString2( smr, s, forItem ) \
+    smr_allocateCopyString( smr, s, forItem, __FILE__, __LINE__ )
+
+#define smr_allocateCopyStringN2( smr, s, n, forItem ) 
+    smr_allocateCopyStringN( smr, s, n, forItem, __FILE__, __LINE__ )
+
+#define smr_setReportInfo2( smr, libID, code, fmt, ... ) \
+    smr_setReportInfo( smr, NULL, __FILL__, __LINE__, __func__, \
+        libID, code, fmt, __VA_ARGS__ )
+
+#define smr_setReportInfo2p( smr, libID, code, fmt ) \
+    smr_setReportInfo( smr, NULL, __FILL__, __LINE__, __func__, \
+        libID, code, fmt )
+
+#define smr_vsetReportInfo2( smr, libID, code, fmt, args ) \
+    smr_vsetReportInfo( smr, NULL, __FILL__, __LINE__, __func__, \
+        libID, code, fmt, args )
+
+#define smr_setReportWarning2( smr, libID, code, fmt, ... ) \
+    smr_setReportWarning( smr, NULL, __FILL__, __LINE__, __func__, \
+        libID, code, fmt, __VA_ARGS__ )
+
+#define smr_setReportWarning2p( smr, libID, code, fmt ) \
+    smr_setReportWarning( smr, NULL, __FILL__, __LINE__, __func__, \
+        libID, code, fmt )
+
+#define smr_vsetReportWarning2( smr, libID, code, fmt, args ) \
+    smr_vsetReportWarning( smr, NULL, __FILL__, __LINE__, __func__, \
+        libID, code, fmt, args )
+
+#define smr_setReportError2( smr, libID, code, fmt, ... ) \
+    smr_setReportError( smr, NULL, __FILL__, __LINE__, __func__, \
+        libID, code, fmt, __VA_ARGS__ )
+
+#define smr_setReportError2p( smr, libID, code, fmt ) \
+    smr_setReportError( smr, NULL, __FILL__, __LINE__, __func__, \
+        libID, code, fmt )
+
+#define smr_vsetReportError2( smr, libID, code, fmt, args ) \
+    smr_vsetReportError( smr, NULL, __FILL__, __LINE__, __func__, \
+        libID, code, fmt, args )
+
+#define smr_setReportInfo3( smr, userInterface, libID, code, fmt, ... ) \
+    smr_setReportInfo( smr, userInterface, __FILE__, __LINE__, __func__, \
+        libID, code, fmt, __VA_ARGS__ )
+
+#define smr_setReportInfo3p( smr, userInterface, libID, code, fmt ) \
+    smr_setReportInfo( smr, userInterface, __FILE__, __LINE__, __func__, \
+        libID, code, fmt,)
+
+#define smr_vsetReportInfo3( smr, userInterface, libID, code, fmt, args ) \
+    smr_vsetReportInfo( smr, userInterface, __FILE__, __LINE__, __func__, \
+        libID, code, fmt, args )
+
+#define smr_setReportWarning3( smr, userInterface, libID, code, fmt, ... ) \
+    smr_setReportWarning( smr, userInterface, __FILE__, __LINE__, __func__, \
+        libID, code, fmt, __VA_ARGS__ )
+
+#define smr_setReportWarning3p( smr, userInterface, libID, code, fmt ) \
+    smr_setReportWarning( smr, userInterface, __FILE__, __LINE__, __func__, \
+        libID, code, fmt )
+
+#define smr_vsetReportWarning3( smr, userInterface, libID, code, fmt, args ) \
+    smr_vsetReportWarning( smr, userInterface, __FILE__, __LINE__, __func__, \
+        libID, code, fmt, args )
+
+#define smr_setReportError3( smr, userInterface, libID, code, fmt, ... ) \
+    smr_setReportError( smr, userInterface, __FILE__, __LINE__, __func__, \
+        libID, code, fmt, __VA_ARGS__ )
+
+#define smr_setReportError3p( smr, userInterface, libID, code, fmt ) \
+    smr_setReportError( smr, userInterface, __FILE__, __LINE__, __func__, \
+        libID, code, fmt )
+
+#define smr_vsetReportError3( smr, userInterface, libID, code, fmt, args ) \
+    smr_vsetReportError( smr, userInterface, __FILE__, __LINE__, __func__, \
+        libID, code, fmt, args )
+
+\end{verbatim}
+
+\end{document}

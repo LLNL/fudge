@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 import site_packages.legacy.toENDF6.endfFormats as endfFormatsModule
@@ -42,25 +66,28 @@ import site_packages.legacy.toENDF6.gndToENDF6 as gndToENDF6Module
 import fudge.gnd.productData.distributions.photonScattering as photonScatteringModule
 
 #
-# scatteringFactor.pointwise
+# scatteringFactorXYs1d.
 #
 def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
+    if( MT == 502 ) : MT = self.ancestor.ENDFMT
     Z = targetInfo['ZA'] / 1000
+
     endfInterpolation = gndToENDF6Module.gndToENDFInterpolationFlag( self.interpolation )
     data = []
     for xy in self.copyDataToXYs( xUnitTo = 'eV', yUnitTo = '' ) : data += xy
-    endfMFList[27][self.ENDFMT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'],  0, 0, 0, 0 ),
-                                    endfFormatsModule.endfContLine( 0, Z,  0, 0, 1, len( data ) / 2 ) ] + \
-                                    endfFormatsModule.endfInterpolationList( ( len( data ) / 2, endfInterpolation ) ) + \
-                                    endfFormatsModule.endfDataList( data ) + [ endfFormatsModule.endfSENDLineNumber( ) ]
+    endfMFList[27][MT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'],  0, 0, 0, 0 ),
+                           endfFormatsModule.endfContLine( 0, Z,  0, 0, 1, len( data ) / 2 ) ] + \
+                           endfFormatsModule.endfInterpolationList( ( len( data ) / 2, endfInterpolation ) ) + \
+                           endfFormatsModule.endfDataList( data ) + [ endfFormatsModule.endfSENDLineNumber( ) ]
 
-photonScatteringModule.scatteringFactor.pointwise.toENDF6 = toENDF6
+photonScatteringModule.scatteringFactor.XYs1d.toENDF6 = toENDF6
 #
-# scatteringFactor.piecewise
+# scatteringFactor.regions1d
 #
 def toENDF6( self, MT, endfMFList, flags, targetInfo, energyUnit = 'eV' ) :
 
+    if( MT == 502 ) : MT = self.ancestor.ENDFMT
     Z = targetInfo['ZA'] / 1000
 
     endfInterpolation, data = [], []
@@ -76,21 +103,21 @@ def toENDF6( self, MT, endfMFList, flags, targetInfo, energyUnit = 'eV' ) :
         for xy in regionData : data += xy
         lastX, lastY = regionData[-1]
 
-    endfMFList[27][self.ENDFMT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'],  0, 0, 0, 0 ),
-                                    endfFormatsModule.endfContLine( 0, Z,  0, 0, len( endfInterpolation ) / 2, len( data ) / 2 ) ] + \
-                                    endfFormatsModule.endfInterpolationList( endfInterpolation ) + \
-                                    endfFormatsModule.endfDataList( data ) + [ endfFormatsModule.endfSENDLineNumber( ) ]
+    endfMFList[27][MT] = [ endfFormatsModule.endfHeadLine( targetInfo['ZA'], targetInfo['mass'],  0, 0, 0, 0 ),
+                           endfFormatsModule.endfContLine( 0, Z,  0, 0, len( endfInterpolation ) / 2, len( data ) / 2 ) ] + \
+                           endfFormatsModule.endfInterpolationList( endfInterpolation ) + \
+                           endfFormatsModule.endfDataList( data ) + [ endfFormatsModule.endfSENDLineNumber( ) ]
 
-photonScatteringModule.scatteringFactor.piecewise.toENDF6 = toENDF6
+photonScatteringModule.scatteringFactor.regions1d.toENDF6 = toENDF6
 
 #
 # coherent.form
 #
 def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
-    if( self.formFactor is not None ) : self.formFactor.toENDF6( MT, endfMFList, flags, targetInfo, energyUnit = '1/Ang' )
-    if( self.anomalousScatteringFactor_realPart is not None ) : self.anomalousScatteringFactor_realPart.toENDF6( MT, endfMFList, flags, targetInfo )
-    if( self.anomalousScatteringFactor_imaginaryPart is not None ) : self.anomalousScatteringFactor_imaginaryPart.toENDF6( MT, endfMFList, flags, targetInfo )
+    if( self.formFactor is not None ) : self.formFactor.data.toENDF6( MT, endfMFList, flags, targetInfo, energyUnit = '1/Ang' )
+    if( self.anomalousScatteringFactor_realPart is not None ) : self.anomalousScatteringFactor_realPart.data.toENDF6( MT, endfMFList, flags, targetInfo )
+    if( self.anomalousScatteringFactor_imaginaryPart is not None ) : self.anomalousScatteringFactor_imaginaryPart.data.toENDF6( MT, endfMFList, flags, targetInfo )
 
 photonScatteringModule.coherent.form.toENDF6 = toENDF6
 

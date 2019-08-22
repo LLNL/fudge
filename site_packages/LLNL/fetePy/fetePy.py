@@ -1,11 +1,12 @@
 #! /usr/bin/env python
 
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -19,29 +20,53 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 import os, sys
 from argparse import ArgumentParser
 
+from xData import standards as standardsModule
 from xData import XYs as XYsModule
 
 from fudge import fudgeParameters as fudgeParametersModule
@@ -57,12 +82,16 @@ from fudge.gnd import channels as channelsModule
 from fudge.gnd import sums as sumsModule
 from fudge.gnd.reactions import production as productionModule
 from fudge.gnd.productData import multiplicity as multiplicityModule
-from fudge.gnd.productData.distributions import base as distributionBaseModule
 from fudge.gnd.productData.distributions import angular as angularModule
 from fudge.gnd.productData.distributions import energy as energyModule
 from fudge.gnd.productData.distributions import uncorrelated as uncorrelatedModule
+from fudge.gnd.productData.distributions import unspecified as unspecifiedModule
 
 from fudge.core.utilities import brb
+
+outputDefault = 'ascii'
+EMaxDefault = 20
+temperatureDefault = 2.58522e-08
 
 energyEps = 1e-6
 eV2MeV = 1e-6
@@ -85,8 +114,8 @@ parser.add_argument( '-e', '--ENDF', default = False, action = 'store_true',
         help = '''Write the original ENDF file to the target's directory.''' )
 parser.add_argument( '-g', '--GND', default = False, action = 'store_true',
         help = '''Write an GND/XML file representing the ENDF file to the target's directory.''' )
-parser.add_argument( '-o', '--output', type = str, default = 'ascii', action = 'store',
-        help = '''Write the target's files (i.e., (yi0?/za??????/*) to the specified directory.''' )
+parser.add_argument( '-o', '--output', type = str, default = outputDefault, action = 'store',
+        help = '''Write the target's files (i.e., (yi0?/za??????/*) to the specified directory. Default = "%s".''' % outputDefault )
 parser.add_argument( '-s', '--skipBadData', default = False, action = 'store_true',
         help = 'Skips format errors if possible when translating the ENDF file to GND.' )
 parser.add_argument( '--MT2Skip', type = int, action = 'append',
@@ -95,13 +124,14 @@ parser.add_argument( '-c', '--continuumSpectraFix', action = 'store_true',
         help = 'When translating from ENDF to GND, set the "continuumSpectraFix" flag to True.' )
 parser.add_argument( '-b', '--bdfls', action = 'store', default = None,
         help = 'The next argument specifies the bdfls file to use.' )
-parser.add_argument( '-t', '--temperature', action = 'store', type = float, default = 2.58522e-08,
-        help = 'Only data for gammas with non-zero multiplicity below EMax are written to an ENDL file.' )
-parser.add_argument( '--EMax', action = 'store', type = float, default = 20,
-        help = 'Only data for gammas with non-zero multiplicity below EMax are written to an ENDL file.' )
+parser.add_argument( '-t', '--temperature', action = 'store', type = float, default = temperatureDefault,
+        help = 'Sets the temperature in each ENDL dataset to temperature. Default = %s.' % temperatureDefault )
+parser.add_argument( '--EMax', action = 'store', type = float, default = EMaxDefault,
+        help = 'Only data for gammas with non-zero multiplicity below EMax are written to an ENDL file. Default = %s.' % EMaxDefault )
 parser.add_argument( '-f', '--fraction', action = 'store', type = float, default = fractionDefault,
         help = 'If at incident energy E_i the total multiplicity is zero, all gamma multiplcities are evaluated E_i + dE' +
-                ' where dE = faction * DE. DE is either ( E_{i+1} - E_i ) or if that multiplicity is also zero, it is ( E_i - E_{i-1} ).' )
+                ' where dE = faction * DE. DE is either ( E_{i+1} - E_i ) or if that multiplicity is also zero, it is ( E_i - E_{i-1} ).' +
+                ' Default = %s.' % fractionDefault )
 parser.add_argument( '-v', '--verbose', default = 0, action = 'count',
         help = 'Enable verbose output.' )
 
@@ -116,8 +146,8 @@ if( bdflsFile is None ) :
 if( bdflsFile is not None ) : bdflsFile = bdflsModule.bdfls( template = bdflsFile )
 
 rce = endfFileToGNDModule.endfFileToGND( args.inputFile, singleMTOnly = args.MT, MTs2Skip = args.MT2Skip, 
-        toStdOut = args.verbose > 2, skipBadData = args.skipBadData, doCovariances = False, 
-        deprecatedOptions = { 'ignoreBadNK14' : True, 'continuumSpectraFix' : args.continuumSpectraFix } )
+        toStdOut = args.verbose > 2, skipBadData = args.skipBadData, doCovariances = False, verbose = 0,
+        printBadNK14 = False, continuumSpectraFix = args.continuumSpectraFix )
 reactionSuite = rce['reactionSuite']
 
 Z, A, suffix, ZA = reactionSuite.target.getZ_A_SuffixAndZA( )
@@ -134,7 +164,6 @@ os.system( 'rm -rf %s/*' % endlZA.workDir )
 
 if( args.ENDF ) : os.system( 'cp %s %s' % ( args.inputFile, workDir ) )
 if( args.GND ) : reactionSuite.saveToFile( os.path.join( workDir, 'gnd.xml' ) )
-
 
 def getMultiplicityForDistributionSum( self, energy, energies, numberOfGammas, zeroTotal ) :
 
@@ -224,7 +253,7 @@ class continuumGammaIsotropic :
                 for region in energyForm :
                     if( energy_eV < region.domainMax( ) ) : break
                 energyForm = region
-            energyForm = energyForm.evaluate( energy_eV, unitBase = True, epsilon = 3 * energyEps )
+            energyForm = energyForm.evaluate( energy_eV, epsilon = 3 * energyEps )
             energyForm = energyForm.toPointwise_withLinearXYs( accuracy = 1e-4, lowerEps = energyEps, upperEps = energyEps )
             lowerEps = energyEps
             if( energyForm.domainMin( ) == 0 ) : lowerEps = 0
@@ -238,44 +267,58 @@ class continuumGammaIsotropic :
 
 def processGamma( gamma, gammas, crossSection ) :
 
-    distribution = gamma.distributions[style]
-    if( isinstance( distribution, distributionBaseModule.unspecifiedComponent ) ) :
+    distribution = gamma.distribution[style]
+    if( isinstance( distribution, unspecifiedModule.form ) ) :
         if( args.verbose > 1 ) : print '            No distribution data'
         return
 
+    MF13 = False
+    if( 'ENDFconversionFlag' in gamma.attributes ) : MF13 = gamma.attributes['ENDFconversionFlag'] == 'MF13'
     multiplicity = gamma.multiplicity[style]
     if(   isinstance( multiplicity, ( multiplicityModule.constant ) ) ) :
         domainMin, domainMax = multiplicity.domain( )
         multiplicity = XYsModule.XYs( [ [ float( domainMin ), multiplicity.value ], [ float( domainMax ), multiplicity.value ] ],
                 axes = XYsModule.XYs.defaultAxes( labelsUnits = { 1 : ( 'energy_in', 'eV' ) } ) )
     elif( isinstance( multiplicity, ( multiplicityModule.pointwise, multiplicityModule.piecewise ) ) ) :
-        multiplicity = multiplicity.toPointwise_withLinearXYs( lowerEps = energyEps, upperEps = energyEps )
+        if( isinstance( multiplicity, multiplicityModule.piecewise ) and MF13 ) :
+            for region in multiplicity :
+                if( region.interpolation == standardsModule.interpolation.flatToken ) :
+                    print '    WARNING: This may need to be fixed.'
+        if( MF13 and isinstance( multiplicity, multiplicityModule.pointwise ) ) :
+            pass
+        else :
+            multiplicity = multiplicity.toPointwise_withLinearXYs( lowerEps = energyEps, upperEps = energyEps )
     else :
         raise Exception( 'Unsupported multiplicity form "%s"' % multiplicity.moniker )
     multiplicity = multiplicity.convertAxisToUnit( 1, 'MeV' )
     multiplicity = multiplicity.domainSlice( domainMax = args.EMax )
-    if( len( multiplicity ) < 2 ) :
+    if( ( len( multiplicity ) < 2 ) or ( multiplicity.rangeMax( ) == 0 ) ) :
         print '''INFO: not writing reaction's gamma data as gamma multiplicity is 0. below EMax = %s''' % args.EMax
         return
 
     if( crossSection is not None ) :
-        crossSection = crossSection.domainSlice( domainMax = args.EMax )
-        crossSection.setInfill( False )
-        multiplicity.setInfill( False )
-        try :
-            multiplicity = multiplicity * crossSection
-        except :
-            print 'multiplicity'
-            print multiplicity.toString( )
-            print 'crossSection'
-            print crossSection.toString( )
-            print multiplicity.domain( ), crossSection.domain( )
-            raise
-        multiplicity = multiplicity.trim( )
+        if( MF13 ) :
+            values = [ [ E1, m1 * crossSection.evaluate( E1 ) ] for E1, m1 in multiplicity ]
+            multiplicity = XYsModule.XYs( values, axes = multiplicity.axes, interpolation = multiplicity.interpolation )
+            multiplicity = multiplicity.toPointwise_withLinearXYs( lowerEps = energyEps, upperEps = energyEps )
+        else :
+            crossSection = crossSection.domainSlice( domainMax = args.EMax )
+            crossSection.setInfill( False )
+            multiplicity.setInfill( False )
+            try :
+                multiplicity = multiplicity * crossSection
+            except :
+                print 'multiplicity'
+                print multiplicity.toString( )
+                print 'crossSection'
+                print crossSection.toString( )
+                print multiplicity.domain( ), crossSection.domain( )
+                raise
+            multiplicity = multiplicity.trim( )
 
-    if( isinstance( distribution, uncorrelatedModule.component ) ) :
-        angularForm = distribution.angularForm
-        energyForm = distribution.energyForm
+    if( isinstance( distribution, uncorrelatedModule.form ) ) :
+        angularForm = distribution.angularSubform.data
+        energyForm = distribution.energySubform.data
         if( isinstance( angularForm, angularModule.pointwise ) ) :
             if( not( angularForm.isIsotropic( ) ) ) : print 'WARNING: treating angular pointwise as isotropic'
             isIsotropic = True
@@ -306,21 +349,21 @@ def processChannel( channel, gammas, branchingGammas, crossSection = None ) :
         if( product.name in branchingGammas ) : gammas['branchingGammas'].append( ( product.name, branchingGammas[product.name] ) )
         if( isinstance( product.particle, xParticleModule.photon ) ) :
             energy = ''
-            distribution = product.distributions[style]
-            if( isinstance( distribution, uncorrelatedModule.component ) ) :
-                energyForm = distribution.energyForm
+            distribution = product.distribution[style]
+            if( isinstance( distribution, uncorrelatedModule.form ) ) :
+                energyForm = distribution.energySubform.data
                 if( isinstance( energyForm, energyModule.primaryGamma ) ) :
                     energy = ": primary energy = %s" % energyForm.value.getValueAs( 'MeV' )
                 elif( isinstance( energyForm, energyModule.constant ) ) :
                     energy = ": discrete energy = %s" % energyForm.value.getValueAs( 'MeV' )
             if( args.verbose > 1 ) : print '        %-40s: %-12s%s' % ( product, product.label, energy )
-            if( channel.genre == channelsModule.twoBodyGenre ) :
+            if( isinstance( channel, channelsModule.twoBodyOutputChannel ) ) :
                 print 'WARNING: skipping two body gamma'
             else :
                 processGamma( product, gammas, crossSection )
                 numberOfGammasProcessed += 1
-        if( product.decayChannel is not None ) :
-            numberOfGammasProcessed += processChannel( product.decayChannel, gammas, branchingGammas, crossSection = crossSection )
+        if( product.outputChannel is not None ) :
+            numberOfGammasProcessed += processChannel( product.outputChannel, gammas, branchingGammas, crossSection = crossSection )
     return( numberOfGammasProcessed )
 
 def getDiscretePrimaryMultiplicity( gammas, multiplicity, gammaList ) :

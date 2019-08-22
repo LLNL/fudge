@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,59 +18,81 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 import base as baseModule
 
 __metaclass__ = type
 
-from pqu import PQU
-from standards import types
+try :
+    from numericalFunctions import pointwiseXY_C as pointwiseXY_CModule
+    floatToShortestString = pointwiseXY_CModule.floatToShortestString
+except :
+    from pqu import PQU as PQUModule
+    floatToShortestString = PQUModule.floatToShortestString
+
+from . import standards as standardsModule
 
 class values( baseModule.xDataCoreMembers )  :
 
     moniker = 'values'
 
-    def __init__( self, values_, valueType = types.float64Token, sep = ' ', start = 0, size = None,
+    def __init__( self, _values, valueType = standardsModule.types.float64Token, sep = ' ', start = 0, size = None,
                 index = None, label = None ) :
 
         baseModule.xDataCoreMembers.__init__( self, self.moniker, index = index, label = label )
 
-        if( valueType == types.float64Token ) :
-            checker = float
-        elif( valueType == types.float32Token ) :
-            checker = float
-        elif( valueType == types.integer32Token ) :
-            checker = int
-        else :
+        if( valueType not in ( standardsModule.types.float64Token, standardsModule.types.float32Token,
+                standardsModule.types.integer32Token ) ) :
             raise TypeError( 'Invalid valueType = "%s"' % valueType )
-
-        self.__values = [ checker( value ) for value in values_ ]
         self.__valueType = valueType 
 
         if( not( isinstance( sep, str ) ) or ( len( sep ) != 1 ) ) : raise TypeError( 'sep must be a string of length 1: sep = "%s"' % sep )
         self.__sep = sep
 
         self.__start = int( start )
-        length = len( values_ )
+        length = len( _values )
         if( size is not None ) :
             size = int( size )
             if( size < ( self.__start + length ) ) : raise ValueError( 'size = %d < start + length = %d' % 
@@ -77,6 +100,8 @@ class values( baseModule.xDataCoreMembers )  :
             self.__size = size
         else :
             self.__size = self.__start + length
+
+        self.__values = _values
 
     def __len__( self ) :
 
@@ -90,9 +115,9 @@ class values( baseModule.xDataCoreMembers )  :
 
         if( label is None ) : label = self.label
         if( ( untrimZeros ) and ( ( self.start != 0 ) or ( self.end != self.size ) ) ) :
-            return( values( self.start * [ 0 ] + self.__values + ( self.size - self.end ) * [ 0 ], self.__valueType, sep = self.__sep, label = label ) )
+            return( values( self.start * [ 0 ] + self.__values + ( self.size - self.end ) * [ 0 ], self.valueType, sep = self.__sep, label = label ) )
         else :
-            return( values( self.__values, self.__valueType, sep = self.sep, start = self.start, size = self.size, label = label ) )
+            return( values( self.__values, self.valueType, sep = self.sep, start = self.start, size = self.size, label = label ) )
 
     __copy__ = copy
     __deepcopy__ = __copy__
@@ -118,6 +143,23 @@ class values( baseModule.xDataCoreMembers )  :
         return( self.__start )
 
     @property
+    def values( self ) :
+
+        return( self.__values )
+
+    @values.setter
+    def values( self, _values ) :
+
+        if( self.valueType == standardsModule.types.float64Token ) :
+            checker = float
+        elif( self.valueType == standardsModule.types.float32Token ) :
+            checker = float
+        else :
+            checker = int
+
+        self.__values = [ checker( value ) for value in _values ]
+
+    @property
     def valueType( self ) :
 
         return( self.__valueType )
@@ -135,7 +177,8 @@ class values( baseModule.xDataCoreMembers )  :
 
         indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
         valuesPerLine = kwargs.get( 'valuesPerLine', 100 )
-        valueFormatter = kwargs.get( 'valueFormatter', PQU.toShortestString )
+        valueFormatter = kwargs.get( 'valueFormatter', floatToShortestString )
+        significantDigits = kwargs.get( 'significantDigits', 15 )
         sep = kwargs.get( 'sep', None )
         outline = kwargs.get( 'outline', False )
         if( len( self ) < 14 ) : outline = False
@@ -145,7 +188,6 @@ class values( baseModule.xDataCoreMembers )  :
         strList, line = [], None
         attributeStr = ''
 
-        length = len( self )
         if( self.start != 0 ) : attributeStr += ' start="%d"' % self.start
         if( self.end != self.size ) : attributeStr += ' size="%d"' % self.size
 
@@ -154,22 +196,27 @@ class values( baseModule.xDataCoreMembers )  :
         if( sep != ' ' ) :
             attributeStr += ' sep = "%s"' % sep
             sep += ' '
-        if( self.__valueType != types.float64Token ) : attributeStr += ' valueType="%s"' % self.__valueType
+        if( self.valueType != standardsModule.types.float64Token ) : attributeStr += ' valueType="%s"' % self.valueType
         attributeStr += baseModule.xDataCoreMembers.attributesToXMLAttributeStr( self )
         XMLList = [ '%s<%s length="%d"%s>' % ( indent, self.moniker, len( self.__values ), attributeStr ) ]
         if( outline ) :                     # Logic above guarantees more than 14 elements in self.
             line = []
-            for i1 in range( 6 ) : line.append( valueFormatter( self[i1] ) )
+            for i1 in range( 6 ) : line.append( valueFormatter( self[i1], significantDigits = significantDigits ) )
             line.append( ' ... ' )
-            for i1 in range( -6, 0 ) : line.append( valueFormatter( self[i1] ) )
+            for i1 in range( -6, 0 ) : line.append( valueFormatter( self[i1], significantDigits = significantDigits ) )
             strList.append( sep.join( line ) )
         else :
-            for index, value in enumerate( self.__values ) :
-                if( ( index % valuesPerLine ) == 0 ) :
-                    if( line is not None ) : strList.append( sep.join( line ) )
-                    line = []
-                line.append( valueFormatter( value ) )
-            if( ( line is not None ) and ( len( line ) > 0 ) ) : strList.append( sep.join( line ) )
+            dataToString = kwargs.get( 'dataToString', None )
+            if( dataToString is None ) :
+                for index, value in enumerate( self.__values ) :
+                    if( ( index % valuesPerLine ) == 0 ) :
+                        if( line is not None ) : strList.append( sep.join( line ) )
+                        line = []
+                    line.append( valueFormatter( value, significantDigits = significantDigits ) )
+                if( ( line is not None ) and ( len( line ) > 0 ) ) : strList.append( sep.join( line ) )
+            else :
+                kwargs['valueFormatter'] = valueFormatter
+                XMLList += kwargs['dataToString']( self, kwargs['dataToStringParent'], indent = indent2, **kwargs )
         if( len( strList ) > 0 ) : XMLList[-1] += strList.pop( 0 )
 
         for line in strList : XMLList.append( "%s%s" % ( indent2, line ) )
@@ -177,19 +224,19 @@ class values( baseModule.xDataCoreMembers )  :
         return( XMLList )
 
     @staticmethod
-    def parseXMLNode( element, xPath = [] ) :
+    def parseXMLNode( element, xPath, linkData ) :
 
         from numericalFunctions import listOfDoubles_C
 
-        attrs = { 'sep' : ' ', 'valueType' : types.float64Token, 'start' : 0, 'size' : None, 'label' : None }
+        attrs = { 'sep' : ' ', 'valueType' : standardsModule.types.float64Token, 'start' : 0, 'size' : None, 'label' : None }
         attributes = { 'length' : int, 'sep' : str, 'valueType' : str, 'start' : int, 'size' : int, 'label' : str }
         for key, item in element.items( ) :
             if( key not in attributes ) : raise TypeError( 'Invalid attribute "%s"' % key )
             attrs[key] = attributes[key]( item )
 
         if( element.text is None ) : element.text = ''
-# BRB: Need to check extraCharaters
-        values1, extraCharaters = listOfDoubles_C.createFromString( element.text, sep = attrs['sep'] )
+# BRB: Need to check extraCharacters
+        values1, extraCharacters = listOfDoubles_C.createFromString( element.text, sep = attrs['sep'] )
         length = attrs.pop( 'length', len( values1 ) )
         if( length != len( values1 ) ) : raise Exception( 'length = %d != len( values1 ) = %d' % ( length, len( values1 ) ) )
 
@@ -198,24 +245,24 @@ class values( baseModule.xDataCoreMembers )  :
         return( values( values1, **attrs ) )
 
     @staticmethod
-    def parseXMLString( cls, XMLString ) :
+    def parseXMLString( XMLString ) :
 
         from xml.etree import cElementTree
 
-        return( values.parseXMLNode( cElementTree.fromstring( XMLString ) ) )
+        return( values.parseXMLNode( cElementTree.fromstring( XMLString ), xPath=[], linkData={} ) )
 
     @staticmethod
-    def valuesWithTrimmedZeros( values_, valueType = types.float64Token, sep = ' ' ) :
+    def valuesWithTrimmedZeros( _values, valueType = standardsModule.types.float64Token, sep = ' ' ) :
 
-        length = len( values_ )
+        length = len( _values )
         start, end = 0, length - 1
         while( end >= start ) :
-            if( values_[end] != 0 ) : break
+            if( _values[end] != 0 ) : break
             end -= 1
         end += 1
         if( end != 0 ) :
-            for value in values_ :
+            for value in _values :
                 if( value != 0 ) : break
                 start += 1
-        if( ( start != 0 ) or ( end != length ) ) : values_ = values_[start:end]
-        return( values( values_, valueType = valueType, sep = sep, start = start, size = length ) )
+        if( ( start != 0 ) or ( end != length ) ) : _values = _values[start:end]
+        return( values( _values, valueType = valueType, sep = sep, start = start, size = length ) )

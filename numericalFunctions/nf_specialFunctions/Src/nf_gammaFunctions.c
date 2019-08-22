@@ -89,12 +89,12 @@ static double SQTPI = 2.50662827463100050242E0;
 static double STIR[5] = { 7.873113957930936284e-4, -2.2954996161337812638e-4, -2.6813261780578123283e-3, 3.472222216054586673e-3, 8.3333333333348225713e-2 };
 #define MAXSTIR 143.01608
 
-static double stirf( double x, nfu_status *status );
-static double lgam( double x, int *sgngam, nfu_status *status );
+static double stirf( double x );
+static double lgam( double x, int *sgngam );
 /*
 ************************************************************
 */
-static double stirf( double x, nfu_status *status ) {
+static double stirf( double x ) {
 /* Gamma function computed by Stirling's formula. The polynomial STIR is valid for 33 <= x <= 172.  */
 
     double y, w, v;
@@ -114,14 +114,18 @@ static double stirf( double x, nfu_status *status ) {
 /*
 ************************************************************
 */
-double nf_gammaFunction( double x, nfu_status *status ) {
+nfu_status nf_gammaFunction( statusMessageReporting *smr, double x, double *value ) {
 
     double p, q, z;
     int i, sgngam = 1;
 
-    *status = nfu_badInput;
-    if( !isfinite( x ) ) return( x );
-    *status = nfu_Okay;
+    *value = 0.;
+
+    if( !isfinite( x ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badInput, "Invalid input (x = %e).", x );
+        return( nfu_badInput );
+    }
+
 
     q = fabs( x );
 
@@ -138,12 +142,13 @@ double nf_gammaFunction( double x, nfu_status *status ) {
             }
             z = q * sin( M_PI * z );
             if( z == 0.0 ) goto goverf;
-            z = M_PI / ( fabs( z ) * stirf( q, status ) );
+            z = M_PI / ( fabs( z ) * stirf( q ) );
         }
         else {
-            z = stirf( x, status );
+            z = stirf( x );
         }
-        return( sgngam * z );
+        *value = sgngam * z;
+        return( nfu_Okay );
     }
 
     z = 1.0;
@@ -164,19 +169,25 @@ double nf_gammaFunction( double x, nfu_status *status ) {
         x += 1.0;
     }
 
-    if( x == 2.0 ) return( z );
+    if( x == 2.0 ) {
+        *value = z;
+        return( nfu_Okay );
+    }
 
     x -= 2.0;
     p = nf_polevl( x, P, 6 );
     q = nf_polevl( x, Q, 7 );
-    return( z * p / q );
+    *value = z * p / q;
+    return( nfu_Okay );
 
 small:
     if( x == 0.0 ) goto goverf;
-    return( z / ( ( 1.0 + 0.5772156649015329 * x ) * x ) );
+    *value = z / ( ( 1.0 + 0.5772156649015329 * x ) * x );
+    return( nfu_Okay );
 
 goverf:
-    return( sgngam * DBL_MAX );
+    *value = sgngam * DBL_MAX;
+    return( nfu_Okay );
 }
 
 /* A[]: Stirling's formula expansion of log gamma
@@ -194,20 +205,23 @@ static double LS2PI  =  0.91893853320467274178;     /* log( sqrt( 2*pi ) ) */
 /*
 ************************************************************
 */
-double nf_logGammaFunction( double x, nfu_status *status ) {
+nfu_status nf_logGammaFunction( statusMessageReporting *smr, double x, double *value ) {
 /* Logarithm of gamma function */
 
     int sgngam;
 
-    *status = nfu_badInput;
-    if( !isfinite( x ) ) return( x );
-    *status = nfu_Okay;
-    return( lgam( x, &sgngam, status ) );
+    if( !isfinite( x ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badInput, "Invalid input (x = %e).", x );
+        return( nfu_badInput );
+    }
+
+    *value = lgam( x, &sgngam );
+    return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-static double lgam( double x, int *sgngam, nfu_status *status ) {
+static double lgam( double x, int *sgngam ) {
 
     double p, q, u, w, z;
     int i;
@@ -216,7 +230,7 @@ static double lgam( double x, int *sgngam, nfu_status *status ) {
 
     if( x < -34.0 ) {
         q = -x;
-        w = lgam( q, sgngam, status );                  /* note this modifies *sgngam! */
+        w = lgam( q, sgngam );                  /* note this modifies *sgngam! */
         p = floor( q );
         if( p == q ) goto lgsing;
         i = (int) p;

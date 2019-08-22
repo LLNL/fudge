@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,27 +18,50 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
-""" energy/angular double differential distribution classes """
+"""Energy/angular double differential distribution classes."""
 
 import math
 import base, miscellaneous
@@ -48,9 +72,9 @@ from pqu import PQU
 
 import xData.base as xDataBaseModule
 import xData.axes as axesModule
-import xData.XYs as XYsModule
 import xData.standards as standardsModule
 import xData.series1d as series1dModule
+import xData.XYs as XYsModule
 import xData.multiD_XYs as multiD_XYsModule
 import xData.regions as regionsModule
 
@@ -61,99 +85,104 @@ from . import base as baseModule
 
 __metaclass__ = type
 
-class pdfOfMu :             # FIXME: BRB, Should this class inherit from angular.pdfOfMu?
+class XYs1d( XYsModule.XYs1d ) :    # FIXME: BRB, Should this class inherit from angular.XYs1d?
 
-    class pointwise( XYsModule.XYs ) :
+    def averageMu( self ) :
 
-        def averageMu( self ) :
+        allowedInterpolations = [ standardsModule.interpolation.linlinToken,
+                                  standardsModule.interpolation.flatToken ]
+        xys = self.changeInterpolationIfNeeded( allowedInterpolations = allowedInterpolations )
+        return( xys.integrateWithWeight_x( ) )
 
-            allowedInterpolations = [ standardsModule.interpolation.linlinToken,
-                                      standardsModule.interpolation.flatToken ]
-            xys = self.changeInterpolationIfNeeded( allowedInterpolations = allowedInterpolations )
-            return( xys.integrateWithWeight_x( ) )
+class Legendre( series1dModule.LegendreSeries ) :
 
-    class Legendre( series1dModule.LegendreSeries ) :
+    def averageMu( self ) :
 
-        def averageMu( self ) :
+        return( self.getCoefficientSafely( 1 ) )
 
-            return( self.getCoefficientSafely( 1 ) )
+    def integrate( self ) :
 
-        def integrate( self ) :
+        return( self.getCoefficientSafely( 0 ) )
 
-            return( self.getCoefficientSafely( 0 ) )
+class XYs2d( multiD_XYsModule.XYs2d ) :
 
-class pdfOfEpAndMu :
+    def averageEnergy( self ) :
 
-    class pointwise( multiD_XYsModule.multiD_XYs ) :
+        integralOfMu = [ [ pdfOfMuAtEp.value, pdfOfMuAtEp.integrate( ) ] for pdfOfMuAtEp in self ]
+        return( float( XYsModule.XYs1d( integralOfMu, interpolation = self.interpolation ).integrateWithWeight_x( ) ) )
 
-        def averageEnergy( self ) :
+    def averageForwardMomentum( self, sqrt_2_ProductMass ) :
 
-            integralOfMu = [ [ pdfOfMuAtEp.value, pdfOfMuAtEp.integrate( ) ] for pdfOfMuAtEp in self ]
-            return( float( XYsModule.XYs( integralOfMu, interpolation = self.interpolation ).integrateWithWeight_x( ) ) )
+        averageMu = [ [ pdfOfMuAtEp.value, pdfOfMuAtEp.averageMu( ) ] for pdfOfMuAtEp in self ]
+        return( sqrt_2_ProductMass * float( XYsModule.XYs1d( averageMu, interpolation = self.interpolation ).integrateWithWeight_sqrt_x( ) ) )
 
-        def averageMomentum( self ) :
+    @staticmethod
+    def allowedSubElements( ) :
 
-            integralOfMu = [ [ pdfOfMuAtEp.value, pdfOfMuAtEp.integrate( ) ] for pdfOfMuAtEp in self ]
-            return( float( XYsModule.XYs( integralOfMu, interpolation = self.interpolation ).integrateWithWeight_sqrt_x( ) ) )
-
-        @staticmethod
-        def allowedSubElements( ) :
-
-            return( ( pdfOfMu.pointwise, pdfOfMu.Legendre ) )
+        return( ( XYs1d, Legendre ) )
 
 class subform( baseModule.subform ) :
     """Abstract base class for energyAngular subforms."""
 
     pass
 
-class pointwise( subform, multiD_XYsModule.multiD_XYs ) :
+class XYs3d( subform, multiD_XYsModule.XYs3d ) :
 
     def __init__( self, **kwargs ) :
 
-        if( 'dimension' not in kwargs ) : kwargs['dimension'] = 3
-        if( kwargs['dimension'] != 3 ) : raise ValueError( 'Dimension = %s != 3' % ( kwargs['dimension'] ) )
-        multiD_XYsModule.multiD_XYs.__init__( self, **kwargs )
+        multiD_XYsModule.XYs3d.__init__( self, **kwargs )
         subform.__init__( self )
 
-    def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
+    def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
-        if( self.productFrame != standardsModule.frames.labToken ) :
-            root = self.getRootAncestor( )
-            f = open( 'energyAngular.COM', 'a' )
-            f.write( '%s\n' % root.inputParticlesToReactionString( ) )
-            f.close( )
-            return( [] )
-
-        energyUnit = tempInfo['incidentEnergyUnit']
+        verbosity = kwargs.get( 'verbosity', 0 )
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        energyUnit = kwargs['incidentEnergyUnit']
         momentumDepositionUnit = energyUnit + '/c'
         massUnit = energyUnit + '/c**2'
-        energyAccuracy, momentumAccuracy = processInfo.energyAccuracy, processInfo.momentumAccuracy
-        multiplicity = tempInfo['multiplicity']
-        productMass = tempInfo['product'].getMass( massUnit )
+        multiplicity = kwargs['multiplicity']
+        reactionSuite = kwargs['reactionSuite']
+        projectileMass = reactionSuite.projectile.getMass( massUnit )
+        targetMass = reactionSuite.target.getMass( massUnit )
+        productMass = kwargs['product'].getMass( massUnit )
+        energyAccuracy = kwargs['energyAccuracy']
+        momentumAccuracy = kwargs['momentumAccuracy']
+        productFrame = kwargs['productFrame']
 
-        depEnergy = []
+        sqrt_2_ProductMass = math.sqrt( 2 * productMass )
+#
+# FIXME, still need to fill in between energy points.
+#
+        aveEnergy = []
+        aveMomentum = []
+        if( productFrame == standardsModule.frames.labToken ) :
+            for pdfOfEpMuAtE in self :
+                energy = pdfOfEpMuAtE.value
+                aveEnergy.append( [ energy, multiplicity.getValue( energy ) * pdfOfEpMuAtE.averageEnergy( ) ] )
 
-        for pdfOfEpMuAtE in self :
-            energy = pdfOfEpMuAtE.value
-            depEnergy.append( [ energy, multiplicity.getValue( energy ) * pdfOfEpMuAtE.averageEnergy( ) ] )
-        axes = energyDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit, 
-                energyDepositionUnit = energyUnit )
-        depEnergy = energyDepositionModule.pointwise( data = depEnergy, axes = axes,
-                label = processInfo.style.label, accuracy = energyAccuracy )
+            for pdfOfEpMuAtE in self :
+                energy = pdfOfEpMuAtE.value
+                momemtum = multiplicity.getValue( energy ) * pdfOfEpMuAtE.averageForwardMomentum( sqrt_2_ProductMass )
+                if( momemtum < 1e-12 ) : momemtum = 0.          # This should be less arbitrary????????
+                aveMomentum.append( [ energy, momemtum ] )
 
-        const = math.sqrt( 2. * productMass )
-        depMomentum = []
-        for pdfOfEpMuAtE in self :
-            energy = pdfOfEpMuAtE.value
-            momemtum = const * multiplicity.getValue( energy ) * pdfOfEpMuAtE.averageMomentum( )
-            if( momemtum < 1e-12 ) : momemtum = 0.          # This should be less arbitrary????????
-            depMomentum.append( [ energy, momemtum ] )
-        axes = momentumDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit, 
-                momentumDepositionUnit = momentumDepositionUnit )
-        depMomentum = momentumDepositionModule.pointwise( data = depMomentum, axes = axes,
-                label = processInfo.style.label, accuracy = momentumAccuracy )
+        else :                              # Center-of-mass.
+            const1 = math.sqrt( 2 * projectileMass ) / ( projectileMass + targetMass )
+            for pdfOfEpMuAtE in self :
+                energy = pdfOfEpMuAtE.value
+                vCOM = const1 * math.sqrt( energy )
+                EpCOM = pdfOfEpMuAtE.averageEnergy( )
+                ppCOM = pdfOfEpMuAtE.averageForwardMomentum( sqrt_2_ProductMass )
+                productLabEnergy = 0.5 * productMass * vCOM * vCOM + EpCOM + vCOM * ppCOM
+                aveEnergy.append( [ energy, multiplicity.getValue( energy ) * productLabEnergy ] )
 
-        return( [ depEnergy, depMomentum ] )
+            for pdfOfEpMuAtE in self :
+                energy = pdfOfEpMuAtE.value
+                vCOM = const1 * math.sqrt( energy )
+                productLabForwardMomentum = productMass * vCOM + pdfOfEpMuAtE.averageForwardMomentum( sqrt_2_ProductMass )
+                aveMomentum.append( [ energy, multiplicity.getValue( energy ) * productLabForwardMomentum ] )
+
+        return( [ aveEnergy ], [ aveMomentum ] )
 
     def check( self, info ) :
         from fudge.gnd import warning
@@ -164,7 +193,7 @@ class pointwise( subform, multiD_XYsModule.multiD_XYs ) :
         axes[1] = self.axes[-1]
 
         for index, energy_in in enumerate(self):
-            integral = float( XYsModule.XYs( [ ( eout.value, eout.coefficients[0] ) for eout in energy_in ],
+            integral = float( XYsModule.XYs1d( [ ( eout.value, eout.coefficients[0] ) for eout in energy_in ],
                     axes = axes, accuracy = 0.001 ).integrate( ) )
             if abs(integral-1.0) > info['normTolerance']:
                 warnings.append( warning.unnormalizedDistribution( PQU.PQU(energy_in.value,axes[0].unit),
@@ -192,14 +221,28 @@ class pointwise( subform, multiD_XYsModule.multiD_XYs ) :
             for muEpPs in E_MuEpPs : muEpPs.setData( muEpPs / sum )
         return( n )
 
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
+
+        from fudge.processing import group as groupModule
+        from fudge.processing.deterministic import transferMatrices as transferMatricesModule
+
+        verbosity = tempInfo['verbosity']
+        productFrame = tempInfo['productFrame']
+
+        if( verbosity > 2 ) : print '%sGrouping %s' % ( indent, self.moniker )
+        TM_1, TM_E = transferMatricesModule.EEpMuP_TransferMatrix( style, tempInfo, productFrame, tempInfo['crossSection'], self,
+            tempInfo['multiplicity'], comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
+
+        return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
+
     def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
-        return( multiD_XYsModule.multiD_XYs.toPointwise_withLinearXYs( self, accuracy, lowerEps = lowerEps, upperEps = upperEps, cls = pointwise ) )
+        return( multiD_XYsModule.XYs3d.toPointwise_withLinearXYs( self, accuracy, lowerEps = lowerEps, upperEps = upperEps, cls = XYs3d ) )
 
     @staticmethod
     def allowedSubElements( ) :
 
-        return( ( pdfOfEpAndMu.pointwise, ) )
+        return( ( XYs2d, ) )
 
     @staticmethod
     def defaultAxes( energyUnit = 'eV', energy_outUnit = 'eV', probabilityUnit = '1/eV' ) :
@@ -211,16 +254,14 @@ class pointwise( subform, multiD_XYsModule.multiD_XYs ) :
         axes[3] = axesModule.axis( 'energy_in', 3, energyUnit )
         return( axes )
 
-class piecewise( subform, regionsModule.regions ) :
+class regions3d( subform, regionsModule.regions3d ) :
 
     def __init__( self, **kwargs ) :
 
-        if( 'dimension' not in kwargs ) : kwargs['dimension'] = 3
-        if( kwargs['dimension'] != 3 ) : raise ValueError( 'Dimension = %s != 3' % ( kwargs['dimension'] ) )
-        regionsModule.regions.__init__( self, **kwargs )
+        regionsModule.regions3d.__init__( self, **kwargs )
         subform.__init__( self )
 
-    def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
+    def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
         raise Exception( 'Not implemented' )
 
@@ -242,7 +283,7 @@ class piecewise( subform, regionsModule.regions ) :
     @staticmethod
     def allowedSubElements( ) :
 
-        return( ( pointwise, ) )
+        return( ( XYs3d, ) )
 
 class form( baseModule.form ) :
 
@@ -255,22 +296,24 @@ class form( baseModule.form ) :
         if( makeCopy ) : energyAngularSubform = energyAngularSubform.copy( )
         baseModule.form.__init__( self, label, productFrame, ( energyAngularSubform, ) )
 
-    def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
+    def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
-        return( self.energyAngularSubform.calculateDepositionData( processInfo, tempInfo, verbosityIndent ) )
+        kwargs['productFrame'] = self.productFrame
+        return( self.energyAngularSubform.calculateAverageProductData( style, indent = indent, **kwargs ) )
 
-    def process( self, processInfo, tempInfo, verbosityIndent ) :
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
 
-        return( self.energyAngularSubform.process( processInfo, tempInfo, verbosityIndent ) )
+        tempInfo['productFrame'] = self.productFrame
+        return( self.energyAngularSubform.processSnMultiGroup( style, tempInfo, indent ) )
 
     @staticmethod
     def parseXMLNode( element, xPath, linkData ):
-        """ translate <energyAngular> element from xml """
+        """Translate <energyAngular> element from xml."""
 
         xPath.append( element.tag )
         subformElement = element[0]
         subformClass = {
-                pointwise.moniker: pointwise,
+                XYs3d.moniker: XYs3d,
                 }.get( subformElement.tag )
         if subformClass is None: raise Exception( "encountered unknown energyAngular subform: %s" % subformElement.tag )
         subForm = subformClass.parseXMLNode( subformElement, xPath, linkData )

@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -45,6 +69,7 @@
 #include <string.h>
 #include <math.h>
 
+#include <nfut_utilities.h>
 #include <ptwXY.h>
 #include <nf_utilities.h>
 #include <ptwXY_utilities.h>
@@ -52,11 +77,11 @@
 static int verbose = 0;
 static char *fmtX = "%18.11e\n", *fmtXY = "%18.11e %18.11e\n";
 
-static ptwXPoints *getGroupBoundaries( int align, double xMax );
-static ptwXYPoints *getFluxData( void );
-static ptwXYPoints *getCrossSectionData( void );
+static ptwXPoints *getGroupBoundaries( statusMessageReporting *smr, int align, double xMax );
+static ptwXYPoints *getFluxData( statusMessageReporting *smr );
+static ptwXYPoints *getCrossSectionData( statusMessageReporting *smr );
 static void writeXYDataOnVerbosity( ptwXYPoints *data, const char * const fileName );
-static void writeXDataOnVerbosity( ptwXPoints *data, const char * const fileName );
+static void writeXDataOnVerbosity( statusMessageReporting *smr, ptwXPoints *data, const char * const fileName );
 /*
 ************************************************************
 */
@@ -64,9 +89,11 @@ int main( int argc, char **argv ) {
 
     int iarg, errCount = 0, echo = 0, align = 0;
     double xMin, gMin, gMax;
-    nfu_status status;
     ptwXYPoints *flux, *crossSection;
     ptwXPoints *groupBoundaries, *crossSectionGrouped_None;
+    statusMessageReporting smr;
+
+    smr_initialize( &smr, smr_status_Ok );
 
     for( iarg = 1; iarg < argc; iarg++ ) {
         if( strcmp( "-v", argv[iarg] ) == 0 ) {
@@ -87,25 +114,25 @@ int main( int argc, char **argv ) {
         }
     }
 
-    crossSection = getCrossSectionData( );
+    crossSection = getCrossSectionData( &smr );
     writeXYDataOnVerbosity( crossSection, "crossSection2.dat" );
-    xMin = ptwXY_getPointAtIndex( crossSection, 0 )->x;
+    xMin = ptwXY_getPointAtIndex_Unsafely( crossSection, 0 )->x;
 
-    groupBoundaries = getGroupBoundaries( align, xMin );
-    writeXDataOnVerbosity( groupBoundaries, "groupBoundaries2.dat" );
+    groupBoundaries = getGroupBoundaries( &smr, align, xMin );
+    writeXDataOnVerbosity( &smr, groupBoundaries, "groupBoundaries2.dat" );
 
-    flux = getFluxData( );
+    flux = getFluxData( &smr );
     writeXYDataOnVerbosity( flux, "flux2.dat" );
 
-    crossSectionGrouped_None = ptwXY_groupTwoFunctions( crossSection, flux, groupBoundaries, ptwXY_group_normType_none, NULL, &status );
-    if( status != nfu_Okay ) nfu_printErrorMsg( "ERROR %s: ptwXY_groupTwoFunctions status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    writeXDataOnVerbosity( crossSectionGrouped_None, "crossSection_None2.dat" );
+    if( ( crossSectionGrouped_None = ptwXY_groupTwoFunctions( &smr, crossSection, flux, groupBoundaries, ptwXY_group_normType_none, NULL ) ) == NULL )
+        nfut_printSMRErrorExit2p( &smr, "Via." );
+    writeXDataOnVerbosity( &smr, crossSectionGrouped_None, "crossSection_None2.dat" );
 
-    if( ( status = ptwX_range( crossSectionGrouped_None, &gMin, &gMax ) ) == nfu_Okay ) {
+    if( ptwX_range( &smr, crossSectionGrouped_None, &gMin, &gMax ) == nfu_Okay ) {
         if( gMin != 0 ) nfu_printErrorMsg( "ERROR %s: gMin = %e != 0", __FILE__, gMin );
         if( gMax != 0 ) nfu_printErrorMsg( "ERROR %s: gMax = %e != 0", __FILE__, gMax ); }
     else {
-        if( gMin != 0 ) nfu_printErrorMsg( "ERROR %s: ptwX_range status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+        if( gMin != 0 ) nfut_printSMRErrorExit2p( &smr, "Via." );
     }
 
     ptwX_free( crossSectionGrouped_None );
@@ -118,7 +145,7 @@ int main( int argc, char **argv ) {
 /*
 ************************************************************
 */
-static ptwXPoints *getGroupBoundaries( int align, double xMax ) {
+static ptwXPoints *getGroupBoundaries( statusMessageReporting *smr, int align, double xMax ) {
 
     double data[] = {  /* Last points must be last than first point of cross section data. */
         1.30680e-09, 2.09080e-08, 1.30680e-07, 3.34530e-07, 1.17610e-06, 2.09080e-06, 5.65780e-06, 1.30680e-05, 2.07460e-05, 5.12300e-05,
@@ -130,32 +157,30 @@ static ptwXPoints *getGroupBoundaries( int align, double xMax ) {
         6.04250e+00, 6.36660e+00, 6.73670e+00, 7.15580e+00, 7.54790e+00, 7.90960e+00, 8.32150e+00, 8.78670e+00, 9.17670e+00, 9.66480e+00 };
     int nData = sizeof( data ) / sizeof( double );
     ptwXPoints *groupBoundaries;
-    nfu_status status;
 
     if( align != 0 ) data[nData-1] = xMax;
 
-    if( ( groupBoundaries = ptwX_create( nData, nData, data, &status ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: group boundaries creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( groupBoundaries = ptwX_create( smr, nData, nData, data ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( smr, "Via." );
     return( groupBoundaries );
 }
 /*
 ************************************************************
 */
-static ptwXYPoints *getFluxData( void ) {
+static ptwXYPoints *getFluxData( statusMessageReporting *smr ) {
 
     double data[] = { 0.0000000e+00, 85., 21., 85. };
     int nData = sizeof( data ) / ( 2 * sizeof( double ) );
     ptwXYPoints *flux;
-    nfu_status status;
 
-    if( ( flux = ptwXY_create( ptwXY_interpolationLinLin, NULL, 6, 1e-3, 10, 10, nData, data, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: flux creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( flux = ptwXY_create( smr, ptwXY_interpolationLinLin, NULL, 6, 1e-3, 10, 10, nData, data, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( smr, "Via." );
     return( flux );
 }
 /*
 ************************************************************
 */
-static ptwXYPoints *getCrossSectionData( void ) {
+static ptwXYPoints *getCrossSectionData( statusMessageReporting *smr ) {
 
     double data[] = {
         9.71901000e+00,   1.95442000e-21, 1.00000000e+01,   0.00000000e+00, 1.00606300e+01,   3.21609400e-05, 1.05000000e+01,   2.65223000e-04,
@@ -177,10 +202,9 @@ static ptwXYPoints *getCrossSectionData( void ) {
     };
     int nData = sizeof( data ) / ( 2 * sizeof( double ) );
     ptwXYPoints *crossSection;
-    nfu_status status;
 
-    if( ( crossSection = ptwXY_create( ptwXY_interpolationLinLin, NULL, 6, 1e-3, 10, 10, nData, data, &status, 0 ) ) == NULL ) 
-        nfu_printErrorMsg( "ERROR %s: cross section creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+    if( ( crossSection = ptwXY_create( smr, ptwXY_interpolationLinLin, NULL, 6, 1e-3, 10, 10, nData, data, 0 ) ) == NULL ) 
+        nfut_printSMRErrorExit2p( smr, "Via." );
     return( crossSection);
 }
 /*
@@ -192,21 +216,21 @@ static void writeXYDataOnVerbosity( ptwXYPoints *data, const char * const fileNa
 
     if( !verbose ) return;
     if( ( f = fopen( fileName, "w" ) ) == NULL ) nfu_printErrorMsg( "ERROR %s: could not open file %s\n", __FILE__, fileName );
-    fprintf( f, "# length = %d\n", (int) ptwXY_length( data ) );
+    fprintf( f, "# length = %d\n", (int) ptwXY_length( NULL, data ) );
     ptwXY_simpleWrite( data, f, fmtXY );
     fclose( f );
 }
 /*
 ************************************************************
 */
-static void writeXDataOnVerbosity( ptwXPoints *data, const char * const fileName ) {
+static void writeXDataOnVerbosity( statusMessageReporting *smr, ptwXPoints *data, const char * const fileName ) {
 
     int64_t i;
     FILE *f;
 
     if( !verbose ) return;
     if( ( f = fopen( fileName, "w" ) ) == NULL ) nfu_printErrorMsg( "ERROR %s: could not open file %s\n", __FILE__, fileName );
-    fprintf( f, "# length = %d\n", (int) ptwX_length( data ) );
-    for( i = 0; i < ptwX_length( data ); i++ ) fprintf( f, fmtX, ptwX_getPointAtIndex_Unsafely( data, i ) );
+    fprintf( f, "# length = %d\n", (int) ptwX_length( smr, data ) );
+    for( i = 0; i < ptwX_length( smr, data ); i++ ) fprintf( f, fmtX, ptwX_getPointAtIndex_Unsafely( data, i ) );
     fclose( f );
 }

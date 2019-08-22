@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 import endfFormats as endfFormatsModule
@@ -46,6 +70,7 @@ from fudge.structure import masses
 
 import fudge
 
+import resonances as resonancesModule
 import productData.multiplicity as multiplicityModule
 
 from fudge.gnd import styles as stylesModule
@@ -82,7 +107,7 @@ __metaclass__ = type
 def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None ) :
 
     evaluatedStyle = self.styles.getEvaluatedStyle( )
-    if( evaluatedStyle is None ) : raise Exception( 'no evaluation style found' )
+    if( evaluatedStyle is None ) : raise ValueError( 'no evaluation style found' )
 
     if( flags['verbosity'] >= 10 ) : print '%s%s' % ( verbosityIndent, self.inputParticlesToReactionString( suffix = " -->" ) )
     verbosityIndent2 = verbosityIndent + ' ' * ( len( self.inputParticlesToReactionString( suffix = " -->" ) ) + 1 )
@@ -128,10 +153,10 @@ def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None ) 
     targetInfo['delayedRates'] = []
     targetInfo['totalDelayedNubar'] = None
     targetInfo['MTs'], targetInfo['MF8'], targetInfo['LRs'] = {}, {}, {}
-    endfMFList = { 1 : { 451 : [] }, 2 : {}, 3 : {}, 4 : {}, 5 : {}, 6 : {}, 8 : {}, 9 : {}, 10 : {}, 12 : {}, 13 : {}, 
+    endfMFList = { 1 : { 451 : [] }, 2 : {}, 3 : {}, 4 : {}, 5 : {}, 6 : {}, 8 : {}, 9 : {}, 10 : {}, 12 : {}, 13 : {},
             14 : {}, 15 : {}, 23 : {}, 26 : {}, 27 : {}, 31 : {}, 32 : {}, 33 : {}, 34 : {}, 35 : {}, 40 : {} }
     if( self.resonances is not None ) :      # Add resonances, independent of reaction channels
-        self.resonances.toENDF6( endfMFList, flags, targetInfo, verbosityIndent = verbosityIndent2 )
+        self.resonances.toENDF6( endfMFList, flags, targetInfo, verbosityIndent=verbosityIndent2 )
 
     targetInfo['production_gammas'] = {}
 
@@ -181,7 +206,7 @@ def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None ) 
         try :
             if( not( totalDelayedNubar is None ) ) : totalNubar = totalNubar + totalDelayedNubar
         except :                                # The following is a kludge for some "bad" data.
-            if( ( totalNubar.domainMax( unitTo = 'MeV' ) == 30. ) and 
+            if( ( totalNubar.domainMax( unitTo = 'MeV' ) == 30. ) and
                 ( totalDelayedNubar.domainMax( unitTo = 'MeV' ) == 20. ) ) :
                     totalDelayedNubar[-1] = [ totalNubar.domainMax( ), totalDelayedNubar.getValue( totalDelayedNubar.domainMax( ) ) ]
             totalNubar = totalNubar + totalDelayedNubar
@@ -197,8 +222,8 @@ def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None ) 
         docHeader2 = [  ' %2d-%-2s-%3d LLNL       EVAL-OCT03 Unknown' % ( targetZ, fudge.particles.nuclear.elementSymbolFromZ( targetZ ), targetA ),
                         '                      DIST-DEC99                       19990101   ',
                         '----ENDL              MATERIAL %4d' % MAT,
-                        '-----INCIDENT %s DATA' % 
-                            { 1 : 'NEUTRON', 1001 : 'PROTON', 1002 : 'DEUTERON', 1003 : 'TRITON', 2003 : 'HELION', 2004 : 'ALPHA' }[projectileZA], 
+                        '-----INCIDENT %s DATA' %
+                            { 1 : 'NEUTRON', 1001 : 'PROTON', 1002 : 'DEUTERON', 1003 : 'TRITON', 2003 : 'HELION', 2004 : 'ALPHA' }[projectileZA],
                         '------ENDF-6 FORMAT' ]
         endfDoc = [ 'LLNL ENDL file translated to ENDF6 by FUDGE.', '' ' ************************ C O N T E N T S ***********************' ]
     else :
@@ -223,7 +248,7 @@ def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None ) 
         else :
             LRP = 2
     EMAX = max( [ reaction.crossSection.domainMax( unitTo = 'eV' ) for reaction in self.reactions ] )
-    
+
     temperature = self.styles[style].temperature.getValueAs( 'K' )
     library = evaluatedStyle.library
     version = evaluatedStyle.version
@@ -232,7 +257,7 @@ def toENDF6( self, style, flags, verbosityIndent = '', covarianceSuite = None ) 
         NLIB = -1
     else :
         NVER, LREL, NMOD = map( int, version.split( '.' ) )    # Version stored as '7.2.1'
-        NLIB = { "ENDF/B" :  0,     "ENDF/A" :  1,      "JEFF"                 :  2,    "EFF"      :  3,    "ENDF/B (HE)" :  4,  
+        NLIB = { "ENDF/B" :  0,     "ENDF/A" :  1,      "JEFF"                 :  2,    "EFF"      :  3,    "ENDF/B (HE)" :  4,
                  "CENDL"  :  5,     "JENDL"  :  6,      "SG-23"                : 21,    "INDL/V"   : 31,    "INDL/A"      : 32,
                  "FENDL"  : 33,     "IRDF"   : 34,      "BROND (IAEA version)" : 35,    "INGDB-90" : 36,    "FENDL/A"     : 37,
                  "BROND"  : 41 }.get( library, -1 )

@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,30 +18,53 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 """
-    This module contains the class ``XYs``. This class treats a list of :math:`(x_i, y_i)` pairs as if they were the function :math:`y(x)`.
-    That is, it is a numerical representation of :math:`f(x)`. The function :math:`y(x)` is also called a 1-dimensional or univariant
-    function. As an example, let 
+    This module contains the class ``XYs1d``. This class treats a list of :math:`(x_i, y_i)` pairs as if they were 
+    the function :math:`y(x)`.  That is, it is a numerical representation of :math:`f(x)`. The function :math:`y(x)` 
+    is also called a 1-dimensional or univariant function. As an example, let 
     
         .. math::
             y_1(x) = a + b * x
@@ -50,20 +74,21 @@
         .. math::
             y_2(x) = c * \exp( - d * x )
             
-    then, :math:`y_1` and :math:`y_2` can be added, subtracted, multiplied and divided, for example. Similiarly, two XYs instances can
-    be added, subtracted, multiplied and divided. The only restriction on the :math:`(x_i, y_i)` pairs is that :math:`x_i < x_{i+1}`.
+    then, :math:`y_1` and :math:`y_2` can be added, subtracted, multiplied and divided, for example. Similiarly, 
+    two XYs1d instances can be added, subtracted, multiplied and divided. The only restriction on the :math:`(x_i, y_i)` 
+    pairs is that :math:`x_i < x_{i+1}`.
 
-    The ``XYs`` class uses the class :py:class:`numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C` as a base class.
+    The ``XYs1d`` class uses the class :py:class:`numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C` as a base class.
 
-    Members of an XYs instance of interest to most are:
+    Members of an XYs1d instance of interest to most are:
 
         :accuracy:        see the base class :py:class:`numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C`,
         :biSectionMax:    see the base class :py:class:`numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C`,
         :infill:          see the base class :py:class:`numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C`,
         :axes:            Description of the x and y data attributes (e.g., label, units).
 
-    A ``XYs`` instance can be the ``XY`` instance of a 2-dimensional function (i.e., a ``multiD_XYs`` with
-    dimension of 2). In this case, the ``XYs`` instances are secondary instances.
+    A ``XYs1d`` instance can be the ``XY`` instance of a 2-dimensional function (i.e., a ``XYs2d`` with
+    dimension of 2). In this case, the ``XYs1d`` instances are secondary instances.
 """
 
 """
@@ -92,15 +117,15 @@ def return_pointwiseXY_AsXYs( self, C, units = {}, index = None, value = None, a
 
     if( index is None ) : index = self.index
     if( axes is None ) : axes = self.axes
-    c = XYs( C, accuracy = 0.001, axes = axes, biSectionMax = 4, infill = 1, safeDivide = 0, 
+    c = XYs1d( C, accuracy = 0.001, axes = axes, biSectionMax = 4, infill = 1, safeDivide = 0, 
             index = index, value = value )
     if( c.axes is not None ) :
-        for k in units : c.axes[k].setUnit( units[k] )
+        for k in units : c.axes[k].unit = units[k]
     return( c )
 
 def otherToSelfsUnits( self, other, checkXOnly = False ) :
 
-    if( not( isinstance( other, XYs ) ) ) : raise TypeError( 'other instance not XYs instance' )
+    if( not( isinstance( other, XYs1d ) ) ) : raise TypeError( 'other instance not XYs1d instance' )
     if( ( self.axes is None ) and ( other.axes is None ) ) : return( other )
     yScale = 1
     xUnitSelf = PQU._getPhysicalUnit( self.axes[xAxisIndex].unit )
@@ -122,11 +147,11 @@ def getValueAsAxis( axis, quantity ) :
 
 def getOtherAndUnit( self, other ) :
     """
-    For internal use only. This function is used by the multiply and divide methods. Other must be a XYs instance or
+    For internal use only. This function is used by the multiply and divide methods. Other must be a XYs1d instance or
     an object convertible to a PQU object.
     """
 
-    if( isinstance( other, XYs ) ) :
+    if( isinstance( other, XYs1d ) ) :
         yUnit = other.getAxisUnitSafely( yAxisIndex )
         other = otherToSelfsUnits( self, other, checkXOnly = True )
     elif( isinstance( other, pointwiseXY ) ) :
@@ -139,16 +164,16 @@ def getOtherAndUnit( self, other ) :
 
 def allow_XYsWithSameUnits_orNumberWithSameUnit( self, other ) :
 
-    if( isinstance( other, XYs ) ) :
+    if( isinstance( other, XYs1d ) ) :
          other = otherToSelfsUnits( self, other )
     else :
         yUnit = self.getAxisUnitSafely( yAxisIndex )
         other = PQU.PQU( other, checkOrder = False ).getValueAs( yUnit )
     return( other )
 
-class XYs( pointwiseXY, baseModule.xDataFunctional ) :
+class XYs1d( pointwiseXY, baseModule.xDataFunctional ) :
 
-    moniker = 'XYs'
+    moniker = 'XYs1d'
     mutableYUnit = True     # For __imul__ and __idiv__.
 
     def __init__( self, data = [], dataForm = "xys", interpolation = standardsModule.interpolation.linlinToken, axes = None,
@@ -156,14 +181,13 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
             sep = ' ', accuracy = defaultAccuracy,
             initialSize = 10, overflowSize = 10, biSectionMax = 6, infill = True, safeDivide = False ) :
         """
-        Constructor for XYs class. dataForm can be 'xys', 'xsandys' or 'list'.
+        Constructor for XYs1d class. dataForm can be 'xys', 'xsandys' or 'list'.
         """
 
         baseModule.xDataFunctional.__init__( self, self.moniker, 1, axes, index = index, valueType = valueType,
                 value = value, label = label )
 
         if( not( isinstance( interpolation, str ) ) ) : raise TypeError( 'interpolation must be a string' )
-        self.interpolation = interpolation
 
         if( not( isinstance( sep, str ) ) ) : raise TypeError( 'sep must be of type str' )
         if( len( sep ) != 1 ) : raise TypeError( 'sep length must be 1 not %d' % len( sep ) )
@@ -227,7 +251,7 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
         if( not( self.mutableYUnit ) ) :
             if( otherUnit1 != '' ) : raise Exception( "Self's y-unit is immutable and other has unit of '%s'" % otherUnit1 )
         pointwiseXY.__imul__( self, other )
-        if( otherUnit1 != '' ) : self.axes[yAxisIndex].setUnit( baseModule.processUnits( self.axes[yAxisIndex].unit, otherUnit1, '*' ) )
+        if( otherUnit1 != '' ) : self.axes[yAxisIndex].unit = baseModule.processUnits( self.axes[yAxisIndex].unit, otherUnit1, '*' )
         return( self )
 
     def __div__( self, other ) :
@@ -252,7 +276,7 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
         if( not( self.mutableYUnit ) ) :
             if( otherUnit1 != '' ) : raise Exception( "Self's y-unit is immutable and other has unit of '%s'" % otherUnit1 )
         pointwiseXY.__idiv__( self, other )
-        if( otherUnit1 != '' ) : self.axes[yAxisIndex].setUnit( baseModule.processUnits( self.axes[yAxisIndex].unit, otherUnit1, '/' ) )
+        if( otherUnit1 != '' ) : self.axes[yAxisIndex].unit = baseModule.processUnits( self.axes[yAxisIndex].unit, otherUnit1, '/' )
         return( self )
 
     def getitem_units( self, index ) :
@@ -285,20 +309,31 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
         pointwiseXY.__setslice__( self, index1, index2, slice )
 
     @property
+    def interpolation( self ) :
+
+        return( self.getInterpolation( ) )
+#
+# This property needs setInterpolation defined in pointwiseXY_C
+#    @interpolation.setter
+#    def interpolation( self, interpolation ) :
+#
+#        self.setInterpolation( interpolation )
+
+    @property
     def sep( self ) :
 
         return( self.__sep )
 
     def applyFunction( self, f, parameters, accuracy = -1, biSectionMax = -1, checkForRoots = False ) :
         """
-        This method maps the function 'f' onto each y-value in an XYs object, returning a new XYs object.
+        This method maps the function 'f' onto each y-value in an XYs1d object, returning a new XYs1d object.
         Additional points may be added to preserve the desired accuracy.
 
-        For example, the following will transform all negative y-values in an XYs object to zero:
-        >>> newXYs = XYs.applyFunction( lambda y,tmp : 0 if y < 0 else y, None )
+        For example, the following will transform all negative y-values in an XYs1d object to zero:
+        >>> newXYs = XYs1d.applyFunction( lambda y,tmp : 0 if y < 0 else y, None )
 
         Extra parameters to the applied function are be passed via the 'parameters' argument.
-        See XYs.XYs documentation for details on 'accuracy' and 'biSectionMax'.
+        See XYs.XYs1d documentation for details on 'accuracy' and 'biSectionMax'.
         """
 
         return( self.returnAsClass( self, pointwiseXY.applyFunction( self, f, parameters, accuracy = accuracy, biSectionMax = biSectionMax, checkForRoots = checkForRoots ) ) )
@@ -339,8 +374,8 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
     def commonXGrid( self, others ) :
         """
         This method returns copies of self and others that are mapped to the same X-grid. That is, a union is made
-        of all the x-values for self and others and all XYs-type instances are mapped to it. Others must be
-        a list of instances of XYs. All XYs instances must have the same domain.
+        of all the x-values for self and others and all XYs1d-type instances are mapped to it. Others must be
+        a list of instances of XYs1d. All XYs1d instances must have the same domain.
         """
 
 # BRB
@@ -425,7 +460,7 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
 
     def normalize( self, insitu = False, dimension = 1 ) :
         """
-        The dimension argument is ignored. Only here to be compatable with calling from multiD_XYs.normalize.
+        The dimension argument is ignored. Only here to be compatable with calling from XYsnd.normalize.
         """
 
         xys = pointwiseXY.normalize( self )
@@ -569,11 +604,11 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
             +---------------+---------------+
             | a python list | norm[i]       |
             +---------------+---------------+
-        The arguments f2 (and f3) must be None or an XYs instance.
+        The arguments f2 (and f3) must be None or an XYs1d instance.
 
         If ``asXYs`` is ``False``, then ``len( xs ) - 1`` integrals are returned.
         If ``asXYs`` is ``True``, the last integral's values is appended to the end to make a list of length ``len( xs )``, and 
-        an instance of class ``XYs`` is returned with the x-values from ``xs``, the y-values from the integrals and the 
+        an instance of class ``XYs1d`` is returned with the x-values from ``xs``, the y-values from the integrals and the 
         interpolation is 'flat'.
 
         Historical note: the word group comes from deterministic neutron transport (e.g., transport used to simulate nuclear reactors).
@@ -603,28 +638,34 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
         if( asXYs ) :
             grouped.append( grouped[-1] )
             axes = axesModule.axes( labelsUnits = { 0 : [ self.axes[xAxisIndex].label, self.axes[xAxisIndex].unit ], 1 : [ "", yUnit.getUnitSymbol( ) ] } )
-            grouped = XYs( [ xs, grouped ], dataForm = 'xsandys', accuracy = accuracy, 
+            grouped = XYs1d( [ xs, grouped ], dataForm = 'xsandys', accuracy = accuracy, 
                 interpolation = standardsModule.interpolation.flatToken, axes = axes )
         return( grouped )
 
     def groupOneFunction( self, xs, norm = None ) :
         '''.. note:: Need unit of xs.'''
 
-        return( pointwiseXY.groupOneFunction( self, xs, norm = norm ) )
+        if type(xs)==list: boundaries = xs
+        else:              boundaries = xs.values.values
+        return( pointwiseXY.groupOneFunction( self, boundaries, norm = norm ) )
 
     def groupTwoFunctions( self, xs, f2, norm = None ) :
         '''.. note:: Need unit of xs.'''
 
-        return( pointwiseXY.groupTwoFunctions( self, xs, f2, norm = norm ) )
+        if type(xs)==list: boundaries = xs
+        else:              boundaries = xs.values.values
+        return( pointwiseXY.groupTwoFunctions( self, boundaries, f2, norm = norm ) )
 
     def groupThreeFunctions( self, xs, f2, f3, norm = None ) :
         '''.. note:: Need unit of xs.'''
 
-        return( pointwiseXY.groupThreeFunctions( self, xs, f2, f3, norm = norm ) )
+        if type(xs)==list: boundaries = xs
+        else:              boundaries = xs.values.values
+        return( pointwiseXY.groupThreeFunctions( self, boundaries, f2, f3, norm = norm ) )
 
     def integrate( self, domainMin = None, domainMax = None ) :
         """
-        Definite integral of current ``XYs`` instance from ``domainMin`` to ``domainMax``:
+        Definite integral of current ``XYs1d`` instance from ``domainMin`` to ``domainMax``:
         
         .. math::
             \int_{domainMin}^{domainMax} dx \; XYs(x)
@@ -646,7 +687,7 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
         .. math::
             \int_0^x dx \; XYs(x)
             
-        The new ``XYs`` instance is defined on the range of the old one and the units are wrong.
+        The new ``XYs1d`` instance is defined on the range of the old one and the units are wrong.
         '''
 
 # BRB: I think this is just a running sum and may be implemented already. Needs units.
@@ -656,7 +697,7 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
             domainMin = self[i][0]
             domainMax = self[i+1][0]
             myData.append( [ domainMax, myData[-1][1]+pointwiseXY.integrate( self, domainMin = domainMin, domainMax = domainMax ) ] )
-        return XYs( myAxes, myData, 1e-6 )
+        return XYs1d( myAxes, myData, 1e-6 )
 
     def integrateTwoFunctions( self, f2, domainMin = None, domainMax = None ) :
         """
@@ -666,14 +707,17 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
         :param domainMax:
         :return:
         """
-        if not isinstance(f2,XYs): raise TypeError("f2 must be an instance of an XYs")
-        unit = self.getAxisUnitSafely( xAxisIndex )
-        if f2.getAxisUnitSafely( xAxisIndex ) != unit: f2.convertAxisToUnit( xAxisIndex, unit )
+
+        if( not isinstance( f2, XYs1d ) ) : raise TypeError( "f2 must be an instance of an XYs1d" )
+        unit = self.axes[xAxisIndex].unit
+        if( f2.axes[xAxisIndex].unit != unit ) :
+            f2 = f2.copy( )
+            f2.convertAxisToUnit( xAxisIndex, unit )
         domainMin, domainMax = baseModule.getDomainLimits( self, domainMin, domainMax, unit )
         domainMin = max( domainMin, self.domainMin( ), f2.domainMin( ) )
         domainMax = min( domainMax, self.domainMax( ), f2.domainMax( ) )
         return( PQU.PQU( pointwiseXY.groupTwoFunctions( self, [ domainMin, domainMax ], f2 )[0],
-                baseModule.processUnits( baseModule.processUnits( unit, self.getAxisUnitSafely( yAxisIndex ), '*' ), f2.getAxisUnitSafely( yAxisIndex ), '*' ), checkOrder = False ) )
+                baseModule.processUnits( baseModule.processUnits( unit, self.axes[yAxisIndex].unit, '*' ), f2.axes[yAxisIndex].unit, '*' ), checkOrder = False ) )
 
     def integrateThreeFunctions( self, f2, f3, domainMin = None, domainMax = None ) :
         """
@@ -684,11 +728,15 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
         :param domainMax:
         :return:
         """
-        if not isinstance(f2,XYs): raise TypeError("f2 must be an instance of an XYs")
-        if not isinstance(f3,XYs): raise TypeError("f3 must be an instance of an XYs")
-        unit = self.getAxisUnitSafely( xAxisIndex )
-        if f2.getAxisUnitSafely( xAxisIndex ) != unit: f2.convertAxisToUnit( xAxisIndex, unit )
-        if f3.getAxisUnitSafely( xAxisIndex ) != unit: f3.convertAxisToUnit( xAxisIndex, unit )
+        if( not isinstance( f2, XYs1d ) ) : raise TypeError( "f2 must be an instance of an XYs1d" )
+        if( not isinstance( f3, XYs1d ) ) : raise TypeError( "f3 must be an instance of an XYs1d" )
+        unit = self.axes[xAxisIndex].unit
+        if( f2.axes[xAxisIndex].unit != unit ) :
+            f2 = f2.copy( )
+            f2.convertAxisToUnit( xAxisIndex, unit )
+        if( f3.axes[xAxisIndex].unit != unit ) :
+            f3 = f3.copy( )
+            f3.convertAxisToUnit( xAxisIndex, unit )
         domainMin, domainMax = baseModule.getDomainLimits( self, domainMin, domainMax, unit )
         domainMin = max( domainMin, self.domainMin( ), f2.domainMin( ), f3.domainMin( ) )
         domainMax = min( domainMax, self.domainMax( ), f2.domainMax( ), f3.domainMax( ) )
@@ -703,8 +751,8 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
 
     def splitInTwo( self, domainValue, epsilon = domainEpsilon ) : 
         """
-        Splits self at domainValue into two XYs instances. Returns either None if domainValue not in
-        domain or two XYs instances.
+        Splits self at domainValue into two XYs1d instances. Returns either None if domainValue not in
+        domain or two XYs1d instances.
         """
 
         domainMin, domainMax = self.domain( )
@@ -790,11 +838,12 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
     @classmethod
     def returnAsClass( cls, self, other, index = None, value = None, axes = None, interpolation = None ) :
         """
-        Returns other as a class of cls. Other must be a sub-class pointwiseXY. cls must be a sub-class of XYs. 
-        If index and axes are not specified, they are taken from self. The main use of this classmethod is for methods like __add__ where
-        the addends may be a class derived from XYs. For example, the crossSection.pointwise class is derived from The XYs class.
-        If two instances xSec1 and xSec2 of the crossSection.pointwise class are added together (i.e., xSec1 + xSec2) then, since
-        the __add__ method used this classmethod, the returned instance will also be an instance of crossSection.pointwise class.
+        Returns other as a class of cls. Other must be a sub-class pointwiseXY. cls must be a sub-class of XYs1d. 
+        If index and axes are not specified, they are taken from self. The main use of this classmethod is for 
+        methods like __add__ where the addends may be a class derived from XYs1d. For example, the crossSection.XYs1d
+        class is derived from The XYs1d class.  If two instances xSec1 and xSec2 of the crossSection.pointwise class 
+        are added together (i.e., xSec1 + xSec2) then, since the __add__ method used this classmethod, the returned 
+        instance will also be an instance of crossSection.pointwise class.
         """
 
         if( index is None ) : index = self.index
@@ -806,9 +855,9 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
                 safeDivide = other.getSafeDivide( ), index = index, value = value ) )
 
     @classmethod
-    def parseXMLNode( cls, xDataElement, xPath = [], linkData = {}, axes = None, **kwargs ) :
+    def parseXMLNode( cls, xDataElement, xPath, linkData, axes = None, **kwargs ) :
         """
-        Translate an XYs XML element into the python XYs xData class.
+        Translate an XYs1d XML element into the python XYs1d xData class.
         """
 
         xPath.append( xDataElement.tag )
@@ -823,11 +872,11 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
         values, uncertainties = None, None
         for subElement in xDataElement :
             if( subElement.tag == 'axes' ) :
-                axes = axesModule.axes.parseXMLNode( subElement, xPath )
+                axes = axesModule.axes.parseXMLNode( subElement, xPath, linkData )
             elif( subElement.tag == 'values' ) :
-                values = valuesModule.values.parseXMLNode( subElement, xPath )
+                values = valuesModule.values.parseXMLNode( subElement, xPath, linkData )
             elif( subElement.tag == 'uncertainties' ) :
-                uncertainties = uncertaintiesModule.uncertainties.parseXMLNode( subElement, xPath )
+                uncertainties = uncertaintiesModule.uncertainties.parseXMLNode( subElement, xPath, linkData )
             else :
                 raise TypeError( 'sub-element "%s" not valid' % subElement.tag )
 
@@ -844,10 +893,10 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
 
         from xml.etree import cElementTree
 
-        return( cls.parseXMLNode( cElementTree.fromstring( XMLString ) ) )
+        return( cls.parseXMLNode( cElementTree.fromstring( XMLString ), xPath=[], linkData={} ) )
 
-    @staticmethod
-    def createFromFunction( axes, Xs, func, parameters, accuracy, biSectionMax, checkForRoots = False, infill = 1, safeDivide = 1 ) :
+    @classmethod
+    def createFromFunction( cls, axes, Xs, func, parameters, accuracy, biSectionMax, checkForRoots = False, infill = 1, safeDivide = 1 ) :
         """
         Given an ascending list of x-values (Xs) and a function (func), create a linear pointwise 
         representation of the function over the domain of Xs. There must be at least 2 values in Xs.
@@ -857,9 +906,9 @@ class XYs( pointwiseXY, baseModule.xDataFunctional ) :
         import math
         xys = pointwiseXY_C.createFromFunction( Xs, func, parameters, accuracy, biSectionMax, checkForRoots = checkForRoots, infill = infill, safeDivide = safeDivide )
         biSectionMax = max( 0, biSectionMax - math.log( len( xys ) / len( Xs ) ) / math.log( 2 ) )
-        return( XYs( xys, axes = axes, accuracy = accuracy, infill = infill, safeDivide = safeDivide ) )
+        return( cls( data = xys, axes = axes, accuracy = accuracy, infill = infill, safeDivide = safeDivide ) )
 
     @staticmethod
-    def defaultAxes( labelsUnits = {} ) :
+    def defaultAxes( labelsUnits = None ) :
 
-        return( axesModule.axes( rank = 2, labelsUnits = labelsUnits ) )
+        return( axesModule.axes( rank = 2, labelsUnits = labelsUnits or {} ) )

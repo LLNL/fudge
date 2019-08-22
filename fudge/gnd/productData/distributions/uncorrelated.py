@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,27 +18,50 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
-"""Uncorrelated double differential distribution classes"""
+"""Uncorrelated double differential distribution classes."""
 
 import math
 import miscellaneous
@@ -65,7 +89,7 @@ class subform( ancestryModule.ancestry ) :
         if( not isinstance( data, dataSubform ) ) : raise TypeError( "Needed %s distribution subform" % self.moniker )
         ancestryModule.ancestry.__init__( self )
         self.data = data
-        self.data.ancestor = self
+        self.data.setAncestor( self )
 
     @property
     def productFrame( self ) :
@@ -113,40 +137,27 @@ class form( baseModule.form ) :
 
         baseModule.form.__init__( self, label, productFrame, ( _angularSubform, _energySubform ) )
 
-    def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
+    def calculateAverageProductData( self, style, indent = '', **kwargs ) :
 
-        from fudge.gnd.productData import multiplicity as multiplicityModule
+        if( isinstance( self.angularSubform.data, angularModule.regions2d ) ) :
+            raise Exception( 'regions2d angular is currently not supported' )
+        if( isinstance( self.energySubform.data, energyModule.regions2d ) ) :
 
-        multiplicity = tempInfo['multiplicity']['eval']     # BRB - FIXME; Handle gamma data with 1 point for multiplicity weight
-                                                    # until it is fixed.
-
-        if( isinstance( self.angularSubform.data, angularModule.piecewise ) ) :
-            raise Exception( 'piecewise angular is currently not supported' )
-        if( isinstance( self.energySubform.data, energyModule.piecewise ) ) :
-            energyUnit = tempInfo['incidentEnergyUnit']
-            momentumDepositionUnit = energyUnit + '/c'
-
-            axes = energyDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit,
-                    energyDepositionUnit = energyUnit )
-            energyDeposition = energyDepositionModule.piecewise( axes = axes, label = processInfo.style.label )
-
-            axes = momentumDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit,
-                    momentumDepositionUnit = momentumDepositionUnit )
-            momentumDeposition = momentumDepositionModule.piecewise( axes = axes, label = processInfo.style.label )
-
-            EMin, EMax = tempInfo['EMin'], tempInfo['EMax']
+            aveEnergies = []
+            aveMomenta = []
+            EMax = kwargs['EMax']
             for i1, energySubform in enumerate( self.energySubform.data ) :
-                tempInfo['EMax'] = energySubform.domainMax( )
-                if( i1 == ( len( self.energySubform.data ) - 1 ) ) : tempInfo['EMax'] = EMax
-                energyDep, momentumDep = calculateDepositionData( self.productFrame, self.angularSubform.data, energySubform,
-                        processInfo, tempInfo, verbosityIndent )
-                energyDeposition.append( energyDep )
-                momentumDeposition.append( momentumDep )
-                tempInfo['EMin'] = tempInfo['EMax']
-            tempInfo['EMin'], tempInfo['EMax'] = EMin, EMax
-            return( ( energyDeposition, momentumDeposition ) )
+                kwargs['EMax'] = energySubform.domainMax( )
+                if( i1 == ( len( self.energySubform.data ) - 1 ) ) : kwargs['EMax'] = EMax
+                aveEnergy, aveMomentum = calculateAverageProductData( self.productFrame, self.angularSubform.data, energySubform,
+                        style, indent, **kwargs )
+                aveEnergies.append( aveEnergy )
+                aveMomenta.append( aveMomentum )
+                kwargs['EMin'] = kwargs['EMax']
+            return( aveEnergies, aveMomenta )
 
-        return( calculateDepositionData( self.productFrame, self.angularSubform.data, self.energySubform.data, processInfo, tempInfo, verbosityIndent ) )
+        aveEnergy, aveMomentum = calculateAverageProductData( self.productFrame, self.angularSubform.data, self.energySubform.data, style, indent, **kwargs )
+        return( [ aveEnergy ], [ aveMomentum ] )
 
     def getSpectrumAtEnergy( self, energy ) :
         """Returns the energy spectrum for self at projectile energy."""
@@ -163,43 +174,44 @@ class form( baseModule.form ) :
         elif self.angularSubform.moniker == entityName: return self.angularSubform
         return ancestryModule.ancestry.findEntity( self, entityName, attribute, value )
 
-    def process( self, processInfo, tempInfo, verbosityIndent ) :
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
 
-        from fudge.processing.deterministic import transferMatrices
+        from fudge.processing import group as groupModule
+        from fudge.processing.deterministic import transferMatrices as transferMatricesModule
 
-        newComponents = []
-        angularSubform = self.angularSubform
-        energySubform = self.energySubform
+        verbosity = tempInfo['verbosity']
+        indent2 = indent + tempInfo['incrementalIndent']
+        productLabel = tempInfo['productLabel']
+
+        angularSubform = self.angularSubform.data
+        energySubform = self.energySubform.data
         energyUnit = tempInfo['incidentEnergyUnit']
         massUnit = energyUnit + '/c**2'
 
-        if( 'LLNL_Pn' in processInfo['styles'] ) :
-            if( processInfo.verbosity >= 30 ) : print '%sGrouping %s' % ( verbosityIndent, self.moniker )
-            crossSection = tempInfo['crossSection']
-            outputChannel = tempInfo['outputChannel'].outputChannel
-            projectile, target, product = tempInfo['reactionSuite'].projectile, tempInfo['reactionSuite'].target, tempInfo['product']
-            projectileName, productName = processInfo.getProjectileName( ), product.particle.name
-            if( isinstance( energySubform, energyModule.constant ) ) :
-                if( product.name == 'gamma' ) :
-                    Ep = float( energySubform.data )
-                    TM_1, TM_E = transferMatrices.discreteGammaAngularData( processInfo, projectileName, productName, Ep, crossSection,
-                        angularSubform, 1., comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
-                else :
-                    raise Exception( 'See Bret' )
-            else :
-                if( isinstance( energySubform, energyModule.NBodyPhaseSpace ) ) :
-                    totalMass = energySubform.numberOfProductsMasses.getValueAs( massUnit )
-                    Q = tempInfo['outputChannel'].getQ( energyUnit, final = False, groundStateQ = True )
-                    TM_1, TM_E = transferMatrices.NBodyPhaseSpace( processInfo, projectileName, productName, crossSection, \
-                        energySubform.numberOfProducts, tempInfo['masses'], totalMass, Q, tempInfo['multiplicity'], \
-                        comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
-                else :
-                    TM_1, TM_E = transferMatrices.uncorrelated_EMuP_EEpP_TransferMatrix( processInfo, projectileName, productName, tempInfo['masses'], \
-                        crossSection, angularSubform, energySubform, tempInfo['multiplicity'], \
-                        comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
-            fudge.gnd.miscellaneous.TMs2Form( processInfo, tempInfo, newComponents, TM_1, TM_E, crossSection.axes )
+        if( verbosity > 2 ) : print '%sGrouping %s' % ( indent, self.moniker )
 
-        return( newComponents )
+        crossSection = tempInfo['crossSection']
+        product = tempInfo['product']
+        if( isinstance( energySubform, energyModule.constant ) ) :
+            if( product.name == 'gamma' ) :
+                Ep = float( energySubform.value )
+                TM_1, TM_E = transferMatricesModule.discreteGammaAngularData( style, tempInfo, Ep, crossSection,
+                        angularSubform, 1., comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % productLabel )
+            else :
+                raise Exception( 'See Bret' )
+        else :
+            if( isinstance( energySubform, energyModule.NBodyPhaseSpace ) ) :
+                totalMass = energySubform.numberOfProductsMasses.getValueAs( massUnit )
+                Q = tempInfo['reaction'].getQ( energyUnit, final = False, groundStateQ = True )
+                TM_1, TM_E = transferMatricesModule.NBodyPhaseSpace( style, tempInfo, crossSection, 
+                        energySubform.numberOfProducts, totalMass, Q, tempInfo['multiplicity'], 
+                        comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % productLabel )
+            else :
+                TM_1, TM_E = transferMatricesModule.uncorrelated_EMuP_EEpP_TransferMatrix( style, tempInfo, crossSection, 
+                        self.productFrame, angularSubform, energySubform, tempInfo['multiplicity'], 
+                        comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % productLabel )
+
+        return( groupModule.TMs2Form( style, tempInfo, TM_1, TM_E ) )
 
     def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
@@ -211,16 +223,16 @@ class form( baseModule.form ) :
         for e in energySubform.domainGrid( ) :
             if( e not in grid ) : grid.append( e )
         grid.sort( )
-        axes = angularEnergy.pointwise.defaultAxes( energyUnit = energySubform.axes[2].unit, energy_outUnit = energySubform.axes[1].unit,
+        axes = angularEnergy.XYs3d.defaultAxes( energyUnit = energySubform.axes[2].unit, energy_outUnit = energySubform.axes[1].unit,
             probabilityUnit = energySubform.axes[0].unit )
-        f_E_mu_Ep = angularEnergy.pointwise( axes = axes )
+        f_E_mu_Ep = angularEnergy.XYs3d( axes = axes )
         for e in grid :
-            f_mu_Ep = angularEnergy.pdfOfMuAndEp.pointwise( value = e )
+            f_mu_Ep = angularEnergy.XYs2d( value = e )
             af = angularSubform.getAtEnergy( e )   # FIXME why doesn't getSpectrumAtEnergy work here?
             ef = energySubform.getSpectrumAtEnergy( e )
             for mu, P in af :
                 efp = P * ef
-                efp.__class__ = angularEnergy.pdfOfEp.pointwise # FIXME better way to assign class?
+                efp.__class__ = angularEnergy.XYs1d # FIXME better way to assign class?
                 efp.value = mu
                 f_mu_Ep.append( efp )
             f_E_mu_Ep.append( f_mu_Ep )
@@ -260,16 +272,15 @@ class form( baseModule.form ) :
         xPath.pop( )
         return( uncorrelated )
 
-def calculateDepositionData( productFrame, angularSubform, energySubform, processInfo, tempInfo, verbosityIndent ) :
+def calculateAverageProductData( productFrame, angularSubform, energySubform, style, indent, **kwargs ) :
 
-    def fixLimits( multiplicityLimits, Es ) :
+    def fixLimits( EMin, EMax, Es ) :
 
-        if( Es[0] < multiplicityLimits[0] ) :
-            while( len( Es ) and ( Es[0] < multiplicityLimits[0] ) ) : del Es[0]
-            if( len( Es ) and ( Es[0] > multiplicityLimits[0] ) ) : Es.insert( 0, multiplicityLimits[0] )
-        if( Es[-1] > multiplicityLimits[1] ) :
-            while( len( Es ) and ( Es[-1] > multiplicityLimits[1] ) ) : del Es[-1]
-            if( len( Es ) and ( Es[-1] < multiplicityLimits[1] ) ) : Es.append( multiplicityLimits[1] )
+        if( EMin not in Es ) : Es.append( EMin )
+        if( EMax not in Es ) : Es.append( EMax )
+        Es.sort( )
+        while( Es[0] < EMin ) : del Es[0]
+        while( Es[-1] > EMax ) : del Es[-1]
 
     def calculateAverageEnergy( self, Ein ) :
 
@@ -333,59 +344,58 @@ def calculateDepositionData( productFrame, angularSubform, energySubform, proces
 
             return( self.energySubform.averageEp( Ein, self.massUnit, self.projectileMass, self.targetMass, self.productMass, self.Q ) )
 
-        def getEnergyArray( self, EMin, EMax ) :
+        def getEnergyArray( self, EMin = None, EMax = None ) :
 
             return( [ EMin, EMax ] )
 
-    energyUnit = tempInfo['incidentEnergyUnit']
+    energyUnit = kwargs['incidentEnergyUnit']
     momentumDepositionUnit = energyUnit + '/c'
     massUnit = energyUnit + '/c**2'
-    energyAccuracy, momentumAccuracy = processInfo.energyAccuracy, processInfo.momentumAccuracy
+    multiplicity = kwargs['multiplicity']               # BRB - FIXME; Handle gamma data with 1 point for multiplicity weight until it is fixed.
+    energyAccuracy = kwargs['energyAccuracy']
+    momentumAccuracy = kwargs['momentumAccuracy']
+    reactionSuite = kwargs['reactionSuite']
+    projectileMass = reactionSuite.projectile.getMass( massUnit )
+    targetMass = reactionSuite.target.getMass( massUnit )
+    product = kwargs['product']
+    productMass = product.getMass( massUnit )
+    EMin = kwargs['EMin']
+    EMax = kwargs['EMax']
 
-    depData = []
-
-    projectileMass = tempInfo['reactionSuite'].projectile.getMass( massUnit )
-    targetMass = tempInfo['reactionSuite'].target.getMass( massUnit )
-    productMass = tempInfo['product'].getMass( massUnit )
     massRatio = projectileMass * productMass / ( projectileMass + targetMass )**2
 
-    if( tempInfo['product'].name == 'gamma' ) : productFrame = standardsModule.frames.labToken  # All gamma data treated as in lab frame.
+    if( product.name == 'gamma' ) : productFrame = standardsModule.frames.labToken  # All gamma data treated as in lab frame.
     if( isinstance( energySubform, energyModule.NBodyPhaseSpace ) ) :
-        Q = tempInfo['outputChannel'].getQ( energyUnit, final = False, groundStateQ = True )
+        Q = kwargs['reaction'].getQ( energyUnit, final = False, groundStateQ = True )
         energySubform = NBodyPhaseSpace( energySubform, massUnit, projectileMass, targetMass, productMass, Q )
-    multiplicity = tempInfo['multiplicity']
 
     calculationData = calculateDepositionInfo( productFrame, productMass, massRatio, angularSubform, energySubform, multiplicity )
 
-    Es = energySubform.getEnergyArray( tempInfo['EMin'], tempInfo['EMax'] )
-    multiplicityLimits = multiplicity.getEnergyLimits( tempInfo['EMin'], tempInfo['EMax'] )
-    fixLimits( multiplicityLimits, Es )
+    Es = energySubform.getEnergyArray( )
+    if( Es[0] is None ) : Es[0] = EMin
+    if( Es[-1] is None ) : Es[-1] = EMax
+    if( EMin < Es[0] ) : EMin = Es[0]
+    if( EMax > Es[-1] ) : EMax = Es[-1]
+    Es = sorted( set( energySubform.getEnergyArray( EMin, EMax ) + multiplicity.domainGrid( ) ) )
+    fixLimits( EMin, EMax, Es )
     calculationData.setEvaluateAtX( calculateAverageEnergy )
-    depEnergy = [ [ E, calculationData.evaluateAtX( E ) ] for E in Es ]
-    absoluteTolerance = 1e-3 * energyAccuracy * max( [ Ep for E, Ep in depEnergy ] )
+    aveEnergy = [ [ E, calculationData.evaluateAtX( E ) ] for E in Es ]
+    absoluteTolerance = 1e-3 * energyAccuracy * max( [ Ep for E, Ep in aveEnergy ] )
     calculationData.setTolerances( energyAccuracy, absoluteTolerance )
-    depEnergy = fudgemath.thickenXYList( depEnergy, calculationData )
-    axes = energyDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit, energyDepositionUnit = energyUnit )
-    depData.append( energyDepositionModule.pointwise( data = depEnergy, axes = axes,
-            label = processInfo.style.label, accuracy = energyAccuracy ) )
+    aveEnergy = fudgemath.thickenXYList( aveEnergy, calculationData )
 
-    if( isinstance( angularSubform, angularModule.isotropic ) and ( productFrame != standardsModule.frames.centerOfMassToken ) ) :
-        depMomentum = [ [ depEnergy[0][0], 0. ], [ depEnergy[-1][0], 0. ] ]
+    if( isinstance( angularSubform, angularModule.isotropic ) and ( productFrame == standardsModule.frames.labToken ) ) :
+        aveMomentum = [ [ aveEnergy[0][0], 0. ], [ aveEnergy[-1][0], 0. ] ]
     else :
-        if( tempInfo['product'].name == 'gamma' ) :
+        if( product.name == 'gamma' ) :
             calculationData.setEvaluateAtX( calculateAverageMomentumForPhoton )
         else :
             calculationData.setEvaluateAtX( calculateAverageMomentum )
-        for E in angularSubform.getEnergyArray( tempInfo['EMin'], tempInfo['EMax'] ) :
-            if( E not in Es ) : Es.append( E )
-        Es.sort( )
-        fixLimits( multiplicityLimits, Es )
-        depMomentum = [ [ E, calculationData.evaluateAtX( E ) ] for E in Es ]
-        absoluteTolerance = 1e-3 * momentumAccuracy * max( [ pp for E, pp in depMomentum ] )
+        Es = sorted( set( Es + angularSubform.getEnergyArray( EMin, EMax ) ) )
+        fixLimits( EMin, EMax, Es )
+        aveMomentum = [ [ E, calculationData.evaluateAtX( E ) ] for E in Es ]
+        absoluteTolerance = 1e-3 * momentumAccuracy * max( [ pp for E, pp in aveMomentum ] )
         calculationData.setTolerances( momentumAccuracy, absoluteTolerance )
-        depMomentum = fudgemath.thickenXYList( depMomentum, calculationData )
-    axes = momentumDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit, momentumDepositionUnit = momentumDepositionUnit )
-    depData.append( momentumDepositionModule.pointwise( data = depMomentum, axes = axes,
-            label = processInfo.style.label, accuracy = momentumAccuracy ) )
+        aveMomentum = fudgemath.thickenXYList( aveMomentum, calculationData )
 
-    return( depData )
+    return( aveEnergy, aveMomentum )

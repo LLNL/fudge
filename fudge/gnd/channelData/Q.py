@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,36 +18,60 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
-import base as baseModule
+from pqu import PQU as PQUModule
+
+from xData import axes as axesModule
+from xData import XYs as XYsModule
+from xData import gridded as griddedModule
+
+from fudge.processing import group as groupModule
 
 from fudge.gnd import miscellaneous as miscellaneousModule
 from fudge.gnd import abstractClasses as abstractClassesModule
 from fudge.gnd import tokens as tokensModule
-
-from pqu import PQU as PQUModule
-
-import xData.axes as axesModule
-import xData.XYs as XYsModule
 
 __metaclass__ = type
 
@@ -55,11 +80,11 @@ __metaclass__ = type
 #
 class baseQForm( abstractClassesModule.form ) :
 
-    __genre = baseModule.QToken
+    pass
 
 class constant( baseQForm ) :
 
-    moniker = tokensModule.constantFormToken
+    moniker = 'constant'
 
     def __init__( self, label, Q ) :
         """
@@ -84,13 +109,15 @@ class constant( baseQForm ) :
 
     def domainMin( self, unitTo = None, asPQU = False ) :
 
-        from fudge.gnd.reactions import reaction
-        return( self.findClassInAncestry( reaction.reaction ).domainMin( unitTo = unitTo, asPQU = asPQU ) )
+        from fudge.gnd.reactions import base as reactionsBaseModule
+
+        return( self.findClassInAncestry( reactionsBaseModule.base_reaction ).domainMin( unitTo = unitTo, asPQU = asPQU ) )
 
     def domainMax( self, unitTo = None, asPQU = False ) :
 
-        from fudge.gnd.reactions import reaction
-        return( self.findClassInAncestry( reaction.reaction ).domainMax( unitTo = unitTo, asPQU = asPQU ) )
+        from fudge.gnd.reactions import base as reactionsBaseModule
+
+        return( self.findClassInAncestry( reactionsBaseModule.base_reaction ).domainMax( unitTo = unitTo, asPQU = asPQU ) )
 
     def domain( self, unitTo = None, asPQU = False ) :
 
@@ -98,8 +125,9 @@ class constant( baseQForm ) :
 
     def domainUnit( self ) :
 
-        from fudge.gnd.reactions import reaction
-        return( self.findClassInAncestry( reaction.reaction ).domainUnit( ) )
+        from fudge.gnd.reactions import base as reactionsBaseModule
+
+        return( self.findClassInAncestry( reactionsBaseModule.base_reaction ).domainUnit( ) )
 
     def getValue( self, E, unit ) :
 
@@ -110,6 +138,10 @@ class constant( baseQForm ) :
 
         return( self.__label )
 
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
+
+        return( self.toPointwise_withLinearXYs( 1e-8, 1e-8 ).processSnMultiGroup( style, tempInfo, indent ) )
+
     def toXMLList( self, indent = '', **kwargs ) :
 
         attributeStr = ''
@@ -117,10 +149,10 @@ class constant( baseQForm ) :
         return( [ '%s<%s%s value="%s"/>' % ( indent, self.moniker, attributeStr, self.Q ) ] )
 
     def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
-        """This method returns the Q-value as linear-linear pointwise data which spans self's domain."""
+        """This method returns the Q-value as linear-linear XYs1d data which spans self's domain."""
 
-        axes = pointwise.defaultAxes( energyUnit = self.domainUnit( ), QUnit = self.Q.getUnitSymbol( ) )
-        return( pointwise( [ [ self.domainMin( ), self.Q.getValue( ) ], [ self.domainMax( ), self.Q.getValue( ) ] ], axes = axes, accuracy = 1e-12 ) )
+        axes = XYs1d.defaultAxes( energyUnit = self.domainUnit( ), QUnit = self.Q.getUnitSymbol( ) )
+        return( XYs1d( data = [ [ self.domainMin( ), self.Q.getValue( ) ], [ self.domainMax( ), self.Q.getValue( ) ] ], axes = axes, accuracy = 1e-12 ) )
 
     @staticmethod
     def parseXMLNode( element, xPath, linkData ):
@@ -130,62 +162,49 @@ class constant( baseQForm ) :
         xPath.pop( )
         return( Q )
 
-class pointwise( baseQForm, XYsModule.XYs ) :
+class XYs1d( baseQForm, XYsModule.XYs1d ) :
 
     mutableYUnit = False
 
     def __init__( self, **kwargs ) :
 
         baseQForm.__init__( self )
-        XYsModule.XYs.__init__( self, **kwargs )
+        XYsModule.XYs1d.__init__( self, **kwargs )
 
-    def process( self, processInfo, tempInfo, verbosityIndent ) :
+    def processSnMultiGroup( self, style, tempInfo, indent ) :
 
-        projectile, target = processInfo.getProjectileName( ), processInfo.getTargetName( )
-        groups = processInfo.getParticleGroups( projectile )
-        grouped = miscellaneousModule.makeGrouped( self, processInfo, tempInfo, self )
-        self.addForm( grouped( grouped ) )
-        grouped = miscellaneousModule.makeGrouped( self, processInfo, tempInfo, Q_E, normType = 'groupedFlux' )
-        self.addForm( groupedWithCrossSection( grouped ) )
+        from fudge.processing import miscellaneous as miscellaneousModule
+
+        indent2 = indent + tempInfo['incrementalIndent']
+        verbosity = tempInfo['verbosity']
+
+        QGrouped = miscellaneousModule.groupOneFunctionAndFlux( style, tempInfo, self )
+        return( groupModule.toMultiGroup1d( multiGroup, style, tempInfo, self.axes, QGrouped ) )
 
     @staticmethod
     def defaultAxes( energyUnit = 'eV', QUnit = 'eV' ) :
 
         axes = axesModule.axes( )
         axes[0] = axesModule.axis( 'energy_in', 0, energyUnit )
-        axes[1] = axesModule.axis( baseModule.QToken, 1, QUnit )
+        axes[1] = axesModule.axis( component.moniker, 1, QUnit )
         return( axes )
 
-class grouped( baseQForm, abstractClassesModule.multiGroup ) :
+class multiGroup( baseQForm, griddedModule.gridded ) :
 
-    moniker = tokensModule.groupedFormToken
+    def __init__( self, **kwargs ) :
 
-    def __init__( self, axes, data ) :
-
-        baseQForm.__init__( self )
-        abstractClassesModule.multiGroup.__init__( self, axes, data )
-
-class groupedWithCrossSection( baseQForm, abstractClassesModule.multiGroup ) :
-
-    moniker = tokensModule.groupedFormToken
-
-    def __init__( self, axes, data ) :
-
-        baseQForm.__init__( self )
-        abstractClassesModule.multiGroup.__init__( self, axes, data )
-
+        griddedModule.gridded.__init__( self, **kwargs )
 #
 # Q component
 #
 class component( abstractClassesModule.component ) :
 
-    __genre = baseModule.QToken
-    moniker = baseModule.QToken
+    moniker = 'Q'
 
     def __init__( self ) :
 
         abstractClassesModule.component.__init__( self,
-                ( constant, pointwise, grouped, groupedWithCrossSection ) )
+                ( constant, XYs1d, multiGroup ) )
 
     def getConstantAs( self, unit ) :
 
@@ -196,13 +215,6 @@ class component( abstractClassesModule.component ) :
     def getValue( self, E, unit ) :
 
         return( self.getEvaluated( ).getValue( E, unit ) )
-
-    def process( self, processInfo, tempInfo, verbosityIndent ) :
-
-        for form in self :
-            if( isinstance( form, pointwise ) ) :
-                ps = form.process( processInfo, tempInfo, verbosityIndent )
-                for p in ps : self.addForm( p )
 
 def parseXMLNode( QElement, xPath, linkData ):
     """
@@ -215,10 +227,9 @@ def parseXMLNode( QElement, xPath, linkData ):
     Q = component( )
     for form in QElement :
         formClass = {
-                constant.moniker                : constant,
-                pointwise.moniker               : pointwise,
-                grouped.moniker                 : grouped,
-                groupedWithCrossSection.moniker : groupedWithCrossSection
+                constant.moniker        : constant,
+                XYs1d.moniker           : XYs1d,
+                multiGroup.moniker      : multiGroup
             }.get( form.tag )
         if( formClass is None ) : raise Exception( "unknown Q form: %s" % form.tag )
         newForm = formClass.parseXMLNode( form, xPath, linkData, **kwargs )

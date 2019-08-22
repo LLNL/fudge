@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 """A covarianceSuite is organized into sections, where each section contains either
@@ -43,6 +67,7 @@
     """
 from xData.ancestry import ancestry
 from xData import link as linkModule
+from fudge.gnd import suites
 from . import covarianceMatrix
 from .mixed import mixedForm
 from .summed import summedCovariance
@@ -51,7 +76,7 @@ from pqu import PQU as PQUModule
 
 __metaclass__ = type
 
-class section( ancestry ):
+class section( suites.suite ):
     """
     A covarianceSuite contains sections, where each section represents either a self-covariance for one quantity,
     or a cross-covariance between two quantities
@@ -75,28 +100,21 @@ class section( ancestry ):
         """ each section needs a unique id, pointers to the central values (row and column),
         and one or more forms """
 
-        ancestry.__init__( self )
+        suites.suite.__init__( self, [covarianceMatrix, mixedForm, summedCovariance, LegendreOrderCovarianceForm] )
         self.label = label #: a str label that gets used on plots, etc.
         self.id = id #: a str identifier, useful for resolving links
         self.rowData = rowData #: xData.link.link pointing to the corresponding data for the covariance row
         self.columnData = columnData #: xData.link.link pointing to the corresponding data for the covariance column
-        self.forms = {} #: a Python dict.  They key is just a string identifying the form.   The value is the actual covariance matrix instance.  
-
-    def addForm( self, form ):
-        form.setAncestor( self )
-        if( form.label in self.forms ) :
-            raise KeyError( "Style '%s' already present" % form.label )
-        self.forms[form.label] = form
 
     def check( self, info ):
         """ check each section """
 
         from fudge.gnd import warning
         warnings = []
-        for style in self.forms:
-            formWarnings = self.forms[style].check( info )
+        for form in self:
+            formWarnings = form.check( info )
             if formWarnings:
-                warnings.append( warning.context( "Form '%s':" % style, formWarnings ) )
+                warnings.append( warning.context( "Form '%s':" % form.label, formWarnings ) )
 
         return warnings
     
@@ -109,7 +127,7 @@ class section( ancestry ):
         if self.columnData is None: info['columnENDF_MFMT'] = None
         else:                       info['columnENDF_MFMT'] = self.columnData['ENDF_MFMT']
         info.update( kw )
-        for style in self.forms: warnings += self.forms[style].fix( **info )
+        for form in self: warnings += form.fix( **info )
         return warnings
 
     def toXMLList( self, indent = '', **kwargs ) :
@@ -122,13 +140,13 @@ class section( ancestry ):
         for dataPointer in ('rowData','columnData'):
             if getattr(self, dataPointer) is not None:
                 xmlString.append( getattr(self, dataPointer).toXML( indent2, **kwargs ) )
-        for key in self.forms.keys():
-            xmlString += self.forms[key].toXMLList( indent2, **kwargs )
+        for form in self:
+            xmlString += form.toXMLList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
-    @staticmethod
-    def parseXMLNode( element, xPath, linkData ):
+    @classmethod
+    def parseXMLNode( cls, element, xPath, linkData ):
         """Translate <section> element from xml."""
 
         xPath.append( '%s[@id="%s"]' % (element.tag, element.get('id') ) )
@@ -149,7 +167,7 @@ class section( ancestry ):
                     }.get( form.tag )
             if formClass is None:
                 raise Exception("encountered unknown covariance matrix form '%s'" % form.tag)
-            section_.addForm( formClass.parseXMLNode( form, xPath, linkData ) )
+            section_.add( formClass.parseXMLNode( form, xPath, linkData ) )
         xPath.pop()
         return section_
 

@@ -7,21 +7,29 @@ import unittest, copy
 
 C4Point = namedtuple( 'C4Point', 'projectile target targetMetastableState MF MT productMetastableState status cmFlag energy  dEnergy  data  dData   cosMuOrLegendreOrder   dCosMuOrLegendreOrder   eLevelOrHalflife  dELevelOrHalflife idOf78 reference exforEntry exforSubEntry multiDimFlag' )
 
+C5Covariance = namedtuple( 'C5Covariance', 'covariance comment algorithm covarData' ) # unused
+
 C4DataSet = namedtuple( 'C4DataSet', 'dataSet date reaction projectile target MF MT c4Begin numData data' )
+
+C5DataSet = namedtuple( 'C4DataSet', 'dataSet date reaction projectile target MF MT product c4Begin numData data' ) # unused
 
 C4Entry = namedtuple( 'C4Entry', 'entry author1 year institute title authors refCode reference numDataSets dataSets' )
 
+
 # ------------------------------------------------
-# C4 Parsers
+# General purpose parsers
 # ------------------------------------------------
-def emptyStringToNone( s ): 
+
+def emptyStringToNone( s ):
     if s.strip() == '': return None
     return s
-    
+
+
 def NoneToEmptyString( n ):
     if n == None: return " "
     return n
-    
+
+
 def readFunkyFloat( value ):
     value = emptyStringToNone( value )
     if value == None: return
@@ -41,6 +49,7 @@ def readFunkyFloat( value ):
             if( value == len( value ) * ' ' ) : return( 0 )
             raise ValueError( 'Could not convert value "%s"' % ( value ) )
     return( f )
+
 
 def writeFunkyFloat( f, width=11, significant_digits=None ): 
     '''
@@ -78,6 +87,11 @@ def writeFunkyFloat( f, width=11, significant_digits=None ):
     if len(s) > width: print 'too big, len(%s)=%i<%i'%(s,len(s),width)
     return s.strip().ljust(width)
 
+
+# ------------------------------------------------
+# C4 Parsers
+# ------------------------------------------------
+
 def readC4File( fList, asPointList = True ):
     if asPointList: return map( readC4Point, filter( lambda x: not ( x.startswith( '#' ) or x.strip()=='' ), fList ) )
     newList = []
@@ -87,7 +101,102 @@ def readC4File( fList, asPointList = True ):
         else: newList[-1].append( line )
     return map( readC4Entry, newList )
 
-def readC4DataSet( fList ): 
+
+def readC4Entry( fList ):
+    '''
+    An example header taken from a c4 file:
+
+        #ENTRY      40617
+        #AUTHOR1    M.V.Pasechnik+
+        #YEAR       1980
+        #INSTITUTE  (4CCPIJI)
+        #TITLE      TOTAL NEUTRON CROSS-SECTIONS FOR MOLYBDENUM
+        #+          AND ZYRCONIUM AT LOW ENERGIES
+        #AUTHOR(S)  M.V.Pasechnik, M.B.Fedorov, V.D.Ovdienko,
+        #+          G.A.Smetanin, T.I.Jakovenko
+        #REF-CODE   (C,80KIEV,1,304,8009)
+        #REFERENCE  Conf. 5.All Union Conf.on Neutron Phys.,Kiev,15-19 Sep 1980
+        #+          Vol.1, p.304, 1980
+        #DATASETS   7
+        #
+        #DATASET    40617007
+        #DATE       19850305
+        #REACTION   40-ZR-92(N,TOT),,SIG
+        #PROJ       1
+        #TARG       40092
+        #MF         3
+        #MT         1
+        #C4BEGIN    [    1 40092   3   1 A ]
+        #DATA       4
+        # Prj Targ M MF MT PXC  Energy  dEnergy  Data      dData   Cos/LO   dCos/LO   ELV/HL  dELV/HL I78
+        #---><---->o<-><-->ooo<-------><-------><-------><-------><-------><-------><-------><-------><->
+            1 40092   3   1 A  442000.0          12.74000 1.700000                                       M.V.PASECHNIK,ET.AL. (80)40617  7
+            1 40092   3   1 A  507000.0          8.790000 0.570000                                       M.V.PASECHNIK,ET.AL. (80)40617  7
+            1 40092   3   1 A  572000.0          9.520000 0.200000                                       M.V.PASECHNIK,ET.AL. (80)40617  7
+            1 40092   3   1 A  637000.0          8.480000 0.110000                                       M.V.PASECHNIK,ET.AL. (80)40617  7
+        #/DATA      4
+        #/DATASET
+        #/ENTRY
+
+    '''
+    entry       =   ''
+    author1     =   'AUTHOR1'
+    year        =   0
+    institute   =   ''
+    title       =   ''
+    authors     =   ''
+    refCode     =   ''
+    reference   =   ''
+    numDataSets =   0
+    dataSets    =   []
+    flist = copy.copy( fList )
+    line = flist.pop(0)
+    while flist:
+        if line.startswith("#ENTRY"):       entry = line[12:].strip()
+        elif line.startswith("#AUTHOR1"):   author1 = line[12:].strip()
+        elif line.startswith("#YEAR"):      year = int( line[12:].strip() )
+        elif line.startswith("#INSTITUTE"): institute = line[12:].strip()
+        elif line.startswith("#TITLE"):
+            title = line[12:].strip()
+            while flist[0].startswith( '#+' ):
+                line = flist.pop( 0 )
+                title += ' ' + line[12:].strip()
+        elif line.startswith("#AUTHOR(S)"):
+            authors = line[12:].strip()
+            while flist[0].startswith( '#+' ):
+                line = flist.pop( 0 )
+                authors += ' ' + line[12:].strip()
+        elif line.startswith("#REF-CODE"):  refCode = line[12:].strip()
+        elif line.startswith("#REFERENCE"):
+            reference = line[12:].strip()
+            while flist[0].startswith( '#+' ):
+                line = flist.pop( 0 )
+                reference += ' ' + line[12:].strip()
+        elif line.startswith("#DATASETS"):  numDataSets = int( line[12:].strip() )
+        elif line.startswith("#DATASET"):
+            sublist = [ line ]
+            while not flist[0].startswith( '#/DATASET' ):
+                sublist.append( flist.pop( 0 ) )
+            sublist.append( flist.pop(0) )
+            dataSets.append(  readC4DataSet( sublist ) )
+        elif line.strip() == "#": pass
+        elif line.startswith( "/ENTRY" ): pass
+        else: pass
+        line = flist.pop(0)
+    return C4Entry(
+        entry = entry,
+        author1 = author1,
+        year = year,
+        institute = institute,
+        title = title,
+        authors = authors,
+        refCode = refCode,
+        reference = reference,
+        numDataSets = numDataSets,
+        dataSets = dataSets)
+
+
+def readC4DataSet( fList ):
     '''
     An example dataset header taken from a c4 file:
 
@@ -144,98 +253,6 @@ def readC4DataSet( fList ):
         line = flist.pop(0)
     return C4DataSet( dataSet=dataSet, date=date, reaction=reaction, projectile=projectile, target=target, MF=MF, MT=MT, c4Begin=c4Begin, numData=numData, data=data )
 
-def readC4Entry( fList ):
-    '''
-    An example header taken from a c4 file:
-
-        #ENTRY      40617
-        #AUTHOR1    M.V.Pasechnik+
-        #YEAR       1980
-        #INSTITUTE  (4CCPIJI)
-        #TITLE      TOTAL NEUTRON CROSS-SECTIONS FOR MOLYBDENUM
-        #+          AND ZYRCONIUM AT LOW ENERGIES
-        #AUTHOR(S)  M.V.Pasechnik, M.B.Fedorov, V.D.Ovdienko,
-        #+          G.A.Smetanin, T.I.Jakovenko
-        #REF-CODE   (C,80KIEV,1,304,8009)
-        #REFERENCE  Conf. 5.All Union Conf.on Neutron Phys.,Kiev,15-19 Sep 1980
-        #+          Vol.1, p.304, 1980
-        #DATASETS   7
-        #
-        #DATASET    40617007
-        #DATE       19850305
-        #REACTION   40-ZR-92(N,TOT),,SIG
-        #PROJ       1
-        #TARG       40092
-        #MF         3
-        #MT         1
-        #C4BEGIN    [    1 40092   3   1 A ]
-        #DATA       4
-        # Prj Targ M MF MT PXC  Energy  dEnergy  Data      dData   Cos/LO   dCos/LO   ELV/HL  dELV/HL I78
-        #---><---->o<-><-->ooo<-------><-------><-------><-------><-------><-------><-------><-------><->
-            1 40092   3   1 A  442000.0          12.74000 1.700000                                       M.V.PASECHNIK,ET.AL. (80)40617  7
-            1 40092   3   1 A  507000.0          8.790000 0.570000                                       M.V.PASECHNIK,ET.AL. (80)40617  7
-            1 40092   3   1 A  572000.0          9.520000 0.200000                                       M.V.PASECHNIK,ET.AL. (80)40617  7
-            1 40092   3   1 A  637000.0          8.480000 0.110000                                       M.V.PASECHNIK,ET.AL. (80)40617  7
-        #/DATA      4
-        #/DATASET
-        #/ENTRY
-
-    '''
-    entry       =   ''
-    author1     =   'AUTHOR1' 
-    year        =   0
-    institute   =   ''
-    title       =   ''
-    authors     =   ''
-    refCode     =   ''
-    reference   =   ''
-    numDataSets =   0
-    dataSets    =   []
-    flist = copy.copy( fList )
-    line = flist.pop(0)
-    while flist:
-        if line.startswith("#ENTRY"):       entry = line[12:].strip()
-        elif line.startswith("#AUTHOR1"):   author1 = line[12:].strip()
-        elif line.startswith("#YEAR"):      year = int( line[12:].strip() )
-        elif line.startswith("#INSTITUTE"): institute = line[12:].strip()
-        elif line.startswith("#TITLE"):     
-            title = line[12:].strip() 
-            while flist[0].startswith( '#+' ):
-                line = flist.pop( 0 )
-                title += ' ' + line[12:].strip()
-        elif line.startswith("#AUTHOR(S)"): 
-            authors = line[12:].strip()
-            while flist[0].startswith( '#+' ):
-                line = flist.pop( 0 )
-                authors += ' ' + line[12:].strip()
-        elif line.startswith("#REF-CODE"):  refCode = line[12:].strip()
-        elif line.startswith("#REFERENCE"): 
-            reference = line[12:].strip()
-            while flist[0].startswith( '#+' ):
-                line = flist.pop( 0 )
-                reference += ' ' + line[12:].strip()
-        elif line.startswith("#DATASETS"):  numDataSets = int( line[12:].strip() )
-        elif line.startswith("#DATASET"):   
-            sublist = [ line ]
-            while not flist[0].startswith( '#/DATASET' ):
-                sublist.append( flist.pop( 0 ) )
-            sublist.append( flist.pop(0) )
-            dataSets.append(  readC4DataSet( sublist ) )
-        elif line.strip() == "#": pass  
-        elif line.startswith( "/ENTRY" ): pass  
-        else: pass
-        line = flist.pop(0)
-    return C4Entry( 
-        entry = entry,
-        author1 = author1,
-        year = year,
-        institute = institute,
-        title = title,
-        authors = authors,
-        refCode = refCode,
-        reference = reference,
-        numDataSets = numDataSets,
-        dataSets = dataSets)
 
 def writeC4Point( pt ):
     return \
@@ -260,6 +277,7 @@ def writeC4Point( pt ):
         str(pt.exforEntry).rjust(4) + \
         str(pt.exforSubEntry).rjust(3) + \
         str(NoneToEmptyString(pt.multiDimFlag))
+
 
 def readC4Point( fline ):
     '''
@@ -333,10 +351,8 @@ def readC4Point( fline ):
         exforEntry              =   fline[122:127], 
         exforSubEntry           =   int(fline[127:130]), 
         multiDimFlag            =   multiDimFlag )
-  
-  
-  
-        
+
+
 # ------------------------------------------------
 # Unit tests
 # ------------------------------------------------
@@ -353,6 +369,7 @@ class TestFunkyFloats( unittest.TestCase ):
         for k,v in self.nums.items():
             self.assertEqual( v, writeFunkyFloat( k ) )
 
+
 class TestReadC4Point( unittest.TestCase ):
     def setUp( self ): 
         self.a = C4Point( projectile=1, target=40092, targetMetastableState=None, MF=3, MT=1, productMetastableState=None, status='A', cmFlag=None, energy=504400.0, dEnergy=4961.493, data=8.146000, dData=0.404200, cosMuOrLegendreOrder=None, dCosMuOrLegendreOrder=None, eLevelOrHalflife=None, dELevelOrHalflife=None, idOf78=None, reference='L.GREEN,ET.AL. (73)', exforEntry='10225', exforSubEntry=20, multiDimFlag=None )
@@ -363,6 +380,7 @@ class TestReadC4Point( unittest.TestCase ):
         c = writeC4Point( b )
         self.assertEqual( txt, c )
         self.assertEqual( self.a, readC4Point(c) )
+
 
 class TestReadC4Entry( unittest.TestCase ):
     def setUp( self ): 
@@ -425,7 +443,8 @@ class TestReadC4Entry( unittest.TestCase ):
 #/ENTRY
 '''.split('\n') )
         self.assertEqual( self.a, b )
-     
+
+
 class TestReadC4DataSet( unittest.TestCase ):
     def setUp( self ): 
         self.a = C4DataSet( 
@@ -455,7 +474,8 @@ class TestReadC4DataSet( unittest.TestCase ):
     1 40092   3   1 A  637000.0          8.480000 0.110000                                       M.V.PASECHNIK,ET.AL. (80)40617  7
 #/DATA      4
 '''.split('\n') )
-     
+
+
 class TestReadC4File( unittest.TestCase ):
     def setUp( self ): 
         self.testData = '''
@@ -600,7 +620,8 @@ class TestReadC4File( unittest.TestCase ):
         self.assertEqual( readC4File( self.testData.split( '\n' ), asPointList = False ), self.a ) 
     def test_b( self ): 
         self.assertEqual( readC4File( self.testData.split( '\n' ), asPointList = True ), self.b ) 
-     
+
+
 # ------------------------------------------------
 # Main !!
 # ------------------------------------------------

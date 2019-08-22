@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 __metaclass__ = type
@@ -59,7 +83,7 @@ class arrayBase( baseModule.xDataCoreMembers ) :
 
     moniker = 'array'
 
-    def __init__( self, shape, symmetry, storageOrder = storageRowToken, 
+    def __init__( self, shape = None, symmetry = None, storageOrder = storageRowToken, 
                 offset = None, permutation = permutationPlusToken,
                 index = None, label = None ) :
 
@@ -68,7 +92,7 @@ class arrayBase( baseModule.xDataCoreMembers ) :
 
         shape = tuple( int( value ) for value in shape )
         if( len( shape ) == 0 ) : raise ValueError( 'shape must contain at least one value' )
-        if( min( shape ) <= 0 ) : raise ValueError( 'shape lengths must be greater than 0: %s' % shape )
+        if( min( shape ) <= 0 ) : raise ValueError( 'illegal shape "%s": lengths must all be greater than 0' % str(shape) )
         self.__shape = shape
         if( self.dimension > 3 ) : raise Exception( 'Currently, dimension = %d > 3 not supported' % len( self ) )
 
@@ -156,7 +180,7 @@ class arrayBase( baseModule.xDataCoreMembers ) :
         return( '\n'.join( self.toXMLList( indent = indent, **kwargs ) ) )
 
     @classmethod
-    def parseXMLNode( cls, xDataElement, xPath = [], linkData = {}, **kwargs ) :
+    def parseXMLNode( cls, xDataElement, xPath, linkData, **kwargs ) :
 
         xPath.append( xDataElement.tag )
 
@@ -165,12 +189,12 @@ class arrayBase( baseModule.xDataCoreMembers ) :
         numberOfValues = { full.compression : [ 1 ], diagonal.compression : [ 1, 2 ], flattened.compression : [ 3 ],
                 embedded.compression : [ -1 ] }[compression]
         if( ( numberOfValues[0] != -1 ) and ( len( xDataElement ) not in numberOfValues ) ) :
-                raise Exception( '%s array expects %s sub-elements: got %d' % ( numberOfValues, len( xDataElement ) ) )
+                raise Exception( '%s array expects %s sub-elements: got %d' % ( cls.compression, numberOfValues, len( xDataElement ) ) )
         shape = attributes.pop( 'shape' )
 
+        valuesDict = {}
         if( compression != embedded.compression ) :
-            values = [ valuesModule.values.parseXMLNode( valuesElements, xPath = xPath ) for valuesElements in xDataElement ]
-            valuesDict = {}
+            values = [ valuesModule.values.parseXMLNode( valuesElements, xPath, linkData ) for valuesElements in xDataElement ]
             for value in values :
                 label = value.label
                 if( value.label is None ) : label = 'data'
@@ -186,8 +210,8 @@ class arrayBase( baseModule.xDataCoreMembers ) :
         elif( compression == embedded.compression ) :
             array1 = embedded( shape, **attributes )
             for subArrayElement in xDataElement :
-                array2 = arrayBase.parseXMLNode( subArrayElement, xPath = xPath )
-                array1.addArray( array2, copy = False ) 
+                array2 = arrayBase.parseXMLNode( subArrayElement, xPath, linkData )
+                array1.addArray( array2, copy = False )
         else :
             raise TypeError( 'Unsupported array type = "%s"' % compression )
 
@@ -199,7 +223,7 @@ class arrayBase( baseModule.xDataCoreMembers ) :
 
         from xml.etree import cElementTree
 
-        return( cls.parseXMLNode( cElementTree.fromstring( XMLString ) ) )
+        return( cls.parseXMLNode( cElementTree.fromstring( XMLString ), xPath=[], linkData={} ) )
 
     @staticmethod
     def parseXMLNodeAttributes( xDataElement ) :
@@ -259,7 +283,7 @@ class full( arrayBase ) :
 
     compression = 'full'
 
-    def __init__( self, shape, data, symmetry = symmetryNoneToken, storageOrder = storageRowToken, 
+    def __init__( self, shape = None, data = None, symmetry = symmetryNoneToken, storageOrder = storageRowToken, 
                 offset = None, permutation = permutationPlusToken,
                 index = None, label = None ) :
 
@@ -344,7 +368,7 @@ class diagonal( arrayBase ) :
 
     compression = 'diagonal'
 
-    def __init__( self, shape, data, startingIndices = None, symmetry = symmetryNoneToken, storageOrder = storageRowToken, 
+    def __init__( self, shape = None, data = None, startingIndices = None, symmetry = symmetryNoneToken, storageOrder = storageRowToken, 
                 offset = None, permutation = permutationPlusToken,
                 index = None, label = None ) :
 
@@ -438,13 +462,16 @@ class flattened( arrayBase ) :
 
     compression = 'flattened'
 
-    def __init__( self, shape, data, starts, lengths, symmetry = symmetryNoneToken, storageOrder = storageRowToken,
+    def __init__( self, shape = None, data = None, starts = None, lengths = None, symmetry = symmetryNoneToken, storageOrder = storageRowToken,
                 offset = None, permutation = permutationPlusToken,
-                index = None, label = None ) :
+                index = None, label = None,
+                dataToString = None ) :
 
         arrayBase.__init__( self, shape, symmetry, storageOrder = storageOrder,
                 offset = offset, permutation = permutation,
                 index = index, label = label )
+
+        self.dataToString = dataToString
 
         if( not( isinstance( data, valuesModule.values ) ) ) : data = valuesModule.values( data )
         if( not( isinstance( starts, valuesModule.values ) ) ) : 
@@ -454,7 +481,6 @@ class flattened( arrayBase ) :
 
         if( len( starts ) != len( lengths ) ) : raise ValueError( 'length of starts = %d must equal length of lengths = %d' %
                 ( len( starts ), len( lengths ) ) )
-        if( len( starts ) == 0 ) : raise ValueError( 'starts and lengths have no data' )
 
         size = len( data )
         length = 0
@@ -473,7 +499,7 @@ class flattened( arrayBase ) :
 
         self.starts = starts.copy( label = 'starts' )
         self.lengths = lengths.copy( label = 'lengths' )
-        self.values = data.copy( )
+        self.data = data.copy( )
 
     def constructArray( self ) :
 
@@ -484,7 +510,7 @@ class flattened( arrayBase ) :
         for i1, start in enumerate( self.starts ) :
             length = self.lengths[i1]
             for i2 in range( length ) :
-                array1[start+i2] = self.values[index]
+                array1[start+i2] = self.data[index]
                 index += 1
 
         order = { storageRowToken : 'C', storageColumnToken : 'F' }[self.storageOrder]
@@ -492,7 +518,7 @@ class flattened( arrayBase ) :
 
     def copy( self ) :
 
-        return( flattened( self.shape, self.values, self.starts, self.lengths, 
+        return( flattened( self.shape, self.data, self.starts, self.lengths, 
                 symmetry = self.symmetry, storageOrder = self.storageOrder,
                 offset = self.offset, permutation = self.permutation,
                 index = self.index, label = self.label ) )
@@ -505,7 +531,9 @@ class flattened( arrayBase ) :
         XMLList = [ '%s<%s%s>' % ( indent, self.moniker, attributesStr ) ]
         XMLList += self.starts.toXMLList( indent2, **kwargs )
         XMLList += self.lengths.toXMLList( indent2, **kwargs )
-        XMLList += self.values.toXMLList( indent2, **kwargs )
+        kwargs['dataToString'] = self.dataToString
+        kwargs['dataToStringParent'] = self
+        XMLList += self.data.toXMLList( indent2, **kwargs )
         XMLList[-1] += '</%s>' % self.moniker
         return( XMLList )
 
@@ -513,7 +541,7 @@ class embedded( arrayBase ) :
 
     compression = 'embedded'
 
-    def __init__( self, shape, symmetry = symmetryNoneToken, storageOrder = storageRowToken,
+    def __init__( self, shape = None, symmetry = symmetryNoneToken, storageOrder = storageRowToken,
                 offset = None, permutation = permutationPlusToken,
                 index = None, label = None ) :
 
@@ -544,7 +572,6 @@ class embedded( arrayBase ) :
 
         import numpy
 
-        index = 0
         order = { storageRowToken : 'C', storageColumnToken : 'F' }[self.storageOrder]
         array1 = numpy.zeros( self.shape, order = order )
 

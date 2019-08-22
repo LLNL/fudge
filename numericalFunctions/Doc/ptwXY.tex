@@ -382,7 +382,6 @@ The \highlight{ptwXYPoints} type is defined as:
 typedef
     struct ptwXYPoints_s {
         nfu_status status;
-        ptwXY_sigma typeX, typeY;
         ptwXY_interpolation interpolation;
         int userFlag;
         double biSectionMax;
@@ -436,18 +435,7 @@ allows the use of ptwXY storage type for data that does not fit into one the oth
 functions cannot handle the other interpolation and also return the error nfu\_invalidInterpolation.
 
 \subsection{Data types}
-Currently, the \highlight{ptwXY} model only supports a point as an $(x, y)$ pair. In the future uncertainty values may be added
-to both the $x$ and $y$ values. For examples, the $y$ value could have an uncertainty $dy$, in which case a point would require
-3 values $(x, y, dy)$. The data type \highlight{ptwXY\_sigma} specify the the number of values and their meaning for each axis
-and is defined as:
-\begin{verbatim}
-typedef enum ptwXY_sigma_e {
-    ptwXY_sigma_none,       /* Datum contains only x or y values. */
-    ptwXY_sigma_plusMinus,  /* Currently not supported. */
-    ptwXY_sigma_Minus,      /* Currently not supported. */
-    ptwXY_sigma_plus        /* Currently not supported. */
-} ptwXY_sigma;
-\end{verbatim}
+Currently, the \highlight{ptwXY} model only supports a point as an $(x, y)$ pair. 
 
 \subsection{Miscellaneous types}
 The routine \highlight{ptwXY\_getPointsAroundX} is used by other routines to determine

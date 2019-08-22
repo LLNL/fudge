@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -61,6 +85,7 @@ staticforward PyTypeObject listOfDoubles_CPyType;
 
 typedef struct listOfDoubles_CPy_s {
     PyObject_HEAD
+    statusMessageReporting smr;
     ptwXPoints *ptwX;
 } listOfDoubles_CPy;
 
@@ -81,14 +106,13 @@ static void listOfDoubles_C_dealloc( PyObject *self );
 static PyObject *listOfDoubles_C__repr__( listOfDoubles_CPy *self );
 static Py_ssize_t listOfDoubles_C__len__( listOfDoubles_CPy *self );
 static PyObject *listOfDoubles_C__getitem__( listOfDoubles_CPy *self, Py_ssize_t index );
-static void listOfDoubles_C_getSliceIndices( int64_t length, int64_t *index1, int64_t *index2 );
 static PyObject *listOfDoubles_C__getslice__( listOfDoubles_CPy *self, Py_ssize_t index1_, Py_ssize_t index2_ );
 static int listOfDoubles_C__setitem__( listOfDoubles_CPy *self, Py_ssize_t index, PyObject *value );
 static int listOfDoubles_C__setslice__( listOfDoubles_CPy *self, Py_ssize_t index1_, Py_ssize_t index2_, PyObject *value );
 static int listOfDoubles_C_contains( listOfDoubles_CPy *self, PyObject *args );
 static PyObject *listOfDoubles_C__add__( PyObject *self, PyObject *other );
 static PyObject *listOfDoubles_C__iadd__( PyObject *self, PyObject *other );
-static int listOfDoubles_C_addListNTimes( ptwXPoints *ptwX, int numberOfTimes, int64_t length, double *xs );
+static int listOfDoubles_C_addListNTimes( statusMessageReporting *smr, ptwXPoints *ptwX, int numberOfTimes, int64_t length, double *xs );
 static PyObject *listOfDoubles_C__mul__( PyObject *self, PyObject *other );
 static PyObject *listOfDoubles_C__imul__( PyObject *self, PyObject *other );
 static PyObject *listOfDoubles_C__abs__( PyObject *self );
@@ -113,6 +137,7 @@ static char *listOfDoubles_C_toString_isFormatForDouble( char *format, int retur
 static PyObject *listOfDoubles_C_unique( listOfDoubles_CPy *self, PyObject *args, PyObject *keywords );
 static PyObject *listOfDoubles_C_richCompare( PyObject *self, PyObject *other, int op );
 
+static void listOfDoubles_C_getSliceIndices( int64_t length, int64_t *index1, int64_t *index2 );
 static PyObject *listOfDoubles_C_createFromString( listOfDoubles_CPy *self, PyObject *args, PyObject *keywords );
 
 static int listOfDoubles_C_PyNumberToFloat( PyObject *n, double *d );
@@ -120,6 +145,7 @@ static int64_t listOfDoubles_C_doubleListToCList( PyObject *PyDoubleList, double
 static listOfDoubles_CPy *listOfDoubles_C_copyPy( listOfDoubles_CPy *self, int asNew );
 static void listOfDoubles_C_Get_listOfDoubles_CAsSelf( PyObject *self, PyObject *other, PyObject **s, PyObject **o );
 static PyObject *listOfDoubles_C_GetNone( void );
+static void listOfDoubles_C_SetPyErrorExceptionFromSMR( PyObject *type, statusMessageReporting *smr );
 static PyObject *listOfDoubles_C_SetPyErrorExceptionReturnNull( const char *s, ... );
 static int listOfDoubles_C_SetPyErrorExceptionReturnMinusOne( const char *s, ... );
 static int listOfDoubles_C_checkStatus( listOfDoubles_CPy *self, char const *func );
@@ -132,7 +158,10 @@ static listOfDoubles_CPy *listOfDoubles_CNewInitialize( void ) {
 
     listOfDoubles_CPy *self = (listOfDoubles_CPy *) PyObject_New( listOfDoubles_CPy, &listOfDoubles_CPyType );
 
-    if( self ) self->ptwX = NULL;
+    if( self != NULL ) {
+        smr_initialize( &(self->smr), smr_status_Ok );
+        self->ptwX = NULL;
+    }
     return( self );
 }
 /*
@@ -141,7 +170,6 @@ static listOfDoubles_CPy *listOfDoubles_CNewInitialize( void ) {
 static int listOfDoubles_C__init__( listOfDoubles_CPy *self, PyObject *args, PyObject *keywords ) {
 
     int initialSize = 100;
-    nfu_status status_nf;
     static char *kwlist[] = { "data", "initialSize" };
     ptwXPoints *ptwX;
     PyObject *dataPy = NULL;
@@ -149,7 +177,7 @@ static int listOfDoubles_C__init__( listOfDoubles_CPy *self, PyObject *args, PyO
     self->ptwX = NULL;
     if( !PyArg_ParseTupleAndKeywords( args, keywords, "|Oi", kwlist, &dataPy, &initialSize ) ) return( -1 );
 
-    if( ( ptwX = ptwX_new( initialSize, &status_nf ) ) == NULL ) {
+    if( ( ptwX = ptwX_new( NULL, initialSize ) ) == NULL ) {
         PyErr_NoMemory( );
         return( -1 );
     }
@@ -182,6 +210,7 @@ static void listOfDoubles_C_dealloc( PyObject *self ) {
 static PyObject *listOfDoubles_C__repr__( listOfDoubles_CPy *self ) {
 
     if( listOfDoubles_C_checkStatus( self, "__repr__" ) != 0 ) return( NULL );
+
     return( listOfDoubles_C_toString2( self, 1, "%16.8e", " " ) );
 }
 /*
@@ -190,7 +219,8 @@ static PyObject *listOfDoubles_C__repr__( listOfDoubles_CPy *self ) {
 static Py_ssize_t listOfDoubles_C__len__( listOfDoubles_CPy *self ) {
 
     if( listOfDoubles_C_checkStatus( self, "__len__" ) != 0 ) return( -1 );
-    return( (Py_ssize_t) ptwX_length( self->ptwX ) );
+
+    return( (Py_ssize_t) ptwX_length( NULL, self->ptwX ) );
 }
 /*
 ************************************************************
@@ -199,36 +229,16 @@ static PyObject *listOfDoubles_C__getitem__( listOfDoubles_CPy *self, Py_ssize_t
 
     int64_t index = (int64_t) index_;
     double *point;
+    statusMessageReporting *smr = &(self->smr);
 
     if( listOfDoubles_C_checkStatus( self, "__getitem__" ) != 0 ) return( NULL );
+
     if( index < 0 ) index += self->ptwX->length;
-    if( ( point = ptwX_getPointAtIndex( self->ptwX, index ) ) == NULL ) {
-        PyErr_SetString( PyExc_IndexError, "index out of range" );
+    if( ( point = ptwX_getPointAtIndex( smr, self->ptwX, index ) ) == NULL ) {
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_IndexError, smr );
         return( NULL );
     }
     return( (PyObject *) Py_BuildValue( "d", *point ) );
-}
-/*
-************************************************************
-*/
-static void listOfDoubles_C_getSliceIndices( int64_t length, int64_t *index1, int64_t *index2 ) {
-
-    if( length == 0 ) {
-        *index1 = 0;
-        *index2 = 0; }
-    else {
-        if( *index1 < 0 ) {
-            *index1 += length;
-            if( *index1 < 0 ) *index1 = 0;
-        }
-        if( *index1 > length ) *index1 = length;
-        if( *index2 < 0 ) {
-            *index2 = *index2 + length;
-            if( *index2 < 0 ) *index2 = 0;
-        }
-        if( *index2 > length ) *index2 = length;
-        if( *index1 > *index2 ) *index2 = *index1;
-    }
 }
 /*
 ************************************************************
@@ -238,15 +248,16 @@ static PyObject *listOfDoubles_C__getslice__( listOfDoubles_CPy *self, Py_ssize_
     int64_t index1 = (int64_t) index1_, index2 = (int64_t) index2_;
     listOfDoubles_CPy *newPy;
     ptwXPoints *n;
-    nfu_status status_nf;
+    statusMessageReporting *smr = &(self->smr);
 
     if( listOfDoubles_C_checkStatus( self, "__getslice__" ) != 0 ) return( NULL );
 
     listOfDoubles_C_getSliceIndices( self->ptwX->length, &index1, &index2 );
     if( ( newPy = listOfDoubles_CNewInitialize( ) ) == NULL ) return( NULL );
-    if( ( n = ptwX_slice( self->ptwX, index1, index2, &status_nf ) ) == NULL ) {
+    if( ( n = ptwX_slice( smr, self->ptwX, index1, index2 ) ) == NULL ) {
         Py_DECREF( newPy );
-        return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "Error from __getslice__: %s", nfu_statusMessage( status_nf ) ) );
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
     }
     newPy->ptwX = n;
     return( (PyObject *) newPy );
@@ -260,19 +271,32 @@ static int listOfDoubles_C__setitem__( listOfDoubles_CPy *self, Py_ssize_t index
 */
     int status = 0;
     int64_t index = (int64_t) index_;
+    statusMessageReporting *smr = &(self->smr);
 
     if( listOfDoubles_C_checkStatus( self, "__setitem__" ) != 0 ) return( -1 );
+
     if( ( index < 0 ) || ( index >= self->ptwX->length ) ) {
-        PyErr_SetString( PyExc_IndexError, "index out of range" );
+        char *msg = smr_allocateFormatMessage( "index = %d out of range: (0 to %d)", (int) index, (int) self->ptwX->length );
+        if( msg == NULL ) {
+            PyErr_SetString( PyExc_IndexError, "index out of range" ); }
+        else {
+            PyErr_SetString( PyExc_IndexError, msg );
+            free( msg );
+        }
         return( -1 );
     }
     if( valuePy == NULL ) {
-        ptwX_deletePoints( self->ptwX, index, index + 1 ); }    /* Have already check for possible errors above, no need to here. */
+        ptwX_deletePoints( NULL, self->ptwX, index, index + 1 ); }    /* Have already check for possible errors above, no need to here. */
     else {
         double value = 0;
 
         if( ( status = listOfDoubles_C_PyNumberToFloat( valuePy, &value ) ) == 0 ) {
-            ptwX_setPointAtIndex( self->ptwX, index, value );       /* index verified above. */
+            if( ptwX_setPointAtIndex( smr, self->ptwX, index, value ) != nfu_Okay ) {
+                listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+                return( -1 );
+            } }
+        else {
+            self->ptwX->status = nfu_badInput;
         }
     }
     return( status );
@@ -287,19 +311,22 @@ static int listOfDoubles_C__setslice__( listOfDoubles_CPy *self, Py_ssize_t inde
     int64_t index1 = (int64_t) index1_, index2 = (int64_t) index2_, length;
     double *xs;
     nfu_status status_nf;
+    statusMessageReporting *smr = &(self->smr);
 
     if( listOfDoubles_C_checkStatus( self, "__setslice_" ) != 0 ) return( -1 );
 
     listOfDoubles_C_getSliceIndices( self->ptwX->length, &index1, &index2 );
 
-    ptwX_deletePoints( self->ptwX, index1, index2 );        /* Have already check for possible errors above, no need to here. */
+    ptwX_deletePoints( NULL, self->ptwX, index1, index2 );        /* Have already check for possible errors above, no need to here. */
     if( PyDoubleList != NULL ) {
         if( ( length = listOfDoubles_C_doubleListToCList( PyDoubleList, &xs ) ) < 0 ) return( -1 );
         if( length > 0 ) {
-            status_nf = ptwX_insertPointsAtIndex( self->ptwX, index1, length, xs );
+            status_nf = ptwX_insertPointsAtIndex( smr, self->ptwX, index1, length, xs );
             free( xs );
-            if( status_nf != nfu_Okay )
-                return( listOfDoubles_C_SetPyErrorExceptionReturnMinusOne( "Error from ptwX_insertPointsAtIndex: %s", nfu_statusMessage( status_nf ) ) );
+            if( status_nf != nfu_Okay ) {
+                listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+                self->ptwX->status = nfu_badInput;
+            }
         }
     }
     return( 0 );
@@ -312,12 +339,13 @@ static int listOfDoubles_C_contains( listOfDoubles_CPy *self, PyObject *args ) {
     int status = 0;
     int64_t index;
     double value = 0, difference;
-    nfu_status status_nf;
+    statusMessageReporting *smr = &(self->smr);
 
     if( listOfDoubles_C_PyNumberToFloat( args, &value ) ) return( -1 );
 
-    if( ( status_nf = ptwX_closesDifference( self->ptwX, value, &index, &difference ) ) != nfu_Okay ) {
-        return( listOfDoubles_C_SetPyErrorExceptionReturnMinusOne( "Error from ptwX_closesDifference: %s", nfu_statusMessage( status_nf ) ) );
+    if( ptwX_closesDifference( smr, self->ptwX, value, &index, &difference ) != nfu_Okay ) {
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( -1 );
     }
     if( difference == 0. ) status = 1;
     return( status );
@@ -345,17 +373,19 @@ static PyObject *listOfDoubles_C__add__( PyObject *self, PyObject *other ) {
     int status;
     int64_t length;
     double *xs = NULL;
-    listOfDoubles_CPy *nPy = NULL;
+    listOfDoubles_CPy *self2 = (listOfDoubles_CPy *) self, *nPy = NULL;
+    statusMessageReporting *smr = &(self2->smr);
 
-    if( listOfDoubles_C_checkStatus( (listOfDoubles_CPy *) self, "__add__" ) != 0 ) return( NULL );
+    if( listOfDoubles_C_checkStatus( self2, "__add__" ) != 0 ) return( NULL );
+
     if( ( length = listOfDoubles_C_doubleListToCList( other, &xs ) ) < 0 ) return( NULL );
-    if( ( nPy = listOfDoubles_C_copyPy( (listOfDoubles_CPy *) self, 0 ) ) == NULL ) {
+    if( ( nPy = listOfDoubles_C_copyPy( self2, 0 ) ) == NULL ) {
         free( xs );
         return( NULL );
     }
 
     if( length > 0 ) {
-        status = listOfDoubles_C_addListNTimes( nPy->ptwX, 1, length, xs );
+        status = listOfDoubles_C_addListNTimes( smr, nPy->ptwX, 1, length, xs );
         free( xs );
         if( status != 0 ) {
             Py_DECREF( nPy );
@@ -373,13 +403,16 @@ static PyObject *listOfDoubles_C__iadd__( PyObject *self, PyObject *other ) {
     int status;
     int64_t length;
     double *xs = NULL;
-    ptwXPoints *ptwX = ((listOfDoubles_CPy *) self)->ptwX;
+    listOfDoubles_CPy *self2 = (listOfDoubles_CPy *) self;
+    ptwXPoints *ptwX = self2->ptwX;
+    statusMessageReporting *smr = &(self2->smr);
 
-    if( listOfDoubles_C_checkStatus( (listOfDoubles_CPy *) self, "__iadd__" ) != 0 ) return( NULL );
+    if( listOfDoubles_C_checkStatus( self2, "__iadd__" ) != 0 ) return( NULL );
+
     if( ( length = listOfDoubles_C_doubleListToCList( other, &xs ) ) < 0 ) return( NULL );
 
     if( length > 0 ) {
-        status = listOfDoubles_C_addListNTimes( ptwX, 1, length, xs );
+        status = listOfDoubles_C_addListNTimes( smr, ptwX, 1, length, xs );
         free( xs );
         if( status != 0 ) return( NULL );
     }
@@ -390,16 +423,15 @@ static PyObject *listOfDoubles_C__iadd__( PyObject *self, PyObject *other ) {
 /*
 ************************************************************
 */
-static int listOfDoubles_C_addListNTimes( ptwXPoints *ptwX, int numberOfTimes, int64_t length, double *xs ) {
+static int listOfDoubles_C_addListNTimes( statusMessageReporting *smr, ptwXPoints *ptwX, int numberOfTimes, int64_t length, double *xs ) {
 
     int64_t i1, size = numberOfTimes * length;
-    nfu_status status_nf;
 
     if( size < 1 ) return( 0 );
     for( i1 = 0; i1 < numberOfTimes; i1++ ) {
-        status_nf = ptwX_insertPointsAtIndex( ptwX, ptwX->length, length, xs );
-        if( status_nf != nfu_Okay ) {
-            return( listOfDoubles_C_SetPyErrorExceptionReturnMinusOne( "Error from ptwX_insertPointsAtIndex: %s", nfu_statusMessage( status_nf ) ) );
+        if( ptwX_insertPointsAtIndex( smr, ptwX, ptwX->length, length, xs ) != nfu_Okay ) {
+            listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+            return( -1 );
         }
     }
     return( 0 );
@@ -410,23 +442,27 @@ static int listOfDoubles_C_addListNTimes( ptwXPoints *ptwX, int numberOfTimes, i
 static PyObject *listOfDoubles_C__mul__( PyObject *self, PyObject *other ) {
 
     int status;
-    listOfDoubles_CPy *nPy = NULL, *oPy;
+    listOfDoubles_CPy *self2, *nPy = NULL;
     long multiplier;
-    PyObject *self2, *other2;
+    PyObject *self3, *other3;
+    statusMessageReporting *smr;
 
-    listOfDoubles_C_Get_listOfDoubles_CAsSelf( self, other, &self2, &other2 );
+    listOfDoubles_C_Get_listOfDoubles_CAsSelf( self, other, &self3, &other3 );
+
+    self2 = (listOfDoubles_CPy *) self3;
     if( listOfDoubles_C_checkStatus( (listOfDoubles_CPy *) self2, "__mul__" ) != 0 ) return( NULL );
-    oPy = (listOfDoubles_CPy *) self2;
-    multiplier = PyInt_AsLong( other2 );
+    smr = &(self2->smr);
+
+    multiplier = PyInt_AsLong( other3 );
     if( multiplier == -1 ) {
         if( PyErr_Occurred( ) != NULL ) return( NULL );
     }
     if( multiplier < 0 ) multiplier = 0;
 
-    if( ( nPy = listOfDoubles_C_copyPy( (listOfDoubles_CPy *) self2, 1 ) ) == NULL ) return( NULL );
+    if( ( nPy = listOfDoubles_C_copyPy( self2, 1 ) ) == NULL ) return( NULL );
 
-    if( oPy->ptwX->length > 0 ) {       /* BRB; the next line needs to be fixed so that multiplier is checked before casting or something???????? */
-        status = listOfDoubles_C_addListNTimes( nPy->ptwX, (int) multiplier, oPy->ptwX->length, oPy->ptwX->points );
+    if( self2->ptwX->length > 0 ) {       /* BRB; the next line needs to be fixed so that multiplier is checked before casting or something???????? */
+        status = listOfDoubles_C_addListNTimes( smr, nPy->ptwX, (int) multiplier, self2->ptwX->length, self2->ptwX->points );
         if( status != 0 ) {
             Py_DECREF( nPy );
             return( NULL );
@@ -440,24 +476,27 @@ static PyObject *listOfDoubles_C__mul__( PyObject *self, PyObject *other ) {
 */
 static PyObject *listOfDoubles_C__imul__( PyObject *self, PyObject *other ) {
 
-    listOfDoubles_CPy *oPy = (listOfDoubles_CPy *) self;
+    listOfDoubles_CPy *self2 = (listOfDoubles_CPy *) self;
     long multiplier;
-    nfu_status status_nf;
+    statusMessageReporting *smr = &(self2->smr);
 
-    if( listOfDoubles_C_checkStatus( (listOfDoubles_CPy *) self, "__imul__" ) != 0 ) return( NULL );
+    if( listOfDoubles_C_checkStatus( self2, "__imul__" ) != 0 ) return( NULL );
+
     multiplier = PyInt_AsLong( other );
     if( multiplier == -1 ) {
         if( PyErr_Occurred( ) != NULL ) return( NULL );
     }
 
-    if( oPy->ptwX->length > 0 ) {
+    if( self2->ptwX->length > 0 ) {
         if( multiplier < 1 ) {
-            ptwX_clear( oPy->ptwX ); }
+            ptwX_clear( NULL, self2->ptwX ); }
         else if( multiplier > 1 ) {
-            if( ( status_nf = ptwX_reallocatePoints( oPy->ptwX, multiplier * oPy->ptwX->length, 0 ) ) != nfu_Okay )
-                return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "Error from ptwX_reallocatePoints: %s", nfu_statusMessage( status_nf ) ) );
+            if( ptwX_reallocatePoints( smr, self2->ptwX, multiplier * self2->ptwX->length, 0 ) != nfu_Okay ) {
+                listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+                return( NULL );
+            }
                     /* BRB; the next line needs to be fixed so that multiplier is checked before casting or something???????? */
-            if( listOfDoubles_C_addListNTimes( oPy->ptwX, (int) multiplier - 1, oPy->ptwX->length, oPy->ptwX->points ) != 0 ) return( NULL );
+            if( listOfDoubles_C_addListNTimes( smr, self2->ptwX, (int) multiplier - 1, self2->ptwX->length, self2->ptwX->points ) != 0 ) return( NULL );
         }
     }
     Py_INCREF( self );
@@ -468,13 +507,14 @@ static PyObject *listOfDoubles_C__imul__( PyObject *self, PyObject *other ) {
 */
 static PyObject *listOfDoubles_C__abs__( PyObject *self ) {
 
-    nfu_status status_nf;
-    listOfDoubles_CPy *nPy;
+    listOfDoubles_CPy *self2 = (listOfDoubles_CPy *) self, *nPy;
+    statusMessageReporting *smr = &(self2->smr);
 
-    if( ( nPy = listOfDoubles_C_copyPy( (listOfDoubles_CPy *) self, 0 ) ) == NULL ) return( NULL );
-    if( ( status_nf = ptwX_abs( ((listOfDoubles_CPy *) nPy)->ptwX ) ) != nfu_Okay ) {
+    if( ( nPy = listOfDoubles_C_copyPy( self2, 0 ) ) == NULL ) return( NULL );
+    if( ptwX_abs( smr, ((listOfDoubles_CPy *) nPy)->ptwX ) != nfu_Okay ) {
         Py_DECREF( nPy );
-        return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "Error from ptwX_abs: %s", nfu_statusMessage( status_nf ) ) );
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
     }
     return( (PyObject *) nPy );
 }
@@ -483,13 +523,14 @@ static PyObject *listOfDoubles_C__abs__( PyObject *self ) {
 */
 static PyObject *listOfDoubles_C__neg__( PyObject *self ) {
 
-    nfu_status status_nf;
-    listOfDoubles_CPy *nPy;
+    listOfDoubles_CPy *self2 = (listOfDoubles_CPy *) self, *nPy;
+    statusMessageReporting *smr = &(self2->smr);
 
-    if( ( nPy = listOfDoubles_C_copyPy( (listOfDoubles_CPy *) self, 0 ) ) == NULL ) return( NULL );
-    if( ( status_nf = ptwX_neg( ((listOfDoubles_CPy *) nPy)->ptwX ) ) != nfu_Okay ) {
+    if( ( nPy = listOfDoubles_C_copyPy( self2, 0 ) ) == NULL ) return( NULL );
+    if( ptwX_neg( smr, ((listOfDoubles_CPy *) nPy)->ptwX ) != nfu_Okay ) {
         Py_DECREF( nPy );
-        return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "Error from ptwX_neg: %s", nfu_statusMessage( status_nf ) ) );
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
     }
     return( (PyObject *) nPy );
 }
@@ -552,12 +593,15 @@ static PyObject *listOfDoubles_C_allocatedSize( listOfDoubles_CPy *self ) {
 */
 static PyObject *listOfDoubles_C_copy( listOfDoubles_CPy *self ) {
 
-    nfu_status status_nf;
     ptwXPoints *n;
     listOfDoubles_CPy *nPy;
+    statusMessageReporting *smr = &(self->smr);
 
-    n = ptwX_clone( self->ptwX, &status_nf );
-    if( n == NULL ) return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "Error from copy: %s", nfu_statusMessage( status_nf ) ) );
+    n = ptwX_clone( smr, self->ptwX );
+    if( n == NULL ) {
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
+    }
     if( ( nPy = listOfDoubles_CNewInitialize( ) ) == NULL ) {
         ptwX_free( n );
         return( NULL );
@@ -570,15 +614,17 @@ static PyObject *listOfDoubles_C_copy( listOfDoubles_CPy *self ) {
 */
 static PyObject *listOfDoubles_C_reallocatePoints( listOfDoubles_CPy *self, PyObject *args, PyObject *keywords ) {
 
-    nfu_status status_nf;
     int size;
     int forceSmallerResize = 1;
     static char *kwlist[] = { "size", "forceSmaller", NULL };
+    statusMessageReporting *smr = &(self->smr);
 
     if( !PyArg_ParseTupleAndKeywords( args, keywords, "i|i", kwlist, &size, &forceSmallerResize ) ) return( NULL );
 
-    if( ( status_nf = ptwX_reallocatePoints( self->ptwX, size, forceSmallerResize ) ) != nfu_Okay )
-        return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "Error from reallocatePoints: %s", nfu_statusMessage( status_nf ) ) );
+    if( ptwX_reallocatePoints( smr, self->ptwX, size, forceSmallerResize ) != nfu_Okay ) {
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
+    }
 
     return( listOfDoubles_C_GetNone( ) );
 }
@@ -588,11 +634,16 @@ static PyObject *listOfDoubles_C_reallocatePoints( listOfDoubles_CPy *self, PyOb
 static PyObject *listOfDoubles_C_append( listOfDoubles_CPy *self, PyObject *args ) {
 
     double value;
+    statusMessageReporting *smr = &(self->smr);
 
     if( listOfDoubles_C_checkStatus( self, "append" ) != 0 ) return( NULL );
+
     if( !PyArg_ParseTuple( args, "d", &value ) ) return( NULL );
 
-    ptwX_setPointAtIndex( self->ptwX, self->ptwX->length, value );
+    if( ptwX_setPointAtIndex( smr, self->ptwX, self->ptwX->length, value ) != nfu_Okay ) {
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
+    }
     return( listOfDoubles_C_GetNone( ) );
 }
 /*
@@ -602,12 +653,12 @@ static PyObject *listOfDoubles_C_count( listOfDoubles_CPy *self, PyObject *args 
 
     int count;
     double value;
-    nfu_status status_nf;
 
     if( listOfDoubles_C_checkStatus( self, "count" ) != 0 ) return( NULL );
+
     if( !PyArg_ParseTuple( args, "d", &value ) ) return( NULL );
 
-    status_nf = ptwX_countOccurrences( self->ptwX, value, &count );
+    count = ptwX_countOccurrences( NULL, self->ptwX, value );
     return( Py_BuildValue( "i", (int) count ) );
 }
 /*
@@ -619,17 +670,20 @@ static PyObject *listOfDoubles_C_extend( listOfDoubles_CPy *self, PyObject *args
     PyObject *PyDoubleList;
     double *xs;
     nfu_status status_nf;
+    statusMessageReporting *smr = &(self->smr);
 
     if( listOfDoubles_C_checkStatus( self, "extend" ) != 0 ) return( NULL );
+
     if( !PyArg_ParseTuple( args, "O", &PyDoubleList ) ) return( NULL );
 
     if( ( length = listOfDoubles_C_doubleListToCList( PyDoubleList, &xs ) ) < 0 ) return( NULL );
-
     if( length  > 0 ) {
-        status_nf = ptwX_insertPointsAtIndex( self->ptwX, self->ptwX->length, length, xs );
+        status_nf =  ptwX_insertPointsAtIndex( smr, self->ptwX, self->ptwX->length, length, xs );
         free( xs );
-        if( status_nf != nfu_Okay ) 
-            return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "Error from ptwX_insertPointsAtIndex: %s", nfu_statusMessage( status_nf ) ) );
+        if( status_nf != nfu_Okay ) {
+            listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+            return( NULL );
+        }
     }
 
     return( listOfDoubles_C_GetNone( ) );
@@ -644,8 +698,11 @@ static PyObject *listOfDoubles_C_index( listOfDoubles_CPy *self, PyObject *args,
     double value, difference;
     static char *kwlist[] = { "start", "stop", NULL };
 
+    if( listOfDoubles_C_checkStatus( self, "index" ) != 0 ) return( NULL );
+
     if( !PyArg_ParseTupleAndKeywords( args, keywords, "d|ii", kwlist, &value, &iStart, &iStop ) ) return( NULL );
-    ptwX_closesDifferenceInRange( self->ptwX, iStart, iStop, value, &index, &difference );
+
+    ptwX_closesDifferenceInRange( NULL, self->ptwX, iStart, iStop, value, &index, &difference );
     if( difference != 0 ) {
         PyErr_SetString( PyExc_ValueError, "value not in self" );
         return( NULL );
@@ -659,18 +716,20 @@ static PyObject *listOfDoubles_C_insert( listOfDoubles_CPy *self, PyObject *args
 
     int index;
     double value;
-    nfu_status status_nf;
+    statusMessageReporting *smr = &(self->smr);
 
     if( listOfDoubles_C_checkStatus( self, "insert" ) != 0 ) return( NULL );
+
     if( !PyArg_ParseTuple( args, "id", &index, &value ) ) return( NULL );
 
     if( index < 0 ) index += self->ptwX->length;    /* Next few lines attempt to replicate weird logic of python's [] class. */
     if( index < 0 ) index = 0;
     if( index > self->ptwX->length ) index = (int) self->ptwX->length; /* BRB; this needs to be fixed: see above??????? */
 
-    status_nf = ptwX_insertPointsAtIndex( self->ptwX, index, 1, &value );
-    if( status_nf != nfu_Okay ) 
-        return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "Error from ptwX_insertPointsAtIndex: %s", nfu_statusMessage( status_nf ) ) );
+    if( ptwX_insertPointsAtIndex( smr, self->ptwX, index, 1, &value ) != nfu_Okay ) {
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
+    }
     return( listOfDoubles_C_GetNone( ) );
 }
 /*
@@ -680,17 +739,24 @@ static PyObject *listOfDoubles_C_pop( listOfDoubles_CPy *self, PyObject *args, P
 
     int index = -1;
     static char *kwlist[] = { "index", NULL };
-    double value;
+    double value, *valueP;
+    statusMessageReporting *smr = &(self->smr);
+
+    if( listOfDoubles_C_checkStatus( self, "pop" ) != 0 ) return( NULL );
 
     if( !PyArg_ParseTupleAndKeywords( args, keywords, "|i", kwlist, &index ) ) return( NULL );
+
     if( index < 0 ) index += self->ptwX->length;
-    if( ( index < 0 ) || ( index >= self->ptwX->length ) ) {
-        PyErr_SetString( PyExc_IndexError, "pop index out of range" );
+    if( ( valueP = ptwX_getPointAtIndex( smr, self->ptwX, index ) ) == NULL ) {
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
         return( NULL );
     }
-
-    value = *ptwX_getPointAtIndex( self->ptwX, index );
-    ptwX_deletePoints( self->ptwX, index, index + 1 );
+    value = *valueP;
+    
+    if( ptwX_deletePoints( smr, self->ptwX, index, index + 1 ) != nfu_Okay ) {
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
+    }   
 
     return( Py_BuildValue( "d", value ) );
 }   
@@ -701,16 +767,27 @@ static PyObject *listOfDoubles_C_remove( listOfDoubles_CPy *self, PyObject *args
 
     int64_t index;
     double value, difference;
+    statusMessageReporting *smr = &(self->smr);
+
+    if( listOfDoubles_C_checkStatus( self, "remove" ) != 0 ) return( NULL );
 
     if( !PyArg_ParseTuple( args, "d", &value ) ) return( NULL );
-    ptwX_closesDifference( self->ptwX, value, &index, &difference );
+
+    if( ptwX_closesDifference( smr, self->ptwX, value, &index, &difference ) != nfu_Okay ) {
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
+    }
 
     if( difference != 0 ) {
         PyErr_SetString( PyExc_ValueError, "value not in self" );
         return( NULL );
     }
 
-    ptwX_deletePoints( self->ptwX, index, index + 1 );
+    if( ptwX_deletePoints( smr, self->ptwX, index, index + 1 ) != nfu_Okay ) {
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
+    }
+
     return( listOfDoubles_C_GetNone( ) );
 }
 /*
@@ -718,17 +795,21 @@ static PyObject *listOfDoubles_C_remove( listOfDoubles_CPy *self, PyObject *args
 */
 static PyObject *listOfDoubles_C_reverse( listOfDoubles_CPy *self ) {
 
-    nfu_status status_nf;
     listOfDoubles_CPy *reversedPy;
     ptwXPoints *reversed;
+    statusMessageReporting *smr = &(self->smr);
 
-    if( ( reversed = ptwX_clone( self->ptwX, &status_nf ) ) == NULL ) {
-        return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "Error from ptwX_clone: %s", nfu_statusMessage( status_nf ) ) );
+    if( listOfDoubles_C_checkStatus( self, "reverse" ) != 0 ) return( NULL );
+
+    if( ( reversed = ptwX_clone( smr, self->ptwX ) ) == NULL ) {
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
     }
 
-    if( ( status_nf = ptwX_reverse( reversed ) ) != nfu_Okay ) {
+    if( ptwX_reverse( smr, reversed ) != nfu_Okay ) {
         ptwX_free( reversed );
-        return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "Error from ptwX_reverse: %s", nfu_statusMessage( status_nf ) ) );
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
     }
 
     if( ( reversedPy = listOfDoubles_CNewInitialize( ) ) == NULL ) {
@@ -745,7 +826,10 @@ static PyObject *listOfDoubles_C_setData( listOfDoubles_CPy *self, PyObject *arg
 
     PyObject *status = NULL, *PyXList;
 
+    if( listOfDoubles_C_checkStatus( self, "reverse" ) != 0 ) return( NULL );
+
     if( !PyArg_ParseTuple( args, "O", &PyXList ) ) return( NULL );
+
     if( listOfDoubles_C_setData2( self, PyXList ) == 0 ) status = listOfDoubles_C_GetNone( );
     return( status );
 
@@ -758,14 +842,18 @@ static int listOfDoubles_C_setData2( listOfDoubles_CPy *self, PyObject *PyXList 
     nfu_status status_nf;
     int64_t length;
     double *xs;
+    statusMessageReporting *smr = &(self->smr);
 
-    ptwX_setData( self->ptwX, 0, NULL ); 
+    ptwX_setData( NULL, self->ptwX, 0, NULL ); 
+
     if( ( length = listOfDoubles_C_doubleListToCList( PyXList, &xs ) ) < 0 ) return( -1 );
     if( length > 0 ) {
-        status_nf = ptwX_setData( self->ptwX, length, xs );
+        status_nf = ptwX_setData( smr, self->ptwX, length, xs );
         free( xs );
-        if( status_nf != nfu_Okay )
-            return( listOfDoubles_C_SetPyErrorExceptionReturnMinusOne( "Error from ptwX_setData: %s", nfu_statusMessage( status_nf ) ) );
+        if( status_nf != nfu_Okay ) {
+            listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+            return( -1 );
+        }
     }
 
     return( 0 );
@@ -775,23 +863,27 @@ static int listOfDoubles_C_setData2( listOfDoubles_CPy *self, PyObject *PyXList 
 */
 static PyObject *listOfDoubles_C_sort( listOfDoubles_CPy *self, PyObject *args, PyObject *keywords ) {
 
-    nfu_status status_nf;
     int descendingOrder = 1;
     static char *kwlist[] = { "reverse", NULL };
     ptwXPoints *sorted;
     listOfDoubles_CPy *sortedPy;
     enum ptwX_sort_order order = ptwX_sort_order_ascending;
+    statusMessageReporting *smr = &(self->smr);
+
+    if( listOfDoubles_C_checkStatus( self, "reverse" ) != 0 ) return( NULL );
 
     if( !PyArg_ParseTupleAndKeywords( args, keywords, "|i", kwlist, &descendingOrder ) ) return( NULL );
 
-    if( ( sorted = ptwX_clone( self->ptwX, &status_nf ) ) == NULL ) {
-        return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "Error from ptwX_clone: %s", nfu_statusMessage( status_nf ) ) );
+    if( ( sorted = ptwX_clone( smr, self->ptwX ) ) == NULL ) {
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
     }
 
     if( descendingOrder ) order = ptwX_sort_order_descending;
-    if( ( status_nf = ptwX_sort( sorted, order ) ) != nfu_Okay ) {
+    if( ptwX_sort( smr, sorted, order ) != nfu_Okay ) {
         ptwX_free( sorted );
-        return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "Error from ptwX_sort: %s", nfu_statusMessage( status_nf ) ) );
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
     }
     if( ( sortedPy = listOfDoubles_CNewInitialize( ) ) == NULL ) {
         ptwX_free( sorted );
@@ -809,7 +901,10 @@ static PyObject *listOfDoubles_C_toString( listOfDoubles_CPy *self, PyObject *ar
     char *format = "%16.8e", *valueSeparator = " ";
     static char *kwlist[] = { "valuesPerLine", "format", "valueSeparator", NULL };
 
+    if( listOfDoubles_C_checkStatus( self, "toString" ) != 0 ) return( NULL );
+
     if( !PyArg_ParseTupleAndKeywords( args, keywords, "|iss", kwlist, &valuesPerLine, &format, &valueSeparator ) ) return( NULL );
+
     return( listOfDoubles_C_toString2( self, valuesPerLine, format, valueSeparator ) );
 }
 /*
@@ -822,8 +917,6 @@ static PyObject *listOfDoubles_C_toString2( listOfDoubles_CPy *self, int valuesP
     int64_t index, strLength, valueSeparatorLength = strlen( valueSeparator );
     char *s, *e, *p, dummy[1024];
     PyObject *str;
-
-    if( listOfDoubles_C_checkStatus( self, "toString2" ) != 0 ) return( NULL );
 
     s = listOfDoubles_C_toString_isFormatForDouble( format, 0 );
     if( s == NULL ) return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "invalid format = '%s' for converting a double to a string", format ) );
@@ -892,16 +985,19 @@ static char *listOfDoubles_C_toString_isFormatForDouble( char *format, int retur
 */
 static PyObject *listOfDoubles_C_unique( listOfDoubles_CPy *self, PyObject *args, PyObject *keywords ) {
 
-    nfu_status status_nf;
     int order = 0;
     static char *kwlist[] = { "order", NULL };
     ptwXPoints *unique;
     listOfDoubles_CPy *uniquePy;
+    statusMessageReporting *smr = &(self->smr);
+
+    if( listOfDoubles_C_checkStatus( self, "unique" ) != 0 ) return( NULL );
 
     if( !PyArg_ParseTupleAndKeywords( args, keywords, "|i", kwlist, &order ) ) return( NULL );
 
-    if( ( unique = ptwX_unique( self->ptwX, order, &status_nf ) ) == NULL ) {
-        return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "Error from ptwX_unique: %s", nfu_statusMessage( status_nf ) ) );
+    if( ( unique = ptwX_unique( smr, self->ptwX, order ) ) == NULL ) {
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
     }
     if( ( uniquePy = listOfDoubles_CNewInitialize( ) ) == NULL ) {
         ptwX_free( unique );
@@ -917,13 +1013,19 @@ static PyObject *listOfDoubles_C_richCompare( PyObject *self, PyObject *other, i
 
     int comparison;
     listOfDoubles_CPy *self2 = (listOfDoubles_CPy *) self, *other2 = (listOfDoubles_CPy *) other;
-    nfu_status status_nf;
     PyObject *result = Py_False;
+    statusMessageReporting *smr = &(self2->smr);
+
+    if( listOfDoubles_C_checkStatus( self2, "tp_richcompare" ) != 0 ) return( NULL );
 
     if( PyObject_TypeCheck( other, &listOfDoubles_CPyType ) ) {
+    
+        if( listOfDoubles_C_checkStatus( other2, "tp_richcompare" ) != 0 ) return( NULL );
 
-        if( ( status_nf = ptwX_compare( self2->ptwX, other2->ptwX, &comparison ) ) != nfu_Okay )
-            return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "Error from ptwX_compare: %s", nfu_statusMessage( status_nf ) ) );
+        if( ptwX_compare( smr, self2->ptwX, other2->ptwX, &comparison ) != nfu_Okay ) {
+            listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+            return( NULL );
+        }
 
         switch( op ) {
         case Py_LT :
@@ -953,18 +1055,44 @@ static PyObject *listOfDoubles_C_richCompare( PyObject *self, PyObject *other, i
 /*
 ************************************************************
 */
+static void listOfDoubles_C_getSliceIndices( int64_t length, int64_t *index1, int64_t *index2 ) {
+
+    if( length == 0 ) {
+        *index1 = 0;
+        *index2 = 0; }
+    else {
+        if( *index1 < 0 ) {
+            *index1 += length;
+            if( *index1 < 0 ) *index1 = 0;
+        }
+        if( *index1 > length ) *index1 = length;
+        if( *index2 < 0 ) {
+            *index2 = *index2 + length;
+            if( *index2 < 0 ) *index2 = 0;
+        }
+        if( *index2 > length ) *index2 = length;
+        if( *index1 > *index2 ) *index2 = *index1;
+    }
+}
+/*
+************************************************************
+*/
 static PyObject *listOfDoubles_C_createFromString( listOfDoubles_CPy *self, PyObject *args, PyObject *keywords ) {
 
-    nfu_status status_nf;
     ptwXPoints *ptwX;
     listOfDoubles_CPy *ptwXPy;
     char *str, *endCharacter, sep = ' ';
     static char *kwlist[] = { "string", "sep", NULL };
+    statusMessageReporting smr;
 
     if( !PyArg_ParseTupleAndKeywords( args, keywords, "s|c", kwlist, &str, &sep ) ) return( NULL );
 
-    if( ( ptwX = ptwX_fromString( str, sep, &endCharacter, &status_nf ) ) == NULL )
-        return( listOfDoubles_C_SetPyErrorExceptionReturnNull( "Error from ptwX_fromString: %s", nfu_statusMessage( status_nf ) ) );
+    smr_initialize( &smr, smr_status_Ok );
+
+    if( ( ptwX = ptwX_fromString( &smr, str, sep, &endCharacter ) ) == NULL ) {
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, &smr );
+        return( NULL );
+    }
 
     if( ( ptwXPy = listOfDoubles_CNewInitialize( ) ) == NULL ) {
         ptwX_free( ptwX );
@@ -980,9 +1108,7 @@ static int listOfDoubles_C_PyNumberToFloat( PyObject *valuePy, double *value ) {
 
     PyObject *floatPy = PyNumber_Float( valuePy );
 
-    if( floatPy == NULL ) {
-        return( listOfDoubles_C_SetPyErrorExceptionReturnMinusOne( "could not convert object to float" ) );
-    }
+    if( floatPy == NULL ) return( -1 );
     *value = PyFloat_AsDouble( floatPy );
     return( 0 );
 }
@@ -1024,16 +1150,19 @@ static int64_t listOfDoubles_C_doubleListToCList( PyObject *PyDoubleList, double
 */
 static listOfDoubles_CPy *listOfDoubles_C_copyPy( listOfDoubles_CPy *self, int asNew ) {
 
-    nfu_status status_nf;
     ptwXPoints *n;
     listOfDoubles_CPy *nPy;
+    statusMessageReporting *smr = &(self->smr);
 
     if( asNew ) {
-        n = ptwX_new( self->ptwX->length, &status_nf ); }
+        n = ptwX_new( smr, self->ptwX->length ); }
     else {
-        n = ptwX_clone( self->ptwX, &status_nf );
+        n = ptwX_clone( smr, self->ptwX );
     }
-    if( n == NULL ) return( (listOfDoubles_CPy *) listOfDoubles_C_SetPyErrorExceptionReturnNull( "Error from copy: %s", nfu_statusMessage( status_nf ) ) );
+    if( n == NULL ) {
+        listOfDoubles_C_SetPyErrorExceptionFromSMR( PyExc_Exception, smr );
+        return( NULL );
+    }
     if( ( nPy = listOfDoubles_CNewInitialize( ) ) == NULL ) {
         ptwX_free( n );
         return( NULL );
@@ -1064,17 +1193,10 @@ static PyObject *listOfDoubles_C_GetNone( void ) {
 /*
 ************************************************************
 */
-static PyObject *listOfDoubles_C_SetPyErrorExceptionReturnNull( const char *s, ... ) {
+static void listOfDoubles_C_SetPyErrorExceptionFromSMR( PyObject *type, statusMessageReporting *smr ) {
 
-    va_list args;
-    char Str[1024];
-
-    va_start( args, s );
-    vsnprintf( Str, sizeof( Str ), s, args );
-    Str[sizeof( Str ) - 1] = 0;
-    PyErr_SetString( PyExc_Exception, Str );
-    va_end( args );
-    return( NULL );
+    PyErr_SetString( PyExc_IndexError, smr_getMessage( smr_firstReport( smr ) ) );
+    smr_release( smr );
 }
 /*
 ************************************************************
@@ -1094,11 +1216,29 @@ static int listOfDoubles_C_SetPyErrorExceptionReturnMinusOne( const char *s, ...
 /*
 ************************************************************
 */
+static PyObject *listOfDoubles_C_SetPyErrorExceptionReturnNull( const char *s, ... ) {
+
+    va_list args;
+    char Str[1024];
+
+    va_start( args, s );
+    vsnprintf( Str, sizeof( Str ), s, args );
+    Str[sizeof( Str ) - 1] = 0;
+    PyErr_SetString( PyExc_Exception, Str );
+    va_end( args );
+    return( NULL );
+}
+/*
+************************************************************
+*/
 static int listOfDoubles_C_checkStatus( listOfDoubles_CPy *self, char const *func ) {
 
-    if( self->ptwX->status == nfu_Okay ) return( 0 );
+    nfu_status status_nf = self->ptwX->status;
+
+    if( status_nf == nfu_Okay ) return( 0 );
     listOfDoubles_C_SetPyErrorExceptionReturnMinusOne( 
-        "listOfDoubles_C object had a prior error and is not usable in %s: status = %d", func, self->ptwX->status );
+        "listOfDoubles_C object had a prior error and is not usable in %s: status = %d", func, status_nf,
+                nfu_statusMessage( status_nf ) );
     return( -1 );
 }
 /*
@@ -1218,6 +1358,8 @@ static PyMethodDef listOfDoubles_CMiscPyMethods[] = {
 DL_EXPORT( void ) initlistOfDoubles_C( void ) {
 
     PyObject *m;
+
+    nfu_setup( );
 
     listOfDoubles_CPyType.tp_new = PyType_GenericNew;
     if( PyType_Ready( &listOfDoubles_CPyType ) < 0 ) return;

@@ -1,10 +1,11 @@
 /*
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -18,24 +19,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 */
 
@@ -51,52 +75,65 @@ static int ptwX_sort_ascending( void const *p1, void const *p2 );
 /*
 ************************************************************
 */
-ptwXPoints *ptwX_new( int64_t size, nfu_status *status ) {
+ptwXPoints *ptwX_new( statusMessageReporting *smr, int64_t size ) {
 
-    ptwXPoints *ptwX = (ptwXPoints *) nfu_calloc( sizeof( ptwXPoints ), 1 );
+    ptwXPoints *ptwX = (ptwXPoints *) smr_malloc2( smr, sizeof( ptwXPoints ), 1, "ptwX" );
 
-    *status = nfu_mallocError;
-    if( ptwX == NULL ) return( NULL );
-    ptwX_setup( ptwX, size );
-    if( ( *status = ptwX->status ) != nfu_Okay ) ptwX = (ptwXPoints *) nfu_free( ptwX );
-    return( ptwX );
-}
-/*
-************************************************************
-*/
-nfu_status ptwX_setup( ptwXPoints *ptwX, int64_t size ) {
+    if( ptwX == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
 
-    ptwX->status = nfu_Okay;
-    ptwX->length = 0;
-    ptwX->allocatedSize = 0;
-    ptwX->mallocFailedSize = 0;
-    ptwX->points = NULL;
-    ptwX_reallocatePoints( ptwX, size, 0 );
-    return( ptwX->status );
-}
-/*
-************************************************************
-*/
-ptwXPoints *ptwX_create( int64_t size, int64_t length, double const *xs, nfu_status *status ) {
-
-    ptwXPoints *ptwX = ptwX_new( size, status );
-
-    if( ptwX != NULL ) {
-        if( ( *status = ptwX_setData( ptwX, length, xs ) ) != nfu_Okay ) ptwX = ptwX_free( ptwX );
+    if( ptwX_initialize( smr, ptwX, size ) != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        smr_freeMemory2( ptwX );
     }
     return( ptwX );
 }
 /*
 ************************************************************
 */
-ptwXPoints *ptwX_createLine( int64_t size, int64_t length, double slope, double offset, nfu_status *status ) {
+nfu_status ptwX_initialize( statusMessageReporting *smr, ptwXPoints *ptwX, int64_t size ) {
+
+    ptwX->status = nfu_Okay;
+    ptwX->length = 0;
+    ptwX->allocatedSize = 0;
+    ptwX->mallocFailedSize = 0;
+    ptwX->points = NULL;
+    if( ptwX_reallocatePoints( smr, ptwX, size, 0 ) != nfu_Okay )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( ptwX->status );
+}
+/*
+************************************************************
+*/
+ptwXPoints *ptwX_create( statusMessageReporting *smr, int64_t size, int64_t length, double const *xs ) {
+
+    ptwXPoints *ptwX = ptwX_new( smr, size );
+
+    if( ptwX == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." ); }
+    else {
+        if( ptwX_setData( smr, ptwX, length, xs ) != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            ptwX = ptwX_free( ptwX );
+        }
+    }
+    return( ptwX );
+}
+/*
+************************************************************
+*/
+ptwXPoints *ptwX_createLine( statusMessageReporting *smr, int64_t size, int64_t length, double slope, double offset ) {
 
     int64_t i1;
     double *p1;
     ptwXPoints *ptwX;
 
     if( size < length ) size = length;
-    if( ( ptwX = ptwX_new( size, status ) ) != NULL ) {
+    if( ( ptwX = ptwX_new( smr, size ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." ); }
+    else {
         for( i1 = 0, p1 = ptwX->points; i1 < length; i1++, p1++ ) *p1 = slope * i1 + offset;
         ptwX->length = length;
     }
@@ -105,53 +142,94 @@ ptwXPoints *ptwX_createLine( int64_t size, int64_t length, double slope, double 
 /*
 ************************************************************
 */
-nfu_status ptwX_copy( ptwXPoints *dest, ptwXPoints *src ) {
+nfu_status ptwX_copy( statusMessageReporting *smr, ptwXPoints *dest, ptwXPoints *src ) {
 
-    if( dest->status == nfu_Okay ) return( dest->status );
-    if( src->status == nfu_Okay ) return( src->status );
-    ptwX_clear( dest );
-    return( ptwX_setData( dest, src->length, src->points ) );
+    if( dest->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid destination." );
+        return( nfu_badSelf );
+    }
+    if( src->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( nfu_badSelf );
+    }
+
+    if( ptwX_clear( smr, dest ) ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( src->status );
+    }
+    if( ptwX_setData( smr, dest, src->length, src->points ) ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( src->status );
+    }
+    return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-ptwXPoints *ptwX_clone( ptwXPoints *ptwX, nfu_status *status ) {
+ptwXPoints *ptwX_clone( statusMessageReporting *smr, ptwXPoints *ptwX ) {
 
-    return( ptwX_slice( ptwX, 0, ptwX->length, status ) );
+    ptwXPoints *clone = ptwX_slice( smr, ptwX, 0, ptwX->length );
+
+    if( clone == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( clone );
 }
 /*
 ************************************************************
 */
-ptwXPoints *ptwX_slice( ptwXPoints *ptwX, int64_t index1, int64_t index2, nfu_status *status ) {
+ptwXPoints *ptwX_slice( statusMessageReporting *smr, ptwXPoints *ptwX, int64_t index1, int64_t index2 ) {
 
-    int64_t i, j, length;
-    ptwXPoints *n;
+    int64_t i1, i2, length;
+    ptwXPoints *n1;
 
-    *status = nfu_badSelf;
-    if( ptwX->status != nfu_Okay ) return( NULL );
-    *status = nfu_badIndex;
-    if( index1 < 0 ) return( NULL );
-    if( index2 < index1 ) return( NULL );
-    if( index2 > ptwX->length ) return( NULL );
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( NULL );
+    }
+
+    if( index1 < 0 ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badIndex, "negative index1 = %d.", (int) index1 );
+        return( NULL );
+    }
+    if( index2 < index1 ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badIndex, "index1 = %d greater than index2 = %d", 
+                (int) index1, (int) index2 );
+        return( NULL );
+    }
+    if( index2 > ptwX->length ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badIndex, "index2 = %d greater than length = %d.", 
+                (int) index2, (int) ptwX->length );
+        return( NULL );
+    }
+
     length = ( index2 - index1 );
-    if( ( n = ptwX_new( length, status ) ) == NULL ) return( n );
-    *status = n->status;
-    for( j = 0, i = index1; i < index2; i++, j++ ) n->points[j] = ptwX->points[i];
-    n->length = length;
-    return( n );
+    if( ( n1 = ptwX_new( smr, length ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
+    for( i2 = 0, i1 = index1; i1 < index2; i1++, i2++ ) n1->points[i2] = ptwX->points[i1];
+    n1->length = length;
+
+    return( n1 );
 }
 /*
 ************************************************************
 */
-nfu_status ptwX_reallocatePoints( ptwXPoints *ptwX, int64_t size, int forceSmallerResize ) {
+nfu_status ptwX_reallocatePoints( statusMessageReporting *smr, ptwXPoints *ptwX, int64_t size, int forceSmallerResize ) {
 
-    if( size < ptwX_minimumSize ) size = ptwX_minimumSize;                        /* ptwX_minimumSize must be > 0 for other routines to work properly. */
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( nfu_badSelf );
+    }
+
+    if( size < ptwX_minimumSize ) size = ptwX_minimumSize;                      /* ptwX_minimumSize must be > 0 for other routines to work properly. */
     if( size < ptwX->length ) size = ptwX->length;
     if( size != ptwX->allocatedSize ) {
-        if( size > ptwX->allocatedSize ) {                                         /* Increase size of allocated points. */
-             ptwX->points = (double *) nfu_realloc( (size_t) size * sizeof( double ), ptwX->points ); }
-        else if( ( ptwX->allocatedSize > 2 * size ) || forceSmallerResize ) {      /* Decrease size, if at least 1/2 size reduction or if forced to. */
-            ptwX->points = (double *) nfu_realloc( (size_t) size * sizeof( double ), ptwX->points );
+        if( size > ptwX->allocatedSize ) {                                      /* Increase size of allocated points. */
+            ptwX->points = (double *) smr_realloc2( smr, ptwX->points, (size_t) size * sizeof( double ), "ptwX->points" );
+            if( ptwX->points == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." ); }
+        else if( ( ptwX->allocatedSize > 2 * size ) || forceSmallerResize ) {   /* Decrease size, if at least 1/2 size reduction or if forced to. */
+            ptwX->points = (double *) smr_realloc2( smr, ptwX->points, (size_t) size * sizeof( double ), "ptwX->points" );
+            if( ptwX->points == NULL ) smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
         }
         if( ptwX->points == NULL ) {
             ptwX->mallocFailedSize = size;
@@ -166,19 +244,22 @@ nfu_status ptwX_reallocatePoints( ptwXPoints *ptwX, int64_t size, int forceSmall
 /*
 ************************************************************
 */
-nfu_status ptwX_clear( ptwXPoints *ptwX ) {
+nfu_status ptwX_clear( statusMessageReporting *smr, ptwXPoints *ptwX ) {
 
     ptwX->length = 0;
+    ptwX->status = nfu_Okay;
+
     return( ptwX->status );
 }
 /*
 ************************************************************
 */
-nfu_status ptwX_release( ptwXPoints *ptwX ) {
+nfu_status ptwX_release( statusMessageReporting *smr, ptwXPoints *ptwX ) {
 
+    ptwX->status = nfu_Okay;
     ptwX->length = 0;
     ptwX->allocatedSize = 0;
-    ptwX->points = (double *) nfu_free( ptwX->points );
+    smr_freeMemory2( ptwX->points );
 
     return( nfu_Okay );
 }
@@ -187,28 +268,39 @@ nfu_status ptwX_release( ptwXPoints *ptwX ) {
 */
 ptwXPoints *ptwX_free( ptwXPoints *ptwX ) {
 
-    if( ptwX != NULL ) ptwX_release( ptwX );
-    return( (ptwXPoints *) nfu_free( ptwX ) );
+    if( ptwX != NULL ) ptwX_release( NULL, ptwX );
+    smr_freeMemory2( ptwX );
+    return( ptwX );
 }
 /*
 ************************************************************
 */
-int64_t ptwX_length( ptwXPoints *ptwX ) {
+int64_t ptwX_length( statusMessageReporting *smr, ptwXPoints *ptwX ) {
+
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( -nfu_badSelf );
+    }
 
     return( ptwX->length );
 }
 /*
 ************************************************************
 */
-nfu_status ptwX_setData( ptwXPoints *ptwX, int64_t length, double const *xs ) {
+nfu_status ptwX_setData( statusMessageReporting *smr, ptwXPoints *ptwX, int64_t length, double const *xs ) {
 
     int64_t  i;
 
-    if( ptwX->status != nfu_Okay ) return( ptwX->status );
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( nfu_badSelf );
+    }
 
     if( length > ptwX->allocatedSize ) {
-        ptwX_reallocatePoints( ptwX, length, 0 );
-        if( ptwX->status != nfu_Okay ) return( ptwX->status );
+        if( ptwX_reallocatePoints( smr, ptwX, length, 0 ) != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( ptwX->status );
+        }
     }
     for( i = 0; i < length; i++ ) ptwX->points[i] = xs[i];
     ptwX->length = length;
@@ -218,25 +310,41 @@ nfu_status ptwX_setData( ptwXPoints *ptwX, int64_t length, double const *xs ) {
 /*
 ************************************************************
 */ 
-nfu_status ptwX_deletePoints( ptwXPoints *ptwX, int64_t i1, int64_t i2 ) {
+nfu_status ptwX_deletePoints( statusMessageReporting *smr, ptwXPoints *ptwX, int64_t i1, int64_t i2 ) {
 
-    int64_t n = ptwX->length - ( i2 - i1 );
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( nfu_badSelf );
+    }
 
-    if( ptwX->status != nfu_Okay ) return( ptwX->status );
-    if( ( i1 < 0 ) || ( i1 > i2 ) || ( i2 > ptwX->length ) ) return( nfu_badIndex );
+    if( ( i1 < 0 ) || ( i1 > i2 ) || ( i2 > ptwX->length ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badIndex, "index1 = %d, index2 = %d and length = %d", 
+                (int) i1, (int) i2, (int) ptwX->length );
+        return( nfu_badIndex );
+    }
     if( i1 != i2 ) {
+        int64_t n1 = ptwX->length - ( i2 - i1 );
+
         for( ; i2 < ptwX->length; i1++, i2++ ) ptwX->points[i1] = ptwX->points[i2];
-        ptwX->length = n;
+        ptwX->length = n1;
     }
     return( ptwX->status );
 }
 /*
 ************************************************************
 */
-double *ptwX_getPointAtIndex( ptwXPoints *ptwX, int64_t index ) {
+double *ptwX_getPointAtIndex( statusMessageReporting *smr, ptwXPoints *ptwX, int64_t index ) {
 
-    if( ptwX->status != nfu_Okay ) return( NULL );
-    if( ( index < 0 ) || ( index >= ptwX->length ) ) return( NULL );
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( NULL );
+    }
+
+    if( ( index < 0 ) || ( index >= ptwX->length ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badIndex, "Index = %d out of bounds: length = %d", 
+                (int) index, (int) ptwX->length );
+        return( NULL );
+    }
     return( &(ptwX->points[index]) );
 }
 /*
@@ -249,14 +357,24 @@ double ptwX_getPointAtIndex_Unsafely( ptwXPoints *ptwX, int64_t index ) {
 /*
 ************************************************************
 */
-nfu_status ptwX_setPointAtIndex( ptwXPoints *ptwX, int64_t index, double x ) {
+nfu_status ptwX_setPointAtIndex( statusMessageReporting *smr, ptwXPoints *ptwX, int64_t index, double x ) {
 
-    nfu_status status;
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( nfu_badSelf );
+    }
 
-    if( ptwX->status != nfu_Okay ) return( ptwX->status );
-    if( ( index < 0 ) || ( index > ptwX->length ) ) return( nfu_badIndex );
+    if( ( index < 0 ) || ( index > ptwX->length ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badIndex, "Index = %d out of bounds: length = %d", 
+                (int) index, (int) ptwX->length );
+        return( nfu_badIndex );
+    }
+
     if( index == ptwX->allocatedSize ) {
-        if( ( status = ptwX_reallocatePoints( ptwX, ptwX->allocatedSize + 10, 0 ) ) != nfu_Okay ) return( status );
+        if( ptwX_reallocatePoints( smr, ptwX, ptwX->allocatedSize + 10, 0 ) != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( ptwX->status );
+        }
     }
     ptwX->points[index] = x;
     if( index == ptwX->length ) ptwX->length++;
@@ -265,86 +383,126 @@ nfu_status ptwX_setPointAtIndex( ptwXPoints *ptwX, int64_t index, double x ) {
 /*
 ************************************************************
 */
-nfu_status ptwX_insertPointsAtIndex( ptwXPoints *ptwX, int64_t index, int64_t n1, double const *xs ) {
+nfu_status ptwX_insertPointsAtIndex( statusMessageReporting *smr, ptwXPoints *ptwX, int64_t index, int64_t n1, double const *xs ) {
 
-    nfu_status status;
     int64_t i1, i2, n1p, size = n1 + ptwX->length;
 
-    if( ptwX->status != nfu_Okay ) return( ptwX->status );
-    if( n1 < 1 ) return( nfu_Okay );
-    if( ( index < 0 ) || ( index > ptwX->length ) ) return( nfu_badIndex );
-    if( size > ptwX->allocatedSize ) {
-        if( ( status = ptwX_reallocatePoints( ptwX, size, 0 ) ) != nfu_Okay ) return( status );
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( nfu_badSelf );
     }
-    for( i1 = ptwX->length - 1, i2 = size - 1, n1p = ptwX->length - index + 1; n1p > 0; i1--, i2--, n1p-- ) ptwX->points[i2] = ptwX->points[i1];
+
+    if( n1 < 1 ) return( nfu_Okay );        /* No points to insert. */
+
+    if( ( index < 0 ) || ( index > ptwX->length ) ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_badIndex, "Index = %d out of bounds: length = %d", 
+                (int) index, (int) ptwX->length );
+        return( ptwX->status = nfu_Error );
+    }
+
+    if( size > ptwX->allocatedSize ) {
+        if( ptwX_reallocatePoints( smr, ptwX, size, 0 ) != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( ptwX->status );
+        }
+    }
+
+    for( i1 = ptwX->length - 1, i2 = size - 1, n1p = ptwX->length - index; n1p > 0; i1--, i2--, n1p-- )
+        ptwX->points[i2] = ptwX->points[i1];
     for( i1 = 0, i2 = index; i1 < n1; i1++, i2++ ) ptwX->points[i2] = xs[i1];
     ptwX->length += n1;
+
     return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-int ptwX_ascendingOrder( ptwXPoints *ptwX ) {
+nfu_status ptwX_ascendingOrder( statusMessageReporting *smr, ptwXPoints *ptwX, int *order ) {
 /*
 *    Returns -1 list is descending, 1 if ascending and 0 otherwise (i.e., mixed).
 */
-    int order = 1;
-    int64_t i;
+    int64_t i1;
     double x1, x2;
 
-    if( ptwX->length < 2 ) return( 0 );
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( nfu_badSelf );
+    }
+
+    *order = 1;
+    if( ptwX->length < 2 ) return( nfu_Okay );
 
     if( ( x1 = ptwX->points[0] ) < ( x2 = ptwX->points[1] ) ) {     /* Check for ascending order. */
-        for( i = 2; i < ptwX->length; i++ ) {
+        for( i1 = 2; i1 < ptwX->length; i1++ ) {
             x1 = x2;
-            x2 = ptwX->points[i];
-            if( x2 <= x1 ) return( 0 );
+            x2 = ptwX->points[i1];
+            if( x2 <= x1 ) {
+                *order = 0;
+                return( nfu_Okay );
+            }
         } }
     else {
-        if( x1 == x2 ) return( 0 );
-        order = -1;                                                 /* Check for descending order. */
-        for( i = 2; i < ptwX->length; i++ ) {
+        *order = -1;                                                 /* Check for descending order. */
+        for( i1 = 1; i1 < ptwX->length; i1++ ) {
+            x2 = ptwX->points[i1];
+            if( x1 <= x2 ) {
+                *order = 0;
+                return( nfu_Okay );
+            }
             x1 = x2;
-            x2 = ptwX->points[i];
-            if( x1 <= x2 ) return( 0 );
         }
     }
-    return( order );
+    return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-ptwXPoints *ptwX_fromString( char const *str, char sep, char **endCharacter, nfu_status *status ) {
+ptwXPoints *ptwX_fromString( statusMessageReporting *smr, char const *str, char sep, char **endCharacter ) {
 
     int64_t numberConverted;
     double  *doublePtr;
     ptwXPoints *ptwX = NULL;
 
-    if( ( doublePtr = nfu_stringToListOfDoubles( str, sep, &numberConverted, endCharacter, status ) ) == NULL ) return( NULL );
-    ptwX = ptwX_create( numberConverted, numberConverted, doublePtr, status );
-    nfu_free( doublePtr );
+    if( ( doublePtr = nfu_stringToListOfDoubles( smr, str, sep, &numberConverted, endCharacter ) ) == NULL ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+        return( NULL );
+    }
+    if( ( ptwX = ptwX_create( smr, numberConverted, numberConverted, doublePtr ) ) == NULL )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    smr_freeMemory2( doublePtr );
     return( ptwX );
 }
 /*
 ************************************************************
 */
-nfu_status ptwX_countOccurrences( ptwXPoints *ptwX, double value, int *count ) {
+int ptwX_countOccurrences( statusMessageReporting *smr, ptwXPoints *ptwX, double value ) {
 
+    int count;
     int64_t i1;
 
-    *count = 0;
-    for( i1 = 0; i1 < ptwX->length; i1++ ) {
-        if( ptwX->points[i1] == value ) (*count)++;
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( -nfu_badSelf );
     }
-    return( nfu_Okay );
+
+    count = 0;
+    for( i1 = 0; i1 < ptwX->length; i1++ ) {
+        if( ptwX->points[i1] == value ) ++count;
+    }
+    return( count );
 }
 /*
 ************************************************************
 */
-nfu_status ptwX_reverse( ptwXPoints *ptwX ) {
+nfu_status ptwX_reverse( statusMessageReporting *smr, ptwXPoints *ptwX ) {
 
     int64_t i1, i2 = ptwX->length - 1, n1 = ptwX->length / 2;
     double tmp;
+
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( nfu_badSelf );
+    }
 
     for( i1 = 0; i1 < n1; i1++, i2-- ) {
         tmp = ptwX->points[i1];
@@ -356,9 +514,14 @@ nfu_status ptwX_reverse( ptwXPoints *ptwX ) {
 /*
 ************************************************************
 */
-nfu_status ptwX_sort( ptwXPoints *ptwX, enum ptwX_sort_order order ) {
+nfu_status ptwX_sort( statusMessageReporting *smr, ptwXPoints *ptwX, enum ptwX_sort_order order ) {
 
     int (*cmp)( void const *, void const * ) = ptwX_sort_descending;
+
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( nfu_badSelf );
+    }
 
     if( order == ptwX_sort_order_ascending ) cmp = ptwX_sort_ascending;
     qsort( ptwX->points, (size_t) ptwX->length, sizeof( ptwX->points[0] ), cmp );
@@ -379,22 +542,25 @@ static int ptwX_sort_ascending( void const *p1, void const *p2 ) {
 /*
 ************************************************************
 */
-nfu_status ptwX_closesDifference( ptwXPoints *ptwX, double value, int64_t *index, double *difference ) {
+nfu_status ptwX_closesDifference( statusMessageReporting *smr, ptwXPoints *ptwX, double value, int64_t *index, double *difference ) {
 
-    return( ptwX_closesDifferenceInRange( ptwX, 0, ptwX->length, value, index, difference ) );
+    return( ptwX_closesDifferenceInRange( smr, ptwX, 0, ptwX->length, value, index, difference ) );
 }
 /*
 ************************************************************
 */
-nfu_status ptwX_closesDifferenceInRange( ptwXPoints *ptwX, int64_t i1, int64_t i2, double value, int64_t *index, double *difference ) {
+nfu_status ptwX_closesDifferenceInRange( statusMessageReporting *smr, ptwXPoints *ptwX, int64_t i1, int64_t i2, 
+        double value, int64_t *index, double *difference ) {
 /*
 *   Finds the closes datum to value. If *difference is zero, datum is same as value.
 */
     double d1;
 
-    *index = -1;
-    *difference = -1;
-    if( ptwX->status != nfu_Okay ) return( ptwX->status );
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( nfu_badSelf );
+    }
+
     if( i1 < 0 ) i1 = 0;
     if( i2 > ptwX->length ) i2 = ptwX->length;
     if( i1 >= i2 ) return( nfu_Okay );
@@ -412,16 +578,25 @@ nfu_status ptwX_closesDifferenceInRange( ptwXPoints *ptwX, int64_t i1, int64_t i
 /*
 ************************************************************
 */
-ptwXPoints *ptwX_unique( ptwXPoints *ptwX, int order, nfu_status *status ) {
+ptwXPoints *ptwX_unique( statusMessageReporting *smr, ptwXPoints *ptwX, int order ) {
 /*
+*   Returns a new ptwXPoints instance that is a unique list of the values in ptwX.
 *   If order < 0 order is descending, if order > 0 order is ascending, otherwise, order is the same as ptwX.
 */
     int64_t i1, i2, n1 = 0;
     double x1, *p2;
     ptwXPoints *ptwX2 = NULL;
 
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( NULL );
+    }
+
     if( order == 0 ) {
-        if( ( ptwX2 = ptwX_new( ptwX->length, status ) ) == NULL ) return( NULL );
+        if( ( ptwX2 = ptwX_new( smr, ptwX->length ) ) == NULL ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( NULL );
+        }
         for( i1 = 0; i1 < ptwX->length; i1++ ) {
             x1 = ptwX->points[i1];
             for( i2 = 0, p2 = ptwX2->points; i2 < ptwX2->length; i2++, p2++ ) {
@@ -433,11 +608,19 @@ ptwXPoints *ptwX_unique( ptwXPoints *ptwX, int order, nfu_status *status ) {
             }
         } }
     else {
-        if( ( ptwX2 = ptwX_clone( ptwX, status ) ) == NULL ) return( NULL );
-        if( ( *status = ptwX_sort( ptwX2, ptwX_sort_order_ascending ) ) != nfu_Okay ) goto err;
+        enum ptwX_sort_order sort_order = ( order > 0 ) ? ptwX_sort_order_ascending : ptwX_sort_order_descending;
+
+        if( ( ptwX2 = ptwX_clone( smr, ptwX ) ) == NULL ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            return( NULL );
+        }
+        if( ptwX_sort( smr, ptwX2, sort_order ) != nfu_Okay ) {
+            smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+            goto err;
+        }
 
         if( ptwX2->length > 1 ) {
-            x1 = ptwX2->points[n1];
+            x1 = ptwX2->points[n1];                 /* n1 is initially 0. */
             n1++;
             for( i1 = 1; i1 < ptwX2->length; i1++ ) {
                 if( x1 != ptwX2->points[i1] ) {
@@ -447,9 +630,6 @@ ptwXPoints *ptwX_unique( ptwXPoints *ptwX, int order, nfu_status *status ) {
                 }
             }
             ptwX2->length = n1;
-            if( order < 0 ) {
-                if( ( *status = ptwX_sort( ptwX2, ptwX_sort_order_descending ) ) != nfu_Okay ) goto err;
-            }
         }
     }
     return( ptwX2 );
@@ -461,59 +641,84 @@ err:
 /*
 ************************************************************
 */
-nfu_status ptwX_abs( ptwXPoints *ptwX ) {
+nfu_status ptwX_abs( statusMessageReporting *smr, ptwXPoints *ptwX ) {
 
     int64_t i1;
     double *p1;
 
-    if( ptwX->status != nfu_Okay ) return( ptwX->status );
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( nfu_badSelf );
+    }
+
     for( i1 = 0, p1 = ptwX->points; i1 < ptwX->length; i1++, p1++ ) *p1 = fabs( *p1 );
     return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-nfu_status ptwX_neg( ptwXPoints *ptwX ) {
+nfu_status ptwX_neg( statusMessageReporting *smr, ptwXPoints *ptwX ) {
 
-    return( ptwX_slopeOffset( ptwX, -1, 0 ) );
+    if( ptwX_slopeOffset( smr, ptwX, -1, 0 ) != nfu_Okay )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( ptwX->status );
 }
 /*
 ************************************************************
 */
-nfu_status ptwX_add_double( ptwXPoints *ptwX, double value ) {
+nfu_status ptwX_add_double( statusMessageReporting *smr, ptwXPoints *ptwX, double value ) {
 
-    return( ptwX_slopeOffset( ptwX, 1, value ) );
+    if( ptwX_slopeOffset( smr, ptwX, 1, value ) != nfu_Okay )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( ptwX->status );
 }
 /*
 ************************************************************
 */
-nfu_status ptwX_mul_double( ptwXPoints *ptwX, double value ) {
+nfu_status ptwX_mul_double( statusMessageReporting *smr, ptwXPoints *ptwX, double value ) {
 
-    return( ptwX_slopeOffset( ptwX, value, 0 ) );
+    if( ptwX_slopeOffset( smr, ptwX, value, 0 ) != nfu_Okay )
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_Error, "Via." );
+    return( ptwX->status );
 }
 /*
 ************************************************************
 */
-nfu_status ptwX_slopeOffset( ptwXPoints *ptwX, double slope, double offset ) {
+nfu_status ptwX_slopeOffset( statusMessageReporting *smr, ptwXPoints *ptwX, double slope, double offset ) {
 
     int64_t i1;
     double *p1;
 
-    if( ptwX->status != nfu_Okay ) return( ptwX->status );
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( nfu_badSelf );
+    }
+
     for( i1 = 0, p1 = ptwX->points; i1 < ptwX->length; i1++, p1++ ) *p1 = slope * *p1 + offset;
     return( nfu_Okay );
 }
 /*
 ************************************************************
 */
-nfu_status ptwX_add_ptwX( ptwXPoints *ptwX1, ptwXPoints *ptwX2 ) {
+nfu_status ptwX_add_ptwX( statusMessageReporting *smr, ptwXPoints *ptwX1, ptwXPoints *ptwX2 ) {
 
     int64_t i1;
     double *p1 = ptwX1->points, *p2 = ptwX2->points;
 
-    if( ptwX1->status != nfu_Okay ) return( ptwX1->status );
-    if( ptwX2->status != nfu_Okay ) return( ptwX2->status );
-    if( ptwX1->length != ptwX2->length ) return( nfu_domainsNotMutual );
+    if( ptwX1->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source1." );
+        return( nfu_badSelf );
+    }
+    if( ptwX2->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source2." );
+        return( nfu_badSelf );
+    }
+
+    if( ptwX1->length != ptwX2->length ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_domainsNotMutual, 
+                "length of source1 = %d not the same as length of source2 = %d.", (int) ptwX1->length, (int) ptwX2->length );
+        return( nfu_domainsNotMutual );
+    }
 
     for( i1 = 0; i1 < ptwX1->length; i1++, p1++, p2++ ) *p1 += *p2;
     return( nfu_Okay );
@@ -521,14 +726,25 @@ nfu_status ptwX_add_ptwX( ptwXPoints *ptwX1, ptwXPoints *ptwX2 ) {
 /*
 ************************************************************
 */
-nfu_status ptwX_sub_ptwX( ptwXPoints *ptwX1, ptwXPoints *ptwX2 ) {
+nfu_status ptwX_sub_ptwX( statusMessageReporting *smr, ptwXPoints *ptwX1, ptwXPoints *ptwX2 ) {
 
     int64_t i1;
     double *p1 = ptwX1->points, *p2 = ptwX2->points;
 
-    if( ptwX1->status != nfu_Okay ) return( ptwX1->status );
-    if( ptwX2->status != nfu_Okay ) return( ptwX2->status );
-    if( ptwX1->length != ptwX2->length ) return( nfu_domainsNotMutual );
+    if( ptwX1->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source1" );
+        return( nfu_badSelf );
+    }
+    if( ptwX2->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source2." );
+        return( nfu_badSelf );
+    }
+
+    if( ptwX1->length != ptwX2->length ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_domainsNotMutual, 
+                "length of source1 = %d not the same as length of source2 = %d.", (int) ptwX1->length, (int) ptwX2->length );
+        return( nfu_domainsNotMutual );
+    }
 
     for( i1 = 0; i1 < ptwX1->length; i1++, p1++, p2++ ) *p1 -= *p2;
     return( nfu_Okay );
@@ -536,13 +752,17 @@ nfu_status ptwX_sub_ptwX( ptwXPoints *ptwX1, ptwXPoints *ptwX2 ) {
 /*
 ************************************************************
 */
-nfu_status ptwX_range( ptwXPoints *ptwX, double *rangeMin, double *rangeMax ) {
+nfu_status ptwX_range( statusMessageReporting *smr, ptwXPoints *ptwX, double *rangeMin, double *rangeMax ) {
 
     int64_t i1, n1 = ptwX->length;
     *rangeMin = *rangeMax = 0;
     double *p1 = ptwX->points;
 
-    if( ptwX->status != nfu_Okay ) return( ptwX->status );
+    if( ptwX->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source." );
+        return( nfu_badSelf );
+    }
+
     if( n1 > 0 ) {
         *rangeMin = *rangeMax = *(p1++);
         for( i1 = 1; i1 < n1; ++i1, ++p1 ) {
@@ -555,14 +775,21 @@ nfu_status ptwX_range( ptwXPoints *ptwX, double *rangeMin, double *rangeMax ) {
 /*
 ************************************************************
 */
-nfu_status ptwX_compare( ptwXPoints *ptwX1, ptwXPoints *ptwX2, int *comparison ) {
+nfu_status ptwX_compare( statusMessageReporting *smr, ptwXPoints *ptwX1, ptwXPoints *ptwX2, int *comparison ) {
 
     int64_t i1, n1 = ptwX1->length, n2 = ptwX2->length, nn = n1;
     double *p1 = ptwX1->points, *p2 = ptwX2->points;
 
     *comparison = 0;
-    if( ptwX1->status != nfu_Okay ) return( ptwX1->status );
-    if( ptwX2->status != nfu_Okay ) return( ptwX2->status );
+    if( ptwX1->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source1." );
+        return( nfu_badSelf );
+    }
+    if( ptwX2->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source2." );
+        return( nfu_badSelf );
+    }
+
     if( nn > n2 ) nn = n2;
     for( i1 = 0; i1 < nn; i1++, p1++, p2++ ) {
         if( *p1 == *p2 ) continue;
@@ -580,26 +807,39 @@ nfu_status ptwX_compare( ptwXPoints *ptwX1, ptwXPoints *ptwX2, int *comparison )
 /*
 ************************************************************
 */
-int ptwX_close( ptwXPoints *ptwX1, ptwXPoints *ptwX2, int epsilonFactor, double epsilon, nfu_status *status ) {
+nfu_status ptwX_close( statusMessageReporting *smr, ptwXPoints *ptwX1, ptwXPoints *ptwX2, int epsilonFactor, double epsilon,
+        int *index ) {
+/*
+*   Returns the index where ptwX1 and ptwX2 differ significantly as determined by epsilonFactor and epsilon.
+*/
 
     int64_t i1, n1 = ptwX1->length;
     double larger;
     double *p1 = ptwX1->points, *p2 = ptwX2->points;
 
+    *index = -1;
+    if( ptwX1->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source1." );
+        return( nfu_badSelf );
+    }
+    if( ptwX2->status != nfu_Okay ) {
+        smr_setReportError2p( smr, nfu_SMR_libraryID, nfu_badSelf, "Invalid source2." );
+        return( nfu_badSelf );
+    }
+
+    if( ptwX1->length != ptwX2->length ) {
+        smr_setReportError2( smr, nfu_SMR_libraryID, nfu_domainsNotMutual, 
+                "length of source1 = %d not the same as length of source2 = %d.", (int) ptwX1->length, (int) ptwX2->length );
+        return( nfu_domainsNotMutual );
+    }
+
     epsilon = fabs( epsilon ) + abs( epsilonFactor ) * DBL_EPSILON;
 
-    *status = ptwX1->status;
-    if( ptwX1->status != nfu_Okay ) return( -1 );
-    *status = ptwX2->status;
-    if( ptwX2->status != nfu_Okay ) return( -1 );
-    *status = nfu_domainsNotMutual;
-    if( n1 != ptwX2->length ) return( -1 );
-
-    *status = nfu_Okay;
     for( i1 = 0; i1 < n1; i1++, p1++, p2++ ) {
         larger = fabs( *p1 );
         if( fabs( *p2 ) > larger ) larger = fabs( *p2 );
-        if( fabs( *p2 - *p1 ) > epsilon * larger ) return( (int) ( i1 + 1 ) );
+        if( fabs( *p2 - *p1 ) > epsilon * larger ) break;
     }
-    return( 0 );
+    *index = (int) i1;
+    return( nfu_Okay );
 }

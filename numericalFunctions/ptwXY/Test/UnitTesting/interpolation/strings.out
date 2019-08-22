@@ -1,18 +1,18 @@
-linear-linear string = <lin,lin>
-string = <lin,lin>
-string = <lin,lin>
+linear-linear string = <lin-lin>
+string = <lin-lin>
+string = <lin-lin>
 
-linear-log string = <lin,log>
-string = <lin,log>
-string = <lin,log>
+linear-log string = <log-lin>
+string = <log-lin>
+string = <log-lin>
 
-log-linear string = <log,lin>
-string = <log,lin>
-string = <log,lin>
+log-linear string = <lin-log>
+string = <lin-log>
+string = <lin-log>
 
-log-log string = <log,log>
-string = <log,log>
-string = <log,log>
+log-log string = <log-log>
+string = <log-log>
+string = <log-log>
 
 flat string = <flat>
 string = <flat>

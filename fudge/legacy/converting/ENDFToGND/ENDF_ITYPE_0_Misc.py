@@ -1,9 +1,10 @@
 # <<BEGIN-copyright>>
-# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2016, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory.
-# Written by the LLNL Computational Nuclear Physics group
+# Written by the LLNL Nuclear Data and Theory group
 #         (email: mattoon1@llnl.gov)
-# LLNL-CODE-494171 All rights reserved.
+# LLNL-CODE-683960.
+# All rights reserved.
 # 
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
@@ -17,24 +18,47 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
+#       notice, this list of conditions and the disclaimer below.
 #     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
+#       notice, this list of conditions and the disclaimer (as noted below) in the
 #       documentation and/or other materials provided with the distribution.
-#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
-#       names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     * Neither the name of LLNS/LLNL nor the names of its contributors may be used
+#       to endorse or promote products derived from this software without specific
+#       prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY, LLC,
+# THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY
 # DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 # (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# 
+# 
+# Additional BSD Notice
+# 
+# 1. This notice is required to be provided under our contract with the U.S.
+# Department of Energy (DOE). This work was produced at Lawrence Livermore
+# National Laboratory under Contract No. DE-AC52-07NA27344 with the DOE.
+# 
+# 2. Neither the United States Government nor Lawrence Livermore National Security,
+# LLC nor any of their employees, makes any warranty, express or implied, or assumes
+# any liability or responsibility for the accuracy, completeness, or usefulness of any
+# information, apparatus, product, or process disclosed, or represents that its use
+# would not infringe privately-owned rights.
+# 
+# 3. Also, reference herein to any specific commercial products, process, or services
+# by trade name, trademark, manufacturer or otherwise does not necessarily constitute
+# or imply its endorsement, recommendation, or favoring by the United States Government
+# or Lawrence Livermore National Security, LLC. The views and opinions of authors expressed
+# herein do not necessarily state or reflect those of the United States Government or
+# Lawrence Livermore National Security, LLC, and shall not be used for advertising or
+# product endorsement purposes.
+# 
 # <<END-copyright>>
 
 epsilonExponent = -10
@@ -199,20 +223,20 @@ def nudgeValue( value, sign ) :
 def getCrossSectionForm( info, crossSectionRegions ) :
 
     axes = crossSectionModule.defaultAxes( )
-    if( len( crossSectionRegions ) == 1 ) :         # Store as pointwise.
-        crossSectionForm = crossSectionModule.pointwise( data = crossSectionRegions[0], label = info.style,
+    if( len( crossSectionRegions ) == 1 ) :         # Store as XYs1d.
+        crossSectionForm = crossSectionModule.XYs1d( data = crossSectionRegions[0], label = info.style,
                 axes = axes, accuracy = ENDF_Accuracy, interpolation = crossSectionRegions[0].interpolation )
     else :
-        crossSectionForm = crossSectionModule.piecewise( label = info.style, axes = axes )
+        crossSectionForm = crossSectionModule.regions1d( label = info.style, axes = axes )
         for region in crossSectionRegions :
             if( len( region ) > 1 ) : crossSectionForm.append( region )
     return( crossSectionForm )
 
 def getMultiplicity( multiplicity, EPrior, Ein ) :
 
-    if(   isinstance( multiplicity, XYsModule.XYs ) ) :
+    if(   isinstance( multiplicity, XYsModule.XYs1d ) ) :
         return( multiplicity.evaluate( Ein ) )
-    elif( isinstance( multiplicity, regionsModule.regions ) ) :
+    elif( isinstance( multiplicity, regionsModule.regions1d ) ) :
         for region in multiplicity :
             if( Ein <= region.domainMax( ) ) :
                 if( region.domainMax( ) == EPrior == Ein ) : continue          # Next region is the one we want.
@@ -228,19 +252,19 @@ def uncorrelated( style, frame, angularSubform, energySubform ) :
 
 def getMultiplicityPointwiseOrPieceWise( info, data, warningList ) :
 
-    axes = multiplicityModule.pointwise.defaultAxes( )
+    axes = multiplicityModule.XYs1d.defaultAxes( )
     if( len( data  ) == 1 ) :
-        multiplicity = multiplicityModule.pointwise( data = data[0], label = info.style, axes = axes, 
+        multiplicity = multiplicityModule.XYs1d( data = data[0], label = info.style, axes = axes, 
                 accuracy = ENDF_Accuracy, interpolation = data[0].interpolation )
 # BRB : fix me.
 #    elif( ( len( data ) == 2 ) and ( data[0][-1] == data[1][0] ) and
 #            ( data[0].axes[0].interpolation == data[1].axes[0].interpolation ) ) :
-#        xys = data[1].copyDataToXYs( )      # This is pointwise data masquerading as piecewise, convert to pointwise.
+#        xys = data[1].copyDataToXYs( )      # This is a XYs1d data masquerading as regions1d, convert to XYs1d.
 #        xys[0][0] *= ( 1 + FUDGE_EPS )
 #        xys = data[0].copyDataToXYs( ) + xys
-#        multiplicity = multiplicityModule.pointwise( data = xys, axes = axea, accuracy = ENDF_Accuracy )
+#        multiplicity = multiplicityModule.XYs1d( data = xys, axes = axea, accuracy = ENDF_Accuracy )
     else :
-        multiplicity = multiplicityModule.piecewise( label = info.style, axes = axes )
+        multiplicity = multiplicityModule.regions1d( label = info.style, axes = axes )
         for region in data :
             multiplicity.append( region.copy( axes=axes ) )
     return( multiplicity )
@@ -259,7 +283,7 @@ def getTotalOrPromptFission( info, MT456Data, totalOrPrompt, warningList ) :
         fissionMultiplicity = multiplicityModule.polynomial( coefficients = polynomial['data'], label = info.style, 
                 axes = axes, domainMin = domainMin, domainMax = domainMax )
     else :
-        axes = multiplicityModule.pointwise.defaultAxes( )
+        axes = multiplicityModule.XYs1d.defaultAxes( )
         dataLine, TAB1, multiplicityRegions = endfFileToGNDMisc.getTAB1Regions( 1, MT456Data, axes = axes, logFile = info.logs )
         fissionMultiplicity = getMultiplicityPointwiseOrPieceWise( info, multiplicityRegions, warningList )
     return( fissionMultiplicity )
@@ -290,7 +314,7 @@ def getDelayedFission( info, MT455Data, warningList ) :
 
     if( 5 in MT455Data ) :
         delayedNeutronEnergies, weights = readMF5( info, 455, MT455Data[5], warningList, delayNeutrons = True )
-        weightsSum = XYsModule.XYs( [], axes = weights[0].axes )                            # Renormalize weights to sum to 1.
+        weightsSum = XYsModule.XYs1d( [], axes = weights[0].axes, interpolation = weights[0].interpolation )  # Renormalize weights to sum to 1.
         for weight in weights : weightsSum = weightsSum + weight
         for weight in weights :
             for i1, xy in enumerate( weight ) : XYsModule.pointwiseXY.__setitem__( weight, i1, xy[1] / weightsSum.evaluate( xy[0] ) )
@@ -305,7 +329,7 @@ def getDelayedFission( info, MT455Data, warningList ) :
                 ( len( decayRates ), len( delayedNeutronEnergies ) ) )
         info.doRaise.append( warningList[-1] )
         decayRates = []
-    decayChannel = channelsModule.NBodyDecayChannel( )      # Dummy channel, so Q's value does not matter.
+    decayChannel = channelsModule.NBodyOutputChannel( )      # Dummy channel, so Q's value does not matter.
     decayChannel.Q.add( toGNDMisc.returnConstantQ( info.style, 0. ) )
     for i1, decayRate in enumerate( decayRates ) :
         energySubform = delayedNeutronEnergies[i1]
@@ -315,11 +339,11 @@ def getDelayedFission( info, MT455Data, warningList ) :
             if( weightsInterpolation == standardsModule.interpolation.flatToken ) :
                 if( ( len( weight ) == 2 ) and ( nubarInterpolation == standardsModule.interpolation.linlinToken ) ) :
                     weightsInterpolation = standardsModule.interpolation.linlinToken
-                    weight = XYsModule.XYs( data = [ xy for xy in weight ], axes = weight.axes )
+                    weight = XYsModule.XYs1d( data = [ xy for xy in weight ], axes = weight.axes )
             if( weightsInterpolation != nubarInterpolation ) :
                 raise Exception( 'For total nubar and energy interpolation differ which is currently not supported' )
             if( weightsInterpolation != standardsModule.interpolation.linlinToken ) :
-                raise Exception( 'For energy only "lin,lin" interpolation is supported: %s' % weightsInterpolation )
+                raise Exception( 'For energy only "lin-lin" interpolation is supported: %s' % weightsInterpolation )
             totalDelayedM = totalDelayedMultiplicity
             if( totalDelayedMultiplicity.domainMax( ) > weight.domainMax( ) ) :
                 totalDelayedM = totalDelayedMultiplicity.domainSlice( domainMax = weight.domainMax( ) )
@@ -345,7 +369,7 @@ def getDelayedFission( info, MT455Data, warningList ) :
             angularSubform = angularModule.isotropic( )
             form = uncorrelated( info.style, frames[1], angularSubform, energySubform )
             particle.distribution.add( form )
-        decayChannel.products.add( particle )
+        decayChannel.products.add( decayChannel.products.uniqueLabel( particle ) )
     info.logs.write( '\n' )
     return( decayChannel )
 
@@ -395,7 +419,7 @@ def getFissionEnergies( info, MF458Data, warningList ) :
 def angularLegendrePiecewiseToPointwiseIfPossible( piecewiseForm ) :
 
     if( len( piecewiseForm ) != 1 ) : return( piecewiseForm )
-    pointwise = angularModule.pointwise( axes = piecewiseForm.axes )
+    pointwise = angularModule.XYs2d( axes = piecewiseForm.axes )
     for series in piecewiseForm[0] : pointwise.append( series )
     return( pointwise )
 
@@ -428,27 +452,27 @@ def angularLegendreToPointwiseOrPiecewiseLegendre( MT, angularData, warningList,
         warningList.append( 'ValueError occurred when constructing LegendreSeries: %s' % err )
         raise
 
-    axes = angularModule.pointwise.defaultAxes( asLegendre = True )
+    axes = angularModule.XYs2d.defaultAxes( asLegendre = True )
     if( ( len( regions ) == 1 ) and ( subformPointwise is None ) ) :
         interpolationQualifier, interpolationEin, region = regions[0]
-        subformLegendre = angularModule.pointwise( axes = axes, interpolation = interpolationEin,
+        subformLegendre = angularModule.XYs2d( axes = axes, interpolation = interpolationEin,
                 interpolationQualifier = interpolationQualifier )
         for i1, ( energy, coefficients ) in enumerate( region ) :
-            subformLegendre.append( angularModule.pdfOfMu.Legendre( coefficients = coefficients, value = energy ) )
+            subformLegendre.append( angularModule.Legendre( coefficients = coefficients, value = energy ) )
     else :
-        subformLegendre = angularModule.piecewise( axes = axes )
+        subformLegendre = angularModule.regions2d( axes = axes )
         for i1, regionInfo in enumerate( regions ) :
             interpolationQualifier, interpolationEin, region = regionInfo
-            LegendreRegion = angularModule.pointwise( dimension = 2, interpolation = interpolationEin,
+            LegendreRegion = angularModule.XYs2d( interpolation = interpolationEin,
                     interpolationQualifier = interpolationQualifier )
             for i2, ( energy, coefficients ) in enumerate( region ) :
-                LegendreRegion.append( angularModule.pdfOfMu.Legendre( coefficients = coefficients, value = energy ), makeCopy = False )
+                LegendreRegion.append( angularModule.Legendre( coefficients = coefficients, value = energy ), makeCopy = False )
             subformLegendre.append( LegendreRegion )
         if( subformPointwise is not None ) :
-            if( isinstance( subformPointwise, angularModule.piecewise ) ) :
+            if( isinstance( subformPointwise, angularModule.regions2d ) ) :
                     raise 'hell - need to implement this'
             else :
-                region = angularModule.pointwise( dimension = 2, interpolation = subformPointwise.interpolation,
+                region = angularModule.XYs2d( interpolation = subformPointwise.interpolation,
                     interpolationQualifier = subformPointwise.interpolationQualifier, axes = subformPointwise.axes )
                 for data in subformPointwise : region.append( data )
                 subformLegendre.append( region )
@@ -458,27 +482,27 @@ def convertNuclearPlusInterferenceDataToPiecewise( MT, angularData, warningList,
     """Return distribution.LegendreNuclearPlusCoulombInterference instance. This in turn contains
     Legendre sections for both the nuclear and interference contributions."""
 
-    axes = angularModule.pointwise.defaultAxes( asLegendre=True )
-    nuclear = angularModule.piecewise( axes = axes )
-    interferenceReal = angularModule.piecewise( axes = axes )
-    interferenceImaginary = angularModule.piecewise( axes = axes )
+    axes = angularModule.XYs2d.defaultAxes( asLegendre = True )
+    nuclear = angularModule.regions2d( axes = axes )
+    interferenceReal = angularModule.regions2d( axes = axes )
+    interferenceImaginary = angularModule.regions2d( axes = axes )
     index, start, lastRegion = 0, 0, None
     lists = angularData['Lists']
     for end, interpolationFlag in angularData['interpolationInfo'] :
         interpolationQualifier, interpolationE_in = endfFileToGNDMisc.ENDFInterpolationToGND2plusd( interpolationFlag )
         if( interpolationFlag > 6 ) : raise Exception( 'Unsupported interpolation = %s for MF=%s, MT=%s' % ( interpolationFlag, MF, MT ) )
         #interpolationE_in, interpolationCl, interpolationQualifier = endfFileToGNDMisc.ENDFInterpolationToGNDAxes3plusd( interpolationFlag )
-        region_Nuc = angularModule.pointwise( dimension = 2, interpolation = interpolationE_in )
-        region_IntReal = angularModule.pointwise( dimension = 2, interpolation = interpolationE_in )
-        region_IntImaginary = angularModule.pointwise( dimension = 2, interpolation = interpolationE_in )
+        region_Nuc = angularModule.XYs2d( interpolation = interpolationE_in )
+        region_IntReal = angularModule.XYs2d( interpolation = interpolationE_in )
+        region_IntImaginary = angularModule.XYs2d( interpolation = interpolationE_in )
         priorEnergy = -1
         if( lastRegion is not None ) :
             if( lists[start]['C2'] != lastRegion ) : # ensure no gaps between regions
-                region_Nuc.append( angularModule.pdfOfMu.Legendre( coefficients = nuclear_term,
+                region_Nuc.append( angularModule.Legendre( coefficients = nuclear_term,
                         value = lastRegion ), makeCopy = False )
-                region_IntReal.append( angularModule.pdfOfMu.Legendre( coefficients = interference_termReal,
+                region_IntReal.append( angularModule.Legendre( coefficients = interference_termReal,
                         value = lastRegion ), makeCopy = False )
-                region_IntImaginary.append( angularModule.pdfOfMu.Legendre( coefficients = interference_termImaginary,
+                region_IntImaginary.append( angularModule.Legendre( coefficients = interference_termImaginary,
                         value = lastRegion ), makeCopy = False )
         for idx in xrange( start, end ) :
             list = lists[idx]
@@ -496,11 +520,11 @@ def convertNuclearPlusInterferenceDataToPiecewise( MT, angularData, warningList,
             for jdx in range( 0, len( interference_term ), 2 ) :
                 interference_termReal.append( interference_term[jdx] )
                 interference_termImaginary.append( interference_term[jdx+1] )
-            region_Nuc.append( angularModule.pdfOfMu.Legendre( coefficients = nuclear_term,
+            region_Nuc.append( angularModule.Legendre( coefficients = nuclear_term,
                     value = energy ), makeCopy = False )
-            region_IntReal.append( angularModule.pdfOfMu.Legendre( coefficients = interference_termReal,
+            region_IntReal.append( angularModule.Legendre( coefficients = interference_termReal,
                     value = energy ), makeCopy = False )
-            region_IntImaginary.append( angularModule.pdfOfMu.Legendre( coefficients = interference_termImaginary,
+            region_IntImaginary.append( angularModule.Legendre( coefficients = interference_termImaginary,
                     value = energy ), makeCopy = False )
         lastRegion = energy
         nuclear[index] = region_Nuc
@@ -516,18 +540,18 @@ def convertNuclearPlusInterferenceDataToPiecewise( MT, angularData, warningList,
 def convertAngularToPointwiseOrPiecewiseFromTAB2_TAB1( MT, angularTAB1, warningList ) :
 
     angularData = angularTAB1['TAB2s']
-    axes = angularModule.pointwise.defaultAxes( )
+    axes = angularModule.XYs2d.defaultAxes( )
     if( len( angularData ) == 1 ) :
         interplation, angularData = angularData[0]      # BRB: need to check interpolation?
-        subform = angularModule.pointwise( axes = axes )
+        subform = angularModule.XYs2d( axes = axes )
         for xys in angularData :
             if( len( xys ) > 1 ) : raise 'hell - need to support this'
             xys = xys[0]
-            xys = angularModule.pdfOfMu.pointwise( data = xys, interpolation = xys.interpolation,
+            xys = angularModule.XYs1d( data = xys, interpolation = xys.interpolation,
                 accuracy = ENDF_Accuracy, value = xys.value )
             subform.append( xys )
     else :
-        raise 'hell - piecewise tabulated angular not currently supported'
+        raise 'hell - regions2d tabulated angular not currently supported'
     return( subform )
 
 def convertAngularToPointwiseOrPiecewiseFromTAB2_List( MT, LANG, angularList, warningList ) :
@@ -536,14 +560,14 @@ def convertAngularToPointwiseOrPiecewiseFromTAB2_List( MT, LANG, angularList, wa
     """
 
     angularData = angularList['Lists']
-    axes = angularModule.pointwise.defaultAxes( )
+    axes = angularModule.XYs2d.defaultAxes( )
     try :
         interpolation = { 12 : 2, 14 : 4 }[LANG]
     except :
         print 'interpolation = %d' % interpolation
         raise 'hell - what is this and how does it differ from 12'
     interpolation = endfFileToGNDMisc.ENDFInterpolationToGND1d( interpolation )
-    subform = angularModule.pointwise( axes = axes )
+    subform = angularModule.XYs2d( axes = axes )
     e_in_Prior = -1
     for i1, list in enumerate( angularData ) :
         LANG_e_in = int( list['L1'] )
@@ -557,7 +581,7 @@ def convertAngularToPointwiseOrPiecewiseFromTAB2_List( MT, LANG, angularList, wa
                 if( j2 is not None ) :
                     if( data[j2] == data[j3] ) : data[j2] -= 0.5 * ( data[j2] - data[j1] )
                 j1, j2 = j2, j3
-        xys = angularModule.pdfOfMu.pointwise( data = list['data'], dataForm = 'list', 
+        xys = angularModule.XYs1d( data = list['data'], dataForm = 'list', 
                 interpolation = interpolation, accuracy = ENDF_Accuracy, value = e_in )
         subform.append( xys )
         e_in_Prior = e_in
@@ -570,25 +594,25 @@ def toPointwiseOrPiecewiseEnergy( MT, TAB2 ) :
         EpP = data[0]
         energy = float( EpP.value )
         if( len( data ) == 1 ) :
-            EpP = energyModule.pdfOfEp.pointwise( data = EpP, interpolation = EpP.interpolation, value = energy )
+            EpP = energyModule.XYs1d( data = EpP, interpolation = EpP.interpolation, value = energy )
         else :
-            EpP = energyModule.pdfOfEp.piecewise( 1, value = energy )
+            EpP = energyModule.regions1d( value = energy )
             for datum in data :
-                EpP.append( energyModule.pdfOfEp.pointwise( data = datum, interpolation = datum.interpolation ) )
+                EpP.append( energyModule.XYs1d( data = datum, interpolation = datum.interpolation ) )
         return( energy, EpP )
 
-    axes = energyModule.pointwise.defaultAxes( )
+    axes = energyModule.XYs2d.defaultAxes( )
     if( TAB2['NR'] == 1 ) :
         interpolation, data = TAB2['TAB2s'][0]
         interpolationQualifier, interpolation = endfFileToGNDMisc.ENDFInterpolationToGND2plusd( interpolation )
-        subform = energyModule.piecewise( axes = axes )
-        subformRegion = energyModule.pointwise( axes = axes, interpolation = interpolation, interpolationQualifier = interpolationQualifier )
+        subform = energyModule.regions2d( axes = axes )
+        subformRegion = energyModule.XYs2d( axes = axes, interpolation = interpolation, interpolationQualifier = interpolationQualifier )
         energyPrior = -1
         for EpP in data :
             EIn = float( EpP[0].value )
             if( EIn == energyPrior ) :
                 if( len( subformRegion ) > 1 ) : subform.append( subformRegion )
-                subformRegion = energyModule.pointwise( axes = axes, interpolation = interpolation, interpolationQualifier = interpolationQualifier )
+                subformRegion = energyModule.XYs2d( axes = axes, interpolation = interpolation, interpolationQualifier = interpolationQualifier )
                 energyPrior = -1
             energyPrior, EpPp = getEpP( energyPrior, EpP )
             subformRegion.append( EpPp, makeCopy = False )
@@ -597,12 +621,11 @@ def toPointwiseOrPiecewiseEnergy( MT, TAB2 ) :
         else :
             subform.append( subformRegion )
     else :
-        subform = energyModule.piecewise( axes = axes )
+        subform = energyModule.regions2d( axes = axes )
         TAB2s = TAB2['TAB2s']
         for i1, ( interpolation, TAB1s ) in enumerate( TAB2s ) :
             interpolationQualifier, interpolation = endfFileToGNDMisc.ENDFInterpolationToGND2plusd( interpolation )
-            region = energyModule.pointwise( dimension = 2, interpolation = interpolation,
-                    interpolationQualifier = interpolationQualifier )
+            region = energyModule.XYs2d( interpolation = interpolation, interpolationQualifier = interpolationQualifier )
             energyPrior = -1
             for EpP in TAB1s :
                 energyPrior, EpPp = getEpP( energyPrior, EpP )
@@ -633,8 +656,8 @@ def readMF2( info, MF2, warningList ) :
             data = [line1] + [mf2.next() for i in range(nLines)]
             axes = axesModule.axes( labelsUnits = { 1 : ( 'energy_in', 'eV' ), 0 : ( 'radius', '10*fm' ) } )
             dataLine, TAB1, regions = endfFileToGNDMisc.getTAB1Regions( 0, data, axes = axes, logFile = info.logs )
-            if TAB1['NR']!=1 or TAB1['interpolationInfo'][0][1]!=2:
-                raise BadResonances("scattering radius must be pointwise linear")
+            if TAB1['NR']!=1:
+                raise NotImplementedError("multi-region scattering radius")
             data = regions[0]
             data = data.convertAxisToUnit(0,'fm')
             scatRadius = resonancesModule.scatteringRadius( data )
@@ -654,7 +677,8 @@ def readMF2( info, MF2, warningList ) :
             info.particleSpins['target'] = ( xParticleModule.spin(SPI), 0 )
             if NRO==0:
                 scatRadius = resonancesModule.scatteringRadius(
-                        resonancesModule.constantScatteringRadius( PQUModule.PQU( PQUModule.pqu_float.surmiseSignificantDigits( AP*10 ),"fm") ) )
+                        resonancesModule.constantScatteringRadius( PQUModule.PQU(
+                            PQUModule.pqu_float.surmiseSignificantDigits( AP*10 ),"fm") ) )
             resList = []
             negativeJs = False
             for lidx in range(NLS):
@@ -750,6 +774,8 @@ def readMF2( info, MF2, warningList ) :
             dum,dum,IFG,KRM,NJS,KRL = funkyFI( mf2.next(), logFile = info.logs )
             if KRM==3:
                 approximation = 'Reich_Moore'
+            elif KRM==4:
+                approximation = 'Full R-Matrix'
             else:
                 raise BadResonances( "R-Matrix with KRM=%d not yet implemented!\n" % KRM )
 
@@ -915,9 +941,10 @@ def readMF2( info, MF2, warningList ) :
             targetSpins.add( SPI )
             if info.target.name not in info.particleSpins:
                 info.particleSpins[ info.target.name ] = ( xParticleModule.spin(SPI), 0 )
-            scatRadius = resonancesModule.scatteringRadius(
-                        resonancesModule.constantScatteringRadius( PQUModule.PQU( PQUModule.pqu_float.surmiseSignificantDigits( AP*10 ),"fm"),
-                        label = info.style ) )
+            if NRO==0:
+                scatRadius = resonancesModule.scatteringRadius(
+                        resonancesModule.constantScatteringRadius( PQUModule.PQU(
+                            PQUModule.pqu_float.surmiseSignificantDigits( AP*10 ),"fm"), label = info.style ) )
 
             if LFW==0 and LRF==1:   # 'Case A', see ENDF 2010 manual page 70
                 NLS = NE
@@ -1064,7 +1091,7 @@ def readMF2( info, MF2, warningList ) :
     elif len(unresolvedList)==1:
         unresolved = resonancesModule.unresolved( *unresolvedList[0] )
     else:
-        raise BadResonances, "multiple unresolved regions not supported"
+        raise BadResonances( "multiple unresolved regions not supported" )
 
 #    if mf2.index != mf2.length: raise BadResonances("Not all resonance data converted!")
     if mf2.index != mf2.length: warningList.append("Not all resonance data converted!")
@@ -1077,7 +1104,7 @@ def readMF3( info, MT, MF3Data, warningList ) :
 
     axes = crossSectionModule.defaultAxes( )
     dataLine, TAB1, crossSectionRegions = endfFileToGNDMisc.getTAB1Regions( 1, MF3Data, allowInterpolation6 = True, 
-            logFile = info.logs, axes = axes )
+            logFile = info.logs, axes = axes, cls = crossSectionModule.XYs1d )
     QM, QI, LR = TAB1['C1'], TAB1['C2'], int( TAB1['L2'] )
     breakupProducts = None
     if(   LR == 0 ) :
@@ -1188,7 +1215,7 @@ def readMF5( info, MT, MF5Data, warningList, delayNeutrons = False, product = No
                 for discontinuity in discontinuities : del productData['data'][discontinuity]
             interpolation = endfFileToGNDMisc.ENDFInterpolationToGND1d( 1 )    # Flat interpolation.
             axes = axesModule.axes( labelsUnits = { 1 : ( 'energy_in' , 'eV' ), 0 : ( 'weight' , '' ) } )
-            weight = XYsModule.XYs( data = productData['data'], axes = axes, accuracy = ENDF_Accuracy, interpolation = interpolation )
+            weight = XYsModule.XYs1d( data = productData['data'], axes = axes, accuracy = ENDF_Accuracy, interpolation = interpolation )
         else :
             for xy in productData['data'] :
                 if( xPrior is not None ) :
@@ -1199,13 +1226,13 @@ def readMF5( info, MT, MF5Data, warningList, delayNeutrons = False, product = No
                         addWarning = False
                 xPrior = xy[0]
         interpolation = endfFileToGNDMisc.ENDFInterpolationToGND1d( productData['interpolationInfo'][0][1] )
-        axes = multiplicityModule.pointwise.defaultAxes( multiplicityName = '' )
-        weights.append( XYsModule.XYs( data = productData['data'], axes = axes, accuracy = ENDF_Accuracy, interpolation = interpolation ) )   # weights is only used for delayed nu_bar data
+        axes = multiplicityModule.XYs1d.defaultAxes( multiplicityName = '' )
+        weights.append( XYsModule.XYs1d( data = productData['data'], axes = axes, accuracy = ENDF_Accuracy, interpolation = interpolation ) )   # weights is only used for delayed nu_bar data
 
         info.logs.write( ' : MF=5, LF=%s' % LF )
         U = PQUModule.PQU( PQUModule.pqu_float.surmiseSignificantDigits( productData['C1'] ), 'eV' )    # Upper energy limit.
         if( LF == 1 ) :
-            axes2d = energyModule.pointwise.defaultAxes( )
+            axes2d = energyModule.XYs2d.defaultAxes( )
             axes = axesModule.axes( )
             axes[0] = axes2d[0]
             axes[1] = axes2d[1]
@@ -1267,7 +1294,7 @@ def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, is
     info.logs.write( ' : MF=6' )
     for outGoing in xrange( NK ) :
         isLegendreConvertedToEnergy = False
-        axes = multiplicityModule.pointwise.defaultAxes( )
+        axes = multiplicityModule.XYs1d.defaultAxes( )
         dataLine, productData, multiplicityRegions = endfFileToGNDMisc.getTAB1Regions( dataLine, MF6Data, logFile = info.logs,
                 axes = axes )
             # ZAP is ZA for outgoing particle; AWP is its atomic mass, LIP: 0 for residual in ground state, 1 for first excited state, etc
@@ -1416,27 +1443,27 @@ def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, is
                         isLegendreConvertedToEnergy = True
                         angularSubform = angularModule.isotropic( )
 
-                        axes = energyModule.pointwise.defaultAxes( energyUnit = "eV" )
+                        axes = energyModule.XYs2d.defaultAxes( energyUnit = "eV" )
                         EPrior = -1
-                        energySubform = energyModule.piecewise( axes = axes )
-                        energySubformRegion = energyModule.pointwise( axes = axes, interpolation = EinInterpolation,
+                        energySubform = energyModule.regions2d( axes = axes )
+                        energySubformRegion = energyModule.XYs2d( axes = axes, interpolation = EinInterpolation,
                                 interpolationQualifier = interpolationQualifier )
                         axes2 = axesModule.axes( rank = 2 )
                         axes2[0] = axes[0]
                         axes2[1] = axes[1]
                         for index, ( Ein, EpCls, multiRegion ) in enumerate( EEpClsData ) :
                             if multiRegion:
-                                xData = energyModule.pdfOfEp.piecewise( dimension = 1, value = Ein, axes = axes2 )
+                                xData = energyModule.regions1d( value = Ein, axes = axes2 )
                                 for region in EpCls:
                                     EpP = [ [ Ep, P[0] ] for Ep, P in region ]
-                                    xData.append( energyModule.pdfOfEp.pointwise( data = EpP, interpolation = interpolationLEP ) )
+                                    xData.append( energyModule.XYs1d( data = EpP, interpolation = interpolationLEP ) )
                             else:
                                 EpP = [ [ Ep, P[0] ] for Ep, P in EpCls ]
-                                xData = energyModule.pdfOfEp.pointwise( data = EpP, interpolation = interpolationLEP, 
+                                xData = energyModule.XYs1d( data = EpP, interpolation = interpolationLEP, 
                                         value = Ein, axes = axes2 )
                             if( Ein == EPrior ) :
                                 energySubform.append( energySubformRegion )
-                                energySubformRegion = energyModule.pointwise( axes = axes, interpolation = EinInterpolation,
+                                energySubformRegion = energyModule.XYs2d( axes = axes, interpolation = EinInterpolation,
                                 interpolationQualifier = interpolationQualifier )
                             energySubformRegion.append( xData )
                             EPrior = Ein
@@ -1453,17 +1480,17 @@ def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, is
                     axes[1] = axesModule.axis( 'l', 1, '' )
                     axes[0] = axesModule.axis( 'C_l(energy_out|energy_in)', 0, '1/eV' )
                     EPrior = -1
-                    energyAngularSubform = energyAngularModule.piecewise( axes = axes )
-                    energyAngularSubformRegion = energyAngularModule.pointwise( axes = axes, interpolation = EinInterpolation,
+                    energyAngularSubform = energyAngularModule.regions3d( axes = axes )
+                    energyAngularSubformRegion = energyAngularModule.XYs3d( axes = axes, interpolation = EinInterpolation,
                             interpolationQualifier = interpolationQualifier )
                     for i1, ( e_in, EpCls, multiRegion ) in enumerate( EEpClsData ) :
                         if( multiRegion ) : raise NotImplemented
-                        multiD_2d = energyAngularModule.pdfOfEpAndMu.pointwise( 2, value = e_in, interpolation = interpolationLEP )
+                        multiD_2d = energyAngularModule.XYs2d( value = e_in, interpolation = interpolationLEP )
                         for i2, ( e_out, Cls ) in enumerate( EpCls ) :
-                            multiD_2d.append( energyAngularModule.pdfOfMu.Legendre( coefficients = Cls, value = e_out ) )
+                            multiD_2d.append( energyAngularModule.Legendre( coefficients = Cls, value = e_out ) )
                         if( e_in == EPrior ) :
                             energyAngularSubform.append( energyAngularSubformRegion )
-                            energyAngularSubformRegion = energyAngularModule.pointwise( axes = axes, interpolation = EinInterpolation,
+                            energyAngularSubformRegion = energyAngularModule.XYs3d( axes = axes, interpolation = EinInterpolation,
                             interpolationQualifier = interpolationQualifier )
                         energyAngularSubformRegion.append( multiD_2d )
                         EPrior = e_in
@@ -1482,19 +1509,24 @@ def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, is
                 NA = int( KalbachMannData['Lists'][0]['L2'] )
                 dataPerPoint = NA + 2
 
+                if( interpolationQualifier == standardsModule.interpolation.noneQualifierToken ) :
+                    interpolationQualifier = standardsModule.interpolation.unitBaseToken
                 axes = KalbachMannModule.subform.defaultAxes( 'f' )
-                fData = multiD_XYsModule.multiD_XYs( dimension = 2, axes = axes, interpolation = interpolation, 
+                fData = multiD_XYsModule.XYs2d( axes = axes, interpolation = interpolation, 
                         interpolationQualifier = interpolationQualifier )
 
-
+                if( interpolationQualifier == standardsModule.interpolation.unitBaseToken ) :
+                    interpolationQualifier = standardsModule.interpolation.unitBaseUnscaledToken
+                else :
+                    interpolationQualifier = standardsModule.interpolation.correspondingPointsUnscaledToken
                 axes = KalbachMannModule.subform.defaultAxes( 'r' )
-                rData = multiD_XYsModule.multiD_XYs( dimension = 2, axes = axes, interpolation = interpolation, 
+                rData = multiD_XYsModule.XYs2d( axes = axes, interpolation = interpolation, 
                         interpolationQualifier = interpolationQualifier )
 
                 aData = None
                 if( NA == 2 ) :
                     axes = KalbachMannModule.subform.defaultAxes( 'a' )
-                    aData = multiD_XYsModule.multiD_XYs( dimension = 2, axes = axes, label="a",interpolation = interpolation, 
+                    aData = multiD_XYsModule.XYs2d( axes = axes, label = "a", interpolation = interpolation, 
                             interpolationQualifier = interpolationQualifier )
 
                 priorE, priorEp_f_r_ = -1, [ -1, -1, -1 ]
@@ -1516,13 +1548,13 @@ def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, is
                             print priorE, priorEp_f_r__
                             raise 'hell - need to support regions'
                     priorE, priorEp_f_r_ = value, priorEp_f_r__
-                    fData.append( XYsModule.XYs( data = ( Ep_, f_ ), dataForm = 'xsandys',
+                    fData.append( XYsModule.XYs1d( data = ( Ep_, f_ ), dataForm = 'xsandys',
                                                  value = value, interpolation = interpolationLEP ) )
-                    rData.append( XYsModule.XYs( data = ( Ep_, r_ ), dataForm = 'xsandys',
+                    rData.append( XYsModule.XYs1d( data = ( Ep_, r_ ), dataForm = 'xsandys',
                                                  value = value, interpolation = interpolationLEP ) )
                     if( aData is not None ) :
                         a_ = data['data'][3::dataPerPoint]
-                        aData.append( XYsModule.XYs( data = ( Ep_, a_ ), dataForm = 'xsandys',
+                        aData.append( XYsModule.XYs1d( data = ( Ep_, a_ ), dataForm = 'xsandys',
                                                      value = value, interpolation = interpolationLEP ) )
 
                 fSubform = KalbachMannModule.fSubform( fData )
@@ -1593,9 +1625,9 @@ def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, is
             dataLine, NEData = endfFileToGNDMisc.getTAB2Header( dataLine, MF6Data, logFile = info.logs )
             NR = int( NEData['NR'] )                    # number of interpolation regions for this incident energy
             if( NR != 1 ) : raise Exception( "Currently only one interpolation flag is supported for MF = 6, LAW = 7; MT = %s" % MT )
-            axes = angularEnergyModule.pointwise.defaultAxes( )
+            axes = angularEnergyModule.XYs3d.defaultAxes( )
             interpolationQualifier, interpolation = endfFileToGNDMisc.ENDFInterpolationToGND2plusd( NEData['interpolationInfo'][0][1] )
-            angularEnergySubform = angularEnergyModule.pointwise( axes = axes, interpolation = interpolation,
+            angularEnergySubform = angularEnergyModule.XYs3d( axes = axes, interpolation = interpolation,
                     interpolationQualifier = interpolationQualifier )
             axes2d = axesModule.axes( 3 )
             axes2d[0] = angularEnergySubform.axes[0]
@@ -1610,11 +1642,11 @@ def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, is
                 if( len( muEpP ) != 1 ) : raise 'hell - need to fix'
                 interpolation, muEpP = muEpP[0]
                 interpolationQualifier, interpolation = endfFileToGNDMisc.ENDFInterpolationToGND2plusd( muEpPTable['interpolationInfo'][0][1] )
-                muEpP_multiD = angularEnergyModule.pdfOfMuAndEp.pointwise( dimension = 2, value = muEpPTable['C2'], 
+                muEpP_multiD = angularEnergyModule.XYs2d( value = muEpPTable['C2'], 
                         interpolation = interpolation, interpolationQualifier = interpolationQualifier, axes = axes2d )
                 for i2, EpP in enumerate( muEpP ) :
                     if( len( EpP ) > 1 ) : raise 'hell - need to fix'
-                    muEpP_multiD.append( angularEnergyModule.pdfOfEp.pointwise.returnAsClass( EpP[0], EpP[0] ) )
+                    muEpP_multiD.append( angularEnergyModule.XYs1d.returnAsClass( EpP[0], EpP[0] ) )
                 angularEnergySubform.append( muEpP_multiD )
             form = angularEnergyModule.form( info.style, frame, angularEnergySubform )
         elif( LAW == 8 ) :
@@ -1638,7 +1670,7 @@ def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, is
                 multiplicity = int( rangeMin )
         else :
             multiplicity = getMultiplicityPointwiseOrPieceWise( info, multiplicityRegions, warningList )
-        if( isinstance( multiplicity, multiplicityModule.pointwise ) and ( multiplicity.rangeMin( ) < 0 ) ) :
+        if( isinstance( multiplicity, multiplicityModule.XYs1d ) and ( multiplicity.rangeMin( ) < 0 ) ) :
             warningList.append( "Negative multiplicity encountered for MF6, MT%d %s" %
                 ( MT, toGNDMisc.getTypeNameENDF( info, ZAP, undefinedLevelInfo ) ) )
 
@@ -1646,12 +1678,12 @@ def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, is
 
             def addGammaProduct( form, multiplicity ) :
 
-                if( isinstance( multiplicity, multiplicityModule.piecewise ) ) :
+                if( isinstance( multiplicity, multiplicityModule.regions1d ) ) :
                     if( len( multiplicity ) == 1 ) :
                         label = multiplicity.label
                         multiplicity = multiplicity[0]
                         multiplicity.label = label
-                if( isinstance( multiplicity, multiplicityModule.pointwise ) ) :
+                if( isinstance( multiplicity, multiplicityModule.XYs1d ) ) :
                     if( len( multiplicity ) < 2 ) : return( None )
                 product = toGNDMisc.newGNDParticle( info, toGNDMisc.getTypeNameENDF( info, ZAP, None ), multiplicity = multiplicity )
                 product.distribution.add( form )
@@ -1671,16 +1703,16 @@ def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, is
                         multiplicity = getMultiplicity( totalGammaMultiplicity, EPrior, energy_in.value )
                         data.append( [ energy_in.value, energy_in.coefficients[0] * multiplicity ] )
                         EPrior = energy_in.value
-                    multiplicity = multiplicityModule.pointwise( data = data, axes = axes )
+                    multiplicity = multiplicityModule.XYs1d( data = data, axes = axes )
                     return( EPrior, multiplicity )
 
                 if( len( angularSubform ) < 2 ) : return( None )
-                axes = multiplicityModule.pointwise.defaultAxes( )
-                if( isinstance( angularSubform, angularModule.pointwise ) ) :
+                axes = multiplicityModule.XYs1d.defaultAxes( )
+                if( isinstance( angularSubform, angularModule.XYs2d ) ) :
                     EPrior, multiplicity = getPointwiseMultiplicity( angularSubform, totalGammaMultiplicity, angularSubform[0].value )
                     multiplicity.label = info.style
-                elif( isinstance( angularSubform, angularModule.piecewise ) ) :
-                    multiplicity = multiplicityModule.piecewise( label = info.style, axes = axes )
+                elif( isinstance( angularSubform, angularModule.regions2d ) ) :
+                    multiplicity = multiplicityModule.regions1d( label = info.style, axes = axes )
                     EPrior = -1
                     for region in angularSubform :
                         EPrior, multiplicityRegion = getPointwiseMultiplicity( region, totalGammaMultiplicity, EPrior )
@@ -1703,17 +1735,17 @@ def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, is
                 else :
                     energySubform = energyModule.primaryGamma( PQUModule.PQU( PQUModule.pqu_float.surmiseSignificantDigits( Eg ), 'eV' ) )
 
-                axes = angularModule.pointwise.defaultAxes( asLegendre = True )
-                angularSubform = angularModule.pointwise( axes = axes )
+                axes = angularModule.XYs2d.defaultAxes( asLegendre = True )
+                angularSubform = angularModule.XYs2d( axes = axes )
                 EPrior = -1
                 maxLegendre = 0
-                angularRegion = angularModule.piecewise( axes = axes )
+                angularRegion = angularModule.regions2d( axes = axes )
                 for i1, ( energy, coefficients ) in enumerate( ELegenres ) :
                     maxLegendre = max( maxLegendre, len( coefficients ) )
                     if( energy == EPrior ) :
                         angularRegion.append( angularSubform )
-                        angularSubform = angularModule.pointwise( axes = axes )
-                    angularSubform.append( angularModule.pdfOfMu.Legendre( coefficients = coefficients, value = energy ) )
+                        angularSubform = angularModule.XYs2d( axes = axes )
+                    angularSubform.append( angularModule.Legendre( coefficients = coefficients, value = energy ) )
                     EPrior = energy
                 if( len( angularRegion ) > 0 ) :
                     angularRegion.append( angularSubform )
@@ -1749,14 +1781,14 @@ def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, is
                             EpPrior = Ep
                             energyDist[i1] = ( Ep, 0 )
 
-                    if(   isinstance( totalGammaMultiplicity, XYsModule.XYs ) ) :
-                        newMultiplicity = multiplicityModule.pointwise( axes = totalGammaMultiplicity.axes,
+                    if(   isinstance( totalGammaMultiplicity, XYsModule.XYs1d ) ) :
+                        newMultiplicity = multiplicityModule.XYs1d( axes = totalGammaMultiplicity.axes,
                                 interpolation = totalGammaMultiplicity.interpolation, label = info.style )
                     elif( isinstance( totalGammaMultiplicity, regionsModule.regions ) ) :
-                        newMultiplicity = multiplicityModule.piecewise( axes = totalGammaMultiplicity.axes, label = info.style )
+                        newMultiplicity = multiplicityModule.regions1d( axes = totalGammaMultiplicity.axes, label = info.style )
                     else :
                         raise Exception( 'Unsupported multiplicity form "%s"' % totalGammaMultiplicity.moniker )
-                    if( isinstance( energySubform, energyModule.pointwise ) ) : energySubform = [ energySubform ]
+                    if( isinstance( energySubform, energyModule.XYs2d ) ) : energySubform = [ energySubform ]
                     EPrior = energySubform[0][0].value
                     for i1, region in enumerate( energySubform ) :
                         for i2, energyDist in enumerate( region ) :
@@ -1768,18 +1800,18 @@ def readMF6( MT, info, MF6Data, productList, warningList, undefinedLevelInfo, is
                                             ( energyDist.value, MT ) )
                                 fixContinuumGammaSpectrum( energyDist )
                                 integral = energyDist.integrate( )
-                            if(   isinstance( newMultiplicity, XYsModule.XYs ) ) :
+                            if(   isinstance( newMultiplicity, XYsModule.XYs1d ) ) :
                                 newMultiplicity.setValue( Ein, getMultiplicity( totalGammaMultiplicity, EPrior, Ein ) * integral )
                             elif( isinstance( newMultiplicity, regionsModule.regions ) ) :
                                 if( Ein == EPrior ) :
                                     if( ( i1 + i2 ) > 0 ) : newMultiplicity.append( newRegionMultiplicity )
-                                    newRegionMultiplicity = multiplicityModule.pointwise( axes = totalGammaMultiplicity.axes )
+                                    newRegionMultiplicity = multiplicityModule.XYs1d( axes = totalGammaMultiplicity.axes )
                                 newRegionMultiplicity.setValue( Ein, getMultiplicity( totalGammaMultiplicity, EPrior, Ein ) * integral )
                             region[i2] = region[i2].normalize( )
                             EPrior = Ein
                     if( isinstance( energySubform, list ) ) : energySubform = energySubform[0]
                     form = uncorrelated( info.style, form.productFrame, form.angularSubform.data, energySubform )
-                    if( isinstance( newMultiplicity, multiplicityModule.piecewise ) ) :
+                    if( isinstance( newMultiplicity, multiplicityModule.regions1d ) ) :
                         newMultiplicity.append( newRegionMultiplicity )
                     product = addGammaProduct( form, newMultiplicity )
                 else:
@@ -1928,6 +1960,8 @@ def readMF9or10( info, MT, MTData, MF, targetLIS, warningList ) :
         axes = crossSectionModule.defaultAxes( crossSectionUnit = 'b' )
     else:
         axes = axesModule.axes( labelsUnits = { 1 : ( 'energy_in' , 'eV' ), 0 : ( 'weight' , '' ) } )
+    cls = crossSectionModule.XYs1d
+    if( MF == 9 ) : cls = multiplicityModule.XYs1d
     for i1 in xrange( NS ) :
         QM, QI, IZAP, LFS, NR, NP = endfFileToGNDMisc.sixFunkyFloatStringsToIntsAndFloats( MFData[0], intIndices = [ 0, 2, 4 ], logFile = info.logs )
         dataLine, TAB1, regions = endfFileToGNDMisc.getTAB1Regions( dataLine, MFData, axes = axes, logFile = info.logs )
@@ -1990,7 +2024,7 @@ def readMF12_13( info, MT, MTData, productList, warningList, gammaBRTolerance = 
     dataLine, continuousGamma, discreteGammas, primaryGammas, branchingGammas = 1, [], [], [], []
     if( ( ( MF == 12 ) and ( LO == 1 ) ) or ( ( MF == 13 ) and ( LO == 0 ) ) ) :
         if( MF == 12 ) :
-            axes = multiplicityModule.pointwise.defaultAxes( )
+            axes = multiplicityModule.XYs1d.defaultAxes( )
         else :
             axes = crossSectionModule.defaultAxes( crossSectionUnit = 'b' )
         if( NK > 1 ) :
@@ -2085,7 +2119,7 @@ def readMF14( info, MT, MTData, MF, NK, warningList, discreteGammas, primaryGamm
     ZA, AWR, LI, LTT, NK14, NI = endfFileToGNDMisc.sixFunkyFloatStringsToIntsAndFloats( MF14Data[0], intIndices = [ 0, 2, 3, 4, 5 ], logFile = info.logs )
     printAWR_mode( info, MT, 14, ZA, AWR )
     countZAMasses( info, ZA, AWR )
-    if( NK14 != NK ) :
+    if( ( NK14 != NK ) and info.printBadNK14 ) :
         warningList.append( 'MF14 NK = %s != MF12/13 NK = %s for MT = %s' % ( NK14, NK, MT ) )
     dataLine, frame = NI + 1, standardsModule.frames.labToken
     if( LTT == 0 ) :                                     # All distributions are isotropic
@@ -2122,7 +2156,7 @@ def readMF15( info, MT, MTData, continuousGamma, warningList ) :
 
     LF = int( weights['L2'] )
     if( LF != 1 ) : raise Exception( 'For MF=15 data, only LF=1 is currently supported, not LF=%s : MT%s' % ( LF, MT ) )
-    axes2d = energyModule.pointwise.defaultAxes( )
+    axes2d = energyModule.XYs2d.defaultAxes( )
     axes = axesModule.axes( )
     axes[0] = axes2d[0]
     axes[1] = axes2d[1]
@@ -2292,17 +2326,16 @@ def readMatrix( info, LS,LB, NT,NP, dat ):
     else:
         return None
 
-    # FIXME: covariances need 'lin,flat' interpolation along both independent axes, but gridded doesn't support that yet
+    # FIXME: covariances need 'flat' interpolation along both independent axes, but gridded doesn't support that yet
     axes = axesModule.axes( labelsUnits={0:('matrix_elements',''), 1:('column_energy_bounds','eV'), 2:('row_energy_bounds','eV')} )
     axes[2] = axesModule.grid( axes[2].label, axes[2].index, axes[2].unit,
-                style = axesModule.boundariesGridToken, grid = valuesModule.values( energyBounds[0] ) )
+                style = axesModule.boundariesGridToken, values = valuesModule.values( energyBounds[0] ) )
     if len(energyBounds)==2:
         axes[1] = axesModule.grid( axes[1].label, axes[1].index, axes[1].unit,
-                style = axesModule.boundariesGridToken, grid = valuesModule.values( energyBounds[1] ) )
+                style = axesModule.boundariesGridToken, values = valuesModule.values( energyBounds[1] ) )
     else:
-        path = axes[1].toRelativeXLink( axes[2].grid )
         axes[1] = axesModule.grid( axes[1].label, axes[1].index, axes[1].unit,
-                style = axesModule.linkGridToken, grid = linkModule.link( path = path ) )
+                style = axesModule.linkGridToken, values = linkModule.link( link = axes[2].values, relative = True ) )
     return griddedModule.gridded( axes, matrix )
 
 def readMF31_33( info, dat, mf, mt, cov_info, warningList ):
@@ -2369,7 +2402,7 @@ def readMF31_33( info, dat, mf, mt, cov_info, warningList ):
             Type='relative'
             if LB==0:
                 Type='absolute'
-                matrix.axes[0].setUnit( 'b**2' )
+                matrix.axes[0].unit = 'b**2'
 
             ENDFconversionFlag = None
             if LB in (2,3,4,8,): ENDFconversionFlag = "LB=%d" % LB
@@ -2385,15 +2418,14 @@ def readMF31_33( info, dat, mf, mt, cov_info, warningList ):
         if len(covarsThisSection)>1:
             form = covarianceMixedModule.mixedForm( label = info.style, components=covarsThisSection )
             for idx in range( len( form ) ) :
-                form[idx].index = idx
-                form[idx].label = None
+                form[idx].label = str(idx)
         elif len(covarsThisSection)==1:
             form = covarsThisSection[0]
         else:
             #raise Exception("Encountered empty covariance section!!!")
             info.logs.write("Missing covariance data from section!")
             continue
-        section.addForm( form )
+        section.add( form )
 
         sectionList.append( section )
         linkData.append( (mt,mf,MT1,XMF1, idNow) )
@@ -2434,9 +2466,9 @@ def readMF32( info, dat, mf, mt, cov_info, warningList ) :
                 warningList.append("skipping LRF=7 resonance covariances!")
                 continue
             if LRF in (1,2,3):  # Breit-Wigner and simplified Reich-Moore formats are similar
-                mf2_elist = zip( resonances.resolved.nativeData.resonanceParameters.table.getColumn('energy'),
-                        resonances.resolved.nativeData.resonanceParameters.table.getColumn('neutronWidth'),
-                        resonances.resolved.nativeData.resonanceParameters.table.getColumn('captureWidth') )
+                mf2_elist = zip( resonances.resolved.evaluated.resonanceParameters.table.getColumn('energy'),
+                        resonances.resolved.evaluated.resonanceParameters.table.getColumn('neutronWidth'),
+                        resonances.resolved.evaluated.resonanceParameters.table.getColumn('captureWidth') )
                 SPI,AP,dum,LCOMP,NLS,ISR = funkyFI(dat.next(), logFile = info.logs)
                 DAP = []
                 if ISR>0:   # scattering radius uncertainty
@@ -2601,7 +2633,7 @@ def readMF32( info, dat, mf, mt, cov_info, warningList ) :
                     GNDmatrix.form = "diagonal"
 
                 # store into GND:
-                resData = resonances.resolved.nativeData.resonanceParameters.table
+                resData = resonances.resolved.evaluated.resonanceParameters.table
                 nResonances = len( mf32_elist )
                 parametersPerResonance = "energy,neutronWidth,captureWidth"
                 if MPAR>=4: parametersPerResonance = parametersPerResonance + ',fissionWidthA'
@@ -2610,7 +2642,7 @@ def readMF32( info, dat, mf, mt, cov_info, warningList ) :
                             nResonances=nResonances, parametersPerResonance=parametersPerResonance ) ]
                 if DAP:
                     inputParameters.insert( 0, covarianceModelParametersModule.inputParameter("scatteringRadius",
-                        resonances.resolved.nativeData.scatteringRadius, unit="fm") )
+                        resonances.resolved.evaluated.scatteringRadius, unit="fm") )
                 sections.append( covarianceModelParametersModule.resonanceParameterCovariance( None, inputParameters,
                     GNDmatrix, type=Type, **attributes ) )
         else:
@@ -2676,21 +2708,22 @@ def readMF34( info, dat, mf, mt, cov_info, warningList ):
                 # pretend it's MF33 file:
                 matrix = readMatrix( info, LS,LB,NT,NE, dat )
                 if LB==0: raise Exception("LB=0 in Legendre covariances")
-                covarsThisL.append( covarianceBaseModule.covarianceMatrix(type='relative', matrix=matrix ) )
+                covarsThisL.append( covarianceBaseModule.covarianceMatrix(
+                    label = info.style, type='relative', matrix=matrix ) )
 
             if len(covarsThisL)>1:
                 sectionForm = covarianceMixedModule.mixedForm( label = info.style, components=covarsThisL )
-                for idx in range(len(sectionForm)): sectionForm[idx].index = idx
+                for idx in range(len(sectionForm)): sectionForm[idx].label = str(idx)
             elif len(covarsThisL)==1:
                 sectionForm = covarsThisL[0]
 
-            Lsection.nativeData = sectionForm.moniker
-            Lsection.forms[ Lsection.nativeData ] = sectionForm
+            Lsection.add( sectionForm )
 
             # end loop over subsubsections
             form.lvalues.append( Lsection )
 
             if frame == 'frameOfMF4':
+                form.endfConversionFlag = "LCT=0"
                 cov_info.setdefault( 'MF34_missingFrames', {} ).setdefault( mt, [] ).append( Lsection )
 
         if dat.index != dat.length: raise BadCovariance("Not all covariance data converted, MF%d MT%d" % (mf,mt))
@@ -2699,7 +2732,7 @@ def readMF34( info, dat, mf, mt, cov_info, warningList ):
         idNow, pointers = genID( cov_info, mt, mf )
         rowdat, coldat = pointers
         section = covarianceSectionModule.section( id=idNow, rowData=rowdat, columnData=coldat)
-        section.addForm( form )
+        section.add( form )
 
         sectionList.append( section )
         linkData.append( (mt,mf,mt,mf, idNow) )
@@ -2733,7 +2766,7 @@ def readMF35( info, dat, mf, mt, cov_info, warningList ):
         rowdat.attributes['incidentEnergyLowerBound'] = E1
         rowdat.attributes['incidentEnergyUpperBound'] = E2
         section = covarianceSectionModule.section( id=idNow, rowData=rowdat, columnData=coldat)
-        section.addForm( form )
+        section.add( form )
 
         sectionList.append( section )
         linkData.append( (mt,mf,mt,mf, idNow) )
@@ -2798,7 +2831,7 @@ def readMF40(info,dat,mf,mt,cov_info,warningList):
                 Type='relative'
                 if LB==0:
                     Type='absolute'
-                    matrix.axes[0].setUnit( 'b**2' )
+                    matrix.axes[0].unit = 'b**2'
 
                 covarsThisSection.append( covarianceBaseModule.covarianceMatrix( label = info.style, type=Type, matrix=matrix) )
 
@@ -2812,14 +2845,14 @@ def readMF40(info,dat,mf,mt,cov_info,warningList):
 
             if len(covarsThisSection)>1:
                 form = covarianceMixedModule.mixedForm( label = info.style, components=covarsThisSection )
-                for idx in range(len(form)): form[idx].index = idx
+                for idx in range(len(form)): form[idx].label = str(idx)
             elif len(covarsThisSection)==1:
                 form = covarsThisSection[0]
             else:
                 #raise Exception("Encountered empty covariance section!!!")
                 info.logs.write("Missing covariance data from section!")
                 continue
-            section.addForm( form )
+            section.add( form )
 
             sectionList.append( section )
             linkData.append( (mt,mf,MT1,XMF1, idNow) )
@@ -2837,12 +2870,13 @@ def fillRemainingProductsResidualForBreakup( info, decayChannel, lightIsotopeNam
         if( productName in breakupProducts ) :
             multiplicity = breakupProducts[productName]
             product = toGNDMisc.newGNDParticle( info, toGNDMisc.getTypeNameGamma( info, productNameToZA[productName] ), multiplicity = multiplicity )
-            decayChannel.products.add( product )
+            decayChannel.products.add( decayChannel.products.uniqueLabel( product ) )
             if( ( residualZA % 1000 ) > 0 ) :
                 residualZA2 -= multiplicity * productNameToZA[productName]
             else :
                 residualZA2 -= multiplicity * ( 1000 * ( productNameToZA[productName] / 1000 ) )
-    if( residualZA2 != 0 ) : decayChannel.products.add( toGNDMisc.newGNDParticle( info, toGNDMisc.getTypeNameGamma( info, residualZA2 ) ) )
+    if( residualZA2 != 0 ) : decayChannel.products.add( decayChannel.products.uniqueLabel( 
+            toGNDMisc.newGNDParticle( info, toGNDMisc.getTypeNameGamma( info, residualZA2 ) ) ) )
 
 def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList, parseCrossSectionOnly = False ) :
     """
@@ -2851,7 +2885,6 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
     """
 
     productList = []
-    info.newIndices( )
     MFKeys = MTData.keys( )
     info.logs.write( '    %3d %s' % ( MT, sorted( MFKeys ) ) )
 
@@ -2975,9 +3008,10 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
             if( levelIndex is not None ) :
                 if( ( levelIndex <= info.targetLevel ) and ( info.target.getZ_A_SuffixAndZA( )[3] == residualZA ) ) : levelIndex -= 1
             if( QI != QM ) :     # Residual is in an excited state.
-                decayChannel = channelsModule.NBodyDecayChannel( )
-                decayChannel.products.add( toGNDMisc.newGNDParticle( info, toGNDMisc.getTypeNameGamma( info, residualZA ) ) )
-            residual = toGNDMisc.newGNDParticle( info, toGNDMisc.getTypeNameGamma( info, residualZA, level = level ), decayChannel = decayChannel )
+                decayChannel = channelsModule.NBodyOutputChannel( )
+                decayChannel.products.add( decayChannel.products.uniqueLabel( 
+                        toGNDMisc.newGNDParticle( info, toGNDMisc.getTypeNameGamma( info, residualZA ) ) ) )
+            residual = toGNDMisc.newGNDParticle( info, toGNDMisc.getTypeNameGamma( info, residualZA, level = level ), outputChannel = decayChannel )
             productList.append( product )
             productList.append( residual )
     else :
@@ -3066,21 +3100,21 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
 
         if( breakupProducts is not None ) :
             if( decayChannel is not None ) : raise Exception( 'breakupProducts and decayChannel both not None' )
-            decayChannel = channelsModule.NBodyDecayChannel( )
+            decayChannel = channelsModule.NBodyOutputChannel( )
             decayChannel.Q.add( toGNDMisc.returnConstantQ( info.style, QM - QI ) )
             fillRemainingProductsResidualForBreakup( info, decayChannel, lightIsotopeNames, breakupProducts,
                 productList[1].particle.getZ_A_SuffixAndZA( )[3] )
-            productList[1].addDecayChannel( decayChannel )
+            productList[1].addOutputChannel( decayChannel )
         elif( len( decayProductList ) > 0 ) :                         # At this point, both two bodies are in productList and second one is redisual.
             if( QI > QM ) : raise Exception( "Negative decay Q-value for MT%d, QI = %s, QM = %s" % ( MT, QI, QM ) )
-            decayChannel = channelsModule.NBodyDecayChannel( )
+            decayChannel = channelsModule.NBodyOutputChannel( )
             decayChannel.Q.add( toGNDMisc.returnConstantQ( info.style, QM - QI ) )  # Q????? Not right?
-            for decayProduct in decayProductList : decayChannel.products.add( decayProduct )
-            productList[1].addDecayChannel( decayChannel )
+            for decayProduct in decayProductList : decayChannel.products.add( decayChannel.products.uniqueLabel( decayProduct ) )
+            productList[1].addOutputChannel( decayChannel )
 
     elif( endfMTProductList.isFission ) :
         if hasattr( info, 'fissionEnergies' ):
-            ER = info.fissionEnergies.forms[info.fissionEnergies.nativeData].data[ 'nonNeutrinoEnergy' ] # gets whole polynomial + uncertianty
+            ER = info.fissionEnergies[info.style].data[ 'nonNeutrinoEnergy' ] # gets whole polynomial + uncertianty
             useThisQM = ER[ 0 ][ 0 ] # grab constant term and take the value, not the uncertainty
             if abs( QM - useThisQM )/QM > 1e-7: warningList.append( "Fission QM inconsistent with energy release data for MT = " + str( MT ) )
         else:
@@ -3089,11 +3123,11 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
         outputChannel.Q.add( toGNDMisc.returnConstantQ( info.style, useThisQM ) )
         if( MT == 18 ) :
             if( hasattr( info, 'fissionEnergies' ) ) : outputChannel.addFissionEnergyReleased( info.fissionEnergies )
-            if( len( productList ) > 0 ) : outputChannel.products.add( productList.pop( 0 ) )
+            if( len( productList ) > 0 ) : outputChannel.products.add( outputChannel.products.uniqueLabel( productList.pop( 0 ) ) )
             if( len( outputChannel ) == 0 ) :
                 multiplicity = multiplicityModule.unknown( info.style )
                 product = toGNDMisc.newGNDParticle( info, toGNDMisc.getTypeNameGamma( info, 1 ), multiplicity = multiplicity )
-                outputChannel.products.add( product )
+                outputChannel.products.add( outputChannel.products.uniqueLabel( product ) )
             else :
                 for product in outputChannel :
                     if( product.name == 'n' ) : break
@@ -3111,7 +3145,7 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
                     product.multiplicity.remove( 'constant' )
                     product.addAttribute( 'emissionMode', 'total' )
                 if( hasattr( info, 'delayedFissionDecayChannel' ) ) :
-                    for delayedNeutron in info.delayedFissionDecayChannel : outputChannel.products.add( delayedNeutron )
+                    for delayedNeutron in info.delayedFissionDecayChannel : outputChannel.products.add( outputChannel.products.uniqueLabel( delayedNeutron ) )
         else :
             if( neutronMFs == [] ) :
                 pass    # we used to add a reference to total fission nubar and PFNS, but that's not physically correct
@@ -3124,7 +3158,7 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
                 if( hasattr( info, 'firstFissionNeutron' ) ) :
                     form = referenceModule.form( link = info.firstFissionNeutron.distribution, label = info.style )
                     product.distribution.add( form )
-                outputChannel.products.add( product )
+                outputChannel.products.add( outputChannel.products.uniqueLabel( product ) )
                 """
 
         # July 2011: some files have distributions for 1stChanceFission etc, but should still link to total nubar:
@@ -3136,7 +3170,7 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
                     multiplicity = multiplicityModule.reference( info.firstFissionNeutron.multiplicity, label = info.style )
                     product.multiplicity.add( multiplicity )
 
-        while( len( productList ) > 0 ) : outputChannel.products.add( productList.pop( 0 ) )
+        while( len( productList ) > 0 ) : outputChannel.products.add( outputChannel.products.uniqueLabel( productList.pop( 0 ) ) )
     else :
         outputChannel = channelsModule.NBodyOutputChannel( )
         outputChannel.Q.add( toGNDMisc.returnConstantQ( info.style, QI ) )      # Q?????
@@ -3182,15 +3216,15 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
                 for index, product in enumerate( productList ) :
                     if( product.name == 'gamma' ) : gammaIndices.append( index )
                 if( len( gammaIndices ) > 0 ) :
-                    decayChannel = channelsModule.NBodyDecayChannel( )
+                    decayChannel = channelsModule.NBodyOutputChannel( )
                     decayChannel.Q.add( toGNDMisc.returnConstantQ( info.style, QM - QI ) )
                     finalResidual = toGNDMisc.newGNDParticle( info, toGNDMisc.getTypeNameENDF( info, residualZA, None ) )
-                    decayChannel.products.add( finalResidual )
+                    decayChannel.products.add( decayChannel.products.uniqueLabel( finalResidual ) )
                     if( productList[-1].getAttribute( 'ENDFconversionFlag' ) ) : finalResidual.addAttribute( 'ENDFconversionFlag', productList[-1].getAttribute( 'ENDFconversionFlag' ) )
-                    for index in gammaIndices : decayChannel.products.add( productList[index] )
+                    for index in gammaIndices : decayChannel.products.add( decayChannel.products.uniqueLabel( productList[index] ) )
                     gammaIndices.reverse( )
                     for index in gammaIndices : del productList[index]
-                    productList[-1].addDecayChannel( decayChannel )
+                    productList[-1].addOutputChannel( decayChannel )
                     if( productList[-1].distribution.hasData() ) :  # One must be careful here as this assumes that distributions
                         u_distribution = productList[-1].distribution             # can be simply traded.
                         productList[-1].distribution = finalResidual.distribution
@@ -3198,11 +3232,11 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
             if( breakupProducts is not None ) :
                 if( MT == 91 ) :
                     if( decayChannel is not None ) : raise Exception( 'breakupProducts and decayChannel both not None' )
-                    decayChannel = channelsModule.NBodyDecayChannel( )
+                    decayChannel = channelsModule.NBodyOutputChannel( )
                     decayChannel.Q.add( toGNDMisc.returnConstantQ( info.style, QM - QI ) )
                     fillRemainingProductsResidualForBreakup( info, decayChannel, lightIsotopeNames, breakupProducts,
                         productList[1].particle.getZ_A_SuffixAndZA( )[3] )
-                    productList[1].addDecayChannel( decayChannel )
+                    productList[1].addOutputChannel( decayChannel )
                 else :
                     raise Exception( 'breakup not supported for MT %d' % MT )
 
@@ -3212,7 +3246,7 @@ def parseReaction( info, target, projectileZA, targetZA, MT, MTData, warningList
             if( isTwoBody ) : frame = standardsModule.frames.centerOfMassToken
             form = unspecifiedModule.form( info.style, productFrame = frame )
             product.distribution.add( form )
-        outputChannel.products.add( product )
+        outputChannel.products.add( outputChannel.products.uniqueLabel( product ) )
 
     return( crossSection, outputChannel, MFKeys )
 
