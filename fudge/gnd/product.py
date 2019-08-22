@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -47,7 +72,6 @@ class product( ancestry ) :
 
         ancestry.__init__( self, ancestryName, None, attribute = 'label' )
         self.particle = particle
-        if( label is None ) : label = particle.getName( )
         self.label = label
         self.attributes = {}
         for q in attributes : self.addAttribute( q, attributes[q] )
@@ -110,6 +134,14 @@ class product( ancestry ) :
 
         self.attributes[name] = value
 
+    def checkProductFrame( self ) :
+        """
+        Calls checkProductFrame for self's distributions and if present for its decayChannel.
+        """
+
+        self.distributions.checkProductFrame( )
+        if( self.decayChannel is not None ) : self.decayChannel.checkProductFrame( )
+
     def getDataTokens( self ) :
         """Returns the list of data for this particle."""
 
@@ -157,7 +189,7 @@ class product( ancestry ) :
     def setMultiplicity( self, data ) :
         """Sets the multiplicity nativeData to be data."""
 
-        self.multiplicity.addFormAsNativeData( data )
+        self.multiplicity.addForm( data, asNativeData = True )
 
     def getName( self ) :
         """Returns self's name"""
@@ -195,25 +227,36 @@ class product( ancestry ) :
 
     def process( self, processInfo, tempInfo, verbosityIndent ) :
 
+        doProcess = True
         if( 'LLNL_Pn' in processInfo['styles'] ) :
-            if( not( processInfo.isProcessParticle( self.getName( ) ) ) ) : return
-        if( processInfo['verbosity'] >= 20 ) : print '%s%s: label = %s: processing: (%s)' % \
-            ( verbosityIndent, self.getName( ), self.label, self.distributions.nativeData )
-        if( self.distributions.nativeData not in [ distributions.base.noneComponentToken, distributions.base.unknownGenre ] ) :
-            tempInfo['product'] = self
-            tempInfo['multiplicity'] = self.multiplicity
-            self.multiplicity.process( processInfo, tempInfo, verbosityIndent )
-            try :
-                self.distributions.process( processInfo, tempInfo, verbosityIndent + '    ' )
-            except :
-                if( processInfo['logFile'] is None ) :
-                    raise
-                else :
-                    import traceback
-                    processInfo['logFile'].write( '\n' + self.toXLink() + ':\n' + traceback.format_exc( ) + '\n' )
-            for genre in self.data : self.data[genre].process( processInfo, tempInfo, verbosityIndent + '    ' )
+            if( not( processInfo.isProcessParticle( self.getName( ) ) ) ) : doProcess = False
+
+        processInfo['workFile'].append( self.label )
+        if( doProcess ) :
+            if( processInfo['verbosity'] >= 20 ) : print '%s%s: label = %s: processing: (%s)' % \
+                ( verbosityIndent, self.getName( ), self.label, self.distributions.nativeData )
+
+            productMass = tempInfo['masses']['Product']             # Save to restore later
+            tempInfo['masses']['Product'] = self.getMass( tempInfo['massUnit'] )
+
+            if( self.distributions.nativeData not in [ distributions.base.noneComponentToken, distributions.base.unknownGenre ] ) :
+                tempInfo['product'] = self
+                tempInfo['multiplicity'] = self.multiplicity
+                self.multiplicity.process( processInfo, tempInfo, verbosityIndent )
+                try :
+                    self.distributions.process( processInfo, tempInfo, verbosityIndent + '    ' )
+                except :
+                    if( processInfo['logFile'] is None ) :
+                        raise
+                    else :
+                        import traceback
+                        processInfo['logFile'].write( '\n' + self.toXLink() + ':\n' + traceback.format_exc( ) + '\n' )
+                for genre in self.data : self.data[genre].process( processInfo, tempInfo, verbosityIndent + '    ' )
+            tempInfo['masses']['Product'] = productMass
+
         if( self.decayChannel is not None ) :
             for product in self.decayChannel : product.process( processInfo, tempInfo, verbosityIndent + '    ' )
+        del processInfo['workFile'][-1]
 
     def check( self, info ):
         """ check product and distributions """
@@ -241,8 +284,8 @@ class product( ancestry ) :
 
             if info['isTwoBody']:
                 nativeForm = component.forms[ component.nativeData ]
-                if ( hasattr(nativeForm, 'frame') and nativeForm.frame != 'centerOfMass' ) or (
-                        hasattr(nativeForm, 'axes') and nativeForm.axes[-1].frame != 'centerOfMass' ):
+                from fudge.core.math.xData import axes
+                if nativeForm.getProductFrame() != axes.centerOfMassToken :
                     warnings.append( warning.wrong2BodyFrame( nativeForm ) )
 
             def checkForm( form, uncorrelatedComponent='' ):
@@ -263,8 +306,7 @@ class product( ancestry ) :
                 frames = []
                 for subcomponent in ('angularComponent','energyComponent'):
                     form = getattr(component, subcomponent).forms[ getattr(component, subcomponent).nativeData]
-                    if hasattr(form, 'frame'): frames.append( form.frame )
-                    elif hasattr(form, 'axes'): frames.append( form.axes[-1].frame )
+                    frames.append( form.getProductFrame() )
                     checkForm( form, subcomponent )
                 if (len(frames)==2) and (frames[0] != frames[1]):
                     warnings.append( warning.uncorrelatedFramesMismatch( frames[0], frames[1], component ) )
@@ -281,44 +323,8 @@ class product( ancestry ) :
 
         return warnings
 
-    def toLLNLSnCOut( self, toOtherData, moreOtherData, crossSection, reactionWithProduct, addToFissionMatrix, verbosityIndent ) :
+    def toXMLList( self, flags, indent = '' ) :
 
-        if( toOtherData['verbosity'] >= 20 ) : print '%s%s: label = %s: converting to LLNLSnCout' % ( verbosityIndent, self.getName( ), self.label )
-        if( not ( self.decayChannel is None ) ) :
-            for product in self.decayChannel : product.toLLNLSnCOut( toOtherData, moreOtherData, crossSection, reactionWithProduct, False, 
-                verbosityIndent + '    ' )
-        else :
-            if( self.getName( ) not in crossSection.products ) : crossSection.products[self.getName( )] = 0
-            if( self.distributions.nativeData not in [ distributions.base.noneComponentToken, distributions.base.unknownGenre ] ) :
-                if( self.getName( ) in reactionWithProduct ) : reactionWithProduct[self.getName( )] = 1
-                multiplicity = self.multiplicity
-                multiplicityCount = 0
-                if( multiplicity.getNativeDataToken( ) == tokens.constantFormToken ) : multiplicityCount = multiplicity.getConstant( )
-                crossSection.products[self.getName( )] += multiplicityCount
-                if( not toOtherData.isProcessParticle( self.getName( ) ) ) : return
-                doDistributions = True
-                if( 'emissionMode' in self.attributes ) :
-                    if( self.getAttribute( 'emissionMode' ) == 'prompt' ) :
-                        moreOtherData.coutData[12] = multiplicity.getFormByToken( tokens.groupedWithCrossSectionFormToken ).data
-                    else :
-                        doDistributions = False     # Do not do delayed fission neutrons later.
-                        decayRate = float( self.getAttribute( 'decayRate' ) )
-                        moreOtherData.coutData[14][decayRate] = { 'multiplicity' : multiplicity.getFormByToken( tokens.groupedWithCrossSectionFormToken ).data }
-                        chi = self.distributions.getGropuedChiAndDepEnergyAtLowestE( toOtherData.getParticleGroups( self.getName( ) ) )
-                        if( chi is not None ) : moreOtherData.coutData[14][decayRate]['chi'] = chi
-                        if( productData.base.energyDepositionToken in self.data ) : moreOtherData.coutData[14][decayRate]['depositionEnergy'] = \
-                            self.data[productData.base.energyDepositionToken].getFormByToken( tokens.groupedWithCrossSectionFormToken ).data
-                if( doDistributions ) :
-                    self.distributions.toLLNLSnCOut( toOtherData, moreOtherData, self.getName( ), addToFissionMatrix )
-                    if( ( productData.base.energyDepositionToken in self.data ) and ( self.getName( ) in moreOtherData.coutData[7] ) ) :
-                        moreOtherData.coutData[7][self.getName( )] = moreOtherData.coutData[7][self.getName( )] + \
-                            self.data[productData.base.energyDepositionToken].getFormByToken( tokens.groupedWithCrossSectionFormToken ).data
-            else :
-                crossSection.products[self.getName( )] += 1
-
-    def toXMLList( self, flags, verbosityIndent = '', indent = '' ) :
-
-        if( flags['verbosity'] >= 20 ) : print '%s%s: label = %s: writing gnd' % ( verbosityIndent, self.getName( ), self.label )
         indent2 = indent + '  '
         attributeString = ''
         for q in sorted(self.attributes) : attributeString += ' %s="%s"' % ( q, self.attributes[q] )
@@ -328,7 +334,7 @@ class product( ancestry ) :
         for genre in self.data : xmlString += self.data[genre].toXMLList( indent = indent2 )
         xmlString += self.multiplicity.toXMLList( indent = indent2 )
         if( not ( self.decayChannel is None ) ) :
-            xmlString += self.decayChannel.toXMLList( flags, verbosityIndent = verbosityIndent + '    ', indent = indent2 )
+            xmlString += self.decayChannel.toXMLList( flags, indent = indent2 )
         xmlString[-1] += '</product>'
         return( xmlString )
 
@@ -416,32 +422,29 @@ class product( ancestry ) :
             if( self.decayChannel != None ) : s = '(%s -> %s)' % ( s, self.decayChannel )
         return( s )
 
-def parseXMLNode( productElement, linkData={} ):
-    """ translate a <product> element from xml """
+def parseXMLNode( productElement, xPath=[], linkData={} ):
+    """Translate a <product> element from xml."""
+
+    xPath.append( '%s[@label="%s"]' % (productElement.tag, productElement.get('label')) )
     attrs = dict( productElement.items() )
     particle = linkData['particles'].getParticle( attrs.pop('name') )
     mult = attrs.pop('multiplicity')
     if mult == tokens.unknownFormToken:
         mult = productData.multiplicity.unknown()
     elif mult == productData.multiplicity.energyDependent:
-        try:
-            mult = productData.multiplicity.parseXMLNode( productElement.find('multiplicity'), linkData )
-        except Exception as e:
-            raise Exception, '/product[@label="%s"]/multiplicity: %s' % (attrs['label'], e)
+        mult = productData.multiplicity.parseXMLNode( productElement.find('multiplicity'), xPath, linkData )
     elif mult == tokens.partialProductionFormToken:
         mult = productData.multiplicity.partialProduction()
     else:
         mult = float( mult )
         if mult.is_integer(): mult = int(mult)
     prod = product( particle, productElement.tag, label=attrs.pop('label'), multiplicity=mult)
-    try:
-        prod.distributions = productData.distributions.parseXMLNode( productElement.find('distributions'), linkData )
-    except Exception as e:
-        raise Exception, "%s%s" % (prod.toXLink(), e)
+    prod.distributions = productData.distributions.parseXMLNode( productElement.find('distributions'),
+            xPath, linkData )
     prod.distributions.parent = prod
     decayChannel = productElement.find( channels.decayChannelToken )
     if decayChannel:
-        prod.decayChannel = channels.parseXMLNode( decayChannel, linkData )
+        prod.decayChannel = channels.parseXMLNode( decayChannel, xPath, linkData )
         prod.decayChannel.parent = prod
     for attr in ('decayRate','primary','discrete'):
         if attr in attrs:
@@ -453,9 +456,10 @@ def parseXMLNode( productElement, linkData={} ):
     depositionEnergyToken = productData.base.energyDepositionToken
     if productElement.find(depositionEnergyToken) is not None:
         prod.data[depositionEnergyToken] = productData.energyDeposition.parseXMLNode(
-                productElement.find(depositionEnergyToken) )
+                productElement.find(depositionEnergyToken), xPath )
     depositionMomentumToken = productData.base.momentumDepositionToken
     if productElement.find(depositionMomentumToken) is not None:
         prod.data[depositionMomentumToken] = productData.momentumDeposition.parseXMLNode(
-                productElement.find(depositionMomentumToken) )
+                productElement.find(depositionMomentumToken), xPath )
+    xPath.pop()
     return prod

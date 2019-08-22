@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -161,7 +186,7 @@ def LabelToZ( label ) :
 
 def gndNameToZ_A_Suffix( name ):
     """Returns the tuple (Z, A, suffix, ZA) for an gnd isotope name (e.g., gnd name = 'Am242_m1' 
-    returns ( 95, 242, 'm1', 95242 ). Replaces the endl2.py function gndNameToEndlZ_A_Suffix."""
+    returns ( 95, 242, 'm1', 95242 )."""
 
     if( name == 'n' ) : return( 0, 1, '', 1 )
     if( name == 'gamma' ) : return( 0, 0, '', 0 )
@@ -202,7 +227,7 @@ def gndNameToZ_A_Suffix( name ):
     return( Z, A, suffix, ZA )
 
 def ZAToGNDName( ZA ):
-    """ use this instead of endl2.endlToGNDName"""
+    """Converts an ENDL ZA or 'zaZZZAAA_suffix' into a GND name. For example ENDL 94239 or 'za094239', is converted to 'Pu239'."""
 
     if( ZA == 1 ) : return( 'n' )
     if type(ZA) in (int,float):

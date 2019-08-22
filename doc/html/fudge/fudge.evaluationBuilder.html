@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>evaluationBuilder Package &mdash; Fudge and GND 1.2 beta documentation</title>
+    <title>evaluationBuilder Package &mdash; Fudge and GND 1.3 beta documentation</title>
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.2 beta',
+        VERSION:     '1.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +25,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
-    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../index.html" />
+    <link rel="top" title="Fudge and GND 1.3 beta documentation" href="../index.html" />
     <link rel="up" title="fudge Package" href="index.html" />
     <link rel="next" title="legacy Package" href="fudge.legacy.html" />
     <link rel="prev" title="test Package" href="fudge.gnd.test.html" /> 
@@ -47,7 +46,7 @@
         <li class="right" >
           <a href="fudge.gnd.test.html" title="test Package"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">fudge Package</a> &raquo;</li> 
       </ul>
     </div>  
@@ -73,6 +72,11 @@
 <dd><dl class="method">
 <dt id="fudge.evaluationBuilder.reactionSuiteBuilder.reactionSuiteBuilder.addReaction">
 <tt class="descname">addReaction</tt><big>(</big><em>reaction</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/reactionSuiteBuilder.html#reactionSuiteBuilder.addReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.reactionSuiteBuilder.reactionSuiteBuilder.addReaction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.evaluationBuilder.reactionSuiteBuilder.reactionSuiteBuilder.addSummedReaction">
+<tt class="descname">addSummedReaction</tt><big>(</big><em>reaction</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/reactionSuiteBuilder.html#reactionSuiteBuilder.addSummedReaction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.reactionSuiteBuilder.reactionSuiteBuilder.addSummedReaction" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -117,7 +121,7 @@
 
 <dl class="method">
 <dt id="fudge.evaluationBuilder.reactionBuilder.reactionBuilder.addResidual">
-<tt class="descname">addResidual</tt><big>(</big><em>excitationLevel=0</em>, <em>excitationEnergy=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/reactionBuilder.html#reactionBuilder.addResidual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.reactionBuilder.reactionBuilder.addResidual" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">addResidual</tt><big>(</big><em>excitationLevel=None</em>, <em>excitationEnergy=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/reactionBuilder.html#reactionBuilder.addResidual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.reactionBuilder.reactionBuilder.addResidual" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -198,7 +202,7 @@ Use this method to change interpolation.</p>
 <span id="distributionbuilder-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">distributionBuilder</span></tt> Module<a class="headerlink" href="#module-fudge.evaluationBuilder.distributionBuilder" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="fudge.evaluationBuilder.distributionBuilder.AngularLegendre">
-<tt class="descclassname">fudge.evaluationBuilder.distributionBuilder.</tt><tt class="descname">AngularLegendre</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/distributionBuilder.html#AngularLegendre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.distributionBuilder.AngularLegendre" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.evaluationBuilder.distributionBuilder.</tt><tt class="descname">AngularLegendre</tt><big>(</big><em>data</em>, <em>frame='centerOfMass'</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/distributionBuilder.html#AngularLegendre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.distributionBuilder.AngularLegendre" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create an angular distribution with Legendre coefficients. &#8216;data&#8217; should be a list of tuples:
 [ (incident_energy_0, [list of coefficients]),</p>
 <blockquote>
@@ -210,7 +214,7 @@ The interpolation is assumed to be linear-linear, energies are assumed to be in 
 
 <dl class="function">
 <dt id="fudge.evaluationBuilder.distributionBuilder.AngularMixed">
-<tt class="descclassname">fudge.evaluationBuilder.distributionBuilder.</tt><tt class="descname">AngularMixed</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/distributionBuilder.html#AngularMixed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.distributionBuilder.AngularMixed" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.evaluationBuilder.distributionBuilder.</tt><tt class="descname">AngularMixed</tt><big>(</big><em>data</em>, <em>frame='centerOfMass'</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/distributionBuilder.html#AngularMixed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.distributionBuilder.AngularMixed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Legendre coefficients are an efficient way to represent an angular distribution, but if the distribution
 is very forward-peaked (which is often true at high incident energies) we have trouble with negative probabilities
 due to truncating the Legendre series. One solution is to use the Mixed form, where Legendre coefficients are used
@@ -225,7 +229,7 @@ In both cases, interpolation is lin-lin and energies are in eV.</p>
 
 <dl class="function">
 <dt id="fudge.evaluationBuilder.distributionBuilder.AngularPointwise">
-<tt class="descclassname">fudge.evaluationBuilder.distributionBuilder.</tt><tt class="descname">AngularPointwise</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/distributionBuilder.html#AngularPointwise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.distributionBuilder.AngularPointwise" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.evaluationBuilder.distributionBuilder.</tt><tt class="descname">AngularPointwise</tt><big>(</big><em>data</em>, <em>frame='centerOfMass'</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/distributionBuilder.html#AngularPointwise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.distributionBuilder.AngularPointwise" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a pointwise angular distribution. &#8216;data&#8217; should be a nested list:
 [ (incident_energy_0, [(mu0, P(mu0)), (mu1, P(mu1)), ... ]),</p>
 <blockquote>
@@ -236,14 +240,26 @@ The interpolation is assumed to be linear-linear, energies are assumed to be in 
 </dd></dl>
 
 <dl class="function">
+<dt id="fudge.evaluationBuilder.distributionBuilder.EnergyPointwise">
+<tt class="descclassname">fudge.evaluationBuilder.distributionBuilder.</tt><tt class="descname">EnergyPointwise</tt><big>(</big><em>data</em>, <em>frame='lab'</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/distributionBuilder.html#EnergyPointwise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.distributionBuilder.EnergyPointwise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a pointwise energy distribution. &#8216;data&#8217; should be a nested list:
+[ (incident_energy_0, [(E&#8217;_0, P(E&#8217;_0)), (E&#8217;_1, P(E&#8217;_1)), ... ]),</p>
+<blockquote>
+<div>(incident_energy_1, [(E&#8217;_0, P(E&#8217;_0)), (E&#8217;_1, P(E&#8217;_1)), ... ]), 
+...  ]</div></blockquote>
+<p>A different outgoing energy grid may be used at each incident energy.
+The interpolation is assumed to be linear-linear, and energies are assumed to be in eV.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="fudge.evaluationBuilder.distributionBuilder.Isotropic">
-<tt class="descclassname">fudge.evaluationBuilder.distributionBuilder.</tt><tt class="descname">Isotropic</tt><big>(</big><em>data=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/distributionBuilder.html#Isotropic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.distributionBuilder.Isotropic" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.evaluationBuilder.distributionBuilder.</tt><tt class="descname">Isotropic</tt><big>(</big><em>data=None</em>, <em>frame='centerOfMass'</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/distributionBuilder.html#Isotropic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.distributionBuilder.Isotropic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create an isotropic angular distribution. No arguments are required.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fudge.evaluationBuilder.distributionBuilder.KalbachMann">
-<tt class="descclassname">fudge.evaluationBuilder.distributionBuilder.</tt><tt class="descname">KalbachMann</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/distributionBuilder.html#KalbachMann"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.distributionBuilder.KalbachMann" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.evaluationBuilder.distributionBuilder.</tt><tt class="descname">KalbachMann</tt><big>(</big><em>data</em>, <em>frame='centerOfMass'</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/distributionBuilder.html#KalbachMann"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.distributionBuilder.KalbachMann" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Kalbach-Mann distribution. &#8216;data&#8217; should be a dictionary with two keys:
 { &#8216;form&#8217;: a string, either &#8216;f&#8217; or &#8216;fr&#8217;, depending on how many parameters are given per incident/outgoing energy combination,</p>
 <blockquote>
@@ -263,66 +279,30 @@ Energies are assumed to be in eV.</p>
 
 <dl class="function">
 <dt id="fudge.evaluationBuilder.distributionBuilder.Recoil">
-<tt class="descclassname">fudge.evaluationBuilder.distributionBuilder.</tt><tt class="descname">Recoil</tt><big>(</big><em>otherProduct</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/distributionBuilder.html#Recoil"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.distributionBuilder.Recoil" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.evaluationBuilder.distributionBuilder.</tt><tt class="descname">Recoil</tt><big>(</big><em>otherProduct</em>, <em>frame=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/distributionBuilder.html#Recoil"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.distributionBuilder.Recoil" title="Permalink to this definition">¶</a></dt>
 <dd><p>For 2-body reactions, the distribution of one product can be calculated from the other.
 &#8216;otherProduct&#8217; should be a gnd.product or productBuilder instance, from which this product is recoiling</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="fudge.evaluationBuilder.distributionBuilder.Uncorrelated">
+<tt class="descclassname">fudge.evaluationBuilder.distributionBuilder.</tt><tt class="descname">Uncorrelated</tt><big>(</big><em>data</em>, <em>frame='lab'</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/distributionBuilder.html#Uncorrelated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.distributionBuilder.Uncorrelated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="class">
 <dt id="fudge.evaluationBuilder.distributionBuilder.distributionBuilder">
-<em class="property">class </em><tt class="descclassname">fudge.evaluationBuilder.distributionBuilder.</tt><tt class="descname">distributionBuilder</tt><big>(</big><em>dataForm</em>, <em>data</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/distributionBuilder.html#distributionBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.distributionBuilder.distributionBuilder" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">fudge.evaluationBuilder.distributionBuilder.</tt><tt class="descname">distributionBuilder</tt><big>(</big><em>dataForm</em>, <em>data</em>, <em>frame=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/distributionBuilder.html#distributionBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.distributionBuilder.distributionBuilder" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
 <div class="section" id="module-fudge.evaluationBuilder.productBuilder">
 <span id="productbuilder-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">productBuilder</span></tt> Module<a class="headerlink" href="#module-fudge.evaluationBuilder.productBuilder" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="fudge.evaluationBuilder.productBuilder.particleLibrary">
-<em class="property">class </em><tt class="descclassname">fudge.evaluationBuilder.productBuilder.</tt><tt class="descname">particleLibrary</tt><big>(</big><em>database=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/productBuilder.html#particleLibrary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.productBuilder.particleLibrary" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="fudge.evaluationBuilder.productBuilder.particleLibrary.checkForUnknownMassOrExcitation">
-<tt class="descname">checkForUnknownMassOrExcitation</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/productBuilder.html#particleLibrary.checkForUnknownMassOrExcitation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.productBuilder.particleLibrary.checkForUnknownMassOrExcitation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.evaluationBuilder.productBuilder.particleLibrary.getParticle">
-<tt class="descname">getParticle</tt><big>(</big><em>name</em>, <em>mass=None</em>, <em>levelIndex=None</em>, <em>levelEnergy=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/productBuilder.html#particleLibrary.getParticle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.productBuilder.particleLibrary.getParticle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Each particle should be defined only once. This checks whether the particle is already defined,
-and either returns it or defines and returns the result.</p>
-<p>Currently we must manually add the energy level for an excited state.
-for example:</p>
-<blockquote>
-<div>&gt;prod = getParticle(&#8216;Fe56&#8217;)
-&gt;lev1 = getParticle(&#8216;Fe56_e1&#8217;, levelIndex=1, levelEnergy=PQU(&#8216;...&#8217;) )
-&gt;lev2 = getParticle(&#8216;Fe56&#8217;, levelIndex=2, levelEnergy=PQU(&#8216;...&#8217;) )</div></blockquote>
-<p>In the future we&#8217;ll get that information from the particle database instead.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.evaluationBuilder.productBuilder.particleLibrary.newProduct">
-<tt class="descname">newProduct</tt><big>(</big><em>name</em>, <em>mass=None</em>, <em>levelIndex=None</em>, <em>levelEnergy=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/productBuilder.html#particleLibrary.newProduct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.productBuilder.particleLibrary.newProduct" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="fudge.evaluationBuilder.productBuilder.particleLibrary.setExcitationEnergy">
-<tt class="descname">setExcitationEnergy</tt><big>(</big><em>name</em>, <em>energy</em>, <em>energyUnit</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/productBuilder.html#particleLibrary.setExcitationEnergy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.productBuilder.particleLibrary.setExcitationEnergy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the excitation for level named &lt;name&gt;</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.evaluationBuilder.productBuilder.particleLibrary.setMass">
-<tt class="descname">setMass</tt><big>(</big><em>name</em>, <em>mass</em>, <em>massUnit</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/productBuilder.html#particleLibrary.setMass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.productBuilder.particleLibrary.setMass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the mass for particle named &lt;name&gt;.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
 <dt id="fudge.evaluationBuilder.productBuilder.productBuilder">
 <em class="property">class </em><tt class="descclassname">fudge.evaluationBuilder.productBuilder.</tt><tt class="descname">productBuilder</tt><big>(</big><em>particle</em>, <em>multiplicity=None</em>, <em>distributionForm=None</em>, <em>distributionData=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/productBuilder.html#productBuilder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.productBuilder.productBuilder" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="fudge.evaluationBuilder.productBuilder.productBuilder.addDistribution">
-<tt class="descname">addDistribution</tt><big>(</big><em>dataForm</em>, <em>data=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/productBuilder.html#productBuilder.addDistribution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.productBuilder.productBuilder.addDistribution" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">addDistribution</tt><big>(</big><em>dataForm</em>, <em>data=None</em>, <em>frame=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/evaluationBuilder/productBuilder.html#productBuilder.addDistribution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.evaluationBuilder.productBuilder.productBuilder.addDistribution" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -404,13 +384,13 @@ or a list of energy-dependent multiplicities of form [ [energies], [multipliciti
         <li class="right" >
           <a href="fudge.gnd.test.html" title="test Package"
              >previous</a> |</li>
-        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="index.html" >fudge Package</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

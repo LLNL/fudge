@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 from fudge.core.ancestry import ancestry
@@ -25,12 +50,22 @@ class matrix( ancestry ):
         """
         ancestry.__init__( self, matrixToken, None )
         self.form = form
-        self.nrows, self.ncols = len(data),len(data[0])
         self.data = data
         self.precision = precision
+
+    @property
+    def nrows(self): return len(self.data)
+
+    @property
+    def ncols(self): return len(self.data[0])
     
     def __getitem__(self, idx):
         return self.data[idx]
+
+    def __add__(self, other):
+        if self.form == other.form and self.precision == other.precision:
+            return matrix( self.data + other.data, self.form, self.precision )
+        raise Exception("Can't add together matrices with different form/precision")
 
     def check( self, info ): 
         """ 
@@ -92,7 +127,7 @@ class matrix( ancestry ):
         show()
 
 
-    def toXMLList(self, flags=None, verbosityIndent='', indent=''):
+    def toXMLList(self, flags=None, indent=''):
         xmlString = [indent+'<matrix rows="%s" columns="%s" form="%s"' 
                 % (self.nrows, self.ncols, self.form)]
         if self.precision: xmlString[0]+=' precision="%i"' % self.precision
@@ -155,7 +190,9 @@ class matrix( ancestry ):
         xmlString[-1] += '</matrix>'
         return xmlString
 
-def parseXMLNode( mat, linkData={} ):
+def parseXMLNode( mat, xPath=[], linkData={} ):
+
+    xPath.append( mat.tag )
     import numpy
     if mat.text: matrixDat = map(float, mat.text.split())
     else: matrixDat = []
@@ -197,4 +234,6 @@ def parseXMLNode( mat, linkData={} ):
     else:
         precision=None
 
-    return matrix( tmp, form, precision=precision )
+    matrix_ = matrix( tmp, form, precision=precision )
+    xPath.pop()
+    return matrix_

@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 import sys
@@ -7,7 +32,6 @@ import math
 
 from fudge.core.ancestry import ancestry
 from fudge.core.math import *
-from fudge.legacy.converting import endfFormats
 from fudge.core.math.xData import axes
 
 __metaclass__ = type
@@ -105,48 +129,30 @@ def floatToString( f, precision = 12 ) :
     if( len( t3 ) <= len( s ) ) : s = t3
     return( s )
 
-def copyVariables( variables, indices = [] ) :
-    """Need to modify to handle axes instance for variables.???????"""
-
-    if( indices == [] ) : indices = variables.keys( )
-    variables_ = {}
-    for index in indices :
-        if( type( index ) == type( 1 ) ) :
-            iFrom = iTo = index
-        else :                              # Must be a list of length 2
-            if( len( index ) != 2 ) : raise Exception( 'Index = "%s" not a list of integers of length 2' % str( index ) )
-            iFrom, iTo = index
-        variables_[iTo] = copy.copy( variables[iFrom] )
-    return( variables_ )
-
 def TMs2Form( processInfo, tempInfo, newComponents, TM_1, TM_E, axes_p ) :
 
     from productData import distributions
     from fudge.core.math import matrix
     crossSectionUnit = 'b'                          # ?????? 'b' should not be hardwired.
     axes_ = axes.axes( dimension = 3 )
-    axes_[0] = axes.axis( axes_p[0].getLabel( ), 0, axes_p[0].getUnit( ), frame = axes.labToken, interpolation = axes.interpolationXY( axes.linearToken, axes.flatToken ) )
-    axes_[1] = axes.axis( 'energy_out',          1, axes_p[0].getUnit( ), frame = axes.labToken, interpolation = axes.interpolationXY( axes.linearToken, axes.flatToken ) )
-    axes_[2] = axes.axis( 'C_l(energy_in,energy_out)', 2, crossSectionUnit, frame = axes.labToken )
+    axes_[0] = axes.axis( axes_p[0].getLabel( ), 0, axes_p[0].getUnit( ), interpolation = axes.interpolationXY( axes.linearToken, axes.flatToken ) )
+    axes_[1] = axes.axis( 'energy_out',          1, axes_p[0].getUnit( ), interpolation = axes.interpolationXY( axes.linearToken, axes.flatToken ) )
+    axes_[2] = axes.axis( 'C_l(energy_in,energy_out)', 2, crossSectionUnit )
     # convert TM_1 and TM_E from dicts into matrix objects:
     if( not ( TM_1 is None ) ) :
         TM_1_new = []
         for i in range(len(TM_1)):
             TM_1_new.append( matrix.matrix( [TM_1[i][idx] for idx in range(len(TM_1[i]))], form="sparse_asymmetric" ) )
         component = distributions.Legendre.component( nativeData = distributions.base.groupedFormToken )
-        component.addForm( distributions.Legendre.grouped( axes_, TM_1_new ) )
+        component.addForm( distributions.Legendre.grouped( axes_, TM_1_new, axes.labToken ) )
         newComponents.append( component )
     if( not ( TM_E is None ) ) :
         TM_E_new = []
         for i in range(len(TM_E)):
             TM_E_new.append( matrix.matrix( [TM_E[i][idx] for idx in range(len(TM_E[i]))], form="sparse_asymmetric" ) )
         component = distributions.Legendre.energyConservationComponent( nativeData = distributions.base.groupedFormToken )
-        component.addForm( distributions.Legendre.energyConservationGrouped( axes_, TM_E_new ) )
+        component.addForm( distributions.Legendre.energyConservationGrouped( axes_, TM_E_new, axes.labToken ) )
         newComponents.append( component )
-
-def getMassLevel( particle, massUnit, levelUnit ) :
-
-    return( particle.getMass( massUnit ), particle.getLevelAsFloat( levelUnit ) )
 
 def makeGrouped( self, processInfo, tempInfo, data, normType = 'groupedCrossSectionNorm' ) :
 

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>fudge.gnd.productData.momentumDeposition &mdash; Fudge and GND 1.2 beta documentation</title>
+    <title>fudge.gnd.productData.momentumDeposition &mdash; Fudge and GND 1.3 beta documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '1.2 beta',
+        VERSION:     '1.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +25,7 @@
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
-    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../../index.html" />
+    <link rel="top" title="Fudge and GND 1.3 beta documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
@@ -39,7 +38,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -103,13 +102,14 @@
         <span class="n">momentumDepositionInterpolation</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">linearToken</span><span class="p">,</span> <span class="n">momentumDepositionUnit</span> <span class="o">=</span> <span class="s">&#39;eV/c&#39;</span> <span class="p">)</span> <span class="p">:</span>
 
         <span class="n">axes_</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">axes</span><span class="p">(</span> <span class="n">dimension</span> <span class="o">=</span> <span class="mi">2</span> <span class="p">)</span>
-        <span class="n">axes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span> <span class="s">&#39;energy_in&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">energyUnit</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">labToken</span><span class="p">,</span> \
-            <span class="n">interpolation</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">interpolationXY</span><span class="p">(</span> <span class="n">energyInterpolation</span><span class="p">,</span> <span class="n">momentumDepositionInterpolation</span> <span class="p">)</span> <span class="p">)</span>
-        <span class="n">axes_</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span> <span class="n">momentumDepositionName</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">momentumDepositionUnit</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">labToken</span> <span class="p">)</span>
+        <span class="n">axes_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span> <span class="s">&#39;energy_in&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">energyUnit</span><span class="p">,</span> <span class="n">interpolation</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">interpolationXY</span><span class="p">(</span> <span class="n">energyInterpolation</span><span class="p">,</span> <span class="n">momentumDepositionInterpolation</span> <span class="p">)</span> <span class="p">)</span>
+        <span class="n">axes_</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span> <span class="n">momentumDepositionName</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">momentumDepositionUnit</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">axes_</span> <span class="p">)</span>
 </div></div>
-<div class="viewcode-block" id="parseXMLNode"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.momentumDeposition.parseXMLNode">[docs]</a><span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">linkData</span><span class="o">=</span><span class="p">{}</span> <span class="p">):</span>
+<div class="viewcode-block" id="parseXMLNode"><a class="viewcode-back" href="../../../../fudge/fudge.gnd.productData.html#fudge.gnd.productData.momentumDeposition.parseXMLNode">[docs]</a><span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">element</span><span class="p">,</span> <span class="n">xPath</span><span class="o">=</span><span class="p">[],</span> <span class="n">linkData</span><span class="o">=</span><span class="p">{}</span> <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Reads an xml &lt;depositionMomentum&gt; component element into fudge, including all forms in the component.&quot;&quot;&quot;</span>
+
+    <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
     <span class="n">dmc</span> <span class="o">=</span> <span class="n">component</span><span class="p">(</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;nativeData&#39;</span><span class="p">)</span> <span class="p">)</span>
     <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
         <span class="n">formClass</span> <span class="o">=</span> <span class="p">{</span><span class="n">tokens</span><span class="o">.</span><span class="n">pointwiseFormToken</span><span class="p">:</span> <span class="n">pointwise</span><span class="p">,</span>
@@ -117,10 +117,11 @@
                 <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="n">form</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
         <span class="k">if</span> <span class="n">formClass</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot; encountered unknown depositionMomentum form: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">form</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">newForm</span> <span class="o">=</span> <span class="n">formClass</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">form</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+            <span class="n">newForm</span> <span class="o">=</span> <span class="n">formClass</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">form</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">,</span> <span class="s">&quot;/depositionMomentum/</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
         <span class="n">dmc</span><span class="o">.</span><span class="n">addForm</span><span class="p">(</span> <span class="n">newForm</span> <span class="p">)</span>
+    <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">dmc</span></div>
 </pre></div>
 
@@ -158,13 +159,13 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

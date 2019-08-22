@@ -1,5 +1,30 @@
 /*
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 */
 
@@ -88,15 +113,17 @@ ptwXYPoints *ptwXY_flatInterpolationToLinear( ptwXYPoints *ptwXY, double lowerEp
         if( i > 1 ) {
             if( lowerEps > 0 ) {
                 x = ptwXY_flatInterpolationToLinear_eps( p2->x, -lowerEps );
-                if( x <= p1->x ) goto xErr;
-                if( ( *status = ptwXY_setValueAtX( n, x, p1->y ) ) != nfu_Okay ) goto Err;
+                if( x > p1->x ) {
+                    if( ( *status = ptwXY_setValueAtX( n, x, p1->y ) ) != nfu_Okay ) goto Err;
+                }
             }
             if( lowerEps == 0 ) if( ( *status = ptwXY_setValueAtX( n, p2->x, p1->y ) ) != nfu_Okay ) goto Err;
             if( upperEps == 0 ) if( ( *status = ptwXY_setValueAtX( n, p2->x, p2->y ) ) != nfu_Okay ) goto Err;
             if( upperEps > 0 ) {
                 x = ptwXY_flatInterpolationToLinear_eps( p2->x, upperEps );
-                if( x >= p3->x ) goto xErr;
-                if( ( *status = ptwXY_setValueAtX( n, x, p2->y ) ) != nfu_Okay ) goto Err;
+                if( x < p3->x ) {
+                    if( ( *status = ptwXY_setValueAtX( n, x, p2->y ) ) != nfu_Okay ) goto Err;
+                }
             }
         }
         p1 = p2;
@@ -105,16 +132,15 @@ ptwXYPoints *ptwXY_flatInterpolationToLinear( ptwXYPoints *ptwXY, double lowerEp
     if( ptwXY->length > 1 ) {
         if( ( lowerEps != 0 ) && ( p1->y != p2->y ) ) {
             x = ptwXY_flatInterpolationToLinear_eps( p2->x, -lowerEps );
-            if( x <= p1->x ) goto xErr;
-            if( ( *status = ptwXY_setValueAtX( n, x, p1->y ) ) != nfu_Okay ) goto Err;
+            if( x > p1->x ) {
+                if( ( *status = ptwXY_setValueAtX( n, x, p1->y ) ) != nfu_Okay ) goto Err;
+            }
         }
         if( ( *status = ptwXY_setValueAtX( n, p2->x, p2->y ) ) != nfu_Okay ) goto Err;
     }
 
     return( n );
 
-xErr:
-    *status = nfu_XNotAscending;
 Err:
     ptwXY_free( n );
     return( NULL );

@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -49,34 +74,39 @@ class xParticle(baseParticle) :
 
     def __eq__( self, other ) :
 
-        return( self.localCompare( other ) == 0 )
+        return( self._localCompare( other ) == 0 )
 
     def __ge__( self, other ) :
 
-        return( self.localCompare( other ) >= 0 )
+        return( self._localCompare( other ) >= 0 )
 
     def __gt__( self, other ) :
 
-        return( self.localCompare( other ) > 0 )
+        return( self._localCompare( other ) > 0 )
 
     def __le__( self, other ) :
 
-        return( self.localCompare( other ) <= 0 )
+        return( self._localCompare( other ) <= 0 )
 
     def __lt__( self, other ) :
 
-        return( self.localCompare( other ) < 0 )
+        return( self._localCompare( other ) < 0 )
 
     def __ne__( self, other ) :
 
-        return( self.localCompare( other ) != 0 )
+        return( self._localCompare( other ) != 0 )
 
-    def localCompare( self, other ) :
+    def _localCompare( self, other ) :
+        """
+        Designed only for internal use. Returns -1 if self is less than other, 0 if it is the same and 1 
+        otherwise. Compares self to other based firstly on their ZAs (ZA = 1000 * Z + A).  If that comparison 
+        differs, the comparison is returned. Otherwise, returns the comparison of self's and other's suffixes.
+        """
 
-        Z, A, suffixSelf,  ZAMSelf  = self.getZ_A_SuffixAndZA()
-        Z, A, suffixOther, ZAMOther = other.getZ_A_SuffixAndZA()
-        if( ZAMSelf < ZAMOther ) : return( -1 )
-        if( ZAMSelf > ZAMOther ) : return(  1 )
+        Z, A, suffixSelf,  ZASelf  = self.getZ_A_SuffixAndZA()
+        Z, A, suffixOther, ZAOther = other.getZ_A_SuffixAndZA()
+        if( ZASelf < ZAOther ) : return( -1 )
+        if( ZASelf > ZAOther ) : return(  1 )
         if( suffixSelf < suffixOther ) : return( -1 )
         if( suffixSelf > suffixOther ) : return(  1 )
         return( 0 )
@@ -122,8 +152,6 @@ class xParticle(baseParticle) :
 
     def getLevelAsFloat( self, unit, default = 0. ): return 0
 
-    def getMetaStableIndex( self ): return 0
-
     def addLevel( self, level ):
 
         if isinstance(level, nuclearLevel):
@@ -149,7 +177,7 @@ class xParticle(baseParticle) :
             if type(level) is not int: continue # 'c' and 'u' levels may be out of order
             enow = self.levels[level].getLevelAsFloat('eV')
             if enow <= emax:
-                warnings.append( warning.discreteLevelsOutOfOrder( level ) )
+                warnings.append( warning.discreteLevelsOutOfOrder( level, self.levels[level] ) )
             else:
                 emax = enow
 
@@ -189,15 +217,56 @@ class nuclearLevel(baseParticle):
         self.attributes = attributes or {}
         self.groundState = groundState  # points to xParticle instance
 
-    def __lt__(self, other):
-        if isinstance(other, nuclearLevel):
-            if self.groundState == other.groundState: return self.label < other.label
+    def __eq__( self, other ) :
+        """Returns True if self._localCompare( other ) == 0 and False otherwise (also see _localCompare)."""
+
+        return( isinstance(other, nuclearLevel) and self._localCompare( other ) == 0 )
+
+    def __ge__( self, other ) :
+        """Returns True if self._localCompare( other ) >= 0 and False otherwise (also see _localCompare)."""
+
+        return( self._localCompare( other ) >= 0 )
+
+    def __gt__( self, other ) :
+        """Returns True if self._localCompare( other ) > 0 and False otherwise (also see _localCompare)."""
+
+        return( self._localCompare( other ) > 0 )
+
+    def __le__( self, other ) :
+        """Returns True if self._localCompare( other ) <= 0 and False otherwise (also see _localCompare)."""
+
+        return( self._localCompare( other ) <= 0 )
+
+    def __ne__( self, other ) :
+        """Returns True if self._localCompare( other ) != 0 and False otherwise (also see _localCompare)."""
+
+        return( not isinstance(other, nuclearLevel) or self._localCompare( other ) != 0 )
+
+    def __lt__( self, other ) :
+
+        if isinstance( other, nuclearLevel ) :
+            if self.groundState == other.groundState : return self.label < other.label
             return self.groundState < other.groundState
         elif isinstance(other, xParticle):
             return self.groundState < other
         else:
-            raise Exception("Can't compare nuclear level to %s instance" % other.__class__)
+            raise NotImplemented( "Cannot compare nuclear level to %s instance" % other.__class__ )
 
+    def _localCompare( self, other ) :
+        """
+        Designed only for internal use. Returns -1 if self is less than other, 0 if it is the same and 1 otherwise. 
+        Compares self to other based firstly on their ground state comparison (see xParticle._localCompare).  If 
+        that comparison differs, the comparison is returned. Otherwise, returns the comparison of self's and other's labels.
+        """
+
+        if( not( isinstance( other, nuclearLevel ) ) ) : raise NotImplemented( 'Cannot compare nuclear level to %s instance' % other.__class__ )
+
+        if( self.groundState < other.groundState ) : return( -1 )
+        if( self.groundState > other.groundState ) : return(  1 )
+        if( self.label  < other.label ) : return( -1 )
+        if( self.label == other.label ) : return(  0 )
+        return( 1 )
+ 
     def __str__( self ) :
 
         return( self.name )
@@ -222,10 +291,6 @@ class nuclearLevel(baseParticle):
     def getLevelIndex( self ) :
         return self.label
 
-    def getMetaStableIndex( self ) :
-        if( 'metaStableIndex' in self.attributes ) : return( int( self.attributes['metaStableIndex'] ) )
-        return( 0 )
-
     def getLevelAsFloat( self, unit, default = 0. ) :
         try :
             level = float( self.energy.getValueAs( unit ) )
@@ -248,10 +313,10 @@ class nuclearLevel(baseParticle):
         Check parts of nuclearLevel
         
         Options & defaults:
-            'gammaBRSumAbsTol'      1e-6
+            'branchingRatioSumTolerance'      1e-6
         '''
         warnings = []
-        gammaBRSumAbsTol = info.get( 'gammaBRSumAbsTol', 1e-6 )
+        gammaBRSumAbsTol = info.get( 'branchingRatioSumTolerance', 1e-6 )
         if self.gammas and abs( sum([gamma.probability for gamma in self.gammas]) - 1.0 ) > gammaBRSumAbsTol:
             warnings.append( warning.unnormalizedGammas( sum([gamma.probability for gamma in self.gammas]), self ) )
         return warnings
@@ -288,6 +353,49 @@ class nuclearLevel(baseParticle):
         # Currently, assume all distributions are isotropic
         endfMFList[14][MT] = [ endfFormats.endfHeadLine( tempInfo['ZA'], tempInfo['mass'], 1, 0, nGammas, 0 ) ]
         endfMFList[14][MT].append( endfFormats.endfSENDLineNumber( ) )
+
+    def getGammaEmission( self ) :
+        """
+        This method returns a dictionary of all gammas (as nuclearLevelGamma) and thier probabilities for the
+        current level and all levels in its decay path. Each gamma has a unique (for this target) key in the
+        dictionary and the returned dictionary can be combined with those returned from other levels from self's 
+        xParticle (i.e., parent). The probability for each gamma is the sum from all decay paths. As example, 
+        consider the decay from level 5 where the possible decays are (when more than one 'to' level, probability 
+        'p' is given as (p)):
+
+                 level 
+              from    to
+                5     1 (1/2) and 3 (1/2)
+                4     0
+                3     0 (1/4) and 2 (3/4)
+                2     0 (2/3) and 1 (1/3)
+                1     0
+                0
+
+        In this example, the gamma from level 1 to 0 occurs with probability 1/2 + 1/2 * 3/4 * 1/3 = 5/8.
+
+        Two returned dictionaries name GGE1 and GGE2 can be combined into GGE1 as:
+
+        for key in GGE2 :
+            if( key not in GGE1 ) :
+                GGE1[key] = copy.copy( GGE2[key] )
+            else :
+                GGE1[key][1] += GGE2[key][1]
+        """
+
+        def _addGamma( levelFrom, gamma, gammas, probability, level ) :
+            """Designed for internal use only."""
+
+            levelTo = gamma.finalLevel
+            name = levelFrom.getName( ) + '__' + levelTo.getName( )
+            probability *= gamma.probability
+            if( name not in gammas ) : gammas[name] = [ gamma, 0 ]
+            gammas[name][1] += probability
+            for gamma_ in levelTo.gammas : _addGamma( levelTo, gamma_, gammas, probability, level + 1 )
+
+        gammas = {}
+        for gamma in self.gammas : _addGamma( self, gamma, gammas, 1., 0 )
+        return( gammas )
 
 class nuclearLevelGamma( ancestry ) :
 

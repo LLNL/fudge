@@ -1,6 +1,31 @@
 #! /usr/bin/env python
 
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 import sys, os, shutil
@@ -75,14 +100,16 @@ else :
     f.close( )
 subprocessing.executeCommand( [ 'python', os.path.join( binDir, 'reForm.py' ), 'test.endf6.orig2', 'test.endf6.orig' ] )
 subprocessing.deleteFilesUsingGlob( 'test.endf6.orig2' )
-x, c = endfFileToGND.endfFileToGND( argv[0], singleMTOnly = MT, toStdOut = Options.verbose, skipBadData = Options.skipBadData )
+rce = endfFileToGND.endfFileToGND( argv[0], singleMTOnly = MT, toStdOut = Options.verbose, skipBadData = Options.skipBadData )
+r, c = rce['reactionSuite'], rce['covarianceSuite']
+errs = rce['errors']
 if( Options.checkCovars ) :
     sys.stderr.write( ''.join( [ "%s: %s" % ( os.path.split( argv[0] )[-1], warning ) for warning in c.checkCovariances( ) ] ) )
 
 flags = processingInfo.tempInfo( )
 flags['verbosity'] = 0
 f = open( 'test.endf6.xml', 'w' )
-f.write( '\n'.join( x.toXMLList( flags ) + [ '' ] ) )
+f.write( '\n'.join( r.toXMLList( flags ) + [ '' ] ) )
 f.close( )
 if c:
     f = open( 'test.endf6-covar.xml', 'w' )
@@ -91,7 +118,7 @@ if c:
 
 if( Options.verbose ) : flags['verbosity'] = 31
 f = open( 'test.endf6', 'w' )
-f.write( x.toENDF6( flags, covarianceSuite=c ) )
+f.write( r.toENDF6( flags, covarianceSuite=c ) )
 f.close( )
 
 counter = 0
@@ -119,3 +146,4 @@ subprocessing.executeCommand( [ 'python', os.path.join( binDir, 'fixZeroLeaders.
     'test.endf6.orig.noLineNumbers.cleanAndFixed' ] )
 subprocessing.deleteFilesUsingGlob( 'test.endf6.orig.noLineNumbers[0-9]*' )
 if( True ) : subprocessing.executeCommand( [ 'rm', '-f', 'test.endf6', 'test.endf6.orig', 'test.endf6.orig.noLineNumbers.clean' ] )
+sys.exit( len( errs ) )

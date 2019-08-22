@@ -1,5 +1,30 @@
 /*
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 */
 
@@ -77,11 +102,11 @@ nfu_status nf_Legendre_reallocateCls( nf_Legendre *Legendre, int size, int force
     if( size > ( nf_Legendre_maxMaxOrder + 1 ) ) size = nf_Legendre_maxMaxOrder + 1;
     if( size != Legendre->allocated ) {
         if( size > Legendre->allocated ) {
-            Legendre->Cls = nfu_realloc( size * sizeof( double ), Legendre->Cls ); }
+            Legendre->Cls = (double *) nfu_realloc( size * sizeof( double ), Legendre->Cls ); }
         else {
             if( size < ( Legendre->maxOrder + 1 ) ) size = Legendre->maxOrder + 1;
             if( ( Legendre->allocated > 2 * size ) || forceSmallerResize ) {
-                    Legendre->Cls = nfu_realloc( size * sizeof( double ), Legendre->Cls ); } 
+                    Legendre->Cls = (double *) nfu_realloc( size * sizeof( double ), Legendre->Cls ); } 
             else {
                 size = Legendre->allocated;
             }
@@ -170,14 +195,15 @@ double nf_Legendre_evauluateAtMu( nf_Legendre *Legendre, double mu, nfu_status *
 double nf_Legendre_PofL_atMu( int l, double mu ) {
 
     int l_, twoL_plus1;
-    double mu2, Pl_minus1, Pl, Pl_plus1;
+    double Pl_minus1, Pl, Pl_plus1;
 
     if( l == 0 ) {
         return( 1. ); }
     else if( l == 1 ) {
         return( mu ); }
-    else if( l <= 10 ) {
-        mu2 = mu * mu;
+/*
+    else if( l <= 9 ) {
+        double mu2 = mu * mu;
         if ( l == 2 ) {
             return(                1.5 * mu2 - 0.5 ); }
         else if( l == 3 ) {
@@ -192,12 +218,11 @@ double nf_Legendre_PofL_atMu( int l, double mu ) {
             return( ( (        26.8125 * mu2 -      43.3125 ) * mu2 +     19.6875 ) * mu2 -      2.1875 ) * mu; }
         else if( l == 8 ) {
             return( ( (     50.2734375 * mu2 -     93.84375 ) * mu2 +   54.140625 ) * mu2 -     9.84375 ) * mu2 + 0.2734375; }
-        else if( l == 9 ) {
-            return( ( ( (   94.9609375 * mu2 -    201.09375 ) * mu2 +  140.765625 ) * mu2 -    36.09375 ) * mu2 + 2.4609375 ) * mu; }
         else {
-            return( ( ( ( 180.42578125 * mu2 - 427.32421875 ) * mu2 + 351.9140625 ) * mu2 - 117.3046875 ) * mu2 + 13.53515625 ) * mu2 - 0.246093;
+            return( ( ( (   94.9609375 * mu2 -    201.09375 ) * mu2 +  140.765625 ) * mu2 -    36.09375 ) * mu2 + 2.4609375 ) * mu;
         }
     }
+*/
 
     Pl = 0.;
     Pl_plus1 = 1.;
@@ -244,7 +269,7 @@ static nfu_status nf_Legendre_to_ptwXY2( double mu, double *P, void *argList ) {
 */
 nf_Legendre *nf_Legendre_from_ptwXY( ptwXYPoints *ptwXY, int maxOrder, nfu_status *status ) {
 
-    int64_t l, i, n = ptwXY_length( ptwXY );
+    int l, i, n = (int) ptwXY_length( ptwXY );
     nf_Legendre *Legendre;
     double mu1, mu2, f1, f2, Cl, Cls[1] = { 0 }, integral;
     struct nf_Legendre_from_ptwXY_callback_s argList;

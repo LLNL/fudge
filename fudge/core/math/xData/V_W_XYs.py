@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -40,6 +65,7 @@ class V_W_XYs( ancestry ) :
         self.w_xys = []
         self.axes = axes_.copy( )           # Even secondary must have axes
         self.index = index
+        if( value is not None ) : value = fudgemath.toFloat( value )
         self.value = value
 
     def __len__( self ) :
@@ -53,7 +79,6 @@ class V_W_XYs( ancestry ) :
     def __setitem__( self, index, w_xys_ ) :
 
         if( not( isinstance( w_xys_, W_XYs.W_XYs ) ) ) : raise Exception( 'right-hand-side must be instance of W_XYs; it is %s' % brb.getType( w_xys_ ) )
-        if( type( w_xys_.value ) != type( 1. ) ) : raise Exception( 'w_xys value must be a float; it is a %s' % brb.getType( w_xys_.value ) )
         n = len( self )
         if( n < index ) : raise IndexError( 'index = %s while length is %s' % ( index, n ) )
         if( index < 0 ) : raise IndexError( 'index = %s' % index )
@@ -195,9 +220,12 @@ class V_W_XYs( ancestry ) :
 
         return( self.axes[0].getUnit( ) )
 
-    def toPointwiseLinear( self, accuracy = None, lowerEps = 0, upperEps = 0, cls = None ) :
+    def getDimensions( self ) :
+        """Returns the dimensions (4 for V_W_XYs) for this type of data."""
 
-        from fudge.core.utilities import mathMisc
+        return( 4 )
+
+    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0, cls = None ) :
 
         axes_ = self.axes.copy( )
         independent, dependent, qualifier = self.axes[0].interpolation.getInterpolationTokens( )
@@ -216,8 +244,8 @@ class V_W_XYs( ancestry ) :
         axes_[2].setInterpolation( axes.interpolationXY( axes.linearToken, axes.linearToken ) )
 
         if( cls is None ) : cls = V_W_XYs
-        n = cls( axes_ )
-        for w_xys in self : n.append( w_xys.toPointwiseLinear( accuracy, lowerEps = lowerEps, upperEps = upperEps ) )
+        n = cls( axes_, self.getProductFrame( ) )
+        for w_xys in self : n.append( w_xys.toPointwise_withLinearXYs( accuracy, lowerEps = lowerEps, upperEps = upperEps ) )
         return( n )
 
     def toString( self ) :
@@ -228,7 +256,7 @@ class V_W_XYs( ancestry ) :
 
     def toXML( self, tag = 'xData', indent = '', incrementalIndent = '  ', pairsPerLine = 100, xyFormatter = None, xySeparater = ' ' ) :
 
-        return( '\n'.join( self.toXMLList( indent = indent, incrementalIndent = incrementalIndent, pairsPerLine = pairsPerLine, xyFormatter = xyFormatter, 
+        return( '\n'.join( self.toXMLList( tag = tag, indent = indent, incrementalIndent = incrementalIndent, pairsPerLine = pairsPerLine, xyFormatter = xyFormatter, 
             xySeparater = xySeparater ) ) )
 
     def toXMLList( self, tag = 'xData', indent = '', incrementalIndent = '  ', pairsPerLine = 100, xyFormatter = None, xySeparater = ' ' ) :
@@ -236,12 +264,19 @@ class V_W_XYs( ancestry ) :
         if( hasattr( self, 'tag' ) ) : tag = self.tag
         if( xyFormatter is None ) : xyFormatter = XYFormatter
         indent2 = indent + incrementalIndent
-        xmlString = [ '%s<%s xData="%s">' % ( indent, tag, self.xData ) ] 
+        extraXMLAttributeString = ''
+        if( hasattr( self, 'extraXMLAttributeString' ) ) : extraXMLAttributeString = ' ' + self.extraXMLAttributeString( )
+        xmlString = [ '%s<%s xData="%s"%s>' % ( indent, tag, self.xData, extraXMLAttributeString ) ] 
         xmlString += self.axes.toXMLList( indent = indent2 )
         for w_xys in self.w_xys : xmlString += w_xys.toXMLList( tag = self.axes[0].getLabel( ), indent = indent2, incrementalIndent = incrementalIndent, \
             pairsPerLine = pairsPerLine, xyFormatter = xyFormatter, xySeparater = xySeparater )
         xmlString[-1] += '</%s>' % tag
         return( xmlString )
+
+    @staticmethod
+    def defaultAxes( labelsUnits = {} ) :
+
+        return( axes.defaultAxes( dimension = 4, labelsUnits = labelsUnits ) )
 
 def XYFormatter( x, y ) :
 

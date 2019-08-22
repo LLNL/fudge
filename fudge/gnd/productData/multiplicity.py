@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 from fudge.gnd import baseClasses
@@ -71,7 +96,7 @@ class component( baseClasses.componentBase ) :
 
         if self.isConstant():
             if self.getConstant() < 1:
-                warnings.append( warning.negativeMultiplicity( self.getConstant(), self.toXLink() ) )
+                warnings.append( warning.negativeMultiplicity( self.getConstant(), self ) )
         else:   # energy-dependent mult.
             for form in self.forms.values():
                 if hasattr(form, 'getDomain') and form.getDomain() != info['crossSectionDomain']:
@@ -90,15 +115,6 @@ class component( baseClasses.componentBase ) :
     def getXMLAttribute( self ) :
 
         return( self.forms[self.nativeData].getXMLAttribute( ) )
-
-    def toPointwiseLinear( self, lowerEps = 1.e-8, upperEps = 1.e-8, template = None ) :
-        """This method calls the toPointwiseLinear method for the 'nativeData' to return the multiplicity as linear-linear pointwise form.
-        If nativeData is constantFormToken then template (typically a cross section component) is needed to get EMin, EMax and axes information."""
-
-        if( self.nativeData in [ tokens.constantFormToken, tokens.polynomialFormToken ] ) :
-            return( self.forms[self.nativeData].toPointwiseLinear( lowerEps, upperEps, template ) )
-        else :
-            return( self.forms[self.nativeData].toPointwiseLinear( lowerEps, upperEps ) )
 
     def toXMLList( self, indent = "" ) :
 
@@ -129,7 +145,7 @@ class unknown( baseClasses.formBase ) :
 
         return( tokens.unknownFormToken )
 
-    def toPointwiseLinear( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
 
         raise Exception( 'Linear-linear pointwise data for multiplicity form %s does not make sense' % tokens.unknownFormToken )
 
@@ -167,6 +183,11 @@ class constant( baseClasses.formBase ) :
 
         return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
 
+    def getDomainUnit( self ) :
+
+        from fudge.gnd.reactions import reaction
+        return( self.findClassInAncestry( reaction.reaction ).getDomainUnit( ) )
+
     def getEnergyLimits( self, EMin, EMax ) :
 
         return( [ EMin, EMax ] )
@@ -179,11 +200,11 @@ class constant( baseClasses.formBase ) :
 
         return( self.value )
 
-    def toPointwiseLinear( self, lowerEps, upperEps, template  ) :
-        """This method returns a the multiplicity as linear-linear pointwise data which spans template's domain."""
+    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+        """This method returns the multiplicity as linear-linear pointwise data which spans self's domain."""
 
-        axes_ = pointwise.defaultAxes( energyUnit = template.getDomainUnit( ) )
-        return( pointwise( axes_, [ [ template.domainMin( ), self.value ], [ template.domainMax( ), self.value ] ], 1e-12 ) )
+        axes_ = pointwise.defaultAxes( energyUnit = self.getDomainUnit( ) )
+        return( pointwise( axes_, [ [ self.domainMin( ), self.value ], [ self.domainMax( ), self.value ] ], 1e-12 ) )
 
     def toXMLList( self, indent ) :
 
@@ -228,9 +249,8 @@ class pointwise( base.XYPointwiseFormBase ) :
         multiplicityInterpolation = axes.linearToken ) :
 
         axes_ = axes.axes( dimension = 2 )
-        axes_[0] = axes.axis( 'energy_in', 0, energyUnit, frame = axes.labToken, \
-            interpolation = axes.interpolationXY( energyInterpolation, multiplicityInterpolation ) )
-        axes_[1] = axes.axis( multiplicityName, 1, '', frame = axes.labToken )
+        axes_[0] = axes.axis( 'energy_in', 0, energyUnit, interpolation = axes.interpolationXY( energyInterpolation, multiplicityInterpolation ) )
+        axes_[1] = axes.axis( multiplicityName, 1, '' )
         return( axes_ )
 
 class piecewise( baseClasses.formBase, regions.regionsXYs ) :
@@ -285,14 +305,14 @@ class piecewise( baseClasses.formBase, regions.regionsXYs ) :
             lastX, lastY = data[-1]
         return( interpolationFlatData, counter, endfFormats.endfDataList( multiplicityFlatData ) )
 
-    def toPointwiseLinear( self, lowerEps, upperEps ) :
-        """See regionsXYs.toPointwiseLinear on the use of lowerEps, upperEps."""
+    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+        """See regionsXYs.toPointwise_withLinearXYs on the use of lowerEps, upperEps."""
 
         axes_ = axes.defaultAxes( labelsUnits = { 0 : [ self.axes[0].getLabel( ), self.axes[1].getUnit( ) ], 
                                                   1 : [ self.axes[0].getLabel( ), self.axes[1].getUnit( ) ] } )
         accuracy = 1e-6
         if( len( self ) > 0 ) : accuracy = self[0].getAccuracy( )
-        xys = regions.regionsXYs.toPointwiseLinear( self, accuracy, lowerEps, upperEps, removeOverAdjustedPoints = True )
+        xys = regions.regionsXYs.toPointwise_withLinearXYs( self, accuracy, lowerEps, upperEps, removeOverAdjustedPoints = True )
         return( pointwise( xys.axes, xys, accuracy = xys.getAccuracy( ) ) )
 
 class grouped( baseClasses.groupedFormBase ) :
@@ -353,9 +373,9 @@ class reference( baseClasses.formBase ) :
 
         self.referenceInstance = referenceInstance
 
-    def toPointwiseLinear( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
 
-        return( self.referenceInstance.multiplicity.toPointwiseLinear( lowerEps, upperEps ) )
+        return( self.referenceInstance.multiplicity.toPointwise_withLinearXYs( lowerEps, upperEps ) )
 
     def toXMLList( self, indent = "" ) :
 
@@ -366,12 +386,15 @@ class reference( baseClasses.formBase ) :
         return( self.referenceInstance.multiplicity.getXMLAttribute( ) )
 
     @staticmethod
-    def parseXMLNode( form, linkData={} ):
+    def parseXMLNode( form, xPath=[], linkData={} ):
+
+        xPath.append( form.tag )
         from fudge.gnd import link
         """ translate <reference> element from xml """
         xlink = link.parseXMLNode( form ).path
         ref = reference(None)
         if 'unresolvedLinks' in linkData: linkData['unresolvedLinks'].append((xlink, ref))
+        xPath.pop()
         return ref
 
 class weightedReference( reference ):
@@ -405,10 +428,14 @@ class weightedReference( reference ):
 
         return( self.weights.getDomain( ) )
 
-    def toPointwiseLinear( self, lowerEps, upperEps ) :
+    def getProductFrame( self ) :
 
-        referenceMultiplicity = self.referenceInstance.multiplicity.toPointwiseLinear( lowerEps, upperEps )
-        weights = self.weights.toPointwiseLinear( lowerEps = lowerEps, upperEps = upperEps )
+        return( self.referenceInstance.distributions.getNativeData( ).getProductFrame( ) )
+
+    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+
+        referenceMultiplicity = self.referenceInstance.multiplicity.toPointwise_withLinearXYs( lowerEps, upperEps )
+        weights = self.weights.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
         return( referenceMultiplicity.xSlice( xMin = weights.domainMin( ) ) * weights ) 
 
     def toXMLList( self, indent = "" ) :
@@ -427,23 +454,27 @@ class weightedReference( reference ):
 
         from fudge.core.math.xData import LegendreSeries
         from fudge.gnd.productData import distributions
-        axes_ = distributions.angular.LegendrePointwise.defaultAxes( self.weights.axes[1].frame, axes.linearToken, axes.linearToken )
-        form = distributions.angular.LegendrePointwise( axes_ )
+
+        axes_ = distributions.angular.LegendrePointwise.defaultAxes( axes.linearToken, axes.linearToken )
+        form = distributions.angular.LegendrePointwise( axes_, self.getProductFrame( ) )
         weights = self.weights.copyDataToXYs( xUnit = 'eV' )
         for i, enlc in enumerate( weights ) :
             energy, LegendreCoeffs = enlc
-            form[i] = LegendreSeries.XYs_LegendreSeries( axes_[1].getUnit( ), [ LegendreCoeffs ], index = i, value = energy )
+            form[i] = LegendreSeries.XYs_LegendreSeries( [ LegendreCoeffs ], index = i, value = energy )
         return( form )
 
     @staticmethod
-    def parseXMLNode( WRelement, linkData={} ):
+    def parseXMLNode( WRelement, xPath=[], linkData={} ):
+
+        xPath.append( WRelement.tag )
         from fudge.gnd import link
         xlink = link.parseXMLNode( WRelement[0] ).path
         if WRelement[1].get('nativeData')!=tokens.pointwiseFormToken:
             raise Exception("parsing %s multiplicity weights not yet supported" % WRelement[1].get('nativeData'))
-        weights = XYs.XYs.parseXMLNode( WRelement[1][0] )
+        weights = XYs.XYs.parseXMLNode( WRelement[1][0], xPath )
         ref = weightedReference( None, weights )
         if 'unresolvedLinks' in linkData: linkData['unresolvedLinks'].append((xlink, ref))
+        xPath.pop()
         return ref
 
 class polynomial( baseClasses.formBase, polynomial_.polynomial ) :
@@ -471,6 +502,11 @@ class polynomial( baseClasses.formBase, polynomial_.polynomial ) :
 
         return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
 
+    def getDomainUnit( self ) :
+
+        from fudge.gnd.reactions import reaction
+        return( self.findClassInAncestry( reaction.reaction ).getDomainUnit( ) )
+
     def getEnergyLimits( self, EMin, EMax ) :
 
         return( [ EMin, EMax ] )
@@ -485,17 +521,17 @@ class polynomial( baseClasses.formBase, polynomial_.polynomial ) :
 
         return( energyDependent )
 
-    def toPointwiseLinear( self, lowerEps, upperEps, template, accuracy = 1e-6 ) :
+    def toPointwise_withLinearXYs( self, lowerEps, upperEps, accuracy = 1e-6 ) :
 
-        xys = polynomial_.polynomial.toPointwiseLinear( self, template.domainMin( ), template.domainMax( ), accuracy )
+        xys = polynomial_.polynomial.toPointwise_withLinearXYs( self, self.domainMin( ), self.domainMax( ), accuracy )
         return( pointwise( self.axes, xys, accuracy = accuracy ) )
 
     @staticmethod
     def defaultAxes( energyName = 'energy_in', energyUnit = 'eV', multiplicityName = base.multiplicityToken ) :
 
         axes_ = axes.axes( dimension = 2 )
-        axes_[0] = axes.axis( energyName, 0, energyUnit, frame = axes.labToken, interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-        axes_[1] = axes.axis( multiplicityName, 1, '', frame = axes.labToken )
+        axes_[0] = axes.axis( energyName, 0, energyUnit, interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
+        axes_[1] = axes.axis( multiplicityName, 1, '' )
         return( axes_ )
 
 class partialProduction( baseClasses.formBase ) :
@@ -516,7 +552,7 @@ class partialProduction( baseClasses.formBase ) :
 
         return( tokens.partialProductionFormToken )
 
-    def toPointwiseLinear( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
 
         from fudge.core.utilities import brb
         brb.objectoutline( self.data )
@@ -526,9 +562,10 @@ class partialProduction( baseClasses.formBase ) :
 
         return( [] )
 
-def parseXMLNode( multElement, linkData={} ):
+def parseXMLNode( multElement, xPath=[], linkData={} ):
     """ translate an xml <multiplicity> element into fudge """
 
+    xPath.append( multElement.tag )
     nativeData = multElement.get('nativeData')
     mult = component( nativeData )
     if nativeData==tokens.unknownFormToken: mult.addForm( unknown() )
@@ -542,10 +579,8 @@ def parseXMLNode( multElement, linkData={} ):
                 tokens.groupedWithCrossSectionFormToken: groupedWithCrossSection,
                 }.get( form.tag )
         if formClass is None: raise Exception("encountered unknown multiplicity form: %s" % form.tag)
-        try:
-            newForm = formClass.parseXMLNode( form, linkData )
-        except Exception as e:
-            raise Exception ("/%s %s" % (form.tag, e))
+        newForm = formClass.parseXMLNode( form, xPath, linkData )
         mult.addForm( newForm )
         newForm.setParent( mult )
+    xPath.pop()
     return mult

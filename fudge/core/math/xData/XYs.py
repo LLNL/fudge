@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -72,7 +97,8 @@ def raiseNotSameUnit( v1, v2 ) :
 def raiseNotSameUnits( self, other, checkXOnly = False ) :
 
     if( not( isinstance( other, XYs ) ) ) : raise TypeError( 'other instance of %s and not XYs' % brb.getType( other ) )
-    if( len( self.axes ) != len( other.axes ) ) : raise Exception( 'axes not the same' )
+    if( len( self.axes ) != 2 ) : raise Exception( "self's axes must be of length 2 not %d" % len( self.axes ) )
+    if( len( other.axes ) != 2 ) : raise Exception( "other's axes must be of length 2 not %d" % len( other.axes ) )
     raiseNotSameUnit( self.axes[0], other.axes[0] )
     if( not( checkXOnly ) ) : raiseNotSameUnit( self.axes[1], other.axes[1] )
 
@@ -107,10 +133,16 @@ def processUnits( unit1, unit2, operator ) :
 
 def getOtherAndUnit( self, other ) :
 
+    if( type( other ) == type( '' ) ) :     # If this is a string try to convert to a number or PhysicalQuantityWithUncertainty.
+        try :
+            other = float( other )
+        except :
+            other = physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty( other )
+
     if( fudgemath.isNumber( other ) ) :
         unit2 = ''
     elif( isinstance( other, physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty ) ) :
-        unit2 = other.getUnitName( )
+        unit2 = other.getUnitSymbol( )
         other = other.getValue( )
     elif( isinstance( other, XYs ) ) :
         raiseNotSameUnit( self.axes[0], other.axes[0] )
@@ -122,7 +154,7 @@ def getOtherAndUnit( self, other ) :
 def allow_XYsWithSameUnits_orNumberWithSameUnit( self, other ) :
 
     unit = self.axes[1].getUnit( )
-    if( type( other ) == type( '' ) ) :     # If its is a string try to convert to a number or PhysicalQuantityWithUncertainty.
+    if( type( other ) == type( '' ) ) :     # If this is a string try to convert to a number or PhysicalQuantityWithUncertainty.
         try :
             other = float( other )
         except :
@@ -130,7 +162,6 @@ def allow_XYsWithSameUnits_orNumberWithSameUnit( self, other ) :
     if( fudgemath.isNumber( other ) ) :
         if( unit != '' ) : raise ValueError( 'unitless number found where unit = "%s" needed' % unit )
     elif( isinstance( other, physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty ) ) :
-        if( unit == '' ) : raise ValueError( 'unit number = "%s" found where unitless needed' % other )
         other = other.getValueAs( unit )
     else :
          raiseNotSameUnits( self, other )
@@ -165,11 +196,11 @@ def compareAxisToParent( axis, parent_, parentAxisIndex ) :
     if( axis.getLabel( ) != parentAxis.getLabel( ) ) : 
         raise ValueError( "axis' label not the same: '%s' vs. '%s'" % ( axis.getLabel( ), parentAxis.getLabel( ) ) )
     if( axis.getUnit( ) != parentAxis.getUnit( ) ) : raise ValueError( "axis' units not the same: '%s' vs. '%s'" % ( axis.getUnit( ), parentAxis.getUnit( ) ) )
-    if( axis.frame != parentAxis.frame ) : raise ValueError( "axis' frames not the same: '%s' vs. '%s'" % ( axis.frame, parentAxis.frame ) )
 
 class XYs( pointwiseXY, ancestry ) :
 
     xData = monikerXYs
+    mutableYUnit = True     # For __imul__ and __idiv__.
 
     def __init__( self, axes_, data, accuracy, dataForm = "xys", initialSize = None, overflowSize = 10, biSectionMax = 6, 
             infill = True, safeDivide = False, index = None, value = None, parent = None, moniker = xData, isPrimaryXData = None, 
@@ -204,6 +235,7 @@ class XYs( pointwiseXY, ancestry ) :
         else :
             self.axes.setParent( self )
         self.index = index
+        if( value is not None ) : value = fudgemath.toFloat( value )
         self.value = value
         if( isPrimaryXData is not None ) : self.isPrimaryXData = isPrimaryXData
 
@@ -222,6 +254,12 @@ class XYs( pointwiseXY, ancestry ) :
 
     __radd__ = __add__
 
+    def __iadd__( self, other ) :
+
+        other_ = allow_XYsWithSameUnits_orNumberWithSameUnit( self, other )
+        pointwiseXY.__iadd__( self, other_ )
+        return( self )
+
     def __sub__( self, other ) :
 
         other_ = allow_XYsWithSameUnits_orNumberWithSameUnit( self, other )
@@ -232,6 +270,12 @@ class XYs( pointwiseXY, ancestry ) :
         sub = self.__sub__( other )
         return( sub.__neg__( ) )
 
+    def __isub__( self, other ) :
+
+        other_ = allow_XYsWithSameUnits_orNumberWithSameUnit( self, other )
+        pointwiseXY.__isub__( self, other_ )
+        return( self )
+
     def __mul__( self, other ) :
 
         unit1 = self.axes[1].getUnit( )
@@ -241,6 +285,18 @@ class XYs( pointwiseXY, ancestry ) :
         return( return_pointwiseXY_AsXYs( self, m, units = { 1 : unit } ) )
 
     __rmul__ = __mul__
+
+    def __imul__( self, other ) :
+
+        other, otherUnit1 = getOtherAndUnit( self, other )
+        if( not( self.mutableYUnit ) ) :
+            if( otherUnit1 != '' ) : raise Exception( "Self's y-unit is immutable and other has unit of '%s'" % otherUnit1 )
+        pointwiseXY.__imul__( self, other )
+        if( otherUnit1 != '' ) :
+            selfUnit1 = self.axes[1].getUnit( )
+            unit = processUnits( selfUnit1, otherUnit1, '*' )
+            self.axes[1].setUnit( unit )
+        return( self )
 
     def __div__( self, other ) :
 
@@ -257,6 +313,18 @@ class XYs( pointwiseXY, ancestry ) :
         d = pointwiseXY.__rdiv__( self, other )
         unit = processUnits( unit1, unit2, '/' )
         return( return_pointwiseXY_AsXYs( self, d, units = { 1 : unit } ) )
+
+    def __idiv__( self, other ) :
+
+        other, otherUnit1 = getOtherAndUnit( self, other )
+        if( not( self.mutableYUnit ) ) :
+            if( otherUnit1 != '' ) : raise Exception( "Self's y-unit is immutable and other has unit of '%s'" % otherUnit1 )
+        pointwiseXY.__idiv__( self, other )
+        if( otherUnit1 != '' ) :
+            selfUnit1 = self.axes[1].getUnit( )
+            unit = processUnits( selfUnit1, otherUnit1, '/' )
+            self.axes[1].setUnit( unit )
+        return( self )
 
     def getitem_units( self, index ) :
 
@@ -381,6 +449,11 @@ class XYs( pointwiseXY, ancestry ) :
 
         d = pointwiseXY.dullEdges( self, lowerEps = lowerEps, upperEps = upperEps, positiveXOnly = positiveXOnly );
         return( self.returnAsClass( self, d ) )
+
+    def getDimensions( self ) :
+        """Returns the dimensions (2 for XYs) for this type of data."""
+
+        return( 2 )
 
     def getValue_units( self, x ) :
 
@@ -510,63 +583,74 @@ class XYs( pointwiseXY, ancestry ) :
     def convolute( self, func, fpars ) : 
         raise NotImplementedError( 'Currently, convolute is not implemented' )
 
-    def _group( self, groupBoundaries, f2 = None, f3 = None, norm = None, asXYs = False ) :
+    def _group( self, xs, f2 = None, f3 = None, norm = None, asXYs = False ) :
         """
         This function will be renamed to group when it is completed. Called ``_group`` for now so that it does not conflict with
         Dave Brown's version when using svn. That is, this version will eventually replace Dave's.
 
-        This function groups self onto the boudaries given in ``groupBoundaries``. If ``asXYs`` is ``False``, the returned 
-        list, here in called ``groups``, has ``length = len( groupBoundaries ) - 1`` with the :math:`{i-1}^{th}` item begin the 
-        integral along the :math:`x` axis, :math:`dx`, from ``x[i] = groupBoundaries[i]`` to ``x[i+1] = groupBoundaries[i+1]`` defined as
-        ::
+        The argument ``xs`` is a list of x-values with ``xs[i] < xs[i+1]``. This function calculates the integrals
 
-            groups[i] = self(x) / n[i]                       for f2 = f3 = None
-            groups[i] = self(x) * f2(x) / n[i]               for f2 = None
-            groups[i] = self(x) * f3(x) / n[i]               for f3 = None
-            groups[i] = self(x) * f2(x) * f(x) / n[i]        otherwise
+        .. math::
+            \int_{xs[i]}^{xs[i+1]} dx \; { f(x) \over n[i] }
 
-        Here norm can be None, ``dx`` or a list of length ``len( groupBoundaries ) - 1`` of numbers.
-        
-            +---------------+----------------+
-            | norm          |  n[i]          |
-            +---------------+----------------+
-            | None          |  1             |
-            +---------------+----------------+
-            | 'dx'          |  x[i+1] - x[i] |
-            +---------------+----------------+
-            | a python list |  norm[i]       |
-            +---------------+----------------+
+        where :math:`f(x)` is defined as
+            +------------------------------------+--------------------+
+            | :math:`f(x)`                       |  conditional       |
+            +====================================+====================+
+            | :math:`f_1(x)`                     | for f2 = f3 = None |
+            +------------------------------------+--------------------+
+            | :math:`f_1(x) \, f_2(x)`           | for f3 = None      |
+            +------------------------------------+--------------------+
+            | :math:`f_1(x) \, f_3(x)`           | for f2 = None      |
+            +------------------------------------+--------------------+
+            | :math:`f_1(x) \, f_2(x) \, f_3(x)` | otherwise          |
+            +------------------------------------+--------------------+
+        :math:`f_1(x)` is self evaluated at `x` and `n[i]` is a normalization determined from the `norm` arugment as
+            +---------------+---------------+
+            | norm          | n[i]          |
+            +===============+===============+
+            | None          | 1             |
+            +---------------+---------------+
+            | 'dx'          | x[i+1] - x[i] |
+            +---------------+---------------+
+            | a python list | norm[i]       |
+            +---------------+---------------+
+        The arguments f2 (and f3) must be None of an XYs instance.
 
-        If ``asXYs`` is ``True``, an instance of class ``XYs`` is returned with the x-values from ``groupBoundaries`` and with 
-        interpolation 'linear,flat'.
+
+        If ``asXYs`` is ``False``, then ``len( xs ) - 1`` integrals are returned.
+        If ``asXYs`` is ``True``, the last integral's values is appended to the end to make a list of length ``len( xs )``, and 
+        an instance of class ``XYs`` is returned with the x-values from ``xs``, the y-values from the integrals and the interpolation is 'linear,flat'.
+
+        Historical note: the word group comes from deterministic neutron transport (e.g., transport used to simulate nuclear reactors.
         """
 
         accuracy, yUnit = self.getAccuracy( ), PhysicalQuantityWithUncertainty( 1, self.axes[1].getUnit( ) )
         if( f2 is None ) :
             if( f3 is None ) : 
-                grouped = self.groupOneFunctions( groupBoundaries, norm = norm )
+                grouped = self.groupOneFunction( xs, norm = norm )
             else :
-                grouped = self.groupTwoFunctions( groupBoundaries, f3, norm = norm )
+                grouped = self.groupTwoFunctions( xs, f3, norm = norm )
                 yUnit = yUnit * PhysicalQuantityWithUncertainty( 1,  f3.axes[1].getUnit( ) )
                 accuracy = max( accuracy, f3.getAccuracy( ) )
         else :
             yUnit = yUnit * PhysicalQuantityWithUncertainty( 1, f2.axes[1].getUnit( ) )
             accuracy = max( accuracy, f2.getAccuracy( ) )
             if( f3 is None ) :
-                grouped = self.groupTwoFunctions( groupBoundaries, f2, norm = norm )
+                grouped = self.groupTwoFunctions( xs, f2, norm = norm )
             else :
-                grouped = self.groupThreeFunctions( groupBoundaries, f2, f3, norm = norm )
+                grouped = self.groupThreeFunctions( xs, f2, f3, norm = norm )
                 yUnit = yUnit * PhysicalQuantityWithUncertainty( 1, f3.axes[1].getUnit( ) )
                 accuracy = max( accuracy, f3.getAccuracy( ) )
         if( norm is None ) :
             yUnit = PhysicalQuantityWithUncertainty( 1, self.axes[0].getUnit( ) ) * yUnit
         elif( norm != 'dx' ) :
-            pass                    # Need to add units to norm. That is, norm, grouped and groupBoundaries should be an instance of Ys.
+            pass                    # Need to add units to norm. That is, norm, grouped and xs should be an instance of Ys.
         if( asXYs ) :
             grouped.append( grouped[-1] )
             axes_ = axes.defaultAxes( dependentInterpolation = axes.flatToken, 
-                labelsUnits = { 0 : [ self.axes[0].getLabel( ), self.axes[0].getUnit( ) ], 1 : [ "", yUnit.getUnitName( ) ] } )
-            grouped = XYs( axes_, [ groupBoundaries, grouped ], accuracy, dataForm = 'xsandys' )
+                labelsUnits = { 0 : [ self.axes[0].getLabel( ), self.axes[0].getUnit( ) ], 1 : [ "", yUnit.getUnitSymbol( ) ] } )
+            grouped = XYs( axes_, [ xs, grouped ], accuracy, dataForm = 'xsandys' )
         return( grouped )
         
     def group( self, groupBoundaries = [], groupUnit = '' ):
@@ -598,17 +682,20 @@ class XYs( pointwiseXY, ancestry ) :
         
         return grouped
         
-    def groupOneFunction( self, groupBoundaries, norm = None ) :
-        '''.. note:: Need unit of groupBoundaries.'''
-        return( pointwiseXY.groupOneFunction( self, groupBoundaries, norm = norm ) )
+    def groupOneFunction( self, xs, norm = None ) :
+        '''.. note:: Need unit of xs.'''
 
-    def groupTwoFunctions( self, groupBoundaries, f2, norm = None ) :
-        '''.. note:: Need unit of groupBoundaries.'''
-        return( pointwiseXY.groupTwoFunctions( self, f2, groupBoundaries, norm = norm ) )
+        return( pointwiseXY.groupOneFunction( self, xs, norm = norm ) )
 
-    def groupThreeFunctions( self, groupBoundaries, f2, f3, norm = None ) :
-        '''.. note:: Need unit of groupBoundaries.'''
-        return( pointwiseXY.groupThreeFunctions( self, f2, f3, groupBoundaries, norm = norm ) )
+    def groupTwoFunctions( self, xs, f2, norm = None ) :
+        '''.. note:: Need unit of xs.'''
+
+        return( pointwiseXY.groupTwoFunctions( self, f2, xs, norm = norm ) )
+
+    def groupThreeFunctions( self, xs, f2, f3, norm = None ) :
+        '''.. note:: Need unit of xs.'''
+
+        return( pointwiseXY.groupThreeFunctions( self, f2, f3, xs, norm = norm ) )
 
     def integrate( self, xMin = None, xMax = None ) :
         '''
@@ -660,14 +747,14 @@ class XYs( pointwiseXY, ancestry ) :
         xMax = min( xMax, self.xMax( ), f2.xMax( ), f3.xMax( ) )
         return( pointwiseXY.groupThreeFunctions( self, f2, f3, [ xMin, xMax ] )[0] )
 
-    def toPointwiseLinear( self, accuracy = None, lowerEps = 0, upperEps = 0, cls = None ) :
+    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0, cls = None ) :
 
         return( self.changeInterpolation( axes.linearToken, axes.linearToken, accuracy = self.getAccuracy( ), lowerEps = lowerEps, upperEps = upperEps,
             cls = cls ) )
 
     def toXML( self, tag = 'xData', indent = '', incrementalIndent = '  ', pairsPerLine = 10, xyFormatter = None, xySeparater = ' ' ) :
 
-        return( '\n'.join( self.toXMLList( indent = indent, incrementalIndent = incrementalIndent, pairsPerLine = pairsPerLine, xyFormatter = xyFormatter, 
+        return( '\n'.join( self.toXMLList( tag = tag, indent = indent, incrementalIndent = incrementalIndent, pairsPerLine = pairsPerLine, xyFormatter = xyFormatter, 
             xySeparater = xySeparater ) ) )
 
     def toXMLList( self, tag = None, indent = '', incrementalIndent = '  ', pairsPerLine = 10, xyFormatter = None, xySeparater = ' ', oneLine = False ) :
@@ -761,8 +848,12 @@ class XYs( pointwiseXY, ancestry ) :
             moniker = moniker, isPrimaryXData = isPrimaryXData, changeInterpolationSubFunction = self.changeInterpolationSubFunction ) )
 
     @classmethod
-    def parseXMLNode( cls, xdataElement, linkData={} ):
-        """ translate anything directly inheriting XYs (pointwise multiplicity or xsc for example) back from xml """
+    def parseXMLNode( cls, xdataElement, xPath=[], linkData={} ):
+        """
+        Translate anything directly inheriting XYs (pointwise multiplicity or xsc for example) back from xml.
+        """
+
+        xPath.append( xdataElement.tag )
         attrs = dict( xdataElement.items() )
         if "xData" in attrs:
             assert attrs.pop("xData") == monikerXYs
@@ -771,13 +862,22 @@ class XYs( pointwiseXY, ancestry ) :
         if 'length' in attrs: del attrs['length']
         if 'index' in attrs: attrs['index'] = int(attrs['index'])
         attrs['moniker'] = xdataElement.tag
-        axes_ = axes.parseXMLNode( xdataElement[0] )
+
+        axes_ = axes.parseXMLNode( xdataElement[0], xPath )
+        interpolation = None
         if axes_[0].interpolation.dependent==axes.chargedParticleToken:
+            # Can't create pointwiseXY_C with special interpolation. Instead pretend it's lin-lin, but also create a 'changeInterpolationSubFunction'
+            interpolation = "%s,%s" % ( axes.linearToken, axes.linearToken )
             from fudge.gnd.reactionData import crossSection
             attrs['changeInterpolationSubFunction'] = crossSection.chargeParticle_changeInterpolationSubFunction
-        data = map(float, xdataElement[1].text.split())
-        data = zip( data[::2], data[1::2] )
-        return cls( axes_, data, float(attrs.pop('accuracy')), **attrs )
+        else :
+            interpolation = axes_[0].interpolation
+            interpolation = "%s,%s" % ( interpolation.independent, interpolation.dependent )
+
+        data, extraCharacters = pointwiseXY_C.createFromString( xdataElement[1].text, float( attrs.pop( 'accuracy' ) ), 6, interpolation = interpolation )
+        XYs_ = cls( axes_, data, data.getAccuracy( ), **attrs )
+        xPath.pop()
+        return XYs_
 
     @staticmethod
     def createFromFunction( axes_, Xs, func, parameters, accuracy, biSectionMax, checkForRoots = False, infill = 1, safeDivide = 1 ) :
@@ -792,11 +892,16 @@ class XYs( pointwiseXY, ancestry ) :
         biSectionMax = max( 0, biSectionMax - math.log( len( xys ) / len( Xs ) ) / math.log( 2 ) )
         return( XYs( axes_, xys, accuracy, infill = infill, safeDivide = safeDivide ) )
 
+    @staticmethod
+    def defaultAxes( labelsUnits = {} ) :
+
+        return( axes.defaultAxes( dimension = 2, labelsUnits = labelsUnits ) )
+
 if( __name__ == '__main__' ) :
 
     vl1 = axes.axes( )
-    vl1[0] = axes.axis( 'energy_in', 0, 'eV', frame = axes.labToken, interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-    vl1[1] = axes.axis( 'crossSection', 1, 'b', frame = axes.labToken )
+    vl1[0] = axes.axis( 'energy_in', 0, 'eV', interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
+    vl1[1] = axes.axis( 'crossSection', 1, 'b' )
     pXY1 = XYs( vl1, [ [ 1, 0 ], [ 3, 2 ], [ 4, 1 ] ], 1e-3, safeDivide = True, biSectionMax = 7 )
     pXY2 = XYs( vl1, [ [ 1, 0 ], [ 4, 2 ] ], 1e-3, safeDivide = True, biSectionMax = 7 )
 

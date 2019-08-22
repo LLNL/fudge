@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -105,8 +130,9 @@ if __name__ == '__main__':
         try:
             RS = reactionSuite.readXML( filename )
         except:
-            try: RS,c = endfFileToGND.endfFileToGND( filename, singleMTOnly=MT, parseCrossSectionOnly=True,
-                    skipBadData=True )
+            try:
+                rce = endfFileToGND.endfFileToGND( filename, singleMTOnly=MT, parseCrossSectionOnly=True, skipBadData=True )
+                RS, c = rce['reactionSuite'], rce['covarianceSuite']
             except:
                 print "File %s doesn't seem to be a legal ENDF or GND file!" % filename
                 sys.exit()
@@ -116,9 +142,9 @@ if __name__ == '__main__':
         xsc = reac[0].crossSection
         if xsc.forms.keys() == ['resonancesWithBackground']:
             RS.reconstructResonances( opts.tolerance )
-        try: pwxs = xsc.toPointwiseLinear( 1e-08 )
+        try: pwxs = xsc.toPointwise_withLinearXYs( 1e-08 )
         except:
-            pwxs = xsc.toPointwiseLinear( 1e-9 )
+            pwxs = xsc.toPointwise_withLinearXYs( 1e-9 )
         return pwxs
 
     xs1, xs2 = getXS(args[1], mt), getXS(args[2], mt)

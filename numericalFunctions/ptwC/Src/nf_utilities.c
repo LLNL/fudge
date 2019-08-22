@@ -1,5 +1,30 @@
 /*
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 */
 
@@ -30,52 +55,31 @@ static const char badNorm_message[] = "bad norm";
 static const char badIntegrationInput_message[] = "bad integration input";
 static const char otherInterpolation_message[] = "other integration not supported";
 static const char failedToConverge_message[] = "failed to converge";
+static const char oddNumberOfValues_message[] = "odd number of inputted values";
 
-static int nfu_miscInitialized = 0;
-static double nfu_NAN, nfu_Inf, nfu_mInf;
 static int nfu_debugging = 0;
 
-static void nfu_miscInitialize( void );
-/*
-************************************************************
-*/
-static void nfu_miscInitialize( void ) {
-
-    char *e;
-
-    nfu_NAN = strtod( "nan", &e );
-    nfu_Inf = strtod( "inf", &e );
-    nfu_mInf = strtod( "-inf", &e );
-    nfu_miscInitialized = 1;
-}
 /*
 ************************************************************
 */
 double nfu_getNAN( void ) {
 
-    if( !nfu_miscInitialized ) nfu_miscInitialize( );
-    return( nfu_NAN );
+    return( NAN );
 }
 /*
 ************************************************************
 */
 int nfu_isNAN( double d ) {
 
-    int i;
-    char *p1 = (char *) &nfu_NAN, *p2 = (char *) &d;
-
-    if( !nfu_miscInitialized ) nfu_miscInitialize( );
-    for( i = 0; i < sizeof( double ); i++, p1++, p2++ ) if( *p1 != *p2 ) return( 0 );
-    return( 1 );
+    return( isnan( d ) );
 }
 /*
 ************************************************************
 */
 double nfu_getInfinity( double sign ) {
 
-    if( !nfu_miscInitialized ) nfu_miscInitialize( );
-    if( sign < 0 ) return( nfu_mInf );
-    return( nfu_Inf );
+    if( sign < 0 ) return( -INFINITY );
+    return( INFINITY );
 }
 /*
 ************************************************************
@@ -103,6 +107,7 @@ const char *nfu_statusMessage( nfu_status status ) {
     case nfu_badIntegrationInput : return( badIntegrationInput_message );
     case nfu_otherInterpolation : return( otherInterpolation_message );
     case nfu_failedToConverge : return( failedToConverge_message );
+    case nfu_oddNumberOfValues : return( oddNumberOfValues_message );
     }
     return( unknownStatus_message );
 }

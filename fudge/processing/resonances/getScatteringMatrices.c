@@ -1,7 +1,34 @@
 /*
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 */
+
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
 #include <Python.h>
 #include <arrayobject.h>    /* for numpy c interface */
@@ -64,9 +91,9 @@ static PyObject *getScatteringMatrices(PyObject *self, PyObject *args)
     	&PyArray_Type, &widths, &PyArray_Type, &penetrabilities))  return NULL;
 
     /* Get dimensions from input */
-    Ne=(int)E->dimensions[0];
-    Nres=(int)Eres->dimensions[0];
-    Nch=(int)widths->dimensions[0];
+    Ne=(int) PyArray_DIMS( E )[0];
+    Nres=(int) PyArray_DIMS( Eres )[0];
+    Nch=(int) PyArray_DIMS( widths )[0];
 
     dims[0] = Ne * Nch * Nch;
 
@@ -151,7 +178,7 @@ static PyObject *pointwiseXY_C_SetPyErrorExceptionReturnNull( char *s, ... ) {
 /* ==== Create 1D Carray from PyArray ======================
     Assumes PyArray is contiguous in memory.             */
 static double *pyvector_to_Carrayptrs(PyArrayObject *arrayin)  {
-    return (double *) arrayin->data;  /* pointer to arrayin data as double */
+    return (double *) PyArray_DATA( arrayin );  /* pointer to arrayin data as double */
 }
 /* ==== Create 2D Carray from PyArray ======================
     Assumes PyArray is contiguous in memory.
@@ -160,10 +187,10 @@ static double **pymatrix_to_Carrayptrs(PyArrayObject *arrayin)  {
     double **c, *a;
     int i,n,m;
 
-    n=(int)arrayin->dimensions[0];
-    m=(int)arrayin->dimensions[1];
+    n=(int) PyArray_DIMS( arrayin )[0];
+    m=(int) PyArray_DIMS( arrayin )[1];
     c=ptrvector(n);
-    a=(double *) arrayin->data;  /* pointer to arrayin data as double */
+    a=(double *) PyArray_DATA( arrayin );  /* pointer to arrayin data as double */
     for ( i=0; i<n; i++)  {
     	c[i]=a+i*m;  }
     return c;

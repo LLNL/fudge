@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 from fudge.core.ancestry import ancestry
@@ -13,7 +38,7 @@ fissionComponentToken = 'fissionComponent'
 partialGammaProductionToken = 'partialGammaProduction'
 
 class base_reaction( ancestry ):
-    """ base class for all types of reaction """
+    """Base class for all types of reaction."""
 
     def __init__( self, token, label, ENDF_MT, crossSection = None, documentation = None, attributes = {} ):
 
@@ -103,69 +128,92 @@ class base_reaction( ancestry ):
         del info['isTwoBody']
 
         if info['checkEnergyBalance']:
-            # get list of energy deposition data for all products. If a product has no energy dep. data,
-            # but its decay product does, use that instead. Also determine whether reaction has *full*
-            # energy deposition info: do all products (or all their decay prods) have energy dep info?
+            # Calculate energy deposition data for all products, and for decay products.
+            # Then recursively check the product list for energy balance at each step of the reaction/decay
+            # At each step, if we have energy deposition for *every* product in the list, we can rigorously check
+            # energy balance. Otherwise, can only check that we don't exceed available energy.
             try:
                 self.calculateDepositionData( info['processInfo'], '' )
             except Exception, e:
                 warnings.append( warning.EnergyDepositionExceptionRaised( str(e), self ) )
                 return warnings
 
-            energyDep = []
-            energyDepCount = 0
-            for product in self.outputChannel:
-                if 'depositionEnergy' in product.data:
-                    energyDep.append( [product.getLabel(), product.data['depositionEnergy']['pointwise'] ] )
-                    energyDepCount += 1
-                elif product.decayChannel is not None:
-                    decayEnergyDep = [[dProd.getLabel(), dProd.data['depositionEnergy']['pointwise']]
-                            for dProd in product.decayChannel if 'depositionEnergy' in dProd.data]
-                    energyDep.extend( decayEnergyDep )
-                    if len(decayEnergyDep) == len(product.decayChannel): energyDepCount += 1
-            if energyDep:
-                totalEDep = energyDep[0][1]
-                for idx in range(1,len(energyDep)):
-                    if totalEDep.getDomain() != energyDep[idx][1].getDomain():
-                        try:
-                            totalEDep, energyDep[idx][1] = totalEDep.mutualify(1e-8,0,0, energyDep[idx][1], 1e-8,0,0)
-                        except Exception, e:
-                            warnings.append( warning.EnergyDepositionExceptionRaised( str(e), self ) )
-                            return warnings
-                    totalEDep += energyDep[idx][1]
-            else: totalEDep = []
+            def checkProductsForEnergyBalance( products, Qs, flags = {'fission':False, 'decay':False} ):
+                # sample usage: for the reaction n + F19 -> n + (F19_c -> F19 + gamma), this function
+                # should be called twice, to test energy balance at each step of the reaction.
+                # First call: products = [n, F19_c] and Qs = [Q_reaction],
+                # second call: products = [n, F19, gamma] and Qs = [Q_reaction, Q_decay].
+                edepWarnings = []
 
-            def energyDepositedPerProduct( energyDep, ein ):
-                """ if energy doesn't balance, determine how much is deposited in each product """
-                result = []
-                for prod, edep in energyDep:
-                    edep = edep.getValue( ein )
-                    if edep is None: result.append( (prod, 0) )
-                    else: result.append( ( prod, 100.0 * edep/(ein + Q) ) )
-                return sorted(result, key=lambda foo: foo[1])[::-1]
+                energyDep = [[prod.getLabel(), prod.data['depositionEnergy'].getNativeData()]
+                        for prod in products if 'depositionEnergy' in prod.data]
+                if energyDep:
+                    totalEDep = energyDep[0][1]
+                    for idx in range(1,len(energyDep)):
+                        if totalEDep.getDomain() != energyDep[idx][1].getDomain():
+                            try:
+                                totalEDep, energyDep[idx][1] = totalEDep.mutualify(
+                                        1e-8,0,0, energyDep[idx][1], 1e-8,0,0)
+                            except Exception, e:
+                                edepWarnings.append( warning.EnergyDepositionExceptionRaised( str(e), self ) )
+                                return warnings
+                        totalEDep += energyDep[idx][1]
+                else: totalEDep = []
+                Qsum = sum(Qs)
 
-            # now we have total energy deposition for all particles, use to check energy balance.
-            # a few special cases to consider:
-            if self.outputChannel.isFission():
-                # fission products aren't listed (so far, anyway), so about 85% of available energy should be missing:
-                for i,(ein,edep) in enumerate(totalEDep):
-                    if edep > abs((ein + Q) * info['fissionEnergyBalanceLimit']):
-                        warnings.append( warning.fissionEnergyImbalance( PQU(ein, totalEDep.axes[0].unit),
-                            i, energyDepositedPerProduct(energyDep, ein), self ) )
-            elif len(self.outputChannel) == energyDepCount:
-                # have full energy dep. data for all products, so we can rigorously check energy balance:
-                for i,(ein,edep) in enumerate(totalEDep):
-                    if ( abs(edep - (ein+Q)) > abs((ein+Q) * info['dEnergyBalanceRelative'])
-                            and abs(edep - (ein+Q)) > info['dEnergyBalanceAbsolute'] ):
-                        warnings.append( warning.energyImbalance( PQU(ein, totalEDep.axes[0].unit),
-                            i, energyDepositedPerProduct(energyDep, ein), self ) )
-            else:
-                # missing some products, so just check that outgoing energy doesn't exceed incoming:
-                for i,(ein,edep) in enumerate(totalEDep):
-                    if ( (edep - (ein+Q)) > ((ein+Q) * info['dEnergyBalanceRelative'])
-                            and (edep - (ein+Q)) > info['dEnergyBalanceAbsolute'] ):
-                        warnings.append( warning.energyImbalance( PQU(ein, totalEDep.axes[0].unit),
-                            i, energyDepositedPerProduct(energyDep, ein), self ) )
+                def energyDepositedPerProduct( energyDep, ein ):
+                    """ if energy doesn't balance, determine how much is deposited in each product """
+                    result = []
+                    availableEnergy = ein + Qsum
+                    if availableEnergy == 0: availableEnergy = sum( [edep.getValue(ein) for p,edep in energyDep] )
+                    for prod, edep in energyDep:
+                        edep = edep.getValue( ein )
+                        if edep is None: result.append( (prod, 0) )
+                        else: result.append( ( prod, 100.0 * edep/availableEnergy ) )
+                    return sorted(result, key=lambda foo: foo[1])[::-1]
+
+                # now we have total energy deposition for all particles, use to check energy balance.
+                # a few special cases to consider:
+                if flags['fission']:
+                    # fission products aren't listed (so far, anyway), so about 85% of available energy should be missing:
+                    for i,(ein,edep) in enumerate(totalEDep):
+                        if edep > abs((ein + Qsum) * info['fissionEnergyBalanceLimit']):
+                            edepWarnings.append( warning.fissionEnergyImbalance( PQU(ein, totalEDep.axes[0].unit),
+                                i, ein+Qsum, energyDepositedPerProduct(energyDep, ein), self ) )
+                elif len(products) == len(energyDep):
+                    # have full energy dep. data for all products, so we can rigorously check energy balance:
+                    for i,(ein,edep) in enumerate(totalEDep):
+                        if ( abs(edep - (ein+Qsum)) > abs((ein+Qsum) * info['dEnergyBalanceRelative'])
+                                and abs(edep - (ein+Qsum)) > info['dEnergyBalanceAbsolute'] ):
+                            edepWarnings.append( warning.energyImbalance( PQU(ein, totalEDep.axes[0].unit),
+                                i, ein+Qsum, energyDepositedPerProduct(energyDep, ein), self ) )
+                else:
+                    # missing some products, so just check that outgoing energy doesn't exceed incoming:
+                    for i,(ein,edep) in enumerate(totalEDep):
+                        if ( (edep - (ein+Qsum)) > ((ein+Qsum) * info['dEnergyBalanceRelative'])
+                                and (edep - (ein+Qsum)) > info['dEnergyBalanceAbsolute'] ):
+                            edepWarnings.append( warning.energyImbalance( PQU(ein, totalEDep.axes[0].unit),
+                                i, ein+Qsum, energyDepositedPerProduct(energyDep, ein), self ) )
+
+                if edepWarnings:
+                    context = "Energy balance"
+                    if flags['decay']: context += " (after decay)"
+                    context += " for products: " + ', '.join( [prod.particle.name for prod in products] )
+                    warnings.append( warning.context( context, edepWarnings ) )
+
+                # now recursively check decay products, if any:
+                for pidx, currentProd in enumerate(products):
+                    if currentProd.decayChannel is not None:
+                        flags['decay'] = True
+                        checkProductsForEnergyBalance(
+                                products[:pidx] + [p for p in currentProd.decayChannel] + products[pidx+1:],
+                                Qs + [currentProd.decayChannel.getConstantQAs('eV')],
+                                flags
+                                )
+                # end of helper function checkProductsForEnergyBalance
+
+            checkProductsForEnergyBalance( products = [p1 for p1 in self.outputChannel], Qs = [Q],
+                    flags = {'fission':self.outputChannel.isFission(), 'decay':False} )
 
         return warnings
 
@@ -241,28 +289,25 @@ class base_reaction( ancestry ):
         return( self.documentation[doc.name] )
 
     def getQ( self, unit, final = True, groundStateQ = False ) :
-        """Returns the Q-value for this reaction. Converted to float if possible, otherwis a string value is returned"""
+        """Returns the Q-value for this reaction. Converted to float if possible, otherwise a string value is returned."""
 
-        if 'constant' in self.Q.forms: return self.Q.getConstantAs( unit )
-        else:
+        if( 'constant' in self.Q.forms ) :
+            return( self.Q.getConstantAs( unit ) )
+        else :      # BRB ?????? getQ needs work with redesign of reaction stuff.
             raise Exception
 
     def setQ( self, Q ) :
+
         self.Q.setParent( self )
         self.Q = Q
 
-    def toXMLList( self, flags, verbosityIndent = '', indent = '' ):
-
-        if( flags['verbosity'] >= 10 ) :
-            print '%s%s:' % ( verbosityIndent, self.moniker ),
-            if hasattr(self, 'outputChannel'): print self.outputChannel.toString( simpleString = True )
-            elif self.moniker == productionToken: print self
-            elif self.moniker == summedReactionToken: print self.name
+    def toXMLList( self, flags, indent = '' ):
 
         attributeString = ""
         for attribute in self.attributes : attributeString += ' %s="%s"' % ( attribute, self.attributes[attribute] )
 
         xmlString = [ '%s<%s label="%s"' % ( indent, self.moniker, self.label ) ]
+# BRB ????????? self should always have an outputChannel
         if hasattr(self, 'outputChannel'):  # for reaction, fissionComponent and partialGammaProduction
             xmlString[-1] += ' outputChannel="%s"' % self.outputChannel
             fissionGenre = self.outputChannel.getFissionGenre( )
@@ -285,7 +330,7 @@ class base_reaction( ancestry ):
 
         xmlString += self.getCrossSection( ).toXMLList( indent = indent+'  ' )
         if hasattr(self, 'outputChannel'):
-            xmlString += self.outputChannel.toXMLList( flags, verbosityIndent + '    ', indent = indent+'  ' )
+            xmlString += self.outputChannel.toXMLList( flags, indent = indent+'  ' )
             for key in self.data: xmlString += self.data[key].toXMLList( indent = indent+'  ' )
         elif hasattr(self, 'Q'):
             xmlString += self.Q.toXMLList( indent = indent+'  ' )

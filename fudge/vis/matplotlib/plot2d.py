@@ -1,13 +1,34 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 from fudge.core.utilities.brb import uniquify
 from pqu.physicalQuantityWithUncertainty import PhysicalQuantityWithUncertainty as PQU
 from pqu.physicalQuantityWithUncertainty import valueOrPQ
-from fudge.core.math.endl2dmathClasses import endl2dmath
-from fudge.core.math.endl3dmathClasses import endl3dmath
-from fudge.core.math.xData.XYs import XYs
-from fudge.core.math.xData.W_XYs import W_XYs
 
 __metaclass__ = type
 
@@ -29,6 +50,24 @@ defaultColors = [ 'k','r','g','b','y','brown','gray','violet','cyan',
                   'magenta','orange','indigo','maroon','turquoise',
                   'darkgreen','0.20','0.40','0.60','0.80' ]
 nColors = len( defaultColors )
+
+def convertUnit( unitFrom, unitTo, xs, xErrs, legend ) :
+
+    unit = unitFrom
+    if( ( unitFrom is not None ) and ( unitTo is not None ) and ( unitFrom != unitTo ) ) :
+        try:
+            conversionFactor = valueOrPQ( 1.0, unitFrom = unitFrom, unitTo = unitTo, asPQU = False )
+        except TypeError, err: 
+            if legend == None: legend="name suppressed"
+            raise TypeError( "In plot2d.convertUnit, " + err.message + ', error from PQU: ' + unitFrom + ' -> ' + unitTo + ' for dataset ' + str( legend ) )
+        except NameError, err:
+            if legend == None: legend="name suppressed"
+            raise NameError( "In plot2d.convertUnit, " + err.message + ', error from PQU: ' + unitFrom + ' -> ' + unitTo + ' for dataset ' + str( legend ) )
+        if( xErrs != None ) :
+            for i1, x1 in enumerate( xErrs ) : xErrs[i1] = conversionFactor * x1
+        for i1, x1 in enumerate( xs ) : xs[i1] = conversionFactor * x1
+        unit = unitTo
+    return( unit )
 
 #--------------------------------------------------------
 #
@@ -71,6 +110,7 @@ class AxisSettings( TextSettings ):
         - `gridOn` : (optional)
     
     '''
+
     def __init__( self, axisMin=None, axisMax=None, autoscale=True, isLog=False, unit=None,
             gridOn=False, label=None, font=None, fontSize=20, fontWeight='normal' ):
         TextSettings.__init__(self, text=label, font=font, fontSize=fontSize, fontWeight=fontWeight )
@@ -92,7 +132,25 @@ class AxisSettings( TextSettings ):
         if self.unit != None:
             if self.unit == '': self.label += ' (dimensionless)'
             else: self.label += ' (' + self.unit + ')'
-            
+
+    def __str__( self ) :
+
+        units = ''
+        if( self.unit is not None ) : units = " %s" % self.unit
+        mode = 'linear'
+        if( self.isLog ) : mode = 'log'
+        if( self.autoscale ) :
+            s = 'Axis "%s" is autoscaled' % self.label
+        else :
+            s = 'Axis "%s" spans %s to %s%s' % ( self.label, self.axisMin, self.axisMax, units )
+        s += ' as %s' % mode
+        if( self.gridOn ) : s += ' with grids'
+        font = 'default'
+        if( self.font is None ) :   # Need to fix this
+            pass
+        s += '. Font is "%s" with size %s and weight "%s".' % ( font, self.fontSize, self.fontWeight )
+        return( s )
+
     def setupAxis( self, theAxis ):
         theAxis.grid( self.gridOn, linewidth=1.5 )
         if INCLASSAXISSETTING: # this doesn't' work, should I remove it?
@@ -180,6 +238,7 @@ class DataSetParameters:
         '_'         hline marker
         =========   ====================
     '''
+
     def __init__( self, legend='', symbol=None, symbolSize=5, color=None, lineStyle=None, 
             lineWidth=None, errorbarCapSize=3, errorbarLineWidth=1.5, errorbarColor=None, 
             formatString=None, dataType=None ):
@@ -229,88 +288,69 @@ class DataSet2d( DataSetParameters ):
     '''
     Member data (set these with __init__ function):
     
-    * data: the data as either a list of [ x, y ] pairs or as fudge XYs of legacy 
-      endl2dmath objects
-    * uncertainty: the uncertainty on the data as either a list of [ x, y ] pairs or as 
-      fudge XYs of legacy endl2dmath objects
-    * dataType ('scatter', 'line', or None): by default endl2dmath or fudge XYs objects 
-      are rendered as 'line' and lists of points as 'scatter'.  
-      Override the default behavior with this keyword.
-    * xUnits: Use this option to set the x units because neither endl2dmath 
-      objects nor lists of pairs have units associated with them (on the other hand, fudge 
-      XYs do have x and y units associated with them).  The default is None.  
-      When the units are given as None and the data/uncertainty are not fudge XYs, the 
-      units are assumed to match those of the plot axis.
-    * yUnits: Use this option to set the y units because neither endl2dmath 
-      objects nor lists of pairs have units associated with them (on the other hand, fudge 
-      XYs do have x and y units associated with them).  The default is None.  
-      When the units are given as None and the data/uncertainty are not fudge XYs, the 
-      units are assumed to match those of the plot axis.
+    * data: the data as either a list of [ x, y ] pairs or as an object that has the method copyDataToXsAndYs
+      (and also toPointwise_withLinearXYs if infill is True).
+    * uncertainty: the uncertainty on the data as either a list of [ x, y ] pairs or as an object that has
+      the method getValue.
+    * dataType ('scatter', 'line', or None): by default lists of points are rendered as 'scatter' and the
+      others as 'line'.  Override the default behavior with this keyword.
+    * xUnits: If the data object has an axes member, units are taken from it. Otherwise this argument is used
+      to for the x units. When the units are given as None and the data/uncertainty do not have an axes member
+      units are assumed to match those of the plot axis. The default is None.
+    * yUnits: Units for the y-axis. See xUnits for more information.
     
     type help(DataSetParameters) to find out about how to set the line properties, etc.  
     All of this information is passed on though the __init__ function of DataSet2d to 
     DataSetParameters.
     '''
     
-    def __init__( self, data, uncertainty = None, xUnit = None, yUnit = None, dataType = None, **kw ):
+    def __init__( self, data, uncertainty = None, xUnit = None, yUnit = None, dataType = None, infill = False, **kw ):
         
         self.xerr = None
         self.yerr = None
         self.xUnit = xUnit
         self.yUnit = yUnit
 
-        if type(data) == list:
+        if( ( type( data ) == list ) or ( type( data ) == tuple ) ) :
             self.x = [ p[0] for p in data ]
             self.y = [ p[1] for p in data ]
             self.dataType = 'scatter'
             if 'lineStyle' not in kw: kw[ 'lineStyle' ] = '-'
-            if type(uncertainty) == list:
+            if( ( type( uncertainty ) == list ) or ( type( uncertainty ) == tuple ) ) :
                 try: self.xerr = [ p[0] for p in uncertainty ]
                 except IndexError: pass
                 try: self.yerr = [ p[1] for p in uncertainty ]
                 except IndexError: pass
-        elif isinstance( data, endl2dmath ):
-            data = data.toInterpolation( 0, 0.01 )
-            self.x = [ p[0] for p in data.data ]
-            if True:
-                self.x.sort()
-                self.y = [ data.getValue( xx ) for xx in self.x ]
-            else:
-                self.y = [ p[1] for p in data.data ]
+        else :
             self.dataType = 'line'
-            if isinstance( uncertainty, endl2dmath ): self.yerr = [ uncertainty.getValue( xx ) for xx in self.x ]
-        elif isinstance( data, XYs ):
-            self.x, self.y = data.toPointwiseLinear( 0, 0.00001 ).copyDataToXsAndYs()
-            self.xUnit = data.axes[0].getUnit()
-            self.yUnit = data.axes[1].getUnit()
-            self.dataType = 'line'
-            if isinstance( uncertainty, XYs ): self.yerr = [ uncertainty.getValue( xx ) for xx in self.x ]
-        else: raise TypeError( "Unsupported type: " + str( type( data ) ) )
-        
-        if dataType != None: self.dataType = dataType
+            if( hasattr( data, 'axes' ) ) :
+                self.xUnit = data.axes[0].getUnit( )
+                self.yUnit = data.axes[1].getUnit( )
+            if( infill ) :
+                if( not( hasattr( data, 'toPointwise_withLinearXYs' ) ) ) : raise TypeError( "Unsupported type for infilling: %s" % type( data ) )
+                data = data.toPointwise_withLinearXYs( 0, 0.00001 )
+            if( hasattr( data, 'copyDataToXsAndYs' ) ) :
+                self.x, self.y = data.copyDataToXsAndYs( )
+                if( uncertainty is not None ): self.yerr = [ uncertainty.getValue( xx ) for xx in self.x ]
+            else :
+                raise TypeError( "Unsupported type: " + str( type( data ) ) )
+
+        if( 'legend' not in kw ) : 
+            if( hasattr( data, 'legend' ) ) :
+                kw_ = {}
+                for key in kw : kw_[key] = kw[key]
+                kw_['legend'] = data.legend
+                kw = kw_
+
+        if(  dataType is not None ) : self.dataType = dataType
         DataSetParameters.__init__( self, **kw )
     
     def convertUnits( self, xUnit = None, yUnit = None ):
         '''Convert self's units to xUnit and yUnit'''
-        if xUnit != None and self.xUnit != None and self.xUnit != xUnit:
-            try:  conversionFactor = valueOrPQ( 1.0, unitFrom=self.xUnit, unitTo=xUnit, asPQU=False )
-            except TypeError, err: 
-                raise TypeError( err.message + ': '+self.xUnit+' -> '+xUnit+' for set '+str( self.legend ) )
-            except NameError, err:
-                raise NameError( err.message + ': '+self.xUnit+' -> '+xUnit+' for set '+str( self.legend ) )
-            if self.xerr != None: self.xerr = [ xx*conversionFactor for xx in self.xerr ]
-            self.x = [ xx*conversionFactor for xx in self.x ]
-            self.xUnit = xUnit
-        if yUnit != None and self.yUnit != None and self.yUnit != yUnit:        
-            try:  conversionFactor = valueOrPQ( 1.0, unitFrom=self.yUnit, unitTo=yUnit, asPQU=False )
-            except TypeError, err: 
-                raise TypeError( err.message + ': '+self.yUnit+' -> '+yUnit+' for set '+str( self.legend ) )
-            except NameError, err:
-                raise NameError( err.message + ': '+self.yUnit+' -> '+yUnit+' for set '+str( self.legend ) )
-            if self.yerr != None: self.yerr = [ yy*conversionFactor for yy in self.yerr ]
-            self.y = [ yy*conversionFactor for yy in self.y ]
-            self.yUnit = yUnit
-        
+
+        self.xUnit = convertUnit( self.xUnit, xUnit, self.x, self.xerr, self.legend )
+        self.yUnit = convertUnit( self.yUnit, yUnit, self.y, self.yerr, self.legend )
+
     def addToPlot( self, thePlot, logY = False, minY = 1e-12, verbose=False ):      
         if self.dataType == 'scatter':
             thePlot.errorbar( self.x, self.y, yerr=self.yerr, xerr=self.xerr, 
@@ -347,8 +387,10 @@ class DataSet2d( DataSetParameters ):
                 thePlot.plot( self.x, theYs, **self.getFormatMap(  ) )
                 if self.yerr != None: thePlot.fill_between( self.x, theYLowBounds, theYUpBounds, facecolor = self.color, alpha = 0.25 )    
         else: raise TypeError( 'dataType must be "scatter" or "line", found ' + str( self.dataType ) )
-        
-        
+
+    def getDimensions( self ) :
+
+        return( 2 )
 
 class DataSet3d( DataSetParameters ):
     '''
@@ -362,83 +404,72 @@ class DataSet3d( DataSetParameters ):
     DataSetParameters.
     '''
     
-    def __init__( self, data, dataType = None, **kw ):
-        if isinstance( data, endl3dmath ):
-            self.x = [ p[0] for p in data.data ]
-            tmp = []
-            for p in data.data: tmp += [ pp[0] for pp in p[1] ]
-            self.y = sorted( uniquify( tmp ) )
-            self.z = [ ]
-            for yy in self.y:
-                self.z.append( [ data.getValue( xx, yy ) for xx in self.x ] )
-            self.dataType = 'line'
-        elif isinstance( data, W_XYs ):
-            newData = data.toPointwiseLinear( 0, 0 )
-            self.x, self.y, self.z = newData.copyDataToGridWsAndXsAndYs()
+    def __init__( self, data, dataType = None, xUnit = None, yUnit = None, zUnit = None, **kw ):
+
+        data_ = data
+        if( hasattr( data, 'toPointwise_withLinearXYs' ) ) : data_ = data.toPointwise_withLinearXYs( 0, 0 )
+        self.x, self.y, self.z = data_.copyDataToGridWsAndXsAndYs()
+
+        self.xUnit, self.yUnit, self.zUnit = xUnit, yUnit, zUnit
+        if( hasattr( data, 'axes' ) ) :
             self.xUnit = data.axes[0].getUnit()
             self.yUnit = data.axes[1].getUnit()
             self.zUnit = data.axes[2].getUnit()
-            self.dataType = 'line'
-        else: raise TypeError( "Unsupported type: " + str( type( data ) ) )
-        if dataType != None: self.dataType = dataType
+        self.dataType = 'line'
+        if( dataType is not None ) : self.dataType = dataType
         DataSetParameters.__init__( self, **kw )
         
     def convertUnits( self, xUnit = None, yUnit = None, zUnit = None ):
         '''Convert self's units to xUnit and yUnit and zUnit'''
-        if xUnit != None and self.xUnit != None and self.xUnit != xUnit:
-            try:  conversionFactor = valueOrPQ( 1.0, unitFrom=self.xUnit, unitTo=xUnit, asPQU=False )
-            except TypeError, err: 
-                raise TypeError( err.message + ': '+self.xUnit+' -> '+xUnit+' for set '+str( self.legend ) )
-            except NameError, err:
-                raise NameError( err.message + ': '+self.xUnit+' -> '+xUnit+' for set '+str( self.legend ) )
-            if self.xerr != None: self.xerr = [ xx*conversionFactor for xx in self.xerr ]
-            self.x = [ xx*conversionFactor for xx in self.x ]
-            self.xUnit = xUnit
-        if yUnit != None and self.yUnit != None and self.yUnit != yUnit:        
-            try:  conversionFactor = valueOrPQ( 1.0, unitFrom=self.yUnit, unitTo=yUnit, asPQU=False )
-            except TypeError, err: 
-                raise TypeError( err.message + ': '+self.yUnit+' -> '+yUnit+' for set '+str( self.legend ) )
-            except NameError, err:
-                raise NameError( err.message + ': '+self.yUnit+' -> '+yUnit+' for set '+str( self.legend ) )
-            if self.yerr != None: self.yerr = [ yy*conversionFactor for yy in self.yerr ]
-            self.y = [ yy*conversionFactor for yy in self.y ]
-            self.yUnit = yUnit
-        if zUnit != None and self.zUnit != None and self.zUnit != zUnit:        
-            try:  conversionFactor = valueOrPQ( 1.0, unitFrom=self.zUnit, unitTo=zUnit, asPQU=False )
-            except TypeError, err: 
-                raise TypeError( err.message + ': '+self.zUnit+' -> '+zUnit+' for set '+str( self.legend ) )
-            except NameError, err:
-                raise NameError( err.message + ': '+self.zUnit+' -> '+zUnit+' for set '+str( self.legend ) )
-            if self.zerr != None: self.zerr = [ zz*conversionFactor for zz in self.zerr ]
-            self.z = [ zz*conversionFactor for zz in self.z ]
-            self.zUnit = zUnit
-        
+
+        self.xUnit = convertUnit( self.xUnit, xUnit, self.x, None, self.legend )
+        self.yUnit = convertUnit( self.yUnit, yUnit, self.y, None, self.legend )
+        self.zUnit = convertUnit( self.zUnit, zUnit, self.z, None, self.legend )
+
     def addToPlot( self, thePlot, plotType = 'contour', numContours = 10, logX = False, logY = False ):
         '''Default plotType set to 'contour' so that can use the __makePlot2d function to drive both the regular 2d plotting and contour plotting'''
         if self.dataType == 'line':
             if plotType == 'contour': 
+                import matplotlib.pyplot as plt
                 plt.clabel( thePlot.contour( self.x, self.y, self.z, numContours, **self.getFormatMap(  ) ), inline=1, fontsize=10 )
-            else: raise TypeError( 'plotType ' + plotType + ' not supported' )
+            else :
+                raise TypeError( 'plotType ' + plotType + ' not supported' )
         else: raise TypeError( 'dataType must be "scatter" or "line", found ' + str( self.dataType ) )
-        
-    def getEndl3dmath( self ): 
-        table = []
-        for ix, x in enumerate( self.x ):
-            table.append( [ x, [] ] )
-            for iy, y in enumerate( self.y ):
-                table[-1][1].append( [ y, self.z[ iy ][ ix ] ] )
-        return endl3dmath( data = table )
 
+    def getW_XYs( self ) :
 
+        from fudge.core.math.xData import axes, XYs, W_XYs
 
-def __makePlot2d( theSets, xAxisSettings=None, yAxisSettings=None, theTitle=None, 
-        legendOn=False, legendXY=( 0.05, 0.95 ), figsize=( 20, 10 ), outFile=None, 
+        xUnit, yUnit, zUnit = '', '', ''
+        if( self.xUnit is not None ) : xUnit = self.xUnit
+        if( self.yUnit is not None ) : yUnit = self.yUnit
+        if( self.zUnit is not None ) : zUnit = self.zUnit
+        axes_3d = axes.axes( 3 )
+        axes_3d[0] = axes.axis( 'x', 0, xUnit, interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
+        axes_3d[1] = axes.axis( 'y', 0, yUnit, interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
+        axes_3d[2] = axes.axis( 'z', 0, zUnit )
+        w_xys = W_XYs.W_XYs( axes_3d )
+
+        axes_2d = axes.axes( )
+        axes_2d[0] = axes_3d[1]
+        axes_2d[1] = axes_3d[2]
+
+        for ix, x in enumerate( self.x ) :
+            xys = [ [ y, self.z[iy][ix] ] for iy, y in enumerate( self.y ) ]
+            w_xys[ix] = XYs.XYs( axes_2d, xys, 1e-3, value = x )
+        return( w_xys )
+
+    def getDimensions( self ) :
+
+        return( 3 )
+ 
+def __makePlot2d( datasets, xAxisSettings=None, yAxisSettings=None, theTitle=None, 
+        legendOn=False, legendXY=( 0.05, 0.95 ), figsize=( 20, 10 ), outFile=None, infill = False,
         thePlot=None, **kw ):
     '''
-    
     Main driver routine for all 2d plots (regular, contour, slices, ...)
-    
     '''
+
     if outFile == None: defaultBackend = 'TkAgg'
     else:  defaultBackend = 'Agg'
     backendMap = { 'png':'AGG', 'ps':'PS', 'eps':'PS', 'pdf':'PDF', 'svg':'SVG' }
@@ -461,16 +492,16 @@ def __makePlot2d( theSets, xAxisSettings=None, yAxisSettings=None, theTitle=None
     else: returnPlotInstance = True
 
     # Add the data to the plot
-    for set in theSets: 
+    for dataset in datasets : 
         try:
-            set.convertUnits( xUnit = xAxisSettings.unit, yUnit = yAxisSettings.unit )
-            set.addToPlot( thePlot, logY = yAxisSettings.isLog, **kw )
+            dataset.convertUnits( xUnit = xAxisSettings.unit, yUnit = yAxisSettings.unit )
+            dataset.addToPlot( thePlot, logY = yAxisSettings.isLog, **kw )
         except Exception, err: 
-            print "WARNING: could not add set "+str(set.legend)+", found error:"
+            print "WARNING: could not add dataset "+str(dataset.legend)+", found error:"
             print err.__class__, err
     # Put on the plot legend
     if legendOn:
-        thePlot.legend( bbox_to_anchor = legendXY, loc = 2, borderaxespad = 0., markerscale = 1.0, ncol = max( 1, len( theSets )/20 ) ) #, scatterpoints = 1, frameon = False ) # these last 3 options don't work?
+        thePlot.legend( bbox_to_anchor = legendXY, loc = 'upper left', borderaxespad = 0., markerscale = 1.0, ncol = max( 1, len( datasets )/20 ), fancybox = True, framealpha = 0.5 ) #, scatterpoints = 1, frameon = False ) # these last 3 options don't work?
 
     # Set up the axes
     xAxisSettings.setupAxis( thePlot.get_xaxis() )
@@ -511,42 +542,48 @@ def __makePlot2d( theSets, xAxisSettings=None, yAxisSettings=None, theTitle=None
     if returnPlotInstance: return thePlot
     else:
         # Generate the output
-        if outFile != None: plt.savefig(outFile)
-        else:               plt.show()
+        if outFile != None: 
+                plt.savefig(outFile)
+                plt.clf()
+        else:               
+                plt.show()
         
 
 
-def makePlot2d( sets, xAxisSettings = None, yAxisSettings = None, title = '', legendOn = False, outFile = None, legendXY = ( 0.05, 0.95 ), figsize=( 20, 10 ) ):
+def makePlot2d( datasets, xAxisSettings = None, yAxisSettings = None, title = '', legendOn = False, outFile = None, legendXY = ( 0.05, 0.95 ),  figsize=( 20, 10 ), infill = False ):
     '''
-    Plain, vanilla, 2d plots
+    Plain, vanilla, 2d plots.
     
-    * sets (required), list of DataSet objects to plot
-    * xAxisSettings (optional) 
-    * yAxisSettings (optional)
-    * title (optional, defaults to '' )
-    * legendOn (optional, defaults to True)
+    Arguments ::
     
+        * datasets (required), list of DataSet objects to plot
+        * xAxisSettings (optional) 
+        * yAxisSettings (optional)
+        * title (optional, defaults to '' )
+        * legendOn (optional, defaults to True)
+        * outFile, if not None, use this to output plot instead of generating a matplotlib window
+        * legendXY, upper left corner of legend (optional, defaults to ( 0.05, 0.95 ))
+        * figsize (optional, defaults to ( 20, 10 ))
+        * infill
     '''
+
     # Process the function arguments
     if isinstance( title, TextSettings ): theTitle = title
     else:                                 theTitle = TextSettings( title, fontSize = 24 )
     if not isinstance( xAxisSettings, AxisSettings ): xAxisSettings = AxisSettings( )
     if not isinstance( yAxisSettings, AxisSettings ): yAxisSettings = AxisSettings( )
-    if not isinstance( sets, list ): sets = [ sets ]
-    theSets = [ ]
-    for set in sets:
-        if isinstance( set, DataSet2d ):    theSets.append( set )
-        elif isinstance( set, endl2dmath ): theSets.append( DataSet2d( set ) )
-        elif isinstance( set, XYs ):        theSets.append( DataSet2d( set ) )
-        else:                               theSets.append( DataSet2d( set ) )
-    __makePlot2d( theSets, xAxisSettings, yAxisSettings, theTitle = theTitle, legendOn = legendOn, legendXY = legendXY, figsize = figsize, outFile = outFile )
+    if not isinstance( datasets, ( list, tuple ) ): datasets = [ datasets ]
+    _datasets = [ ]
+    for dataset in datasets:
+        if( not( isinstance( dataset, DataSet2d ) ) ) : dataset = DataSet2d( dataset, infill = infill )
+        _datasets.append( dataset )
+    __makePlot2d( _datasets, xAxisSettings, yAxisSettings, theTitle = theTitle, legendOn = legendOn, legendXY = legendXY, figsize = figsize, outFile = outFile )
 
-
-def makePlot2dContour( sets, xAxisSettings = None, yAxisSettings = None, numContours = 10, title = '', figsize=( 20, 10 ), legendOn = False, outFile = None ):
+def makePlot2dContour( datasets, xAxisSettings = None, yAxisSettings = None, numContours = 10, title = '', figsize=( 20, 10 ), legendOn = False, outFile = None ):
     '''
     Contour plots:
     
-    * sets (required): list of DataSet objects to plot, one works better than many for a contour plot
+    * datasets (required): list of DataSet objects to plot, one works better than many for a contour plot
     * xAxisSettings (optional) 
     * yAxisSettings (optional)
     * numContours (optional, defaults to 10): number of contours in the plot assuming linear spacing between intervals from the min to max data values
@@ -560,20 +597,19 @@ def makePlot2dContour( sets, xAxisSettings = None, yAxisSettings = None, numCont
     else:                                 theTitle = TextSettings( title, fontSize = 24 )
     if not isinstance( xAxisSettings, AxisSettings ): xAxisSettings = AxisSettings( )
     if not isinstance( yAxisSettings, AxisSettings ): yAxisSettings = AxisSettings( )
-    if not isinstance( sets, list ): sets = [ sets ]
-    theSets = [ ]
-    for set in sets:
-        if   isinstance( set, DataSet3d ):  theSets.append( set )
-        elif isinstance( set, endl3dmath ): theSets.append( DataSet3d( set ) )
-        else:                               theSets.append( DataSet3d( set ) )
-    if len( sets ) != 1: print 'Warning:  Contour plots with more than one set may not be very readable'
-    __makePlot2d( theSets, xAxisSettings, yAxisSettings, theTitle = theTitle, legendOn = legendOn, outFile = outFile, figsize = figsize, numContours = numContours )
+    if not isinstance( datasets, ( list, tuple ) ): datasets = [ datasets ]
+    _datasets = [ ]
+    for dataset in datasets:
+        if( isinstance( dataset, DataSet3d ) ) :
+            _datasets.append( dataset )
+        else :
+            _datasets.append( DataSet3d( dataset ) )
+    if len( _datasets ) != 1: print 'Warning:  Contour plots with more than one dataset may not be very readable'
+    __makePlot2d( _datasets, xAxisSettings, yAxisSettings, theTitle = theTitle, legendOn = legendOn, outFile = outFile, figsize = figsize, numContours = numContours )
 
-
-
-def makePlot2dSlice( sets, xyAxisSettings = None, zAxisSettings = None, sliceXCoords = None, sliceYCoords = None, sliceUnits = '', title = '', legendOn = True, legendXY = ( 0.05, 0.95 ), figsize=( 20, 10 ), outFile = None ):
+def makePlot2dSlice( datasets, xyAxisSettings = None, zAxisSettings = None, sliceXCoords = None, sliceYCoords = None, sliceUnits = '', title = '', legendOn = True, legendXY = ( 0.05, 0.95 ), figsize=( 20, 10 ), outFile = None ):
     '''
-        Make a slice of a set of 3d data objects along a fixed x line or a fixed y line.  
+        Make a slice of a dataset of 3d data objects along a fixed x line or a fixed y line.  
         
         Any 2d objects get plotted as if they are xy data in the correct plane for plotting.
         
@@ -581,7 +617,7 @@ def makePlot2dSlice( sets, xyAxisSettings = None, zAxisSettings = None, sliceXCo
         as y vs. F( 2.0, y ) and all 2d functions G( x ) are plotted as x vs. G( x ) even 
         if you meant something different.
         
-        * sets (required): list of DataSet objects to plot
+        * datasets (required): list of DataSet objects to plot
         * xyAxisSettings (optional) 
         * zAxisSettings (optional)
         * sliceXCoords: a list or value
@@ -591,6 +627,7 @@ def makePlot2dSlice( sets, xyAxisSettings = None, zAxisSettings = None, sliceXCo
         * outFile (optional)
         
     '''
+
     # Process the function arguments
     if isinstance( title, TextSettings ): theTitle = title
     else:                                 theTitle = TextSettings( title, fontSize = 24 )
@@ -600,30 +637,29 @@ def makePlot2dSlice( sets, xyAxisSettings = None, zAxisSettings = None, sliceXCo
         raise ValueError( "sliceXCoords or sliceYCoords must have a list or value, otherwise where do I slice?" )
     if sliceXCoords != None and sliceYCoords != None: 
         raise ValueError( "sliceXCoords or sliceYCoords both have a list or value, which one do I slice?" )
-    if not isinstance( sets, list ): sets = [ sets ]
-    theSets = [ ]
-    for set in sets:
-        if isinstance( set, DataSet2d ):    theSets.append( set )
-        elif isinstance( set, endl2dmath ): theSets.append( DataSet2d( set ) )
-        elif isinstance( set, DataSet3d ) or isinstance( set, endl3dmath ): 
-            if isinstance( set, endl3dmath ):
-                asDataSet3d = DataSet3d( set )
-                asEndl3dmath = set
-            else:
-                asDataSet3d = set
-                asEndl3dmath = set.getEndl3dmath()
-            if sliceXCoords != None:
-                for x in sliceXCoords:
-                    theSets.append( DataSet2d( endl2dmath( data = [ [ y, asEndl3dmath.getValue( x, y ) ] for y in asDataSet3d.y ] ), legend = asDataSet3d.legend + ' @ ' + str( x ) + ' ' + sliceUnits ) )
-            if sliceYCoords != None:
-                for y in sliceYCoords:
-                    theSets.append( DataSet2d( endl2dmath( data = [ [ x, asEndl3dmath.getValue( x, y ) ] for x in asDataSet3d.x ] ), legend = asDataSet3d.legend + ' @ ' + str( y ) + ' ' + sliceUnits ) )
-        else: raise TypeError( 'Can only put 2d or 3d objects in slice plots' )
-    __makePlot2d( theSets, xyAxisSettings, zAxisSettings, theTitle = theTitle, legendOn = legendOn, outFile = outFile, legendXY = legendXY, figsize = figsize )
 
-
-
-
+    if not isinstance( datasets, ( list, tuple ) ): datasets = [ datasets ]
+    _datasets = [ ]
+    for dataset in datasets:
+        dimension = dataset.getDimensions( )
+        if( dimension == 2 ) :
+            _datasets.append( dataset )
+        elif( dimension == 3 ) :
+            if( isinstance( dataset, DataSet3d ) ) :
+                asDataSet3d = dataset
+                likeW_XYs = dataset.getW_XYs( )
+            else :
+                asDataSet3d = DataSet3d( dataset )
+                likeW_XYs = dataset
+            if( sliceXCoords is not None ) :
+                for x in sliceXCoords :
+                    _datasets.append( DataSet2d( likeW_XYs.getValue( x ), legend = asDataSet3d.legend + ' @ ' + str( x ) + ' ' + sliceUnits ) )
+            if( sliceYCoords is not None ) :
+                for y in sliceYCoords :
+                    _datasets.append( DataSet2d( [ [ x, likeW_XYs.getValue( x, y ) ] for x in asDataSet3d.x ], legend = asDataSet3d.legend + ' @ ' + str( y ) + ' ' + sliceUnits ) )
+        else :
+            raise TypeError( 'Can only put 2d or 3d objects in slice plots' )
+    __makePlot2d( _datasets, xyAxisSettings, zAxisSettings, theTitle = theTitle, legendOn = legendOn, outFile = outFile, legendXY = legendXY, figsize = figsize )
 
 #--------------------------------------------------------
 #
@@ -631,6 +667,14 @@ def makePlot2dSlice( sets, xyAxisSettings = None, zAxisSettings = None, sliceXCo
 #
 #--------------------------------------------------------
 def plotTests( tests = 11*[ False ] ):
+
+    from fudge import fudgeParameters
+    fudgeParameters.VerboseMode = 0
+    from fudge.legacy.endl.endlProject import endlProject
+    from fudge.legacy.endl.endl3dmathClasses import endl3dmath
+    from fudge import __path__
+    from fudge.core.math.xData import axes, XYs, W_XYs
+
     testData = '''
         #  Authors:   T.S.Suzuki, Y.Nagai, T.Shima, T.Kikuchi, H.Sato, T.Kii, M.Igashira
         #  Title:     First Measurement Of A P(N,Gamma)D Reaction Cross Section Between 10 And 80 Kev
@@ -655,13 +699,12 @@ def plotTests( tests = 11*[ False ] ):
             0.064         0.000158      0.0           1.1e-05       
             0.064         0.00014       0.0           9e-06
     '''
-    from fudge.legacy.endl.endlProject import endlProject
-    from fudge import __path__
+
     e=endlProject( __path__[0] + "/legacy/endl/test/testdb" )
     za=e.readZA(1001)
     za.read( )
-    xAxis = AxisSettings( isLog = True, label = '$E_n$ (MeV)', axisMin = 0.5e-2, axisMax = 1.5e-1, gridOn = True, autoscale = False )
-    yAxis = AxisSettings( isLog = True, label = '$\sigma(E_n)$ (barns)', gridOn = True )
+    xAxis = AxisSettings( isLog = True, label = '$E_n$ (MeV)', axisMin = 0.5e-2, axisMax = 1.5e-1, gridOn = True, autoscale = False, unit = 'MeV' )
+    yAxis = AxisSettings( isLog = True, label = '$\sigma(E_n)$ (b)', gridOn = True, unit = 'b' )
     d = []
     u = []
     for line in testData.split( '\n' ):
@@ -671,9 +714,23 @@ def plotTests( tests = 11*[ False ] ):
             d.append( sline[0:2] )
             u.append( sline[2:4] )
 
+    xLinLog = axes.linearToken
+    if( xAxis.isLog ) : xLinLog = axes.logToken
+    yLinLog = axes.linearToken
+    if( yAxis.isLog ) : yLinLog = axes.logToken
+    xyAxes = axes.defaultAxes( independentInterpolation = xLinLog, dependentInterpolation = yLinLog, 
+        labelsUnits = { 0 : ( xAxis.label, xAxis.unit ), 1 : ( yAxis.label, yAxis.unit ) } )
+
     # Simple test, here we make a plot of one set
+
     if tests[0]:
-        makePlot2d( [ za.findData( I = 0, C = 46 ) ], xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,\gamma)$ Cross Section', outFile = None )        
+        xSec = za.findData( I = 0, C = 46 )
+        makePlot2d( [ xSec ], xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,\gamma)$ Cross Section', outFile = None )
+        xys = XYs.XYs( xyAxes, xSec.data, 1e-3 )
+        makePlot2d( ( xys ), xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,\gamma)$ Cross Section', outFile = None )
+        dataset = DataSet2d( xys, xUnit = xAxis.unit, yUnit = yAxis.unit )
+        dataset.convertUnits( 'eV', 'mb' )
+        makePlot2d( ( dataset ), xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,\gamma)$ Cross Section', outFile = None )
 
     # Plot all the cross section data in the fudge2 test library, but unthemed!
     if tests[1]:
@@ -681,27 +738,37 @@ def plotTests( tests = 11*[ False ] ):
             
     # Plot all the cross section data in the fudge2 test library
     if tests[2]:
-        makePlot2d( za.findDatas( I = 0 ), xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,*)$ Cross Sections', outFile = None )   
+        xSecs = za.findDatas( I = 0 )
+        makePlot2d( xSecs, xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,*)$ Cross Sections', outFile = None )   
+        xySecs = [ XYs.XYs( xyAxes, xSec.data, 1e-3 ) for xSec in xSecs ]
+        xySecs = ( xySecs[0], xySecs[1], xySecs[2] )
+        makePlot2d( xySecs, xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,*)$ Cross Sections', outFile = None )   
 
-    # Fancy test, here we make a plot of one set (the testData above)
+    # Fancy test, here we make a plot of one dataset (the testData above)
     if tests[3]:
         endfData = za.findData( I=0, C=46 ) #.slicex(xMin=1e-2,xMax=1e-1)
         endfUnc = 0.1 * endfData # 10% error bars
         makePlot2d( [ \
-            DataSet2d( data = endfData, uncertainty = endfUnc, legend = 'ENDF/B-VII.0', color='g', lineStyle = '-' ),
-            DataSet2d( data = d, uncertainty = u, legend = 'T.S.Suzuki, et al. (1995) EXFOR entry # 22310002', color='g', symbol = 'o' ),
-        ], xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,\gamma)$ Cross Section', legendOn = True, outFile = None )
+                DataSet2d( data = endfData, uncertainty = endfUnc, legend = 'ENDF/B-VII.0', color='g', lineStyle = '-' ),
+                DataSet2d( data = d, uncertainty = u, legend = 'T.S.Suzuki, et al. (1995) EXFOR entry # 22310002', color='g', symbol = 'o' ),
+            ], xAxisSettings = xAxis, yAxisSettings = yAxis, title = '$^1$H$(n,\gamma)$ Cross Section', legendOn = True, outFile = None )
 
     # Contour test
-    if tests[4]:
-        # Contour plots are meaningful if there is only one set plotted, how do we enforce this?
+    if tests[4]:        # Contour plots are meaningful if there is only one dataset plotted, how do we enforce this?
         endfData = za.findData( yo = 1, I = 1, C = 10 )
-        EAxis  = AxisSettings( isLog = False, label = '$E_n$ (MeV)', axisMin = 1.0, axisMax = 20.0, gridOn = True, autoscale = False )
+        EAxis  = AxisSettings( isLog = False, label = '$E_n$ (MeV)', axisMin = 1.0, axisMax = 20.0, gridOn = True, autoscale = False, unit = 'MeV' )
         muAxis = AxisSettings( isLog = False, label = '$\mu$ = cos( $\\theta$ )', axisMin = -1.0, axisMax = 1.0, autoscale = False, gridOn = True )
-        makePlot2dContour( DataSet3d( data = endfData, legend = 'ENDF/B-VII.0' ), xAxisSettings = EAxis, yAxisSettings = muAxis, title = '$^1$H$(n,el)$ Angular Distribution', outFile = None )
+        makePlot2dContour( DataSet3d( data = endfData, legend = 'ENDF/B-VII.0', xUnit = EAxis.unit, yUnit = muAxis.unit ), 
+            xAxisSettings = EAxis, yAxisSettings = muAxis, title = '$^1$H$(n,el)$ Angular Distribution', outFile = None )
+        w_xys = W_XYs.W_XYs( W_XYs.W_XYs.defaultAxes( labelsUnits = { 0 : ( '$E_n$', 'MeV' ) } ) )
+        for w, xy in endfData.data : w_xys.append( XYs.XYs( XYs.XYs.defaultAxes( ), xy, 1e-3, value = w ) )
+        dataset = DataSet3d( data = w_xys, legend = 'ENDF/B-VII.0' )
+        dataset.convertUnits( 'eV', None, None )
+        makePlot2dContour( dataset, xAxisSettings = EAxis, yAxisSettings = muAxis, 
+            title = '$^1$H$(n,el)$ Angular Distribution', outFile = None )
 
     # Slice tests
-    if tests[5]:
+    if( tests[5] or tests[6] or tests[7] or tests[8] or tests[9] ) :
         endfDataI0 = za.findData( yo = 0, I = 0, C = 10 ).slicex(1.0,20.0) # simplify the plot
         endfDataI1 = za.findData( yo = 1, I = 1, C = 10 )
         Es = [ p[0] for p in endfDataI0.data ]  # in [MeV]
@@ -716,18 +783,21 @@ def plotTests( tests = 11*[ False ] ):
         endfDataCombined = endl3dmath( data = table )
         EAxis  = AxisSettings( isLog = True, label = '$E_n$ (MeV)', axisMin = 1.0, axisMax = 20.0, gridOn = True, autoscale = False )
         muAxis = AxisSettings( isLog = False, label = '$\mu = \cos{( \\theta )}$', axisMin = -1.0, axisMax = 1.0, autoscale = False, gridOn = True )
-        zAxis = AxisSettings( isLog = True, label = '$d\sigma(E)/d\mu$ (barns)', axisMin = 0.0, axisMax = 5.0, autoscale = False, gridOn = True )
+        zAxis = AxisSettings( isLog = True, label = '$d\sigma(E)/d\mu$ (b)', axisMin = 0.0, axisMax = 5.0, autoscale = False, gridOn = True )
         
         # unthemed slice tests
-        if tests[6]:makePlot2dSlice( endfDataCombined, xyAxisSettings = EAxis, zAxisSettings = zAxis, sliceXCoords = None, sliceYCoords = [ -1.0, -0.75, -0.5, -.25,  0.0, .25, .5, .75, 1.0 ], title = '', outFile = None )
-        if tests[7]:makePlot2dSlice( endfDataCombined, xyAxisSettings = muAxis, zAxisSettings = zAxis, sliceXCoords = [ 1.0, 5.0, 10.0, 15.0, 20.0 ], sliceYCoords = None, title = '', outFile = None )
+        if tests[5] :
+            makePlot2dSlice( endfDataCombined, xyAxisSettings = EAxis, zAxisSettings = zAxis, sliceXCoords = None, sliceYCoords = [ -1.0, -0.75, -0.5, -.25,  0.0, .25, .5, .75, 1.0 ], title = '', outFile = None )
+            dataSet3d = DataSet3d( data = endfDataCombined, legend = 'ENDF/B-VII.0' )
+            makePlot2dSlice( dataSet3d.getW_XYs( ), xyAxisSettings = EAxis, zAxisSettings = zAxis, sliceXCoords = None, sliceYCoords = [ -1.0, -0.75, -0.5, -.25,  0.0, .25, .5, .75, 1.0 ], title = '', outFile = None )
+        if tests[6]: makePlot2dSlice( endfDataCombined, xyAxisSettings = muAxis, zAxisSettings = zAxis, sliceXCoords = [ 1.0, 5.0, 10.0, 15.0, 20.0 ], sliceYCoords = None, title = '', outFile = None )
 
         # themed slice test and contour test
-        if tests[8]:makePlot2dContour( DataSet3d( data = endfDataCombined, legend = 'ENDF/B-VII.0' ), xAxisSettings = EAxis, yAxisSettings = muAxis, numContours = 10, title = '$d\sigma(E)/d\mu$ for $^1$H$(n,el)$', outFile = None )
-        if tests[9]: makePlot2dSlice( DataSet3d( data = endfDataCombined, legend = 'ENDF/B-VII.0' ), xyAxisSettings = EAxis, zAxisSettings = zAxis, sliceXCoords = None, sliceYCoords = [ -1.0, -0.75, -0.5, -.25,  0.0, .25, .5, .75, 1.0 ], title = '', outFile = None )
+        if tests[7]: makePlot2dContour( DataSet3d( data = endfDataCombined, legend = 'ENDF/B-VII.0' ), xAxisSettings = EAxis, yAxisSettings = muAxis, numContours = 10, title = '$d\sigma(E)/d\mu$ for $^1$H$(n,el)$', outFile = None )
+        if tests[8]: makePlot2dSlice( DataSet3d( data = endfDataCombined, legend = 'ENDF/B-VII.0' ), xyAxisSettings = EAxis, zAxisSettings = zAxis, sliceXCoords = None, sliceYCoords = [ -1.0, -0.75, -0.5, -.25,  0.0, .25, .5, .75, 1.0 ], title = '', outFile = None )
 
         # themed slice test, with test 2d experimental data
-        if tests[10]: 
+        if tests[9]: 
             makePlot2dSlice( [ \
                 DataSet3d( data = endfDataCombined, legend = 'ENDF/B-VII.0' ), \
                 DataSet2d( data = d, uncertainty = u, legend = 'T.S.Suzuki, et al. (1995) EXFOR entry # 22310002', color='g', symbol = 'o' ),\
@@ -740,4 +810,8 @@ def plotTests( tests = 11*[ False ] ):
 #
 #--------------------------------------------------------
 if __name__ == "__main__":
-    plotTests( tests = [ False, False, False, False, False, True, False, False, False, False, True ]  )
+
+    for i in xrange( 10 ) :
+        tests = 10 * [ False ]
+        tests[i] = True
+        plotTests( tests = tests )

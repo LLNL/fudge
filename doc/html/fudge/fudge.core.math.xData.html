@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>xData Package &mdash; Fudge and GND 1.2 beta documentation</title>
+    <title>xData Package &mdash; Fudge and GND 1.3 beta documentation</title>
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.2 beta',
+        VERSION:     '1.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +25,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
-    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../index.html" />
+    <link rel="top" title="Fudge and GND 1.3 beta documentation" href="../index.html" />
     <link rel="up" title="math Package" href="fudge.core.math.html" />
     <link rel="next" title="utilities Package" href="fudge.core.utilities.html" />
     <link rel="prev" title="test Package" href="fudge.core.math.test.html" /> 
@@ -47,7 +46,7 @@
         <li class="right" >
           <a href="fudge.core.math.test.html" title="test Package"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="index.html" >fudge Package</a> &raquo;</li>
           <li><a href="fudge.core.html" >core Package</a> &raquo;</li>
           <li><a href="fudge.core.math.html" accesskey="U">math Package</a> &raquo;</li> 
@@ -66,13 +65,20 @@
 <span class="target" id="module-fudge.core.math.xData"></span></div>
 <div class="section" id="module-fudge.core.math.xData.LegendreSeries">
 <span id="legendreseries-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">LegendreSeries</span></tt> Module<a class="headerlink" href="#module-fudge.core.math.xData.LegendreSeries" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="fudge.core.math.xData.LegendreSeries.Legendre">
+<tt class="descclassname">fudge.core.math.xData.LegendreSeries.</tt><tt class="descname">Legendre</tt><big>(</big><em>n</em>, <em>x</em>, <em>checkXRange=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#Legendre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.Legendre" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the Legendre function of order n at x.  For n &lt;= 10, use analytical form,
+for n &gt; 10 use the recursive relationship. (This would be way faster in C or using numpy version)</p>
+</dd></dl>
+
 <dl class="class">
 <dt id="fudge.core.math.xData.LegendreSeries.V_W_XYs_LegendreSeries">
 <em class="property">class </em><tt class="descclassname">fudge.core.math.xData.LegendreSeries.</tt><tt class="descname">V_W_XYs_LegendreSeries</tt><big>(</big><em>axes_</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#V_W_XYs_LegendreSeries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.V_W_XYs_LegendreSeries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="fudge.core.html#fudge.core.ancestry.ancestry" title="fudge.core.ancestry.ancestry"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.ancestry.ancestry</span></tt></a></p>
 <dl class="method">
 <dt id="fudge.core.math.xData.LegendreSeries.V_W_XYs_LegendreSeries.append">
-<tt class="descname">append</tt><big>(</big><em>W_LegendreSeries_</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#V_W_XYs_LegendreSeries.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.V_W_XYs_LegendreSeries.append" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">append</tt><big>(</big><em>W_LegendreSeries_</em>, <em>copy=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#V_W_XYs_LegendreSeries.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.V_W_XYs_LegendreSeries.append" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -101,6 +107,12 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="fudge.core.math.xData.LegendreSeries.V_W_XYs_LegendreSeries.getW_XYs_LegendreSeriesAtV">
+<tt class="descname">getW_XYs_LegendreSeriesAtV</tt><big>(</big><em>v</em>, <em>extrapolation='noExtrapolation'</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#V_W_XYs_LegendreSeries.getW_XYs_LegendreSeriesAtV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.V_W_XYs_LegendreSeries.getW_XYs_LegendreSeriesAtV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the W_XYs_LegendreSeries for self at v. Currently, extrapolation is ignored.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="fudge.core.math.xData.LegendreSeries.V_W_XYs_LegendreSeries.maxLegendreOrder">
 <tt class="descname">maxLegendreOrder</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#V_W_XYs_LegendreSeries.maxLegendreOrder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.V_W_XYs_LegendreSeries.maxLegendreOrder" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -111,8 +123,8 @@
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fudge.core.math.xData.LegendreSeries.V_W_XYs_LegendreSeries.toPointwiseLinear">
-<tt class="descname">toPointwiseLinear</tt><big>(</big><em>accuracy</em>, <em>cls=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#V_W_XYs_LegendreSeries.toPointwiseLinear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.V_W_XYs_LegendreSeries.toPointwiseLinear" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.core.math.xData.LegendreSeries.V_W_XYs_LegendreSeries.toPointwise_withLinearXYs">
+<tt class="descname">toPointwise_withLinearXYs</tt><big>(</big><em>accuracy</em>, <em>cls=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#V_W_XYs_LegendreSeries.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.V_W_XYs_LegendreSeries.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -138,12 +150,12 @@
 <dd><p>Bases: <a class="reference internal" href="fudge.core.html#fudge.core.ancestry.ancestry" title="fudge.core.ancestry.ancestry"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.ancestry.ancestry</span></tt></a></p>
 <dl class="method">
 <dt id="fudge.core.math.xData.LegendreSeries.W_XYs_LegendreSeries.append">
-<tt class="descname">append</tt><big>(</big><em>LegendreSeries_</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#W_XYs_LegendreSeries.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.W_XYs_LegendreSeries.append" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">append</tt><big>(</big><em>LegendreSeries_</em>, <em>copy=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#W_XYs_LegendreSeries.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.W_XYs_LegendreSeries.append" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="fudge.core.math.xData.LegendreSeries.W_XYs_LegendreSeries.copy">
-<tt class="descname">copy</tt><big>(</big><em>parent=None</em>, <em>index=None</em>, <em>value=None</em>, <em>moniker=None</em>, <em>isPrimaryXData=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#W_XYs_LegendreSeries.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.W_XYs_LegendreSeries.copy" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">copy</tt><big>(</big><em>parent=None</em>, <em>index=None</em>, <em>value=None</em>, <em>moniker=None</em>, <em>isPrimaryXData=True</em>, <em>standAlone=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#W_XYs_LegendreSeries.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.W_XYs_LegendreSeries.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -199,8 +211,8 @@ That is, returns Legendre series which represent self&#8217;s pdf(w,-mu).</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fudge.core.math.xData.LegendreSeries.W_XYs_LegendreSeries.toPointwiseLinear">
-<tt class="descname">toPointwiseLinear</tt><big>(</big><em>accuracy</em>, <em>axes_=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#W_XYs_LegendreSeries.toPointwiseLinear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.W_XYs_LegendreSeries.toPointwiseLinear" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.core.math.xData.LegendreSeries.W_XYs_LegendreSeries.toPointwise_withLinearXYs">
+<tt class="descname">toPointwise_withLinearXYs</tt><big>(</big><em>accuracy</em>, <em>axes_=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#W_XYs_LegendreSeries.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.W_XYs_LegendreSeries.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -222,7 +234,7 @@ That is, returns Legendre series which represent self&#8217;s pdf(w,-mu).</p>
 
 <dl class="class">
 <dt id="fudge.core.math.xData.LegendreSeries.XYs_LegendreSeries">
-<em class="property">class </em><tt class="descclassname">fudge.core.math.xData.LegendreSeries.</tt><tt class="descname">XYs_LegendreSeries</tt><big>(</big><em>unit</em>, <em>coefficients</em>, <em>index=None</em>, <em>value=None</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#XYs_LegendreSeries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.XYs_LegendreSeries" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">fudge.core.math.xData.LegendreSeries.</tt><tt class="descname">XYs_LegendreSeries</tt><big>(</big><em>coefficients</em>, <em>index=None</em>, <em>value=None</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#XYs_LegendreSeries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.XYs_LegendreSeries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="fudge.core.html#fudge.core.ancestry.ancestry" title="fudge.core.ancestry.ancestry"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.ancestry.ancestry</span></tt></a></p>
 <p>This class stores and manipulates an angular pdf (i.e. pdf(mu) where mu is the cos of the angle) 
 represented as Legendre coefficients. The pdf and Legendre coefficients are related by</p>
@@ -239,9 +251,16 @@ respectively. The new instance&#8217;s parent determined by the parent argument.
 </dd></dl>
 
 <dl class="method">
+<dt id="fudge.core.math.xData.LegendreSeries.XYs_LegendreSeries.getCoefficientSafely">
+<tt class="descname">getCoefficientSafely</tt><big>(</big><em>l</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#XYs_LegendreSeries.getCoefficientSafely"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.XYs_LegendreSeries.getCoefficientSafely" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the (l+1)^th Legendre coefficient. Returns 0 if l is greater than lMax. This is like
+__getitem__ but allows for l to be greater than lMax.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="fudge.core.math.xData.LegendreSeries.XYs_LegendreSeries.getValue">
 <tt class="descname">getValue</tt><big>(</big><em>mu</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#XYs_LegendreSeries.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.XYs_LegendreSeries.getValue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Using the Legendre coefficients, this method calculates pdf(mu) and returns it.</p>
+<dd><p>Using the Legendre coefficients, this method calculates f(mu) and returns it.</p>
 </dd></dl>
 
 <dl class="method">
@@ -263,8 +282,8 @@ That is, returns a Legendre series which represent self&#8217;s pdf(-mu).</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fudge.core.math.xData.LegendreSeries.XYs_LegendreSeries.toPointwiseLinear">
-<tt class="descname">toPointwiseLinear</tt><big>(</big><em>accuracy</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#XYs_LegendreSeries.toPointwiseLinear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.XYs_LegendreSeries.toPointwiseLinear" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.core.math.xData.LegendreSeries.XYs_LegendreSeries.toPointwise_withLinearXYs">
+<tt class="descname">toPointwise_withLinearXYs</tt><big>(</big><em>accuracy</em>, <em>biSectionMax=16</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#XYs_LegendreSeries.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.XYs_LegendreSeries.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
 <dd><p>The method constructs the pdf(mu) versus mu and returns it as a XYs instance. The accuracy of the 
 reconstruction (hence the number of points in the returned XYs) is determined by the accuracy argument.</p>
 </dd></dl>
@@ -278,9 +297,11 @@ reconstruction (hence the number of points in the returned XYs) is determined by
 <dl class="method">
 <dt id="fudge.core.math.xData.LegendreSeries.XYs_LegendreSeries.toXMLList">
 <tt class="descname">toXMLList</tt><big>(</big><em>tag='xData'</em>, <em>indent=''</em>, <em>incrementalIndent='  '</em>, <em>includeType=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/LegendreSeries.html#XYs_LegendreSeries.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.LegendreSeries.XYs_LegendreSeries.toXMLList" title="Permalink to this definition">¶</a></dt>
-<dd><p>This method returns self as a list of string which converts to the XML string representation of self via
-the python statement &#8216;
-&#8216;.join( xmlString ).</p>
+<dd><dl class="docutils">
+<dt>This method returns self as a list of string which converts to the XML string representation of self via</dt>
+<dd>the python statement &#8216;</dd>
+</dl>
+<p>&#8216;.join( xmlString ).</p>
 </dd></dl>
 
 </dd></dl>
@@ -306,6 +327,11 @@ where w_xys is an instance of class W_XYs.</p>
 <tt class="descname">copy</tt><big>(</big><em>index=None</em>, <em>value=None</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/V_W_XYs.html#V_W_XYs.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.V_W_XYs.V_W_XYs.copy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="staticmethod">
+<dt id="fudge.core.math.xData.V_W_XYs.V_W_XYs.defaultAxes">
+<em class="property">static </em><tt class="descname">defaultAxes</tt><big>(</big><em>labelsUnits={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/V_W_XYs.html#V_W_XYs.defaultAxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.V_W_XYs.V_W_XYs.defaultAxes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="fudge.core.math.xData.V_W_XYs.V_W_XYs.domainMax">
 <tt class="descname">domainMax</tt><big>(</big><em>unitTo=None</em>, <em>asPQU=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/V_W_XYs.html#V_W_XYs.domainMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.V_W_XYs.V_W_XYs.domainMax" title="Permalink to this definition">¶</a></dt>
@@ -320,6 +346,12 @@ where w_xys is an instance of class W_XYs.</p>
 <dt id="fudge.core.math.xData.V_W_XYs.V_W_XYs.domainUnitConversionFactor">
 <tt class="descname">domainUnitConversionFactor</tt><big>(</big><em>unitTo</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/V_W_XYs.html#V_W_XYs.domainUnitConversionFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.V_W_XYs.V_W_XYs.domainUnitConversionFactor" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.core.math.xData.V_W_XYs.V_W_XYs.getDimensions">
+<tt class="descname">getDimensions</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/V_W_XYs.html#V_W_XYs.getDimensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.V_W_XYs.V_W_XYs.getDimensions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dimensions (4 for V_W_XYs) for this type of data.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fudge.core.math.xData.V_W_XYs.V_W_XYs.getDomain">
@@ -350,8 +382,8 @@ True, then unit base interpolation is performed.</p>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fudge.core.math.xData.V_W_XYs.V_W_XYs.toPointwiseLinear">
-<tt class="descname">toPointwiseLinear</tt><big>(</big><em>accuracy=None</em>, <em>lowerEps=0</em>, <em>upperEps=0</em>, <em>cls=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/V_W_XYs.html#V_W_XYs.toPointwiseLinear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.V_W_XYs.V_W_XYs.toPointwiseLinear" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.core.math.xData.V_W_XYs.V_W_XYs.toPointwise_withLinearXYs">
+<tt class="descname">toPointwise_withLinearXYs</tt><big>(</big><em>accuracy=None</em>, <em>lowerEps=0</em>, <em>upperEps=0</em>, <em>cls=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/V_W_XYs.html#V_W_XYs.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.V_W_XYs.V_W_XYs.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -395,7 +427,7 @@ where xys is an instance of class XYs.</p>
 <div>axes            Description of the w, x and y data attributes (e.g., label, interpolation, units).</div></blockquote>
 <dl class="class">
 <dt id="fudge.core.math.xData.W_XYs.W_XYs">
-<em class="property">class </em><tt class="descclassname">fudge.core.math.xData.W_XYs.</tt><tt class="descname">W_XYs</tt><big>(</big><em>axes_</em>, <em>index=None</em>, <em>value=None</em>, <em>parent=None</em>, <em>isPrimaryXData=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">fudge.core.math.xData.W_XYs.</tt><tt class="descname">W_XYs</tt><big>(</big><em>axes_</em>, <em>data=None</em>, <em>index=None</em>, <em>value=None</em>, <em>parent=None</em>, <em>isPrimaryXData=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="fudge.core.html#fudge.core.ancestry.ancestry" title="fudge.core.ancestry.ancestry"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.ancestry.ancestry</span></tt></a></p>
 <dl class="method">
 <dt id="fudge.core.math.xData.W_XYs.W_XYs.append">
@@ -417,6 +449,11 @@ where xys is an instance of class XYs.</p>
 <tt class="descname">copyDataToW_XYs</tt><big>(</big><em>wUnit=None</em>, <em>xUnit=None</em>, <em>yUnit=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs.copyDataToW_XYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs.copyDataToW_XYs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="staticmethod">
+<dt id="fudge.core.math.xData.W_XYs.W_XYs.defaultAxes">
+<em class="property">static </em><tt class="descname">defaultAxes</tt><big>(</big><em>labelsUnits={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs.defaultAxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs.defaultAxes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="fudge.core.math.xData.W_XYs.W_XYs.domainMax">
 <tt class="descname">domainMax</tt><big>(</big><em>unitTo=None</em>, <em>asPQU=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs.domainMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs.domainMax" title="Permalink to this definition">¶</a></dt>
@@ -431,6 +468,12 @@ where xys is an instance of class XYs.</p>
 <dt id="fudge.core.math.xData.W_XYs.W_XYs.domainUnitConversionFactor">
 <tt class="descname">domainUnitConversionFactor</tt><big>(</big><em>unitTo</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs.domainUnitConversionFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs.domainUnitConversionFactor" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.core.math.xData.W_XYs.W_XYs.getDimensions">
+<tt class="descname">getDimensions</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs.getDimensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs.getDimensions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dimensions (3 for W_XYs) for this type of data.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fudge.core.math.xData.W_XYs.W_XYs.getDomain">
@@ -449,8 +492,21 @@ where xys is an instance of class XYs.</p>
 
 <dl class="method">
 <dt id="fudge.core.math.xData.W_XYs.W_XYs.getValue">
-<tt class="descname">getValue</tt><big>(</big><em>w</em>, <em>x</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs.getValue" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descname">getValue</tt><big>(</big><em>w</em>, <em>x=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs.getValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an XYs instance of self evaluated at w if x is None. Otherwise, returns, as a float, the value of self at w, x.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.core.math.xData.W_XYs.W_XYs.insert">
+<tt class="descname">insert</tt><big>(</big><em>index</em>, <em>xys</em>, <em>w=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs.insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs.insert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts xys at index. If w is None, w is take from the value of xys.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.core.math.xData.W_XYs.W_XYs.insertAtW">
+<tt class="descname">insertAtW</tt><big>(</big><em>w</em>, <em>xys</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs.insertAtW"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs.insertAtW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts xys at the appropriate index for w. The inserted XYs instance will have value w, even if xys as a value.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fudge.core.math.xData.W_XYs.W_XYs.integrate">
@@ -472,7 +528,7 @@ True, then unit base interpolation is performed.</p>
 
 <dl class="classmethod">
 <dt id="fudge.core.math.xData.W_XYs.W_XYs.parseXMLNode">
-<em class="property">classmethod </em><tt class="descname">parseXMLNode</tt><big>(</big><em>xdataElement</em>, <em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><tt class="descname">parseXMLNode</tt><big>(</big><em>xdataElement</em>, <em>xPath=</em>, <span class="optional">[</span><span class="optional">]</span><em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs.parseXMLNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>translate W_XYs and its subclasses from xml</p>
 </dd></dl>
 
@@ -482,6 +538,21 @@ True, then unit base interpolation is performed.</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="fudge.core.math.xData.W_XYs.W_XYs.setFromList">
+<tt class="descname">setFromList</tt><big>(</big><em>w_xys</em>, <em>accuracy=0.001</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs.setFromList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs.setFromList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces self&#8217;s data with the data in w_xys. w_xys must be a list of [ w_i, xys_i ] pairs with w_i &lt; w_{i+1}. xys_i can be
+either a list of [ x_j, y_j ] pairs with x_j &lt; x_{j+1} or an XYs instance. For example:</p>
+<blockquote>
+<div>w_xys = [ [ 1e-6, [ [ -1, 0.5 ], [ 1, 0.5 ] ] ], [ 20, [ [ -1, 0. ], [ 0, 0. ], [ 1, 2. ] ] ] ].</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.core.math.xData.W_XYs.W_XYs.setFromW_XYs">
+<tt class="descname">setFromW_XYs</tt><big>(</big><em>w_xys</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs.setFromW_XYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs.setFromW_XYs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces self&#8217;s data with the data in w_xys. w_xys must be a W_XYs instance.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="fudge.core.math.xData.W_XYs.W_XYs.thin">
 <tt class="descname">thin</tt><big>(</big><em>accuracy</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs.thin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs.thin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove extra points in both the W and X-directions, while maintaining specified accuracy.
@@ -489,8 +560,8 @@ Returns a thinned copy (original is unchanged).</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="fudge.core.math.xData.W_XYs.W_XYs.toPointwiseLinear">
-<tt class="descname">toPointwiseLinear</tt><big>(</big><em>accuracy=None</em>, <em>lowerEps=0</em>, <em>upperEps=0</em>, <em>cls=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs.toPointwiseLinear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs.toPointwiseLinear" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.core.math.xData.W_XYs.W_XYs.toPointwise_withLinearXYs">
+<tt class="descname">toPointwise_withLinearXYs</tt><big>(</big><em>accuracy=None</em>, <em>lowerEps=0</em>, <em>upperEps=0</em>, <em>cls=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/W_XYs.html#W_XYs.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.W_XYs.W_XYs.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -577,7 +648,7 @@ case, the <tt class="docutils literal"><span class="pre">XYs</span></tt> instanc
 
 <dl class="attribute">
 <dt id="fudge.core.math.xData.XYs.XYs.__dict__">
-<tt class="descname">__dict__</tt><em class="property"> = dict_proxy({'convolute': &lt;function convolute at 0x107c49938&gt;, 'thicken': &lt;function thicken at 0x107c49050&gt;, 'changeInterpolationIfNeeded': &lt;function changeInterpolationIfNeeded at 0x107c48a28&gt;, '__getslice__': &lt;function __getslice__ at 0x107c48848&gt;, 'groupOneFunction': &lt;function groupOneFunction at 0x107c49aa0&gt;, '__rsub__': &lt;function __rsub__ at 0x107c48500&gt;, 'getValue_units': &lt;function getValue_units at 0x107c48de8&gt;, '__rdiv__': &lt;function __rdiv__ at 0x107c48668&gt;, 'clip_units': &lt;function clip_units at 0x107c48b18&gt;, '__exp__': &lt;function __exp__ at 0x107c498c0&gt;, '__weakref__': &lt;attribute '__weakref__' of 'XYs' objects&gt;, '__sub__': &lt;function __sub__ at 0x107c48488&gt;, 'copyDataToXYs': &lt;function copyDataToXYs at 0x107c48cf8&gt;, 'group': &lt;function group at 0x107c49a28&gt;, 'getDomainGrid': &lt;function getDomainGrid at 0x107c49500&gt;, 'union': &lt;function union at 0x107c491b8&gt;, 'toPointwiseLinear': &lt;function toPointwiseLinear at 0x107c49de8&gt;, '__abs__': &lt;function __abs__ at 0x107c48320&gt;, 'integrate': &lt;function integrate at 0x107c49c08&gt;, 'changeInterpolation': &lt;function changeInterpolation at 0x107c489b0&gt;, 'yMin': &lt;function yMin at 0x107c495f0&gt;, 'getAxisIndexByIndexOrName': &lt;function getAxisIndexByIndexOrName at 0x107c48c08&gt;, 'yMax': &lt;function yMax at 0x107c49668&gt;, 'getDomain': &lt;function getDomain at 0x107c49488&gt;, 'mutualify': &lt;function mutualify at 0x107c48ed8&gt;, 'getDomainUnit': &lt;function getDomainUnit at 0x107c49578&gt;, '__dict__': &lt;attribute '__dict__' of 'XYs' objects&gt;, 'toXML': &lt;function toXML at 0x107c49e60&gt;, 'groupThreeFunctions': &lt;function groupThreeFunctions at 0x107c49b90&gt;, 'domainMax': &lt;function domainMax at 0x107c49410&gt;, 'domainMin': &lt;function domainMin at 0x107c49320&gt;, 'copy': &lt;function copy at 0x107c48c80&gt;, 'integrateThreeFunctions': &lt;function integrateThreeFunctions at 0x107c49d70&gt;, 'xSlice_units': &lt;function xSlice_units at 0x107c49758&gt;, '__mod__': &lt;function __mod__ at 0x107c497d0&gt;, '__doc__': None, 'thin': &lt;function thin at 0x107c490c8&gt;, 'parseXMLNode': &lt;classmethod object at 0x107c40c90&gt;, 'dullEdges': &lt;function dullEdges at 0x107c48d70&gt;, 'domainUnitConversionFactor': &lt;function domainUnitConversionFactor at 0x107c492a8&gt;, 'trim': &lt;function trim at 0x107c49140&gt;, '__module__': 'fudge.core.math.xData.XYs', 'clip': &lt;function clip at 0x107c48aa0&gt;, 'applyFunction': &lt;function applyFunction at 0x107c48938&gt;, '__radd__': &lt;function __add__ at 0x107c48410&gt;, '__rmul__': &lt;function __mul__ at 0x107c48578&gt;, 'xMax': &lt;function xMax at 0x107c49398&gt;, '__init__': &lt;function __init__ at 0x107c482a8&gt;, 'normalize': &lt;function normalize at 0x107c48f50&gt;, 'convertAxisToUnit': &lt;function convertAxisToUnit at 0x107c48b90&gt;, 'xMin': &lt;function xMin at 0x107c49230&gt;, '_group': &lt;function _group at 0x107c499b0&gt;, 'xData': 'XYs', 'setValue_units': &lt;function setValue_units at 0x107c48e60&gt;, 'plot': &lt;function plot at 0x107c49f50&gt;, 'returnAsClass': &lt;classmethod object at 0x107c40788&gt;, 'integrateTwoFunctions': &lt;function integrateTwoFunctions at 0x107c49cf8&gt;, 'createFromFunction': &lt;staticmethod object at 0x107c40cc8&gt;, '__setitem__': &lt;function __setitem__ at 0x107c48758&gt;, 'getitem_units': &lt;function getitem_units at 0x107c486e0&gt;, '__add__': &lt;function __add__ at 0x107c48410&gt;, 'indefiniteIntegral': &lt;function indefiniteIntegral at 0x107c49c80&gt;, 'toXMLList': &lt;function toXMLList at 0x107c49ed8&gt;, 'xSlice': &lt;function xSlice at 0x107c496e0&gt;, '__setslice__': &lt;function __setslice__ at 0x107c488c0&gt;, 'setitem_units': &lt;function setitem_units at 0x107c487d0&gt;, '__div__': &lt;function __div__ at 0x107c485f0&gt;, '__mul__': &lt;function __mul__ at 0x107c48578&gt;, '__neg__': &lt;function __neg__ at 0x107c48398&gt;, 'groupTwoFunctions': &lt;function groupTwoFunctions at 0x107c49b18&gt;, '__pow__': &lt;function __pow__ at 0x107c49848&gt;})</em><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.__dict__" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">__dict__</tt><em class="property"> = dict_proxy({'convolute': &lt;function convolute at 0x10c8d42a8&gt;, 'thicken': &lt;function thicken at 0x10c8d3938&gt;, 'changeInterpolationIfNeeded': &lt;function changeInterpolationIfNeeded at 0x10c8d3320&gt;, '__getslice__': &lt;function __getslice__ at 0x10c8d3140&gt;, 'groupOneFunction': &lt;function groupOneFunction at 0x10c8d4410&gt;, 'toPointwise_withLinearXYs': &lt;function toPointwise_withLinearXYs at 0x10c8d4758&gt;, '__rsub__': &lt;function __rsub__ at 0x10c8cac08&gt;, 'getValue_units': &lt;function getValue_units at 0x10c8d3758&gt;, '__rdiv__': &lt;function __rdiv__ at 0x10c8cae60&gt;, 'clip_units': &lt;function clip_units at 0x10c8d3410&gt;, '__exp__': &lt;function __exp__ at 0x10c8d4230&gt;, '__weakref__': &lt;attribute '__weakref__' of 'XYs' objects&gt;, '__sub__': &lt;function __sub__ at 0x10c8cab90&gt;, 'copyDataToXYs': &lt;function copyDataToXYs at 0x10c8d35f0&gt;, 'group': &lt;function group at 0x10c8d4398&gt;, 'getDomainGrid': &lt;function getDomainGrid at 0x10c8d3de8&gt;, 'union': &lt;function union at 0x10c8d3aa0&gt;, 'defaultAxes': &lt;staticmethod object at 0x10c8c9f30&gt;, '__abs__': &lt;function __abs__ at 0x10c8ca9b0&gt;, 'integrate': &lt;function integrate at 0x10c8d4578&gt;, 'changeInterpolation': &lt;function changeInterpolation at 0x10c8d32a8&gt;, 'yMin': &lt;function yMin at 0x10c8d3ed8&gt;, 'getAxisIndexByIndexOrName': &lt;function getAxisIndexByIndexOrName at 0x10c8d3500&gt;, '__isub__': &lt;function __isub__ at 0x10c8cac80&gt;, 'yMax': &lt;function yMax at 0x10c8d3f50&gt;, 'getDomain': &lt;function getDomain at 0x10c8d3d70&gt;, 'mutualify': &lt;function mutualify at 0x10c8d3848&gt;, 'getDimensions': &lt;function getDimensions at 0x10c8d36e0&gt;, 'getDomainUnit': &lt;function getDomainUnit at 0x10c8d3e60&gt;, '__dict__': &lt;attribute '__dict__' of 'XYs' objects&gt;, 'toXML': &lt;function toXML at 0x10c8d47d0&gt;, 'groupThreeFunctions': &lt;function groupThreeFunctions at 0x10c8d4500&gt;, 'domainMax': &lt;function domainMax at 0x10c8d3cf8&gt;, 'domainMin': &lt;function domainMin at 0x10c8d3c08&gt;, 'copy': &lt;function copy at 0x10c8d3578&gt;, 'integrateThreeFunctions': &lt;function integrateThreeFunctions at 0x10c8d46e0&gt;, 'xSlice_units': &lt;function xSlice_units at 0x10c8d40c8&gt;, '__mod__': &lt;function __mod__ at 0x10c8d4140&gt;, '__iadd__': &lt;function __iadd__ at 0x10c8cab18&gt;, '__doc__': None, 'thin': &lt;function thin at 0x10c8d39b0&gt;, 'parseXMLNode': &lt;classmethod object at 0x10c8c9ec0&gt;, 'dullEdges': &lt;function dullEdges at 0x10c8d3668&gt;, 'domainUnitConversionFactor': &lt;function domainUnitConversionFactor at 0x10c8d3b90&gt;, 'trim': &lt;function trim at 0x10c8d3a28&gt;, '__module__': 'fudge.core.math.xData.XYs', 'clip': &lt;function clip at 0x10c8d3398&gt;, 'applyFunction': &lt;function applyFunction at 0x10c8d3230&gt;, 'mutableYUnit': True, '__radd__': &lt;function __add__ at 0x10c8caaa0&gt;, '__rmul__': &lt;function __mul__ at 0x10c8cacf8&gt;, 'xMax': &lt;function xMax at 0x10c8d3c80&gt;, '__init__': &lt;function __init__ at 0x10c8ca938&gt;, 'normalize': &lt;function normalize at 0x10c8d38c0&gt;, 'convertAxisToUnit': &lt;function convertAxisToUnit at 0x10c8d3488&gt;, 'xMin': &lt;function xMin at 0x10c8d3b18&gt;, '_group': &lt;function _group at 0x10c8d4320&gt;, 'xData': 'XYs', 'setValue_units': &lt;function setValue_units at 0x10c8d37d0&gt;, 'plot': &lt;function plot at 0x10c8d48c0&gt;, '__idiv__': &lt;function __idiv__ at 0x10c8caed8&gt;, 'returnAsClass': &lt;classmethod object at 0x10c8c9868&gt;, 'integrateTwoFunctions': &lt;function integrateTwoFunctions at 0x10c8d4668&gt;, 'createFromFunction': &lt;staticmethod object at 0x10c8c9ef8&gt;, '__setitem__': &lt;function __setitem__ at 0x10c8d3050&gt;, 'getitem_units': &lt;function getitem_units at 0x10c8caf50&gt;, '__add__': &lt;function __add__ at 0x10c8caaa0&gt;, 'indefiniteIntegral': &lt;function indefiniteIntegral at 0x10c8d45f0&gt;, 'toXMLList': &lt;function toXMLList at 0x10c8d4848&gt;, '__imul__': &lt;function __imul__ at 0x10c8cad70&gt;, 'xSlice': &lt;function xSlice at 0x10c8d4050&gt;, '__setslice__': &lt;function __setslice__ at 0x10c8d31b8&gt;, 'setitem_units': &lt;function setitem_units at 0x10c8d30c8&gt;, '__div__': &lt;function __div__ at 0x10c8cade8&gt;, '__mul__': &lt;function __mul__ at 0x10c8cacf8&gt;, '__neg__': &lt;function __neg__ at 0x10c8caa28&gt;, 'groupTwoFunctions': &lt;function groupTwoFunctions at 0x10c8d4488&gt;, '__pow__': &lt;function __pow__ at 0x10c8d41b8&gt;})</em><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.__dict__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -596,10 +667,30 @@ case, the <tt class="docutils literal"><span class="pre">XYs</span></tt> instanc
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="fudge.core.math.xData.XYs.XYs.__iadd__">
+<tt class="descname">__iadd__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.__iadd__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.__iadd__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.core.math.xData.XYs.XYs.__idiv__">
+<tt class="descname">__idiv__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.__idiv__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.__idiv__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.core.math.xData.XYs.XYs.__imul__">
+<tt class="descname">__imul__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.__imul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.__imul__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="fudge.core.math.xData.XYs.XYs.__init__">
 <tt class="descname">__init__</tt><big>(</big><em>axes_</em>, <em>data</em>, <em>accuracy</em>, <em>dataForm='xys'</em>, <em>initialSize=None</em>, <em>overflowSize=10</em>, <em>biSectionMax=6</em>, <em>infill=True</em>, <em>safeDivide=False</em>, <em>index=None</em>, <em>value=None</em>, <em>parent=None</em>, <em>moniker='XYs'</em>, <em>isPrimaryXData=None</em>, <em>changeInterpolationSubFunction=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor for XYs class. dataForm can be &#8216;xys&#8217;, &#8216;xsandys&#8217; or list.</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="fudge.core.math.xData.XYs.XYs.__isub__">
+<tt class="descname">__isub__</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.__isub__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.__isub__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="fudge.core.math.xData.XYs.XYs.__mod__">
@@ -669,28 +760,52 @@ case, the <tt class="docutils literal"><span class="pre">XYs</span></tt> instanc
 
 <dl class="method">
 <dt id="fudge.core.math.xData.XYs.XYs._group">
-<tt class="descname">_group</tt><big>(</big><em>groupBoundaries</em>, <em>f2=None</em>, <em>f3=None</em>, <em>norm=None</em>, <em>asXYs=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs._group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs._group" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">_group</tt><big>(</big><em>xs</em>, <em>f2=None</em>, <em>f3=None</em>, <em>norm=None</em>, <em>asXYs=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs._group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs._group" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function will be renamed to group when it is completed. Called <tt class="docutils literal"><span class="pre">_group</span></tt> for now so that it does not conflict with
 Dave Brown&#8217;s version when using svn. That is, this version will eventually replace Dave&#8217;s.</p>
-<p>This function groups self onto the boudaries given in <tt class="docutils literal"><span class="pre">groupBoundaries</span></tt>. If <tt class="docutils literal"><span class="pre">asXYs</span></tt> is <tt class="docutils literal"><span class="pre">False</span></tt>, the returned 
-list, here in called <tt class="docutils literal"><span class="pre">groups</span></tt>, has <tt class="docutils literal"><span class="pre">length</span> <span class="pre">=</span> <span class="pre">len(</span> <span class="pre">groupBoundaries</span> <span class="pre">)</span> <span class="pre">-</span> <span class="pre">1</span></tt> with the <span class="math">\({i-1}^{th}\)</span> item begin the 
-integral along the <span class="math">\(x\)</span> axis, <span class="math">\(dx\)</span>, from <tt class="docutils literal"><span class="pre">x[i]</span> <span class="pre">=</span> <span class="pre">groupBoundaries[i]</span></tt> to <tt class="docutils literal"><span class="pre">x[i+1]</span> <span class="pre">=</span> <span class="pre">groupBoundaries[i+1]</span></tt> defined as</p>
-<div class="highlight-python"><pre>groups[i] = self(x) / n[i]                       for f2 = f3 = None
-groups[i] = self(x) * f2(x) / n[i]               for f2 = None
-groups[i] = self(x) * f3(x) / n[i]               for f3 = None
-groups[i] = self(x) * f2(x) * f(x) / n[i]        otherwise</pre>
-</div>
-<p>Here norm can be None, <tt class="docutils literal"><span class="pre">dx</span></tt> or a list of length <tt class="docutils literal"><span class="pre">len(</span> <span class="pre">groupBoundaries</span> <span class="pre">)</span> <span class="pre">-</span> <span class="pre">1</span></tt> of numbers.</p>
-<blockquote>
-<div><table border="1" class="docutils">
+<p>The argument <tt class="docutils literal"><span class="pre">xs</span></tt> is a list of x-values with <tt class="docutils literal"><span class="pre">xs[i]</span> <span class="pre">&lt;</span> <span class="pre">xs[i+1]</span></tt>. This function calculates the integrals</p>
+<div class="math">
+\[\int_{xs[i]}^{xs[i+1]} dx \; { f(x) \over n[i] }\]</div>
+<dl class="docutils">
+<dt>where <span class="math">\(f(x)\)</span> is defined as</dt>
+<dd><table border="1" class="first last docutils">
 <colgroup>
-<col width="48%" />
-<col width="52%" />
+<col width="64%" />
+<col width="36%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>norm</td>
-<td>n[i]</td>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><span class="math">\(f(x)\)</span></th>
+<th class="head">conditional</th>
 </tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><span class="math">\(f_1(x)\)</span></td>
+<td>for f2 = f3 = None</td>
+</tr>
+<tr class="row-odd"><td><span class="math">\(f_1(x) \, f_2(x)\)</span></td>
+<td>for f3 = None</td>
+</tr>
+<tr class="row-even"><td><span class="math">\(f_1(x) \, f_3(x)\)</span></td>
+<td>for f2 = None</td>
+</tr>
+<tr class="row-odd"><td><span class="math">\(f_1(x) \, f_2(x) \, f_3(x)\)</span></td>
+<td>otherwise</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt><span class="math">\(f_1(x)\)</span> is self evaluated at <cite>x</cite> and <cite>n[i]</cite> is a normalization determined from the <cite>norm</cite> arugment as</dt>
+<dd><table border="1" class="first last docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">norm</th>
+<th class="head">n[i]</th>
+</tr>
+</thead>
+<tbody valign="top">
 <tr class="row-even"><td>None</td>
 <td>1</td>
 </tr>
@@ -702,9 +817,13 @@ groups[i] = self(x) * f2(x) * f(x) / n[i]        otherwise</pre>
 </tr>
 </tbody>
 </table>
-</div></blockquote>
-<p>If <tt class="docutils literal"><span class="pre">asXYs</span></tt> is <tt class="docutils literal"><span class="pre">True</span></tt>, an instance of class <tt class="docutils literal"><span class="pre">XYs</span></tt> is returned with the x-values from <tt class="docutils literal"><span class="pre">groupBoundaries</span></tt> and with 
-interpolation &#8216;linear,flat&#8217;.</p>
+</dd>
+</dl>
+<p>The arguments f2 (and f3) must be None of an XYs instance.</p>
+<p>If <tt class="docutils literal"><span class="pre">asXYs</span></tt> is <tt class="docutils literal"><span class="pre">False</span></tt>, then <tt class="docutils literal"><span class="pre">len(</span> <span class="pre">xs</span> <span class="pre">)</span> <span class="pre">-</span> <span class="pre">1</span></tt> integrals are returned.
+If <tt class="docutils literal"><span class="pre">asXYs</span></tt> is <tt class="docutils literal"><span class="pre">True</span></tt>, the last integral&#8217;s values is appended to the end to make a list of length <tt class="docutils literal"><span class="pre">len(</span> <span class="pre">xs</span> <span class="pre">)</span></tt>, and 
+an instance of class <tt class="docutils literal"><span class="pre">XYs</span></tt> is returned with the x-values from <tt class="docutils literal"><span class="pre">xs</span></tt>, the y-values from the integrals and the interpolation is &#8216;linear,flat&#8217;.</p>
+<p>Historical note: the word group comes from deterministic neutron transport (e.g., transport used to simulate nuclear reactors.</p>
 </dd></dl>
 
 <dl class="method">
@@ -766,6 +885,11 @@ of the function over the domain of the x-values. There must be at least 2 x-valu
 must be linear,linear, else a raise is executed. See pointwiseXY_C.createFromFunction for all other arguments.</p>
 </dd></dl>
 
+<dl class="staticmethod">
+<dt id="fudge.core.math.xData.XYs.XYs.defaultAxes">
+<em class="property">static </em><tt class="descname">defaultAxes</tt><big>(</big><em>labelsUnits={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.defaultAxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.defaultAxes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="fudge.core.math.xData.XYs.XYs.domainMax">
 <tt class="descname">domainMax</tt><big>(</big><em>unitTo=None</em>, <em>asPQU=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.domainMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.domainMax" title="Permalink to this definition">¶</a></dt>
@@ -790,6 +914,12 @@ must be linear,linear, else a raise is executed. See pointwiseXY_C.createFromFun
 <dt id="fudge.core.math.xData.XYs.XYs.getAxisIndexByIndexOrName">
 <tt class="descname">getAxisIndexByIndexOrName</tt><big>(</big><em>indexOrName</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.getAxisIndexByIndexOrName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.getAxisIndexByIndexOrName" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="fudge.core.math.xData.XYs.XYs.getDimensions">
+<tt class="descname">getDimensions</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.getDimensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.getDimensions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dimensions (2 for XYs) for this type of data.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="fudge.core.math.xData.XYs.XYs.getDomain">
@@ -818,7 +948,7 @@ must be linear,linear, else a raise is executed. See pointwiseXY_C.createFromFun
 
 <dl class="method">
 <dt id="fudge.core.math.xData.XYs.XYs.group">
-<tt class="descname">group</tt><big>(</big><em>groupBoundaries=</em><span class="optional">[</span><span class="optional">]</span>, <em>groupUnit=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.group" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">group</tt><big>(</big><em>groupBoundaries=</em>, <span class="optional">[</span><span class="optional">]</span><em>groupUnit=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.group" title="Permalink to this definition">¶</a></dt>
 <dd><p>A convience fuction that groups an XYs instance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -841,28 +971,28 @@ in the group structure&#8217;s units (at least for the X axis).</p>
 
 <dl class="method">
 <dt id="fudge.core.math.xData.XYs.XYs.groupOneFunction">
-<tt class="descname">groupOneFunction</tt><big>(</big><em>groupBoundaries</em>, <em>norm=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.groupOneFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.groupOneFunction" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">groupOneFunction</tt><big>(</big><em>xs</em>, <em>norm=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.groupOneFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.groupOneFunction" title="Permalink to this definition">¶</a></dt>
 <dd><div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Need unit of groupBoundaries.</p>
+<p class="last">Need unit of xs.</p>
 </div>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.core.math.xData.XYs.XYs.groupThreeFunctions">
-<tt class="descname">groupThreeFunctions</tt><big>(</big><em>groupBoundaries</em>, <em>f2</em>, <em>f3</em>, <em>norm=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.groupThreeFunctions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.groupThreeFunctions" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">groupThreeFunctions</tt><big>(</big><em>xs</em>, <em>f2</em>, <em>f3</em>, <em>norm=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.groupThreeFunctions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.groupThreeFunctions" title="Permalink to this definition">¶</a></dt>
 <dd><div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Need unit of groupBoundaries.</p>
+<p class="last">Need unit of xs.</p>
 </div>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.core.math.xData.XYs.XYs.groupTwoFunctions">
-<tt class="descname">groupTwoFunctions</tt><big>(</big><em>groupBoundaries</em>, <em>f2</em>, <em>norm=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.groupTwoFunctions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.groupTwoFunctions" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">groupTwoFunctions</tt><big>(</big><em>xs</em>, <em>f2</em>, <em>norm=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.groupTwoFunctions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.groupTwoFunctions" title="Permalink to this definition">¶</a></dt>
 <dd><div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Need unit of groupBoundaries.</p>
+<p class="last">Need unit of xs.</p>
 </div>
 </dd></dl>
 
@@ -902,6 +1032,11 @@ in the group structure&#8217;s units (at least for the X axis).</p>
 </div>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="fudge.core.math.xData.XYs.XYs.mutableYUnit">
+<tt class="descname">mutableYUnit</tt><em class="property"> = True</em><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.mutableYUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="fudge.core.math.xData.XYs.XYs.mutualify">
 <tt class="descname">mutualify</tt><big>(</big><em>lowerEps1</em>, <em>upperEps1</em>, <em>positiveXOnly1</em>, <em>other</em>, <em>lowerEps2</em>, <em>upperEps2</em>, <em>positiveXOnly2</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.mutualify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.mutualify" title="Permalink to this definition">¶</a></dt>
@@ -918,8 +1053,8 @@ in the group structure&#8217;s units (at least for the X axis).</p>
 
 <dl class="classmethod">
 <dt id="fudge.core.math.xData.XYs.XYs.parseXMLNode">
-<em class="property">classmethod </em><tt class="descname">parseXMLNode</tt><big>(</big><em>xdataElement</em>, <em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.parseXMLNode" title="Permalink to this definition">¶</a></dt>
-<dd><p>translate anything directly inheriting XYs (pointwise multiplicity or xsc for example) back from xml</p>
+<em class="property">classmethod </em><tt class="descname">parseXMLNode</tt><big>(</big><em>xdataElement</em>, <em>xPath=</em>, <span class="optional">[</span><span class="optional">]</span><em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate anything directly inheriting XYs (pointwise multiplicity or xsc for example) back from xml.</p>
 </dd></dl>
 
 <dl class="method">
@@ -963,8 +1098,8 @@ the __add__ method used this classmethod, the returned instance will also be an 
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fudge.core.math.xData.XYs.XYs.toPointwiseLinear">
-<tt class="descname">toPointwiseLinear</tt><big>(</big><em>accuracy=None</em>, <em>lowerEps=0</em>, <em>upperEps=0</em>, <em>cls=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.toPointwiseLinear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.toPointwiseLinear" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.core.math.xData.XYs.XYs.toPointwise_withLinearXYs">
+<tt class="descname">toPointwise_withLinearXYs</tt><big>(</big><em>accuracy=None</em>, <em>lowerEps=0</em>, <em>upperEps=0</em>, <em>cls=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/XYs.html#XYs.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.XYs.XYs.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1146,18 +1281,13 @@ qualifier must also be None for returned value to be True; otherwise, qualifier 
 
 <dl class="class">
 <dt id="fudge.core.math.xData.axes.axis">
-<em class="property">class </em><tt class="descclassname">fudge.core.math.xData.axes.</tt><tt class="descname">axis</tt><big>(</big><em>label</em>, <em>index</em>, <em>unit</em>, <em>frame=None</em>, <em>interpolation=None</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/axes.html#axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.axes.axis" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">fudge.core.math.xData.axes.</tt><tt class="descname">axis</tt><big>(</big><em>label</em>, <em>index</em>, <em>unit</em>, <em>interpolation=None</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/axes.html#axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.axes.axis" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="fudge.core.html#fudge.core.ancestry.ancestry" title="fudge.core.ancestry.ancestry"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.ancestry.ancestry</span></tt></a></p>
 <dl class="method">
 <dt id="fudge.core.math.xData.axes.axis.copy">
 <tt class="descname">copy</tt><big>(</big><em>index=None</em>, <em>parent=None</em>, <em>standAlone=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/axes.html#axis.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.axes.axis.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a new instance that is a copy of self.</p>
 </dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.xData.axes.axis.getFrame">
-<tt class="descname">getFrame</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/axes.html#axis.getFrame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.axes.axis.getFrame" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="method">
 <dt id="fudge.core.math.xData.axes.axis.getLabel">
@@ -1190,6 +1320,12 @@ qualifier must also be None for returned value to be True; otherwise, qualifier 
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="fudge.core.math.xData.axes.axis.setUnit">
+<tt class="descname">setUnit</tt><big>(</big><em>unit</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/axes.html#axis.setUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.axes.axis.setUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets self&#8217;s unit. Only checks that unit is a string. If unit is None, it is set to an empty string (i.e., &#8216;&#8217;).</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="fudge.core.math.xData.axes.axis.toXML">
 <tt class="descname">toXML</tt><big>(</big><em>indent=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/axes.html#axis.toXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.axes.axis.toXML" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1206,7 +1342,8 @@ qualifier must also be None for returned value to be True; otherwise, qualifier 
 <dt id="fudge.core.math.xData.axes.defaultAxes">
 <tt class="descclassname">fudge.core.math.xData.axes.</tt><tt class="descname">defaultAxes</tt><big>(</big><em>dimension=2</em>, <em>independentInterpolation='linear'</em>, <em>dependentInterpolation='linear'</em>, <em>labelsUnits={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/axes.html#defaultAxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.axes.defaultAxes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper function to initialize <tt class="docutils literal"><span class="pre">axes</span></tt>. Example, setting up <tt class="docutils literal"><span class="pre">axes</span></tt> for a pointwise lin-lin crossSection</p>
-<div class="highlight-python"><pre>axes_ = defaultAxes( labelsUnits = { 0 : ( 'energy_in', 'eV' ), 1 : ( 'crossSection' , 'b' ) } ).</pre>
+<div class="highlight-python"><div class="highlight"><pre>axes_ = defaultAxes( labelsUnits = { 0 : ( &#39;energy_in&#39;, &#39;eV&#39; ), 1 : ( &#39;crossSection&#39; , &#39;b&#39; ) } ).
+</pre></div>
 </div>
 </dd></dl>
 
@@ -1329,7 +1466,7 @@ instance of interpolationAxis as the constructor for this class handles that tas
 
 <dl class="function">
 <dt id="fudge.core.math.xData.axes.parseXMLNode">
-<tt class="descclassname">fudge.core.math.xData.axes.</tt><tt class="descname">parseXMLNode</tt><big>(</big><em>axesElement</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/axes.html#parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.axes.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.core.math.xData.axes.</tt><tt class="descname">parseXMLNode</tt><big>(</big><em>axesElement</em>, <em>xPath=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/axes.html#parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.axes.parseXMLNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Starting with &#8216;&lt;axes&gt;&#8217; or &#8216;&lt;interpolationAxes&gt;&#8217; element in xml-formatted GND document, read in axes information.</p>
 </dd></dl>
 
@@ -1383,7 +1520,7 @@ instance of interpolationAxis as the constructor for this class handles that tas
 
 <dl class="classmethod">
 <dt id="fudge.core.math.xData.polynomial.polynomial.parseXMLNode">
-<em class="property">classmethod </em><tt class="descname">parseXMLNode</tt><big>(</big><em>polyElement</em>, <em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/polynomial.html#polynomial.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.polynomial.polynomial.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><tt class="descname">parseXMLNode</tt><big>(</big><em>polyElement</em>, <em>xPath=</em>, <span class="optional">[</span><span class="optional">]</span><em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/polynomial.html#polynomial.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.polynomial.polynomial.parseXMLNode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1392,8 +1529,8 @@ instance of interpolationAxis as the constructor for this class handles that tas
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fudge.core.math.xData.polynomial.polynomial.toPointwiseLinear">
-<tt class="descname">toPointwiseLinear</tt><big>(</big><em>xMin</em>, <em>xMax</em>, <em>accuracy</em>, <em>biSectionMax=8</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/polynomial.html#polynomial.toPointwiseLinear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.polynomial.polynomial.toPointwiseLinear" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.core.math.xData.polynomial.polynomial.toPointwise_withLinearXYs">
+<tt class="descname">toPointwise_withLinearXYs</tt><big>(</big><em>xMin</em>, <em>xMax</em>, <em>accuracy</em>, <em>biSectionMax=8</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/polynomial.html#polynomial.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.polynomial.polynomial.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the self&#8217;s y-value at various x-values and the returns the results as a XYs.pointwiseXY instance.</p>
 </dd></dl>
 
@@ -1454,12 +1591,12 @@ instance of interpolationAxis as the constructor for this class handles that tas
 <dd><p>Bases: <a class="reference internal" href="#fudge.core.math.xData.regions.regions" title="fudge.core.math.xData.regions.regions"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.xData.regions.regions</span></tt></a></p>
 <dl class="classmethod">
 <dt id="fudge.core.math.xData.regions.regionsXYs.parseXMLNode">
-<em class="property">classmethod </em><tt class="descname">parseXMLNode</tt><big>(</big><em>regionsElement</em>, <em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/regions.html#regionsXYs.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.regions.regionsXYs.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><tt class="descname">parseXMLNode</tt><big>(</big><em>regionsElement</em>, <em>xPath=</em>, <span class="optional">[</span><span class="optional">]</span><em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/regions.html#regionsXYs.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.regions.regionsXYs.parseXMLNode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="fudge.core.math.xData.regions.regionsXYs.toPointwiseLinear">
-<tt class="descname">toPointwiseLinear</tt><big>(</big><em>accuracy</em>, <em>lowerEps</em>, <em>upperEps</em>, <em>removeOverAdjustedPoints=False</em>, <em>axes_=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/regions.html#regionsXYs.toPointwiseLinear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.regions.regionsXYs.toPointwiseLinear" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.core.math.xData.regions.regionsXYs.toPointwise_withLinearXYs">
+<tt class="descname">toPointwise_withLinearXYs</tt><big>(</big><em>accuracy</em>, <em>lowerEps</em>, <em>upperEps</em>, <em>removeOverAdjustedPoints=False</em>, <em>axes_=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/xData/regions.html#regionsXYs.toPointwise_withLinearXYs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.xData.regions.regionsXYs.toPointwise_withLinearXYs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the regions of self into a single <tt class="docutils literal"><span class="pre">XYs.XYs</span></tt> instance that has &#8216;linear,linear&#8217; interpolation. At the
 boundary between two abutting regions, the x-values are the same, which is not allowed for an <tt class="docutils literal"><span class="pre">XYs.XYs</span></tt> instance.
 The arguments <tt class="docutils literal"><span class="pre">lowerEps</span></tt>, <tt class="docutils literal"><span class="pre">upperEps</span></tt> are used to smear the x-values at a boundary as follows. Let <span class="math">\((x_l, y_l)\)</span> and
@@ -1547,7 +1684,7 @@ for upperEps and the point <span class="math">\((x_u, y_u)\)</span>.</p>
         <li class="right" >
           <a href="fudge.core.math.test.html" title="test Package"
              >previous</a> |</li>
-        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="index.html" >fudge Package</a> &raquo;</li>
           <li><a href="fudge.core.html" >core Package</a> &raquo;</li>
           <li><a href="fudge.core.math.html" >math Package</a> &raquo;</li> 
@@ -1555,7 +1692,7 @@ for upperEps and the point <span class="math">\((x_u, y_u)\)</span>.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

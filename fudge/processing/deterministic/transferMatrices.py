@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 import os, subprocess
@@ -6,53 +31,95 @@ from fudge.core.utilities import fudgeFileMisc, subprocessing, times
 from pqu.physicalQuantityWithUncertainty import PhysicalQuantityWithUncertainty
 
 from fudge.core.math.xData import axes, XYs, LegendreSeries
-GND2ProcessingInterpolations = { axes.unitBaseToken : 'unit base', axes.flatToken : 'flat', 
-    axes.linearToken + axes.linearToken : 'linear-linear', axes.linearToken + axes.logToken : 'linear-log', 
-    axes.logToken    + axes.linearToken : 'log-linear',    axes.logToken    + axes.logToken : 'log-log' }
+linlin = axes.linearToken + axes.linearToken
+linlog = axes.linearToken + axes.logToken
+loglin = axes.logToken + axes.linearToken
+loglog = axes.logToken + axes.logToken
+
+GND2ProcessingInterpolations = { axes.unitBaseToken : 'unit base', axes.correspondingPointsToken : 'corresponding energies', 
+        axes.flatToken : 'flat', linlin : 'linear-linear', linlog : 'linear-log', loglin : 'log-linear', loglog : 'log-log' }
 
 versionStr = "xndfgenTransferMatrix: version 1.0"
 doubleFmt = "%19.12e"
 lowerEps = 1e-8
 upperEps = 1e-8
+startOfNewData = "\n# Start data\n"
+startOfNewSubData = "# Start sub data"
 
 if( os.path.exists( 'get_transfer' ) ) :
     srcPath = os.path.abspath( './' )
 else :
     srcPath = os.path.split( os.path.abspath( __file__ ) )[0]
 
-def twoBodyTransferMatrix( processInfo, projectile, product, crossSection, angularData, mProj, mTarget, mProd, mRes, Q, comment = None ) :
+def twoBodyTransferMatrix( processInfo, projectile, product, crossSection, angularData, masses, Q, weight = None, comment = None ) :
+    """
+    Generate input and call processing code to generate a transfer matrix for two-body angular distribution.
+    If the distribution is actually made up of two different forms in different energy regions, this function
+    calls itself in the two regions and sums the result.
+    """
 
     from fudge.gnd.productData import distributions
+    weightAxes = axes.defaultAxes( dependentInterpolation = axes.flatToken )
 
     if( isinstance( angularData, distributions.angular.mixedRanges ) ) :    # Legendre and tabulated data can still be piecewise.
-        crossSectionLower = crossSection.xSlice( xMax = angularData.LegendreForm.domainMax() )
-        crossSectionUpper = crossSection.xSlice( xMin = angularData.tabulatedForm.domainMin() )
-        L_TM1, L_TME = twoBodyTransferMatrix( processInfo, projectile, product, crossSectionLower, angularData.LegendreForm, mProj, mTarget, mProd, mRes, 
-            Q, comment = comment )
-        t_TM1, t_TME = twoBodyTransferMatrix( processInfo, projectile, product, crossSectionUpper, angularData.tabulatedForm, mProj, mTarget, mProd, mRes, 
-            Q, comment = comment )
+        boundaries = [angularData.LegendreForm.domainMin(), angularData.LegendreForm.domainMax(), angularData.tabulatedForm.domainMax()]
+        crossSectionLower = crossSection.xSlice( xMax = boundaries[1] )
+        crossSectionUpper = crossSection.xSlice( xMin = boundaries[1] )
+
+        weightLower = XYs.XYs( weightAxes, zip(boundaries, [1,1,0]), 1e-6 )
+        weightUpper = XYs.XYs( weightAxes, zip(boundaries, [0,1,1]), 1e-6 )
+
+        L_TM1, L_TME = twoBodyTransferMatrix( processInfo, projectile, product, crossSectionLower, angularData.LegendreForm, masses, 
+            Q, weight = weightLower, comment = comment )
+        processInfo['workFile'].append( 'r1' )
+        try :
+            t_TM1, t_TME = twoBodyTransferMatrix( processInfo, projectile, product, crossSectionUpper, angularData.tabulatedForm, masses, 
+                Q, weight = weightUpper, comment = comment )
+        except :
+            del processInfo['workFile'][-1]
+            raise
+        del processInfo['workFile'][-1]
         TM1 = addTMs( [ L_TM1, t_TM1 ] )
         TME = addTMs( [ L_TME, t_TME ] )
     elif( isinstance( angularData, distributions.angular.piecewise ) ) :
         raise Exception( 'distributions.angular.piecewise not supported' )
     elif( isinstance( angularData, distributions.angular.LegendrePiecewise ) ) :
-        TM1s, TMEs = [], []
-        for region in angularData :
-            TM1, TME = twoBodyTransferMatrix2( processInfo, projectile, product, crossSection, region, mProj, mTarget, mProd, mRes, Q, comment = comment )
+        # process each piecewise region separately:
+        TM1s, TMEs, productFrame = [], [], angularData.getProductFrame( )
+        lowestBound, highestBound = angularData[0].domainMin(), angularData[-1].domainMax()
+        for iRegion, region in enumerate( angularData ) :
+            # weights define sharp cutoff for each region (important if region boundary doesn't match group boundary for processing):
+            if iRegion==0: weightData = [[lowestBound,1],[region.domainMax(),0],[highestBound,0]]
+            elif iRegion==len(angularData)-1: weightData = [[lowestBound,0],[region.domainMin(),1],[highestBound,1]]
+            else: weightData = [[lowestBound,0],[region.domainMin(),1],[region.domainMax(),0],[highestBound,0]]
+            weight_ = XYs.XYs( weightAxes, weightData, 1e-6 )
+
+            processInfo['workFile'].append( 'r%s' % iRegion )
+            try :
+                TM1, TME = twoBodyTransferMatrix2( processInfo, projectile, product, crossSection, region, masses, Q, 
+                    productFrame, weight = weight_, comment = comment )
+            except :
+                del processInfo['workFile'][-1]
+                raise
+            del processInfo['workFile'][-1]
             TM1s.append( TM1 )
             TMEs.append( TME )
         TM1 = addTMs( TM1s )
         TME = addTMs( TMEs )
     else :
-        TM1, TME = twoBodyTransferMatrix2( processInfo, projectile, product, crossSection, angularData, mProj, mTarget, mProd, mRes, Q, comment = comment )
+        TM1, TME = twoBodyTransferMatrix2( processInfo, projectile, product, crossSection, angularData, masses, Q, 
+            angularData.getProductFrame( ), weight = weight, comment = comment )
     return( TM1, TME )
         
-def twoBodyTransferMatrix2( processInfo, projectile, product, crossSection, angularData, mProj, mTarget, mProd, mRes, Q, comment = None ) :
+def twoBodyTransferMatrix2( processInfo, projectile, product, crossSection, angularData, masses, Q, productFrame, weight = None, comment = None ) :
+    """
+    Helper function for twoBodyTransferMatrix. This should be called separately for every different angular distribution form,
+    and for every interpolation region within a piecewise form.
+    """
 
     from fudge.gnd.productData import distributions
 
     logFile, lMax = processInfo['logFile'], processInfo.getParticle_lMax( product )
-    projectileGroupBoundaries, productGroupBoundaries = processInfo.getParticleGroups( projectile ), processInfo.getParticleGroups( product )
     fluxes, workDir = processInfo['flux']['data'], processInfo['workDir']
 
     if( isinstance( angularData, distributions.angular.recoil ) ) : angularData = angularData.getNumericalDistribution( )
@@ -65,118 +132,118 @@ def twoBodyTransferMatrix2( processInfo, projectile, product, crossSection, angu
         s += "Process: 'two body transfer matrix'\n"
 
     if( comment is not None ) : s += "Comment: %s\n" % comment
-    s += "Projectile's mass: %s\n" % floatToString( mProj )
-    s += "Target's mass: %s\n" % floatToString( mTarget )
-    s += "Product's mass: %s\n" % floatToString( mProd )
-    s += "Residual's mass: %s\n" % floatToString( mRes )
-
     s += "Reaction's Q value: %s\n" % floatToString( Q )
 
-    s += commonDataToString( lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, crossSection )
-    s += angularToString( angularData, crossSection )
-    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir ) )
+    s += commonDataToString( lMax, processInfo, projectile, product, masses, fluxes, crossSection, productFrame )
+    s += angularToString( angularData, crossSection, weight = weight, twoBody = True )
+    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir, processInfo['workFile'] ) )
 
 def wholeAtomScattering( processInfo, projectile, product, formFactor, comment = None ) :
 
-    logFile, lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, workDir = processInfo['logFile'], processInfo.getParticle_lMax( product ), \
-        processInfo.getParticleGroups( projectile ), processInfo.getParticleGroups( product ), processInfo['flux']['data'], processInfo['workDir']
+    logFile, lMax = processInfo['logFile'], processInfo.getParticle_lMax( product )
+    fluxes, workDir = processInfo['flux']['data'], processInfo['workDir']
 
     s  = versionStr + '\n'
     s += "Process: 'whole atom scattering'\n"
 
     if( comment is not None ) : s += "Comment: %s\n" % comment
-    s += commonDataToString( lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, None )
+    s += commonDataToString( lMax, processInfo, projectile, product, masses, fluxes, None, axes.labToken )
+    s += startOfNewData
     s += '\n'.join( twoDToString( "FormFactorData", formFactor ) )
-    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir ) )
+    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir, processInfo['workFile'] ) )
 
 def comptonScattering( processInfo, projectile, product, formFactor, comment = None ) :
 
-    logFile, lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, workDir = processInfo['logFile'], processInfo.getParticle_lMax( product ), \
-        processInfo.getParticleGroups( projectile ), processInfo.getParticleGroups( product ), processInfo['flux']['data'], processInfo['workDir']
+    logFile, lMax = processInfo['logFile'], processInfo.getParticle_lMax( product )
+    fluxes, workDir = processInfo['flux']['data'], processInfo['workDir']
 
     s  = versionStr + '\n'
     s += "Process: 'Compton scattering'\n"
 
     if( comment is not None ) : s += "Comment: %s\n" % comment
-    s += commonDataToString( lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, None )
+    s += commonDataToString( lMax, processInfo, projectile, product, masses, fluxes, None, axes.labToken )
     s += '\n'.join( twoDToString( "ScatteringFactorData", formFactor ) )
-    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir ) )
+    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir, processInfo['workFile'] ) )
 
-def ENDFEMuEpP_TransferMatrix( processInfo, projectile, product, crossSection, angularEnergyData, multiplicity, comment = None ) :
+def ENDFEMuEpP_TransferMatrix( processInfo, projectile, product, masses, crossSection, angularEnergyData, multiplicity, comment = None ) :
     """This is ENDF MF = 6, LAW = 7 type data."""
 
-    logFile, lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, workDir = processInfo['logFile'], processInfo.getParticle_lMax( product ), \
-        processInfo.getParticleGroups( projectile ), processInfo.getParticleGroups( product ), processInfo['flux']['data'], processInfo['workDir']
+    logFile, lMax = processInfo['logFile'], processInfo.getParticle_lMax( product )
+    fluxes, workDir = processInfo['flux']['data'], processInfo['workDir']
 
     s  = versionStr + '\n'
     s += "Process: ENDF Double differential EMuEpP data\n"
 
     if( comment is not None ) : s += "Comment: %s\n" % comment
     s += "Quadrature method: adaptive\n"
-    s += commonDataToString( lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, crossSection, multiplicity = multiplicity )
+    s += commonDataToString( lMax, processInfo, projectile, product, masses, fluxes, crossSection, angularEnergyData.getProductFrame( ),
+        multiplicity = multiplicity )
     s += EMuEpPDataToString( angularEnergyData )
-    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir ) )
+    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir, processInfo['workFile'] ) )
 
-def EMuEpP_TransferMatrix( processInfo, projectile, product, crossSection, angularData, EMuEpPData, multiplicity, comment = None ) :
+def EMuEpP_TransferMatrix( processInfo, projectile, product, masses, crossSection, angularData, EMuEpPData, multiplicity, comment = None ) :
     """This is LLNL I = 1, 3 type data."""
 
-    logFile, lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, workDir = processInfo['logFile'], processInfo.getParticle_lMax( product ), \
-        processInfo.getParticleGroups( projectile ), processInfo.getParticleGroups( product ), processInfo['flux']['data'], processInfo['workDir']
+    logFile, lMax = processInfo['logFile'], processInfo.getParticle_lMax( product )
+    fluxes, workDir = processInfo['flux']['data'], processInfo['workDir']
 
     s  = versionStr + '\n'
     s += "Process: 'Double differential EMuEpP data transfer matrix'\n"
 
     if( comment is not None ) : s += "Comment: %s\n" % comment
-    s += commonDataToString( lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, crossSection, multiplicity = multiplicity )
+    s += commonDataToString( lMax, processInfo, projectile, product, masses, fluxes, crossSection, angularData.getProductFrame( ), 
+        multiplicity = multiplicity )
     s += angularToString( angularData, crossSection )
     s += EMuEpPDataToString( EMuEpPData )
-    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir ) )
+    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir, processInfo['workFile'] ) )
 
 def ELEpP_TransferMatrix( processInfo, projectile, product, crossSection, LEEpPData, multiplicity, comment = None ) :
 
-    logFile, lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, workDir = processInfo['logFile'], processInfo.getParticle_lMax( product ), \
-        processInfo.getParticleGroups( projectile ), processInfo.getParticleGroups( product ), processInfo['flux']['data'], processInfo['workDir']
+    logFile, lMax = processInfo['logFile'], processInfo.getParticle_lMax( product )
+    fluxes, workDir = processInfo['flux']['data'], processInfo['workDir']
 
     s  = versionStr + '\n'
     s += "Process: 'Legendre EEpP data transfer matrix'\n"
     if( comment is not None ) : s += "Comment: %s\n" % comment
 
-    s += commonDataToString( lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, crossSection, multiplicity = multiplicity )
+    s += commonDataToString( lMax, processInfo, projectile, product, masses, fluxes, crossSection, LEEpPData.getProductFrame( ),
+        multiplicity = multiplicity )
     s += LEEpPDataToString( LEEpPData )
-    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir ) )
+    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir, processInfo['workFile'] ) )
 
-def Legendre_TransferMatrix( processInfo, projectile, product, crossSection, LegendreData, multiplicity, comment = None ) :
+def Legendre_TransferMatrix( processInfo, projectile, product, crossSection, LegendreData, multiplicity, masses, comment = None ) :
 
-    logFile, lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, workDir = processInfo['logFile'], processInfo.getParticle_lMax( product ), \
-        processInfo.getParticleGroups( projectile ), processInfo.getParticleGroups( product ), processInfo['flux']['data'], processInfo['workDir']
+    logFile, lMax = processInfo['logFile'], processInfo.getParticle_lMax( product )
+    fluxes, workDir = processInfo['flux']['data'], processInfo['workDir']
 
     s  = versionStr + '\n'
     s += "Process: Legendre energy-angle data\n"
     if( comment is not None ) : s += "Comment: %s\n" % comment
 
     s += "Quadrature method: adaptive\n"
-    s += commonDataToString( lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, crossSection, multiplicity = multiplicity )
+    s += commonDataToString( lMax, processInfo, projectile, product, masses, fluxes, crossSection, LegendreData.getProductFrame( ),
+        multiplicity = multiplicity )
     s += LegendreDataToString( LegendreData )
 
-    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir ) )
+    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir, processInfo['workFile'] ) )
 
-def uncorrelated_EMuP_EEpP_TransferMatrix( processInfo, projectile, product, crossSection, angularData, EEpPData, multiplicity, comment = None, weight = None ) :
+def uncorrelated_EMuP_EEpP_TransferMatrix( processInfo, projectile, product, masses, crossSection, angularData, EEpPData, multiplicity, comment = None, weight = None ) :
 
     from fudge.gnd.productData import distributions
 
-    logFile, lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, workDir = processInfo['logFile'], processInfo.getParticle_lMax( product ), \
-        processInfo.getParticleGroups( projectile ), processInfo.getParticleGroups( product ), processInfo['flux']['data'], processInfo['workDir']
+    logFile, lMax = processInfo['logFile'], processInfo.getParticle_lMax( product )
+    fluxes, workDir = processInfo['flux']['data'], processInfo['workDir']
 
     sSpecific = ''
-    sCommon = commonDataToString( lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, crossSection, multiplicity = multiplicity )
-    if( isinstance( EEpPData, distributions.energy.semiPiecewise ) ) : EEpPData = EEpPData.toPointwiseLinear( 1e-6, lowerEps = 1e-12, upperEps = 1e-12 )
+    if( isinstance( EEpPData, distributions.energy.semiPiecewise ) ) : EEpPData = EEpPData.toPointwise_withLinearXYs( 1e-6, lowerEps = 1e-12, upperEps = 1e-12 )
     if( isinstance( EEpPData, distributions.energy.functionalBase ) ) :
         sProcess, sSpecific, sData = energyFunctionToString( EEpPData, weight = weight )
     elif( isinstance( EEpPData, distributions.energy.weightedFunctionals ) ) :
         TM1s, TMEs = [], []
         for weight in EEpPData :
-            TM1, TME = uncorrelated_EMuP_EEpP_TransferMatrix( processInfo, projectile, product, crossSection, angularData, weight.functional, multiplicity, 
-                comment = comment, weight = weight )
+            TM1, TME = uncorrelated_EMuP_EEpP_TransferMatrix( processInfo, projectile, product, masses, crossSection, angularData, 
+                weight.functional, multiplicity, comment = comment, weight = weight )
+            TM1s.append(TM1); TMEs.append(TME)
         TM1 = addTMs( TM1s )
         TME = addTMs( TMEs )
         return( TM1, TME )
@@ -185,15 +252,20 @@ def uncorrelated_EMuP_EEpP_TransferMatrix( processInfo, projectile, product, cro
         sData = angularToString( angularData, crossSection )
         sData += EEpPDataToString( EEpPData )
     if( comment is not None ) : sProcess += "Comment: %s\n" % comment
-    s  = versionStr + '\n' + sProcess + sSpecific + sCommon + sData
-    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir ) )
+    sCommon = commonDataToString( lMax, processInfo, projectile, product, masses, fluxes, crossSection, angularData.getProductFrame( ), 
+        multiplicity = multiplicity )
+    s  = versionStr + '\n' + sProcess + sSpecific + sCommon + startOfNewData + sData
+    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir, processInfo['workFile'] ) )
 
 def discreteGammaAngularData( processInfo, projectile, product, gammaEnergy, crossSection, angularData, multiplicity = 1, comment = None ) :
     """Currently, only isotropic (i.e., l = 0) data are returned. That is, lMax and angularData are ignored. This routine is also used
     for pair-production which pass angularData as None."""
 
-    logFile, lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, workDir = processInfo['logFile'], processInfo.getParticle_lMax( product ), \
-        processInfo.getParticleGroups( projectile ), processInfo.getParticleGroups( product ), processInfo['flux']['data'], processInfo['workDir']
+    from fudge.processing import miscellaneous
+
+    logFile, lMax = processInfo['logFile'], processInfo.getParticle_lMax( product )
+    projectileGroupBoundaries, productGroupBoundaries = processInfo.getParticleGroups( projectile ), processInfo.getParticleGroups( product )
+    fluxes, workDir = processInfo['flux']['data'], processInfo['workDir']
 
     nProj = len( projectileGroupBoundaries ) - 1
     nProd = len( productGroupBoundaries ) - 1
@@ -210,7 +282,7 @@ def discreteGammaAngularData( processInfo, projectile, product, gammaEnergy, cro
     indexEp = max( indexEp, 0 )
     indexEp = min( indexEp, nProd - 1 )
     groupedFlux = fluxes[0].groupOneFunction( projectileGroupBoundaries )
-    xsec = crossSection.groupTwoFunctions( projectileGroupBoundaries, fluxes[0], norm = groupedFlux )
+    xsec = miscellaneous.groupOneFunctionAndFlux( projectile, processInfo, crossSection, norm = groupedFlux )
     for indexE in xrange( nProj ) :
         x = multiplicity * xsec[indexE]
         TM_1[indexE][indexEp] = x
@@ -233,8 +305,9 @@ def primaryGammaAngularData( processInfo, projectile, product, bindingEnergy, ma
     mp is the projectile's mass and mt is the target's mass. Note, this formula is from the ENDF manual an ignores the recoil of the residual
     nucleus."""
 
-    logFile, lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, workDir = processInfo['logFile'], processInfo.getParticle_lMax( product ), \
-        processInfo.getParticleGroups( projectile ), processInfo.getParticleGroups( product ), processInfo['flux']['data'], processInfo['workDir']
+    logFile, lMax = processInfo['logFile'], processInfo.getParticle_lMax( product )
+    projectileGroupBoundaries, productGroupBoundaries = processInfo.getParticleGroups( projectile ), processInfo.getParticleGroups( product )
+    fluxes, workDir = processInfo['flux']['data'], processInfo['workDir']
 
     nProj = len( projectileGroupBoundaries ) - 1
     nProd = len( productGroupBoundaries ) - 1
@@ -267,50 +340,42 @@ def primaryGammaAngularData( processInfo, projectile, product, bindingEnergy, ma
             if( indexEo < ( nProd - 1 ) ) : indexEo += 1
     return( [ [ TM_1 ], [ TM_E ] ] )
 
-def NBodyPhaseSpace( processInfo, projectile, product, crossSection, numberOfProducts, mProj, mTarget, mProduct, mTotal, Q, multiplicity = 1, comment = None ) :
+def NBodyPhaseSpace( processInfo, projectile, product, crossSection, numberOfProducts, masses, mTotal, Q, multiplicity = 1, comment = None ) :
 
     logFile, lMax = processInfo['logFile'], processInfo.getParticle_lMax( product )
-    projectileGroupBoundaries, productGroupBoundaries = processInfo.getParticleGroups( projectile ), processInfo.getParticleGroups( product )
     fluxes, workDir = processInfo['flux']['data'], processInfo['workDir']
 
     s  = versionStr + '\n'
     s += "Process: phase space spectrum\n"
     if( comment is not None ) : s += "Comment: %s\n" % comment
     s += "Number of particles: %s\n" % numberOfProducts
-    s += "Projectile's mass: %s\n" % floatToString( mProj )
-    s += "Target's mass: %s\n" % floatToString( mTarget )
-    s += "Product's mass: %s\n" % floatToString( mProduct )
     s += "Total mass: %s\n" % mTotal
     s += "Q value: %s\n" % Q
     s += 'Quadrature method: Gauss6\n'
-    s += commonDataToString( lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, crossSection, multiplicity = multiplicity )
-    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir ) )
+    s += commonDataToString( lMax, processInfo, projectile, product, masses, fluxes, crossSection, axes.centerOfMassToken, 
+        multiplicity = multiplicity )
+    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir, processInfo['workFile'] ) )
 
-def KalbachMann_TransferMatrix( processInfo, projectile, product, crossSection, particlesData, KalbachMannData, multiplicity = 1, comment = None ) :
+def KalbachMann_TransferMatrix( processInfo, projectile, product, masses, crossSection, particlesData, KalbachMannData, multiplicity = 1, comment = None ) :
 
     logFile, lMax = processInfo['logFile'], processInfo.getParticle_lMax( product )
-    projectileGroupBoundaries, productGroupBoundaries = processInfo.getParticleGroups( projectile ), processInfo.getParticleGroups( product )
     fluxes, workDir = processInfo['flux']['data'], processInfo['workDir']
 
     energy_in_unit = 'MeV'
     s  = versionStr + '\n'
     s += "Process: Kalbach spectrum\n"
     if( comment is not None ) : s += "Comment: %s\n" % comment
-    s += "Projectile's mass: %s\n" % particlesData['projectile']['mass']
     s += "Projectile's ZA: %s\n" % particlesData['projectile']['ZA']
-    s += "Target's mass: %s\n" % particlesData['target']['mass']
     s += "Target's ZA: %s\n" % particlesData['target']['ZA']
-    s += "Product's mass: %s\n" % particlesData['product']['mass']
     s += "Product's ZA: %s\n" % particlesData['product']['ZA']
-    s += "Residual's mass: %s\n" % particlesData['residual']['mass']
     s += "Compound's mass: %s\n" % particlesData['compound']['mass']
     s += "Quadrature method: adaptive\n"
-    s += commonDataToString( lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, crossSection, multiplicity = multiplicity, 
-        energy_in_unit = energy_in_unit )
+    s += commonDataToString( lMax, processInfo, projectile, product, masses, fluxes, crossSection, axes.centerOfMassToken, 
+        multiplicity = multiplicity, energy_in_unit = energy_in_unit )
     s += KalbachMannDataToString( KalbachMannData, energy_in_unit )
-    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir ) )
+    return( executeCommand( logFile, '%s/get_transfer' % srcPath, s, workDir, processInfo['workFile'] ) )
 
-def executeCommand( logFile, file, cmd, workDir ) :
+def executeCommand( logFile, file, cmd, workDir, workFile ) :
 
     def checkNegative_l0( TM_l0, weight, f ) :
 
@@ -323,17 +388,25 @@ def executeCommand( logFile, file, cmd, workDir ) :
                     largestNegative = min( largestNegative, cell )
                     f.write( 'negative l=0 for weight %s at row %3d column %3d: %s\n' % ( weight, ig, ih, cell ) )
         return( negative_l0Counter )
-            
-    dataFile = fudgeFileMisc.fudgeTempFile( dir = workDir, suffix = "_in" )
+
+    if( workFile == [] ) :
+        dataFile = fudgeFileMisc.fudgeTempFile( dir = workDir, suffix = "_in" )
+        fullFileName = dataFile.getName( )
+    else :
+        workFile = '_'.join( workFile ) + '_in'
+        if( workDir is not None ) :
+            if( not( os.path.exists( workDir ) ) ) : os.makedirs( workDir )
+            fullFileName = os.path.join( workDir, workFile )
+        dataFile = open( fullFileName, 'w' )
     dataFile.write( cmd )
     dataFile.close( )
-    infoFile = '%s.info' %  dataFile.getName( )
+    infoFile = '%s.info' % fullFileName
     t0 = times.times( )
     try :
-        status, stdout, stderr = subprocessing.executeCommand( [ file, '-output', '%s.out' % dataFile.getName( ), dataFile.getName( ) ], 
+        status, stdout, stderr = subprocessing.executeCommand( [ file, '-output', fullFileName + '.out', fullFileName ], 
             stdout = infoFile, stderr = subprocess.STDOUT )
     except :
-        f = open( "%s.err" % dataFile.getName( ), "w" )
+        f = open( fullFileName + ".err", "w" )
         f.close( )
         raise
     f = open( infoFile, 'a' )
@@ -341,16 +414,21 @@ def executeCommand( logFile, file, cmd, workDir ) :
     if( status != 0 ) :
         print "status = ", status
         print s
-        raise Exception( 'Transfer failed for %s %s' % ( file, dataFile.getName( ) ) )
-    TM1, TME = parseOutputFile( '%s.out' % dataFile.getName( ) )
-    negative_l0Counter = checkNegative_l0( TM1[0], "0", f )
-    negative_l0Counter += checkNegative_l0( TME[0], "E", f )
+        raise Exception( 'Transfer failed for %s %s' % ( file, fullFileName ) )
+    TM1, TME = parseOutputFile( fullFileName + '.out' )
+    negative_l0Counter = 0
+    if( TM1 is not None ) : negative_l0Counter = checkNegative_l0( TM1[0], "0", f )
+    if( TME is not None ) : negative_l0Counter += checkNegative_l0( TME[0], "E", f )
     if( negative_l0Counter > 0 ) : print 'WARNING: %d negative l=0 elements found in transfer matrix' % negative_l0Counter
     f.close( )
     if( workDir is None ) :
-        os.remove( '%s.out' % dataFile.getName( ) )
-        os.remove( '%s.info' % dataFile.getName( ) )
-        dataFile.delete( )
+        os.remove( fullFileName + '.out' )
+        os.remove( fullFileName + '.info' )
+        if( workFile == [] ) :
+            dataFile.delete( )
+        else :
+            dataFile.close( )
+            os.remove( fullFileName )
     return( TM1, TME )
 
 def parseOutputFile( file ) :
@@ -418,33 +496,41 @@ def parseOutputFile( file ) :
         index += 1
     return( TM1, TME )
 
-def commonDataToString( lMax, projectileGroupBoundaries, productGroupBoundaries, fluxes, crossSection, multiplicity = None, energy_in_unit = None ) :
+def commonDataToString( lMax, processInfo, projectile, product, masses, fluxes, crossSection, productFrame, multiplicity = None, energy_in_unit = None ) :
 
-    crossSection_energy_in_unit = crossSection.axes[0].getUnit( )
+    projectileGroupBoundaries, productGroupBoundaries = processInfo.getParticleGroups( projectile ), processInfo.getParticleGroups( product )
     if( energy_in_unit is not None ) :
-        factor = crossSection.axes[0].unitConversionFactor( energy_in_unit )
         crossSection = crossSection.convertAxisToUnit( 0, energy_in_unit )
         fluxes = [ f.convertAxisToUnit( 0, energy_in_unit ) for f in fluxes ]
-        projectileGroupBoundaries = [ factor * b for b in projectileGroupBoundaries ]   # ????? Currently use endl1dmath projectileGroupBoundaries, need to
-        productGroupBoundaries = [ factor * b for b in productGroupBoundaries ]         # have a new class that has convertAxisToUnit.
+        factor = projectileGroupBoundaries.axes[0].unitConversionFactor( energy_in_unit )
+        projectileGroupBoundaries = [ factor * b for b in projectileGroupBoundaries ]
+        factor = productGroupBoundaries.axes[0].unitConversionFactor( energy_in_unit )
+        productGroupBoundaries = [ factor * b for b in productGroupBoundaries ]
+
     s  = "lMax: %d\n" % lMax
+    for particle, mass in masses.items( ) :
+        if( mass is not None ) : s += "%s's mass: %s\n" % ( particle, floatToString( masses[particle] ) )
+    s += "Projectile Frame: %s\n" % processInfo.target.getProjectileFrame( )
     s += projGBToString( projectileGroupBoundaries )
     s += prodGBToString( productGroupBoundaries )
     s += fluxesToString( fluxes )
-    if( not ( crossSection is None ) ) : s += crossSectionToString( crossSection )
-    if( not ( multiplicity is None ) ) : s += multiplicityToString( multiplicity, crossSection[0][0], crossSection[-1][0], crossSection_energy_in_unit,
-        energy_in_unit = energy_in_unit )
+    if( crossSection is not None ) : s += crossSectionToString( crossSection )
+    if( multiplicity is not None ) : s += multiplicityToString( multiplicity, energy_in_unit = energy_in_unit )
+    if( product == 'gamma' ) : productFrame = axes.labToken     # BRB, hardwired??????
+    s += "\nProduct Frame: %s\n" % productFrame
     return( s )
 
 def projGBToString( gb ) :
 
-    s  = "Projectile's group boundaries: n = %d\n" % len( gb )
+    s  = startOfNewData
+    s += "Projectile's group boundaries: n = %d\n" % len( gb )
     s += oneDToString( gb )
     return( s )
 
 def prodGBToString( gb ) :
 
-    s  = "Product's group boundaries: n = %d\n" % len( gb )
+    s  = startOfNewData
+    s += "Product's group boundaries: n = %d\n" % len( gb )
     s += oneDToString( gb )
     return( s )
 
@@ -460,81 +546,51 @@ def fluxesToString( fluxes ) :
         s.append( '  n = %d' % len( sp  ) )
         s += sp
     s.append( '' )
-    return( '\n'.join( s ) )
+    return( startOfNewData + '\n'.join( s ) )
 
 def crossSectionToString( crossSection ) :
 
-    return( '\n'.join( twoDToString( "Cross section", crossSection ) ) )
+    return( startOfNewData + '\n'.join( twoDToString( "Cross section", crossSection ) ) )
 
-def multiplicityToString( multiplicity_, EMin, EMax, crossSection_energy_in_unit, energy_in_unit = None ) :
+def multiplicityToString( multiplicity_, energy_in_unit = None ) :
 
-    import fudge
-
-    class template :
-        """Dummy class needed for multiplicity.polynomial.toPointwiseLinear."""
-
-        def __init__( self, EMin, EMax ) :
-
-            self.EMin = EMin
-            self.EMax = EMax
-
-        def domainMin( self ) : return( self.EMin )
-
-        def domainMax( self ) : return( self.EMax )
-
-    if( energy_in_unit is not None ) : 
-        factor = PhysicalQuantityWithUncertainty( 1, energy_in_unit ).getValueAs( crossSection_energy_in_unit )
-        EMin, EMax = factor * EMin, factor * EMax
-
-    try :
-        multiplicity = XYs.XYs( fudge.gnd.productData.multiplicity.pointwise.defaultAxes( energyUnit = crossSection_energy_in_unit ), 
-                [ [ EMin, multiplicity_.getConstant( ) ], [ EMax, multiplicity_.getConstant( ) ] ], 1e-6 )
-    except :
-        from fudge.gnd import tokens
-
-        if( multiplicity_.getNativeDataToken( ) == tokens.referenceFormToken ) : 
-            multiplicity_ = multiplicity_.forms[tokens.referenceFormToken].referenceInstance.multiplicity
-        if( tokens.pointwiseFormToken in multiplicity_.forms ) :
-            multiplicity = multiplicity_.forms[tokens.pointwiseFormToken]
-        else :
-            multiplicityForm = multiplicity_[multiplicity_.getNativeDataToken( )]
-            if( isinstance( multiplicityForm, fudge.gnd.productData.multiplicity.piecewise ) ) :
-                multiplicity = multiplicityForm.toPointwiseLinear( 1e-8, 1e-8 )
-            elif( isinstance( multiplicityForm, fudge.gnd.productData.multiplicity.polynomial ) ) :
-                multiplicity = multiplicityForm.toPointwiseLinear( 1e-8, 1e-8, template( EMin, EMax ) )
-            else :
-                raise Exception( 'multiplicity = %s is unsupported' % multiplicityForm.moniker )
+    multiplicity = multiplicity_.toPointwise_withLinearXYs( 1e-8, 1e-8 )
     if( energy_in_unit is not None ) : multiplicity = multiplicity.convertAxisToUnit( 0, energy_in_unit )
-    return( '\n'.join( twoDToString( "Multiplicity", multiplicity ) ) )
+    return( startOfNewData + '\n'.join( twoDToString( "Multiplicity", multiplicity ) ) )
 
-def angularToString( angularData, crossSection ) :
+def angularToString( angularData, crossSection, weight = None, twoBody = False ) :
 
     from fudge.gnd.productData import distributions
-    from fudge.core.utilities import brb
+
+    weightString = ''
+    if( weight is not None ) : weightString = '\n'.join( twoDToString( "weight", weight, addExtraBlankLine = False ) ) + '\n'
 
     if( isinstance( angularData, distributions.angular.isotropic ) ) :
-        s  = "Angular data: n = 2\n"
-        s += 'Incident energy interpolation: %s-%s\n' % ( axes.linearToken, axes.linearToken )
-        s += 'Outgoing cosine interpolation: %s-%s\n' % ( axes.linearToken, axes.linearToken )
+        s = "Angular data: n = 2\n"
+        s += 'Incident energy interpolation: %s\n' % GND2ProcessingInterpolations[linlin]
+        s += 'Outgoing cosine interpolation: %s\n' % GND2ProcessingInterpolations[linlin]
         for x in [ crossSection.domainMin( ), crossSection.domainMax( ) ] : s += " %s : n = 2\n   -1 0.5\n   1 0.5\n" % ( doubleFmt % x )
 
     elif( isinstance( angularData, distributions.angular.pointwise ) ) :
-        s  = "Angular data: n = %s\n" % len( angularData )
+        s = "Angular data: n = %s\n" % len( angularData )
 
         independent, dependent, qualifier = angularData.axes[0].interpolation.getInterpolationTokens( )
         if( qualifier is not None ) : raise Exception( 'interpolation qualifier = %s is not supported' % qualifier )
         if( ( independent not in [ axes.linearToken ] ) or ( dependent not in [ axes.linearToken, axes.flatToken ] ) ) :
-            angularData = angularData.toPointwiseLinear( lowerEps = lowerEps, upperEps = upperEps )
+            angularData = angularData.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
 
         independent, dependent, qualifier = angularData.axes[1].interpolation.getInterpolationTokens( )
         if( qualifier is not None ) : raise Exception( 'interpolation qualifier = %s is not supported' % qualifier )
         if( ( independent not in [ axes.linearToken ] ) or ( dependent not in [ axes.linearToken, axes.flatToken ] ) ) :
-            angularData = angularData.toPointwiseLinear( lowerEps = lowerEps, upperEps = upperEps )
+            angularData = angularData.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
 
         independent, dependent, qualifier = angularData.axes[0].interpolation.getInterpolationTokens( )
-        s += 'Incident energy interpolation: %s-%s\n' % ( independent, dependent )
+        if( twoBody ) :
+            s += 'Incident energy interpolation: %s\n' % GND2ProcessingInterpolations[independent+dependent]    # Ignoring data's interpolation for unitbase
+        else :
+            s += 'Incident energy interpolation: %s\n' % GND2ProcessingInterpolations[axes.unitBaseToken]       # Ignoring data's interpolation for unitbase
         independent, dependent, qualifier = angularData.axes[1].interpolation.getInterpolationTokens( )
-        s += 'Outgoing cosine interpolation: %s-%s\n' % ( independent, dependent )
+        s += 'Outgoing cosine interpolation: %s\n' % GND2ProcessingInterpolations[independent+dependent]
 
         s += threeDListToString( angularData )
 
@@ -543,12 +599,19 @@ def angularToString( angularData, crossSection ) :
         independent, dependent, qualifier = angularData.axes[0].interpolation.getInterpolationTokens( )
         if( qualifier is not None ) : raise Exception( 'interpolation qualifier = %s is not supported' % qualifier )
         if( ( independent not in [ axes.linearToken ] ) or ( dependent not in [ axes.linearToken, axes.flatToken ] ) ) :
-            angularData = angularData.toLegendreLinear( 1e-6 )
+            angularData_ = angularData.copy( standAlone = True )
+            angularData_.axes[0].setInterpolation( axes.interpolationXY( axes.linearToken, axes.linearToken ) )
+            print 'WARNING: ignoring interpolation "%s" and using "%s" instead' % ( angularData.axes[0].interpolation, angularData_.axes[0].interpolation )
+            angularData = angularData_.toLegendreLinear( 1e-6 )
 
         s = [ "Legendre coefficients: n = %s" % len( angularData ) ]
 
-        independent, dependent, qualifier = angularData.axes[0].interpolation.getInterpolationTokens( )
-        s.append( 'Interpolation: %s-%s' % ( independent, dependent ) )
+        if( twoBody ) :
+            independent, dependent, qualifier = angularData.axes[0].interpolation.getInterpolationTokens( )
+            interpolationStr = 'Interpolation: %s' % GND2ProcessingInterpolations[independent+dependent]
+        else :
+            interpolationStr = 'Interpolation: %s' % GND2ProcessingInterpolations[axes.unitBaseToken]      # Ignoring data's interpolation for unitbase
+        s.append( interpolationStr )
 
         for energy_in in angularData :
             s.append( ' Ein: %s:  n = %d' % ( energy_in.value, len( energy_in ) ) )
@@ -556,18 +619,19 @@ def angularToString( angularData, crossSection ) :
         s = '\n'.join( s ) + '\n'
 
     else :
+        from fudge.core.utilities import brb
         raise Exception( "angular data = %s not supported" % brb.getType( angularData ) )
 
-    return( s )
+    return( startOfNewData + weightString + s )
 
 def energyFunctionToString( energyData, weight = None ) :
 
     def getParameter( data, label ) :
 
-        linlin = data.toPointwiseLinear( lowerEps = lowerEps, upperEps = upperEps )
-        sData = [ "%s: n = %d" % ( label, len( linlin ) ) ]
-        sData.append( 'Interpolation: linear-linear' )
-        for x, y in linlin : sData.append( '%s %s' % ( x, y ) )
+        linlin_ = data.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
+        sData = [ "%s: n = %d" % ( label, len( linlin_ ) ) ]
+        sData.append( 'Interpolation: %s' % GND2ProcessingInterpolations[linlin] )
+        for x, y in linlin_ : sData.append( '%s %s' % ( x, y ) )
         return( sData )
 
     from fudge.gnd.productData.distributions import energy
@@ -576,10 +640,11 @@ def energyFunctionToString( energyData, weight = None ) :
     if( isinstance( energyData, ( energy.simpleMaxwellianFissionSpectrum, energy.evaporationSpectrum, energy.WattSpectrum ) ) ) :
         sData.append( 'U: %s' % energyData.U.getValueAs( energyData.parameter1.axes[0].getUnit( ) ) )
 
-    parameter1 = energyData.parameter1.toPointwiseLinear( lowerEps = lowerEps, upperEps = upperEps )
+    parameter1 = energyData.parameter1.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
 
     if( weight is None ) :
-        weight = XYs.XYs( axes.defaultAxes( ), [ [ parameter1.domainMin( ), 1. ], [ parameter1.domainMax( ), 1. ] ], 1e-6 )
+        axes_ = axes.defaultAxes( dependentInterpolation = axes.flatToken )
+        weight = XYs.XYs( axes_, [ [ parameter1.domainMin( ), 1. ], [ parameter1.domainMax( ), 1. ] ], 1e-6 )
     else :
         weight = weight.weight
     sData += twoDToString( "weight", weight, addExtraBlankLine = False )
@@ -619,11 +684,12 @@ def energyFunctionToString( energyData, weight = None ) :
 
 def EEpPDataToString( EEpPData ) :
 
-    s = "EEpPData: n = %d\n" % len( EEpPData )
+    s  = startOfNewData
+    s += "EEpPData: n = %d\n" % len( EEpPData )
 
     independent, dependent, qualifier = EEpPData.axes[0].interpolation.getInterpolationTokens( )
     if( qualifier == axes.correspondingPointsToken ) :
-        s += 'Incident energy interpolation: corresponding energies\n'
+        s += 'Incident energy interpolation: %s\n' % GND2ProcessingInterpolations[axes.correspondingPointsToken]
     elif( qualifier == axes.unitBaseToken ) :
         s += 'Incident energy interpolation: %s\n' % GND2ProcessingInterpolations[axes.unitBaseToken]
     else :
@@ -631,19 +697,21 @@ def EEpPDataToString( EEpPData ) :
 
     independent, dependent, qualifier = EEpPData.axes[1].interpolation.getInterpolationTokens( )
     if( dependent == axes.flatToken ) :
-        s += 'Outgoing energy interpolation: flat\n'
+        s += 'Outgoing energy interpolation: %s\n' % GND2ProcessingInterpolations[axes.flatToken]
     elif( independent == dependent == axes.linearToken ) :
-        s += 'Outgoing energy interpolation: linear-linear\n'
+        s += 'Outgoing energy interpolation: %s\n' % GND2ProcessingInterpolations[linlin]
 
     s += threeDToString( EEpPData )
     return( s )
 
 def LEEpPDataToString( LEEpPData ) :
 
-    s = "LEEpPData: n = %d\n" % len( LEEpPData )
-    s += 'Incident energy interpolation: unit base\n'
-    s += 'Outgoing energy interpolation: linear-linear\n'
+    s  = startOfNewData
+    s += "LEEpPData: n = %d\n" % len( LEEpPData )
+    s += 'Incident energy interpolation: %s\n' % GND2ProcessingInterpolations[axes.unitBaseToken]
+    s += 'Outgoing energy interpolation: %s\n' % GND2ProcessingInterpolations[linlin]
     for l_EEpP in LEEpPData :
+        s += startOfNewSubData + '\n'
         EEpP = l_EEpP.EpP
         s += "  l = %d: n = %d\n" % ( l_EEpP.l, len( EEpP ) )
         s += threeDToString( EEpP )
@@ -654,25 +722,27 @@ def LegendreDataToString( LegendreData ) :
     s = [ 'Legendre data by incident energy:  n = %d' % len( LegendreData ) ]
     independent, dependent, qualifier = LegendreData.axes[0].interpolation.getInterpolationTokens( )
     if( qualifier == axes.correspondingPointsToken ) :
-        s.append( 'Incident energy interpolation: corresponding energies' )
+        s.append( 'Incident energy interpolation: %s' % GND2ProcessingInterpolations[axes.correspondingPointsToken] )
     elif( qualifier == axes.unitBaseToken ) :
         s.append( 'Incident energy interpolation: %s' % GND2ProcessingInterpolations[axes.unitBaseToken] )
     independent, dependent, qualifier = LegendreData.axes[1].interpolation.getInterpolationTokens( )
     if( dependent == axes.flatToken ) :
-        s.append( 'Outgoing energy interpolation: flat' )
+        s.append( 'Outgoing energy interpolation: %s' % GND2ProcessingInterpolations[axes.flatToken])
     elif( independent == dependent == axes.linearToken ) :
-        s.append( 'Outgoing energy interpolation: linear-linear' )
+        s.append( 'Outgoing energy interpolation: %s' % GND2ProcessingInterpolations[linlin] )
     for EEpCl in LegendreData :
         s.append( " Ein: %s:  n = %d" % ( EEpCl.value, len( EEpCl ) ) )
         for EpCl in EEpCl :
+            s.append( startOfNewSubData )
             s.append( "  Eout: %s:  n = %d" % ( EpCl.value, len( EpCl ) ) )
             for Cl in EpCl : s.append( "   %s" % Cl )
     s.append( '' )
-    return( '\n'.join( s ) )
+    return( startOfNewData + '\n'.join( s ) )
 
 def EMuEpPDataToString( EMuEpPData ) :
 
-    s = "EMuEpPData: n = %d\n" % len( EMuEpPData )
+    s  = startOfNewData
+    s += "EMuEpPData: n = %d\n" % len( EMuEpPData )
 
     independent, dependent, qualifier = EMuEpPData.axes[0].interpolation.getInterpolationTokens( )
     if( qualifier not in [ None, axes.unitBaseToken ] ) : raise Exception( 'interpolation qualifier = %s is not supported' % qualifier )
@@ -682,9 +752,10 @@ def EMuEpPDataToString( EMuEpPData ) :
 
     s += 'Outgoing cosine interpolation: %s\n' % GND2ProcessingInterpolations[axes.unitBaseToken]
 
-    s += 'Outgoing energy interpolation: %s-%s\n' % ( axes.linearToken, axes.linearToken )
+    s += 'Outgoing energy interpolation: %s\n' % GND2ProcessingInterpolations[linlin]
 
     for muEpP in EMuEpPData :
+        s += startOfNewSubData + '\n'
         E = muEpP.value
         s += "  E = %s: n = %d\n" % ( doubleFmt % E, len( muEpP ) )
         s += threeDToString( muEpP )
@@ -694,7 +765,8 @@ def KalbachMannDataToString( KalbachMannData, energy_in_unit ) :
 
     nForm = 3
     if( KalbachMannData.form == 'fra' ) : nForm = 4
-    s = "KalbachData: n = %s\n" % len( KalbachMannData )
+    s  = startOfNewData
+    s += "KalbachData: n = %s\n" % len( KalbachMannData )
     s += "Incident energy interpolation: %s\n" % GND2ProcessingInterpolations[axes.unitBaseToken]
     s += getOutgoingEnergyInterpolation( KalbachMannData.axes[1], [ axes.linearToken ], [ axes.linearToken, axes.flatToken ] )
     factor = KalbachMannData.axes[0].unitConversionFactor( energy_in_unit ) # Energies passed to get_transfer must be in energy_in_unit, traditionally MeV.
@@ -736,12 +808,12 @@ def twoDToString( label, data, addHeader = True, addExtraBlankLine = True ) :
         independent, dependent, qualifier = data.axes[0].interpolation.getInterpolationTokens( )
         if( qualifier is not None ) : raise Exception( 'interpolation qualifier = %s is not supported' % qualifier )
         if( ( independent not in [ axes.linearToken ] ) or ( dependent not in [ axes.linearToken, axes.flatToken ] ) ) :
-            data = data.toPointwiseLinear( lowerEps = lowerEps, upperEps = upperEps )
+            data = data.toPointwise_withLinearXYs( lowerEps = lowerEps, upperEps = upperEps )
         independent, dependent, qualifier = data.axes[0].interpolation.getInterpolationTokens( )
         if( dependent == axes.flatToken ) :
-            interpolationStr = 'Interpolation: %s' % dependent
+            interpolationStr = 'Interpolation: %s' % GND2ProcessingInterpolations[axes.flatToken]
         else :
-            interpolationStr = 'Interpolation: %s-%s' % ( independent, dependent )
+            interpolationStr = 'Interpolation: %s' % GND2ProcessingInterpolations[independent+dependent]
     else :
         from fudge.core.utilities import brb
         brb.objectoutline( data )
@@ -760,6 +832,7 @@ def threeDToString( data ) :
     wFmt = " %s : n = %%d" % ( doubleFmt )
     xyFmt = "   %s %s" % ( doubleFmt, doubleFmt )
     for w_xy in data :
+        a.append( startOfNewSubData )
         if( type( w_xy ) == type( [] ) ) :       # ???? This is a kludge until Legendre EEpP data is represented like angular EMuP data.
             raise Exception( 'need to update for new gnd forms' )
             x, yz = xyz
@@ -776,6 +849,7 @@ def threeDListToString( data ) :
     wFmt = " %s : n = %%d" % ( doubleFmt )
     xyFmt = "   %s %s" % ( doubleFmt, doubleFmt )
     for w_xy in data :
+        a.append( startOfNewSubData )
         w = w_xy.value
         a.append( wFmt % ( w, len( w_xy ) ) )
         for x, y in w_xy : a.append( xyFmt % ( x, y ) )

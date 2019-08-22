@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>endl Package &mdash; Fudge and GND 1.2 beta documentation</title>
+    <title>endl Package &mdash; Fudge and GND 1.3 beta documentation</title>
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.2 beta',
+        VERSION:     '1.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +25,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
-    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../index.html" />
+    <link rel="top" title="Fudge and GND 1.3 beta documentation" href="../index.html" />
     <link rel="up" title="legacy Package" href="fudge.legacy.html" />
     <link rel="next" title="test Package" href="fudge.legacy.endl.test.html" />
     <link rel="prev" title="converting Package" href="fudge.legacy.converting.html" /> 
@@ -47,7 +46,7 @@
         <li class="right" >
           <a href="fudge.legacy.converting.html" title="converting Package"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="index.html" >fudge Package</a> &raquo;</li>
           <li><a href="fudge.legacy.html" accesskey="U">legacy Package</a> &raquo;</li> 
       </ul>
@@ -233,15 +232,13 @@ otherwise, natural targets only contain the symbol. If m_to_m1 is True then when
 <dl class="function">
 <dt id="fudge.legacy.endl.endl2.yoToZA">
 <tt class="descclassname">fudge.legacy.endl.endl2.</tt><tt class="descname">yoToZA</tt><big>(</big><em>yo_i</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endl2.html#yoToZA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endl2.yoToZA" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns ZA designator, or special code, from yo id.  That is, ::
-yo_i = 0, 1,    2,    3,    4,    5,    6, 7,  8,  9,  10, 11,   12,   13,   14,   15,   16</p>
-<blockquote>
-<div><dl class="docutils">
-<dt>is converted to</dt>
-<dd>0, 1, 1001, 1002, 1003, 2003, 2004, 0, -8, -9, -10,  1, 1001, 1002, 1003, 2003, 2004</dd>
-</dl>
-</div></blockquote>
-<dl class="docutils">
+<dd><dl class="docutils">
+<dt>Returns ZA designator, or special code, from yo id.  That is, ::</dt>
+<dd><p class="first">yo_i = 0, 1,    2,    3,    4,    5,    6, 7,  8,  9,  10, 11,   12,   13,   14,   15,   16
+is converted to</p>
+<blockquote class="last">
+<div>0, 1, 1001, 1002, 1003, 2003, 2004, 0, -8, -9, -10,  1, 1001, 1002, 1003, 2003, 2004</div></blockquote>
+</dd>
 <dt>with the following meanings ::</dt>
 <dd>none, n,    p,    d,    t,  He3,   He, g, b+, b-,  EC,  n,    p,    d,    t,  He3,   He.</dd>
 </dl>
@@ -291,7 +288,7 @@ the same for C, I and S. For example self has yo = 7 and C = 3 then self.IsyoCIS
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlFile.endlFile.addData">
-<tt class="descname">addData</tt><big>(</big><em>data=</em><span class="optional">[</span><span class="optional">]</span>, <em>date=None</em>, <em>interpolation=0</em>, <em>eLevel=0.0</em>, <em>temperature=2.586e-08</em>, <em>Q=None</em>, <em>X1=0.0</em>, <em>X2=0.0</em>, <em>X3=0.0</em>, <em>X4=0.0</em>, <em>mass=None</em>, <em>halflife=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlFile.html#endlFile.addData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlFile.endlFile.addData" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">addData</tt><big>(</big><em>data=</em>, <span class="optional">[</span><span class="optional">]</span><em>date=None</em>, <em>interpolation=0</em>, <em>eLevel=0.0</em>, <em>temperature=2.586e-08</em>, <em>Q=None</em>, <em>X1=0.0</em>, <em>X2=0.0</em>, <em>X3=0.0</em>, <em>X4=0.0</em>, <em>mass=None</em>, <em>halflife=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlFile.html#endlFile.addData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlFile.endlFile.addData" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds data to self with the header information provided.</p>
 </dd></dl>
 
@@ -377,7 +374,7 @@ points for which integral( d_mu P(E,mu) ) = 0 and not 1 (that is, the normalizat
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI0">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI0</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI0" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl2dmathClasses.endl2dmath" title="fudge.core.math.endl2dmathClasses.endl2dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl2dmathClasses.endl2dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl2dmathClasses.endl2dmath</span></tt></p>
 <p>This class is for the I = 0 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI0.check">
@@ -426,7 +423,7 @@ instance. See module crossSectionAdjustForHeatedTarget for more details.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI1">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI1</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl3dmathClasses.endl3dmath" title="fudge.core.math.endl3dmathClasses.endl3dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl3dmathClasses.endl3dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl3dmathClasses.endl3dmath</span></tt></p>
 <p>This class is for the I = 1 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI1.check">
@@ -495,7 +492,7 @@ then linear interpolation is performed.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI10">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI10</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI10" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl2dmathClasses.endl2dmath" title="fudge.core.math.endl2dmathClasses.endl2dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl2dmathClasses.endl2dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl2dmathClasses.endl2dmath</span></tt></p>
 <p>This class is for the I = 10 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI10.check">
@@ -532,7 +529,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI11">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI11</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI11"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI11" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl2dmathClasses.endl2dmath" title="fudge.core.math.endl2dmathClasses.endl2dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl2dmathClasses.endl2dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl2dmathClasses.endl2dmath</span></tt></p>
 <p>This class is for the I = 11 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI11.check">
@@ -569,7 +566,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI12">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI12</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI12"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI12" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl2dmathClasses.endl2dmath" title="fudge.core.math.endl2dmathClasses.endl2dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl2dmathClasses.endl2dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl2dmathClasses.endl2dmath</span></tt></p>
 <p>This class is for the I = 12, Q(E), data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI12.check">
@@ -606,7 +603,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI13">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI13</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI13"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI13" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl2dmathClasses.endl2dmath" title="fudge.core.math.endl2dmathClasses.endl2dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl2dmathClasses.endl2dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl2dmathClasses.endl2dmath</span></tt></p>
 <p>This class is for the I = 13 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI13.check">
@@ -643,7 +640,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI20">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI20</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI20"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI20" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl4dmathClasses.endl4dmath" title="fudge.core.math.endl4dmathClasses.endl4dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl4dmathClasses.endl4dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl4dmathClasses.endl4dmath</span></tt></p>
 <p>This class is for the I = 20 data. I 20 data is unresolved resonance probability table data which
 has four columns. These columns are 1) s incident energy, 2) Temperature, 3) probability and 
 4) cross section.</p>
@@ -683,7 +680,7 @@ See endl4dmathmisc.check4dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI21">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI21</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI21"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI21" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl3dmathClasses.endl3dmath" title="fudge.core.math.endl3dmathClasses.endl3dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl3dmathClasses.endl3dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl3dmathClasses.endl3dmath</span></tt></p>
 <p>This class is for the I = 21 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI21.check">
@@ -715,7 +712,7 @@ See endl3dmathmisc.check3dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI22">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI22</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI22"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI22" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl3dmathClasses.endl3dmath" title="fudge.core.math.endl3dmathClasses.endl3dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl3dmathClasses.endl3dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl3dmathClasses.endl3dmath</span></tt></p>
 <p>This class is for the I = 22 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI22.check">
@@ -747,7 +744,7 @@ See endl3dmathmisc.check3dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI3">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI3</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl4dmathClasses.endl4dmath" title="fudge.core.math.endl4dmathClasses.endl4dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl4dmathClasses.endl4dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl4dmathClasses.endl4dmath</span></tt></p>
 <p>This class is for the I = 3 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI3.E">
@@ -890,7 +887,7 @@ difference is less than relEps. Also see getMuEpPAtE.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI4">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI4</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI4" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl4dmathClasses.endl4dmath" title="fudge.core.math.endl4dmathClasses.endl4dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl4dmathClasses.endl4dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl4dmathClasses.endl4dmath</span></tt></p>
 <p>This class is for the I = 4 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI4.EMax">
@@ -924,7 +921,7 @@ This method calls convertToUI3. The returned value is the tuple (I1, I3).</p>
 <tt class="descname">convertToUI3</tt><big>(</big><em>nMu=21</em>, <em>lMax=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI4.convertToUI3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI4.convertToUI3" title="Permalink to this definition">¶</a></dt>
 <dd><p>This methods converts the I = 4 data into unnormalized I = 3 data using nMu equally spaced mu 
 values.  Note that the data is not normalized; hence, the normalized method should be called on the
-returned object. This method will only convert up to Legendre order l = min( lMax, fudgemath.maxLegendre ) 
+returned object. This method will only convert up to Legendre order l = min( lMax, LegendreSeries.maxLegendreOrder ) 
 of self&#8217;s data.</p>
 </dd></dl>
 
@@ -1043,7 +1040,7 @@ The l-value must be an existing l-value or one greater than the current maximum 
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI7">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI7</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI7"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI7" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl2dmathClasses.endl2dmath" title="fudge.core.math.endl2dmathClasses.endl2dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl2dmathClasses.endl2dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl2dmathClasses.endl2dmath</span></tt></p>
 <p>This class is for the I = 7 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI7.check">
@@ -1080,7 +1077,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI80">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI80</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI80"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI80" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl2dmathClasses.endl2dmath" title="fudge.core.math.endl2dmathClasses.endl2dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl2dmathClasses.endl2dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl2dmathClasses.endl2dmath</span></tt></p>
 <p>This class is for the I = 80 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI80.check">
@@ -1099,7 +1096,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI81">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI81</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI81"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI81" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl3dmathClasses.endl3dmath" title="fudge.core.math.endl3dmathClasses.endl3dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl3dmathClasses.endl3dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl3dmathClasses.endl3dmath</span></tt></p>
 <p>This class is for the I = 81 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI81.check">
@@ -1119,7 +1116,7 @@ See endl3dmathmisc.check3dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI84">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI84</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI84"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI84" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl3dmathClasses.endl3dmath" title="fudge.core.math.endl3dmathClasses.endl3dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl3dmathClasses.endl3dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl3dmathClasses.endl3dmath</span></tt></p>
 <p>This class is for the I = 84 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI84.check">
@@ -1139,7 +1136,7 @@ See endl3dmathmisc.check3dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI89">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI89</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI89"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI89" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl2dmathClasses.endl2dmath" title="fudge.core.math.endl2dmathClasses.endl2dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl2dmathClasses.endl2dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl2dmathClasses.endl2dmath</span></tt></p>
 <p>This class is for the I = 89 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI89.check">
@@ -1158,7 +1155,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI9">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI9</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI9"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI9" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl2dmathClasses.endl2dmath" title="fudge.core.math.endl2dmathClasses.endl2dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl2dmathClasses.endl2dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl2dmathClasses.endl2dmath</span></tt></p>
 <p>This class is for the I = 9 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI9.check">
@@ -1200,7 +1197,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI90">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI90</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI90"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI90" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl2dmathClasses.endl2dmath" title="fudge.core.math.endl2dmathClasses.endl2dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl2dmathClasses.endl2dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl2dmathClasses.endl2dmath</span></tt></p>
 <p>This class is for the I = 90 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI90.check">
@@ -1219,7 +1216,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI91">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI91</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI91"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI91" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl2dmathClasses.endl2dmath" title="fudge.core.math.endl2dmathClasses.endl2dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl2dmathClasses.endl2dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl2dmathClasses.endl2dmath</span></tt></p>
 <p>This class is for the I = 91 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI91.check">
@@ -1238,7 +1235,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI92">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI92</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI92"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI92" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl2dmathClasses.endl2dmath" title="fudge.core.math.endl2dmathClasses.endl2dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl2dmathClasses.endl2dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl2dmathClasses.endl2dmath</span></tt></p>
 <p>This class is for the I = 92 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI92.check">
@@ -1257,7 +1254,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI941">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI941</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI941"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI941" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl2dmathClasses.endl2dmath" title="fudge.core.math.endl2dmathClasses.endl2dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl2dmathClasses.endl2dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl2dmathClasses.endl2dmath</span></tt></p>
 <p>This class is for the I = 941 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI941.check">
@@ -1281,7 +1278,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI942">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI942</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI942"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI942" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl2dmathClasses.endl2dmath" title="fudge.core.math.endl2dmathClasses.endl2dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl2dmathClasses.endl2dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl2dmathClasses.endl2dmath</span></tt></p>
 <p>This class is for the I = 942 data.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI942.check">
@@ -1305,7 +1302,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI951">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI951</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI951"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI951" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl2dmathClasses.endl2dmath" title="fudge.core.math.endl2dmathClasses.endl2dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl2dmathClasses.endl2dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl2dmathClasses.endl2dmath</span></tt></p>
 <p>This class is for the I = 951 data. Special I value for NADS.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI951.check">
@@ -1324,7 +1321,7 @@ See endl2dmathmisc.check2dData for meaning of printWarning and printErrors.</p>
 <dl class="class">
 <dt id="fudge.legacy.endl.endlIClasses.endlI952">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">endlI952</tt><big>(</big><em>f</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#endlI952"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.endlI952" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <a class="reference internal" href="fudge.core.math.html#fudge.core.math.endl3dmathClasses.endl3dmath" title="fudge.core.math.endl3dmathClasses.endl3dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl3dmathClasses.endl3dmath</span></tt></a></p>
+<dd><p>Bases: <a class="reference internal" href="#fudge.legacy.endl.endlNd.endlNd" title="fudge.legacy.endl.endlNd.endlNd"><tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endlNd.endlNd</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl3dmathClasses.endl3dmath</span></tt></p>
 <p>This class is for the I = 952 data. Special I value for NADS.</p>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlIClasses.endlI952.check">
@@ -1348,7 +1345,7 @@ See endl3dmathmisc.check3dData for meaning of printWarning and printErrors.</p>
 
 <dl class="function">
 <dt id="fudge.legacy.endl.endlIClasses.fixThresholdFor3d">
-<tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">fixThresholdFor3d</tt><big>(</big><em>self</em>, <em>threshold</em>, <em>dThreshold_MeV</em>, <em>EMin=0.0</em>, <em>realSelf=None</em>, <em>fixThresholdMode='raiseOnly'</em>, <em>threshold_MeV_shiftWarning=0.1</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#fixThresholdFor3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.fixThresholdFor3d" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.legacy.endl.endlIClasses.</tt><tt class="descname">fixThresholdFor3d</tt><big>(</big><em>self</em>, <em>I</em>, <em>threshold</em>, <em>dThreshold_MeV</em>, <em>EMin=0.0</em>, <em>realSelf=None</em>, <em>fixThresholdMode='raiseOnly'</em>, <em>threshold_MeV_shiftWarning=0.1</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlIClasses.html#fixThresholdFor3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlIClasses.fixThresholdFor3d" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -1382,7 +1379,7 @@ See endl3dmathmisc.check3dData for meaning of printWarning and printErrors.</p>
 <dt id="fudge.legacy.endl.endlNd.endlNd">
 <em class="property">class </em><tt class="descclassname">fudge.legacy.endl.endlNd.</tt><tt class="descname">endlNd</tt><big>(</big><em>f</em>, <em>I_</em>, <em>yo</em>, <em>C</em>, <em>I</em>, <em>S</em>, <em>h</em>, <em>points</em>, <em>i0=0</em>, <em>i1=1</em>, <em>i2=None</em>, <em>i3=None</em>, <em>bdflsFile=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlNd.html#endlNd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlNd.endlNd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Useful Members (all of these should be accessed via get/set methods):</p>
-<div class="highlight-python"><pre>h               The ENDL header for this data.
+<div class="highlight-python"><div class="highlight"><pre>h               The ENDL header for this data.
 ZA              The ENDL ZA for this data. That is, the target for this file.
 yi              The ENDL yi-value for this data. That is, the projectile for this file.
 yo              The ENDL yo-value for this data. That is, the outgoing particle for this file.
@@ -1392,7 +1389,8 @@ S               The ENDL S-value for this data.
 X1, X2, X3, X4  The X-vales for this data.
 ELevel          The initial excitation level of the target for this data.
 Halflife        The halflife of the target.
-Temperature     The temperature of the target for this data.</pre>
+Temperature     The temperature of the target for this data.
+</pre></div>
 </div>
 <dl class="method">
 <dt id="fudge.legacy.endl.endlNd.endlNd.checkHeader">
@@ -1672,7 +1670,7 @@ or a string convertible to an integer.</p>
 <li>Uses the bdflsFileName argument if it is None; else,</li>
 <li>Uses &#8221;./bdfls&#8221; if it exists; else,</li>
 <li>Uses the bdfls in the database (at the same level as the &#8220;ascii&#8221; file) if it exists; else,</li>
-<li>Uses the bdlfs pointed to by the environmental variable BDFLSPATH if it exists; else,</li>
+<li>Uses the bdfls pointed to by the environmental variable BDFLSPATH if it exists; else,</li>
 <li>Uses &#8220;/usr/gapps/data/nuclear/bdfls&#8221;.</li>
 </ol>
 </dd>
@@ -1731,7 +1729,7 @@ and its return value to used for matching ZAs. If ZA has not been instantiated t
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlProject.endlProject.process">
-<tt class="descname">process</tt><big>(</big><em>oldfile</em>, <em>newfile=None</em>, <em>options=''</em>, <em>defines=</em><span class="optional">[</span><span class="optional">]</span>, <em>bdflsFile=None</em>, <em>ndfgen=None</em>, <em>mcfgen=None</em>, <em>endep=None</em>, <em>extraZAs=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlProject.html#endlProject.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlProject.endlProject.process" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">process</tt><big>(</big><em>oldfile</em>, <em>newfile=None</em>, <em>options=''</em>, <em>defines=</em>, <span class="optional">[</span><span class="optional">]</span><em>bdflsFile=None</em>, <em>ndfgen=None</em>, <em>mcfgen=None</em>, <em>endep=None</em>, <em>extraZAs=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlProject.html#endlProject.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlProject.endlProject.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>Processes the active ZAs in self, using oldfile as a template to 
 create newfile.  Active ZAs are ones that have been read-in-to (readZA) 
 or added-to (addZA) self.  Uses bdfls pointed to by bdflsFile if not None; otherwise,
@@ -2373,6 +2371,14 @@ path.  ## is yi convert to a 2-digit integer.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="fudge.legacy.endl.endlmisc.checkCulling">
+<tt class="descclassname">fudge.legacy.endl.endlmisc.</tt><tt class="descname">checkCulling</tt><big>(</big><em>errs</em>, <em>cullStrings</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlmisc.html#checkCulling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlmisc.checkCulling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes all messages containing sub-strings listed in cullStrings. cullStrings can be either a string or a
+list of strings. If as list of strings, each string must be a sub-string in a message for the message to
+be culled.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="fudge.legacy.endl.endlmisc.checkMessagesToString">
 <tt class="descclassname">fudge.legacy.endl.endlmisc.</tt><tt class="descname">checkMessagesToString</tt><big>(</big><em>message</em>, <em>indentation='  '</em>, <em>subIndentation='  '</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlmisc.html#checkMessagesToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlmisc.checkMessagesToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -2409,7 +2415,7 @@ path.  ## is yi convert to a 2-digit integer.</p>
 
 <dl class="method">
 <dt id="fudge.legacy.endl.endlmisc.endlCheckerObject.toString">
-<tt class="descname">toString</tt><big>(</big><em>selections=</em><span class="optional">[</span><span class="optional">]</span>, <em>returnNoneOnNoMatches=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlmisc.html#endlCheckerObject.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlmisc.endlCheckerObject.toString" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">toString</tt><big>(</big><em>selections=</em>, <span class="optional">[</span><span class="optional">]</span><em>returnNoneOnNoMatches=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlmisc.html#endlCheckerObject.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlmisc.endlCheckerObject.toString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2531,7 +2537,7 @@ return ( 95242, &#8220;m&#8221; ).</p>
 
 <dl class="function">
 <dt id="fudge.legacy.endl.endlmisc.processDataBase">
-<tt class="descclassname">fudge.legacy.endl.endlmisc.</tt><tt class="descname">processDataBase</tt><big>(</big><em>database</em>, <em>oldFile</em>, <em>newFile</em>, <em>options=''</em>, <em>defines=</em><span class="optional">[</span><span class="optional">]</span>, <em>bdflsFile=None</em>, <em>ndfgen=None</em>, <em>mcfgen=None</em>, <em>endep=None</em>, <em>extraZAs=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlmisc.html#processDataBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlmisc.processDataBase" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.legacy.endl.endlmisc.</tt><tt class="descname">processDataBase</tt><big>(</big><em>database</em>, <em>oldFile</em>, <em>newFile</em>, <em>options=''</em>, <em>defines=</em>, <span class="optional">[</span><span class="optional">]</span><em>bdflsFile=None</em>, <em>ndfgen=None</em>, <em>mcfgen=None</em>, <em>endep=None</em>, <em>extraZAs=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../_modules/fudge/legacy/endl/endlmisc.html#processDataBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.legacy.endl.endlmisc.processDataBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>For internal use only.</p>
 </dd></dl>
 
@@ -2796,9 +2802,7 @@ This allows a user to have their own directory containing databases.</p>
 <li><a class="reference internal" href="#module-fudge.legacy.endl.endltdf"><tt class="docutils literal"><span class="pre">endltdf</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-fudge.legacy.endl.fudgeDocumentationFile"><tt class="docutils literal"><span class="pre">fudgeDocumentationFile</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-fudge.legacy.endl.fudgemiscLegacy"><tt class="docutils literal"><span class="pre">fudgemiscLegacy</span></tt> Module</a></li>
-<li><a class="reference internal" href="#subpackages">Subpackages</a><ul>
-</ul>
-</li>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 </ul>
 </li>
 </ul>
@@ -2846,14 +2850,14 @@ This allows a user to have their own directory containing databases.</p>
         <li class="right" >
           <a href="fudge.legacy.converting.html" title="converting Package"
              >previous</a> |</li>
-        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="index.html" >fudge Package</a> &raquo;</li>
           <li><a href="fudge.legacy.html" >legacy Package</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

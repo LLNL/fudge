@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -26,7 +51,10 @@ class W_XYs( ancestry ) :
     type = monikerW_XYs
     xData = monikerW_XYs
 
-    def __init__( self, axes_, index = None, value = None, parent = None, isPrimaryXData = None ) :
+    def __init__( self, axes_, data = None, index = None, value = None, parent = None, isPrimaryXData = None ) :
+        """
+        If the data argument is not None, it must be the argument for either the method setFromList or setFromW_XYs.
+        """
 
         attribute = None
         if( parent is not None ) :
@@ -37,11 +65,17 @@ class W_XYs( ancestry ) :
         axes.isValidAxes( axes_ )
         axes_.checkDimension( 3 )
 
-        self.xys = []
         self.axes = axes_.copy( )           # Even secondary must have axes
         self.index = index
+        if( value is not None ) : value = fudgemath.toFloat( value )
         self.value = value
         if( isPrimaryXData is not None ) : self.isPrimaryXData = isPrimaryXData
+
+        self.xys = []
+        if( isinstance( data, ( list, tuple ) ) ) :
+            self.setFromList( data )
+        elif( isinstance( data, W_XYs ) ) :
+            self.setFromW_XYs( data )
 
     def __len__( self ) :
 
@@ -51,31 +85,69 @@ class W_XYs( ancestry ) :
 
         return( self.xys[index] )
 
-    def __setitem__( self, index, xys_ ) :
+    def __setitem__( self, index, xys ) :
 
-        if( not( isinstance( xys_, XYs.XYs ) ) ) : raise Exception( 'right-hand-side must be instance of XYs; it is %s' % brb.getType( xys_ ) )
-        if( type( xys_.value ) != type( 1. ) ) : raise Exception( 'xys value must be a float; it is a %s' % brb.getType( xys_.value ) )
-        n = len( self )
-        if( n < index ) : raise IndexError( 'index = %s while length is %s' % ( index, n ) )
-        if( index < 0 ) : raise IndexError( 'index = %s' % index )
-        xys = xys_.copy( parent = self, index = index, value = xys_.value, axes_ = axes.referenceAxes( self ), isPrimaryXData = False )
-        if( n == 0 ) :
-            self.xys.append( xys )
-        elif( n == index ) :
-            if( xys_.value <= self.xys[-1].value ) : raise Exception( 'xys.value = %s is <= prior xys.value = %s' % ( xys_.value, self.xys[-1].value ) )
-            self.xys.append( xys )
-        else :
-            if( index > 0 ) :
-                if( xys_.value <= self.xys[index - 1].value ) : 
-                    raise Exception( 'xys.value = %s is <= prior xys.value = %s' % ( xys_.value, self.xys[index - 1].value ) )
-            if( index < ( n - 1 ) ) :
-                if( xys_.value >= self.xys[index + 1].value ) :
-                    raise Exception( 'xys.value = %s is >= next xys.value = %s' % ( xys_.value, self.xys[index + 1].value ) )
-            self.xys[index] = xys
+        index_, xys_ = self._set_insertCommon( index, xys, xys.value )
+        if( index_ is not None ) :
+            if( index_ > 0 ) :
+                if( xys_.value <= self.xys[index_-1].value ) : 
+                    raise Exception( 'xys.value = %s is <= prior xys.value = %s' % ( xys_.value, self.xys[index_-1].value ) )
+            if( index_ < ( len( self ) - 1 ) ) :
+                if( xys_.value >= self.xys[index_+1].value ) :
+                    raise Exception( 'xys.value = %s is >= next xys.value = %s' % ( xys_.value, self.xys[index_+1].value ) )
+            self.xys[index_] = xys_
 
     def append( self, xys_ ) :
 
         self[len( self )] = xys_
+
+    def insert( self, index, xys, w = None ) :
+        """
+        Inserts xys at index. If w is None, w is take from the value of xys.
+        """
+
+        if( w is None ) : w = xys.value
+        index_, xys_ = self._set_insertCommon( index, xys, w )
+        if( index_ is not None ) :
+            if( index_ > 0 ) :
+                if( w <= self.xys[index_-1].value ) : raise Exception( 'w = %s is <= prior xys.value = %s' % ( w, self.xys[index_-1].value ) )
+            if( w >= self.xys[index_].value ) : raise Exception( 'w = %s is >= next xys.value = %s. index = %d' % ( w, self.xys[index_].value, index_ ) )
+            self.xys.insert( index_, xys_ )
+            for i1 in xrange( index_ + 1, len( self ) ) : self.xys[i1].index = i1
+
+    def insertAtW( self, w, xys ) :
+        """
+        Inserts xys at the appropriate index for w. The inserted XYs instance will have value w, even if xys as a value.
+        """
+
+        index = -1               # Set in case self is empty and next line does not set index or xys.
+        for index, xys_ in enumerate( self ) :
+            if( xys_.value >= w ) : break
+        if( index == -1 ) :
+            index = 0
+        else :
+            if( xys_.value == w ) : del self.xys[index]
+            if( xys_.value < w ) : index += 1               # Happends when w is greater than last items value.
+        self.insert( index, xys, w = w )
+
+    def _set_insertCommon( self, index, xys, w ) :
+        """For internal use only."""
+
+        if( not( isinstance( xys, XYs.XYs ) ) ) : raise Exception( 'right-hand-side must be instance of XYs; it is %s' % brb.getType( xys_ ) )
+        n = len( self )
+        if( n < index ) : raise IndexError( 'index = %s while length is %s' % ( index, n ) )
+        index_ = index
+        if( index_ < 0 ) : index_ += n
+        if( index_ < 0 ) : raise IndexError( 'index = %s' % index )
+        xys_ = xys.copy( parent = self, index = index_, value = w, axes_ = axes.referenceAxes( self ), isPrimaryXData = False )
+        if( n == 0 ) :
+            self.xys.append( xys_ )
+            return( None, None )
+        elif( n == index_ ) :
+            if( w <= self.xys[-1].value ) : raise Exception( 'w = %s is <= prior xys.value = %s' % ( w, self.xys[-1].value ) )
+            self.xys.append( xys_ )
+            return( None, None )
+        return( ( index_, xys_ ) )
 
     def copy( self, index = None, value = None, parent = None, axes = None, isPrimaryXData = None ) :
 
@@ -95,6 +167,7 @@ class W_XYs( ancestry ) :
         return( w_xys )
 
     def copyDataToGridWsAndXsAndYs( self, wUnit = None, xUnit = None, yUnit = None ) :
+
         from fudge.core.utilities.brb import uniquify
         wScale = 1.0
         if( wUnit is not None ) : wScale = physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty( '1 ' + self.axes[0].getUnit( ) ).getValueAs( wUnit )
@@ -110,9 +183,19 @@ class W_XYs( ancestry ) :
             ys.append( [ self.getValue( w, x ) for w in ws ] )
         return [ ws, xs, ys ]
 
+    def getDimensions( self ) :
+        """Returns the dimensions (3 for W_XYs) for this type of data."""
 
-    def getValue( self, w, x ):
-        return self.interpolateAtW( w ).getValue( x )
+        return( 3 )
+
+    def getValue( self, w, x = None ) :
+        """
+        Returns an XYs instance of self evaluated at w if x is None. Otherwise, returns, as a float, the value of self at w, x.
+        """
+
+        XYs_atW = self.interpolateAtW( w )
+        if( x is None ) : return( XYs_atW )
+        return( XYs_atW.getValue( x ) )
 
     def integrate( self, wMin = None, wMax = None, xMin = None, xMax = None ) :
 
@@ -156,6 +239,30 @@ class W_XYs( ancestry ) :
         if( not( insitu ) ) : n = self.copy( )
         for xys in n.xys : xys.normalize( insitu = True )
         return( n )
+
+    def setFromList( self, w_xys, accuracy = 1e-3 ) :
+        """
+        Replaces self's data with the data in w_xys. w_xys must be a list of [ w_i, xys_i ] pairs with w_i < w_{i+1}. xys_i can be
+        either a list of [ x_j, y_j ] pairs with x_j < x_{j+1} or an XYs instance. For example:
+            w_xys = [ [ 1e-6, [ [ -1, 0.5 ], [ 1, 0.5 ] ] ], [ 20, [ [ -1, 0. ], [ 0, 0. ], [ 1, 2. ] ] ] ].
+        """
+
+        self.xys = []
+        for w1, xys in w_xys :
+            if( isinstance( xys, XYs.XYs ) ) :
+                xys_ = xys.copy( value = w1 )
+            else :
+                xys_ = XYs.XYs( axes.referenceAxes( self ), xys, accuracy, value = w1 )
+            self.append( xys_ )
+
+    def setFromW_XYs( self, w_xys ) :
+        """
+        Replaces self's data with the data in w_xys. w_xys must be a W_XYs instance.
+        """
+
+        if( not( isinstance( w_xys, W_XYs ) ) ) : raise TypeError( 'instance of of type W_XYs. Is type "%d"' % brb.getType( w_xys ) )
+        w_xys_ = [ ( xys.value, xys ) for xys in w_xys ]
+        self.setFromList( w_xys_ )
 
     def thin( self, accuracy ) :
         """Remove extra points in both the W and X-directions, while maintaining specified accuracy.
@@ -237,9 +344,9 @@ class W_XYs( ancestry ) :
 
         return( self.axes[0].getUnit( ) )
 
-    def toPointwiseLinear( self, accuracy = None, lowerEps = 0, upperEps = 0, cls = None ) :
+    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0, cls = None ) :
 
-        from fudge.core.utilities import mathMisc
+        from fudge.core.math import miscellaneous
 
         independent, dependent, qualifier = self.axes[0].interpolation.getInterpolationTokens( )
         if( independent not in [ axes.linearToken ] ) : raise Exception( 'independent interpolation = %s not supported' % dependent )
@@ -248,17 +355,20 @@ class W_XYs( ancestry ) :
         axes_[0].setInterpolation( axes.interpolationXY( axes.linearToken, axes.linearToken, qualifier ) )
         axes_[1].setInterpolation( axes.interpolationXY( axes.linearToken, axes.linearToken ) )
         if( cls is None ) : cls = W_XYs
-        n = cls( axes_ )
+        if( self.isPrimaryXData ):
+            n = cls( axes_, self.productFrame )
+        else:
+            n = cls( axes_ )
         w_prior = None
         independentXY, dependentXY, qualifier = self.axes[1].interpolation.getInterpolationTokens( )
         for w_xys in self :
             if( ( independentXY != axes.linearToken ) or ( dependentXY != axes.linearToken ) ) :
                 value = w_xys.value
-                w_xys = w_xys.toPointwiseLinear( accuracy, lowerEps = lowerEps, upperEps = upperEps )
+                w_xys = w_xys.toPointwise_withLinearXYs( accuracy, lowerEps = lowerEps, upperEps = upperEps )
                 w_xys.value = value
             if( w_prior is not None ) :
                 if( independent == axes.flatToken ) :
-                    value = mathMisc.shiftFloatDownABit( w_xys.value, lowerEps )
+                    value = miscellaneous.shiftFloatDownABit( w_xys.value, lowerEps )
                     n.append( w_prior.copy( value = value ) )
             n.append( w_xys )
             w_prior = w_xys
@@ -267,7 +377,7 @@ class W_XYs( ancestry ) :
 
     def toXML( self, tag = 'xData', indent = '', incrementalIndent = '  ', pairsPerLine = 100, xyFormatter = None, xySeparater = ' ' ) :
 
-        return( '\n'.join( self.toXMLList( indent = indent, incrementalIndent = incrementalIndent, pairsPerLine = pairsPerLine, xyFormatter = xyFormatter, 
+        return( '\n'.join( self.toXMLList( tag = tag, indent = indent, incrementalIndent = incrementalIndent, pairsPerLine = pairsPerLine, xyFormatter = xyFormatter, 
             xySeparater = xySeparater ) ) )
 
     def toXMLList( self, tag = 'xData', indent = '', incrementalIndent = '  ', pairsPerLine = 100, xyFormatter = None, xySeparater = ' ' ) :
@@ -282,7 +392,9 @@ class W_XYs( ancestry ) :
             if( self.isPrimaryXData ) : xDataString = ' xData="%s"' % self.xData
         else :
             xDataString = ' type="%s"' % self.type
-        xmlString = [ '%s<%s%s%s>' % ( indent, tag, indexValueStr, xDataString ) ] 
+        extraXMLAttributeString = ''
+        if( hasattr( self, 'extraXMLAttributeString' ) ) : extraXMLAttributeString = ' ' + self.extraXMLAttributeString( )
+        xmlString = [ '%s<%s%s%s%s>' % ( indent, tag, indexValueStr, xDataString, extraXMLAttributeString ) ] 
         xmlString += self.axes.toXMLList( indent = indent2 )
         for xys in self.xys : xmlString += xys.toXMLList( tag = self.axes[0].getLabel( ), indent = indent2, incrementalIndent = incrementalIndent, \
             pairsPerLine = pairsPerLine, xyFormatter = xyFormatter, xySeparater = xySeparater, oneLine = True )
@@ -343,25 +455,34 @@ class W_XYs( ancestry ) :
         subprocessing.spawn( s )
 
     @classmethod
-    def parseXMLNode( cls, xdataElement, linkData={} ):
+    def parseXMLNode( cls, xdataElement, xPath=[], linkData={} ):
         """ translate W_XYs and its subclasses from xml """
+        xPath.append( xdataElement.tag )
         attrs = dict( xdataElement.items() )
         if "xData" in attrs:
             assert attrs.pop("xData") == "W_XYs"
             attrs['isPrimaryXData'] = True
         else: attrs['isPrimaryXData'] = False
-        axes_ = axes.parseXMLNode( xdataElement[0] )
+        axes_ = axes.parseXMLNode( xdataElement[0], xPath )
         wxys_ = cls( axes_, **attrs )
         wxys_.tag = xdataElement.tag
         for xys in xdataElement[1:]:
             # doesn't work yet:
-            #wxys_.append( XYs.XYs.parseXMLNode( xys ) )
+            #wxys_.append( XYs.XYs.parseXMLNode( xys, xPath ) )
+            xPath.append( '%s[@value="%s"]' % (xys.tag, xys.get('value') ) )
             axes_ = axes.referenceAxes( parent=wxys_ )
             data = map(float, xys.text.split())
             data = zip( data[::2], data[1::2] )
             wxys_.append( XYs.XYs( axes_, data, float(xys.get("accuracy")), index=int(xys.get("index")),
                 value=float(xys.get("value")), parent=wxys_ ) )
+            xPath.pop()
+        xPath.pop()
         return wxys_
+
+    @staticmethod
+    def defaultAxes( labelsUnits = {} ) :
+
+        return( axes.defaultAxes( dimension = 3, labelsUnits = labelsUnits ) )
 
 def XYFormatter( x, y ) :
 
@@ -370,9 +491,9 @@ def XYFormatter( x, y ) :
 if( __name__ == '__main__' ) :
 
     vl_w_xy = axes.axes( dimension = 3 )
-    vl_w_xy[0] = axes.axis( 'energy_in', 0, 'eV', frame = axes.labToken, interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-    vl_w_xy[1] = axes.axis( 'mu', 0, '', frame = axes.centerOfMassToken, interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-    vl_w_xy[2] = axes.axis( 'P(energy_in|mu)', 0, '', frame = axes.centerOfMassToken )
+    vl_w_xy[0] = axes.axis( 'energy_in', 0, 'eV', interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
+    vl_w_xy[1] = axes.axis( 'mu', 0, '', interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
+    vl_w_xy[2] = axes.axis( 'P(energy_in|mu)', 0, '' )
     vl_w_xy.checkDimension( 3 )
 
     vl_xy = axes.axes( )

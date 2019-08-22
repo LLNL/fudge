@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """Routines for writing an ENDF file"""
@@ -177,4 +202,40 @@ def writeEndfINTG( row, col, vals, ndigit ):
         rets += toStr(a)
     rets += padright
     return rets
+
+def endfMFListToFinalFile( endfMFList, MAT, lineNumbers=True ):
+	""" from dictionary of MF/MTs, build final ENDF file as a string """
+	directory = []
+	MFs = sorted(endfMFList.keys())
+	for MF in MFs:
+		MFData = endfMFList[MF]
+		MTs = sorted( MFData.keys( ) )
+		for MT in MTs :
+			if( ( MF == 1 ) and ( MT == 451 ) ) : continue
+			data = MFData[MT]
+			directory.append( "%33d%11d%11d%11d" % ( MF, MT, len( data ) - 1, 0 ) )
+	directory.insert( 0, "%33d%11d%11d%11d" % ( 1, 451, len( directory ) + len( endfMFList[1][451] ) + 1, 0 ) )  # Add current line of directory
+	directory.append( 99999 )
+	endfMFList[1][451][3] = endfMFList[1][451][3][:55] + '%11i' % len(directory[:-1])
+	endfMFList[1][451] += directory
+
+	endfList = [ "%66s%s" % ( " ", endfFENDLine( 1 )[66:75] ) ]
+	for MF in MFs :
+		MFData = endfMFList[MF]
+		MTs = sorted( MFData.keys( ) )
+		for MT in MTs :
+			data = MFData[MT]
+			for i, datum in enumerate( data ) :
+				if( datum == 99999 ) :
+					endfList.append( endfSENDLine( MAT, MF ) )
+				else :
+					if lineNumbers:
+						endfList.append( '%-66s%4d%2d%3d%5d' % ( datum, MAT, MF, MT, i + 1 ) )
+					else:
+						endfList.append( '%-66s%4d%2d%3d' % ( datum, MAT, MF, MT ) )
+		if( len( MTs ) > 0 ) : endfList.append( endfFENDLine( MAT ) )
+	endfList.append( endfMENDLine( ) )
+	endfList.append( endfTENDLine( ) )
+	endfList.append( '' )
+	return( '\n'.join( endfList ) )
 

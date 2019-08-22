@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 __metaclass__ = type
@@ -12,6 +37,10 @@ class tempInfo :
     def __init__( self ) :
 
         self.dict = {}
+
+    def __contains__( self, key ) :
+
+        return( key in self.dict )
 
     def __getitem__( self, key ) :
 
@@ -65,11 +94,11 @@ class processInfo :
 
     def getProjectileName( self ) :
 
-        return( self.target.projectile.getToken( ) )
+        return( self.target.projectile.getName( ) )
 
     def getTargetName( self ) :
 
-        return( self.target.target.getToken( ) )
+        return( self.target.target.getName( ) )
 
     def isProcessParticle( self, name ) :
 
@@ -110,7 +139,7 @@ class processInfoLLNL( processInfo ) :
         particles = {}
         for particle in groups :
             lMax_ = 0
-            if( particle == target.projectile.getToken( ) ) : lMax_ = lMax
+            if( particle == target.projectile.getName( ) ) : lMax_ = lMax
             conservationFlag = conserveParticleAndEnergy
             if( particle == 'n' ) : conservationFlag = conserveParticle
             if( particle == 'gamma' ) : conservationFlag = conserveEnergy

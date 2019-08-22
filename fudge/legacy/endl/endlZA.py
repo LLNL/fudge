@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -14,8 +39,8 @@ import copy
 import re
 from fudge import fudgeDefaults, fudgeParameters
 from fudge.core.utilities import fudgeExceptions, brb
-from fudge.core.math import endl2dmathClasses
-from fudge.processing import bdfls
+import endl2dmathClasses
+import bdfls
 import fudgeDocumentationFile
 import endlFile
 import endl2
@@ -379,6 +404,8 @@ can be used to get a reference to the neutron in-elastic cross section,
                     I9present = 9 in Is
                     if( C == 46 and yo == 7 and I1present and ( not I3present and not ( I4present and lenI4 == 1 ) ) ) :
                         yoMsg = 'missing I = 3 or 4 (l=0) data to go with I = 1 data'
+                    elif( ( C != 10 ) and ( S == 0 ) and I1present and not( I3present or I4present ) ) :
+                        yoMsg = 'missing I = 3 or 4 data to go with I = 1 data'
                     elif( I3present ) :
                         if( not I1present ) :
                              yoMsg = 'missing I = 1 data to go with I = 3 data'
@@ -447,7 +474,6 @@ can be used to get a reference to the neutron in-elastic cross section,
                 if( S == 1 ) :
                     if( ( C in [ 11, 40, 41, 42, 44, 45 ] ) and not energyDepositionToGammasPresent ) : dELevels -= I0.getX1( )
                 dE = totalEnergyDeposition - ( incidentEnergy + energyDepedentQ + dELevels )
-# I0.getELevel( )
                 dEMax = float( checkListKeys['energyBalance'] )
                 i = -1
                 for E, deltaE in dE.data :

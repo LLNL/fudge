@@ -196,14 +196,14 @@ For ``endf2gnd.py``, we want to read one ENDF file and write the GND evaluation 
         outEvalFile = args.outFilePrefix + '.gnd.xml'
         outCovFile = args.outFilePrefix + '.gndCov.xml'
     else:
-        outEvalFile = inFile.replace( '.endf', '.gnd.xml' )
-        outCovFile = inFile.replace( '.endf', '.gndCov.xml' )
+        outEvalFile = args.inFile.replace( '.endf', '.gnd.xml' )
+        outCovFile = args.inFile.replace( '.endf', '.gndCov.xml' )
         
     # Now translate
     myEval, myCov = endfFileToGND( args.inFile, toStdOut=True, skipBadData=True )
-    open( outEvalFile, mode='w' ).writelines( myEval.toXMLList( {'verbosity':0} ) )
+    open( outEvalFile, mode='w' ).writelines( line+'\n' for line in myEval.toXMLList( {'verbosity':0} ) )
     if myCov is not None:
-         open( outCovFile, mode='w' ).writelines( myCov.toXMLList( {'verbosity':0} ) )
+         open( outCovFile, mode='w' ).writelines( line+'\n' for line in myCov.toXMLList( {'verbosity':0} ) )
 
 I urge you to try it out.  If you are unsure how to use it, type ``./endf2gnd.py --help``.
 

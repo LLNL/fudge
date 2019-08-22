@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """ basic plotting example: reconstructs resonances (if necessary), and plots cross sections for requested MTs.
@@ -29,7 +54,8 @@ if open(filename).readline().startswith( "<?xml" ):
     RS = reactionSuite.readXML( filename )
 else:
     from fudge.legacy.converting import endfFileToGND
-    RS, CS = endfFileToGND.endfFileToGND( filename )
+    rce = endfFileToGND.endfFileToGND( filename )
+    RS, CS = rce['reactionSuite'], rce['covarianceSuite']
 
 reconstructed = False
 
@@ -49,9 +75,9 @@ for MT in args.mt:
     elif 'pointwise' in reac.crossSection.forms:
         data[MT] = reac.crossSection['pointwise']
     else:
-        xsc = [form for form in reac.crossSection.forms.values() if hasattr(form, 'toPointwiseLinear')]
+        xsc = [form for form in reac.crossSection.forms.values() if hasattr(form, 'toPointwise_withLinearXYs')]
         if len(xsc)>0:
-            data[MT] = xsc[0].toPointwiseLinear(1e-8,0)
+            data[MT] = xsc[0].toPointwise_withLinearXYs(1e-8,0)
         else: print("Don't know how to plot cross section form(s): %s" % reac.crossSection.forms.keys())
 
     
@@ -73,7 +99,7 @@ try:
             title=title, legendOn=True )
 except ImportError: # likely means matplotlib is missing. Try with Gnuplot instead:
     from fudge.vis.gnuplot import fudgeMultiPlots
-    from fudge.core.math.endl2dmathClasses import endl2dmath
+    from fudge.legacy.endl.endl2dmathClasses import endl2dmath
     data = [ endl2dmath( d.copyDataToXYs() ) for d in data.values() ]
     fudgeMultiPlots.multiPlot( data, xylog=3, xMin=low, xMax=high, xLabel="E_n (eV)", title=title )
 

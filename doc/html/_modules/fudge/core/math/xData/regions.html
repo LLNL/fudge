@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>fudge.core.math.xData.regions &mdash; Fudge and GND 1.2 beta documentation</title>
+    <title>fudge.core.math.xData.regions &mdash; Fudge and GND 1.3 beta documentation</title>
     
     <link rel="stylesheet" href="../../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../../',
-        VERSION:     '1.2 beta',
+        VERSION:     '1.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +25,7 @@
     <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../../../../../_static/gnd-20121206-favicon.ico"/>
-    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../../../index.html" />
+    <link rel="top" title="Fudge and GND 1.3 beta documentation" href="../../../../../index.html" />
     <link rel="up" title="Module code" href="../../../../index.html" /> 
   </head>
   <body>
@@ -39,7 +38,7 @@
         <li class="right" >
           <a href="../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../../../../../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="../../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -157,7 +156,7 @@
 
         <span class="n">regions</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">XYs</span><span class="o">.</span><span class="n">XYs</span><span class="p">,</span> <span class="n">axes_</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="p">,</span> <span class="n">isPrimaryXData</span> <span class="o">=</span> <span class="n">isPrimaryXData</span> <span class="p">)</span>
 
-<div class="viewcode-block" id="regionsXYs.toPointwiseLinear"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.xData.html#fudge.core.math.xData.regions.regionsXYs.toPointwiseLinear">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwiseLinear</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">lowerEps</span><span class="p">,</span> <span class="n">upperEps</span><span class="p">,</span> <span class="n">removeOverAdjustedPoints</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="n">axes_</span> <span class="o">=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="regionsXYs.toPointwise_withLinearXYs"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.xData.html#fudge.core.math.xData.regions.regionsXYs.toPointwise_withLinearXYs">[docs]</a>    <span class="k">def</span> <span class="nf">toPointwise_withLinearXYs</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">lowerEps</span><span class="p">,</span> <span class="n">upperEps</span><span class="p">,</span> <span class="n">removeOverAdjustedPoints</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="n">axes_</span> <span class="o">=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Converts the regions of self into a single ``XYs.XYs`` instance that has &#39;linear,linear&#39; interpolation. At the</span>
 <span class="sd">        boundary between two abutting regions, the x-values are the same, which is not allowed for an ``XYs.XYs`` instance.</span>
@@ -227,14 +226,16 @@
         <span class="k">return</span><span class="p">(</span> <span class="n">pointwise</span> <span class="p">)</span>
 </div>
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="regionsXYs.parseXMLNode"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.xData.html#fudge.core.math.xData.regions.regionsXYs.parseXMLNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">cls</span><span class="p">,</span> <span class="n">regionsElement</span><span class="p">,</span> <span class="n">linkData</span><span class="o">=</span><span class="p">{}</span> <span class="p">):</span>
+<div class="viewcode-block" id="regionsXYs.parseXMLNode"><a class="viewcode-back" href="../../../../../fudge/fudge.core.math.xData.html#fudge.core.math.xData.regions.regionsXYs.parseXMLNode">[docs]</a>    <span class="k">def</span> <span class="nf">parseXMLNode</span><span class="p">(</span> <span class="n">cls</span><span class="p">,</span> <span class="n">regionsElement</span><span class="p">,</span> <span class="n">xPath</span><span class="o">=</span><span class="p">[],</span> <span class="n">linkData</span><span class="o">=</span><span class="p">{}</span> <span class="p">):</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">regionsElement</span><span class="o">.</span><span class="n">tag</span> <span class="p">)</span>
         <span class="n">attrs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="n">regionsElement</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="p">)</span>
-        <span class="n">axes_</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">regionsElement</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">axes_</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">regionsElement</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">xPath</span> <span class="p">)</span>
         <span class="n">regions_</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span> <span class="n">axes_</span> <span class="p">)</span>
         <span class="k">for</span> <span class="n">region</span> <span class="ow">in</span> <span class="n">regionsElement</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
-            <span class="n">xys</span> <span class="o">=</span> <span class="n">XYs</span><span class="o">.</span><span class="n">XYs</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">region</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
+            <span class="n">xys</span> <span class="o">=</span> <span class="n">XYs</span><span class="o">.</span><span class="n">XYs</span><span class="o">.</span><span class="n">parseXMLNode</span><span class="p">(</span> <span class="n">region</span><span class="p">,</span> <span class="n">xPath</span><span class="p">,</span> <span class="n">linkData</span> <span class="p">)</span>
             <span class="n">xys</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">regions_</span><span class="p">;</span> <span class="n">xys</span><span class="o">.</span><span class="n">tag</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">tag</span><span class="p">;</span> <span class="n">xys</span><span class="o">.</span><span class="n">isPrimaryXData</span><span class="o">=</span><span class="bp">False</span>
-            <span class="n">regions_</span><span class="o">.</span><span class="n">regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">xys</span> <span class="p">)</span>
+            <span class="n">regions_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">xys</span> <span class="p">)</span>
+        <span class="n">xPath</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">regions_</span></div></div>
 </pre></div>
 
@@ -272,13 +273,13 @@
         <li class="right" >
           <a href="../../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../../../../../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="../../../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

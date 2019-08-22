@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 __metaclass__ = type
@@ -12,12 +37,17 @@ class table(ancestry):
         ancestry.__init__(self, tableToken, None)
         self.columns = columns or []
         self.data = data or []
-        self.nColumns, self.nRows = len(self.columns), len(self.data)
         if not all( [len(d)==self.nColumns for d in self.data] ):
             raise Exception, ("Data is the wrong shape for a table with %i columns!" % self.nColumns)
 
+    @property
+    def nColumns(self): return len(self.columns)
+
+    @property
+    def nRows(self): return len(self.data)
+
     def __len__( self ):
-        return len(self.data)
+        return self.nRows
 
     def __getitem__( self, indices ):
         if type(indices) is int: return self.data[ indices ]
@@ -32,7 +62,6 @@ class table(ancestry):
         if not len(dataRow) == self.nColumns:
             raise Exception, ("New row has %i columns, should have %i!" % (len(dataRow),self.nColumns))
         self.data.append( dataRow )
-        self.nRows += 1
 
     def addColumn( self, columnHeader, index=None ):
         """ add another column, either at 'index' or at the end of the table """
@@ -42,7 +71,6 @@ class table(ancestry):
         else:
             self.columns.append( columnHeader )
             [row.append(0) for row in self.data]
-        self.nColumns += 1
         for idx, col in enumerate(self.columns): col.index = idx
 
     def getColumn( self, columnName, units=None ):
@@ -66,7 +94,6 @@ class table(ancestry):
         index = self.columns.index( column[0] )
         self.columns.pop( index )
         [row.pop(index) for row in self.data]
-        self.nColumns -= 1
         for idx, col in enumerate(self.columns): col.index = idx
 
     def toXMLList( self, indent='', prettyPrint=True, addHeader=True ):
@@ -151,9 +178,11 @@ class blank:
     def __mul__( self, other ): return self
     def __rmul__( self, other ): return self
 
-def parseXMLNode(element, conversionTable={}):
+def parseXMLNode(element, xPath=[], conversionTable={}):
     """Read a table element from xml into python. To convert a column or attribute from string to some other type,
     enter the new type in the conversionTable: {'index':int, 'scatteringRadius':PhysicalQuantityWithUncertainty, etc}. """
+
+    xPath.append( element.tag )
     def fixAttributes( items ):
         attrs = dict(items)
         for key in attrs:
@@ -175,7 +204,9 @@ def parseXMLNode(element, conversionTable={}):
             data[i::nColumns] = map( conversionTable[columns[i].name], data[i::nColumns] )
     assert len(data) == nRows * nColumns
     data = [data[i*nColumns:(i+1)*nColumns] for i in range(nRows)]
-    return table( columns, data )
+    Table = table( columns, data )
+    xPath.pop()
+    return Table
 
 
 if __name__ == '__main__':
@@ -194,7 +225,7 @@ if __name__ == '__main__':
 
     from xml.etree import cElementTree as parser
     element = parser.fromstring( xmlstring )
-    tt2 = parseXMLNode( element, {'index':int} )
+    tt2 = parseXMLNode( element, conversionTable = {'index':int} )
     xmlstring2 = '\n'.join( tt2.toXMLList() )
     assert xmlstring == xmlstring2
 

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>deterministic Package &mdash; Fudge and GND 1.2 beta documentation</title>
+    <title>deterministic Package &mdash; Fudge and GND 1.3 beta documentation</title>
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.2 beta',
+        VERSION:     '1.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +25,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
-    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../index.html" />
+    <link rel="top" title="Fudge and GND 1.3 beta documentation" href="../index.html" />
     <link rel="up" title="processing Package" href="fudge.processing.html" />
     <link rel="next" title="montecarlo Package" href="fudge.processing.montecarlo.html" />
     <link rel="prev" title="processing Package" href="fudge.processing.html" /> 
@@ -47,7 +46,7 @@
         <li class="right" >
           <a href="fudge.processing.html" title="processing Package"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="index.html" >fudge Package</a> &raquo;</li>
           <li><a href="fudge.processing.html" accesskey="U">processing Package</a> &raquo;</li> 
       </ul>
@@ -63,52 +62,8 @@
 <div class="section" id="id1">
 <h2><tt class="xref py py-mod docutils literal"><span class="pre">deterministic</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-fudge.processing.deterministic"></span></div>
-<div class="section" id="module-fudge.processing.deterministic.gndToLLNLSnCOut">
-<span id="gndtollnlsncout-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">gndToLLNLSnCOut</span></tt> Module<a class="headerlink" href="#module-fudge.processing.deterministic.gndToLLNLSnCOut" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="fudge.processing.deterministic.gndToLLNLSnCOut.LLNLSnCOutCrossSection">
-<em class="property">class </em><tt class="descclassname">fudge.processing.deterministic.gndToLLNLSnCOut.</tt><tt class="descname">LLNLSnCOutCrossSection</tt><big>(</big><em>reaction</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/gndToLLNLSnCOut.html#LLNLSnCOutCrossSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.gndToLLNLSnCOut.LLNLSnCOutCrossSection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.processing.deterministic.gndToLLNLSnCOut.ZAToYo">
-<tt class="descclassname">fudge.processing.deterministic.gndToLLNLSnCOut.</tt><tt class="descname">ZAToYo</tt><big>(</big><em>ZA</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/gndToLLNLSnCOut.html#ZAToYo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.gndToLLNLSnCOut.ZAToYo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns yo designator for ZA.  This mapping is not one-to-one as example
-ZA = 1001 could be yo = 2 or 12.  The smaller yo values is returned.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.processing.deterministic.gndToLLNLSnCOut.calcConserveParticleAndEnergy">
-<tt class="descclassname">fudge.processing.deterministic.gndToLLNLSnCOut.</tt><tt class="descname">calcConserveParticleAndEnergy</tt><big>(</big><em>productTMs</em>, <em>nGroupsProjectile</em>, <em>productGroupBoundaries</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/gndToLLNLSnCOut.html#calcConserveParticleAndEnergy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.gndToLLNLSnCOut.calcConserveParticleAndEnergy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.processing.deterministic.gndToLLNLSnCOut.groupSpeeds">
-<tt class="descclassname">fudge.processing.deterministic.gndToLLNLSnCOut.</tt><tt class="descname">groupSpeeds</tt><big>(</big><em>groupBoundaries</em>, <em>fluxes</em>, <em>mass</em>, <em>mass_Energy_speedConstant</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/gndToLLNLSnCOut.html#groupSpeeds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.gndToLLNLSnCOut.groupSpeeds" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.processing.deterministic.gndToLLNLSnCOut.groupedDataToCOutStr">
-<tt class="descclassname">fudge.processing.deterministic.gndToLLNLSnCOut.</tt><tt class="descname">groupedDataToCOutStr</tt><big>(</big><em>grouped</em>, <em>label=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/gndToLLNLSnCOut.html#groupedDataToCOutStr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.gndToLLNLSnCOut.groupedDataToCOutStr" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.processing.deterministic.gndToLLNLSnCOut.toLLNLSnCOut">
-<tt class="descclassname">fudge.processing.deterministic.gndToLLNLSnCOut.</tt><tt class="descname">toLLNLSnCOut</tt><big>(</big><em>self</em>, <em>toOtherData</em>, <em>moreOtherData</em>, <em>first</em>, <em>last</em>, <em>verbosityIndent=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/gndToLLNLSnCOut.html#toLLNLSnCOut"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.gndToLLNLSnCOut.toLLNLSnCOut" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="fudge.processing.deterministic.gndToLLNLSnCOut.transferMatrices">
-<em class="property">class </em><tt class="descclassname">fudge.processing.deterministic.gndToLLNLSnCOut.</tt><tt class="descname">transferMatrices</tt><big>(</big><em>lMax</em>, <em>nGroupsProjectile</em>, <em>nGroupsProduct</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/gndToLLNLSnCOut.html#transferMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.gndToLLNLSnCOut.transferMatrices" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<dl class="method">
-<dt id="fudge.processing.deterministic.gndToLLNLSnCOut.transferMatrices.hasData">
-<tt class="descname">hasData</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/gndToLLNLSnCOut.html#transferMatrices.hasData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.gndToLLNLSnCOut.transferMatrices.hasData" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="section" id="gndtollnlsncout-module">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">gndToLLNLSnCOut</span></tt> Module<a class="headerlink" href="#gndtollnlsncout-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-fudge.processing.deterministic.transferMatrices">
 <span id="transfermatrices-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">transferMatrices</span></tt> Module<a class="headerlink" href="#module-fudge.processing.deterministic.transferMatrices" title="Permalink to this headline">¶</a></h2>
@@ -129,13 +84,13 @@ ZA = 1001 could be yo = 2 or 12.  The smaller yo values is returned.</p>
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.EMuEpP_TransferMatrix">
-<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">EMuEpP_TransferMatrix</tt><big>(</big><em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>crossSection</em>, <em>angularData</em>, <em>EMuEpPData</em>, <em>multiplicity</em>, <em>comment=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#EMuEpP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.EMuEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">EMuEpP_TransferMatrix</tt><big>(</big><em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>masses</em>, <em>crossSection</em>, <em>angularData</em>, <em>EMuEpPData</em>, <em>multiplicity</em>, <em>comment=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#EMuEpP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.EMuEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is LLNL I = 1, 3 type data.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.ENDFEMuEpP_TransferMatrix">
-<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">ENDFEMuEpP_TransferMatrix</tt><big>(</big><em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>crossSection</em>, <em>angularEnergyData</em>, <em>multiplicity</em>, <em>comment=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#ENDFEMuEpP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.ENDFEMuEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">ENDFEMuEpP_TransferMatrix</tt><big>(</big><em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>masses</em>, <em>crossSection</em>, <em>angularEnergyData</em>, <em>multiplicity</em>, <em>comment=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#ENDFEMuEpP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.ENDFEMuEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is ENDF MF = 6, LAW = 7 type data.</p>
 </dd></dl>
 
@@ -146,7 +101,7 @@ ZA = 1001 could be yo = 2 or 12.  The smaller yo values is returned.</p>
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.KalbachMann_TransferMatrix">
-<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">KalbachMann_TransferMatrix</tt><big>(</big><em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>crossSection</em>, <em>particlesData</em>, <em>KalbachMannData</em>, <em>multiplicity=1</em>, <em>comment=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#KalbachMann_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.KalbachMann_TransferMatrix" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">KalbachMann_TransferMatrix</tt><big>(</big><em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>masses</em>, <em>crossSection</em>, <em>particlesData</em>, <em>KalbachMannData</em>, <em>multiplicity=1</em>, <em>comment=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#KalbachMann_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.KalbachMann_TransferMatrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -161,12 +116,12 @@ ZA = 1001 could be yo = 2 or 12.  The smaller yo values is returned.</p>
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.Legendre_TransferMatrix">
-<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">Legendre_TransferMatrix</tt><big>(</big><em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>crossSection</em>, <em>LegendreData</em>, <em>multiplicity</em>, <em>comment=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#Legendre_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.Legendre_TransferMatrix" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">Legendre_TransferMatrix</tt><big>(</big><em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>crossSection</em>, <em>LegendreData</em>, <em>multiplicity</em>, <em>masses</em>, <em>comment=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#Legendre_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.Legendre_TransferMatrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.NBodyPhaseSpace">
-<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">NBodyPhaseSpace</tt><big>(</big><em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>crossSection</em>, <em>numberOfProducts</em>, <em>mProj</em>, <em>mTarget</em>, <em>mProduct</em>, <em>mTotal</em>, <em>Q</em>, <em>multiplicity=1</em>, <em>comment=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#NBodyPhaseSpace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.NBodyPhaseSpace" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">NBodyPhaseSpace</tt><big>(</big><em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>crossSection</em>, <em>numberOfProducts</em>, <em>masses</em>, <em>mTotal</em>, <em>Q</em>, <em>multiplicity=1</em>, <em>comment=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#NBodyPhaseSpace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.NBodyPhaseSpace" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -176,12 +131,12 @@ ZA = 1001 could be yo = 2 or 12.  The smaller yo values is returned.</p>
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.angularToString">
-<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">angularToString</tt><big>(</big><em>angularData</em>, <em>crossSection</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#angularToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.angularToString" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">angularToString</tt><big>(</big><em>angularData</em>, <em>crossSection</em>, <em>weight=None</em>, <em>twoBody=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#angularToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.angularToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.commonDataToString">
-<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">commonDataToString</tt><big>(</big><em>lMax</em>, <em>projectileGroupBoundaries</em>, <em>productGroupBoundaries</em>, <em>fluxes</em>, <em>crossSection</em>, <em>multiplicity=None</em>, <em>energy_in_unit=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#commonDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.commonDataToString" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">commonDataToString</tt><big>(</big><em>lMax</em>, <em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>masses</em>, <em>fluxes</em>, <em>crossSection</em>, <em>productFrame</em>, <em>multiplicity=None</em>, <em>energy_in_unit=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#commonDataToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.commonDataToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -208,7 +163,7 @@ for pair-production which pass angularData as None.</p>
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.executeCommand">
-<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">executeCommand</tt><big>(</big><em>logFile</em>, <em>file</em>, <em>cmd</em>, <em>workDir</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#executeCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.executeCommand" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">executeCommand</tt><big>(</big><em>logFile</em>, <em>file</em>, <em>cmd</em>, <em>workDir</em>, <em>workFile</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#executeCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.executeCommand" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -223,17 +178,17 @@ for pair-production which pass angularData as None.</p>
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.getInterpolationString">
-<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">getInterpolationString</tt><big>(</big><em>axis</em>, <em>allowedIndependent</em>, <em>allowedDependent</em><big>)</big><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.getInterpolationString" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">getInterpolationString</tt><big>(</big><em>axis</em>, <em>allowedIndependent</em>, <em>allowedDependent</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#getInterpolationString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.getInterpolationString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.getOutgoingEnergyInterpolation">
-<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">getOutgoingEnergyInterpolation</tt><big>(</big><em>axis</em>, <em>allowedIndependent</em>, <em>allowedDependent</em><big>)</big><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.getOutgoingEnergyInterpolation" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">getOutgoingEnergyInterpolation</tt><big>(</big><em>axis</em>, <em>allowedIndependent</em>, <em>allowedDependent</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#getOutgoingEnergyInterpolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.getOutgoingEnergyInterpolation" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.multiplicityToString">
-<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">multiplicityToString</tt><big>(</big><em>multiplicity_</em>, <em>EMin</em>, <em>EMax</em>, <em>crossSection_energy_in_unit</em>, <em>energy_in_unit=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#multiplicityToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.multiplicityToString" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">multiplicityToString</tt><big>(</big><em>multiplicity_</em>, <em>energy_in_unit=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#multiplicityToString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.multiplicityToString" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -284,13 +239,18 @@ nucleus.</p>
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix">
-<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">twoBodyTransferMatrix</tt><big>(</big><em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>crossSection</em>, <em>angularData</em>, <em>mProj</em>, <em>mTarget</em>, <em>mProd</em>, <em>mRes</em>, <em>Q</em>, <em>comment=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#twoBodyTransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">twoBodyTransferMatrix</tt><big>(</big><em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>crossSection</em>, <em>angularData</em>, <em>masses</em>, <em>Q</em>, <em>weight=None</em>, <em>comment=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#twoBodyTransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate input and call processing code to generate a transfer matrix for two-body angular distribution.
+If the distribution is actually made up of two different forms in different energy regions, this function
+calls itself in the two regions and sums the result.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix2">
-<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">twoBodyTransferMatrix2</tt><big>(</big><em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>crossSection</em>, <em>angularData</em>, <em>mProj</em>, <em>mTarget</em>, <em>mProd</em>, <em>mRes</em>, <em>Q</em>, <em>comment=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#twoBodyTransferMatrix2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix2" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">twoBodyTransferMatrix2</tt><big>(</big><em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>crossSection</em>, <em>angularData</em>, <em>masses</em>, <em>Q</em>, <em>productFrame</em>, <em>weight=None</em>, <em>comment=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#twoBodyTransferMatrix2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.twoBodyTransferMatrix2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function for twoBodyTransferMatrix. This should be called separately for every different angular distribution form,
+and for every interpolation region within a piecewise form.</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.twoDToString">
@@ -299,7 +259,7 @@ nucleus.</p>
 
 <dl class="function">
 <dt id="fudge.processing.deterministic.transferMatrices.uncorrelated_EMuP_EEpP_TransferMatrix">
-<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">uncorrelated_EMuP_EEpP_TransferMatrix</tt><big>(</big><em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>crossSection</em>, <em>angularData</em>, <em>EEpPData</em>, <em>multiplicity</em>, <em>comment=None</em>, <em>weight=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#uncorrelated_EMuP_EEpP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.uncorrelated_EMuP_EEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.processing.deterministic.transferMatrices.</tt><tt class="descname">uncorrelated_EMuP_EEpP_TransferMatrix</tt><big>(</big><em>processInfo</em>, <em>projectile</em>, <em>product</em>, <em>masses</em>, <em>crossSection</em>, <em>angularData</em>, <em>EEpPData</em>, <em>multiplicity</em>, <em>comment=None</em>, <em>weight=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/processing/deterministic/transferMatrices.html#uncorrelated_EMuP_EEpP_TransferMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.processing.deterministic.transferMatrices.uncorrelated_EMuP_EEpP_TransferMatrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -323,7 +283,7 @@ nucleus.</p>
   <ul>
 <li><a class="reference internal" href="#">deterministic Package</a><ul>
 <li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">deterministic</span></tt> Package</a></li>
-<li><a class="reference internal" href="#module-fudge.processing.deterministic.gndToLLNLSnCOut"><tt class="docutils literal"><span class="pre">gndToLLNLSnCOut</span></tt> Module</a></li>
+<li><a class="reference internal" href="#gndtollnlsncout-module"><tt class="docutils literal"><span class="pre">gndToLLNLSnCOut</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-fudge.processing.deterministic.transferMatrices"><tt class="docutils literal"><span class="pre">transferMatrices</span></tt> Module</a></li>
 </ul>
 </li>
@@ -372,14 +332,14 @@ nucleus.</p>
         <li class="right" >
           <a href="fudge.processing.html" title="processing Package"
              >previous</a> |</li>
-        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="index.html" >fudge Package</a> &raquo;</li>
           <li><a href="fudge.processing.html" >processing Package</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

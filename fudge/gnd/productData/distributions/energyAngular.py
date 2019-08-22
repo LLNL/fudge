@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """ energy/angular double differential distribution classes """
@@ -12,17 +37,6 @@ __metaclass__ = type
 
 KalbachMann_Form_fr_Token = 'fr'
 KalbachMann_Form_fra_Token = 'fra'
-
-def parseXMLNode( energyAngularElement, linkData={} ):
-    """ translate <energyAngular> element from xml """
-    energyAngular = component( energyAngularElement.get("nativeData") )
-    for form in energyAngularElement:
-        if form.tag==base.KalbachMannFormToken:
-            energyAngular.addForm( KalbachMann.parseXMLNode( form, linkData ) )
-        elif form.tag==base.pointwiseFormToken:
-            energyAngular.addForm( pointwise.parseXMLNode( form, linkData ) )
-        else: raise Exception("encountered unknown energyAngular form: %s" % form.tag )
-    return energyAngular
 
 class component( base.component ) :
 
@@ -48,15 +62,24 @@ class component( base.component ) :
         else :
             print 'WARNING: Component, no toENDF6 for nativeData = %s' % self.nativeData, self.forms[self.nativeData].__class__
 
-class pointwise( base.form, V_W_XYs.V_W_XYs ) :
+class form( base.form ) :
+    """Abstract base class for energyAngular distribution forms."""
+
+    pass
+
+class pointwise( form, V_W_XYs.V_W_XYs ) :
 
     tag = base.pointwiseFormToken
     moniker = base.pointwiseFormToken
 
-    def __init__( self, axes ) :
+    def __init__( self, axes_, productFrame ) :
 
-        base.form.__init__( self, base.pointwiseFormToken )
-        V_W_XYs.V_W_XYs.__init__( self, axes )
+        form.__init__( self, base.pointwiseFormToken, productFrame )
+        V_W_XYs.V_W_XYs.__init__( self, axes_ )
+
+    def extraXMLAttributeString( self ) :
+
+        return( 'productFrame="%s"' % self.productFrame )
 
     def normalize( self, insitu = True ) :
 
@@ -67,16 +90,33 @@ class pointwise( base.form, V_W_XYs.V_W_XYs ) :
             for muEpPs in E_MuEpPs : muEpPs.setData( muEpPs / sum )
         return( n )
 
-    def toPointwiseLinear( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
+    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
-        return( V_W_XYs.V_W_XYs.toPointwiseLinear( self, accuracy, lowerEps = lowerEps, upperEps = upperEps, cls = linear ) )
+        return( V_W_XYs.V_W_XYs.toPointwise_withLinearXYs( self, accuracy, lowerEps = lowerEps, upperEps = upperEps, cls = linear ) )
+
+    @staticmethod
+    def defaultAxes( energyUnit = 'eV', energyInterpolation = axes.linearToken, energyFunctionInterpolation = axes.linearToken,
+        energyInterpolationQualifier = None, muInterpolation = axes.linearToken, energy_outInterpolation = axes.linearToken,
+        energy_outUnit = 'eV', probabilityInterpolation = axes.linearToken, probabilityUnit = '1/eV' ) :
+
+        axes_ = axes.axes( dimension = 4 )
+        axes_[0] = axes.axis( 'energy_in', 0, energyUnit, \
+            interpolation = axes.interpolationXY( energyInterpolation, energyFunctionInterpolation, energyInterpolationQualifier ) )
+        axes_[1] = axes.axis( 'energy_out', 1, energy_outUnit, \
+            interpolation = axes.interpolationXY( energy_outInterpolation, probabilityInterpolation ) )
+        axes_[2] = axes.axis( 'mu', 2, '', interpolation = axes.interpolationXY( muInterpolation, probabilityInterpolation ) )
+        axes_[3] = axes.axis( 'P(mu,energy_out|energy_in)', 3, probabilityUnit )
+        return( axes_ )
+
 
     @classmethod
-    def parseXMLNode( self, pwElement, linkData={} ):
-        """ translate <pointwise> element from xml """
-        from fudge.core.math.xData import axes, W_XYs
-        axes_ = axes.parseXMLNode( pwElement[0] )
-        pw = pointwise( axes_ )
+    def parseXMLNode( cls, pwElement, xPath=[], linkData={} ):
+        """Translate <pointwise> element from xml."""
+
+        xPath.append( pwElement.tag )
+        axes_ = axes.parseXMLNode( pwElement[0], xPath )
+        frame = pwElement.get( 'productFrame' )
+        pw = cls( axes_, frame )
         for energy_in in pwElement[1:]:
             w_xys = W_XYs.W_XYs( axes.referenceAxes(pw, 3), index=int(energy_in.get('index')),
                     value=float(energy_in.get('value')), parent=pw)
@@ -88,6 +128,7 @@ class pointwise( base.form, V_W_XYs.V_W_XYs ) :
                         value=float(energy_out.get('value')) )
                 w_xys.append( xys )
             pw.append( w_xys )
+        xPath.pop()
         return pw
 
 class linear( pointwise ) :
@@ -95,12 +136,12 @@ class linear( pointwise ) :
     tag = base.linearFormToken
     moniker = base.linearFormToken
 
-    def __init__( self, axes ) :
+    def __init__( self, axes_, productFrame ) :
 
-        if( not axes.isLinear( qualifierOk = True ) ) : raise Exception( 'interpolation not linear: %s' % axes )
-        pointwise.__init__( self, axes )
+        if( not axes_.isLinear( qualifierOk = True ) ) : raise Exception( 'interpolation not linear: %s' % axes_ )
+        pointwise.__init__( self, axes_, productFrame = productFrame )
 
-class KalbachMann( base.form ) :
+class KalbachMann( form ) :
 
     KalbachMann_Forms = [ KalbachMann_Form_fr_Token, KalbachMann_Form_fra_Token ]
     KalbachMann_a_parameters = { 'n'     : { 'M' : 1, 'm' : 0.5, 'I' : 0.0  }, 'H1'  : { 'M' : 1, 'm' : 1.0, 'I' : 0.0  },
@@ -108,12 +149,13 @@ class KalbachMann( base.form ) :
                                  'He3'   : { 'M' : 0, 'm' : 1.0, 'I' : 7.72 }, 'He4' : { 'M' : 0, 'm' : 2.0, 'I' : 28.3 },
                                  'gamma' : { 'M' : 0, 'm' : 0.0, 'I' : 0.0 } }
 
-    def __init__( self, form, axes ) :
+    def __init__( self, parameterForm, axes_ ) :
 
-        if( form not in self.KalbachMann_Forms ) : raise Exception( 'Invalid KalbachMann form = %s' % form )
-        base.form.__init__( self, base.KalbachMannFormToken )
-        self.form = form
-        self.axes = axes.copy( parent = self )
+        if( parameterForm not in self.KalbachMann_Forms ) :
+            raise Exception( 'Invalid KalbachMann form = %s' % parameterForm )
+        base.form.__init__( self, base.KalbachMannFormToken, axes.centerOfMassToken )
+        self.form = parameterForm
+        self.axes = axes_.copy( parent = self )
         self.energies_in = []
 
     def __len__( self ) :
@@ -288,7 +330,7 @@ class KalbachMann( base.form ) :
         axes_ = axes.axes( )
         axes_[0] = self.axes[1].copy( standAlone = True )
         axes_[0].setInterpolation( axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-        axes_[1] = axes.axis( 'a', 1, '', frame = self.axes[2].frame )
+        axes_[1] = axes.axis( 'a', 1, '' )
         return( XYs.XYs( axes_, a, accuracy = accuracy ) )
 
     def getPointwiseLinear( self, accuracy = 1e-3 ) :
@@ -307,11 +349,10 @@ class KalbachMann( base.form ) :
         accuracy = min( max( accuracy, 1e-5 ), .2 )
         axes_ = axes.axes( dimension = 4 )
         axes_[0] = self.axes[0]
-        axes_[1] = axes.axis( self.axes[1].getLabel( ), 1, self.axes[1].getUnit( ), frame = self.axes[1].getFrame( ), interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-        axes_[2] = axes.axis( 'mu', 2, '', frame = axes.centerOfMassToken, interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-        axes_[3] = axes.axis( 'f(%s,%s|%s)' % ( axes_[1].getLabel( ), axes_[2].getLabel( ), axes_[0].getLabel( ) ), 
-            3, self.axes[2].getUnit( ), frame = self.axes[2].getFrame( ) )
-        f_E_Ep_mu = linear( axes_ )
+        axes_[1] = axes.axis( self.axes[1].getLabel( ), 1, self.axes[1].getUnit( ), interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
+        axes_[2] = axes.axis( 'mu', 2, '', interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
+        axes_[3] = axes.axis( 'f(%s,%s|%s)' % ( axes_[1].getLabel( ), axes_[2].getLabel( ), axes_[0].getLabel( ) ), 3, self.axes[2].getUnit( ) )
+        f_E_Ep_mu = linear( axes_, self.getProductFrame( ) )
         axesW_XY = axes.referenceAxes( f_E_Ep_mu, dimension = 3 )
         axesXY = axes.referenceAxes( f_E_Ep_mu, dimension = 2 )
         for e_in in self :
@@ -325,15 +366,15 @@ class KalbachMann( base.form ) :
 
     def getFRAatEnergy_asLinearPointwise( self, E ) :
 
-        def getAsLinearPointwise( form, coefficients ) :
+        def getAsLinearPointwise( parameterForm, coefficients ) :
 
             epsilon, fra_accuracy = 1e-8, 1e-6
             n, f, r, a = 4, [], [], []
-            if( form == KalbachMann_Form_fr_Token ) : n = 3
+            if( parameterForm == KalbachMann_Form_fr_Token ) : n = 3
             for i in xrange( 0, len( coefficients ), n ) :
                 f.append( [ coefficients[i], coefficients[i+1] ] )
                 r.append( [ coefficients[i], coefficients[i+2] ] ) 
-                if( form == KalbachMann_Form_fra_Token ) : a.append( [ coefficients[i], coefficients[i+3] ] ) 
+                if( parameterForm == KalbachMann_Form_fra_Token ) : a.append( [ coefficients[i], coefficients[i+3] ] ) 
             axes_ = axes.axes( )
             axes_[0] = self.axes[1]
             axes_[1] = self.axes[2]
@@ -350,7 +391,7 @@ class KalbachMann( base.form ) :
                 r.setValue( x, 0. )
 
             axes_[1].label = 'a'
-            if( form == KalbachMann_Form_fra_Token ) :
+            if( parameterForm == KalbachMann_Form_fra_Token ) :
                 a = XYs.XYs( axes_, a, accuracy = fra_accuracy )
                 a = a.changeInterpolation( axes.linearToken, axes.linearToken, lowerEps = epsilon, upperEps = epsilon )
             else :
@@ -383,38 +424,42 @@ class KalbachMann( base.form ) :
             productZA = product.getZ_A_SuffixAndZA( )[-1]
             compoundZA = projectileZA + targetZA
             residualZA = compoundZA - productZA
-            particlesData = { 'projectile' : { 'ZA' : projectileZA, 'mass' : projectile.getMass( massUnit ) },
-                              'target'     : { 'ZA' : targetZA,     'mass' : target.getMass( massUnit ) },
-                              'product'    : { 'ZA' : productZA,    'mass' : product.getMass( massUnit ) },
+            particlesData = { 'projectile' : { 'ZA' : projectileZA },
+                              'target'     : { 'ZA' : targetZA },
+                              'product'    : { 'ZA' : productZA },
 # The next line is wrong.
-                              'residual'   : { 'ZA' : residualZA,   'mass' : target.getMass( massUnit ) },      # ??????? This is wrong!
+                              'residual'   : { 'ZA' : residualZA },             # ??????? This is wrong!
                               'compound'   : { 'ZA' : compoundZA, 'mass' : projectile.getMass( massUnit ) + target.getMass( massUnit ) } }
-            TM_1, TM_E = transferMatrices.KalbachMann_TransferMatrix( processInfo, projectile.getName( ), product.getName( ), tempInfo['crossSection'], 
-                particlesData, self, tempInfo['multiplicity'], 
+            residualMass = tempInfo['masses']['Residual']
+            tempInfo['masses']['Residual'] = target.getMass( massUnit )         # ??????? This is wrong!
+            TM_1, TM_E = transferMatrices.KalbachMann_TransferMatrix( processInfo, projectile.getName( ), product.getName( ), tempInfo['masses'],
+                tempInfo['crossSection'], particlesData, self, tempInfo['multiplicity'], 
                 comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
+            tempInfo['masses']['Residual'] = residualMass
             fudge.gnd.miscellaneous.TMs2Form( processInfo, tempInfo, newComponents, TM_1, TM_E, self.axes )
 
         return( newComponents )
 
     @classmethod
-    def parseXMLNode( self, KalbachMannElement, linkData={} ):
-        """ translate <KalbachMann> element from xml """
-        from fudge.core.math.xData import axes
-        axes_ = axes.parseXMLNode( KalbachMannElement[0] )
-        form = KalbachMannElement.get("form")
-        KMForm = KalbachMann( form, axes_ )
-        for energy_in in KalbachMannElement[1:]:
+    def parseXMLNode( self, element, xPath=[], linkData={} ):
+        """Translate <KalbachMann> element from xml."""
+
+        xPath.append( element.tag )
+        axes_ = axes.parseXMLNode( element[0], xPath )
+        parameterForm = element.get("form")
+        KMForm = KalbachMann( parameterForm, axes_ )
+        for energy_in in element[1:]:
             KMForm.append( KalbachMannCoefficients( int(energy_in.get("index")), float(energy_in.get("value")),
                 map(float, energy_in.text.split()) ) )
+        xPath.pop()
         return KMForm
 
-    def toPointwiseLinear( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
+    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
         return( self.getPointwiseLinear( accuracy ) )
 
     def toENDF6( self, flags, tempInfo ) :
 
-        from fudge.core.math.xData import axes
         from fudge.legacy.converting import endfFormats
         LEP = 1
         independent, dependent, qualifier = self.axes[1].interpolation.getInterpolationTokens( )
@@ -422,12 +467,12 @@ class KalbachMann( base.form ) :
         ENDFDataList = [ endfFormats.endfContLine( 0, 0, 2, LEP, 1, len( self ) ) ]
         ENDFDataList += endfFormats.endfInterpolationList( [ len( self ), 2 ] )
         for energy in self : ENDFDataList += energy.toENDF6( flags, tempInfo )
-        return( 1, self.axes[2].frame, ENDFDataList )
+        return( 1, self.getProductFrame( ), ENDFDataList )
 
     def toXMLList( self, indent = "" ) :
 
         indent2 = indent + '  '
-        xmlString = [ '%s<%s form="%s">' % ( indent, self.moniker, self.form ) ]
+        xmlString = [ self.XMLStartTagString( indent = indent, extraAttributesAsStrings = 'form="%s"' % self.form ) ]
         xmlString += self.axes.toXMLList( indent = indent2 )
         for index, data in enumerate( self ) : xmlString += data.toXMLList( indent = indent2 )
         xmlString[-1] += '</%s>' % self.moniker
@@ -473,3 +518,19 @@ class KalbachMannCoefficients :
         data = [ physicalQuantityWithUncertainty.toShortestString( datum ) for datum in self.coefficients ]
         xmlString += ' '.join( data ) + '</energy_in>'
         return( [ xmlString ] )
+
+def parseXMLNode( element, xPath=[], linkData={} ):
+    """ translate <energyAngular> element from xml """
+
+    xPath.append( element.tag )
+    energyAngular = component( element.get("nativeData") )
+    for formElement in element:
+        formClass = {base.KalbachMannFormToken: KalbachMann,
+                base.pointwiseFormToken: pointwise,
+                base.linearFormToken: linear,
+                }.get( formElement.tag )
+        if formClass is None: raise Exception("encountered unknown energyAngular form: %s" % formElement.tag)
+        newForm = formClass.parseXMLNode( formElement, xPath, linkData )
+        energyAngular.addForm( newForm )
+    xPath.pop()
+    return energyAngular

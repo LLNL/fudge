@@ -1,6 +1,31 @@
 #~/usr/bin/env python
 
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 
@@ -969,7 +994,8 @@ def get_test_matrix( endfFile = None, MT = None, MF = None ):
 def get_covariances_from_endf( endfFile, MT, MF = 33 ):
     from fudge.legacy.converting import endfFileToGND, endfFileToGNDMisc, endfFormats
     from fudge.processing import processingInfo
-    xFileOne, cFileOne = endfFileToGND.endfFileToGND( endfFile, toStdOut = False )
+    rce = endfFileToGND.endfFileToGND( endfFile, toStdOut = False )
+    xFileOne, cFileOne = rce['reactionSuite'], rce['covarianceSuite']
     MFMTListOne = [ section.rowData.attributes[ 'ENDF_MFMT' ] for section in cFileOne ]
     if not str(MF)+","+str(MT) in MFMTListOne:  raise ValueError( "Requested MF,MT (" +str(MF)+","+str(MT)+ ") not in first file, pick from " +str( MFMTListOne ) )
     try:

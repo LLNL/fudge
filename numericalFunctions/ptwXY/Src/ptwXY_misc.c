@@ -1,5 +1,30 @@
 /*
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 */
 
@@ -82,7 +107,7 @@ err:
 ptwXYPoints *ptwXY_createFromFunction2( ptwXPoints *xs, ptwXY_createFromFunction_callback func, void *argList, double accuracy, int checkForRoots, 
     int biSectionMax, nfu_status *status ) {
 
-    return( ptwXY_createFromFunction( xs->length, xs->points, func, argList, accuracy, checkForRoots, biSectionMax, status ) );
+    return( ptwXY_createFromFunction( (int) xs->length, xs->points, func, argList, accuracy, checkForRoots, biSectionMax, status ) );
 }
 /*
 ************************************************************
@@ -216,6 +241,22 @@ static nfu_status ptwXY_applyFunctionZeroCrossing( ptwXYPoints *ptwXY1, double y
         }
     }
     return( ptwXY_setValueAtX( ptwXY1, p.x, 0. ) );
+}
+/*
+************************************************************
+*/
+ptwXYPoints *ptwXY_fromString( char const *str, ptwXY_interpolation interpolation, double biSectionMax, double accuracy, char **endCharacter, nfu_status *status ) {
+
+    int64_t numberConverted;
+    double  *doublePtr;
+    ptwXYPoints *ptwXY = NULL;
+
+    if( ( *status = nfu_stringToListOfDoubles( str, &numberConverted, &doublePtr, endCharacter ) ) != nfu_Okay ) return( NULL );
+    *status = nfu_oddNumberOfValues;
+    if( ( numberConverted % 2 ) == 0 )
+        ptwXY = ptwXY_create( interpolation, biSectionMax, accuracy, numberConverted, 10, numberConverted / 2, doublePtr, status, 0 );
+    nfu_free( doublePtr );
+    return( ptwXY );
 }
 /*
 ************************************************************

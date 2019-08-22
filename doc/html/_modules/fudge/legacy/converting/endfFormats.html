@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>fudge.legacy.converting.endfFormats &mdash; Fudge and GND 1.2 beta documentation</title>
+    <title>fudge.legacy.converting.endfFormats &mdash; Fudge and GND 1.3 beta documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '1.2 beta',
+        VERSION:     '1.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +25,7 @@
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
-    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../../index.html" />
+    <link rel="top" title="Fudge and GND 1.3 beta documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
@@ -39,7 +38,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -229,6 +228,42 @@
         <span class="n">rets</span> <span class="o">+=</span> <span class="n">toStr</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
     <span class="n">rets</span> <span class="o">+=</span> <span class="n">padright</span>
     <span class="k">return</span> <span class="n">rets</span>
+</div>
+<div class="viewcode-block" id="endfMFListToFinalFile"><a class="viewcode-back" href="../../../../fudge/fudge.legacy.converting.html#fudge.legacy.converting.endfFormats.endfMFListToFinalFile">[docs]</a><span class="k">def</span> <span class="nf">endfMFListToFinalFile</span><span class="p">(</span> <span class="n">endfMFList</span><span class="p">,</span> <span class="n">MAT</span><span class="p">,</span> <span class="n">lineNumbers</span><span class="o">=</span><span class="bp">True</span> <span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot; from dictionary of MF/MTs, build final ENDF file as a string &quot;&quot;&quot;</span>
+	<span class="n">directory</span> <span class="o">=</span> <span class="p">[]</span>
+	<span class="n">MFs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">endfMFList</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+	<span class="k">for</span> <span class="n">MF</span> <span class="ow">in</span> <span class="n">MFs</span><span class="p">:</span>
+		<span class="n">MFData</span> <span class="o">=</span> <span class="n">endfMFList</span><span class="p">[</span><span class="n">MF</span><span class="p">]</span>
+		<span class="n">MTs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">MFData</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+		<span class="k">for</span> <span class="n">MT</span> <span class="ow">in</span> <span class="n">MTs</span> <span class="p">:</span>
+			<span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="n">MF</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">MT</span> <span class="o">==</span> <span class="mi">451</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">continue</span>
+			<span class="n">data</span> <span class="o">=</span> <span class="n">MFData</span><span class="p">[</span><span class="n">MT</span><span class="p">]</span>
+			<span class="n">directory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s">&quot;</span><span class="si">%33d%11d%11d%11d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">MF</span><span class="p">,</span> <span class="n">MT</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span>
+	<span class="n">directory</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%33d%11d%11d%11d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">451</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span> <span class="n">directory</span> <span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span> <span class="n">endfMFList</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">451</span><span class="p">]</span> <span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">)</span>  <span class="c"># Add current line of directory</span>
+	<span class="n">directory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="mi">99999</span> <span class="p">)</span>
+	<span class="n">endfMFList</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">451</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">endfMFList</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">451</span><span class="p">][</span><span class="mi">3</span><span class="p">][:</span><span class="mi">55</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;</span><span class="si">%11i</span><span class="s">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">directory</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+	<span class="n">endfMFList</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">451</span><span class="p">]</span> <span class="o">+=</span> <span class="n">directory</span>
+
+	<span class="n">endfList</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;</span><span class="si">%66s%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="s">&quot; &quot;</span><span class="p">,</span> <span class="n">endfFENDLine</span><span class="p">(</span> <span class="mi">1</span> <span class="p">)[</span><span class="mi">66</span><span class="p">:</span><span class="mi">75</span><span class="p">]</span> <span class="p">)</span> <span class="p">]</span>
+	<span class="k">for</span> <span class="n">MF</span> <span class="ow">in</span> <span class="n">MFs</span> <span class="p">:</span>
+		<span class="n">MFData</span> <span class="o">=</span> <span class="n">endfMFList</span><span class="p">[</span><span class="n">MF</span><span class="p">]</span>
+		<span class="n">MTs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span> <span class="n">MFData</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+		<span class="k">for</span> <span class="n">MT</span> <span class="ow">in</span> <span class="n">MTs</span> <span class="p">:</span>
+			<span class="n">data</span> <span class="o">=</span> <span class="n">MFData</span><span class="p">[</span><span class="n">MT</span><span class="p">]</span>
+			<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">datum</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span> <span class="p">:</span>
+				<span class="k">if</span><span class="p">(</span> <span class="n">datum</span> <span class="o">==</span> <span class="mi">99999</span> <span class="p">)</span> <span class="p">:</span>
+					<span class="n">endfList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">endfSENDLine</span><span class="p">(</span> <span class="n">MAT</span><span class="p">,</span> <span class="n">MF</span> <span class="p">)</span> <span class="p">)</span>
+				<span class="k">else</span> <span class="p">:</span>
+					<span class="k">if</span> <span class="n">lineNumbers</span><span class="p">:</span>
+						<span class="n">endfList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s">&#39;</span><span class="si">%-66s%4d%2d%3d%5d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">datum</span><span class="p">,</span> <span class="n">MAT</span><span class="p">,</span> <span class="n">MF</span><span class="p">,</span> <span class="n">MT</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">)</span>
+					<span class="k">else</span><span class="p">:</span>
+						<span class="n">endfList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s">&#39;</span><span class="si">%-66s%4d%2d%3d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">datum</span><span class="p">,</span> <span class="n">MAT</span><span class="p">,</span> <span class="n">MF</span><span class="p">,</span> <span class="n">MT</span> <span class="p">)</span> <span class="p">)</span>
+		<span class="k">if</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span> <span class="n">MTs</span> <span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="p">:</span> <span class="n">endfList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">endfFENDLine</span><span class="p">(</span> <span class="n">MAT</span> <span class="p">)</span> <span class="p">)</span>
+	<span class="n">endfList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">endfMENDLine</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+	<span class="n">endfList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">endfTENDLine</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+	<span class="n">endfList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="s">&#39;&#39;</span> <span class="p">)</span>
+	<span class="k">return</span><span class="p">(</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">endfList</span> <span class="p">)</span> <span class="p">)</span>
 </pre></div></div>
 
           </div>
@@ -265,13 +300,13 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

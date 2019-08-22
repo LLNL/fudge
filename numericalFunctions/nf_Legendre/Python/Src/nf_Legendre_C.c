@@ -1,5 +1,30 @@
 /*
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 */
 
@@ -32,7 +57,7 @@ typedef struct nf_Legendre_CPy_s {
 #define is_nf_Legendre_CPyObject( v ) ((v)->ob_type == &nf_Legendre_CPyType)
 
 static char nf_Legendre_C__doc__[] = 
-    "The nf_Legendre class stores the coefficients for a Legendre series.\n" \
+    "The Legendre class stores the coefficients for a Legendre series.\n" \
     "\n" \
     "Constructor arguments are:\n" \
     "   Cls             the list of Legendre coefficients,\n" \
@@ -58,7 +83,7 @@ static int nf_Legendre_C_SetPyErrorExceptionReturnMinusOne( const char *s, ... )
 static PyObject *nf_Legendre_C_from_pointwiseXY_C( PyObject *self, PyObject *args );
 static PyObject *nf_Legendre_C_getMaxMaxOrder( PyObject *self );
 
-DL_EXPORT( void ) initnf_Legendre_C( void );
+DL_EXPORT( void ) initLegendre( void );
 /*
 ******************** nf_Legendre_CNewInitialize ************************
 */
@@ -114,7 +139,7 @@ static void nf_Legendre_C_dealloc( PyObject *self ) {
 */
 static PyObject *nf_Legendre_C__repr__( nf_Legendre_CPy *self ) {
 
-    return( nf_Legendre_C_toString2( self, " %16.8e", "" ) );
+    return( nf_Legendre_C_toString2( self, "%16.8e", " " ) );
 }
 /*
 ************************************************************
@@ -226,7 +251,7 @@ static PyObject *nf_Legendre_C_toPointwiseLinear( nf_Legendre_CPy *self, PyObjec
 */
 static PyObject *nf_Legendre_C_toString( nf_Legendre_CPy *self, PyObject *args, PyObject *keywords ) {
 
-    char *format = " %16.8e", *sep = "";
+    char *format = "%16.8e", *sep = " ";
     static char *kwlist[] = { "format", "sep", NULL };
 
     if( !PyArg_ParseTupleAndKeywords( args, keywords, "|ss", kwlist, &format, &sep ) ) return( NULL );
@@ -238,7 +263,7 @@ static PyObject *nf_Legendre_C_toString( nf_Legendre_CPy *self, PyObject *args, 
 static PyObject *nf_Legendre_C_toString2( nf_Legendre_CPy *self, char *format, char *sep ) {
 
     int l, extraSpace = 3, dummyLen;     /* three more for reserve. */
-    int length, strLength, sepLength = strlen( sep );
+    int length, strLength, sepLength = (int) strlen( sep );
     double d;
     nf_Legendre *nfL = self->nfL;
     char *s, *e, *p, dummy[1024];
@@ -377,14 +402,14 @@ static PyMethodDef nf_Legendre_CPyMethods[] = {
         "Returns the maxOrder of self or -1 if no coefficients are defined.\n" \
         "\nArguments are: (this method does not take any arguments).\n" },
     { "normalize", (PyCFunction) nf_Legendre_C_normalize, METH_NOARGS, 
-        "Returns a new nf_Legendre instance that is the a clone of self, except that its is normalized to 1.\n" \
+        "Returns a new Legendre instance that is the a clone of self, except that it is normalized to 1.\n" \
         "\nArguments are: (this method does not take any arguments).\n" },
     { "toPointwiseLinear", (PyCFunction) nf_Legendre_C_toPointwiseLinear, METH_VARARGS | METH_KEYWORDS, 
         "Returns a pointwiseXY_C instance of self by evaluating self at enough mu values to represent the Legendre series\n" \
         "as the function f(mu) for -1 <= mu <= 1 to accuracy. Bisection is used to fill in the domain to the desired accuracy.\n" \
         "The number of bisections is controlled by the biSectionMax argument. That is, the bisecting is stopped when either\n" \
         "accuracy or biSectionMax is reached. However, if checkForRoots is True and f(mu) is determined to have a zero between\n" \
-        "the two mu-values, then an additional point is added at the zero of f(mu).\n" \
+        "two mu-values, then an additional point is added at the zero of f(mu).\n" \
         "\nArguments are: ([o] implies optional argument)\n" \
         "   accuracy        the desired accuracy of the pointwise representation of the Legendre series,\n" \
         "   biSectionMax    [o] the maximum number of bisections (default = 16),\n" \
@@ -392,10 +417,10 @@ static PyMethodDef nf_Legendre_CPyMethods[] = {
         "   infill          [o] see module pointwiseXY_C for meaning (default = True),\n" \
         "   safeDivide      [o] see module pointwiseXY_C for meaning (default = True).\n" },
     { "toString", (PyCFunction) nf_Legendre_C_toString, METH_VARARGS | METH_KEYWORDS, 
-        "Returns a string representation of the Legendre coefficients.\n" \
+        "Returns a string representation of the Legendre Series (i.e., coefficients).\n" \
         "\nArguments are: ([o] implies optional argument)\n" \
-        "   format      [o] the format specifier for a coefficients (default = ' %16.8e'),\n" \
-        "   sep         [o] a string to use as the separator between coefficients (default = '').\n" },
+        "   format      [o] the format specifier for a coefficients (default = '%16.8e'),\n" \
+        "   sep         [o] a string to use as the separator between coefficients (default = ' ').\n" },
     { NULL, NULL, 0, NULL }        /* Sentinel (i.e., the end of the list) */
 };
 /*
@@ -404,7 +429,7 @@ static PyMethodDef nf_Legendre_CPyMethods[] = {
 static PyTypeObject nf_Legendre_CPyType = {
     PyObject_HEAD_INIT( NULL )
     0,                                          /* ob_size        */
-    "nf_Legendre_C.nf_Legendre_C",              /* tp_name        */
+    "Legendre.Series",                          /* tp_name        */
     sizeof( nf_Legendre_CPy ),                  /* tp_basicsize   */
     0,                                          /* tp_itemsize    */
     /* methods */ 
@@ -481,11 +506,12 @@ static PyObject *nf_Legendre_C_getMaxMaxOrder( PyObject *self ) {
 static PyMethodDef nf_Legendre_CMiscPyMethods[] = {
 
     { "from_pointwiseXY_C", (PyCFunction) nf_Legendre_C_from_pointwiseXY_C, METH_VARARGS, 
-        "The nf_Legendre_C class limits the maximum Legendre order that an instance can have.\n" \
-        "This function returns the largest allowed Legendre order.\n" \
-        "\nArguments are: (this method does not take any arguments).\n" },
+        "This function returns a Legendre class representation of a pointwiseXY_C instance.\n" \
+        "\nArguments are:\n" \
+        "   ptwXYs  A pointwiseXY_C instance.\n" \
+        "   order   The maximum order for the Legendre series representation of ptwXYs.\n" },
     { "maxMaxOrder", (PyCFunction) nf_Legendre_C_getMaxMaxOrder, METH_NOARGS, 
-        "The nf_Legendre_C class limits the maximum Legendre order that an instance can have.\n" \
+        "The Legendre class limits the maximum Legendre order that an instance can have.\n" \
         "This function returns the largest allowed Legendre order.\n" \
         "\nArguments are: (this method does not take any arguments).\n" },
     { NULL, NULL, 0, NULL }        /* Sentinel (i.e., the end of the list) */
@@ -493,17 +519,17 @@ static PyMethodDef nf_Legendre_CMiscPyMethods[] = {
 /*
 ************************************************************
 */
-DL_EXPORT( void ) initnf_Legendre_C( void ) {
+DL_EXPORT( void ) initLegendre( void ) {
 
     PyObject *m;
 
     nf_Legendre_CPyType.tp_new = PyType_GenericNew;
     if( PyType_Ready( &nf_Legendre_CPyType ) < 0 ) return;
 
-    if( ( m = Py_InitModule3( "nf_Legendre_C", nf_Legendre_CMiscPyMethods, "A module that contains the class nf_Legendre_C." ) ) == NULL ) return;
+    if( ( m = Py_InitModule3( "Legendre", nf_Legendre_CMiscPyMethods, "A module that contains the Legendre class." ) ) == NULL ) return;
 
     if( import_pointwiseXY_C( ) < 0 ) return;
 
     Py_INCREF( &nf_Legendre_CPyType );
-    PyModule_AddObject( m, "nf_Legendre_C", (PyObject *) &nf_Legendre_CPyType );
+    PyModule_AddObject( m, "Series", (PyObject *) &nf_Legendre_CPyType );
 }

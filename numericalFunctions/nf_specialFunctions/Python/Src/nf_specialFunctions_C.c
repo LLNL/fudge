@@ -1,5 +1,30 @@
 /*
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 */
 
@@ -23,6 +48,16 @@
 #endif
 
 static PyObject *nf_exponentialIntegral_C( PyObject *self, PyObject *args );
+static PyObject *nf_gamma_C( PyObject *self, PyObject *args );
+static PyObject *nf_incompleteGamma_C( PyObject *self, PyObject *args, PyObject *keywords );
+static PyObject *nf_amc_wigner_3j_C( PyObject *self, PyObject *args );
+static PyObject *nf_amc_wigner_6j_C( PyObject *self, PyObject *args );
+static PyObject *nf_amc_wigner_9j_C( PyObject *self, PyObject *args );
+static PyObject *nf_amc_racah_C( PyObject *self, PyObject *args );
+static PyObject *nf_amc_clebsh_gordan_C( PyObject *self, PyObject *args );
+static PyObject *nf_amc_z_coefficient_C( PyObject *self, PyObject *args );
+static PyObject *nf_amc_reduced_matrix_element_C( PyObject *self, PyObject *args );
+static PyObject *nf_erf_C( PyObject *self, PyObject *args, PyObject *keywords );
 static PyObject *nf_specialFunctions_C_SetPyErrorExceptionReturnNull( const char *s, ... );
 
 DL_EXPORT( void ) initnf_specialFunctions_C( void );
@@ -86,6 +121,90 @@ static PyObject *nf_incompleteGamma_C( PyObject *self, PyObject *args, PyObject 
         nfu_statusMessage( status_nf ) ) );
     return( Py_BuildValue( "d", gamma ) );
 }
+
+
+
+/*
+************************************************************
+*/
+static PyObject *nf_amc_wigner_3j_C( PyObject *self, PyObject *args ) {
+
+    int j1, j2, j3, j4, j5, j6;
+
+    if( !PyArg_ParseTuple( args, "iiiiii", &j1, &j2, &j3, &j4, &j5, &j6 ) ) return( NULL );
+
+    return( Py_BuildValue( "d", nf_amc_wigner_3j( j1, j2, j3, j4, j5, j6 ) ) );
+}
+/*
+************************************************************
+*/
+static PyObject *nf_amc_wigner_6j_C( PyObject *self, PyObject *args ) {
+
+    int j1, j2, j3, j4, j5, j6;
+
+    if( !PyArg_ParseTuple( args, "iiiiii", &j1, &j2, &j3, &j4, &j5, &j6 ) ) return( NULL );
+
+    return( Py_BuildValue( "d", nf_amc_wigner_6j( j1, j2, j3, j4, j5, j6 ) ) );
+}
+/*
+************************************************************
+*/
+static PyObject *nf_amc_wigner_9j_C( PyObject *self, PyObject *args ) {
+
+    int j1, j2, j3, j4, j5, j6, j7, j8, j9;
+
+    if( !PyArg_ParseTuple( args, "iiiiiiiii", &j1, &j2, &j3, &j4, &j5, &j6, &j7, &j8, &j9 ) ) return( NULL );
+
+    return( Py_BuildValue( "d", nf_amc_wigner_9j( j1, j2, j3, j4, j5, j6, j7, j8, j9 ) ) );
+}
+/*
+************************************************************
+*/
+static PyObject *nf_amc_racah_C( PyObject *self, PyObject *args ) {
+
+    int j1, j2, j3, j4, j5, j6;
+
+    if( !PyArg_ParseTuple( args, "iiiiii", &j1, &j2, &j3, &j4, &j5, &j6 ) ) return( NULL );
+
+    return( Py_BuildValue( "d", nf_amc_racah( j1, j2, j3, j4, j5, j6 ) ) );
+}
+/*
+************************************************************
+*/
+static PyObject *nf_amc_clebsh_gordan_C( PyObject *self, PyObject *args ) {
+
+    int j1, j2, j3, m1, m2;
+
+    if( !PyArg_ParseTuple( args, "iiiii", &j1, &j2, &m1, &m2, &j3 ) ) return( NULL );
+
+    return( Py_BuildValue( "d", nf_amc_clebsh_gordan( j1, j2, m1, m2, j3 ) ) );
+}
+/*
+************************************************************
+*/
+static PyObject *nf_amc_z_coefficient_C( PyObject *self, PyObject *args ) {
+
+    int j1, j2, l1, l2, ll, s;
+
+    if( !PyArg_ParseTuple( args, "iiiiii", &l1, &j1, &l2, &j2, &s, &ll ) ) return( NULL );
+
+    return( Py_BuildValue( "d", nf_amc_z_coefficient( l1, j1, l2, j2, s, ll ) ) );
+}
+/*
+************************************************************
+*/
+static PyObject *nf_amc_reduced_matrix_element_C( PyObject *self, PyObject *args ) {
+
+    int lt, st, jt, l0, j0, l1, j1;
+
+    if( !PyArg_ParseTuple( args, "iiiiiii", &lt, &st, &jt, &l0, &j0, &l1, &j1 ) ) return( NULL );
+
+    return( Py_BuildValue( "d", nf_amc_reduced_matrix_element( lt, st, jt, l0, j0, l1, j1 ) ) );
+}
+
+
+
+
 /*
 ************************************************************
 */
@@ -122,7 +241,7 @@ static PyObject *nf_specialFunctions_C_SetPyErrorExceptionReturnNull( const char
 /*
 ************************************************************
 */
-static PyMethodDef nf_specialFunctions_CMiscPyMethods[] = {
+static PyMethodDef nf_specialFunctions_C_MiscPyMethods[] = {
 
     { "exponentialIntegral", (PyCFunction) nf_exponentialIntegral_C, METH_VARARGS, 
         "exponentialIntegral( n, x )\n\n" \
@@ -192,10 +311,85 @@ static PyMethodDef nf_specialFunctions_CMiscPyMethods[] = {
 /*
 ************************************************************
 */
-DL_EXPORT( void ) initnf_specialFunctions_C( void ) {
+static PyMethodDef nf_specialFunctions_C_AngularMomentumCouplingMethods[] = {
+/*
+Testing issues:
+    wigner_3j( 6, 6, 4, 0, 0, 0 ) / wigner_3j( 4, 6, 6, 0, 0, 0 ) - 1 = -4.392597396929432e-12
+*/
+    { "wigner_3j", (PyCFunction) nf_amc_wigner_3j_C, METH_VARARGS,
+        "wigner_3j( j1, j2, j3, j4, j5, j6 )\n\n" \
+        "Wigner's 3J symbol (similar to Clebsh-Gordan)\n\n" \
+        "    = / j1 j2 j3 \\\n" \
+        "      \\ j4 j5 j6 /\n\n" \
+        "\nArguments are:\n" \
+        "    j1, j2, j3, j4, j5, j6     all integers, 2x angular momenta\n" },
+    { "wigner_6j", (PyCFunction) nf_amc_wigner_6j_C, METH_VARARGS,
+        "wigner_6j( j1, j2, j3, j4, j5, j6 )\n\n" \
+        "Wigner's 6J symbol (similar to Racah)\n\n" \
+        "        = { j1 j2 j3 }\n" \
+        "          { j4 j5 j6 }\n\n" \
+        "\nArguments are:\n" \
+        "    j1, j2, j3, j4, j5, j6     all integers, 2x angular momenta\n" },
+    { "wigner_9j", (PyCFunction) nf_amc_wigner_9j_C, METH_VARARGS,
+        "wigner_9j( j1, j2, j3, j4, j5, j6, j7, j8, j9 )\n\n" \
+        "Wigner's 9J symbol\n\n" \
+        "      / j1 j2 j3 \\\n" \
+        "    = | j4 j5 j6 |\n" \
+        "      \\ j7 j8 j9 /\n" \
+        "\nArguments are:\n" \
+        "    j1, j2, j3, j4, j5, j6     all integers, 2x angular momenta\n" },
+    { "racah", (PyCFunction) nf_amc_racah_C, METH_VARARGS,
+        "racah( j1, j2, j3, j4, j5, j6 )\n\n" \
+        "Racah coefficient\n\n" \
+        "    = W(j1 j2 j3 j4 ; j5 j6)\n\n" \
+        "    = (-1)^(j1+j2+j4+j5) * { j1 j2 j3 }\n" \
+        "                           { j4 j5 j6 }\n\n" \
+        "\nArguments are: \n" \
+        "    j1, j2, j3, j4, j5, j6     all integers, 2x angular momenta\n" },
+    { "clebsh_gordan", (PyCFunction) nf_amc_clebsh_gordan_C, METH_VARARGS,
+        "clebsh_gordan( j1, j2, j3, m1, m2)\n\n" \
+        "Clebsh-Gordan coefficient\n\n" \
+        "    = <j1,j2,m1,m2|j3,m1+m2>\n\n" \
+        "    = (-)^(j1-j2+m1+m2) * sqrt(2*j3+1) * / j1 j2   j3   \\\n" \
+        "                                         \\ m1 m2 -m1-m2 /\n\n" \
+        "Note: Last value m3 is preset to m1+m2.  Any other value will evaluate to 0.0.\n\n"\
+        "\nArguments are: \n" \
+        "    j1, j2, j3     integers, 2x the angular momentum (so for j=1/2 use j=1)\n" \
+        "    m1, m2, m3     integers, 2x the projection of the angular momentum onto the z axis\n" },
+    { "z_coefficient", (PyCFunction) nf_amc_z_coefficient_C, METH_VARARGS,
+        "z_coefficient( j1, j2, l1, l2, ll, s )\n\n" \
+        "Biedenharn's Z-coefficient coefficient\n\n" \
+        "    =  Z(l1  j1  l2  j2 | S L )\n\n" \
+        "\nArguments are: \n" \
+        "    j1, j2     integers, 2x the total angular momentum (so for j=1/2 use j=1)\n" \
+        "    l1, l2     integers, 2x the orbital angular momentum\n" \
+        "    ll         integer, 2x the orbital angular momentum that l1 and l2 couple up to,\n" \
+        "    s          integer, 2x the projection of the ll onto the z axis\n" },
+    { "reduced_matrix_element", (PyCFunction) nf_amc_reduced_matrix_element_C, METH_VARARGS,
+        "reduced_matrix_element( lt, st, jt, l0, j0, l1, j1 )\n\n" \
+        "Reduced Matrix Element for Tensor Operator\n\n" \
+        "    = < l1j1 || T(YL,sigma_S)J || l0j0 >\n\n" \
+        "From M.B.Johnson, L.W.Owen, G.R.Satchler, Phys. Rev. 142, 748 (1966)\n\n" \
+        "Note: definition differs from JOS by the factor sqrt(2j1+1)\n\n" \
+        "\nArguments are: \n" \
+        "    lt     integer, 2x the orbital angular momentum of the tensor operator,\n" \
+        "    st     integer, 2x the projection of lt onto the z axis,\n" \
+        "    jt     integer, 2x the total angular momentum of the tensor operator,\n" \
+        "    l0     integer, 2x the orbital angular momentum of the ket,\n" \
+        "    j0     integer, 2x the total angular momentum of the ket,\n" \
+        "    l1     integer, 2x the orbital angular momentum of the bra,\n" \
+        "    j1     integer, 2x the total angular momentum of the bra.\n" },
+    { NULL, NULL, 0, NULL }        /* Sentinel (i.e., the end of the list) */
+};
+/*
+************************************************************
+*/
+DL_EXPORT( void ) initspecialFunctions( void ) {
 
     PyObject *m;
 
-    if( ( m = Py_InitModule3( "nf_specialFunctions_C", nf_specialFunctions_CMiscPyMethods, 
+    if( ( m = Py_InitModule3( "specialFunctions", nf_specialFunctions_C_MiscPyMethods, 
         "A module that contains special math functions not in the python math module." ) ) == NULL ) return;
+    if( ( m = Py_InitModule3( "angularMomentumCoupling", nf_specialFunctions_C_AngularMomentumCouplingMethods, 
+        "A module that contains special math functions for angular momentum coupling in physics." ) ) == NULL ) return;
 }

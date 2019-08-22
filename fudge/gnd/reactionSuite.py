@@ -1,14 +1,39 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
 reactionSuite.py contains the 'reactionSuite' class that in turn holds all reactions for a given target/projectile.
-reactionSuite is the top-level class for the GND format
+reactionSuite is the top-level class for the GND structure.
 """
 
-formatMajorVersion = 1
-formatMinorVersion = 2
-formatVersion = "gnd version %s.%s" % ( formatMajorVersion, formatMinorVersion )
+GND_MAJORVERSION = 1
+GND_MINORVERSION = 3
+GND_VERSION = "GND %s.%s" % ( GND_MAJORVERSION, GND_MINORVERSION )
 
 import re
 from fudge.core.ancestry import ancestry
@@ -18,7 +43,6 @@ from fudge.legacy.converting import endfFormats, endf_endl
 from alias import aliases
 
 from fudge.processing import processingInfo
-from fudge.processing.deterministic import gndToLLNLSnCOut
 import fudge
 from fudge.core.math.xData import XYs
 
@@ -33,11 +57,13 @@ class reactionSuite( ancestry ) :
         * resonance data
         * a list of reactions """
 
-    def __init__( self, projectile, target, style = None, documentation = None, particleList = None ) :
+    def __init__( self, projectile, target, GND_version = GND_VERSION, style = None, documentation = None, particleList = None ) :
         """Creates a new reactionSuite object. 'projectile' and 'target' should both be
         gnd.xParticle.xParticle or gnd.xParticle.nuclearLevel instances."""
 
         ancestry.__init__( self, monikerReactionSuite, None )
+
+        if( GND_version not in ( 'gnd version 1.2', GND_VERSION ) ) : raise Exception( "Unsupported GND structure '%s'!" % GND_version )
 
         if( not( isinstance( projectile, fudge.gnd.xParticle.xParticle ) ) ) : projectile = fudge.particles.nuclear.getZAOrNameAs_xParticle( projectile )
         self.projectile = projectile
@@ -46,7 +72,7 @@ class reactionSuite( ancestry ) :
             if( not( isinstance( target, fudge.gnd.xParticle.nuclearLevel ) ) ) : target = fudge.particles.nuclear.getZAOrNameAs_xParticle( target )
         self.target = target
 
-        self.format = formatVersion
+        self.GND_version = GND_version
         self.particles = particleList
         if( self.particles is None ) : self.particles = fudge.gnd.xParticleList.xParticleList()
         self.particles.setParent( self )
@@ -84,9 +110,19 @@ class reactionSuite( ancestry ) :
 
         return( self.toString( ) )
 
-    def addAlias( self, key, value ) :
+    def addAlias( self, key, value, attributes = {} ) :
 
-        self.aliases[key] = value
+        self.aliases.add( key, value, attributes )
+
+    def addNuclearMetaStableAlias( self, isotopeName, nuclearLevelName, metaStableIndex ) :
+        """Adds a nuclear meta stable alias to self's aliases."""
+
+        self.aliases.addNuclearMetaStable( isotopeName, nuclearLevelName, metaStableIndex )
+
+    def getAliasesFor( self, value ) :
+        """Returns a list of all aliases that have value value."""
+
+        return( self.aliases.getAliasesFor( value ) )
 
     def addDocumentation( self, documentation ) :
 
@@ -160,17 +196,19 @@ class reactionSuite( ancestry ) :
         Check all data in the reactionSuite, returning a list of warnings. 
         
         Currently supported options:
-            'dQ'                        '1e-3 MeV'
-            'dThreshold'                '1e-3 MeV'
-            'crossSectionEnergyMax'     '20 MeV'
-            'crossSectionOnly':         False
-            'transportables'            ('n',)      # distribution required for these products
-            'normTolerance':            1e-5
-            'checkEnergyBalance'        True
-            'reconstructResonances'     True
-            'dEnergyBalanceRelative'    1e-3
-            'dEnergyBalanceAbsolute'    1.0
-            'fissionEnergyBalanceLimit' 0.15        # at least 85% should go to fission products
+            'branchingRatioSumTolerance' 1e-6        # branching ratios must sum to 1 (within this tolerance)
+            'dQ'                         '1e-3 MeV'
+            'dThreshold'                 '1e-3 MeV'
+            'crossSectionEnergyMax'      '20 MeV'
+            'crossSectionOnly':          False
+            'crossSectionMaxDiff':       1e-3        # for comparing summedReaction cross section to summands
+            'transportables'             ('n',)      # distribution required for these products
+            'normTolerance':             1e-5        # for checking distribution normalization
+            'checkEnergyBalance'         True
+            'reconstructResonances'      True
+            'dEnergyBalanceRelative'     1e-3
+            'dEnergyBalanceAbsolute'     1.0
+            'fissionEnergyBalanceLimit'  0.15        # at least 85% of available energy should go to fission products
  
         Currently unused options:
             'checkForEnDepData'         False
@@ -185,17 +223,19 @@ class reactionSuite( ancestry ) :
         from fudge.gnd import warning
 
         options = {
+                'branchingRatioSumTolerance': 1e-6,
                 'dQ': '1e-3 MeV',
                 'dThreshold': '1e-3 MeV',
                 'crossSectionEnergyMax': '20 MeV',
                 'crossSectionOnly': False,
-                'transportables': ('n',),    # distribution required for these products
+                'crossSectionMaxDiff': 1e-3,
+                'transportables': ('n',),
                 'normTolerance': 1e-5,
                 'checkEnergyBalance': True,
                 'reconstructResonances': True,
                 'dEnergyBalanceRelative': 1e-3,
                 'dEnergyBalanceAbsolute': 1.0,
-                'fissionEnergyBalanceLimit': 0.15,  # at least 85% should go to fission products
+                'fissionEnergyBalanceLimit': 0.15,
                 # currently unused options:
                 'checkForEnDepData': False,
                 'allowZeroE': False,
@@ -219,10 +259,15 @@ class reactionSuite( ancestry ) :
 
         warnings = []
 
-        if ( options['reconstructResonances'] and hasattr(self, 'resonances')
-                and self.resonances.reconstructCrossSection ):
-            # convert resonance parameters to pointwise data, interpolable to .1 percent:
-            self.reconstructResonances( verbose=False )
+        if hasattr( self, 'resonances' ):
+            resonanceWarnings = self.resonances.check( info )
+            if resonanceWarnings:
+                warnings.append( warning.context('resonances', resonanceWarnings) )
+            if ( options['reconstructResonances'] and self.resonances.reconstructCrossSection ):
+                # convert resonance parameters to pointwise data, interpolable to .1 percent:
+                try: self.reconstructResonances( verbose=False )
+                except Exception as e:
+                    warnings.append( warning.ExceptionRaised( "when reconstructing resonances: %s" % e ) )
 
         if info['checkEnergyBalance']:
             # setup options for calculating energy deposition
@@ -232,12 +277,12 @@ class reactionSuite( ancestry ) :
             # test Wick's limit: 0-degree elastic xsc >= ( total xsc * k/4pi )^2
             try:
                 elastic_distribution = ( self.getReaction('elastic').outputChannel.getProductWithName('n')
-                    .distributions.toPointwiseLinear() )
+                    .distributions.toPointwise_withLinearXYs() )
                 egrid = elastic_distribution.getEnergyArray('eV')
                 forward_scattering = [e.getValue(1.0) for e in elastic_distribution]    # probability at mu=1.0
-                elastic_xsc = self.getReaction('elastic').crossSection.toPointwiseLinear()
+                elastic_xsc = self.getReaction('elastic').crossSection.toPointwise_withLinearXYs()
                 elastic_xsc = [elastic_xsc.getValue(e) for e in egrid]
-                total_xsc = self.getReaction('total').crossSection.toPointwiseLinear()
+                total_xsc = self.getReaction('total').crossSection.toPointwise_withLinearXYs()
                 total_xsc = [total_xsc.getValue(e) for e in egrid]
 
                 wlcons = 3.05607e-8 * kinematicFactor**2 # ( sqrt(2 * neutronMass) / (4 * pi * hbar) * (M+m)/M )^2 in 1/(eV*b)
@@ -260,9 +305,23 @@ class reactionSuite( ancestry ) :
         result.info = info
         return result
 
+    def hasAlias( self, key ) :
+
+        return( key in self.aliases )
+
     def hasParticle( self, name ) :
 
         return( self.particles.hasParticle( name ) )
+
+    def getProjectileFrame( self ) :
+
+        from fudge.core.math.xData import axes
+
+        return( axes.labToken )         # BRB ?????? Should not be hardwired.
+
+    def getAlias( self, key ) :
+
+        return( self.aliases[key] )
 
     def getDocumentation( self, name ) :
 
@@ -306,7 +365,7 @@ class reactionSuite( ancestry ) :
         Raises 'KeyError' if specified channel can't be found. """
 
         # translate special channel names:
-        if channel=='elastic': channel='%s + %s' % (self.projectile,self.target)
+        if channel=='elastic': channel = channel_tr = '%s + %s' % (self.projectile,self.target)
         elif channel=='capture': channel_tr='z,gamma'
         else: channel_tr = channel
 
@@ -322,28 +381,7 @@ class reactionSuite( ancestry ) :
         if set(channel.split(' + ')) in chSets: return self.reactions[ chSets.index( set(channel.split(' + ')) ) ]
         if set(channel.split(' + ')) in chSetsNoGamma: return self.reactions[ chSetsNoGamma.index( set(channel.split(' + ')) ) ]
         
-        # if channel is in form '(z,2na)', 'n,4n' or similar:
-        patt = re.match('^[(]?[zn],([a-zA-Z0-9]+)[)]?$', channel_tr)
-        if patt:
-            thisChannelSet = set()
-            match = re.findall('([1-9]?)(gamma|He3|[npagdt]?)[+]?', patt.groups()[0] )
-            for mul, prod in match:
-                if not prod : continue
-                prod = { 'g' : 'gamma' , 'gamma' : 'gamma', 'n' : 'n', 'p' : 'H1', 'd' : 'H2', 't' : 'H3', 'He3' : 'He3', 'a' : 'He4' }[prod]
-                if mul: prod += "[multiplicity:'%s']" % mul
-                if prod in thisChannelSet:
-                    raise KeyError, "Please specify multiplicity explicitly ('z,2n' instead of 'z,nn')"
-                thisChannelSet.add(prod)
-            if not thisChannelSet:
-                raise KeyError, "Channel '%s' could not be found!" % channel
-            # also add final nucleus to the set:
-            proj, target = str( self.projectile ), str( self.target )
-            thisChannelSet.add( self.getIsotopeName( *([proj, target] + ['-'+a for a in thisChannelSet]) ) )
-            #thisChannelSet.discard('gamma') # don't use gammas for comparison
-            if thisChannelSet in chSets: return self.reactions[ chSets.index( thisChannelSet ) ]
-            if thisChannelSet in chSetsNoGamma: return self.reactions[ chSetsNoGamma.index( thisChannelSet ) ]
-        
-        elif 'fission' in channel.lower():
+        if 'fission' in channel.lower():
             channel_fiss = channel.lower()
             def matchlist(*args):
                 return any( [a in channel_fiss for a in args] )
@@ -358,6 +396,28 @@ class reactionSuite( ancestry ) :
             retVal = [a for a in self.reactions + self.fissionComponents if a.outputChannel.fissionGenre==genre]
             if len(retVal)==1:
                 return retVal[0]
+        else:
+            # check if channel is in form '(z,2na)', 'n,4n' or similar:
+            patt = re.match('^[(]?[znpagdt],([a-zA-Z0-9]+)[)]?$', channel_tr)
+            if patt:
+                thisChannelSet = set()
+                match = re.findall('([1-9]?)(gamma|He3|[npagdt]?)[+]?', patt.groups()[0] )
+                for mul, prod in match:
+                    if not prod : continue
+                    prod = { 'g' : 'gamma' , 'gamma' : 'gamma', 'n' : 'n', 'p' : 'H1', 'd' : 'H2', 't' : 'H3', 'He3' : 'He3', 'a' : 'He4' }[prod]
+                    if mul: prod += "[multiplicity:'%s']" % mul
+                    if prod in thisChannelSet:
+                        raise KeyError, "Please specify multiplicity explicitly ('z,2n' instead of 'z,nn')"
+                    thisChannelSet.add(prod)
+                if not thisChannelSet:
+                    raise KeyError, "Channel '%s' could not be found!" % channel
+                # also add final nucleus to the set:
+                proj, target = str( self.projectile ), str( self.target )
+                thisChannelSet.add( self.getIsotopeName( *([proj, target] + ['-'+a for a in thisChannelSet]) ) )
+                #thisChannelSet.discard('gamma') # don't use gammas for comparison
+                if thisChannelSet in chSets: return self.reactions[ chSets.index( thisChannelSet ) ]
+                if thisChannelSet in chSetsNoGamma: return self.reactions[ chSetsNoGamma.index( thisChannelSet ) ]
+        
         raise KeyError, "Channel '%s' could not be found!" % channel
 
     def getReferredData( self, key ) :
@@ -372,6 +432,11 @@ class reactionSuite( ancestry ) :
         """Calculate energy and momentum deposition for all reactions and all products.
         Resulting deposition information is stored within each product. """
 
+        try :
+            verbosity = processInfo['verbosity']        # If verbosity not in processInfo, this will execute a raise.
+        except :
+            processInfo['verbosity'] = 0                # If raise execute (i.e., verbosity not in processInfo), set it.
+
         if( processInfo['verbosity'] >= 10 ) : print '%s%s' % ( verbosityIndent, self.inputParticlesToReactionString( suffix = " -->" ) )
         for channel in self : channel.calculateDepositionData( processInfo, verbosityIndent + '    ' )
 
@@ -382,6 +447,8 @@ class reactionSuite( ancestry ) :
     def process( self, processInfo, verbosityIndent = '' ) :
 
         from fudge.core.utilities import times
+
+        if( processInfo['verbosity'] >= 10 ) : print '%s%s' % ( verbosityIndent, self.inputParticlesToReactionString( suffix = " -->" ) )
         t0 = times.times( )
         try :
             logFile = processInfo.dict['logFile']
@@ -389,9 +456,18 @@ class reactionSuite( ancestry ) :
             logFile = None
         tempInfo = processingInfo.tempInfo( )
         tempInfo['reactionSuite'] = self
-        if( processInfo['verbosity'] >= 10 ) : print '%s%s' % ( verbosityIndent, self.inputParticlesToReactionString( suffix = " -->" ) )
+
+        tempInfo['incidentEnergyUnit'] = self[0].crossSection.getIncidentEnergyUnit( )
+        tempInfo['massUnit'] = tempInfo['incidentEnergyUnit'] + '/c**2'
+        tempInfo['masses'] = { 'Projectile' : self.projectile.getMass( tempInfo['massUnit'] ) }
+        tempInfo['masses']['Target'] = self.target.getMass( tempInfo['massUnit'] )
+        tempInfo['masses']['Product'] = None
+        tempInfo['masses']['Residual'] = None
+
         self.reconstructResonances( accuracy = 1e-3, verbose = False )
+        processInfo['workFile'] = []
         for channel in self : channel.process( processInfo, tempInfo, verbosityIndent + '    ' )
+        for channel in self.fissionComponents : channel.process( processInfo, tempInfo, verbosityIndent + '    ' )
         if( 'LLNL_MC' in processInfo.dict['styles'] ) :
             style = fudge.gnd.miscellaneous.style( 'LLNL_MC' )
             self.addStyle( style )
@@ -417,24 +493,32 @@ class reactionSuite( ancestry ) :
         epsilon = 1e-8  # for joining multiple regions together
 
         # for each channel, add tabulated pointwise data (ENDF MF=3) to reconstructed resonances:
-        needReconstruction = [reac for reac in self._getBaseAndDerivedReactions()
-                if reac.crossSection.nativeData == fudge.gnd.tokens.resonancesWithBackgroundFormToken]
-        for channel in needReconstruction:
+        possibleChannels = { 'elastic' : False, 'capture' : True, 'fission' : True, 'total' : False }
+        for channel in self._getBaseAndDerivedReactions():
+            if channel.crossSection.nativeData != fudge.gnd.tokens.resonancesWithBackgroundFormToken:
+                continue
             # which reconstructed cross section corresponds to this channel?
-            if str(channel) in xsecs: RRxsec = xsecs[ str(channel) ]
-            elif channel is self.getReaction('elastic'): RRxsec = xsecs[ 'elastic' ]
-            elif channel is self.getReaction('capture') or 'capture' in str(channel):
-                RRxsec = xsecs[ 'capture' ]
-            elif channel is self.getReaction('total'):
-                RRxsec = xsecs[ 'total' ]
-            elif 'fission' in str(channel):
-                RRxsec = xsecs[ 'fission' ]
-            else:
-                raise Exception, "Couldn't find appropriate reconstructed cross section to add to channel %s"%channel
+            RRxsec = None
+            if str(channel) in xsecs:
+                RRxsec = xsecs[ str(channel) ]
+            else :
+                for possibleChannel in possibleChannels :
+                    if( possibleChannels[possibleChannel] ) :
+                        if( possibleChannel in str( channel ) ) : RRxsec = xsecs[possibleChannel]
+                    if( RRxsec is None ) :
+                        try :
+                            if( channel is self.getReaction( possibleChannel ) ) : RRxsec = xsecs[possibleChannel]
+                        except :
+                            pass
+                    if( RRxsec is not None ) : break
+            if( RRxsec is None ) :
+                if verbose:
+                    print( "Warning: couldn't find appropriate reconstructed cross section to add to channel %s" % channel )
+                continue
 
             background = channel.crossSection.forms[ channel.crossSection.nativeData ].tabulatedData
-            background = background.toPointwiseLinear( epsilon, epsilon )
-            RRxsec = RRxsec.toPointwiseLinear( epsilon, epsilon )
+            background = background.toPointwise_withLinearXYs( epsilon, epsilon )
+            RRxsec = RRxsec.toPointwise_withLinearXYs( epsilon, epsilon )
             # before adding to another pointwise region, y-value of upper point must be 0:
             RRdomain, pwDomain = RRxsec.getDomain(), background.getDomain()
             if RRdomain[0] < pwDomain[0] or RRdomain[1] > pwDomain[1]:
@@ -468,16 +552,13 @@ class reactionSuite( ancestry ) :
                         decayProd.data = {}
 
     def saveToOpenedFile( self, fOut, flags = None, verbosityIndent = '' ) :
-        if not flags:
-            flags = processingInfo.tempInfo()
-            flags['verbosity'] = 31
 
-        xmlString = self.toXMLList( flags, verbosityIndent = verbosityIndent )
+        xmlString = self.toXMLList( flags )
         fOut.write( '\n'.join( xmlString ) )
         fOut.write( '\n' )
 
     def saveToFile( self, fileName, flags = None, verbosityIndent = '' ) :
-        """Save the reactionSuite in GND/xml format to specified file.
+        """Save the reactionSuite in GND/xml structure to specified file.
         To suppress extra messages, change the 'verbosity' flag:
             >>>self.saveToFile( "output.xml", flags={'verbosity':0} ) 
         """
@@ -485,20 +566,14 @@ class reactionSuite( ancestry ) :
         with open(fileName,"w") as fout:
             self.saveToOpenedFile( fout, flags, verbosityIndent )
 
-    def toLLNLSnCOut( self, toOtherData, first = False, last = False, verbosityIndent = '' ) :
+    def toXMLList( self, flags = None ) :
 
-        tempInfo = processingInfo.tempInfo( )
-        tempInfo['reactionSuite'] = self
-        if( toOtherData['verbosity'] >= 10 ) : print '%s%s' % ( verbosityIndent, self.inputParticlesToReactionString( suffix = " -->" ) )
-        return( gndToLLNLSnCOut.toLLNLSnCOut( self, toOtherData, tempInfo, first, last, verbosityIndent ) )
-
-    def toXMLList( self, flags, verbosityIndent = '' ) :
-
+        if( flags is None ) : flags = {}
         attributeString = ""
         for attribute in self.attributes : attributeString += ' %s="%s"' % ( attribute, self.attributes[attribute] )
         xmlString = [ '<?xml version="1.0" encoding="UTF-8"?>' ]
-        xmlString.append( ( '<%s projectile="%s" target="%s" format="%s"%s xmlns:xlink="http://www.w3.org/1999/xlink">' \
-            % ( self.moniker, self.projectile.getName( ), self.target.getName( ), self.format, attributeString ) ) )
+        xmlString.append( ( '<%s projectile="%s" target="%s" version="%s"%s xmlns:xlink="http://www.w3.org/1999/xlink">' \
+            % ( self.moniker, self.projectile.getName( ), self.target.getName( ), self.GND_version, attributeString ) ) )
 
         xmlString.append( '  <styles>' )
         for style in self.styles : xmlString += self.styles[style].toXMLList( indent = '    ' )
@@ -515,11 +590,9 @@ class reactionSuite( ancestry ) :
         xmlString[-1] += '</particles>'
         
         if hasattr(self,'resonances'):
-            xmlString += self.resonances.toXMLList( flags, verbosityIndent + '    ', indent = '  ' )
+            xmlString += self.resonances.toXMLList( flags, indent = '  ' )
 
-        if( flags['verbosity'] >= 10 ) : print '%s%s' % ( verbosityIndent, self.inputParticlesToReactionString( suffix = " -->" ) )
-        for reaction in self._getBaseAndDerivedReactions():
-            xmlString += reaction.toXMLList( flags, verbosityIndent + '    ', indent = '  ' )
+        for reaction in self._getBaseAndDerivedReactions( ) : xmlString += reaction.toXMLList( flags, indent = '  ' )
         xmlString += self.referredData.toXMLList( indent='  ' )
 
         xmlString.append( '</%s>' % self.moniker)
@@ -550,11 +623,13 @@ class reactionSuite( ancestry ) :
             targetInfo['LIS'] = target['levelIndex']
         except :
             targetInfo['LIS'] = 0
+        targetInfo['metastables'] = []
         targetInfo['LISO'] = 0
-        for key in self.aliases.aliases :
-            if( self.aliases[key] == target.getName( ) ) :
-                targetInfo['LISO'] = int( key.split( '_m' )[1] )
-                break
+        for key, alias in self.aliases.items( ) :
+            if( alias.hasAttribute( 'nuclearMetaStable' ) ) :
+                targetInfo['metastables'].append( alias.getValue() )
+                if alias.getValue() == target.getName() :
+                    targetInfo['LISO'] = int( alias.getAttribute( 'nuclearMetaStable' ) )
         MAT += targetInfo['LISO']
         targetInfo['delayedRates'] = []
         targetInfo['totalDelayedNubar'] = None
@@ -563,9 +638,36 @@ class reactionSuite( ancestry ) :
                 31 : {}, 32 : {}, 33 : {}, 34 : {}, 35 : {}, 40 : {} }
         if hasattr(self,'resonances'):      # Add resonances, independent of reaction channels
             self.resonances.toENDF6( endfMFList, flags, targetInfo, verbosityIndent = verbosityIndent2 )
+
+        targetInfo['production_gammas'] = {}
+
         for channel in self._getBaseAndDerivedReactions() :
             channel.toENDF6( endfMFList, flags, targetInfo, verbosityIndent = verbosityIndent2 )
         gndToENDF6.upDateENDFMF8Data( endfMFList, targetInfo )
+        for MT, production_gammas in targetInfo['production_gammas'].items( ) :
+            from fudge.gnd.reactionData import crossSection
+
+            gammas = []
+            targetInfo['crossSectionMF13'] = None
+            if( production_gammas[0] == 13 ) : targetInfo['crossSectionMF13'] = []
+            for productionReaction in production_gammas[1:] :
+                if( len( productionReaction.outputChannel ) != 1 ) : raise Exception( 'For MF13, only one product is supported. Got %d.' %
+                    len( productionReaction.outputChannel ) )
+                gammas.append( productionReaction.outputChannel[0] )
+                if( production_gammas[0] == 13 ) :
+                    crossSectionComponent = productionReaction.crossSection
+                    crossSectionForms = crossSectionComponent.getFormTokens( )
+                    if( fudge.gnd.tokens.piecewiseFormToken in crossSectionForms ) :
+                        crossSection = crossSectionComponent.getFormByToken( fudge.gnd.tokens.piecewiseFormToken )
+                        crossSection = crossSection.toPointwise_withLinearXYs( 1e-10, 0. )
+                        targetInfo['crossSectionMF13'].append( crossSection )
+                    elif( fudge.gnd.tokens.pointwiseFormToken in crossSectionForms ) :
+                        targetInfo['crossSectionMF13'].append( crossSectionComponent.getFormByToken( fudge.gnd.tokens.pointwiseFormToken ) )
+                    elif( fudge.gnd.tokens.linearFormToken in crossSectionForms ) :
+                        targetInfo['crossSectionMF13'].append( crossSectionComponent.getFormByToken( fudge.gnd.tokens.linearFormToken ) )
+                    else :
+                        raise Exception( 'cross section form(s) "%s" not supported' % crossSectionForms )
+            gndToENDF6.gammasToENDF6_MF12_13( MT, production_gammas[0], endfMFList, flags, targetInfo, gammas )
     
         # gamma decay data:
         for particle in self.particles.values():
@@ -578,7 +680,6 @@ class reactionSuite( ancestry ) :
                     level.toENDF6( baseMT, endfMFList, flags, targetInfo )
 
         MFs = sorted( endfMFList.keys( ) )
-        directory = []
         endfList = []
 
         totalNubar = None
@@ -638,27 +739,18 @@ class reactionSuite( ancestry ) :
         if covarianceSuite:
             covarianceSuite.toENDF6( endfMFList, flags, targetInfo )
 
-        for MF in MFs :                 # Build directory information.
-            MFData = endfMFList[MF]
-            MTs = sorted( MFData.keys( ) )
-            for MT in MTs :
-                if( ( MF == 1 ) and ( MT == 451 ) ) : continue
-                data = MFData[MT]
-                directory.append( "%33d%11d%11d%11d" % ( MF, MT, len( data ) - 1, 0 ) )
         endfDoc = self.documentation.get( 'endfDoc' )
         if( endfDoc is None ) :
             docHeader2 = [  ' %2d-%-2s-%3d LLNL       EVAL-OCT03 Unknown' % ( targetZ, fudge.particles.nuclear.elementSymbolFromZ( targetZ ), targetA ),
                             '                      DIST-DEC99                       19990101   ',
                             '----ENDL              MATERIAL %4d' % MAT,
                             '-----INCIDENT %s DATA' % 
-                                { 1 : 'NEUTRON', 1001 : 'PROTON', 1002 : 'DEUTERON', 1002 : 'TRITON', 2003 : 'HELION', 2004 : 'ALPHA' }[projectileZA], 
+                                { 1 : 'NEUTRON', 1001 : 'PROTON', 1002 : 'DEUTERON', 1003 : 'TRITON', 2003 : 'HELION', 2004 : 'ALPHA' }[projectileZA], 
                             '------ENDF-6 FORMAT' ]
             endfDoc = [ 'LLNL ENDL file translated to ENDF6 by FUDGE.', '' ' ************************ C O N T E N T S ***********************' ]
         else :
             docHeader2 = []
             endfDoc = endfDoc.getLines( )
-        directory.insert( 0, "%33d%11d%11d%11d" % ( 1, 451, len( directory ) + len( endfDoc ) + 5, 0 ) )  # Add 4 lines of metadata at start, plus current line of directory
-        directory.append( 99999 )
 
         # update the documentation, including metadata on first 4 lines:
         try: self.getReaction('fission'); LFI = True
@@ -692,27 +784,11 @@ class reactionSuite( ancestry ) :
         docHeader = [ endfFormats.endfHeadLine( targetZA, targetInfo['mass'], LRP, LFI, NLIB, NMOD ),
                 endfFormats.endfHeadLine( self.target.getLevelAsFloat( 'eV' ), STA, self.target.getLevelIndex(), targetInfo['LISO'], 0, NFOR ),
                 endfFormats.endfHeadLine( self.projectile.getMass( 'eV/c**2' ) / targetInfo['neutronMass'], EMAX, LREL, 0, NSUB, NVER ),
-                endfFormats.endfHeadLine( temperature, 0, LDRV, 0, len( endfDoc ), len( directory[:-1] ) ) ]
+                endfFormats.endfHeadLine( temperature, 0, LDRV, 0, len( endfDoc ), -1 ) ]
         new_doc = fudge.gnd.documentation.documentation( 'endf', '\n'.join( docHeader + docHeader2 + endfDoc ) )
         endfMFList[1][451] += endfFormats.toEndfStringList( new_doc )
-        
-        endfList = [ "%66s%s" % ( " ", endfFormats.endfFENDLine( 1 )[66:75] ) ]
-        endfMFList[1][451] += directory
-        for MF in MFs :
-            MFData = endfMFList[MF]
-            MTs = sorted( MFData.keys( ) )
-            for MT in MTs :
-                data = MFData[MT]
-                for i, datum in enumerate( data ) :
-                    if( datum == 99999 ) :
-                        endfList.append( endfFormats.endfSENDLine( MAT, MF ) )
-                    else :
-                        endfList.append( '%-66s%4d%2d%3d%5d' % ( datum, MAT, MF, MT, i + 1 ) )
-            if( len( MTs ) > 0 ) : endfList.append( endfFormats.endfFENDLine( MAT ) )
-        endfList.append( endfFormats.endfMENDLine( ) )
-        endfList.append( endfFormats.endfTENDLine( ) )
-        endfList.append( '' )
-        return( '\n'.join( endfList ) )
+
+        return endfFormats.endfMFListToFinalFile( endfMFList, MAT, lineNumbers=True )        
 
     def setAttribute( self, name, value ) :
         """Adds attribute name and its value to the list of attributes."""
@@ -743,50 +819,58 @@ def readXML( gndFile ):
     return parseXMLNode( rsElement )
 
 def parseXMLNode( rsElement ):
-    """Translates a <reactionSuite> xml node into a reactionSuite instance.
-    Users should use the 'readXML' function instead. """
-    format = rsElement.get('format')
-    if format not in ('gnd version 1.2',):
-        raise Exception("GND file is in an unsupported format ('%s')!" % format)
-    styles = [fudge.gnd.miscellaneous.style.parseXMLNode( style ) for style in rsElement.find('styles')]
-    documentations = [fudge.gnd.documentation.parseXMLNode(doc) for doc in rsElement.find('documentations')]
-    particles = fudge.gnd.xParticleList.parseXMLNode( rsElement.find('particles') )
-    projectile = particles.getParticle( rsElement.get('projectile') )
-    target = particles.getParticle( rsElement.get('target') )
+    """Translates a <reactionSuite> xml node into a reactionSuite instance. Users should use the 'readXML' function instead."""
 
-    rs = reactionSuite( projectile, target, None, None, particles )
-    for style in styles: rs.addStyle( style )
-    for doc in documentations: rs.addDocumentation( doc )
-    rs.version = rsElement.get('version')
-    rs.attributes['temperature'] = physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty(rsElement.get('temperature'))
+    xPath = ['reactionSuite']  # keep track of location in the tree, in case errors come up
+    try:
+        GND_version = rsElement.get( 'version' )
+        if GND_version is None:
+            GND_version = rsElement.get( 'format' )
 
-    linkData = {'particles':particles, 'reactionSuite':rs, 'unresolvedLinks':[], 'format':format}
+        particles = fudge.gnd.xParticleList.parseXMLNode( rsElement.find('particles') )
+        projectile = particles.getParticle( rsElement.get('projectile') )
+        target = particles.getParticle( rsElement.get('target') )
+        rs = reactionSuite( projectile, target, GND_version = GND_version, particleList = particles )
 
-    for child in rsElement:
-        if child.tag in ('styles','documentations','particles'):
-            continue    # already read above
-        elif child.tag == 'aliases':
-            for alias in child: rs.addAlias( alias.get('key'), alias.get('value') )
-        elif child.tag == 'resonances':
-            rs.addResonances( fudge.gnd.resonances.resonances.parseXMLNode( child ) )
-        elif child.tag == 'reaction':
-            rs.addReaction( fudge.gnd.reaction.parseXMLNode( child, linkData ) )
-        elif child.tag == 'partialGammaProduction':
-            rs.addPartialGammaProduction( fudge.gnd.partialGammaProduction.parseXMLNode( child, linkData ) )
-        elif child.tag == 'summedReaction':
-            rs.addSummedReaction( fudge.gnd.summedReaction.parseXMLNode( child, linkData ) )
-        elif child.tag == 'fissionComponent':
-            fc = fudge.gnd.reaction.parseXMLNode( child, linkData )
-            fc.__class__ = fudge.gnd.fissionComponent.fissionComponent
-            fc.moniker = fudge.gnd.reactions.base.fissionComponentToken
-            rs.addFissionComponent( fc )
-        elif child.tag == 'production':
-            rs.addProductionReaction( fudge.gnd.production.parseXMLNode( child, linkData ) )
-        elif child.tag == 'referredData':
-            rs.referredData = fudge.gnd.referredData.parseXMLNode( child, linkData )
-            rs.referredData.parent = rs
-        else:
-            print("Warning: encountered unexpected element '%s' in reactionSuite!" % child.tag)
+        styles = [fudge.gnd.miscellaneous.style.parseXMLNode( style ) for style in rsElement.find('styles')]
+        documentations = [fudge.gnd.documentation.parseXMLNode(doc) for doc in rsElement.find('documentations')]
+
+        for style in styles: rs.addStyle( style )
+        for doc in documentations: rs.addDocumentation( doc )
+        rs.version = rsElement.get('version')
+        rs.attributes['temperature'] = physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty(rsElement.get('temperature'))
+
+        linkData = {'particles':particles, 'reactionSuite':rs, 'unresolvedLinks':[], 'format' : GND_version }
+        for child in rsElement:
+            if child.tag in ('styles','documentations','particles'):
+                continue    # already read above
+            elif child.tag == 'aliases':
+                for alias in child :
+                    attributes = {}
+                    for key in alias.keys( ) :
+                        if( key in [ 'key', 'value' ] ) : continue
+                        attributes[key] = alias.get( key )
+                    rs.addAlias( alias.get( 'key' ), alias.get( 'value' ), attributes = attributes )
+            elif child.tag == 'resonances':
+                rs.addResonances( fudge.gnd.resonances.resonances.parseXMLNode( child, xPath ) )
+            elif child.tag == 'reaction':
+                rs.addReaction( fudge.gnd.reaction.parseXMLNode( child, xPath, linkData ) )
+            elif child.tag == 'partialGammaProduction':
+                rs.addPartialGammaProduction( fudge.gnd.partialGammaProduction.parseXMLNode( child, xPath, linkData ) )
+            elif child.tag == 'summedReaction':
+                rs.addSummedReaction( fudge.gnd.summedReaction.parseXMLNode( child, xPath, linkData ) )
+            elif child.tag == 'fissionComponent':
+                fc = fudge.gnd.reaction.parseXMLNode( child, xPath, linkData )
+                fc.__class__ = fudge.gnd.fissionComponent.fissionComponent
+                fc.moniker = fudge.gnd.reactions.base.fissionComponentToken
+                rs.addFissionComponent( fc )
+            elif child.tag == 'production':
+                rs.addProductionReaction( fudge.gnd.production.parseXMLNode( child, xPath, linkData) )
+            else:
+                print("Warning: encountered unexpected element '%s' in reactionSuite!" % child.tag)
+    except Exception:
+        print( "Error encountered at xpath = /%s" % '/'.join( xPath ) )
+        raise
 
     # fix links:
     from fudge.gnd.link import follow

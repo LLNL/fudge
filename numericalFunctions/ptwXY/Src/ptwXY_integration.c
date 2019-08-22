@@ -1,5 +1,30 @@
 /*
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 */
 
@@ -125,7 +150,15 @@ double ptwXY_integrate( ptwXYPoints *ptwXY, double xMin, double xMax, nfu_status
             x1 = point[-1].x;
             y1 = point[-1].y;
             if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, xMin, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
-            if( ( *status = ptwXY_f_integrate( ptwXY->interpolation, xMin, y, x2, y2, &sum ) ) != nfu_Okay ) return( 0. );
+            if( x2 > xMax ) {
+                double yMax;
+
+                if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, xMax, &yMax, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
+                if( ( *status = ptwXY_f_integrate( ptwXY->interpolation, xMin, y, xMax, yMax, &sum ) ) != nfu_Okay ) return( 0. );
+                return( sum ); }
+            else {
+                if( ( *status = ptwXY_f_integrate( ptwXY->interpolation, xMin, y, x2, y2, &sum ) ) != nfu_Okay ) return( 0. );
+            }
         }
     }
     i++;
@@ -368,8 +401,9 @@ ptwXPoints *ptwXY_groupOneFunction( ptwXYPoints *ptwXY, ptwXPoints *groupBoundar
         xg2 = groupBoundaries->points[igs+1];
         sum = 0;
         if( xg2 > x1 ) {
-            for( ; ( i < f->length ) && ( x1 != xg2 ); i++, x1 = x2, y1 = y2 ) {
+            for( ; i < f->length; i++, x1 = x2, y1 = y2 ) {
                 x2 = f->points[i].x;
+                if( x2 > xg2 ) break;
                 y2p = y2 = f->points[i].y;
                 if( f->interpolation == ptwXY_interpolationFlat ) y2p = y1;
                 sum += ( y1 + y2p ) * ( x2 - x1 );
@@ -446,8 +480,9 @@ ptwXPoints *ptwXY_groupTwoFunctions( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, p
         xg2 = groupBoundaries->points[igs+1];
         sum = 0;
         if( xg2 > x1 ) {
-            for( ; ( i < f->length ) && ( x1 != xg2 ); i++, x1 = x2, fy1 = fy2, gy1 = gy2 ) {
+            for( ; i < f->length; i++, x1 = x2, fy1 = fy2, gy1 = gy2 ) {
                 x2 = f->points[i].x;
+                if( x2 > xg2 ) break;
                 fy2p = fy2 = f->points[i].y;
                 if( f->interpolation == ptwXY_interpolationFlat ) fy2p = fy1;
                 gy2p = gy2 = g->points[i].y;
@@ -540,8 +575,9 @@ ptwXPoints *ptwXY_groupThreeFunctions( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2,
         xg2 = groupBoundaries->points[igs+1];
         sum = 0;
         if( xg2 > x1 ) {
-            for( ; ( i < f->length ) && ( x1 != xg2 ); i++, x1 = x2, fy1 = fy2, gy1 = gy2, hy1 = hy2 ) {
+            for( ; i < f->length; i++, x1 = x2, fy1 = fy2, gy1 = gy2, hy1 = hy2 ) {
                 x2 = f->points[i].x;
+                if( x2 > xg2 ) break;
                 fy2p = fy2 = f->points[i].y;
                 if( f->interpolation == ptwXY_interpolationFlat ) fy2p = fy1;
                 gy2p = gy2 = g->points[i].y;
@@ -597,13 +633,14 @@ ptwXPoints *ptwXY_runningIntegral( ptwXYPoints *ptwXY, nfu_status *status ) {
     double integral = 0., sum;
 
     if( ( *status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( NULL );
-    if( ( runningIntegral = ptwX_new( ptwXY->length - 1, status ) ) == NULL ) goto err;
+    if( ( runningIntegral = ptwX_new( ptwXY->length, status ) ) == NULL ) goto err;
 
+    if( ( *status = ptwX_setPointAtIndex( runningIntegral, 0, 0. ) ) != nfu_Okay ) goto err;
     for( i = 1; i < ptwXY->length; i++ ) {
         if( ( *status = ptwXY_f_integrate( ptwXY->interpolation, ptwXY->points[i-1].x, ptwXY->points[i-1].y, 
             ptwXY->points[i].x, ptwXY->points[i].y, &sum ) ) != nfu_Okay ) goto err;
         integral += sum;
-        if( ( *status = ptwX_setPointAtIndex( runningIntegral, i - 1, integral ) ) != nfu_Okay ) goto err;
+        if( ( *status = ptwX_setPointAtIndex( runningIntegral, i, integral ) ) != nfu_Okay ) goto err;
     }
     return( runningIntegral );
 

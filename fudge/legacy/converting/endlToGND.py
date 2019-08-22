@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -10,9 +35,8 @@ Nuclear particle name: Name depends on whether natural or specific isotope as fo
         S is the element's symbol (e.g., 'He' for helium).
         A is the nucleon number (e.g., 'He4' for He-4).
         L is an optional level designation (e.g., 'O16_e3' for the third excition state of O16).
-            The level name can be an excitation level designation (e.g., 'e#'), a metastable 
-            designation (e.g., 'm#'), or an unknown designation (i.e., 'c') where '#' is an 
-            integer (e.g., 'e2' or 'm1' for the second excited state of 'Am242').
+            The level name can be an excitation level designation (e.g., 'e#') or an unknown 
+            designation (i.e., 'c') where '#' is an integer (e.g., 'e2' for the second excited state).
     natural: A natural's name is composed of SA[_L] (see above for meanings of S, A and L except A is
             always 'natural'.
 
@@ -33,8 +57,6 @@ import endf_endl
 ENDL_Accuracy = 1e-3
 FUDGE_EPS = 1e-8
 
-linlinInterpolation = axes.interpolationXY( axes.linearToken, axes.linearToken )
-linlinUnitbaseInterpolation = axes.interpolationXY( axes.linearToken, axes.linearToken, axes.unitBaseToken )
 def getXYInterpolation( data ) :
 
     if( data.columns != 2 ) : raise Exception( 'Only 2 column data supported, # of columns = %s for %s' % ( data.columns, str( data ) ) )
@@ -64,7 +86,7 @@ class infos :
 
         self.reactionSuite = reactionSuite
 
-def getTypeName( info, ZA, name = None, levelIndex = None, level = 0., levelUnit = 'MeV', metaStableIndex = None ) :
+def getTypeName( info, ZA, name = None, levelIndex = None, level = 0., levelUnit = 'MeV' ) :
     """Returns the name for this ZA and level if present. Returned name is of the form Am_242, Am_242_m1, Am_242_e2.
     levelIndex must be None, 'c', 's' or an integer > 0."""
 
@@ -88,10 +110,7 @@ def getTypeName( info, ZA, name = None, levelIndex = None, level = 0., levelUnit
                 name += "_%s" % levelIndex
             else :
                 particleQualifiers['level'] = physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty( level, levelUnit )
-                if( metaStableIndex is None ) :
-                    if( levelIndex != 0 ) : name += '_e%d' % levelIndex
-                else :
-                    if( metaStableIndex != 0 ) : name += '_m%d' % metaStableIndex
+                if( levelIndex != 0 ) : name += '_e%d' % levelIndex
     if( not( info.particleList.hasParticle( name ) ) ) :
         if( ZA in info.ZAMasses ) :
             if( not( info.ZAMasses[ZA] is None ) and ( info.ZAMasses[ZA] < 0 ) ) : info.ZAMasses[ZA] *= -1
@@ -117,7 +136,6 @@ def getTypeName( info, ZA, name = None, levelIndex = None, level = 0., levelUnit
             massUnit = physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty( mass, 'amu' )
         if( name in info.transportables ) : particleQualifiers['transportable'] = 'true'
         if( not( levelIndex is None ) and ( levelIndex != 0 ) ) : particleQualifiers['levelIndex'] = levelIndex
-        if( not( metaStableIndex is None ) and ( metaStableIndex != 0 ) ) : particleQualifiers['metaStableIndex'] = metaStableIndex
         if( name in [ 'n', 'H1', 'H2', 'H3', 'He3', 'He4', 'gamma' ] ) : particleQualifiers['transportable'] = 'true'
 
         if( particleQualifiers.get( 'level' ) is not None ) :                   # Add new particle or level.
@@ -261,8 +279,8 @@ def toGND( self, xenslIsotopes = None, verbose = 0, testing = False ) :
 
             muProbabilityFrame = axes.labToken
             if( hasattr( data, 'muProbabilityFrame' ) ) : muProbabilityFrame = data.muProbabilityFrame
-            axes_ = distributions.angular.pointwise.defaultAxes( energyUnit = 'MeV', muProbabilityFrame = muProbabilityFrame )
-            form = distributions.angular.pointwise( axes_ )
+            axes_ = distributions.angular.pointwise.defaultAxes( energyUnit = 'MeV' )
+            form = distributions.angular.pointwise( axes_, productFrame = muProbabilityFrame )
             axesMuP = axes.referenceAxes( form )
             for i, EMuP in enumerate( data.data ) :
                 E, muP = EMuP
@@ -271,11 +289,8 @@ def toGND( self, xenslIsotopes = None, verbose = 0, testing = False ) :
 
         def energy( data ) :
 
-            axes_ = axes.axes( dimension = 3 )
-            axes_[0] = axes.axis( 'energy_in',  0, 'MeV', frame = axes.labToken, interpolation = linlinUnitbaseInterpolation )
-            axes_[1] = axes.axis( 'energy_out', 1, 'MeV', frame = axes.labToken, interpolation = linlinInterpolation )
-            axes_[2] = axes.axis( 'P(energy_in|energy_out)', 2, '1/MeV', frame = axes.labToken )
-            form = distributions.energy.pointwise( axes_ )
+            axes_ = distributions.energy.pointwise.defaultAxes( energyUnit = 'MeV' )
+            form = distributions.energy.pointwise( axes_, productFrame = axes.labToken )
             axes_xy = axes.axes( )
             axes_xy[0] = axes_[1]
             axes_xy[1] = axes_[2]
@@ -284,12 +299,8 @@ def toGND( self, xenslIsotopes = None, verbose = 0, testing = False ) :
 
         def LLNLLegendrePointwise( data ) :
 
-            axes_ = axes.axes( dimension = 4 )
-            axes_[0] = axes.axis( 'l',          0, '',      frame = axes.labToken, interpolation = linlinInterpolation )
-            axes_[1] = axes.axis( 'energy_in',  1, 'MeV',   frame = axes.labToken, interpolation = linlinUnitbaseInterpolation )
-            axes_[2] = axes.axis( 'energy_out', 2, 'MeV',   frame = axes.labToken, interpolation = linlinInterpolation )
-            axes_[3] = axes.axis( 'c_l',        3, '1/MeV', frame = axes.labToken )
-            form = distributions.Legendre.LLNLPointwise( axes_ )
+            axes_ = distributions.Legendre.LLNLPointwise.defaultAxes( )
+            form = distributions.Legendre.LLNLPointwise( axes_, productFrame = axes.labToken )
             axesRefXY = axes.referenceAxes( form )
             for l, EEpPs in data.data :
                 EEpP = distributions.Legendre.LLNLPointwiseEEpP( int( l ) )
@@ -303,12 +314,31 @@ def toGND( self, xenslIsotopes = None, verbose = 0, testing = False ) :
                 form.append( EEpP )
             return( form )
 
+        def LLNLLegendrePointwise_L0_only( data ) :
+            """Has only L=0 component, can be converted to uncorrelated angular (isotropic) and energy distributions."""
+
+            isotropic = distributions.angular.isotropic( productFrame = axes.labToken )
+            angular = distributions.angular.component( )
+            angular.addForm( isotropic )
+            angular.nativeData = isotropic.name
+
+            # energy spectrum:
+            axes_ = distributions.energy.pointwise.defaultAxes( energyUnit = 'MeV' )
+            pw = distributions.energy.pointwise( axes_, productFrame = axes.labToken )
+            for index, (energy, probability_list) in enumerate(data.data[0][1]):
+                axes_ = axes.referenceAxes( parent=pw )
+                pw.append( XYs.XYs( axes_, probability_list, accuracy=ENDL_Accuracy, index=index, value=energy, parent=pw) )
+            energy = distributions.energy.component()
+            energy.addForm( pw )
+            energy.nativeData = pw.name
+            return distributions.uncorrelated.component( angular, energy )
+
         def LLNLAngularEnergy( data ) :
 
             axes_ = distributions.angularEnergy.pointwise.defaultAxes( energyUnit = "MeV", energyInterpolationQualifier = axes.unitBaseToken,
                 energy_outUnit = 'MeV', probabilityUnit = '1/MeV' )
-            axes_[3].label = 'P(energy_in,mu|energy_out)'
-            form = distributions.angularEnergy.pointwise( axes_ )
+            axes_[3].label = 'P(energy_out|energy_in,mu)'
+            form = distributions.angularEnergy.pointwise( axes_, productFrame = axes.labToken )
             axesW_XY = axes.referenceAxes( form, dimension = 3 )
             axesXY = axes.referenceAxes( form )
             for i, E_MuEpPs in enumerate( data.data ) :
@@ -352,8 +382,14 @@ def toGND( self, xenslIsotopes = None, verbose = 0, testing = False ) :
                 component = distributions.angular.twoBodyComponent( distributions.base.pointwiseFormToken )
                 addForm( component, 1, datas, angular )
         elif( Is == [ 4 ] ) :
-            component = distributions.Legendre.component( distributions.base.LLNLLegendrePointwiseFormToken )
-            addForm( component, 4, datas, LLNLLegendrePointwise )
+            for i in range(len(datas)):
+                if datas[i].I==4: break
+            if (len(datas[i].data) == 1 and datas[i].data[0][0] == 0 ):
+                component = LLNLLegendrePointwise_L0_only( datas[i] )
+                del datas[i]
+            else:
+                component = distributions.Legendre.component( distributions.base.LLNLLegendrePointwiseFormToken )
+                addForm( component, 4, datas, LLNLLegendrePointwise )
         elif( Is == [ 1, 3 ] ) :
             angularComponent = distributions.angular.component( nativeData = distributions.base.pointwiseFormToken )
             addForm( angularComponent, 1, datas, angular )
@@ -494,18 +530,14 @@ def toGND( self, xenslIsotopes = None, verbose = 0, testing = False ) :
         residualExcitationIndexLevels[residualZA] = indexLevels
 
     levelIndex = None
-    if( level is not None ) :
-        levelIndex = residualExcitationIndexLevels[self.ZA][level]
-        metaStableIndex = int( self.name.split( '_m' )[1] )
+    if( level is not None ) : levelIndex = residualExcitationIndexLevels[self.ZA][level]
     target = getTypeName( info, self.ZA, level = level, levelIndex = levelIndex )
 
     reactionSuite = gnd.reactionSuite.reactionSuite( projectile, target, particleList = info.particleList, style = evaluatedStyle )
     info.setReactionSuite( reactionSuite )
     reactionSuite.setAttribute( 'temperature', physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty( I0.getTemperature( ), 'MeV' ) )
     if( self.ZA == 95242 ) :
-        metaStableName = target.getName( ).split( '_' )[0]
-        metaStableName += '_m%d' % 1
-        reactionSuite.addAlias( metaStableName, target.getName( ) )
+        reactionSuite.addNuclearMetaStableAlias( target.getName( ).split( '_' )[0], target.getName( ), 1 )
 
     I20s = []                                           # Some I20 data has bad Q values, so let's ignore all I20 data.
     for i, reactionDatas in enumerate( reactionsDatas ) :
@@ -682,7 +714,7 @@ def toGND( self, xenslIsotopes = None, verbose = 0, testing = False ) :
                                 resName = self.name
                             if( ( level == 0.0 ) and ( levelIndex is None ) ) : level = None
                         if( residuals[0] <= 2004 ) : level, levelIndex = None, None
-                        if( self.name == 'Am242_m1' ) : resName = reactionSuite.aliases[metaStableName]
+                        if( self.name == 'Am242_m1' ) : resName = reactionSuite.aliases[self.name].getValue( )
                         secondParticle = newGNDParticle( info, getTypeName( info, residuals[0], level = level, levelIndex = levelIndex, name = resName ), 
                             decayChannel = decayChannel )
                         addDistributionDataAndRemove( secondParticle, resYo, yosDatas )
@@ -825,7 +857,8 @@ def toGND( self, xenslIsotopes = None, verbose = 0, testing = False ) :
 
         CCounts = len( self.findDatas( C = I0.C, I = 0 ) )
         MT = ENDLCS_To_ENDFMT.getMTFromCS( I0.C, I0.S, CCounts = CCounts )
-        reaction = gnd.reaction.reaction( outputChannel, "%s" % iChannel, ENDF_MT = MT, crossSection = crossSection, URRProbabilityTable = I20 )
+        if( I20 is not None ) : endlmisc.printWarning( 'WARNING: I20 URR data not currently supported.' )
+        reaction = gnd.reaction.reaction( outputChannel, "%s" % iChannel, ENDF_MT = MT, crossSection = crossSection )
 
         temperature = physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty( I0.getTemperature( ), 'MeV' )
         if( temperature != reactionSuite.getAttribute( 'temperature' ) ) : raise Exception( 'temperatures do not match for reaction %s' % `reaction` )

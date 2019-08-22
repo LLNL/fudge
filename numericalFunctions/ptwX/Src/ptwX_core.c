@@ -1,5 +1,30 @@
 /*
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 */
 
@@ -9,6 +34,8 @@
 
 #include "ptwX.h"
 
+static int ptwX_sort_descending( void const *p1, void const *p2 );
+static int ptwX_sort_ascending( void const *p1, void const *p2 );
 /*
 ************************************************************
 */
@@ -19,7 +46,7 @@ ptwXPoints *ptwX_new( int64_t size, nfu_status *status ) {
     *status = nfu_mallocError;
     if( ptwX == NULL ) return( NULL );
     ptwX_setup( ptwX, size );
-    if( ( *status = ptwX->status ) != nfu_Okay ) ptwX = nfu_free( ptwX );
+    if( ( *status = ptwX->status ) != nfu_Okay ) ptwX = (ptwXPoints *) nfu_free( ptwX );
     return( ptwX );
 }
 /*
@@ -79,7 +106,7 @@ ptwXPoints *ptwX_slice( ptwXPoints *ptwX, int64_t index1, int64_t index2, nfu_st
     length = ( index2 - index1 );
     if( ( n = ptwX_new( length, status ) ) == NULL ) return( n );
     *status = n->status;
-    for( j = 0, i = index1; i < index2; i++ ) n->points[j] = ptwX->points[i];
+    for( j = 0, i = index1; i < index2; i++, j++ ) n->points[j] = ptwX->points[i];
     n->length = length;
     return( n );
 }
@@ -92,9 +119,9 @@ nfu_status ptwX_reallocatePoints( ptwXPoints *ptwX, int64_t size, int forceSmall
     if( size < ptwX->length ) size = ptwX->length;
     if( size != ptwX->allocatedSize ) {
         if( size > ptwX->allocatedSize ) {                                         /* Increase size of allocated points. */
-             ptwX->points = nfu_realloc( size * sizeof( double ), ptwX->points ); }
+             ptwX->points = (double *) nfu_realloc( (size_t) size * sizeof( double ), ptwX->points ); }
         else if( ( ptwX->allocatedSize > 2 * size ) || forceSmallerResize ) {      /* Decrease size, if at least 1/2 size reduction or if forced to. */
-            ptwX->points = nfu_realloc( size * sizeof( double ), ptwX->points );
+            ptwX->points = (double *) nfu_realloc( (size_t) size * sizeof( double ), ptwX->points );
         }
         if( ptwX->points == NULL ) {
             ptwX->mallocFailedSize = size;
@@ -112,9 +139,7 @@ nfu_status ptwX_reallocatePoints( ptwXPoints *ptwX, int64_t size, int forceSmall
 nfu_status ptwX_clear( ptwXPoints *ptwX ) {
 
     ptwX->length = 0;
-    if( ptwX->status != nfu_Okay ) return( ptwX->status );
-
-    return( nfu_Okay );
+    return( ptwX->status );
 }
 /*
 ************************************************************
@@ -123,7 +148,7 @@ nfu_status ptwX_release( ptwXPoints *ptwX ) {
 
     ptwX->length = 0;
     ptwX->allocatedSize = 0;
-    ptwX->points = nfu_free( ptwX->points );
+    ptwX->points = (double *) nfu_free( ptwX->points );
 
     return( nfu_Okay );
 }
@@ -162,6 +187,21 @@ nfu_status ptwX_setData( ptwXPoints *ptwX, int64_t length, double *xs ) {
 }
 /*
 ************************************************************
+*/ 
+nfu_status ptwX_deletePoints( ptwXPoints *ptwX, int64_t i1, int64_t i2 ) {
+
+    int64_t n = ptwX->length - ( i2 - i1 );
+
+    if( ptwX->status != nfu_Okay ) return( ptwX->status );
+    if( ( i1 < 0 ) || ( i1 > i2 ) || ( i2 > ptwX->length ) ) return( nfu_badIndex );
+    if( i1 != i2 ) {
+        for( ; i2 < ptwX->length; i1++, i2++ ) ptwX->points[i1] = ptwX->points[i2];
+        ptwX->length = n;
+    }
+    return( ptwX->status );
+}
+/*
+************************************************************
 */
 double *ptwX_getPointAtIndex( ptwXPoints *ptwX, int64_t index ) {
 
@@ -183,7 +223,7 @@ nfu_status ptwX_setPointAtIndex( ptwXPoints *ptwX, int64_t index, double x ) {
 
     nfu_status status;
 
-    if( ptwX->status != nfu_Okay ) return( ptwX->status);
+    if( ptwX->status != nfu_Okay ) return( ptwX->status );
     if( ( index < 0 ) || ( index > ptwX->length ) ) return( nfu_badIndex );
     if( index == ptwX->allocatedSize ) {
         if( ( status = ptwX_reallocatePoints( ptwX, ptwX->allocatedSize + 10, 0 ) ) != nfu_Okay ) return( status );
@@ -195,8 +235,29 @@ nfu_status ptwX_setPointAtIndex( ptwXPoints *ptwX, int64_t index, double x ) {
 /*
 ************************************************************
 */
-int ptwX_ascendingOrder( ptwXPoints *ptwX ) {
+nfu_status ptwX_insertPointsAtIndex( ptwXPoints *ptwX, int64_t index, int64_t n1, double *xs ) {
 
+    nfu_status status;
+    int64_t i1, i2, n1p, size = n1 + ptwX->length;
+
+    if( ptwX->status != nfu_Okay ) return( ptwX->status );
+    if( n1 < 1 ) return( nfu_Okay );
+    if( ( index < 0 ) || ( index > ptwX->length ) ) return( nfu_badIndex );
+    if( size > ptwX->allocatedSize ) {
+        if( ( status = ptwX_reallocatePoints( ptwX, size, 0 ) ) != nfu_Okay ) return( status );
+    }
+    for( i1 = ptwX->length - 1, i2 = size - 1, n1p = ptwX->length - index + 1; n1p > 0; i1--, i2--, n1p-- ) ptwX->points[i2] = ptwX->points[i1];
+    for( i1 = 0, i2 = index; i1 < n1; i1++, i2++ ) ptwX->points[i2] = xs[i1];
+    ptwX->length += n1;
+    return( nfu_Okay );
+}
+/*
+************************************************************
+*/
+int ptwX_ascendingOrder( ptwXPoints *ptwX ) {
+/*
+*    Returns -1 list is descending, 1 if ascending and 0 otherwise (i.e., mixed).
+*/
     int order = 1;
     int64_t i;
     double x1, x2;
@@ -219,4 +280,200 @@ int ptwX_ascendingOrder( ptwXPoints *ptwX ) {
         }
     }
     return( order );
+}
+/*
+************************************************************
+*/
+ptwXPoints *ptwX_fromString( char const *str, char **endCharacter, nfu_status *status ) {
+
+    int64_t numberConverted;
+    double  *doublePtr;
+    ptwXPoints *ptwX = NULL;
+
+    if( ( *status = nfu_stringToListOfDoubles( str, &numberConverted, &doublePtr, endCharacter ) ) != nfu_Okay ) return( NULL );
+    ptwX = ptwX_create( numberConverted, numberConverted, doublePtr, status );
+    nfu_free( doublePtr );
+    return( ptwX );
+}
+/*
+************************************************************
+*/
+nfu_status ptwX_countOccurrences( ptwXPoints *ptwX, double value, int *count ) {
+
+    int64_t i1;
+
+    *count = 0;
+    for( i1 = 0; i1 < ptwX->length; i1++ ) {
+        if( ptwX->points[i1] == value ) (*count)++;
+    }
+    return( nfu_Okay );
+}
+/*
+************************************************************
+*/
+nfu_status ptwX_reverse( ptwXPoints *ptwX ) {
+
+    int64_t i1, i2 = ptwX->length - 1, n1 = ptwX->length / 2;
+    double tmp;
+
+    for( i1 = 0; i1 < n1; i1++, i2-- ) {
+        tmp = ptwX->points[i1];
+        ptwX->points[i1] = ptwX->points[i2];
+        ptwX->points[i2] = tmp;
+    }
+    return( nfu_Okay );
+}
+/*
+************************************************************
+*/
+nfu_status ptwX_sort( ptwXPoints *ptwX, enum ptwX_sort_order order ) {
+
+    int (*cmp)( void const *, void const * ) = ptwX_sort_descending;
+
+    if( order == ptwX_sort_order_ascending ) cmp = ptwX_sort_ascending;
+    qsort( ptwX->points, (size_t) ptwX->length, sizeof( ptwX->points[0] ), cmp );
+    return( nfu_Okay );
+}
+/*
+************************************************************
+*/
+static int ptwX_sort_descending( void const *p1, void const *p2 ) { return( -ptwX_sort_ascending( p1, p2 ) ); }
+static int ptwX_sort_ascending( void const *p1, void const *p2 ) {
+
+    double *d1 = (double *) p1, *d2 = (double *) p2;
+
+    if( *d1 < *d2 ) return( -1 );
+    if( *d1 == *d2 ) return( 0 );
+    return( 1 );
+}
+/*
+************************************************************
+*/
+nfu_status ptwX_closesDifference( ptwXPoints *ptwX, double value, int64_t *index, double *difference ) {
+
+    return( ptwX_closesDifferenceInRange( ptwX, 0, ptwX->length, value, index, difference ) );
+}
+/*
+************************************************************
+*/
+nfu_status ptwX_closesDifferenceInRange( ptwXPoints *ptwX, int64_t i1, int64_t i2, double value, int64_t *index, double *difference ) {
+/*
+*   Finds the closes datum to value. If *difference is zero, datum is same as value.
+*/
+    double d1;
+
+    *index = -1;
+    *difference = -1;
+    if( ptwX->status != nfu_Okay ) return( ptwX->status );
+    if( i1 < 0 ) i1 = 0;
+    if( i2 > ptwX->length ) i2 = ptwX->length;
+    if( i1 >= i2 ) return( nfu_Okay );
+    *index = i1;
+    *difference = value - ptwX->points[i1];
+    for( i1++; i1 < i2; i1++ ) {
+        d1 = value - ptwX->points[i1];
+        if( fabs( *difference ) > fabs( d1 ) ) {
+            *index = i1;
+            *difference = d1;
+        }
+    }
+    return( nfu_Okay );
+}
+/*
+************************************************************
+*/
+ptwXPoints *ptwX_unique( ptwXPoints *ptwX, int order, nfu_status *status ) {
+/*
+*   If order < 0 order is descending, if order > 0 order is ascending, otherwise, order is the same as ptwX.
+*/
+    int64_t i1, i2, n1 = 0;
+    double x1, *p2;
+    ptwXPoints *ptwX2 = NULL;
+
+    if( order == 0 ) {
+        if( ( ptwX2 = ptwX_new( ptwX->length, status ) ) == NULL ) return( NULL );
+        for( i1 = 0; i1 < ptwX->length; i1++ ) {
+            x1 = ptwX->points[i1];
+            for( i2 = 0, p2 = ptwX2->points; i2 < ptwX2->length; i2++, p2++ ) {
+                if( *p2 == x1 ) break;
+            }
+            if( i2 == ptwX2->length ) {
+                ptwX2->points[ptwX2->length] = x1;
+                ptwX2->length++;
+            }
+        } }
+    else {
+        if( ( ptwX2 = ptwX_clone( ptwX, status ) ) == NULL ) return( NULL );
+        if( ( *status = ptwX_sort( ptwX2, ptwX_sort_order_ascending ) ) != nfu_Okay ) goto err;
+
+        if( ptwX2->length > 1 ) {
+            x1 = ptwX2->points[n1];
+            n1++;
+            for( i1 = 1; i1 < ptwX2->length; i1++ ) {
+                if( x1 != ptwX2->points[i1] ) {
+                    x1 = ptwX2->points[i1];
+                    ptwX2->points[n1] = x1;
+                    n1++;
+                }
+            }
+            ptwX2->length = n1;
+            if( order < 0 ) {
+                if( ( *status = ptwX_sort( ptwX2, ptwX_sort_order_descending ) ) != nfu_Okay ) goto err;
+            }
+        }
+    }
+    return( ptwX2 );
+
+err:
+    if( ptwX2 != NULL ) ptwX_free( ptwX2 );
+    return( NULL );
+}
+/*
+************************************************************
+*/
+nfu_status ptwX_abs( ptwXPoints *ptwX ) {
+
+    int64_t i1;
+    double *p1;
+
+    if( ptwX->status != nfu_Okay ) return( ptwX->status );
+    for( i1 = 0, p1 = ptwX->points; i1 < ptwX->length; i1++, p1++ ) *p1 = fabs( *p1 );
+    return( nfu_Okay );
+}
+/*
+************************************************************
+*/
+nfu_status ptwX_neg( ptwXPoints *ptwX ) {
+
+    int64_t i1;
+    double *p1;
+
+    if( ptwX->status != nfu_Okay ) return( ptwX->status );
+    for( i1 = 0, p1 = ptwX->points; i1 < ptwX->length; i1++, p1++ ) *p1 *= -1.;
+    return( nfu_Okay );
+}
+/*
+************************************************************
+*/
+nfu_status ptwX_compare( ptwXPoints *ptwX1, ptwXPoints *ptwX2, int *comparison ) {
+
+    int64_t i1, n1 = ptwX1->length, n2 = ptwX2->length, nn = n1;
+    double *p1 = ptwX1->points, *p2 = ptwX2->points;
+
+    *comparison = 0;
+    if( ptwX1->status != nfu_Okay ) return( ptwX1->status );
+    if( ptwX2->status != nfu_Okay ) return( ptwX2->status );
+    if( nn > n2 ) nn = n2;
+    for( i1 = 0; i1 < nn; i1++, p1++, p2++ ) {
+        if( *p1 == *p2 ) continue;
+        *comparison = 1;
+        if( *p1 < *p2 ) *comparison = -1;
+        return( nfu_Okay );
+    }
+    if( n1 < n2 ) {
+        *comparison = -1; }
+    else if( n1 > n2 ) {
+        *comparison = 1;
+    }
+    return( nfu_Okay );
 }

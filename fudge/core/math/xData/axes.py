@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 import string
@@ -138,7 +163,7 @@ class axesBase( ancestry ) :
     def __str__( self ) :
 
         l = [ str( axis ) for axis in self ]
-        return( '\n'.join( l ) + '\n' )
+        return( '\n'.join( l ) )
 
     def checkDimension( self, dimension ) :
 
@@ -163,34 +188,29 @@ class axis( ancestry ) :
 
     moniker = 'axis'
 
-    def __init__( self, label, index, unit, frame = None, interpolation = None, parent = None ) :
+    def __init__( self, label, index, unit, interpolation = None, parent = None ) :
         "Returns a new instance of axis. Some checking of the input parameters is done."
 
-        if( type( label ) != type( '' ) ) : raise Exception( 'label = "%s" is not a string' % `label` )
-        if( type( index ) != type( 0 ) ) : raise Exception( 'index = "%s" is not an interger' % `index` )
-        if( type( unit ) != type( '' ) ) : raise Exception( 'unit = "%s" is not a string' % `unit` )
-        if( frame is not None ) :
-            if( frame not in allowedFrames ) : raise Exception( 'Invalid frame = "%s" for label = "%s"' % ( frame, label ) )
+        if( type( label ) != type( '' ) ) : raise Exception( 'label = "%s" is not a string' % label )
+        if( type( index ) != type( 0 ) ) : raise Exception( 'index = "%s" is not an interger' % index )
         ancestry.__init__( self, self.moniker, parent, attribute = 'label' )
 
+        self.setUnit( unit )
         self.label = label.strip( )
         self.index = index
-        self.unit = unit.strip( )
-        self.frame = frame
         self.setInterpolation( interpolation )
 
     def __str__( self ) :
 
-        frameStr, interpolationStr = '', ''
-        if( self.frame is not None ) : frameStr = ', frame="%s"' % self.frame
+        interpolationStr = ''
         if( self.interpolation is not None ) : interpolationStr = ', interpolation="%s"' % self.interpolation
-        return( 'label="%s", index="%s", unit="%s"%s%s' % ( self.label, self.index, self.unit, interpolationStr, frameStr ) )
+        return( 'label="%s", index="%s", unit="%s"%s' % ( self.label, self.index, self.unit, interpolationStr ) )
 
     def copy( self, index = None,  parent = None, standAlone = True ) :  # The standAlone agrument is not used, for compatibility with interpolationAxis.copy.
         "Returns a new instance that is a copy of self."
 
         if( index is None ) : index = self.index
-        return( axis( self.label, index, self.unit, frame = self.frame, interpolation = self.interpolation, parent = parent ) )
+        return( axis( self.label, index, self.unit, interpolation = self.interpolation, parent = parent ) )
 
     def getLabel( self ) :
 
@@ -199,10 +219,6 @@ class axis( ancestry ) :
     def getUnit( self ) :
 
         return( self.unit )
-
-    def getFrame( self ) :
-
-        return( self.frame )
 
     def isLinear( self, qualifierOk = False, flatIsOk = False ) :
 
@@ -229,12 +245,18 @@ class axis( ancestry ) :
             interpolation = interpolation.copy( )
         self.interpolation = interpolation
 
+    def setUnit( self, unit ) :
+        "Sets self's unit. Only checks that unit is a string. If unit is None, it is set to an empty string (i.e., '')."
+
+        if( unit is None ) : unit = ''
+        if( type( unit ) != str ) : raise Exception( 'unit type "%s" is not a string' % type( unit ) )
+        self.unit = unit.strip( )
+
     def toXML( self, indent = '' ) :
 
-        interpolationStr, frameStr = '', ''
+        interpolationStr = ''
         if( self.interpolation is not None ) : interpolationStr = ' interpolation="%s"' % self.interpolation
-        if( self.frame is not None ) : frameStr = ' frame="%s"' % self.frame
-        return( '%s<axis index="%d" label="%s" unit="%s"%s%s/>' % ( indent, self.index, self.label, self.unit, interpolationStr, frameStr ) )
+        return( '%s<axis index="%d" label="%s" unit="%s"%s/>' % ( indent, self.index, self.label, self.unit, interpolationStr ) )
 
     def unitConversionFactor( self, newUnit ) :
         "Returns as a float the factor needed to convert self's unit to newUnit. If units are not compatible, a raise is executed."
@@ -292,6 +314,7 @@ class referenceAxes( axesBase ) :
 
     def __getitem__( self, index ) :
 
+        if( index < 0 ) : return( self.parent.axes[index] )
         return( self.parent.axes[self.parent.axes.dimension - self.dimension + index] )
 
     def checkDimension( self, dimension ) :
@@ -461,21 +484,23 @@ def defaultAxes( dimension = 2, independentInterpolation = linearToken, dependen
         axes_[i] = axis( label, i, unit, interpolation = interpolation )
     return( axes_ )
 
-def parseXMLNode( axesElement ):
+def parseXMLNode( axesElement, xPath=[] ):
     """Starting with '<axes>' or '<interpolationAxes>' element in xml-formatted GND document, read in axes information."""
 
+    xPath.append( axesElement.tag )
     if( axesElement.tag == axes.moniker ) :
         ax = axes( dimension = len( axesElement ) )
         for axisElement in axesElement :
             interp = axisElement.get("interpolation")
             if interp is not None: interp = interpolationXY.stringToInterpolationXY( interp )
             ax.axes.append( axis( axisElement.get("label"), int(axisElement.get("index")),
-                axisElement.get("unit"), axisElement.get("frame"), interp, parent=ax) )
+                axisElement.get("unit"), interp, parent=ax) )
     elif( axesElement.tag == interpolationAxes.moniker ) :
         interp = interpolationXY.stringToInterpolationXY( axesElement.get("interpolation") )
         ax = interpolationAxes( int(axesElement.get("index")), interp, parent=None )
     else :
         raise Exception( 'Invalid axes type = %s' % ( axesElement.tag ) )
+    xPath.pop()
     return ax
 
 if( __name__ == "__main__" ) :

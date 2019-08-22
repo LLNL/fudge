@@ -1,18 +1,42 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
-""" base classes for distributions """
+"""Base classes for distributions."""
 
 import math
 
 from fudge.core.ancestry import ancestry
-from fudge.core.math import *   #math classes, fudgemath, fudge2dGrouping
 from fudge.legacy.converting import endfFormats
 from fudge.core.utilities import fudgeZA
+from fudge.core.math.xData import axes
 import fudge
 from fudge.processing import processingInfo
 from fudge.processing.montecarlo import fudge2dEqualProbableBinning
-from fudge.processing.deterministic import transferMatrices
 import miscellaneous
 
 __metaclass__ = type
@@ -54,9 +78,6 @@ recoilFormToken = 'recoil'
 groupedFormToken = 'grouped'
 LegendrePointwiseFormToken = 'LegendrePointwise'
 LegendrePiecewiseFormToken = 'LegendrePiecewise'
-LegendrePiecewise_NuclearFormToken = 'LegendrePiecewise_Nuclear'
-LegendrePiecewise_CoulombInterferenceRealFormToken = 'LegendrePiecewise_CoulombInterferenceReal'
-LegendrePiecewise_CoulombInterferenceImaginaryFormToken = 'LegendrePiecewise_CoulombInterferenceImaginary'
 LLNLLegendrePointwiseFormToken = 'LLNLLegendrePointwise'
 NBodyPhaseSpaceFormToken = 'NBodyPhaseSpace'
 generalEvaporationFormToken = 'generalEvaporation'
@@ -90,6 +111,13 @@ class distribution( ancestry ) :
         self.components[component.moniker] = component
         component.setParent( self )
 
+    def checkProductFrame( self ) :
+        """
+        Calls checkProductFrame for each form. See base.for.checkProductFrame for more information.
+        """
+
+        for component in self.components : self.components[component].checkProductFrame( )
+
     def getComponentNames( self ) :
         """Returns a list of the name of each component currently in self."""
 
@@ -97,17 +125,28 @@ class distribution( ancestry ) :
 
     def getNativeData( self ) :
 
+        if( isinstance( self.components[self.nativeData], fudge.gnd.productData.distributions.uncorrelated.component ) ) : return( self.components[self.nativeData] )
         return( self.components[self.nativeData].getNativeData( ) )
 
     def getNativeDataToken( self ) :
 
         return( self.nativeData )
 
+    def getSpectrumAtEnergy( self, energy ) :
+        """Returns the energy spectrum for self at projectile energy using nativeData."""
+
+        return( self.getNativeData( ).getSpectrumAtEnergy( energy ) )
+
     def calculateDepositionData( self, processInfo, tempInfo, name = None ) :
 
         if( name is None ) : name = self.nativeData
         if( name == noneFormToken ) : return( [] )
         return( self.components[name].calculateDepositionData( processInfo, tempInfo ) )
+
+    def hasData( self ) :
+        """Returns False if self's nativeData is noneComponentToken or unknownComponentToken; otherwise, returns True."""
+
+        return( self.getNativeDataToken( ) not in [ noneComponentToken, unknownComponentToken ] )
 
     def process( self, processInfo, tempInfo, verbosityIndent, addToDistribution = True ) :
 
@@ -124,26 +163,13 @@ class distribution( ancestry ) :
 
         self.nativeData = nativeData
 
-    def getGropuedChiAndDepEnergyAtLowestE( self, groupBoundaries ) :
-        """This is a special routine to handle delayed fission neutrons for LLNL_SnCOut."""
-
-        try :
-            return( self.components[LegendreComponentToken].getGropuedChiAndDepEnergyAtLowestE( groupBoundaries ) )
-        except :
-            return( None )
-
-    def toLLNLSnCOut( self, toOtherData, moreOtherData, name, addToFissionMatrix ) :
-
-        self.components[LegendreComponentToken].toLLNLSnCOut( toOtherData, moreOtherData, name, addToFissionMatrix )
-        self.components[LegendreEnergyConservationComponentToken].toLLNLSnCOut( toOtherData, moreOtherData, name )
-
     def addAttributesToGNDString( self ) :
 
         return( '' )
 
-    def toPointwiseLinear( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
+    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
-        return( self.components[self.nativeData].toPointwiseLinear( accuracy, lowerEps, upperEps ) )
+        return( self.components[self.nativeData].toPointwise_withLinearXYs( accuracy, lowerEps, upperEps ) )
 
     def toXMLList( self, indent = '' ) :
 
@@ -200,6 +226,13 @@ class component( ancestry ) :
         form.component = self.moniker
         form.setParent( self )
 
+    def checkProductFrame( self ) :
+        """
+        Calls checkProductFrame for each form. See base.for.checkProductFrame for more information.
+        """
+
+        for form in self.forms : self.forms[form].checkProductFrame( )
+
     def getFormNames( self ) :
         """Returns a list of the name of each form currently in self."""
 
@@ -213,6 +246,11 @@ class component( ancestry ) :
 
         return( self.nativeData )
 
+    def getProductFrame( self ) :
+        "Returns the product frame of the native data from."
+
+        return( self.forms[self.nativeData].getProductFrame( ) )
+
     def calculateDepositionData( self, processInfo, tempInfo ) :
 
         raise Exception( '"calculateDepositionData" not implemented for component = "%s"' % self.moniker )
@@ -221,9 +259,9 @@ class component( ancestry ) :
 
         raise Exception( '"process" not implemented for component = "%s"' % self.moniker )
 
-    def toPointwiseLinear( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
+    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
-        return( self.forms[self.nativeData].toPointwiseLinear( accuracy, lowerEps, upperEps ) )
+        return( self.forms[self.nativeData].toPointwise_withLinearXYs( accuracy, lowerEps, upperEps ) )
 
     def toXMLList( self, indent = '' ) :
 
@@ -234,19 +272,51 @@ class component( ancestry ) :
 
 class form( ancestry ) :
 
-    def __init__( self, moniker ) :
+    def __init__( self, moniker, productFrame ) :
 
         ancestry.__init__( self, moniker, None )
+        self.productFrame = productFrame
+
+    def checkProductFrame( self ) :
+        """
+        Checks that self has a productFrame attribute (raises AttributeError if not) and that its value is valid
+        (raises a ValueError if not). If there is no raise, None is returned.
+        """
+
+        if( hasattr( self, 'productFrame' ) ) :
+            if( self.getProductFrame( ) in axes.allowedFrames ) : return
+            raise ValueError( 'invalid productFrame = "%s" for "%s"' % ( self.getProductFrame( ), self.getName( ) ) )
+        raise AttributeError( 'instance "%s" does not have a productFrame attribute' % self.getName( ) )
+
+    def getSpectrumAtEnergy( self, energy ) :
+        """Default methods for all forms that have not implemented this. Executes a raise."""
+
+        raise Exception( 'getSpectrumAtEnergy is not implemented for form "%s" of component "%s"' % ( self.moniker, self.component ) )
+
+    def getProductFrame( self ) :
+
+        return( self.productFrame )
 
     def getName( self ) :
 
         return( self.moniker )
 
+    def XMLStartTagString( self, indent = '', extraAttributesAsStrings = '', emptyTag = False ) :
+
+        xDataStr = ''
+        if( hasattr( self, 'xData' ) ) : xDataStr = ' xData="%s"' % self.xData
+        productFrameStr = ''
+        if( self.productFrame is not None ) : productFrameStr = ' productFrame="%s"' % self.productFrame
+        emptyTagStr = ''
+        if( emptyTag ) : emptyTagStr = '/'
+        if( len( extraAttributesAsStrings ) > 0 ) : extraAttributesAsStrings = ' ' + extraAttributesAsStrings
+        return( '%s<%s%s%s%s%s>' % ( indent, self.moniker, xDataStr, productFrameStr, extraAttributesAsStrings, emptyTagStr ) )
+
 class distributionFormWithRegions( form ) :
 
-    def __init__( self, name ) :
+    def __init__( self, name, productFrame ) :
 
-        form.__init__( self, name )
+        form.__init__( self, name, productFrame )
         self.data = []
 
     def __len__( self ) :
@@ -274,9 +344,9 @@ class distributionFormWithRegions( form ) :
 
 class equalProbableBinsFormBase( form ) :
 
-    def __init__( self ) :
+    def __init__( self, productFrame ) :
 
-        form.__init__( self, equalProbableBinsFormToken )
+        form.__init__( self, equalProbableBinsFormToken, productFrame )
         self.numberOfBins = len( data[0][1] ) - 1
 
     def toXMLList( self, indent = "" ) :
@@ -287,7 +357,7 @@ class equalProbableBinsFormBase( form ) :
         xmlString += self.axes.toXMLList( indent = indent2 )
         for indexE, energyMu in enumerate( self.data ) :
             energy, mu = energyMu
-            muString = endl1dmathmisc.list1dToXMLEqualProbableBins1dString( mu )
+            muString = list1dToXMLEqualProbableBins1dString( mu )
             xmlString.append( '%s<energy value="%s" index="%d">%s</energy>' % ( indent2, fudge.gnd.miscellaneous.floatToString( energy ), indexE, muString ) )
         xmlString[-1] += '</equalProbableBins2d></%s>' % self.moniker
         return( xmlString )
@@ -312,18 +382,18 @@ class referenceComponent( component ) :
 
         return( self.referenceInstance.process( processInfo, tempInfo, verbosityIndent, addToDistribution = False ) )
 
-    def toPointwiseLinear( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
+    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
-        return( self.referenceInstance.toPointwiseLinear( accuracy, lowerEps, upperEps ) )
+        return( self.referenceInstance.toPointwise_withLinearXYs( accuracy, lowerEps, upperEps ) )
 
     def toXMLList( self, indent = "" ) :
 
         return( [ '%s<%s xlink:type="simple" xlink:href="%s"/>' % ( indent, self.moniker, self.referenceInstance.toXLink( ) ) ] )
 
     @staticmethod
-    def parseXMLNode( referenceElement, linkData={} ):
+    def parseXMLNode( element, xPath=[], linkData={} ):
         from fudge.gnd import link
-        xlink = link.parseXMLNode( referenceElement ).path
+        xlink = link.parseXMLNode( element ).path
         ref = referenceComponent( None )
         if 'unresolvedLinks' in linkData: linkData['unresolvedLinks'].append((xlink, ref))
         return ref
@@ -336,18 +406,27 @@ class unknownComponent( component ) :
         component.__init__( self, unknownComponentToken, noneFormToken )
 
     @staticmethod
-    def parseXMLNode( element, linkData={} ): return unknownComponent()
+    def parseXMLNode( element, xPath=[], linkData={} ): return unknownComponent()
 
     def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
 
         from fudge.legacy.converting import gndToENDF6
-        from fudge.core.math.xData import axes
         gndToENDF6.toENDF6_MF6( MT, endfMFList, flags, targetInfo, 0, axes.labToken, [] )
 
-def parseXMLNode( distributionsElement, linkData={} ):
+def list1dToXMLEqualProbableBins1dString( data, indent = '', floatFormat = '%16.9e' ) :
+    """This is probably not correct for latest format but has not been used (or tested) either."""
+
+    s = [ '<xData type="1d.x" length="%d">' % len( data ) ]
+    s += [ ' %s' % ( floatFormat % x ) for x in data ]
+    s.append( '</xData>' )
+    return( ''.join( s ) )
+
+def parseXMLNode( element, xPath=[], linkData={} ):
     """Translate a <distributions> element from xml."""
-    dist = distribution( distributionsElement.get('nativeData') )
-    for component in distributionsElement:
+
+    xPath.append( element.tag )
+    dist = distribution( element.get('nativeData') )
+    for component in element:
         parserClass = {
                 angularComponentToken:          fudge.gnd.productData.distributions.angular,
                 energyComponentToken:           fudge.gnd.productData.distributions.energy,
@@ -365,9 +444,7 @@ def parseXMLNode( distributionsElement, linkData={} ):
                 }.get(component.tag)
         if parserClass is None:
             raise Exception(" can't handle %s distributions yet" % component.tag)
-        try:
-            newComponent = parserClass.parseXMLNode( component, linkData )
-        except Exception as e:
-            raise Exception, "%s%s" % (dist.toXLink(), e)
+        newComponent = parserClass.parseXMLNode( component, xPath, linkData )
         dist.addComponent( newComponent )
+    xPath.pop()
     return dist

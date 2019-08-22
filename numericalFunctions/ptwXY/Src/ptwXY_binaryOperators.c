@@ -1,5 +1,30 @@
 /*
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 */
 
@@ -103,7 +128,7 @@ static double ptwXY_mod2( double v, double m, int pythonMod ) {
 ptwXYPoints *ptwXY_binary_ptwXY( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, double v1, double v2, double v1v2, nfu_status *status ) {
 
     int64_t i;
-    int unionOptions = ptwXY_union_fill;
+    int unionOptions = ptwXY_union_fill | ptwXY_union_mergeClosePoints;
     double y;
     ptwXYPoints *n;
     ptwXYPoint *p;
@@ -263,7 +288,7 @@ static nfu_status ptwXY_mul2_s_ptwXY( ptwXYPoints *n, ptwXYPoints *ptwXY1, ptwXY
     if( ( a1 == 0. ) || ( a2 == 0. ) ) {                    /* Handle special case of 0 where accuracy can never be met. */
         x = 0.5 * ( x1 + x2 ); }
     else {
-        if( ( a1 * a2 < 0. ) ) return( nfu_Okay );  /* Assume rounding error and no point needed. */
+        if( ( a1 * a2 < 0. ) ) return( nfu_Okay );  /* Assume rounding error and no point needed as zero crossings are set in ptwXY_mul2_ptwXY. */
         a1 = sqrt( fabs( a1 ) );
         a2 = sqrt( fabs( a2 ) );
         x = ( a2 * x1 + a1 * x2 ) / ( a2 + a1 );
@@ -297,7 +322,7 @@ ptwXYPoints *ptwXY_div_ptwXY( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_stat
         return( ptwXY_div_ptwXY_forFlats( ptwXY1, ptwXY2, status, safeDivide ) );
     
     if( ( *status = ptwXY_areDomainsMutual( ptwXY1, ptwXY2 ) ) != nfu_Okay ) return( NULL );
-    if( ( n = ptwXY_union( ptwXY1, ptwXY2, status, ptwXY_union_fill ) ) != NULL ) {
+    if( ( n = ptwXY_union( ptwXY1, ptwXY2, status, ptwXY_union_fill | ptwXY_union_mergeClosePoints ) ) != NULL ) {
         for( i = 0, p = n->points; i < n->length; i++, p++ ) {
             if( ( *status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY2, p->x, &y ) ) != nfu_Okay ) goto Err;
             if( y == 0. ) {
@@ -482,7 +507,7 @@ static ptwXYPoints *ptwXY_div_ptwXY_forFlats( ptwXYPoints *ptwXY1, ptwXYPoints *
     *status = nfu_invalidInterpolation;
     if( ptwXY1->interpolation != ptwXY_interpolationFlat ) return( NULL );
     if( ptwXY2->interpolation != ptwXY_interpolationFlat ) return( NULL );
-    if( ( n = ptwXY_union( ptwXY1, ptwXY2, status, ptwXY_union_fill ) ) != NULL ) {
+    if( ( n = ptwXY_union( ptwXY1, ptwXY2, status, ptwXY_union_fill | ptwXY_union_mergeClosePoints ) ) != NULL ) {
         for( i = 0, p = n->points; i < n->length; i++, p++ ) {
             if( ( *status = ptwXY_getValueAtX_ignore_XOutsideDomainError( ptwXY2, p->x, &y ) ) != nfu_Okay ) goto Err;
             if( y == 0. ) {

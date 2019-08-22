@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -84,7 +109,15 @@ class fudge2dMultiPlotClass( Tkinter.Frame ) :
         menubar.insert_cascade( 0, label = "Data", menu = dataMenu )
 
         fileMenu = Tkinter.Menu( menubar, tearoff = 0 )
-        fileMenu.add_command( label = "SaveAs eps", command = self.plotSaveAsEps )
+
+        savePlotAs = Tkinter.Menu( fileMenu, tearoff = 0 )
+        savePlotAs.add_command( label = "pdf", command = self.plotSaveAsPDF )
+        savePlotAs.add_command( label = "png", command = self.plotSaveAsPNG )
+        savePlotAs.add_command( label = "svg", command = self.plotSaveAsSVG )
+        savePlotAs.add_command( label = "eps", command = self.plotSaveAsEps )
+        fileMenu.add_cascade( label = "Save plot as", menu = savePlotAs )
+
+
         fileMenu.add_command( label = "Print", command = self.plotPrint )
         fileMenu.add_separator( )
         fileMenu.add_command( label = "Exit", command = rootWindow.quit )
@@ -163,12 +196,12 @@ class fudge2dMultiPlotClass( Tkinter.Frame ) :
 
         def xrange_Callback( self, e ) :
             """Called when the <Return> key is pressed in the xrange entry window."""
-            s = "set xrange [ %s ]" % self.xrange.get( )
+            s = "set xrange [ %s ] noreverse" % self.xrange.get( )
             self.replot( s )
 
         self.xrange = Tkinter.Entry( self.frame )
         RangeStr = "%s : %s" % ( self.options["xMin"], self.options["xMax"] )
-        self.g( "set xrange [ %s ]" % RangeStr )
+        self.g( "set xrange [ %s ] noreverse" % RangeStr )
         self.xrange.insert( 0, RangeStr )
         self.xrange.grid( row = Row, column = 1, columnspan = 2, sticky = Tkinter.W + Tkinter.E )
         self.xrange.bind( "<Return>", lambda e, self = self : xrange_Callback( self, e ) )
@@ -182,12 +215,12 @@ class fudge2dMultiPlotClass( Tkinter.Frame ) :
 
         def yrange_Callback( self, e ) :
             """Called when the <Return> key is pressed in the yrange entry window."""
-            s = "set yrange [ %s ]" % self.yrange.get( )
+            s = "set yrange [ %s ] noreverse" % self.yrange.get( )
             self.replot( s )
 
         self.yrange = Tkinter.Entry( self.frame )
         RangeStr = "%s : %s" % ( self.options["yMin"], self.options["yMax"] )
-        self.g( "set yrange [ %s ]" % RangeStr )
+        self.g( "set yrange [ %s ] noreverse" % RangeStr )
         self.yrange.insert( 0, RangeStr )
         self.yrange.grid( row = Row, column = 1, columnspan = 2, sticky = Tkinter.W + Tkinter.E )
         self.yrange.bind( "<Return>", lambda e, self = self : yrange_Callback( self, e ) )
@@ -213,8 +246,6 @@ class fudge2dMultiPlotClass( Tkinter.Frame ) :
             self.gnuplotCommandComboBox['history'] = True
             self.gnuplotCommandComboBox['state'] = 'normal'
             self.gnuplotCommandComboBox.entry['state'] = 'normal'
-#            for k in self.gnuplotCommandComboBox.keys( ) : print "%-20s %s" % ( k, self.gnuplotCommandComboBox[k] )
-#            for k in self.gnuplotCommandComboBox.entry.keys( ) : print "%-20s %s" % ( k, self.gnuplotCommandComboBox.entry[k] )
         except TclError: pass
 
     def redraw( self ) :
@@ -233,29 +264,22 @@ class fudge2dMultiPlotClass( Tkinter.Frame ) :
         self.lastTitle = plotTitle
         self.rootWindow.title( dialogTitle )
 
-        self.g( "set nokey" )
         legendBox = "no"
-        if( self.legendOnVar.get( ) ) : self.g( "set key %sbox" % ( legendBox ) )
-#        if( self.legendOnVar.get( ) ) : self.g( "set key %sbox right top at graph %e, %e" % ( legendBox, self.legendX.get( ), self.legendY.get( ) ) )
-
         if( not gnuplot_old ) :
-            if( self.legendBoxVar.get( ) ) : legendBox = ""
-#           self.g( "set tics scale %e" % self.ticsVar.get( ) )
-            fs_ = self.fontSizeVar.get( )
-            fs = max( 8, min( fs_, 72 ) )
-            self.g( 'set ylabel "%s" font "times,%d"' % ( self.yAxisVar.get( ), fs ) )
-            self.g( 'set terminal X11 font "times,%d"' % fs )
+           if( self.legendBoxVar.get( ) ) : legendBox = ""
+           self.g( "set tics scale %e" % self.ticsVar.get( ) )
+           fs_ = self.fontSizeVar.get( )
+           fs = max( 8, min( fs_, 72 ) )
+           self.g( 'set terminal X11 font "times,%d"' % fs )
+
+        self.g( "set nokey" )
+        if( self.legendOnVar.get( ) ) : self.g( "set key %sbox right top at graph %e, %e" % ( legendBox, self.legendX.get( ), self.legendY.get( ) ) )
 
         self.g( 'set xlabel "%s"' % self.xAxisVar.get( ) )
         self.g( 'set ylabel "%s"' % self.yAxisVar.get( ) )
         self.g( "set nologscale xy" )
-        xlog = self.xlogVar.get( )
-        ylog = self.ylogVar.get( )
-        if ( xlog or ylog ) :
-            s = "set logscale "
-            if ( xlog ) : s = s + "x"
-            if ( ylog ) : s = s + "y"
-            self.g( s )
+        if( self.xlogVar.get( ) ) : self.g( "set logscale x" )
+        if( self.ylogVar.get( ) ) : self.g( "set logscale y" )
 
         activeCurves = self.plotItemEditting.getActiveCurves( )
         if( extraGnuplotCommand != None ) : self.g( extraGnuplotCommand )
@@ -278,27 +302,49 @@ class fudge2dMultiPlotClass( Tkinter.Frame ) :
         fileName, title, columns = fudgeNdMultiPlotMisc.fudgeNdMultiPlotFileRead( self.rootWindow, 2 )
         if( columns != None ) : self.add2dFile( fileName, title, xColumn = columns[0], yColumn = columns[1] )
 
+    def plotSaveAs_terminal( self, terminal, suffix = None, color = True ) :
+        """Called when "File -> SaveAs eps" menu is selected. Uses a FileDialog to get the output 
+        file name and produces an eps file of the current plot."""
+
+        global saveAsCounter
+
+        if( suffix is None ) : suffix = terminal
+        fn = "Fudge%d.%s" % ( saveAsCounter, suffix )
+        FileName = tkFileDialog.asksaveasfilename( initialfile = fn )
+        if( ( type( FileName ) == type( "" ) ) and ( FileName != "" ) ) :
+            if( color ) :
+                self.g.hardcopy( filename = FileName, color = 1, terminal = terminal )
+            else :
+                self.g.hardcopy( filename = FileName, terminal = terminal )
+            saveAsCounter += 1
+
     def plotSaveAsEps( self ) :
         """Called when "File -> SaveAs eps" menu is selected. Uses a FileDialog to get the output 
         file name and produces an eps file of the current plot."""
-        global saveAsCounter
-        fn = "Fudge%d.eps" % saveAsCounter
-        FileName = tkFileDialog.asksaveasfilename( initialfile = fn )
-        if( ( type( FileName ) == type( "" ) ) and ( FileName != "" ) ) :
-            self.g.hardcopy( filename = FileName, color = 1 )
-            saveAsCounter += 1
 
-    def plotSaveAsASCII( self ) :
-        """Currently not implemented."""
-        global saveAsCounter
-        fn = "Fudge%d.asc" % saveAsCounter
-        FileName = tkFileDialog.asksaveasfilename( initialfile = fn )
-        if( ( type( FileName ) == type( "" ) ) and ( FileName != "" ) ) :
-            shutil.copyfile( InputFileName, FileName )
-            saveAsCounter += 1
+        self.plotSaveAs_terminal( 'postscript', suffix = 'ps' )
+
+    def plotSaveAsPDF( self ) :
+        """Called when "File -> SaveAs pdf" menu is selected. Uses a FileDialog to get the output 
+        file name and produces an eps file of the current plot."""
+
+        self.plotSaveAs_terminal( 'pdf' )
+
+    def plotSaveAsPNG( self ) :
+        """Called when "File -> SaveAs png" menu is selected. Uses a FileDialog to get the output 
+        file name and produces an eps file of the current plot."""
+
+        self.plotSaveAs_terminal( 'png', color = False )
+
+    def plotSaveAsSVG( self ) :
+        """Called when "File -> SaveAs svg" menu is selected. Uses a FileDialog to get the output 
+        file name and produces an eps file of the current plot."""
+
+        self.plotSaveAs_terminal( 'svg', color = False )
 
     def plotPrint( self ) :
         """Called when "File -> Print" menu is selected. Prints the current plot."""
+
         self.g.hardcopy( )
 
     def legendCallback( self ) :

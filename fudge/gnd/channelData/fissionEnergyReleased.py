@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 from fudge.gnd import baseClasses
@@ -32,13 +57,16 @@ class component( baseClasses.componentBase ) :
         return warnings
 
     @staticmethod
-    def parseXMLNode( FERelement, linkData={} ):
+    def parseXMLNode( FERelement, xPath=[], linkData={} ):
         """ parse <fissionEnergyReleased> from xml """
+
+        xPath.append( FERelement.tag )
         fer = component()
         fer.nativeData = FERelement.get('nativeData')
         for form in FERelement:
             if form.tag==tokens.polynomialFormToken:
-                fer.addForm( polynomial.parseXMLNode( form, linkData ) )
+                fer.addForm( polynomial.parseXMLNode( form, xPath, linkData ) )
+        xPath.pop()
         return fer
 
     def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
@@ -77,19 +105,23 @@ class polynomial( baseClasses.formBase ) :
         return warnings
 
     @staticmethod
-    def parseXMLNode( polynomialElement, linkData={} ):
+    def parseXMLNode( element, xPath=[], linkData={} ):
         """ translate <polynomial> element from xml """
-        order = int( polynomialElement.get("order") )
+
+        xPath.append( element.tag )
+        order = int( element.get("order") )
         hasUncertainties = False
         dataDict = {}
-        for data in polynomialElement:
+        for data in element:
             coefs = map(float, data.text.split())
             if len(coefs) == (order+1)*2:
                 hasUncertainties=True
                 coefs = zip( coefs[::2], coefs[1::2] )
             assert len(coefs) == order+1
             dataDict[data.tag] = coefs
-        return polynomial( order, dataDict, polynomialElement.get('energyUnit'), hasUncertainties )
+        Poly = polynomial( order, dataDict, element.get('energyUnit'), hasUncertainties )
+        xPath.pop()
+        return Poly
 
     def toXMLList( self, indent = "" ) :
 

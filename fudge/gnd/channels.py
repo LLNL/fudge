@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -71,6 +96,7 @@ manyToken = 'many'
 from fudge.core.utilities import fudgeExceptions, brb
 from fudge.core.ancestry import ancestry
 import channelData
+from pqu.physicalQuantityWithUncertainty import PhysicalQuantityWithUncertainty
 
 class channel( ancestry ) :
     """This is the class for a gnd channel which is a list of particles (i.e., product class objects)."""
@@ -87,6 +113,7 @@ class channel( ancestry ) :
         self.fissionEnergyReleased = None
         self.setQ( Q )
         self.particles = []
+        self._labels = []
 
     def __cmp__( self, other ) :
         """Compares self to other."""
@@ -117,13 +144,31 @@ class channel( ancestry ) :
 
         return( self.toString( simpleString = False ) )
 
-    def addProduct( self, particle ) :
-        """Adds particle to the end of this channel's particle list."""
+    def addProduct( self, product_ ) :
+        """Adds particle to the end of this channel's particle list. Also generates a unique label if not supplied."""
 
+        import product
+
+        if( not( isinstance( product_, product.product ) ) ) :
+            raise Exception( 'Only products (not %s) can be added to a channel!' % type( product_ ) )
         if( ( self.numberOfAllowedParticles != manyToken ) and ( len( self.particles ) >= self.numberOfAllowedParticles ) ) :
             raise fudgeExceptions.FUDGE_Exception( 'Adding more particles than channel allows (=%s)' % self.numberOfAllowedParticles )
-        particle.setParent( self )
-        self.particles.append( particle )
+        if not product_.getLabel() or product_.getLabel() in self._labels:
+            name = product_.getName()
+            index = len([prod for prod in self if prod.getName() == name])
+            if index>0:
+                import string
+                suffixCharacters = string.ascii_lowercase
+                suffix = ''
+                while index>0:
+                    index, index1 = divmod( index-1, 26 )
+                    suffix = suffixCharacters[index1] + suffix
+                product_.label = name+'__'+suffix
+            else:
+                product_.label = name
+        product_.setParent( self )
+        self.particles.append( product_ )
+        self._labels.append( product_.getLabel() )
 
     def addFissionEnergyReleased( self, fissionEnergyReleased ) :
 
@@ -132,6 +177,11 @@ class channel( ancestry ) :
     def removeProductAtIndex( self, index ) :
 
         del self.particles[index]
+
+    def checkProductFrame( self ) :
+        """Calls checkProductFrame for self's products."""
+
+        for product in self : product.checkProductFrame( )
 
     def getFinalProductList( self ) :
         """Returns a list of [ multiplicity, name ] in order for the final products of this channel."""
@@ -191,12 +241,21 @@ class channel( ancestry ) :
         return( not( self.fissionGenre is None ) )
 
     def setQ( self, Q ) :
+        """
+        Sets channel's Q. Q can be None, a string, a PhysicalQuantityWithUncertainty, a Q form or a Q component. 
+        Both string and PhysicalQuantityWithUncertainty must have units of energy.
+        """
 
-        if( not( isinstance( Q, channelData.Q.component ) ) and Q is not None ) :
-            raise Exception( 'Q data of type %s is not supported' % brb.getType( Q ) )
-        self.Q = Q
+        if( Q is None ) :
+            self.Q = Q
+        else :
+            Q_ = Q
+            if( ( type( Q_ ) == str ) or ( isinstance( Q_, PhysicalQuantityWithUncertainty ) ) ) : Q_ = channelData.Q.constant( Q_ )
+            if( not ( isinstance( Q_, channelData.Q.component ) ) ) : Q_ = channelData.Q.component( Q_ )
+            self.Q = Q_
+            self.Q.setParent( self )
 
-    def toXMLList( self, flags, verbosityIndent = '', indent = '' ) :
+    def toXMLList( self, flags, indent = '' ) :
 
         indent2 = indent + '  '
         Qstr = ''
@@ -204,7 +263,7 @@ class channel( ancestry ) :
         xmlString = [ '%s<%s genre="%s"%s>' % ( indent, self.moniker, self.genre, Qstr ) ]
         if( not( self.fissionEnergyReleased is None ) ) : xmlString += self.fissionEnergyReleased.toXMLList( indent = indent2 )
         if self.Q is not None: xmlString += self.Q.toXMLList( indent = indent2 )
-        for particle in self : xmlString += particle.toXMLList( flags, verbosityIndent = verbosityIndent, indent = indent2 )
+        for particle in self : xmlString += particle.toXMLList( flags, indent = indent2 )
         xmlString[-1] += '</%s>' % self.moniker
         return( xmlString )
 
@@ -336,21 +395,24 @@ class sumOfRemainingOutputChannels( channel ) :
         channel.__init__( self, sumOfRemainingOutputChannelsGenre, Q )
 
 class productionChannel( channel ) :
-    """This is a production channel version of the channel class. A production channel is one that contains
-    information about the production of an outgoing particle for various outgoing channels (that is, independent 
-    of the actual outgoing channel). Thus, only a single particle, the production particle, is allowed for this channel."""
+    """
+    This is a production channel version of the channel class. A production channel is one that contains
+    information about the production of outgoing particles for various outgoing channels (that is, independent 
+    of the actual outgoing channel).
+    """
 
     def __init__( self, Q = None ) :
-        """This is the constructor for the productionChannel class. See this class's documentation and
-        the class channel for more information."""
+        """
+        This is the constructor for the productionChannel class. See this class's documentation and
+        the class channel for more information.
+        """
 
-        if Q is None:
-            Q = channelData.Q.component( channelData.Q.notApplicable( ) )
-        channel.__init__( self, productionGenre, Q, numberOfAllowedParticles = 1 )
+        if( Q is None ) : Q = channelData.Q.component( channelData.Q.notApplicable( ) )
+        channel.__init__( self, productionGenre, Q, numberOfAllowedParticles = manyToken )
 
-def parseXMLNode( channelElement, linkData={} ):
+def parseXMLNode( channelElement, xPath=[], linkData={} ):
     """Translate '<outputChannel>' or '<decayChannel>' from xml. """
-    from pqu.physicalQuantityWithUncertainty import PhysicalQuantityWithUncertainty
+    xPath.append( channelElement.tag )
     from fudge import gnd
     Q_str = channelElement.get( channelData.base.QToken )
     if Q_str is not None:
@@ -374,11 +436,9 @@ def parseXMLNode( channelElement, linkData={} ):
     for dat in channelElement:
         if dat.tag==channelData.base.fissionEnergyReleasedToken:
             outputChannel.addFissionEnergyReleased( 
-                    gnd.channelData.fissionEnergyReleased.component.parseXMLNode( dat, linkData ) )
+                    gnd.channelData.fissionEnergyReleased.component.parseXMLNode( dat, xPath, linkData ) )
         elif dat.tag=='product':
-            try:
-                outputChannel.addProduct( gnd.product.parseXMLNode( dat, linkData ) )
-            except Exception as e:
-                raise Exception, '%s%s' % (outputChannel.toXLink(), e)
+            outputChannel.addProduct( gnd.product.parseXMLNode( dat, xPath, linkData ) )
         else: raise ValueError("Parsing %s not yet supported" % dat.tag)
+    xPath.pop()
     return outputChannel

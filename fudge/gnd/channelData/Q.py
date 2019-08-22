@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 from fudge.gnd import baseClasses
@@ -51,33 +76,77 @@ class constant( baseClasses.formBase ) :
     genre = component.genre
     form = tokens.constantFormToken
 
-    def __init__( self, data ) :
+    def __init__( self, Q ) :
+        """
+        Q can be a string, convertible to a PhysicalQuantityWithUncertainty, or a PhysicalQuantityWithUncertainty. The
+        Q must have units of energy.
+        """
 
+        from pqu.physicalQuantityWithUncertainty import PhysicalQuantityWithUncertainty
+        from fudge.core.utilities import brb
+
+        Q_ = Q
+        if( type( Q_ ) == str ) :
+            try :
+                Q_ = PhysicalQuantityWithUncertainty( Q_ )
+            except :
+                raise Exception( "Could not convert '%s' to PhysicalQuantityWithUncertainty" % Q_ )
+        if( isinstance( Q_, component ) ) : Q_ = Q_.getNativeData( )
+        if( isinstance( Q_, constant ) ) : Q_ = Q_.Q
+        if( not( isinstance( Q_, PhysicalQuantityWithUncertainty ) ) ) : raise Exception( "Invalid type for Q: type = '%s'" % brb.getType( Q ) )
+        if( not( Q_.isEnergy( Q_ ) ) ) : raise Exception( "Q must have units of energy, entered Q was '%s'" % Q )
         baseClasses.formBase.__init__( self )
-        self.data = data
+        self.Q = Q_
+
+    def domainMin( self, unitTo = None, asPQU = False ) :
+
+        from fudge.gnd.reactions import reaction
+        return( self.findClassInAncestry( reaction.reaction ).domainMin( unitTo = unitTo, asPQU = asPQU ) )
+
+    def domainMax( self, unitTo = None, asPQU = False ) :
+
+        from fudge.gnd.reactions import reaction
+        return( self.findClassInAncestry( reaction.reaction ).domainMax( unitTo = unitTo, asPQU = asPQU ) )
+
+    def getDomain( self, unitTo = None, asPQU = False ) :
+
+        return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
+
+    def getDomainUnit( self ) :
+
+        from fudge.gnd.reactions import reaction
+        return( self.findClassInAncestry( reaction.reaction ).getDomainUnit( ) )
 
     def getValue( self, E, unit ) :
 
-        return( self.data.getValueAs( unit ) )
+        return( self.Q.getValueAs( unit ) )
 
     def getXMLAttribute( self ) :
 
-        return( self.data )
+        return( self.Q )
 
     def toXMLList( self, indent ) :
 
         return( [] )
+
+    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+        """This method returns the Q-value as linear-linear pointwise data which spans self's domain."""
+
+        axes_ = pointwise.defaultAxes( energyUnit = self.getDomainUnit( ), QUnit = self.Q.getUnitSymbol( ) )
+        return( pointwise( axes_, [ [ self.domainMin( ), self.Q.getValue( ) ], [ self.domainMax( ), self.Q.getValue( ) ] ], 1e-12 ) )
 
 class pointwise( baseClasses.formBase, XYs.XYs ) :
 
     genre = component.genre
     form = tokens.pointwiseFormToken
     tag = tokens.pointwiseFormToken
+    mutableYUnit = False
 
-    def __init__( self, axes, data, accuracy ) :
+    def __init__( self, axes, data, accuracy, **keyWords ) :
 
         baseClasses.formBase.__init__( self )
-        XYs.XYs.__init__( self, axes, data, accuracy, isPrimaryXData = True )
+        keyWords['isPrimaryXData'] = True
+        XYs.XYs.__init__( self, axes, data, accuracy, **keyWords )
         self.toForms = { tokens.groupedFormToken : grouped }
 
     def process( self, processInfo, tempInfo ) :
@@ -98,8 +167,8 @@ class pointwise( baseClasses.formBase, XYs.XYs ) :
     def defaultAxes( energyUnit = 'eV', energyInterpolation = axes.linearToken, QUnit = 'eV', QInterpolation = axes.linearToken ) :
 
         axes_ = axes.axes( )
-        axes_[0] = axes.axis( 'energy_in', 0, energyUnit, frame = axes.labToken, interpolation = axes.interpolationXY( energyInterpolation, QInterpolation ) )
-        axes_[1] = axes.axis( base.QToken, 1, QUnit, frame = axes.labToken )
+        axes_[0] = axes.axis( 'energy_in', 0, energyUnit, interpolation = axes.interpolationXY( energyInterpolation, QInterpolation ) )
+        axes_[1] = axes.axis( base.QToken, 1, QUnit )
         return( axes_ )
 
 class grouped( baseClasses.groupedFormBase ) :
@@ -126,7 +195,7 @@ class notApplicable( baseClasses.formBase ) :
     def __init__( self ) :
 
         baseClasses.formBase.__init__( self )
-        self.data = 'N/A'
+        self.Q = 'N/A'
 
     def getValue( self, E, unit ) :
 
@@ -134,7 +203,7 @@ class notApplicable( baseClasses.formBase ) :
 
     def getXMLAttribute( self ) :
 
-        return( self.data )
+        return( self.Q )
 
     def toXMLList( self, indent ) :
 

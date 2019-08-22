@@ -1,6 +1,7 @@
 Downloading
 ===========
 
-The latest version of Fudge and GND is available either at LLNL's 
-`Green Data Oasis <ftp://gdo-nuclear.ucllnl.org/)>`_ or at the 
+The latest version of Fudge and GND is available from the
 `Fudge and GND GForge page <https://ndclx4.bnl.gov/gf/project/gnd/>`_.
+
+Please `let us know <mailto:mattoon1@llnl.gov>`_ if you have any difficulty accessing the code!

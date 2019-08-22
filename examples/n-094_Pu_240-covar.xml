@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<covarianceSuite projectile="n" target="Pu240" format="gnd version 1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+<covarianceSuite projectile="n" target="Pu240" version="gnd version 1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
   <styles>
     <style name="evaluated" version="7.1.1" library="ENDF/B"></style></styles>
   <section label="0" id="n[multiplicity:'energyDependent', emissionMode:'prompt'] + n[emissionMode:'6 delayed'] + gamma [total fission] [nubar]" nativeData="covarianceMatrix">

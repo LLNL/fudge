@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>math Package &mdash; Fudge and GND 1.2 beta documentation</title>
+    <title>math Package &mdash; Fudge and GND 1.3 beta documentation</title>
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.2 beta',
+        VERSION:     '1.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +25,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
-    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../index.html" />
+    <link rel="top" title="Fudge and GND 1.3 beta documentation" href="../index.html" />
     <link rel="up" title="core Package" href="fudge.core.html" />
     <link rel="next" title="test Package" href="fudge.core.math.test.html" />
     <link rel="prev" title="core Package" href="fudge.core.html" /> 
@@ -47,7 +46,7 @@
         <li class="right" >
           <a href="fudge.core.html" title="core Package"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="index.html" >fudge Package</a> &raquo;</li>
           <li><a href="fudge.core.html" accesskey="U">core Package</a> &raquo;</li> 
       </ul>
@@ -63,1103 +62,29 @@
 <div class="section" id="id1">
 <h2><tt class="xref py py-mod docutils literal"><span class="pre">math</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-fudge.core.math"></span></div>
-<div class="section" id="module-fudge.core.math.endl1dmathClasses">
-<span id="endl1dmathclasses-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">endl1dmathClasses</span></tt> Module<a class="headerlink" href="#module-fudge.core.math.endl1dmathClasses" title="Permalink to this headline">¶</a></h2>
-<p>This module contains the endl1dmath class. Also see the supporting module endl1dmathmisc.py.</p>
-<dl class="class">
-<dt id="fudge.core.math.endl1dmathClasses.endl1dmath">
-<em class="property">class </em><tt class="descclassname">fudge.core.math.endl1dmathClasses.</tt><tt class="descname">endl1dmath</tt><big>(</big><em>data=None</em>, <em>checkDataType=False</em>, <em>yLabel=None</em>, <em>label='unknown'</em>, <em>toFloat=0</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathClasses.html#endl1dmath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathClasses.endl1dmath" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>This class is designed to support operations on a list of numbers (e.g., [ number, number, ..., number ]) that may be useful to scientists.
-A number is an integer or a float.</p>
-<dl class="docutils">
-<dt>Members::</dt>
-<dd>data        | A python list of numbers.
-columns     | This is always 1 as this is 1d data.
-yLabel      | Labelled used as the y-Label when plotting.</dd>
-</dl>
-<p>Some examples are,</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">my1d</span> <span class="o">=</span> <span class="n">endl1dmath</span><span class="p">(</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span> <span class="p">]</span> <span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">my1d</span>
-<span class="go"> 1.0000000e+00</span>
-<span class="go"> 2.0000000e+00</span>
-<span class="go"> 3.0000000e+00</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">new1d</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">my1d</span> <span class="o">+</span> <span class="mf">3.14</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">new1d</span>
-<span class="go"> 5.1400000e+00</span>
-<span class="go"> 7.1400000e+00</span>
-<span class="go"> 9.1400000e+00</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">f1d</span> <span class="o">=</span> <span class="n">new1d</span><span class="o">.</span><span class="n">mapFunction</span><span class="p">(</span> <span class="s">&quot;math.exp(x)&quot;</span> <span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">f1d</span>
-<span class="go"> 1.7071577e+02</span>
-<span class="go"> 1.2614284e+03</span>
-<span class="go"> 9.3207651e+03</span>
-</pre></div>
+<div class="section" id="endl1dmathclasses-module">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">endl1dmathClasses</span></tt> Module<a class="headerlink" href="#endl1dmathclasses-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<dl class="method">
-<dt id="fudge.core.math.endl1dmathClasses.endl1dmath.check">
-<tt class="descname">check</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathClasses.html#endl1dmath.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathClasses.endl1dmath.check" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check that self&#8217;s data is a list of numbers.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl1dmathClasses.endl1dmath.copyData">
-<tt class="descname">copyData</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathClasses.html#endl1dmath.copyData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathClasses.endl1dmath.copyData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl1dmath object that is a copy, and not a reference, of self.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl1dmathClasses.endl1dmath.mapFunction">
-<tt class="descname">mapFunction</tt><big>(</big><em>function</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathClasses.html#endl1dmath.mapFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathClasses.endl1dmath.mapFunction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Maps &#8216;function&#8217; onto every point of self&#8217;s data. &#8216;Function&#8217; must be a string of the form &#8216;f(x)&#8217; where
-f(x) evaluates to a number (e.g. &#8216;math.sin(x)&#8217;). That is, self.data[i] = f( self.data[i] ).  For example, to
-exponentiate the points of instance my1d enter</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">my1d</span><span class="o">.</span><span class="n">mapFunction</span><span class="p">(</span> <span class="s">&#39;exp(x)&#39;</span> <span class="p">)</span>
-</pre></div>
+<div class="section" id="endl1dmathmisc-module">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">endl1dmathmisc</span></tt> Module<a class="headerlink" href="#endl1dmathmisc-module" title="Permalink to this headline">¶</a></h2>
 </div>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl1dmathClasses.endl1dmath.plot">
-<tt class="descname">plot</tt><big>(</big><em>xMin=None</em>, <em>xMax=None</em>, <em>yMin=None</em>, <em>yMax=None</em>, <em>xylog=0</em>, <em>xLabel=None</em>, <em>yLabel=None</em>, <em>title=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathClasses.html#endl1dmath.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathClasses.endl1dmath.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>This routine is like qplot (quick plot) except it spawns an interactive plot.  qplot is faster while plot is more flexible.</p>
-<dl class="docutils">
-<dt>xylog   plot-type::</dt>
-<dd><blockquote class="first last">
-<div>0     linear-linear
-1     log-linear
-2     linear-log
-3     log-log</div></blockquote>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl1dmathClasses.endl1dmath.qplot">
-<tt class="descname">qplot</tt><big>(</big><em>xMin=None</em>, <em>xMax=None</em>, <em>yMin=None</em>, <em>yMax=None</em>, <em>xylog=0</em>, <em>xLabel=None</em>, <em>yLabel=None</em>, <em>title=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathClasses.html#endl1dmath.qplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathClasses.endl1dmath.qplot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Also see plot( ).</p>
-<dl class="docutils">
-<dt>xylog   plot-type::</dt>
-<dd><blockquote class="first last">
-<div>0     linear-linear
-1     log-linear
-2     linear-log
-3     log-log</div></blockquote>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl1dmathClasses.endl1dmath.set">
-<tt class="descname">set</tt><big>(</big><em>other</em>, <em>duplicate=0</em>, <em>checkDataType=1</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathClasses.html#endl1dmath.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathClasses.endl1dmath.set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self.data = other.data. If duplicate is true (i.e., not 0) than a copy of other&#8217;s data 
-is made so that other&#8217;s and self&#8217;s data can be modified independently.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl1dmathClasses.endl1dmath.toFloat">
-<tt class="descname">toFloat</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathClasses.html#endl1dmath.toFloat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathClasses.endl1dmath.toFloat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts every point of self to a float.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl1dmathClasses.endl1dmath.toString">
-<tt class="descname">toString</tt><big>(</big><em>format=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathClasses.html#endl1dmath.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathClasses.endl1dmath.toString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the string returned by the endl1dmath&#8217;s __repr__ function.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl1dmathClasses.endl1dmath.toStringWithPrefixSuffix">
-<tt class="descname">toStringWithPrefixSuffix</tt><big>(</big><em>Prefix=''</em>, <em>Suffix=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathClasses.html#endl1dmath.toStringWithPrefixSuffix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathClasses.endl1dmath.toStringWithPrefixSuffix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a printable string of the points in self. Each point is a separate line surrounded by Prefix and Suffix.</p>
-</dd></dl>
-
-</dd></dl>
-
+<div class="section" id="endl2dmathclasses-module">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">endl2dmathClasses</span></tt> Module<a class="headerlink" href="#endl2dmathclasses-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-fudge.core.math.endl1dmathmisc">
-<span id="endl1dmathmisc-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">endl1dmathmisc</span></tt> Module<a class="headerlink" href="#module-fudge.core.math.endl1dmathmisc" title="Permalink to this headline">¶</a></h2>
-<p>This module contains miscellaneous routines for supporting the endl1dmath class from module endl1dmathClasses.</p>
-<dl class="docutils">
-<dt>Module&#8217;s global variables::</dt>
-<dd><dl class="first last docutils">
-<dt>endl1d_repr_xFormat <span class="classifier-delimiter">:</span> <span class="classifier">Default format string used for converting an element of the data of</span></dt>
-<dd>an endl1dmath object to a string.</dd>
-</dl>
-</dd>
-</dl>
-<dl class="function">
-<dt id="fudge.core.math.endl1dmathmisc.check1dData">
-<tt class="descclassname">fudge.core.math.endl1dmathmisc.</tt><tt class="descname">check1dData</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathmisc.html#check1dData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathmisc.check1dData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks that data is a python list of numbers. Triggers a raise if it is not.  Data may be a
-python list or an instance that is a subclass of endl1dmath.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl1dmathmisc.datasVariableInfoToXML">
-<tt class="descclassname">fudge.core.math.endl1dmathmisc.</tt><tt class="descname">datasVariableInfoToXML</tt><big>(</big><em>data</em>, <em>indent=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathmisc.html#datasVariableInfoToXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathmisc.datasVariableInfoToXML" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl1dmathmisc.endl1dToXMLGroup1dStringList">
-<tt class="descclassname">fudge.core.math.endl1dmathmisc.</tt><tt class="descname">endl1dToXMLGroup1dStringList</tt><big>(</big><em>self</em>, <em>indent=''</em>, <em>floatFormat='%16.9e'</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathmisc.html#endl1dToXMLGroup1dStringList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathmisc.endl1dToXMLGroup1dStringList" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl1dmathmisc.get1dmathData">
-<tt class="descclassname">fudge.core.math.endl1dmathmisc.</tt><tt class="descname">get1dmathData</tt><big>(</big><em>object</em>, <em>callingRoutine</em>, <em>msg</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathmisc.html#get1dmathData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathmisc.get1dmathData" title="Permalink to this definition">¶</a></dt>
-<dd><p>If object is a python list, then it is returned. Else, if object is a sub-class
-of endl1dmath its data is return otherwise a raise is executed.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl1dmathmisc.list1dToXMLEqualProbableBins1dString">
-<tt class="descclassname">fudge.core.math.endl1dmathmisc.</tt><tt class="descname">list1dToXMLEqualProbableBins1dString</tt><big>(</big><em>data</em>, <em>indent=''</em>, <em>floatFormat='%16.9e'</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathmisc.html#list1dToXMLEqualProbableBins1dString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathmisc.list1dToXMLEqualProbableBins1dString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl1dmathmisc.list1dToXMLPointwiseString">
-<tt class="descclassname">fudge.core.math.endl1dmathmisc.</tt><tt class="descname">list1dToXMLPointwiseString</tt><big>(</big><em>data</em>, <em>varString=''</em>, <em>indent=''</em>, <em>floatFormat='%16.9e'</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathmisc.html#list1dToXMLPointwiseString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathmisc.list1dToXMLPointwiseString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl1dmathmisc.valid1dClassType">
-<tt class="descclassname">fudge.core.math.endl1dmathmisc.</tt><tt class="descname">valid1dClassType</tt><big>(</big><em>object</em>, <em>callingRoutine=''</em>, <em>msg=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathmisc.html#valid1dClassType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathmisc.valid1dClassType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the first argument, object, if it is a subclass of the endl1dmath class; else, triggers a raise.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl1dmathmisc.variableInfoToXML">
-<tt class="descclassname">fudge.core.math.endl1dmathmisc.</tt><tt class="descname">variableInfoToXML</tt><big>(</big><em>variables</em>, <em>indent=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl1dmathmisc.html#variableInfoToXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl1dmathmisc.variableInfoToXML" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<div class="section" id="endl2dmathmisc-module">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">endl2dmathmisc</span></tt> Module<a class="headerlink" href="#endl2dmathmisc-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-fudge.core.math.endl2dmathClasses">
-<span id="endl2dmathclasses-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">endl2dmathClasses</span></tt> Module<a class="headerlink" href="#module-fudge.core.math.endl2dmathClasses" title="Permalink to this headline">¶</a></h2>
-<p>This module contains the endl2dmath class.  Also see the supporting module endl2dmathmisc.py.</p>
-<p>It also contains the variables doSafeDivide and doSafeDivideAlways (see __div__ for details).</p>
-<dl class="class">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath">
-<em class="property">class </em><tt class="descclassname">fudge.core.math.endl2dmathClasses.</tt><tt class="descname">endl2dmath</tt><big>(</big><em>data=None</em>, <em>checkDataType=False</em>, <em>xLabel=None</em>, <em>yLabel=None</em>, <em>label='unknown'</em>, <em>interpolation=0</em>, <em>template=None</em>, <em>allowSameX=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>The class endl2dmath is the base class for all 2d data (i.e., data consisting of
-(x, y) pairs or 2 column data). The data is stored as a python list of [ x, y ] values.
-For example, the 2 column data:</p>
-<div class="highlight-python"><pre>2.5  4.5
-3.1  3.6
-3.4  4.4</pre>
+<div class="section" id="endl3dmathclasses-module">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">endl3dmathClasses</span></tt> Module<a class="headerlink" href="#endl3dmathclasses-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<p>is stored as self.data = [ [ 2.5, 4.5 ], [ 3.1, 3.6 ], [ 3.4, 4.4 ] ].</p>
-<dl class="docutils">
-<dt>Members::</dt>
-<dd>data               A python list of [ x, y ] pairs.
-columns            Always 2 (i.e., 2 column data).
-interpolation      Type of interpolation used (see below).
-xLabel             X label used for plotting.
-yLabel             Y label used for plotting.</dd>
-<dt>Interpolation values and meaning::</dt>
-<dd><blockquote class="first last">
-<div>0     linear-linear
-1     log-linear
-2     linear-log
-3     log-log</div></blockquote>
-</dd>
-</dl>
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.GetValueNIndex">
-<tt class="descname">GetValueNIndex</tt><big>(</big><em>x</em>, <em>i=0</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.GetValueNIndex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.GetValueNIndex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the tuple ( y, index ) where y is the value of self evaluated at x and
-index is the starting index to be used in the next call when ascending the list.
-I is the starting index.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.clip">
-<tt class="descname">clip</tt><big>(</big><em>yMin</em>, <em>yMax</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.clip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.clip" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath object whose y values are self&#8217;s y values clipped to be between yMin and yMax.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.cmp">
-<tt class="descname">cmp</tt><big>(</big><em>other</em>, <em>f=5e-05</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.cmp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.cmp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compares self to other and prints out data where they differ by more than f.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.convolution">
-<tt class="descname">convolution</tt><big>(</big><em>other</em>, <em>dxMax=None</em>, <em>convolutionMethod=None</em>, <em>interpolationAccuracy=0.01</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.convolution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.convolution" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance that is a convolution of self and other. convolutionMethod
-can be None or &#8216;pythonCodingV1&#8217;. If None and module fudgeConvolutions exist then function
-fudgeConvolutions.convolution will be used; otherwise, the slow, original python code will be 
-used. If interpolationAccuracy is not None then the endl2dmath.thin method is called with
-interpolationAccuracy = interpolationAccuracy.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.copyData">
-<tt class="descname">copyData</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.copyData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.copyData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance that is a copy, and not a reference, of self.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.exp">
-<tt class="descname">exp</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.exp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.exp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance that has all y values of self exponentiated.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.getDomain">
-<tt class="descname">getDomain</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.getDomain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.getDomain" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the domain (minumum and maximum x values) for self.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.getValue">
-<tt class="descname">getValue</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.getValue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self&#8217;s y value evaluated at x.  If x is outside the range
-of self&#8217;s x domain then 0. is returned. Also see getValueInDomain.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.getValueInDomain">
-<tt class="descname">getValueInDomain</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.getValueInDomain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.getValueInDomain" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self&#8217;s y value evaluated at x.  If x is outside the range
-of self&#8217;s x domain then None is returned. Also see getValue.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.integrateOneFunction">
-<tt class="descname">integrateOneFunction</tt><big>(</big><em>xMin=None</em>, <em>xMax=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.integrateOneFunction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.integrateOneFunction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the integral of self from xMin to xMax.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.integrateThreeFunctions">
-<tt class="descname">integrateThreeFunctions</tt><big>(</big><em>other1</em>, <em>other2</em>, <em>xMin=None</em>, <em>xMax=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.integrateThreeFunctions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.integrateThreeFunctions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the integral of self, other1 and other2 from xMin to xMax.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.integrateTwoFunctions">
-<tt class="descname">integrateTwoFunctions</tt><big>(</big><em>other</em>, <em>xMin=None</em>, <em>xMax=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.integrateTwoFunctions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.integrateTwoFunctions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the integral of self and other from xMin to xMax.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.integrateX">
-<tt class="descname">integrateX</tt><big>(</big><em>xArray=None</em>, <em>weight=None</em>, <em>normalize=0</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.integrateX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.integrateX" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl1dmath object of length len( xArray ) - 1 whose value at index i
-is the integral of self from xArray[i] to xArray[i+1].  If xArray is none then 
-the x values of self are used for xArray.  If Normailzie is non-zero the value 
-at index i is divided by the x interval xArray[i+1] - xArray[i]. If weight is not 
-equal to None, weigth must be an endl2dmath object, and the integral is of self * weight.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.label">
-<tt class="descname">label</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.label" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self&#8217;s label.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.log">
-<tt class="descname">log</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.log" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance that has all y values of self log_e-ed.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.log10">
-<tt class="descname">log10</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.log10"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.log10" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance that has all y values of self log10_e-ed.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.map">
-<tt class="descname">map</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.map" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s y values to other evaluated at self&#8217;s x values.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.max">
-<tt class="descname">max</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.max"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.max" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the maximum y value of self of None if self is empty.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.min">
-<tt class="descname">min</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.min" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the minimum y value of self or None if self is empty.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.normalize">
-<tt class="descname">normalize</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.normalize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance that is the same as self normalized to 1. This, is
-the integral of dx y(x) is 1.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.overstrike">
-<tt class="descname">overstrike</tt><big>(</big><em>other</em>, <em>leftFill=1</em>, <em>rightFill=1</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.overstrike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.overstrike" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance that is the same as self, except that the data from
-other.xMin to other.xMax is replaced by other&#8217;s data.  Other must be an endl2dmath object.
-If leftFill is true then a point at other.xMin * ( 1. - parameters.endlEpsx ) is inserted 
-with y value of self at that x value.  If rightFill is true then a point at other.xMax * 
-( 1. + parameters.endlEpsx ) is inserted  with y value of self at that x value.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.plot">
-<tt class="descname">plot</tt><big>(</big><em>xMin=None</em>, <em>xMax=None</em>, <em>yMin=None</em>, <em>yMax=None</em>, <em>xylog=0</em>, <em>xLabel=None</em>, <em>yLabel=None</em>, <em>title=None</em>, <em>style='lines'</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>This routine is like qplot (quick plot) except it spawns an interactive plot.
-qplot is faster while plot is more flexible.</p>
-<dl class="docutils">
-<dt>xylog values and meaning::</dt>
-<dd><blockquote class="first">
-<div>xylog   plot-type</div></blockquote>
-<blockquote class="last">
-<div>0     linear-linear
-1     log-linear
-2     linear-log
-3     log-log</div></blockquote>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.qplot">
-<tt class="descname">qplot</tt><big>(</big><em>xMin=None</em>, <em>xMax=None</em>, <em>yMin=None</em>, <em>yMax=None</em>, <em>xylog=0</em>, <em>xLabel=None</em>, <em>yLabel=None</em>, <em>title=None</em>, <em>style='lines'</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.qplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.qplot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Also see plot( ).</p>
-<dl class="docutils">
-<dt>xylog values and meaning::</dt>
-<dd><blockquote class="first">
-<div>xylog   plot-type</div></blockquote>
-<blockquote class="last">
-<div>0     linear-linear
-1     log-linear
-2     linear-log
-3     log-log</div></blockquote>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.relativediff">
-<tt class="descname">relativediff</tt><big>(</big><em>other</em>, <em>i1</em>, <em>i2</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.relativediff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.relativediff" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compares self&#8217;s y value at i1 to other&#8217;s y value at i2.  Mainly for internal use.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.removeClosePoints">
-<tt class="descname">removeClosePoints</tt><big>(</big><em>verbose=0</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.removeClosePoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.removeClosePoints" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calls endl2dmathmisc.check2dData and removes all points that check2dData claims are too close.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.reversex">
-<tt class="descname">reversex</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.reversex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.reversex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance whose list of [x,y] has been reversed. For example, the data
-[ [1, 2], [3, 3], [4, 5], [6, 3] ] becomes [ [6, 3], [4, 5], [3, 3], [1, 2] ].</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.safeDivide">
-<tt class="descname">safeDivide</tt><big>(</big><em>other</em>, <em>fMaxValue=10.0</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.safeDivide"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.safeDivide" title="Permalink to this definition">¶</a></dt>
-<dd><p>Like __div__ except it attemps to handle divide by removing the offending point and 
-adding near by points on either side. This routine also detects zeros in the denominator
-and adds near by points on either side. See __div__ for more information.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.scalex">
-<tt class="descname">scalex</tt><big>(</big><em>f</em>, <em>xLabel=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.scalex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.scalex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance whose x data is set to f(x) where the x in f(x)
-is self&#8217;s x data and f(x) is a string representing a function. The y data is not altered.
-Two examples of f(x) are &#8216;exp(x)&#8217; and &#8216;sqrt( pow( x, 2 ) - 1 ) / x&#8217;. 
-Sets the returned objects xLabel to xLabel if is it not None.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.set">
-<tt class="descname">set</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s data to other&#8217;s data.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.setValue">
-<tt class="descname">setValue</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.setValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.setValue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s y value evaluated at x to y.  If there is no point at x 
-then one is added. x and y must be numbers.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.slice">
-<tt class="descname">slice</tt><big>(</big><em>xMin=None</em>, <em>xMax=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.slice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.slice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance that includes all points of self that lie between
-xMin and xMax inclusively.  If xMin = None (xMax = None) then the lowest (highest)
-x value of self is used for xMin (xMax).</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.sliceDull">
-<tt class="descname">sliceDull</tt><big>(</big><em>xMin=None</em>, <em>xMax=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.sliceDull"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.sliceDull" title="Permalink to this definition">¶</a></dt>
-<dd><p>Same as slice except that the end points of the returned endl2dmath instance are 
-dulled if they are not the same as the end points of self.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.slicex">
-<tt class="descname">slicex</tt><big>(</big><em>xMin=None</em>, <em>xMax=None</em>, <em>addZeroPoint=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.slicex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.slicex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Same as slice except if self does not contain a point at xMin (xMax) then it is added with the y 
-value being self evalauted at xMin (xMax). If self evalauted at xMin (xMax) is zero then no point is added,
-unless addZeroPoint is True.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.slicexDull">
-<tt class="descname">slicexDull</tt><big>(</big><em>xMin=None</em>, <em>xMax=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.slicexDull"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.slicexDull" title="Permalink to this definition">¶</a></dt>
-<dd><p>Same as slicex except the end points of the returned endl2dmath instance are 
-dulled if they are not the same as the end points of self.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.sqrt">
-<tt class="descname">sqrt</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.sqrt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.sqrt" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance that has all y values of self sqrt-ed.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.thicken">
-<tt class="descname">thicken</tt><big>(</big><em>dx</em>, <em>Log=0</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.thicken"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.thicken" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance that is the same as self except that more
-points are added, if needed, to insure that the x spacing between points is less
-than dx if Log = 0 or the ratio between x values of points is less than dx if 
-Log != 0. The actual x spacing may be smaller than dx but not larger.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.thin">
-<tt class="descname">thin</tt><big>(</big><em>interpolationAccuracy=0.01</em>, <em>thinningMethod=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.thin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.thin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance that is the same as self except the points are
-thinned while keeping linear interpolation accurate to interpolationAccuracy. interpolationAccuracy
-is forced into the range 1e-1 to 1e-8.  thinningMethod can be None, &#8216;c_CodingV1&#8217; or &#8216;pythonCodingV1&#8217;.
-If thinningMethod is None or &#8216;c_CodingV1&#8217; then thin tries to use the thinning function in fudge2dThin.
-If this fails or thinningMethod is &#8216;pythonCodingV1&#8217;, a slower python code is used.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.toInterpolation">
-<tt class="descname">toInterpolation</tt><big>(</big><em>interpolation</em>, <em>accuracy</em>, <em>diSectionMax=3</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.toInterpolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.toInterpolation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a new endl2dmath object with data converted to the specified interpolation and accuracy.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.toString">
-<tt class="descname">toString</tt><big>(</big><em>format=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.toString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the string returned by the endl2dmath&#8217;s __repr__ function. This can be useful when endl2dmath is used as a base class.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.toStringWithPrefixSuffix">
-<tt class="descname">toStringWithPrefixSuffix</tt><big>(</big><em>Prefix=''</em>, <em>Suffix=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.toStringWithPrefixSuffix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.toStringWithPrefixSuffix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a printable string of the data in self with Prefix and Suffix append to each line.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.trim">
-<tt class="descname">trim</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.trim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.trim" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes extra leading and trailing data whose y values are zero.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.union">
-<tt class="descname">union</tt><big>(</big><em>other</em>, <em>xDomainUnionOnly=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.union"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.union" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance with its x values being a union of self&#8217;s
-and other&#8217;s x values.  The y values are self&#8217;s y values mapped onto
-the union&#8217;s x values. If xDomainUnionOnly is True then only the x domain
-common to self and other is returned.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.vectorScale">
-<tt class="descname">vectorScale</tt><big>(</big><em>vector</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.vectorScale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.vectorScale" title="Permalink to this definition">¶</a></dt>
-<dd><p>Scales the y value of self at x by vector evaluated at x.  Only self&#8217;s data within the x range of vector are modified.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.vectorScaleAdd">
-<tt class="descname">vectorScaleAdd</tt><big>(</big><em>vector</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.vectorScaleAdd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.vectorScaleAdd" title="Permalink to this definition">¶</a></dt>
-<dd><p>Scales the y value of self at x by vector evaluated at x.
-Only self&#8217;s data within the x range of vector are modified.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.xArray">
-<tt class="descname">xArray</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.xArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.xArray" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl1dmath instances of the x values in self.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.xMax">
-<tt class="descname">xMax</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.xMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.xMax" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the maximum x value of self if self contains data, otherwise it returns None.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.xMin">
-<tt class="descname">xMin</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.xMin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.xMin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the minimum x value of self if self contains data, otherwise it returns None.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.yMax">
-<tt class="descname">yMax</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.yMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.yMax" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the maximum y value of self if self contains data, otherwise it returns None.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.yMin">
-<tt class="descname">yMin</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.yMin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.yMin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the minimum y value of self if self contains data, otherwise it returns None.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl2dmathClasses.endl2dmath.yMinMax">
-<tt class="descname">yMinMax</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathClasses.html#endl2dmath.yMinMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathClasses.endl2dmath.yMinMax" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the tuple of the minimum and maximum y values of self if self contains data, otherwise it returns ( None, None ).</p>
-</dd></dl>
-
-</dd></dl>
-
+<div class="section" id="endl3dmathmisc-module">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">endl3dmathmisc</span></tt> Module<a class="headerlink" href="#endl3dmathmisc-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-fudge.core.math.endl2dmathmisc">
-<span id="endl2dmathmisc-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">endl2dmathmisc</span></tt> Module<a class="headerlink" href="#module-fudge.core.math.endl2dmathmisc" title="Permalink to this headline">¶</a></h2>
-<p>This module contains miscellaneous routines for supporting the endl2dmath class from module endl2dmathClasses.</p>
-<dl class="docutils">
-<dt>Module&#8217;s global variables::</dt>
-<dd>endl2d_repr_xFormat : Default format string used for converting an x-element of the data of an endl2dmath object to a string.
-endl2d_repr_yFormat : Default format string used for converting an y-element of the data of an endl2dmath object to a string.</dd>
-</dl>
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.XML2dPointwiseToList">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">XML2dPointwiseToList</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#XML2dPointwiseToList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.XML2dPointwiseToList" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.check2dData">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">check2dData</tt><big>(</big><em>data</em>, <em>allowNegativeX=True</em>, <em>allowSameX=False</em>, <em>allowZeroX=True</em>, <em>positiveY=True</em>, <em>printWarning=True</em>, <em>printErrors=True</em>, <em>xCloseEps=None</em>, <em>formatCode=12</em>, <em>maxAbsFloatValue=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#check2dData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.check2dData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks that data (or data.data if data is an endl2dmath instance) is a list containing
-valid endl2dmath points. If positiveY is true (default) then a negative y value
-generates a raise.  If positiveY is false then the number of negative y values
-is counted and the count is returned. The x values must be in increasing order
-else a raise is generated. If allowZeroX is False, a zero first x value will generate a 
-raise. Also all x values must be positive unless allowNegativeX
-is true. If printWarning is true than close x value warnings are printed. X values 
-x1 and x2 are considered close if x2 - x1 &lt; xCloseEps * ( x1 + x2 ). If on input xCloseEps
-is None, the it is set to parameters.endlEpsx * pow( 0.1, formatCode - 14 ) / 3. 
-If on input formatCode is 12 then it is set to 14.
-This function returns an integer and an array. The integer is the number of negative
-y values and the array is a list of all indices with close x-values. If printWarning
-is &#8216;True&#8217; than warnings are printed (warning will not execute a raise). If printErrors 
-is &#8216;True&#8217; then errors are printed, and if at least one error exist, a raise will be 
-executed after all data has been checked.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.check2dPoint">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">check2dPoint</tt><big>(</big><em>p</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#check2dPoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.check2dPoint" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks that p is the list [ number, number ]. A raise is generated if p is not.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.convertFunctionToLinLin">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">convertFunctionToLinLin</tt><big>(</big><em>f</em>, <em>xMin</em>, <em>xMax</em>, <em>accuracy</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#convertFunctionToLinLin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.convertFunctionToLinLin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a new endl2dmath object that represents the function f(x) as a lin-lin table to 
-the specified absolute accuracy on the interval xMin to xMax.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.convertLogLogToLinLin">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">convertLogLogToLinLin</tt><big>(</big><em>self</em>, <em>accuracy</em>, <em>diSectionMax=3</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#convertLogLogToLinLin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.convertLogLogToLinLin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a new endl2dmath object of self converted from log-log to lin-lin to specified accuracy.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.dullLowerEdge2d">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">dullLowerEdge2d</tt><big>(</big><em>d</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#dullLowerEdge2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.dullLowerEdge2d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dulls the lower edge of d if the y value at that edge is not 0.  d must be an endl2dmath instance.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.dullUpperEdge2d">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">dullUpperEdge2d</tt><big>(</big><em>d</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#dullUpperEdge2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.dullUpperEdge2d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dulls the upper edge of d if the y value at that edge is not 0.  d must be an endl2dmath instance.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.dulledges2d">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">dulledges2d</tt><big>(</big><em>d</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#dulledges2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.dulledges2d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calls dullLowerEdge2d( d ) and dullUpperEdge2d( d ).</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.flattop2d">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">flattop2d</tt><big>(</big><em>xMin</em>, <em>xMax</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#flattop2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.flattop2d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance of a flattop from xMin to xMax with height 1.  0 &lt; xMin &lt; xMax.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.flattop2dDull">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">flattop2dDull</tt><big>(</big><em>xMin</em>, <em>xMax</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#flattop2dDull"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.flattop2dDull" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the endl2dmath instances returned by flattop2d( xMin, xMax ) and that is dulled using dulledges2d( ).</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.gauss2d">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">gauss2d</tt><big>(</big><em>xc</em>, <em>xw</em>, <em>f=0.001</em>, <em>xsigmax=4</em>, <em>xMin=None</em>, <em>xMax=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#gauss2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.gauss2d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance the has a Gaussian shape centered at xc with
-width xw (i.e., Exp( -( (x - xc) / xw )^2 / 2 ).  The points are generated 
-such that linear interpolation is accurate to f.  The x value&#8217;s range is limited 
-by xMin, xMax and abs(x - xc) / xw &lt;= xsigmax.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.gauss2dDull">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">gauss2dDull</tt><big>(</big><em>xc</em>, <em>xw</em>, <em>f=0.001</em>, <em>xsigmax=4</em>, <em>xMin=None</em>, <em>xMax=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#gauss2dDull"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.gauss2dDull" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance of gauss2d( xc, xw, f, xsigmax, xMin, xMax ) that is dulled using dulledges2d( ).</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.get2dmathData">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">get2dmathData</tt><big>(</big><em>object</em>, <em>callingRoutine</em>, <em>msg</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#get2dmathData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.get2dmathData" title="Permalink to this definition">¶</a></dt>
-<dd><p>If object is a python list, then it is returned. Else, if object is a sub-class 
-of endl2dmath its data is return otherwise a raise is executed.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.interpolate2dPoints">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">interpolate2dPoints</tt><big>(</big><em>interpolation</em>, <em>x</em>, <em>x1</em>, <em>y1</em>, <em>x2</em>, <em>y2</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#interpolate2dPoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.interpolate2dPoints" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function interpolates y at x where x1 &lt;= x &lt;= x2 using interpolation.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.interpolate_X">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">interpolate_X</tt><big>(</big><em>data</em>, <em>x</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#interpolate_X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.interpolate_X" title="Permalink to this definition">¶</a></dt>
-<dd><p>For internal use only.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.list2dToXMLPointwiseString">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">list2dToXMLPointwiseString</tt><big>(</big><em>data</em>, <em>varString=''</em>, <em>indent=''</em>, <em>floatFormat='%s'</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#list2dToXMLPointwiseString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.list2dToXMLPointwiseString" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.point2d">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">point2d</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#point2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.point2d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance of [ x, 1. ].</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.point2dDull">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">point2dDull</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#point2dDull"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.point2dDull" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance of point2d( x ) that is dulled using dulledges2d( ).</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.ramp2d">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">ramp2d</tt><big>(</big><em>xMin</em>, <em>xMax</em>, <em>down=0</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#ramp2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.ramp2d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance of a ramp from xMin to xMax with height
-0 at xMin and 1 at xMax if down = 0, and 1 at xMin and 0 at xMax otherwise.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.ramp2dDull">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">ramp2dDull</tt><big>(</big><em>xMin</em>, <em>xMax</em>, <em>down=0</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#ramp2dDull"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.ramp2dDull" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the endl2dmath instances returned by ramp2d( xMin, xMax, ramp ) and that is dulled
-using dulledges2d( ).</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.triangle2d">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">triangle2d</tt><big>(</big><em>x0</em>, <em>x1</em>, <em>x2</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#triangle2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.triangle2d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl2dmath instance of a triangle that starts at x0 with height 0,
-ramps up to 1 at x1 and ramps down to 0 at x2.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl2dmathmisc.valid2dClassType">
-<tt class="descclassname">fudge.core.math.endl2dmathmisc.</tt><tt class="descname">valid2dClassType</tt><big>(</big><em>object</em>, <em>callingRoutine</em>, <em>msg</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl2dmathmisc.html#valid2dClassType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl2dmathmisc.valid2dClassType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the first argument, object, if it is a subclass of the endl2dmath class; else, triggers a raise.</p>
-</dd></dl>
-
+<div class="section" id="endl4dmathclasses-module">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">endl4dmathClasses</span></tt> Module<a class="headerlink" href="#endl4dmathclasses-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-fudge.core.math.endl3dmathClasses">
-<span id="endl3dmathclasses-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">endl3dmathClasses</span></tt> Module<a class="headerlink" href="#module-fudge.core.math.endl3dmathClasses" title="Permalink to this headline">¶</a></h2>
-<p>This module contains the endl3dmath class.  Also see the supporting module endl3dmathmisc.py.</p>
-<dl class="class">
-<dt id="fudge.core.math.endl3dmathClasses.endl3dmath">
-<em class="property">class </em><tt class="descclassname">fudge.core.math.endl3dmathClasses.</tt><tt class="descname">endl3dmath</tt><big>(</big><em>data=None</em>, <em>checkDataType=False</em>, <em>xLabel=None</em>, <em>yLabel=None</em>, <em>zLabel=None</em>, <em>label='unknown'</em>, <em>interpolation=0</em>, <em>template=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl3dmathClasses.html#endl3dmath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl3dmathClasses.endl3dmath" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>This class is designed to support operations on a list of 3-column number data that may be useful to scientists.
-(A number is an integer or a float.) In this documenation the three columns are referred to as x, y and z.
-The data is to be stored as a python list of [ x, yz-data-for-x ], where yz-data-for-x is a list of
-[ y, z ] data. For example, consider the 3 column data:</p>
-<div class="highlight-python"><pre>1 1 1
-1 2 2
-1 3 1
-2 1 1
-2 2 0
-2 4 0
-3 2 0
-3 3 1
-3 4 2</pre>
-</div>
-<p>This data is stored using python lists as</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">],</span> <span class="p">[</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="p">],</span> <span class="p">[</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span> <span class="p">]</span> <span class="p">]</span> <span class="p">],</span>
-  <span class="p">[</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">],</span> <span class="p">[</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span> <span class="p">],</span> <span class="p">[</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span> <span class="p">]</span> <span class="p">]</span> <span class="p">]</span>
-  <span class="p">[</span> <span class="mi">3</span><span class="p">,</span> <span class="p">[</span> <span class="p">[</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span> <span class="p">],</span> <span class="p">[</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span> <span class="p">],</span> <span class="p">[</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span> <span class="p">]</span> <span class="p">]</span> <span class="p">]</span> <span class="p">]</span>
-</pre></div>
-</div>
-<dl class="docutils">
-<dt>Members::</dt>
-<dd>data        | A python list of numbers.
-columns     | This is always 3 as this is 1d data.
-xLabel      | Labelled used as the x-Label when plotting.
-yLabel      | Labelled used as the y-Label when plotting.
-zLabel      | Labelled used as the z-Label when plotting.</dd>
-</dl>
-<dl class="method">
-<dt id="fudge.core.math.endl3dmathClasses.endl3dmath.copyData">
-<tt class="descname">copyData</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl3dmathClasses.html#endl3dmath.copyData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl3dmathClasses.endl3dmath.copyData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl3dmath instance that is a copy, and not a reference, of self.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl3dmathClasses.endl3dmath.getAtX">
-<tt class="descname">getAtX</tt><big>(</big><em>x</em>, <em>unitBase=False</em>, <em>extrapolation='noExtrapolation'</em>, <em>endl2dmathObject=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl3dmathClasses.html#endl3dmath.getAtX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl3dmathClasses.endl3dmath.getAtX" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calls endl3dmathmisc.interpolate3d to get self&#8217;s yz data at x.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl3dmathClasses.endl3dmath.getValue">
-<tt class="descname">getValue</tt><big>(</big><em>x</em>, <em>y</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl3dmathClasses.html#endl3dmath.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl3dmathClasses.endl3dmath.getValue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns self&#8217;s z value evaluated at (x, y). If x (y) is outside the range
-of self&#8217;s x (y) domain then 0. is returned.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl3dmathClasses.endl3dmath.plot">
-<tt class="descname">plot</tt><big>(</big><em>xMin=None</em>, <em>xMax=None</em>, <em>yMin=None</em>, <em>yMax=None</em>, <em>zMin=None</em>, <em>zMax=None</em>, <em>xyzlog=0</em>, <em>xLabel=None</em>, <em>yLabel=None</em>, <em>zLabel=None</em>, <em>title=None</em>, <em>xrot=None</em>, <em>zrot=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl3dmathClasses.html#endl3dmath.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl3dmathClasses.endl3dmath.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots the data.</p>
-<dl class="docutils">
-<dt>xyzlog values and meaning::</dt>
-<dd><blockquote class="first">
-<div>xyzlog   plot-type for x-y-z axis</div></blockquote>
-<blockquote class="last">
-<div>0     linear-linear-linear
-1     log-linear-linear
-2     linear-log-linear
-3     log-log-linear
-4     linear-linear-log
-5     log-linear-log
-6     linear-log-log
-7     log-log-log</div></blockquote>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl3dmathClasses.endl3dmath.setAtX">
-<tt class="descname">setAtX</tt><big>(</big><em>x</em>, <em>data</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl3dmathClasses.html#endl3dmath.setAtX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl3dmathClasses.endl3dmath.setAtX" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets self&#8217;s yz data at x to data. Data can be a endl2dmath object.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl3dmathClasses.endl3dmath.toString">
-<tt class="descname">toString</tt><big>(</big><em>format=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl3dmathClasses.html#endl3dmath.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl3dmathClasses.endl3dmath.toString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the string returned by the endl3dmath&#8217;s __repr__ function. This can be useful when endl3dmath is used as a base class.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl3dmathClasses.endl3dmath.toStringWithPrefixSuffix">
-<tt class="descname">toStringWithPrefixSuffix</tt><big>(</big><em>Prefix=''</em>, <em>Suffix=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl3dmathClasses.html#endl3dmath.toStringWithPrefixSuffix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl3dmathClasses.endl3dmath.toStringWithPrefixSuffix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a printable string of the data in self with Prefix and Suffix append to each line.
-See __repr__ to change the output format.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl3dmathClasses.endl3dmath.xArray">
-<tt class="descname">xArray</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl3dmathClasses.html#endl3dmath.xArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl3dmathClasses.endl3dmath.xArray" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl1dmath instances of the x values in self.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl3dmathClasses.endl3dmath.xMax">
-<tt class="descname">xMax</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl3dmathClasses.html#endl3dmath.xMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl3dmathClasses.endl3dmath.xMax" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the maximum x value of self if self contains data, otherwise it returns None.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl3dmathClasses.endl3dmath.xMin">
-<tt class="descname">xMin</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl3dmathClasses.html#endl3dmath.xMin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl3dmathClasses.endl3dmath.xMin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the minimum x value of self if self contains data, otherwise it returns None.</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-fudge.core.math.endl3dmathmisc">
-<span id="endl3dmathmisc-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">endl3dmathmisc</span></tt> Module<a class="headerlink" href="#module-fudge.core.math.endl3dmathmisc" title="Permalink to this headline">¶</a></h2>
-<p>This module contains miscellaneous routines for supporting the endl3dmath class from module endl3dmathClasses.</p>
-<dl class="docutils">
-<dt>Module&#8217;s global variables::</dt>
-<dd>endl3d_repr_xFormat : Default format string used for converting an x-element of the data of an endl3dmath object to a string.
-endl3d_repr_yFormat : Default format string used for converting an y-element of the data of an endl3dmath object to a string.
-endl3d_repr_zFormat : Default format string used for converting an z-element of the data of an endl3dmath object to a string.</dd>
-</dl>
-<dl class="function">
-<dt id="fudge.core.math.endl3dmathmisc.check3dData">
-<tt class="descclassname">fudge.core.math.endl3dmathmisc.</tt><tt class="descname">check3dData</tt><big>(</big><em>data</em>, <em>allowNegativeX=False</em>, <em>allowZeroX=True</em>, <em>allowNegativeY=False</em>, <em>allowSameY=False</em>, <em>allowZeroY=True</em>, <em>positiveZ=False</em>, <em>printWarning=True</em>, <em>printErrors=True</em>, <em>xCloseEps=None</em>, <em>maxAbsFloatValue=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl3dmathmisc.html#check3dData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl3dmathmisc.check3dData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks that data is a valid structure for endl3dmath data. Triggers a raise if it is not.  Data may be
-an instance that is a subclass of endl3dmath or a python list as required by endl3dmath. If allowZeroX is 
-False, a zero first x value will generate a raise. If allowNegativeX is true than the x data can have negative 
-values (ENDL 3d-data has projectile energy as the x-data which must always be &gt; 0. ). See endl2dmathmisc.check2dData&#8217;s 
-allowSameX, allowZeroX, positiveY and xCloseEps argument for meaning of allowSameY, allowZeroY, positiveZ and 
-xCloseEps respectively.  If printErrors is &#8216;True&#8217; then errors are printed, and if at least one error exist, a 
-raise will be executed.  printWarning is just passed on to endl2dmathmisc.check2dData.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl3dmathmisc.get3dmathData">
-<tt class="descclassname">fudge.core.math.endl3dmathmisc.</tt><tt class="descname">get3dmathData</tt><big>(</big><em>object</em>, <em>callingRoutine</em>, <em>msg</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl3dmathmisc.html#get3dmathData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl3dmathmisc.get3dmathData" title="Permalink to this definition">¶</a></dt>
-<dd><p>If object is a python list, then it is returned. Else, if object is a sub-class
-of endl3dmath its data is return otherwise a raise is executed.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl3dmathmisc.interpolate3d">
-<tt class="descclassname">fudge.core.math.endl3dmathmisc.</tt><tt class="descname">interpolate3d</tt><big>(</big><em>x</em>, <em>data</em>, <em>unitBase=False</em>, <em>extrapolation='noExtrapolation'</em>, <em>endl2dmathObject=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl3dmathmisc.html#interpolate3d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl3dmathmisc.interpolate3d" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the interpolation of data (an endl3dmath object or suitable data)
-at x as a list of [y,z] pairs.  If x is outside the domain of data, then [] 
-is returned. If x is one of the x-values of data, then its yz-data is returned.
-Otherwise, for xl &lt; x &lt; xu where xl and xu are consecutive x-values in data 
-linear interpolation is performed on the yz data of xl and xu.  If unitBase is 
-True, then unit base interpolation is performed.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl3dmathmisc.interpolate_XY">
-<tt class="descclassname">fudge.core.math.endl3dmathmisc.</tt><tt class="descname">interpolate_XY</tt><big>(</big><em>data</em>, <em>x</em>, <em>y</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl3dmathmisc.html#interpolate_XY"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl3dmathmisc.interpolate_XY" title="Permalink to this definition">¶</a></dt>
-<dd><p>For internal use only.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl3dmathmisc.valid3dClassType">
-<tt class="descclassname">fudge.core.math.endl3dmathmisc.</tt><tt class="descname">valid3dClassType</tt><big>(</big><em>object</em>, <em>callingRoutine</em>, <em>msg</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl3dmathmisc.html#valid3dClassType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl3dmathmisc.valid3dClassType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the first argument, object, if it is a subclass of the endl3dmath class; else, triggers a raise.</p>
-</dd></dl>
-
-</div>
-<div class="section" id="module-fudge.core.math.endl4dmathClasses">
-<span id="endl4dmathclasses-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">endl4dmathClasses</span></tt> Module<a class="headerlink" href="#module-fudge.core.math.endl4dmathClasses" title="Permalink to this headline">¶</a></h2>
-<p>This module contains the endl4dmath class. Also see the supporting module endl4dmathmisc.py.</p>
-<dl class="class">
-<dt id="fudge.core.math.endl4dmathClasses.endl4dmath">
-<em class="property">class </em><tt class="descclassname">fudge.core.math.endl4dmathClasses.</tt><tt class="descname">endl4dmath</tt><big>(</big><em>data</em>, <em>checkDataType=False</em>, <em>tLabel=None</em>, <em>xLabel=None</em>, <em>yLabel=None</em>, <em>zLabel=None</em>, <em>label='unknown'</em>, <em>interpolation=0</em>, <em>template=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl4dmathClasses.html#endl4dmath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl4dmathClasses.endl4dmath" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>This class is designed to support operations on a list of 4-column number data that may be useful to scientists.
-(A number is an integer or a float.) In this documenation the four columns are referred to as t, x, y and z.
-The data is to be stored as a python list of [ t, xyz-data-for-t ], where xyz-data-for-t is a list of
-[ x, yz-data-for-x ] and yz-data-for-x is a list of [ y, z ] data. For example, consider the 4 column data:</p>
-<div class="highlight-python"><pre>1 1 1 1
-1 1 2 2
-1 1 3 1
-1 2 1 1
-1 2 2 0
-1 2 4 0
-3 1 1 1
-3 1 2 3
-4 2 2 0
-4 2 3 1
-4 2 4 2</pre>
-</div>
-<p>For this data there are 3 different t-values.  The length of this data is 3, for the 3 different t-values.
-The first t-value has the data:</p>
-<div class="highlight-python"><pre>1 1 1
-1 2 2
-1 3 1
-2 1 1
-2 2 0
-2 4 0</pre>
-</div>
-<dl class="docutils">
-<dt>for which there are 2 x values, and the first having the data::</dt>
-<dd>1 1
-2 2 
-3 1</dd>
-</dl>
-<p>All this data is stored using python lists as</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">],</span>
-                <span class="p">[</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="p">],</span>
-                <span class="p">[</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span> <span class="p">]</span>
-              <span class="p">]</span>
-         <span class="p">],</span>
-         <span class="p">[</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">],</span>
-                <span class="p">[</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span> <span class="p">],</span>
-                <span class="p">[</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span> <span class="p">]</span>
-              <span class="p">]</span>
-         <span class="p">]</span>
-       <span class="p">]</span>
-  <span class="p">]</span>
-  <span class="p">[</span> <span class="mi">3</span><span class="p">,</span> <span class="p">[</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="p">[</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">],</span>
-                <span class="p">[</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span> <span class="p">]</span>
-              <span class="p">]</span>
-         <span class="p">]</span>
-       <span class="p">]</span>
-  <span class="p">]</span>
-  <span class="p">[</span> <span class="mi">4</span><span class="p">,</span> <span class="p">[</span> <span class="p">[</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span> <span class="p">[</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span> <span class="p">],</span>
-                <span class="p">[</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span> <span class="p">],</span>
-                <span class="p">[</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span> <span class="p">]</span>
-              <span class="p">]</span>
-         <span class="p">]</span>
-       <span class="p">]</span>
-  <span class="p">]</span>
-<span class="p">]</span>
-</pre></div>
-</div>
-<p>Note, the xyz data is store like the data in an endl3dmath class. That is, endl3dmath data looks like a list of [ t, 3d-data ].
-However, the 3d part is not an endl3dmath class but is structured like the data in an endl3dmath class. Thus, to plot
-the xyz data for the (i+1)^th t-value of an endl4dmath instance fourD, create an endl3dmath object of the data as endl3dmath( fourD.data[i][1] )
-and use the endl3dmath plot method.</p>
-<dl class="docutils">
-<dt>Members::</dt>
-<dd>data        | A python list of numbers.
-columns     | This is always 4 as this is 1d data.
-tLabel      | Labelled used as the t-Label when plotting.
-xLabel      | Labelled used as the x-Label when plotting.
-yLabel      | Labelled used as the y-Label when plotting.
-zLabel      | Labelled used as the z-Label when plotting.</dd>
-</dl>
-<dl class="method">
-<dt id="fudge.core.math.endl4dmathClasses.endl4dmath.copyData">
-<tt class="descname">copyData</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl4dmathClasses.html#endl4dmath.copyData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl4dmathClasses.endl4dmath.copyData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl4dmath instance that is a copy, and not a reference, of self.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl4dmathClasses.endl4dmath.ll">
-<tt class="descname">ll</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl4dmathClasses.html#endl4dmath.ll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl4dmathClasses.endl4dmath.ll" title="Permalink to this definition">¶</a></dt>
-<dd><p>Same as __repr__( ).</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl4dmathClasses.endl4dmath.ls">
-<tt class="descname">ls</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl4dmathClasses.html#endl4dmath.ls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl4dmathClasses.endl4dmath.ls" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints the number of items in the top list of self and then the number of items in each item of the top list.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl4dmathClasses.endl4dmath.plot">
-<tt class="descname">plot</tt><big>(</big><em>xMin=None</em>, <em>xMax=None</em>, <em>yMin=None</em>, <em>yMax=None</em>, <em>zMin=None</em>, <em>zMax=None</em>, <em>xyzlog=0</em>, <em>tLabel=None</em>, <em>xLabel=None</em>, <em>yLabel=None</em>, <em>zLabel=None</em>, <em>title=None</em>, <em>tScaleLabel=None</em>, <em>xrot=None</em>, <em>zrot=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl4dmathClasses.html#endl4dmath.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl4dmathClasses.endl4dmath.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots the data.</p>
-<dl class="docutils">
-<dt>xyzlog values and meaning::</dt>
-<dd><blockquote class="first">
-<div>xyzlog   plot-type for x-y-z axis</div></blockquote>
-<blockquote class="last">
-<div>0     linear-linear-linear
-1     log-linear-linear
-2     linear-log-linear
-3     log-log-linear
-4     linear-linear-log
-5     log-linear-log
-6     linear-log-log
-7     log-log-log</div></blockquote>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl4dmathClasses.endl4dmath.tArray">
-<tt class="descname">tArray</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl4dmathClasses.html#endl4dmath.tArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl4dmathClasses.endl4dmath.tArray" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an endl1dmath instances of the t values in self.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl4dmathClasses.endl4dmath.tMax">
-<tt class="descname">tMax</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl4dmathClasses.html#endl4dmath.tMax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl4dmathClasses.endl4dmath.tMax" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the maximum t value of self if self contains data, otherwise it returns None.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl4dmathClasses.endl4dmath.tMin">
-<tt class="descname">tMin</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl4dmathClasses.html#endl4dmath.tMin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl4dmathClasses.endl4dmath.tMin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the minimum t value of self if self contains data, otherwise it returns None.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl4dmathClasses.endl4dmath.toString">
-<tt class="descname">toString</tt><big>(</big><em>format=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl4dmathClasses.html#endl4dmath.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl4dmathClasses.endl4dmath.toString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the string returned by the endl4dmath&#8217;s __repr__ function. This can be useful when endl4dmath is used as a base class.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.endl4dmathClasses.endl4dmath.toStringWithPrefixSuffix">
-<tt class="descname">toStringWithPrefixSuffix</tt><big>(</big><em>Prefix=''</em>, <em>Suffix=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl4dmathClasses.html#endl4dmath.toStringWithPrefixSuffix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl4dmathClasses.endl4dmath.toStringWithPrefixSuffix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a printable string of the data in self with Prefix and Suffix append to each line.
-See __repr__ to change the output format.</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-fudge.core.math.endl4dmathmisc">
-<span id="endl4dmathmisc-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">endl4dmathmisc</span></tt> Module<a class="headerlink" href="#module-fudge.core.math.endl4dmathmisc" title="Permalink to this headline">¶</a></h2>
-<p>This module contains miscellaneous routines for supporting the endl4dmath class from module endl4dmathClasses.</p>
-<dl class="docutils">
-<dt>Module&#8217;s global variables::</dt>
-<dd>endl4d_repr_tFormat : Default format string used for converting an t-element of the data of an endl4dmath object to a string.
-endl4d_repr_xFormat : Default format string used for converting an x-element of the data of an endl4dmath object to a string.
-endl4d_repr_yFormat : Default format string used for converting an y-element of the data of an endl4dmath object to a string.
-endl4d_repr_zFormat : Default format string used for converting an z-element of the data of an endl4dmath object to a string.</dd>
-</dl>
-<dl class="function">
-<dt id="fudge.core.math.endl4dmathmisc.check4dData">
-<tt class="descclassname">fudge.core.math.endl4dmathmisc.</tt><tt class="descname">check4dData</tt><big>(</big><em>data</em>, <em>allowNegativeT=False</em>, <em>allowZeroT=True</em>, <em>allowNegativeX=False</em>, <em>allowZeroX=True</em>, <em>allowSameY=False</em>, <em>allowNegativeY=False</em>, <em>allowZeroY=True</em>, <em>positiveZ=False</em>, <em>printWarning=True</em>, <em>printErrors=True</em>, <em>xCloseEps=None</em>, <em>maxAbsFloatValue=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl4dmathmisc.html#check4dData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl4dmathmisc.check4dData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks that data is a valid structure for endl4dmath data. Triggers a raise if it is not.  Data may be
-an instance that is a subclass of endl4dmath or a python list as required by endl4dmath. If allowZeroT is False, 
-a zero first t value will generate a raise.If allowNegativeT is true than the t data can have negative values 
-(many ENDL 4d-data have projectile energy as the t-data which must always be positive). For meanings of 
-allowNegativeX, allowZeroX, allowSameY, allowNegativeY, allowZeroY, positiveZ and xCloseEps see endl3dmathmisc.check3dData.
-If printErrors is &#8216;True&#8217; then errors are printed, and if at least one error exist, a raise will be executed.  
-printWarning is just passed on to endl3dmathmisc.check3dData.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl4dmathmisc.get4dmathData">
-<tt class="descclassname">fudge.core.math.endl4dmathmisc.</tt><tt class="descname">get4dmathData</tt><big>(</big><em>object</em>, <em>callingRoutine</em>, <em>msg</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl4dmathmisc.html#get4dmathData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl4dmathmisc.get4dmathData" title="Permalink to this definition">¶</a></dt>
-<dd><p>If object is a python list, then it is returned. Else, if object is a sub-class
-of endl4dmath its data is return otherwise a raise is executed.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl4dmathmisc.plot3dFrom4d">
-<tt class="descclassname">fudge.core.math.endl4dmathmisc.</tt><tt class="descname">plot3dFrom4d</tt><big>(</big><em>data</em>, <em>i</em>, <em>options</em>, <em>xyzlog=0</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl4dmathmisc.html#plot3dFrom4d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl4dmathmisc.plot3dFrom4d" title="Permalink to this definition">¶</a></dt>
-<dd><p>For internal use only.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl4dmathmisc.string4dData">
-<tt class="descclassname">fudge.core.math.endl4dmathmisc.</tt><tt class="descname">string4dData</tt><big>(</big><em>d</em>, <em>i0=0</em>, <em>i1=1</em>, <em>i2=2</em>, <em>i3=3</em>, <em>fmt0=None</em>, <em>fmt1=None</em>, <em>fmt2=None</em>, <em>fmt3=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl4dmathmisc.html#string4dData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl4dmathmisc.string4dData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list of strings for data d.  D must be list[ number, list[ number, list[ number, number ] ] ].</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.endl4dmathmisc.valid4dClassType">
-<tt class="descclassname">fudge.core.math.endl4dmathmisc.</tt><tt class="descname">valid4dClassType</tt><big>(</big><em>object</em>, <em>callingRoutine</em>, <em>msg</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/endl4dmathmisc.html#valid4dClassType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.endl4dmathmisc.valid4dClassType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the first argument, object, if it is a subclass of the endl4dmath class; else, triggers a raise.</p>
-</dd></dl>
-
+<div class="section" id="endl4dmathmisc-module">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">endl4dmathmisc</span></tt> Module<a class="headerlink" href="#endl4dmathmisc-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-fudge.core.math.fudge2dGrouping">
 <span id="fudge2dgrouping-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">fudge2dGrouping</span></tt> Module<a class="headerlink" href="#module-fudge.core.math.fudge2dGrouping" title="Permalink to this headline">¶</a></h2>
@@ -1187,7 +112,7 @@ of endl4dmath its data is return otherwise a raise is executed.</p>
 
 <dl class="classmethod">
 <dt id="fudge.core.math.fudge2dGrouping.groupedData.parseXMLNode">
-<em class="property">classmethod </em><tt class="descname">parseXMLNode</tt><big>(</big><em>form</em>, <em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/fudge2dGrouping.html#groupedData.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudge2dGrouping.groupedData.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><tt class="descname">parseXMLNode</tt><big>(</big><em>element</em>, <em>xPath=</em>, <span class="optional">[</span><span class="optional">]</span><em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/fudge2dGrouping.html#groupedData.parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudge2dGrouping.groupedData.parseXMLNode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1206,37 +131,6 @@ of endl4dmath its data is return otherwise a raise is executed.</p>
 <div class="section" id="module-fudge.core.math.fudgemath">
 <span id="fudgemath-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">fudgemath</span></tt> Module<a class="headerlink" href="#module-fudge.core.math.fudgemath" title="Permalink to this headline">¶</a></h2>
 <p>This module contains useful fudge math routines that do not fit into any other module.</p>
-<p>cmattoon 3/2011: math functions from fudgemisc moved here</p>
-<dl class="function">
-<dt id="fudge.core.math.fudgemath.Legendre">
-<tt class="descclassname">fudge.core.math.fudgemath.</tt><tt class="descname">Legendre</tt><big>(</big><em>n</em>, <em>x</em>, <em>checkXRange=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#Legendre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.Legendre" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the value of the Legendre function of order n at x.  For n &lt;= 10, use analytical form, 
-for n &gt; 10 use the recursive relationship. (This would be way faster in C or using numpy version)</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.fudgemath.LegendreSeries">
-<tt class="descclassname">fudge.core.math.fudgemath.</tt><tt class="descname">LegendreSeries</tt><big>(</big><em>coefficients</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#LegendreSeries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.LegendreSeries" title="Permalink to this definition">¶</a></dt>
-<dd><p>return a function to evaluate the Legendre series with given coefficients:
-&gt;&gt;&gt;foo = LegendreSeries([1.0,0,0,0.85])
-&gt;&gt;&gt;foo(0.5) == 1.0*Legendre(0,0.5) + 0.85*Legendre(3,0.5)
-[True]
-Beware: coefficients as stored in ENDF must be multiplied by factor of (2*L+1)/2</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.fudgemath.YSum">
-<tt class="descclassname">fudge.core.math.fudgemath.</tt><tt class="descname">YSum</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#YSum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.YSum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the area under the curve y(x). Data must be list of list( x, y ).</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.fudgemath.ZSum">
-<tt class="descclassname">fudge.core.math.fudgemath.</tt><tt class="descname">ZSum</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#ZSum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.ZSum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the area under the curve z(y) for each x as an endl2dmath object. Data must be list of
-( x, list of ( y, z ) ).</p>
-</dd></dl>
-
 <dl class="function">
 <dt id="fudge.core.math.fudgemath.checkForNaN">
 <tt class="descclassname">fudge.core.math.fudgemath.</tt><tt class="descname">checkForNaN</tt><big>(</big><em>v</em>, <em>str</em>, <em>printErrors=True</em>, <em>indentation=''</em>, <em>messages=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#checkForNaN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.checkForNaN" title="Permalink to this definition">¶</a></dt>
@@ -1246,41 +140,6 @@ Beware: coefficients as stored in ENDF must be multiplied by factor of (2*L+1)/2
 <dt id="fudge.core.math.fudgemath.checkNumber">
 <tt class="descclassname">fudge.core.math.fudgemath.</tt><tt class="descname">checkNumber</tt><big>(</big><em>v</em>, <em>str=''</em>, <em>printErrors=True</em>, <em>indentation=''</em>, <em>messages=None</em>, <em>maxAbsFloatValue=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#checkNumber"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.checkNumber" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="class">
-<dt id="fudge.core.math.fudgemath.fastSumOfManyAddends">
-<em class="property">class </em><tt class="descclassname">fudge.core.math.fudgemath.</tt><tt class="descname">fastSumOfManyAddends</tt><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#fastSumOfManyAddends"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.fastSumOfManyAddends" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>This class in designed to sum a lot of endl2dmath or fudge2dmath object together efficiently. For example,
-consider the list f2d of 100,000 fudge2dmath objects that are to be summed. One way to do this is as
-s = fudge2dmath( )
-for f in f2d : s = s + f</p>
-<p>In general, this is very inefficient and will take a long time. Using, this class as</p>
-<p>fs = fastSumOfManyAddends( )
-for f in f2d : fs.appendAddend( f )
-s = fs.returnSum( )</p>
-<p>is, in general, much more efficient (i.e., runs a lot faster) and it should never be less efficient.</p>
-<p>While this class was designed for endl2dmath and fudge2dmath objects, it should work for any object
-for which the &#8216;+&#8217; operation is defined.</p>
-<dl class="method">
-<dt id="fudge.core.math.fudgemath.fastSumOfManyAddends.appendAddend">
-<tt class="descname">appendAddend</tt><big>(</big><em>addend</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#fastSumOfManyAddends.appendAddend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.fastSumOfManyAddends.appendAddend" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds addend to current sum efficiently.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.fudgemath.fastSumOfManyAddends.clear">
-<tt class="descname">clear</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#fastSumOfManyAddends.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.fastSumOfManyAddends.clear" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clears currently summed data.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="fudge.core.math.fudgemath.fastSumOfManyAddends.returnSum">
-<tt class="descname">returnSum</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#fastSumOfManyAddends.returnSum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.fastSumOfManyAddends.returnSum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the current sum of all addends appended.</p>
-</dd></dl>
-
-</dd></dl>
 
 <dl class="function">
 <dt id="fudge.core.math.fudgemath.getValue">
@@ -1293,43 +152,39 @@ for which the &#8216;+&#8217; operation is defined.</p>
 <dd></dd></dl>
 
 <dl class="function">
-<dt id="fudge.core.math.fudgemath.runningYSum">
-<tt class="descclassname">fudge.core.math.fudgemath.</tt><tt class="descname">runningYSum</tt><big>(</big><em>data</em>, <em>normalize=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#runningYSum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.runningYSum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the running sum of dx * y (normalized to 1 of normalize is True) as an endl2dmath object. 
-Data must be list of ( x, y ).</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="fudge.core.math.fudgemath.runningZSum">
-<tt class="descclassname">fudge.core.math.fudgemath.</tt><tt class="descname">runningZSum</tt><big>(</big><em>data</em>, <em>xLabel=None</em>, <em>yLabel=None</em>, <em>zLabel=None</em>, <em>normalize=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#runningZSum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.runningZSum" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the running sum of dy * z (normalized to 1 of normalize is True) for each x as an endl3dmath object.
-Data must be list of ( x, list of ( y, z ) ).</p>
-</dd></dl>
-
-<dl class="function">
 <dt id="fudge.core.math.fudgemath.thickenXYList">
 <tt class="descclassname">fudge.core.math.fudgemath.</tt><tt class="descname">thickenXYList</tt><big>(</big><em>list</em>, <em>tester</em>, <em>biSectionMax=6</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#thickenXYList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.thickenXYList" title="Permalink to this definition">¶</a></dt>
 <dd><p>This functions takes a list of (x,y) points and a function, tester.evaluateAtX, and bi-sectionally adds points to 
 obtain linear-linear tolerance of the returned list and tester.evaluateAtX to tester.relativeTolerance. At most 
 biSectionMax bi-sections are performed between each consecutive pair of inputted points. It is assumed that the 
-inital list of points and the function tester.evaluateAtX agree to tolerance tester.relativeTolerance.</p>
+initial list of points and the function tester.evaluateAtX agree to tolerance tester.relativeTolerance. The instance
+tester must contain the members relativeTolerance and absoluteTolerance as well as the method evaluateAtX. The
+method evaluateAtX takes an x-value and returns its y-value.</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="fudge.core.math.fudgemath.toFloat">
+<tt class="descclassname">fudge.core.math.fudgemath.</tt><tt class="descname">toFloat</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#toFloat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.toFloat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="fudge.core.math.fudgemath.toInt">
+<tt class="descclassname">fudge.core.math.fudgemath.</tt><tt class="descname">toInt</tt><big>(</big><em>value</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/fudgemath.html#toInt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.fudgemath.toInt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
-<div class="section" id="module-fudge.core.math.parameters">
-<span id="parameters-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">parameters</span></tt> Module<a class="headerlink" href="#module-fudge.core.math.parameters" title="Permalink to this headline">¶</a></h2>
-<p>cmattoon 3/2011: copy endlParameters.py contents into fudge/core/fudgemath</p>
+<div class="section" id="parameters-module">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">parameters</span></tt> Module<a class="headerlink" href="#parameters-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-fudge.core.math.pointwiseXY">
 <span id="pointwisexy-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">pointwiseXY</span></tt> Module<a class="headerlink" href="#module-fudge.core.math.pointwiseXY" title="Permalink to this headline">¶</a></h2>
 <p>This module defines &#8216;pointwiseXY&#8217; in pure python. Users will generally prefer to use &#8216;pointwiseXY_C&#8217;,
 which is a faster and more capable C implementation.
 If the C version is not available, fudge will revert to this version.</p>
-<p>cmattoon, July 2011</p>
 <dl class="class">
 <dt id="fudge.core.math.pointwiseXY.pointwiseXY">
 <em class="property">class </em><tt class="descclassname">fudge.core.math.pointwiseXY.</tt><tt class="descname">pointwiseXY</tt><big>(</big><em>initialSize=0</em>, <em>overflowSize=0</em>, <em>data=None</em>, <em>dataForm='xys'</em>, <em>accuracy=None</em>, <em>biSectionMax=4</em>, <em>interpolation=None</em>, <em>infill=True</em>, <em>safeDivide=False</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/pointwiseXY.html#pointwiseXY"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.pointwiseXY.pointwiseXY" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fudge.core.math.endl2dmathClasses.endl2dmath" title="fudge.core.math.endl2dmathClasses.endl2dmath"><tt class="xref py py-class docutils literal"><span class="pre">fudge.core.math.endl2dmathClasses.endl2dmath</span></tt></a></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">fudge.legacy.endl.endl2dmathClasses.endl2dmath</span></tt></p>
 <dl class="method">
 <dt id="fudge.core.math.pointwiseXY.pointwiseXY.changeInterpolation">
 <tt class="descname">changeInterpolation</tt><big>(</big><em>interpolation</em>, <em>accuracy=None</em>, <em>lowerEps=0</em>, <em>upperEps=0</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/pointwiseXY.html#pointwiseXY.changeInterpolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.pointwiseXY.pointwiseXY.changeInterpolation" title="Permalink to this definition">¶</a></dt>
@@ -1406,7 +261,7 @@ If the C version is not available, fudge will revert to this version.</p>
 
 <dl class="function">
 <dt id="fudge.core.math.table.parseXMLNode">
-<tt class="descclassname">fudge.core.math.table.</tt><tt class="descname">parseXMLNode</tt><big>(</big><em>element</em>, <em>conversionTable={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/table.html#parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.table.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.core.math.table.</tt><tt class="descname">parseXMLNode</tt><big>(</big><em>element</em>, <em>xPath=</em>, <span class="optional">[</span><span class="optional">]</span><em>conversionTable={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/table.html#parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.table.parseXMLNode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a table element from xml into python. To convert a column or attribute from string to some other type,
 enter the new type in the conversionTable: {&#8216;index&#8217;:int, &#8216;scatteringRadius&#8217;:PhysicalQuantityWithUncertainty, etc}.</p>
 </dd></dl>
@@ -1432,6 +287,16 @@ enter the new type in the conversionTable: {&#8216;index&#8217;:int, &#8216;scat
 <dd><p>get data from one column, identified by the column &#8216;name&#8217; attribute.
 Convert results to unit if units are specified</p>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.core.math.table.table.nColumns">
+<tt class="descname">nColumns</tt><a class="reference internal" href="../_modules/fudge/core/math/table.html#table.nColumns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.table.table.nColumns" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.core.math.table.table.nRows">
+<tt class="descname">nRows</tt><a class="reference internal" href="../_modules/fudge/core/math/table.html#table.nRows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.table.table.nRows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="fudge.core.math.table.table.removeColumn">
@@ -1459,18 +324,38 @@ Matrix data is stored as a list of lists, which is easily converted into a numpy
 <dl class="method">
 <dt id="fudge.core.math.matrix.matrix.check">
 <tt class="descname">check</tt><big>(</big><em>info</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/matrix.html#matrix.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.matrix.matrix.check" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run some simple checks on covariance matrices: 
-* look for negative eigenvals,
-* check ratio of smallest/largest eigenvals</p>
+<dd><dl class="docutils">
+<dt>Run some simple checks on covariance matrices: </dt>
+<dd><ul class="first last simple">
+<li>look for negative eigenvals,</li>
+<li>check ratio of smallest/largest eigenvals</li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fudge.core.math.matrix.matrix.fix">
 <tt class="descname">fix</tt><big>(</big><em>**kw</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/matrix.html#matrix.fix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.matrix.matrix.fix" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fix common eigenvalue problems: 
-* negative eigenvals,
-* bad ratio of smallest/largest eigenvals</p>
+<dd><dl class="docutils">
+<dt>Fix common eigenvalue problems: </dt>
+<dd><ul class="first last simple">
+<li>negative eigenvals,</li>
+<li>bad ratio of smallest/largest eigenvals</li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.core.math.matrix.matrix.ncols">
+<tt class="descname">ncols</tt><a class="reference internal" href="../_modules/fudge/core/math/matrix.html#matrix.ncols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.matrix.matrix.ncols" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fudge.core.math.matrix.matrix.nrows">
+<tt class="descname">nrows</tt><a class="reference internal" href="../_modules/fudge/core/math/matrix.html#matrix.nrows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.matrix.matrix.nrows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="fudge.core.math.matrix.matrix.plot">
@@ -1479,14 +364,14 @@ Matrix data is stored as a list of lists, which is easily converted into a numpy
 
 <dl class="method">
 <dt id="fudge.core.math.matrix.matrix.toXMLList">
-<tt class="descname">toXMLList</tt><big>(</big><em>flags=None</em>, <em>verbosityIndent=''</em>, <em>indent=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/matrix.html#matrix.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.matrix.matrix.toXMLList" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">toXMLList</tt><big>(</big><em>flags=None</em>, <em>indent=''</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/matrix.html#matrix.toXMLList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.matrix.matrix.toXMLList" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="fudge.core.math.matrix.parseXMLNode">
-<tt class="descclassname">fudge.core.math.matrix.</tt><tt class="descname">parseXMLNode</tt><big>(</big><em>mat</em>, <em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/matrix.html#parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.matrix.parseXMLNode" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.core.math.matrix.</tt><tt class="descname">parseXMLNode</tt><big>(</big><em>mat</em>, <em>xPath=</em>, <span class="optional">[</span><span class="optional">]</span><em>linkData={}</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/matrix.html#parseXMLNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.matrix.parseXMLNode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -1508,8 +393,9 @@ Matrix data is stored as a list of lists, which is easily converted into a numpy
 <tt class="descclassname">fudge.core.math.linearAlgebra.</tt><tt class="descname">cglsqrSolve</tt><big>(</big><em>data</em>, <em>dataUnc=None</em>, <em>dataCov=None</em>, <em>kernel=None</em>, <em>prior=None</em>, <em>priorCov=None</em>, <em>constraintVector=None</em>, <em>constraintMatrix=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/core/math/linearAlgebra.html#cglsqrSolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.core.math.linearAlgebra.cglsqrSolve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constrainted Generalized Least-Squares Solver, based on CorAL routines.
 We are minimizing the following <tt class="docutils literal"><span class="pre">chi^2</span></tt> (assuming Gaussian statistics)</p>
-<div class="highlight-python"><pre>chi^2 = ( data - kernel * model ) * ( dataCov )^-1 * ( data - kernel * model )^T +
-        ( prior - model ) * ( priorCov )^2 * ( prior - model )^T</pre>
+<div class="highlight-python"><div class="highlight"><pre>chi^2 = ( data - kernel * model ) * ( dataCov )^-1 * ( data - kernel * model )^T +
+        ( prior - model ) * ( priorCov )^2 * ( prior - model )^T
+</pre></div>
 </div>
 <p>subject to the constraint</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">constraintVector</span> <span class="o">=</span> <span class="n">constraintMatrix</span> <span class="o">*</span> <span class="n">model</span>
@@ -1556,7 +442,8 @@ If this is specified, the <tt class="docutils literal"><span class="pre">dataUnc
 <blockquote>
 <div><p>If neither the <tt class="docutils literal"><span class="pre">dataUnc</span></tt> or <tt class="docutils literal"><span class="pre">dataCov</span></tt> are specified, we will set the covariance to the 
 identity matrix. Instead of minimizing the <tt class="docutils literal"><span class="pre">chi^2</span></tt>, you will minimize</p>
-<div class="highlight-python"><pre>| data - kernel * model |^2</pre>
+<div class="highlight-python"><div class="highlight"><pre>| data - kernel * model |^2
+</pre></div>
 </div>
 </div></blockquote>
 </li>
@@ -1583,9 +470,10 @@ identity matrix. Instead of minimizing the <tt class="docutils literal"><span cl
 <p class="rubric">HOW IT WORKS</p>
 <p>Because the data and the prior are independent and not correlated, we will solve the minimization problem by
 stacking the prior part and the data part to construct a new <tt class="docutils literal"><span class="pre">chi^2</span></tt> to minimize</p>
-<div class="highlight-python"><pre>          [ data  ]             [ dataCov |     0    ]                [ kernel ]
+<div class="highlight-python"><div class="highlight"><pre>          [ data  ]             [ dataCov |     0    ]                [ kernel ]
 newData = [ ----- ],   newCov = [ --------|--------- ],   newKernel = [ ------ ]
-          [ prior ]             [    0    | priorCov ]                [    1   ]</pre>
+          [ prior ]             [    0    | priorCov ]                [    1   ]
+</pre></div>
 </div>
 <p>With these, the <tt class="docutils literal"><span class="pre">chi^2</span></tt> may be rewritten as</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">chi</span><span class="o">^</span><span class="mi">2</span> <span class="o">=</span> <span class="p">(</span> <span class="n">newData</span> <span class="o">-</span> <span class="n">newKernel</span> <span class="o">*</span> <span class="n">model</span> <span class="p">)</span><span class="o">^</span><span class="n">T</span> <span class="o">*</span> <span class="n">newCov</span><span class="o">^-</span><span class="mi">1</span> <span class="o">*</span> <span class="p">(</span> <span class="n">newData</span> <span class="o">-</span> <span class="n">newKernel</span> <span class="o">*</span> <span class="n">model</span> <span class="p">)</span>
@@ -1599,12 +487,14 @@ newData = [ ----- ],   newCov = [ --------|--------- ],   newKernel = [ ------ ]
 </div>
 <p>Implementing this case where no uncertainty or covariance is given on the data vector is straightforward.
 In this case, we are solving the simple least-squares problem</p>
-<div class="highlight-python"><pre>minimize:   | data - kernel * model |^2 + ( model - prior )*( priorCov )^-1*( model - prior )^T</pre>
+<div class="highlight-python"><div class="highlight"><pre>minimize:   | data - kernel * model |^2 + ( model - prior )*( priorCov )^-1*( model - prior )^T
+</pre></div>
 </div>
 <p>In other words, we use a <tt class="docutils literal"><span class="pre">dataCov</span> <span class="pre">=</span> <span class="pre">1</span></tt>, the identity matrix.</p>
 <p>We comment that the equality constraints can be added in much this same way by adding the constraint 
 vector as a fake data set, with infinitesimal uncertainties</p>
-<div class="highlight-python"><pre>chi^2 += lambda * ( constraintVector - constraintMatrix * model )^2    </pre>
+<div class="highlight-python"><div class="highlight"><pre>chi^2 += lambda * ( constraintVector - constraintMatrix * model )^2    
+</pre></div>
 </div>
 <p>with lambda <span class="math">\(\rightarrow\infty\)</span>.  This approach works, but can lead to numerical instabilities by 
 adding big number to the original covariances, then taking inverses.</p>
@@ -1619,9 +509,10 @@ We use the &#8220;newData&#8221; etc. above and the corresponding <tt class="doc
 </div>
 <p>Here we are really solving the quadratic optimization problem here and the way to solve it is with 
 Lagrange multipliers.  So, extend the model thusly</p>
-<div class="highlight-python"><pre>           [   model  ]
+<div class="highlight-python"><div class="highlight"><pre>           [   model  ]
 newModel = [ ---------]
-           [  lambda  ]</pre>
+           [  lambda  ]
+</pre></div>
 </div>
 <p>Here lambda is the vector of Lagrange multipliers ( there are L of them ).  
 Minimizing the chi^2, we find the usual normal equation</p>
@@ -1629,7 +520,7 @@ Minimizing the chi^2, we find the usual normal equation</p>
 </pre></div>
 </div>
 <p>So, we&#8217;ll stack the normal and constraint equations:</p>
-<div class="highlight-python"><pre>    [ newKernel * newCov^-1 * newKernel^T | constraintMatrix^T ]
+<div class="highlight-python"><div class="highlight"><pre>    [ newKernel * newCov^-1 * newKernel^T | constraintMatrix^T ]
 A = [ ------------------------------------|------------------- ]
     [          constraintMatrix           |         0          ]
 
@@ -1641,7 +532,8 @@ y = [ --------------------------------- ]
 
 giving,
 
-A * newModel = y</pre>
+A * newModel = y
+</pre></div>
 </div>
 <p>We can solve this a few ways:</p>
 <blockquote>
@@ -2096,12 +988,13 @@ or ValueError is raised</p>
 <li><strong>title</strong> &#8211; a string to use as the plot title</li>
 <li><strong>scaling</strong> &#8211; <p>either None, &#8216;log&#8217;, or &#8216;asinh&#8217;
 this scales the value of the matrix plotted in the following ways</p>
-<div class="highlight-python"><pre>* None : no scaling
-* 'log' : each element is plotted as ln(x) -- good for covariances
+<div class="highlight-python"><div class="highlight"><pre>* None : no scaling
+* &#39;log&#39; : each element is plotted as ln(x) -- good for covariances
   which must always be positive semidefinite.  If scalingFloor &gt; 0.0, 
   than we do ln(max(x, scalingFloor)).
-* 'asinh' : each element is scaled as asinh(x).  This exaggerates 
-  scale for values of abs(x)&lt;1.0.</pre>
+* &#39;asinh&#39; : each element is scaled as asinh(x).  This exaggerates 
+  scale for values of abs(x)&lt;1.0.
+</pre></div>
 </div>
 </li>
 <li><strong>scalingFloor</strong> &#8211; the minimum value of each element that gets plotted.</li>
@@ -2199,7 +1092,7 @@ reduce off-diagonal portion of the correlation matrix</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a matrix packed as follows<div class="highlight-python"><pre>[  l[0]  |  0.0  |  0.0 | ... |   0.0  ]
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a matrix packed as follows<div class="highlight-python"><div class="highlight"><pre>[  l[0]  |  0.0  |  0.0 | ... |   0.0  ]
 [ ------ | ----- | ---- | ... | ------ ]
 [   0.0  | l[1]  |  0.0 | ... |   0.0  ]
 [ ------ | ----- | ---- | ... | ------ ]
@@ -2207,7 +1100,8 @@ reduce off-diagonal portion of the correlation matrix</p>
 [ ------ | ----- | ---- | ... | ------ ]
 [    :   |   :   |  :   |     |    :   ]
 [ ------ | ----- | ---- | ... | ------ ]
-[   0.0  |  0.0  |  0.0 | ... | l[n-1] ]</pre>
+[   0.0  |  0.0  |  0.0 | ... | l[n-1] ]
+</pre></div>
 </div>
 <p>where n is the number of non-None elements in l</p>
 </td>
@@ -2255,13 +1149,14 @@ reduce off-diagonal portion of the correlation matrix</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>l</strong> &#8211; a list of numpy matrices, each with same <cite>shape[1]</cite> (i.e. same number of columns).  Elements equal to None are ignored</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a matrix packed as follows<div class="highlight-python"><pre>[  l[0]  ]
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a matrix packed as follows<div class="highlight-python"><div class="highlight"><pre>[  l[0]  ]
 [ ------ ]
 [  l[1]  ]
 [ ------ ]
 [    :   ]
 [ ------ ]
-[ l[n-1] ]</pre>
+[ l[n-1] ]
+</pre></div>
 </div>
 <p>where n is the number of non-None elements in l</p>
 </td>
@@ -2310,24 +1205,22 @@ reduce off-diagonal portion of the correlation matrix</p>
   <ul>
 <li><a class="reference internal" href="#">math Package</a><ul>
 <li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">math</span></tt> Package</a></li>
-<li><a class="reference internal" href="#module-fudge.core.math.endl1dmathClasses"><tt class="docutils literal"><span class="pre">endl1dmathClasses</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-fudge.core.math.endl1dmathmisc"><tt class="docutils literal"><span class="pre">endl1dmathmisc</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-fudge.core.math.endl2dmathClasses"><tt class="docutils literal"><span class="pre">endl2dmathClasses</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-fudge.core.math.endl2dmathmisc"><tt class="docutils literal"><span class="pre">endl2dmathmisc</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-fudge.core.math.endl3dmathClasses"><tt class="docutils literal"><span class="pre">endl3dmathClasses</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-fudge.core.math.endl3dmathmisc"><tt class="docutils literal"><span class="pre">endl3dmathmisc</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-fudge.core.math.endl4dmathClasses"><tt class="docutils literal"><span class="pre">endl4dmathClasses</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-fudge.core.math.endl4dmathmisc"><tt class="docutils literal"><span class="pre">endl4dmathmisc</span></tt> Module</a></li>
+<li><a class="reference internal" href="#endl1dmathclasses-module"><tt class="docutils literal"><span class="pre">endl1dmathClasses</span></tt> Module</a></li>
+<li><a class="reference internal" href="#endl1dmathmisc-module"><tt class="docutils literal"><span class="pre">endl1dmathmisc</span></tt> Module</a></li>
+<li><a class="reference internal" href="#endl2dmathclasses-module"><tt class="docutils literal"><span class="pre">endl2dmathClasses</span></tt> Module</a></li>
+<li><a class="reference internal" href="#endl2dmathmisc-module"><tt class="docutils literal"><span class="pre">endl2dmathmisc</span></tt> Module</a></li>
+<li><a class="reference internal" href="#endl3dmathclasses-module"><tt class="docutils literal"><span class="pre">endl3dmathClasses</span></tt> Module</a></li>
+<li><a class="reference internal" href="#endl3dmathmisc-module"><tt class="docutils literal"><span class="pre">endl3dmathmisc</span></tt> Module</a></li>
+<li><a class="reference internal" href="#endl4dmathclasses-module"><tt class="docutils literal"><span class="pre">endl4dmathClasses</span></tt> Module</a></li>
+<li><a class="reference internal" href="#endl4dmathmisc-module"><tt class="docutils literal"><span class="pre">endl4dmathmisc</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-fudge.core.math.fudge2dGrouping"><tt class="docutils literal"><span class="pre">fudge2dGrouping</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-fudge.core.math.fudgemath"><tt class="docutils literal"><span class="pre">fudgemath</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-fudge.core.math.parameters"><tt class="docutils literal"><span class="pre">parameters</span></tt> Module</a></li>
+<li><a class="reference internal" href="#parameters-module"><tt class="docutils literal"><span class="pre">parameters</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-fudge.core.math.pointwiseXY"><tt class="docutils literal"><span class="pre">pointwiseXY</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-fudge.core.math.table"><tt class="docutils literal"><span class="pre">table</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-fudge.core.math.matrix"><tt class="docutils literal"><span class="pre">matrix</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-fudge.core.math.linearAlgebra"><tt class="docutils literal"><span class="pre">linearAlgebra</span></tt> Module</a></li>
-<li><a class="reference internal" href="#subpackages">Subpackages</a><ul>
-</ul>
-</li>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 </ul>
 </li>
 </ul>
@@ -2375,14 +1268,14 @@ reduce off-diagonal portion of the correlation matrix</p>
         <li class="right" >
           <a href="fudge.core.html" title="core Package"
              >previous</a> |</li>
-        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="index.html" >fudge Package</a> &raquo;</li>
           <li><a href="fudge.core.html" >core Package</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

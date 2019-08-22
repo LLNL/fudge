@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>fudge.processing.miscellaneous &mdash; Fudge and GND 1.2 beta documentation</title>
+    <title>fudge.processing.miscellaneous &mdash; Fudge and GND 1.3 beta documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.2 beta',
+        VERSION:     '1.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +25,7 @@
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
-    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../index.html" />
+    <link rel="top" title="Fudge and GND 1.3 beta documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
@@ -39,7 +38,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -71,7 +70,7 @@
         <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span> <span class="o">=</span> <span class="n">f1</span><span class="o">.</span><span class="n">xSlice</span><span class="p">(</span> <span class="n">xMin</span> <span class="o">=</span> <span class="n">xMin</span><span class="p">,</span> <span class="n">xMax</span> <span class="o">=</span> <span class="n">xMax</span> <span class="p">),</span> <span class="n">f2</span><span class="o">.</span><span class="n">xSlice</span><span class="p">(</span> <span class="n">xMin</span> <span class="o">=</span> <span class="n">xMin</span><span class="p">,</span> <span class="n">xMax</span> <span class="o">=</span> <span class="n">xMax</span> <span class="p">),</span> <span class="n">f3</span><span class="o">.</span><span class="n">xSlice</span><span class="p">(</span> <span class="n">xMin</span> <span class="o">=</span> <span class="n">xMin</span><span class="p">,</span> <span class="n">xMax</span> <span class="o">=</span> <span class="n">xMax</span> <span class="p">)</span>
     <span class="k">return</span><span class="p">(</span> <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span> <span class="p">)</span>
 
-<div class="viewcode-block" id="groupOneFunctionsAndFlux"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.miscellaneous.groupOneFunctionsAndFlux">[docs]</a><span class="k">def</span> <span class="nf">groupOneFunctionsAndFlux</span><span class="p">(</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">processInfo</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
+<div class="viewcode-block" id="groupOneFunctionAndFlux"><a class="viewcode-back" href="../../../fudge/fudge.processing.html#fudge.processing.miscellaneous.groupOneFunctionAndFlux">[docs]</a><span class="k">def</span> <span class="nf">groupOneFunctionAndFlux</span><span class="p">(</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">processInfo</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
 
     <span class="n">groupBoundaries</span><span class="p">,</span> <span class="n">flux_</span> <span class="o">=</span> <span class="n">_groupFunctionsAndFluxInit</span><span class="p">(</span> <span class="n">projectile</span><span class="p">,</span> <span class="n">processInfo</span><span class="p">,</span> <span class="n">f1</span> <span class="p">)</span>
     <span class="k">return</span><span class="p">(</span> <span class="n">f1</span><span class="o">.</span><span class="n">groupTwoFunctions</span><span class="p">(</span> <span class="n">groupBoundaries</span><span class="p">,</span> <span class="n">flux_</span><span class="p">,</span> <span class="n">norm</span> <span class="o">=</span> <span class="n">norm</span> <span class="p">)</span> <span class="p">)</span>
@@ -117,13 +116,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

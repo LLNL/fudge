@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>numericalFunctions Package &mdash; Fudge and GND 1.2 beta documentation</title>
+    <title>numericalFunctions Package &mdash; Fudge and GND 1.3 beta documentation</title>
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.2 beta',
+        VERSION:     '1.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +25,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
-    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../index.html" />
+    <link rel="top" title="Fudge and GND 1.3 beta documentation" href="../index.html" />
     <link rel="up" title="fudge Package" href="index.html" />
     <link rel="next" title="crossSectionAdjustForHeatedTarget Package" href="crossSectionAdjustForHeatedTarget.html" />
     <link rel="prev" title="test Package" href="pqu.test.html" /> 
@@ -47,7 +46,7 @@
         <li class="right" >
           <a href="pqu.test.html" title="test Package"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">fudge Package</a> &raquo;</li> 
       </ul>
     </div>  
@@ -59,173 +58,18 @@
             
   <div class="section" id="numericalfunctions-package">
 <h1>numericalFunctions Package<a class="headerlink" href="#numericalfunctions-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-numericalFunctions.lib.nf_specialFunctions_C">
-<span id="specialfunctions-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">specialFunctions</span></tt> Module<a class="headerlink" href="#module-numericalFunctions.lib.nf_specialFunctions_C" title="Permalink to this headline">¶</a></h2>
-<p>A module that contains special math functions not in the python math module.</p>
-<dl class="function">
-<dt id="numericalFunctions.lib.nf_specialFunctions_C.erf">
-<tt class="descclassname">numericalFunctions.lib.nf_specialFunctions_C.</tt><tt class="descname">erf</tt><big>(</big><em>x</em>, <em>complementary = False</em><big>)</big><a class="headerlink" href="#numericalFunctions.lib.nf_specialFunctions_C.erf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the value of the error function defined as</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><blockquote>
-<div>-| x</div></blockquote>
-<div class="line-block">
-<div class="line"><br /></div>
+<div class="section" id="specialfunctions-module">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">specialFunctions</span></tt> Module<a class="headerlink" href="#specialfunctions-module" title="Permalink to this headline">¶</a></h2>
 </div>
-</div></blockquote>
-<p>2    |     2</p>
-</div></blockquote>
-<dl class="docutils">
-<dt>&#8212;&#8211;  |   -t      </dt>
-<dd></dd>
-<dt>/pi   |           </dt>
-<dd><blockquote class="first">
-<div><div class="line-block">
-<div class="line"><br /></div>
-</div>
-</div></blockquote>
-<p class="last"><a href="#id2"><span class="problematic" id="id3">|</span></a>_  0</p>
-</dd>
-</dl>
-</div></blockquote>
-<p>If the second arugment (i.e., complementary) is False (default), the integral is as shown from 0
-to x, otherwise, the integral is from x to infinite.</p>
-<dl class="docutils">
-<dt>Arguments are:  ([o] implies optional argument)</dt>
-<dd>x                  a float,
-complementary  [o] an integer [default False].</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="numericalFunctions.lib.nf_specialFunctions_C.exponentialIntegral">
-<tt class="descclassname">numericalFunctions.lib.nf_specialFunctions_C.</tt><tt class="descname">exponentialIntegral</tt><big>(</big><em>n</em>, <em>x</em><big>)</big><a class="headerlink" href="#numericalFunctions.lib.nf_specialFunctions_C.exponentialIntegral" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the value of the exponential integral defined as</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><ul class="simple">
-<li>infinity</li>
-</ul>
-</div></blockquote>
-<div class="line-block">
-<div class="line"><br /></div>
-<div class="line-block">
-<div class="line-block">
-<div class="line-block">
-<div class="line">-x t     </div>
-</div>
-<div class="line">e         </div>
-</div>
-<div class="line">&#8212;&#8212; dt   </div>
-<div class="line-block">
-<div class="line-block">
-<div class="line">n        </div>
-</div>
-<div class="line">t         </div>
-<div class="line"><br /></div>
-</div>
-</div>
-</div>
-</div></blockquote>
-<p>_  1</p>
-</div></blockquote>
-<dl class="docutils">
-<dt>Arguments are:</dt>
-<dd>n  an integer that must be greater than or equal to 0
-x  a float</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="numericalFunctions.lib.nf_specialFunctions_C.gamma">
-<tt class="descclassname">numericalFunctions.lib.nf_specialFunctions_C.</tt><tt class="descname">gamma</tt><big>(</big><em>s</em><big>)</big><a class="headerlink" href="#numericalFunctions.lib.nf_specialFunctions_C.gamma" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the value of the gamma function defined as</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div>-| infinity</div></blockquote>
-<div class="line-block">
-<div class="line"><br /></div>
-<div class="line-block">
-<div class="line-block">
-<div class="line">s-1  -t    </div>
-</div>
-<div class="line">t    e   dt </div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-</div>
-</div>
-</div></blockquote>
-<p><a href="#id4"><span class="problematic" id="id5">|</span></a>_  0</p>
-</div></blockquote>
-<dl class="docutils">
-<dt>Arguments are:</dt>
-<dd>s  a float that must be greater than 0</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="numericalFunctions.lib.nf_specialFunctions_C.incompleteGamma">
-<tt class="descclassname">numericalFunctions.lib.nf_specialFunctions_C.</tt><tt class="descname">incompleteGamma</tt><big>(</big><em>s</em>, <em>x</em>, <em>complementary = False</em><big>)</big><a class="headerlink" href="#numericalFunctions.lib.nf_specialFunctions_C.incompleteGamma" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the value of the incomplete gamma function defined as</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div>-| x</div></blockquote>
-<div class="line-block">
-<div class="line"><br /></div>
-<div class="line-block">
-<div class="line-block">
-<div class="line">s-1  -t    </div>
-</div>
-<div class="line">t    e   dt </div>
-<div class="line"><br /></div>
-<div class="line"><br /></div>
-</div>
-</div>
-</div></blockquote>
-<p><a href="#id6"><span class="problematic" id="id7">|</span></a>_  0</p>
-</div></blockquote>
-<p>If the third arugment (i.e., complementary) is False (default), the integral is as shown from 0
-to x, otherwise, the integral is from x to infinite.</p>
-<dl class="docutils">
-<dt>Arguments are:  ([o] implies optional argument)</dt>
-<dd>s                  a float that must be greater than 0,
-x                  a float that must be greater than 0,
-complementary  [o] an integer [default False].</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="section" id="module-numericalFunctions.lib.nf_Legendre_C">
-<span id="legendre-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">Legendre</span></tt> Module<a class="headerlink" href="#module-numericalFunctions.lib.nf_Legendre_C" title="Permalink to this headline">¶</a></h2>
-<p>A module that contains the class nf_Legendre_C.</p>
-<dl class="function">
-<dt id="numericalFunctions.lib.nf_Legendre_C.from_pointwiseXY_C">
-<tt class="descclassname">numericalFunctions.lib.nf_Legendre_C.</tt><tt class="descname">from_pointwiseXY_C</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.nf_Legendre_C.from_pointwiseXY_C" title="Permalink to this definition">¶</a></dt>
-<dd><p>The nf_Legendre_C class limits the maximum Legendre order that an instance can have.
-This function returns the largest allowed Legendre order.</p>
-<p>Arguments are: (this method does not take any arguments).</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="numericalFunctions.lib.nf_Legendre_C.maxMaxOrder">
-<tt class="descclassname">numericalFunctions.lib.nf_Legendre_C.</tt><tt class="descname">maxMaxOrder</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.nf_Legendre_C.maxMaxOrder" title="Permalink to this definition">¶</a></dt>
-<dd><p>The nf_Legendre_C class limits the maximum Legendre order that an instance can have.
-This function returns the largest allowed Legendre order.</p>
-<p>Arguments are: (this method does not take any arguments).</p>
-</dd></dl>
-
+<div class="section" id="legendre-module">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">Legendre</span></tt> Module<a class="headerlink" href="#legendre-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-numericalFunctions.lib.pointwiseXY_C">
 <span id="pointwisexy-c-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">pointwiseXY_C</span></tt> Module<a class="headerlink" href="#module-numericalFunctions.lib.pointwiseXY_C" title="Permalink to this headline">¶</a></h2>
 <p>A module that contains the class pointwiseXY_C.</p>
 <dl class="function">
 <dt id="numericalFunctions.lib.pointwiseXY_C.basicGaussian">
-<tt class="descclassname">numericalFunctions.lib.pointwiseXY_C.</tt><tt class="descname">basicGaussian</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.basicGaussian" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">numericalFunctions.lib.pointwiseXY_C.</tt><tt class="descname">basicGaussian</tt><big>(</big><em>accuracy</em><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.basicGaussian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a new pointwiseXY_C instance constructed from the following equation</p>
 <blockquote>
 <div>exp( ( x^2 / 2 )</div></blockquote>
@@ -237,14 +81,14 @@ This function returns the largest allowed Legendre order.</p>
 
 <dl class="function">
 <dt id="numericalFunctions.lib.pointwiseXY_C.createFromFunction">
-<tt class="descclassname">numericalFunctions.lib.pointwiseXY_C.</tt><tt class="descname">createFromFunction</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.createFromFunction" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">numericalFunctions.lib.pointwiseXY_C.</tt><tt class="descname">createFromFunction</tt><big>(</big><em>xs</em>, <em>f</em>, <em>parameters</em>, <em>accuracy</em>, <em>biSectionMax</em>, <em>checkForRoots = False</em>, <em>infill = True</em>, <em>saveDivide = True</em><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.createFromFunction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a pointwiseXY_C instance which represents the function f(x) where f is the second argument and must be a
 function reference. The function f must take two arguments. The first arugment to f is x and the second is the third
 argument to createFromFunction. The function f must return, as a float, the y-value at x. The returned pointwiseXY_C
 instance may contain more points then xs (the first argument) as createFromFunction does infilling. That is, points
 are added recursively between the points in xs until accuracy or biSectionMax is reached.</p>
 <dl class="docutils">
-<dt>Arguments are:</dt>
+<dt>Arguments are: ([o] implies optional argument)</dt>
 <dd><p class="first">xs            An ascending list of x-values to use as an initial guess for the refinement of the returned pointwiseXY_C instance.
 f             A function that returns the y-value given an x-value.
 parameters    Any python object which may be needed by f. Passed as the second argument to f.
@@ -270,14 +114,30 @@ xSin_xx = pointwiseXY_C.createFromFunction( xs, f, None, 1e-3, 12, checkForRoots
 </dd></dl>
 
 <dl class="function">
-<dt id="numericalFunctions.lib.pointwiseXY_C.erf">
-<tt class="descclassname">numericalFunctions.lib.pointwiseXY_C.</tt><tt class="descname">erf</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.erf" title="Permalink to this definition">¶</a></dt>
-<dd><p>For internal use only. This is a deprecated function, do not use!</p>
+<dt id="numericalFunctions.lib.pointwiseXY_C.createFromString">
+<tt class="descclassname">numericalFunctions.lib.pointwiseXY_C.</tt><tt class="descname">createFromString</tt><big>(</big><em>str</em>, <em>accuracy</em>, <em>biSectionMax</em>, <em>interpolation = 'linear</em>, <em>linear'</em>, <em>infill = True</em>, <em>safeDivide = True</em><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.createFromString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a tuple of two elements. The first element is a pointwiseXY_C instance representing the float values
+translated from &#8216;str&#8217;. The second element is the portion of &#8216;str&#8217; not translated</p>
+<dl class="docutils">
+<dt>Arguments are: ([o] implies optional argument)</dt>
+<dd>str           The containing a list of floats to be converted.
+accuracy      The accuracy for infilling.
+biSectionMax  The maximum number of bi-sections for infilling.
+interpolation [o] the interpolation string (default is &#8216;linear,linear&#8217;).
+infill        [o] Infill value used for the returned pointwiseXY_C instance (default is True).
+safeDivide    [o] SafeDivide value used for the returned pointwiseXY_C instance (default is True).</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="numericalFunctions.lib.pointwiseXY_C.defaultAccuracy">
+<tt class="descclassname">numericalFunctions.lib.pointwiseXY_C.</tt><tt class="descname">defaultAccuracy</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.defaultAccuracy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the default accuracy for the __init_ method.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="numericalFunctions.lib.pointwiseXY_C.gaussian">
-<tt class="descclassname">numericalFunctions.lib.pointwiseXY_C.</tt><tt class="descname">gaussian</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.gaussian" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">numericalFunctions.lib.pointwiseXY_C.</tt><tt class="descname">gaussian</tt><big>(</big><em>accuracy</em>, <em>xMin</em>, <em>xMax</em>, <em>offset = 0.</em>, <em>sigma = 1.</em>, <em>amplitude = 1.</em>, <em>dullEps = False</em><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.gaussian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a new pointwiseXY_C instance constructed from the following equation</p>
 <blockquote>
 <div>amplitude * exp( ( ( x - offset ) / sigma )^2 / 2 )        for xMin &lt;= x &lt;= xMax</div></blockquote>
@@ -295,20 +155,21 @@ dullEps    [o]  currently not used.</dd>
 
 <dl class="function">
 <dt id="numericalFunctions.lib.pointwiseXY_C.interpolatePoint">
-<tt class="descclassname">numericalFunctions.lib.pointwiseXY_C.</tt><tt class="descname">interpolatePoint</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.interpolatePoint" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">numericalFunctions.lib.pointwiseXY_C.</tt><tt class="descname">interpolatePoint</tt><big>(</big><em>interpolation</em>, <em>x</em>, <em>x1</em>, <em>y1</em>, <em>x2</em>, <em>y2</em><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.interpolatePoint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns interpolation of x for x1 &lt;= x &lt;= x2 given x1, y1, x2, y2 and interpolation law.
-Arguments are:
-interpolation   a string representing the interpolation law (e.g., &#8216;log,linear&#8217;),
+Arguments are:</p>
+<blockquote>
+<div>interpolation   a string representing the interpolation law (e.g., &#8216;log,linear&#8217;; see constructor&#8217;s docstring),
 x               x point of interpolated y-value,
 x1              lower x-value,
 y1              y(x1),
 x2              upper x-value,
-y2              y(x2).</p>
+y2              y(x2).</div></blockquote>
 </dd></dl>
 
 <dl class="function">
 <dt id="numericalFunctions.lib.pointwiseXY_C.unitbaseInterpolate">
-<tt class="descclassname">numericalFunctions.lib.pointwiseXY_C.</tt><tt class="descname">unitbaseInterpolate</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.unitbaseInterpolate" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">numericalFunctions.lib.pointwiseXY_C.</tt><tt class="descname">unitbaseInterpolate</tt><big>(</big><em>x</em>, <em>lw</em>, <em>lXY</em>, <em>uw</em>, <em>uXY</em><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.unitbaseInterpolate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the unitbase interpolation of two XYs objects at w where the axes are labeled (w, x, y).</p>
 <dl class="docutils">
 <dt>Arguments are:</dt>
@@ -330,12 +191,12 @@ uXY     a pointwiseXY_C instance for a function y(x),</dd>
 <p>The pointwiseXY_C class stores and manipulates a list of XY points (i.e., [x, y] pairs).
 Methods to add, substract, multiply and divide a pointwiseXY_C object with a scaler
 (i.e., a number) or other pointwiseXY_C object are provided.</p>
+<p>Constructor:
+pointwiseXY_C( data = [], dataForm = &#8216;xys&#8217;, initialSize = 100, overflowSize = 10, accuracy = defaultAccuracy( ), biSectionMax = 3., interpolation = &#8216;linear,linear&#8217;, infill = True, safeDivide = False, userFlag = 0 )</p>
 <dl class="docutils">
-<dt>Constructor arguments are:</dt>
-<dd><p class="first">initialSize     the initial size of the primary data cache (default = 100),
-overflowSize    the initial size of the secondary (overflow) data cache (default = 10),
-data            the [x_i, y_i] pairs given as described by the dataForm argument,
-dataForm        can be one of three strings (case is ignored) that describes the form of data:</p>
+<dt>Constructor arguments are ([o] implies optional argument):</dt>
+<dd><p class="first">data            [o] the [x_i, y_i] pairs given as described by the dataForm argument,
+dataForm        [o] can be one of three strings (case is ignored) that describes the form of data:</p>
 <blockquote>
 <div><dl class="docutils">
 <dt>&#8216;XYs&#8217;      data are a sequence of [x_i, y_i] pairs with x_i ascending (i.e., x_i &lt; x_{i+1})</dt>
@@ -346,12 +207,14 @@ dataForm        can be one of three strings (case is ignored) that describes the
 <dd>(e.g., data = [ 1, 1, 2.3, 2, 3.4, 6, 5.1, 4.3 ]),</dd>
 </dl>
 </div></blockquote>
-<p>accuracy        the accuracy of the data for the given interpolation (default = 1e-3)
-biSectionMax    at times (e.g., multiplication), points may need to be added to maintain the give accuracy. In this case, a region</p>
+<p>initialSize     [o] the initial size of the primary data cache (default = 100),
+overflowSize    [o] the initial size of the secondary (overflow) data cache (default = 10),
+accuracy        [o] the accuracy of the data for the given interpolation (default is value returned by function defaultAccuracy)
+biSectionMax    [o] at times (e.g., multiplication), points may need to be added to maintain the give accuracy. In this case, a region</p>
 <blockquote>
 <div>is continuously divided into two until the accuracy is met or biSectionMax divisions have occurred (default = 3),</div></blockquote>
 <dl class="docutils">
-<dt>interpolation   can be one of the following strings:</dt>
+<dt>interpolation   [o] can be one of the following strings:</dt>
 <dd>&#8216;flat&#8217;              for the domain [x_i,x_{i+1}), the y-value is y_i
 &#8216;linear,flat&#8217;       same as &#8216;flat&#8217;
 &#8216;log,flat&#8217;          same as &#8216;flat&#8217;
@@ -364,8 +227,9 @@ biSectionMax    at times (e.g., multiplication), points may need to be added to 
 &#8216;linear,other&#8217;
 &#8216;log,other&#8217;</dd>
 </dl>
-<p class="last">infill          if True, multiplication will continuously divide a region until accuracy or biSectionMax is met (default = True),
-safeDivide      if True, safe division is used (default = False)</p>
+<p class="last">infill          [o] if True, multiplication will continuously divide a region until accuracy or biSectionMax is met (default = True),
+safeDivide      [o] if True, safe division is used (default = False)
+userFlag        [o] an integer (of type C int) used to store a user defined flag. (see getUserFlag and setUserFlag).</p>
 </dd>
 </dl>
 <dl class="method">
@@ -559,6 +423,12 @@ positiveXOnly  [o] this only applies to lowerEps and only if an added point woul
 </dd></dl>
 
 <dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getUserFlag">
+<tt class="descname">getUserFlag</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getUserFlag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the user flag.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getValue">
 <tt class="descname">getValue</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.getValue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the y value at x.</p>
@@ -715,6 +585,12 @@ forceSmaller  [o] if False action is only taken if allocated is significantly gr
 </dd></dl>
 
 <dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.runningIntegral">
+<tt class="descname">runningIntegral</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.runningIntegral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns, as a python list, the integrals between successive x-values.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setAccuracy">
 <tt class="descname">setAccuracy</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setAccuracy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets self&#8217;s accuracy value and returns the actual value set.</p>
@@ -772,6 +648,12 @@ ys      the list of y-values</dd>
 </dd></dl>
 
 <dl class="method">
+<dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setUserFlag">
+<tt class="descname">setUserFlag</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setUserFlag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the users flag via the first argument.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setValue">
 <tt class="descname">setValue</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.setValue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the y value at x.</p>
@@ -787,9 +669,9 @@ ys      the list of y-values</dd>
 <dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.thicken">
 <tt class="descname">thicken</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.thicken" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a new instance with denser points than self filled in using self&#8217;s interpolation. The number of points added are determined by the following arguments
-sectionSubdivideMax    maximum number of points to insert between consecutive points,
-dxMax                  minimum dx step,
-fxMax                  minimum fractional step.</p>
+sectionSubdivideMax    maximum number of points to insert between consecutive points (default 1),
+dxMax                  minimum dx step (default 0),
+fxMax                  minimum fractional step (default 1).</p>
 </dd></dl>
 
 <dl class="method">
@@ -802,10 +684,11 @@ fxMax                  minimum fractional step.</p>
 <dt id="numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.toString">
 <tt class="descname">toString</tt><big>(</big><big>)</big><a class="headerlink" href="#numericalFunctions.lib.pointwiseXY_C.pointwiseXY_C.toString" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a string representation of self. This method has three keyword parameters:
-pairsPerLine, format and pairSeparator which are defined as,
-pairsPerLine    the number of pairs to put on each line
+pairsPerLine, format and pairSeparator which are defined as,</p>
+<blockquote>
+<div>pairsPerLine    the number of pairs to put on each line
 format          a valid format to convert an (x,y) pair (i.e., two floats) into a string (e.g. format = &#8216; %.3f %12.5e&#8217;)
-pairSeparator   a string to put between every pair (e.g, to put a comma to separate pairs use pairSeparator = &#8216;,&#8217;)</p>
+pairSeparator   a string to put between every pair (e.g, to put a comma to separate pairs use pairSeparator = &#8216;,&#8217;)</div></blockquote>
 </dd></dl>
 
 <dl class="method">
@@ -877,8 +760,8 @@ fill    [o] if True, points are added at xMin and xMax if they are not in self,<
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">numericalFunctions Package</a><ul>
-<li><a class="reference internal" href="#module-numericalFunctions.lib.nf_specialFunctions_C"><tt class="docutils literal"><span class="pre">specialFunctions</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-numericalFunctions.lib.nf_Legendre_C"><tt class="docutils literal"><span class="pre">Legendre</span></tt> Module</a></li>
+<li><a class="reference internal" href="#specialfunctions-module"><tt class="docutils literal"><span class="pre">specialFunctions</span></tt> Module</a></li>
+<li><a class="reference internal" href="#legendre-module"><tt class="docutils literal"><span class="pre">Legendre</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-numericalFunctions.lib.pointwiseXY_C"><tt class="docutils literal"><span class="pre">pointwiseXY_C</span></tt> Module</a></li>
 <li><a class="reference internal" href="#pointwisexy-c-pointwisexy-c-class"><tt class="docutils literal"><span class="pre">pointwiseXY_C.pointwiseXY_C</span></tt> Class</a></li>
 </ul>
@@ -928,13 +811,13 @@ fill    [o] if True, points are added at xMin and xMax if they are not in self,<
         <li class="right" >
           <a href="pqu.test.html" title="test Package"
              >previous</a> |</li>
-        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="index.html" >fudge Package</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

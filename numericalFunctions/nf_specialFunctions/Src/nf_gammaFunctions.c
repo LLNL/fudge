@@ -129,7 +129,7 @@ double nf_gammaFunction( double x, nfu_status *status ) {
         if( x < 0.0 ) {
             p = floor( q );
             if( p == q ) goto goverf;
-            i = p;
+            i = (int) p;
             if( ( i & 1 ) == 0 ) sgngam = -1;
             z = q - p;
             if( z > 0.5 ) {
@@ -219,7 +219,7 @@ static double lgam( double x, int *sgngam, nfu_status *status ) {
         w = lgam( q, sgngam, status );                  /* note this modifies *sgngam! */
         p = floor( q );
         if( p == q ) goto lgsing;
-        i = p;
+        i = (int) p;
         if( ( i & 1 ) == 0 ) {
             *sgngam = -1; }
         else {

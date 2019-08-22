@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -8,7 +33,7 @@ To resolve the location of the bdfls file, endlProject does the following,
     1) Uses the bdflsFileName argument if it is None; else,
     2) Uses "./bdfls" if it exists; else,
     3) Uses the bdfls in the database (at the same level as the "ascii" file) if it exists; else,
-    4) Uses the bdlfs pointed to by the environmental variable BDFLSPATH if it exists; else,
+    4) Uses the bdfls pointed to by the environmental variable BDFLSPATH if it exists; else,
     5) Uses "/usr/gapps/data/nuclear/bdfls".
 """
 
@@ -19,7 +44,7 @@ import sys
 import types
 
 from fudge import fudgeDefaults, fudgeParameters
-from fudge.processing import bdfls
+import bdfls
 from fudge.core.utilities import brb
 import fudgeDocumentationFile
 import endlZA
@@ -137,7 +162,7 @@ class endlProject :
             if( not os.path.isdir( self.workDir ) ) : os.makedirs( self.workDir )
             self.workDir = endlmisc.appendyiDirIfNeeded( self.workDir, self.yiTags[0] )
             if( not os.path.isdir( self.workDir ) ) : os.makedirs( self.workDir )
-        if( not( self.workDir is None ) and cleanWorkDirOfZAs ) : os.system( 'rm -rf %s/za[0-9][0-9][0-9][0-9][0-9][0-9]*' )
+        if( not( self.workDir is None ) and cleanWorkDirOfZAs ) : os.system( 'rm -rf %s/za[0-9][0-9][0-9][0-9][0-9][0-9]*' % self.workDir )
         self.zas = []
         self.documentation = None
         if( self.database != None ) :

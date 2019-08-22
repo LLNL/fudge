@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 import copy, sys
@@ -466,6 +491,6 @@ def toEnergyFunctionalData( LF, moniker, unit, data ) :
 
     interpolationx, interpolationy = ENDFInterpolationToGND2d( data['interpolationInfo'][0][1] )
     axes_ = axes.axes( )
-    axes_[0] = axes.axis( 'energy_in', 0, 'eV', frame = axes.labToken, interpolation = axes.interpolationXY( interpolationx, interpolationy ) )
-    axes_[1] = axes.axis( moniker, 1, unit, frame = axes.labToken )
+    axes_[0] = axes.axis( 'energy_in', 0, 'eV', interpolation = axes.interpolationXY( interpolationx, interpolationy ) )
+    axes_[1] = axes.axis( moniker, 1, unit )
     return( distributions.energy.energyFunctionalData( axes_, data['data'], accuracy = ENDF_Accuracy, moniker = moniker ) )

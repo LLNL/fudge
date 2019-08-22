@@ -1,5 +1,30 @@
 /*
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 */
 
@@ -210,6 +235,7 @@ ptwXYPoints *ptwXY_thin( ptwXYPoints *ptwXY1, double accuracy, nfu_status *statu
     if( ( *status = ptwXY_simpleCoalescePoints( ptwXY1 ) ) != nfu_Okay ) return( NULL );
     *status = nfu_otherInterpolation;
     if( ptwXY1->interpolation == ptwXY_interpolationOther ) return( NULL );
+    if( accuracy < ptwXY1->accuracy ) accuracy = ptwXY1->accuracy;
     if( ( thinned = ptwXY_new( ptwXY1->interpolation, ptwXY1->biSectionMax, accuracy, length, ptwXY1->overflowLength, status, ptwXY1->userFlag ) ) == NULL ) return( NULL );
 
     thinned->points[0] = ptwXY1->points[0];                     /* This sections removes middle point if surrounding points have the same y-value. */
@@ -227,7 +253,7 @@ ptwXYPoints *ptwXY_thin( ptwXYPoints *ptwXY1, double accuracy, nfu_status *statu
 
     if( ptwXY1->interpolation != ptwXY_interpolationFlat ) {    /* Now call ptwXY_thin2 for more thinning. */
         length = thinned->length = j;
-        if( ( thin = nfu_calloc( 1, length ) ) == NULL ) goto Err;
+        if( ( thin = (char *) nfu_calloc( 1, (size_t) length ) ) == NULL ) goto Err;
         if( ( *status = ptwXY_thin2( thinned, thin, accuracy, 0, length - 1 ) ) != nfu_Okay ) goto Err;
         for( j = 1; j < length; j++ ) if( thin[j] != 0 ) break;
         for( i = j + 1; i < length; i++ ) {
@@ -456,9 +482,43 @@ ptwXYPoints *ptwXY_union( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_status *
     }
     n->length = i;
 
-    if( ( *status = ptwXY_mergeClosePoints( n, 4 * DBL_EPSILON ) ) != nfu_Okay ) {
-        ptwXY_free( n );
-        return( NULL );
+    if( unionOptions & ptwXY_union_mergeClosePoints ) {
+        if( ( *status = ptwXY_mergeClosePoints( n, 4 * DBL_EPSILON ) ) != nfu_Okay ) {
+            ptwXY_free( n );
+            return( NULL );
+        }
     }
     return( n );
+}
+/*
+************************************************************
+*/
+nfu_status ptwXY_scaleOffsetXAndY( ptwXYPoints *ptwXY, double xScale, double xOffset, double yScale, double yOffset ) {
+
+    int64_t i1, length = ptwXY->length;
+    ptwXYPoint *p1;
+    nfu_status status;
+
+    if( ptwXY->status != nfu_Okay ) return( ptwXY->status );
+    if( xScale == 0 ) return( nfu_XNotAscending );
+
+    if( ( status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( status );
+
+    for( i1 = 0, p1 = ptwXY->points; i1 < length; i1++, p1++ ) {
+        p1->x = xScale * p1->x + xOffset;
+        p1->y = yScale * p1->y + yOffset;
+    }
+
+    if( xScale < 0 ) {
+        int64_t length_2 = length / 2;
+        ptwXYPoint tmp, *p2;
+
+        for( i1 = 0, p1 = ptwXY->points, p2 = &(ptwXY->points[length-1]); i1 < length_2; i1++ ) {
+            tmp = *p1;
+            *p1 = *p2;
+            *p2 = tmp;
+        }
+    }
+
+    return( ptwXY->status );
 }

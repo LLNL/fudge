@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -438,7 +463,7 @@ def print3dData( d, i0 = 0, i1 = 1, i2 = 2, fmt0 = None, fmt1 = None, fmt2 = Non
 def string3dData( d, i0 = 0, i1 = 1, i2 = 2, fmt0 = None, fmt1 = None, fmt2 = None ) :
     """Returns a list of strings for data d.  D must be list[ number, list[ number, number ] ]."""
 
-    from fudge.core.math import endl3dmathmisc
+    from fudge.legacy.endl import endl3dmathmisc
     i = [ i0, i1, i2 ]
     i.sort( )
     if ( i[0] != 0 ) or ( i[1] != 1 ) or ( i[2] != 2 ) :
@@ -554,7 +579,7 @@ def print4dData( d, i0 = 0, i1 = 1, i2 = 2, i3 = 3, fmt0 = None, fmt1 = None, fm
 def string4dData( d, i0 = 0, i1 = 1, i2 = 2, i3 = 3, fmt0 = None, fmt1 = None, fmt2 = None, fmt3 = None ) :
     """Returns a list of strings for data d.  D must be list[ number, list[ number, list[ number, number ] ] ]."""
 
-    from fudge.core.math import endl4dmathmisc
+    from fudge.legacy.endl import endl4dmathmisc
     i = [ i0, i1, i2, i3 ]
     i.sort( )
     if ( i[0] != 0 ) or ( i[1] != 1 ) or ( i[2] != 2 ) or ( i[3] != 3 ) :
@@ -737,6 +762,48 @@ def checkMessagesToString( message, indentation = '  ', subIndentation = '  ' ) 
             else :
                 raise Exception( 'Error in endlmisc.checkMessagesToString: invalid message type = %s' % type( m ) )
     return( s )
+
+def checkCulling( errs, cullStrings ) :
+    """
+    Removes all messages containing sub-strings listed in cullStrings. cullStrings can be either a string or a
+    list of strings. If as list of strings, each string must be a sub-string in a message for the message to
+    be culled.
+    """
+
+    def checkCullingMatch( message, cullStrings ) :
+
+        found = True
+        for cullString in cullStrings : found = found and ( cullString in message )
+        return( found )
+
+    def checkCulling2( message, cullStrings, level = 0 ) :
+
+        if( isinstance( message, list ) ) :
+            messages = []
+            for msg in message :
+                msg1 = checkCulling2( msg, cullStrings, level + 1 )
+                if( msg1 is not None ) : messages.append( msg1 )
+            if( len( messages ) < 2 ) : messages = None
+            return( messages )
+        else :
+            if( checkCullingMatch( message, cullStrings ) ) : return( None )
+            return( message )
+
+    if( isinstance( cullStrings, str ) ) : cullStrings = [ cullStrings ]
+    errs2 = []
+    for err in errs :
+        messages = []
+        if( isinstance( err.message, str ) ) :
+            if( not( checkCullingMatch( err.message, cullStrings ) ) ) : errs2.append( err )
+        else :
+            for message in err.message :
+                message = checkCulling2( message, cullStrings )
+                if( message is not None ) :
+                    messages.append( message )
+            if( len( messages ) > 0 ) :
+                err.message = messages
+                errs2.append( err )
+    return( errs2 )
 
 def printWarning( s ) :
 

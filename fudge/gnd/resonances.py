@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -51,20 +76,27 @@ class resonances(ancestry):
     def  __str__( self ) :
         """ string representation """
         return( self.toString( simpleString = False ) )
+
+    def check( self, info ):
+        from fudge.gnd import warning
+        warnings = []
+        for section in ('scatteringRadius','resolved','unresolved'):
+            if getattr(self, section) is not None:
+                warningList = getattr(self,section).check(info)
+                if warningList:
+                    warnings.append( warning.context( section, warningList ) )
+        return warnings
     
-    def toXMLList( self, flags, verbosityIndent = '', indent = '' ) :
+    def toXMLList( self, flags, indent = '' ) :
     
         xmlString = [indent+'<resonances reconstructCrossSection="%s">' % 
                 str(self.reconstructCrossSection).lower()]
         if self.scatteringRadius:
-            xmlString += self.scatteringRadius.toXMLList( flags, 
-                    verbosityIndent = verbosityIndent, indent = indent+'  ', writeConstant=True )
+            xmlString += self.scatteringRadius.toXMLList( flags, indent = indent + '  ', writeConstant=True )
         if self.resolved:
-            xmlString += self.resolved.toXMLList( flags, 
-                    verbosityIndent = verbosityIndent, indent = indent+'  ' )
+            xmlString += self.resolved.toXMLList( flags, indent = indent + '  ' )
         if self.unresolved:
-            xmlString += self.unresolved.toXMLList( flags, 
-                    verbosityIndent = verbosityIndent, indent = indent+'  ' )
+            xmlString += self.unresolved.toXMLList( flags, indent = indent + '  ' )
         xmlString[-1] += '</resonances>'
         return xmlString
 
@@ -84,16 +116,20 @@ class resonances(ancestry):
         else: return (bounds[0][0].value, bounds[-1][1].value)
 
     @staticmethod
-    def parseXMLNode( element, linkData={} ):
+    def parseXMLNode( element, xPath=[], linkData={} ):
+        xPath.append( element.tag )
+
         scatRadius, RRR, URR = None,None,None
         kReconstruct = (element.get("reconstructCrossSection") == "true")
         for child in element:
-            if child.tag=='scatteringRadius': scatRadius = scatteringRadius.parseXMLNode( child )
-            elif child.tag=='resolved': RRR = resolved.parseXMLNode( child )
-            elif child.tag=='unresolved': URR = unresolved.parseXMLNode( child )
+            if child.tag=='scatteringRadius': scatRadius = scatteringRadius.parseXMLNode( child, xPath )
+            elif child.tag=='resolved': RRR = resolved.parseXMLNode( child, xPath )
+            elif child.tag=='unresolved': URR = unresolved.parseXMLNode( child, xPath )
             else: raise Exception("unknown element '%s' encountered in resonances!" % child.tag)
-        return resonances( scatteringRadius = scatRadius, resolved=RRR, unresolved=URR,
+        res = resonances( scatteringRadius = scatRadius, resolved=RRR, unresolved=URR,
                 reconstructCrossSection=kReconstruct )
+        xPath.pop()
+        return res
     
     def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = ''):
         """ """
@@ -189,6 +225,9 @@ class scatteringRadius(ancestry):
 
     def __nonzero__(self): return bool(self.value)
 
+    def check( self, info ):
+        return []
+
     def isEnergyDependent(self):
         return isinstance( self.value, XYs.XYs )
 
@@ -209,7 +248,7 @@ class scatteringRadius(ancestry):
         if isinstance(self.value, physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty): return self.value
         else: return 'energyDependent'
 
-    def toXMLList(self, flags, verbosityIndent = '', indent = '', writeConstant=False ):
+    def toXMLList(self, flags, indent = '', writeConstant=False ):
 
         xmlString = []
         if( self.isEnergyDependent( ) ) :
@@ -220,14 +259,17 @@ class scatteringRadius(ancestry):
         return( xmlString )
 
     @staticmethod
-    def parseXMLNode( element, linkData={} ):
+    def parseXMLNode( element, xPath=[], linkData={} ):
+        xPath.append( element.tag )
         lower, upper = None, None
         if len(element)==0:
             value = PQU(element.get('value'))
             lower = PQU(element.get('lowerBound')); upper = PQU(element.get('upperBound'))
         else:
             value = XYs.XYs.parseXMLNode( element )
-        return scatteringRadius( value, lower, upper )
+        SR = scatteringRadius( value, lower, upper )
+        xPath.pop()
+        return SR
 
 
 # resolved/unresolved regions:
@@ -249,22 +291,29 @@ class resolved(ancestry):
             return ("Resolved region with DEPRECATED multiple regions\n")
         else:
             return ("Resolved resonances in %s form\n" % self.nativeData.moniker )
+
+    def check( self, info ):
+        import warning
+        warnings = []
+        if self.multipleRegions:
+            warnings.append( warning.RRmultipleRegions() )
+        return warnings
     
-    def toXMLList( self, flags, verbosityIndent = '', indent = '' ) :
+    def toXMLList( self, flags, indent = '' ) :
         if self.multipleRegions:
             xmlString = [indent+'<resolved multipleRegions="true">']
             for region in self.regions:
-                xmlString += region.toXMLList( flags, 
-                        verbosityIndent = verbosityIndent, indent = indent+'  ' )
+                xmlString += region.toXMLList( flags, indent = indent + '  ' )
         else:
             xmlString = [indent+'<resolved lowerBound="%s" upperBound="%s" nativeData="%s">' % (
                     self.lowerBound, self.upperBound, self.nativeData.moniker ) ]
-            xmlString += self.nativeData.toXMLList( flags, verbosityIndent, indent+'  ')
+            xmlString += self.nativeData.toXMLList( flags, indent + '  ')
         xmlString[-1] += '</resolved>'
         return xmlString
 
     @staticmethod
-    def parseXMLNode( element, linkData={} ):
+    def parseXMLNode( element, xPath=[], linkData={} ):
+        xPath.append( element.tag )
         def readResolved( child ):
             formClass = {'SingleLevel_BreitWigner': SLBW,
                     'MultiLevel_BreitWigner': MLBW,
@@ -286,6 +335,7 @@ class resolved(ancestry):
         else:
             nativeData = readResolved(element[0])
             RRR = resolved( nativeData, **getAttrs( element, exclude=('nativeData',) ) )
+        xPath.pop()
         return RRR
 
 
@@ -300,17 +350,34 @@ class unresolved(ancestry):
     
     def toString( self, simpleString = False ):
         return ("Unresolved resonances in %s form\n" % self.nativeData.moniker )
+
+    def check( self, info ):
+        from fudge.gnd import warning
+        warnings = []
+        for L in self.tabulatedWidths.L_values:
+            for J in L.J_values:
+                elist = J.energyDependentWidths.getColumn('energy','eV')
+                if elist is None:
+                    warnings.append( warning.URRmissingEnergyList( L.L, J.J.value, J ) )
+                else:
+                    if elist[0] > self.lowerBound.getValueAs('eV') or elist[-1] < self.upperBound.getValueAs('eV'):
+                        warnings.append( warning.URRdomainMismatch( L.L, J.J.value, J ) )
+                    missingPoints = [i for i in range(1,len(elist)) if elist[i] > 3*elist[i-1]]
+                    for idx in missingPoints:
+                        warnings.append( warning.URRinsufficientEnergyGrid( L.L, J.J.value, PQU(elist[idx-1],'eV'),
+                            PQU(elist[idx],'eV'), J ) )
+        return warnings
     
-    def toXMLList( self, flags, verbosityIndent = '', indent = '' ):
+    def toXMLList( self, flags, indent = '' ):
         xmlString = [indent+'<unresolved lowerBound="%s" upperBound="%s" nativeData="%s">' % (
             self.lowerBound, self.upperBound, self.nativeData.moniker ) ]
-        xmlString += self.nativeData.toXMLList( flags, 
-                verbosityIndent = verbosityIndent, indent = indent+'  ' )
+        xmlString += self.nativeData.toXMLList( flags, indent = indent + '  ' )
         xmlString[-1] += '</unresolved>'
         return xmlString
 
     @staticmethod
-    def parseXMLNode( element, linkData={} ):
+    def parseXMLNode( element, xPath=[], linkData={} ):
+        xPath.append( element.tag )
         L_values = []
         for lval in element[0]:
             J_values = []
@@ -330,8 +397,8 @@ class unresolved(ancestry):
 
         table = unresolvedTabulatedWidths( L_values, **getAttrs( element[0], required=('forSelfShieldingOnly',) ) )
         URR = unresolved( nativeData=table, **getAttrs( element, exclude=('nativeData',) ) )
+        xPath.pop()
         return URR
-
 
 class energyInterval:
     """ resolved region may be made up of multiple energy intervals (deprecated) """
@@ -348,13 +415,12 @@ class energyInterval:
         return ("%s resonances, %s to %s. Contains %i resonances" % 
                 (self.lowerBound,self.upperBound, len(self.nativeData) ) )
     
-    def toXMLList( self, flags, verbosityIndent = '', indent = ''):
+    def toXMLList( self, flags, indent = ''):
         xmlString = [indent+
                 '<region index="%s" lowerBound="%s" upperBound="%s" nativeData="%s">' 
                 % (self.index,self.lowerBound,self.upperBound,self.nativeData.moniker ) ]
         if self.nativeData:
-            xmlString += self.nativeData.toXMLList( flags, 
-                    verbosityIndent = verbosityIndent, indent = indent+'  ' )
+            xmlString += self.nativeData.toXMLList( flags, indent = indent+'  ' )
         else:
             raise Exception( "Resonance section contains no data!" )
         xmlString[-1] += '</region>'
@@ -410,7 +476,7 @@ class resonanceFormalismBaseClass( ancestry ) :
             print("WARNING: using scattering radius of 0.0 fm!")
         return AP
     
-    def toXMLList( self, flags, verbosityIndent = '', indent = '' ):
+    def toXMLList( self, flags, indent = '' ):
         if not self.moniker :
             raise NotImplementedError ("Please use specific formalisms (MLBW, RM, etc) instead of the BaseClass")
         xmlString = '%s<%s' % ( indent, self.moniker )
@@ -546,7 +612,7 @@ class RMatrix:
     def __len__(self):
         return len(self.spinGroups)
 
-    def toXMLList( self, flags, verbosityIndent = '', indent = '' ):
+    def toXMLList( self, flags, indent = '' ):
         xmlString = ['%s<%s' % ( indent, self.moniker ) ]
         for attr in self.optAttrList:
             if getattr(self,attr):
@@ -754,7 +820,7 @@ class unresolvedTabulatedWidths:
     def __len__(self):
         return len(self.L_values)
     
-    def toXMLList( self, flags, verbosityIndent = '', indent = '' ):
+    def toXMLList( self, flags, indent = '' ):
         xmlString = '%s<%s' % (indent, self.moniker)
         for attr in self.optAttrList:
             if getattr(self,attr,None):
@@ -763,7 +829,7 @@ class unresolvedTabulatedWidths:
                 xmlString += ' %s="%s"' % (attr, attrVal)
         xmlString = [xmlString+'>']
         for L in self.L_values:
-            xmlString += L.toXMLList( flags, verbosityIndent, indent = indent+'  ' )
+            xmlString += L.toXMLList( flags, indent = indent+'  ' )
         xmlString[-1] += '</%s>' % self.moniker
         return xmlString
     
@@ -853,10 +919,10 @@ class URR_Lsection:
         self.L = L
         self.J_values = J_values
     
-    def toXMLList( self, flags, verbosityIndent = '', indent = '' ):
+    def toXMLList( self, flags, indent = '' ):
         xmlString = ['%s<L_section L="%s">' % (indent, self.L)]
         for J in self.J_values:
-            xmlString += J.toXMLList( flags, verbosityIndent, indent+'  ' )
+            xmlString += J.toXMLList( flags, indent+'  ' )
         xmlString[-1] += '</L_section>'
         return xmlString
 
@@ -887,14 +953,14 @@ class URR_Jsection:
                 setattr( self.constantWidths, column.name, physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty(
                     columnData[0], column.units ) )
                 [d.pop(colId) for d in edep.data]
-                edep.columns.pop(colId); edep.nColumns -= 1
+                edep.columns.pop(colId)
         for idx, col in enumerate( edep.columns ): col.index = idx  #re-number
         #if edep.nColumns == 1 and edep.columns[0].name == 'energy':
         #    edep.columns, edep.data = [],[] # all widths are constant
         #    allEliminated = True
         return allEliminated
     
-    def toXMLList( self, flags, verbosityIndent='', indent='' ):
+    def toXMLList( self, flags, indent='' ):
         indent2 = indent+'  '; indent3 = indent+'    '
         xmlString = ['%s<J_section J="%s"' % (indent,self.J) ]
         for attr in URR_Jsection.optAttrList:

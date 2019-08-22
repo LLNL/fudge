@@ -1,5 +1,30 @@
 /*
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 */
 
@@ -24,7 +49,7 @@ ptwXYPoints *ptwXY_new( ptwXY_interpolation interpolation, double biSectionMax, 
     if( ptwXY == NULL ) return( NULL );
     ptwXY_setup( ptwXY, interpolation, biSectionMax, accuracy, primarySize, secondarySize, userFlag );
     if( ( *status = ptwXY->status ) != nfu_Okay ) {
-        ptwXY = nfu_free( ptwXY );
+        ptwXY = (ptwXYPoints *) nfu_free( ptwXY );
     }
     return( ptwXY );
 }
@@ -315,9 +340,9 @@ nfu_status ptwXY_reallocatePoints( ptwXYPoints *ptwXY, int64_t size, int forceSm
     if( size < ptwXY->length ) size = ptwXY->length;
     if( size != ptwXY->allocatedSize ) {
         if( size > ptwXY->allocatedSize ) {                                        /* Increase size of allocated points. */
-            ptwXY->points = nfu_realloc( size * sizeof( ptwXYPoint ), ptwXY->points ); }
+            ptwXY->points = (ptwXYPoint *) nfu_realloc( (size_t) size * sizeof( ptwXYPoint ), ptwXY->points ); }
         else if( ( ptwXY->allocatedSize > 2 * size ) || forceSmallerResize ) {     /* Decrease size, if at least 1/2 size reduction or if forced to. */
-            ptwXY->points = nfu_realloc( size * sizeof( ptwXYPoint ), ptwXY->points ); }
+            ptwXY->points = (ptwXYPoint *) nfu_realloc( (size_t) size * sizeof( ptwXYPoint ), ptwXY->points ); }
         else {
             size = ptwXY->allocatedSize;                                           /* Size is < ptwXY->allocatedSize, but realloc not called. */
         }
@@ -346,7 +371,7 @@ nfu_status ptwXY_reallocateOverflowPoints( ptwXYPoints *ptwXY, int64_t size ) {
     if( size < ptwXY->overflowLength ) status = ptwXY_coalescePoints( ptwXY, ptwXY->length + ptwXY->overflowAllocatedSize, NULL, 0 );
     if( status == nfu_Okay ) {
         if( size != ptwXY->overflowAllocatedSize ) {
-            ptwXY->overflowPoints = nfu_realloc( size * sizeof( ptwXYOverflowPoint ), ptwXY->overflowPoints );
+            ptwXY->overflowPoints = (ptwXYOverflowPoint *) nfu_realloc( (size_t) size * sizeof( ptwXYOverflowPoint ), ptwXY->overflowPoints );
             if( ptwXY->overflowPoints == NULL ) {
                 ptwXY->length = 0;
                 ptwXY->overflowLength = 0;
@@ -450,11 +475,11 @@ nfu_status ptwXY_release( ptwXYPoints *ptwXY ) {
 */
     ptwXY->length = 0;
     ptwXY->allocatedSize = 0;
-    ptwXY->points = nfu_free( ptwXY->points );
+    ptwXY->points = (ptwXYPoint *) nfu_free( ptwXY->points );
 
     ptwXY->overflowLength = 0;
     ptwXY->overflowAllocatedSize = 0;
-    ptwXY->overflowPoints = nfu_free( ptwXY->overflowPoints );
+    ptwXY->overflowPoints = (ptwXYOverflowPoint *) nfu_free( ptwXY->overflowPoints );
 
     return( nfu_Okay );
 }
@@ -894,7 +919,7 @@ static nfu_status ptwXY_mergeFrom( ptwXYPoints *ptwXY, int incY, int length, dou
         }
         if( j == ptwXY->length ) break;             /* Completed all ptwXY points. */
     }
-    n += ( length - i ) + ( ptwXY->length - j );
+    n += (int) ( ( length - i ) + ( ptwXY->length - j ) );
 
     if( ( status = ptwXY_reallocatePoints( ptwXY, n, 0 ) ) == nfu_Okay ) {
         point1 = &(ptwXY->points[n-1]);

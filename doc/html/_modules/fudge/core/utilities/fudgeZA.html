@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>fudge.core.utilities.fudgeZA &mdash; Fudge and GND 1.2 beta documentation</title>
+    <title>fudge.core.utilities.fudgeZA &mdash; Fudge and GND 1.3 beta documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '1.2 beta',
+        VERSION:     '1.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +25,7 @@
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
-    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../../index.html" />
+    <link rel="top" title="Fudge and GND 1.3 beta documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
@@ -39,7 +38,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -213,7 +212,7 @@
 </div>
 <div class="viewcode-block" id="gndNameToZ_A_Suffix"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.fudgeZA.gndNameToZ_A_Suffix">[docs]</a><span class="k">def</span> <span class="nf">gndNameToZ_A_Suffix</span><span class="p">(</span> <span class="n">name</span> <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns the tuple (Z, A, suffix, ZA) for an gnd isotope name (e.g., gnd name = &#39;Am242_m1&#39; </span>
-<span class="sd">    returns ( 95, 242, &#39;m1&#39;, 95242 ). Replaces the endl2.py function gndNameToEndlZ_A_Suffix.&quot;&quot;&quot;</span>
+<span class="sd">    returns ( 95, 242, &#39;m1&#39;, 95242 ).&quot;&quot;&quot;</span>
 
     <span class="k">if</span><span class="p">(</span> <span class="n">name</span> <span class="o">==</span> <span class="s">&#39;n&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
     <span class="k">if</span><span class="p">(</span> <span class="n">name</span> <span class="o">==</span> <span class="s">&#39;gamma&#39;</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="mi">0</span> <span class="p">)</span>
@@ -254,7 +253,7 @@
     <span class="k">return</span><span class="p">(</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">ZA</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="ZAToGNDName"><a class="viewcode-back" href="../../../../fudge/fudge.core.utilities.html#fudge.core.utilities.fudgeZA.ZAToGNDName">[docs]</a><span class="k">def</span> <span class="nf">ZAToGNDName</span><span class="p">(</span> <span class="n">ZA</span> <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; use this instead of endl2.endlToGNDName&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Converts an ENDL ZA or &#39;zaZZZAAA_suffix&#39; into a GND name. For example ENDL 94239 or &#39;za094239&#39;, is converted to &#39;Pu239&#39;.&quot;&quot;&quot;</span>
 
     <span class="k">if</span><span class="p">(</span> <span class="n">ZA</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="s">&#39;n&#39;</span> <span class="p">)</span>
     <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">ZA</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="nb">float</span><span class="p">):</span>
@@ -308,13 +307,13 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

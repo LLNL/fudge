@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 """
 Store and report warnings and errors in GND data, in order to discover problems in the library.
@@ -45,12 +70,12 @@ class context:
         return self.message == other.message and self.warningList == other.warningList
 
     def filter(self, include=None, exclude=None):
-        """ 
-        filter warning list to only include (or exclude) specific classes of warning:
+        """Filter warning list to only include (or exclude) specific classes of warning. For example:
         
             >>> newWarnings = warnings.filter( exclude=[warning.energyImbalance, warning.Q_mismatch] )
-            
-        """
+
+        Note that if both 'include' and 'exclude' lists are provided, exclude is ignored."""
+
         if include is None and exclude is None: return self
         newWarningList = []
         for warning in self.warningList:
@@ -66,13 +91,11 @@ class context:
         return context( self.message, newWarningList )
 
     def flatten(self):
-        """ 
-        from a nested hierarchy of warnings, get back a flat list for easier searching:
+        """From a nested hierarchy of warnings, get back a flat list for easier searching:
         
             >>> w = reactionSuite.check()
-            >>> warningList = w.flatten()
-            
-        """
+            >>> warningList = w.flatten()"""
+
         List = []
         for val in self.warningList:
             if isinstance(val, warning):
@@ -82,7 +105,7 @@ class context:
         return List
 
     def toStringList( self, indent='', dIndent='    ' ):
-        """ format warnings for printing. Returns a list of warning strings with indentation. """
+        """ Format warnings for printing. Returns a list of warning strings with indentation. """
         s = ['%s%s' % (indent, self.message)]
         for warning in self.warningList:
             s += warning.toStringList( indent+dIndent )
@@ -124,6 +147,55 @@ class NotImplemented( warning ):
     def __eq__(self, other):
         return (self.form == other.form and self.xpath == other.xpath)
 
+# resonance region:
+
+class RRmultipleRegions( warning ):
+    def __init__(self, obj=None):
+        warning.__init__(self, obj)
+
+    def __str__(self):
+        return "Use of more than one resolved resonance regions is deprecated"
+
+class URRmissingEnergyList( warning ):
+    def __init__(self, Lval, Jval, obj=None):
+        warning.__init__(self, obj)
+        self.Lval = Lval
+        self.Jval = Jval
+
+    def __str__(self):
+        return "Missing energy list for unresolved region L=%i / J=%.1f" % (self.Lval, self.Jval)
+
+    def __eq__(self, other):
+        return (self.Lval == other.Lval and self.Jval == other.Jval)
+
+class URRdomainMismatch( warning ):
+    def __init__(self, Lval, Jval, obj=None):
+        warning.__init__(self, obj)
+        self.Lval = Lval
+        self.Jval = Jval
+
+    def __str__(self):
+        return "Unresolved L=%i / J=%.1f widths don't span URR energy limits" % (self.Lval, self.Jval)
+
+    def __eq__(self, other):
+        return (self.Lval == other.Lval and self.Jval == other.Jval)
+
+class URRinsufficientEnergyGrid( warning ):
+    def __init__(self, Lval, Jval, eLow, eHigh, obj=None):
+        warning.__init__(self, obj)
+        self.Lval = Lval
+        self.Jval = Jval
+        self.eLow = eLow
+        self.eHigh = eHigh
+
+    def __str__(self):
+        return "More points needed in L=%i J=%.1f unresolved widths between %s and %s" % (self.Lval, self.Jval, self.eLow, self.eHigh)
+
+    def __eq__(self, other):
+        return (self.Lval == other.Lval and self.Jval == other.Jval and self.eLow == other.eLow and self.eHigh == other.eHigh)
+
+# particle list:
+
 class discreteLevelsOutOfOrder( warning ):
     def __init__(self, lidx, obj=None):
         warning.__init__(self, obj)
@@ -134,6 +206,19 @@ class discreteLevelsOutOfOrder( warning ):
 
     def __eq__(self, other):
         return (self.lidx == other.lidx)
+
+class unnormalizedGammas( warning ):
+    def __init__(self, branchingSum, obj=None):
+        warning.__init__(self, obj)
+        self.branchingSum = branchingSum
+
+    def __str__(self):
+        return "Gamma branching = %s, should be 1.0!" % (self.branchingSum)
+
+    def __eq__(self, other):
+        return (self.xpath == other.xpath and self.branchingSum == other.branchingSum)
+
+# reaction objects:
 
 class WicksLimitError( warning ):
     def __init__(self, percentErr, energy_in, obj=None):
@@ -146,17 +231,6 @@ class WicksLimitError( warning ):
 
     def __eq__(self, other):
         return (self.xpath == other.xpath and self.percentErr == other.percentErr and self.energy_in == other.energy_in)
-
-class unnormalizedGammas( warning ):
-    def __init__(self, branchingSum, obj=None):
-        warning.__init__(self, obj)
-        self.branchingSum = branchingSum
-
-    def __str__(self):
-        return "Gamma branching = %s, should be 1.0!" % (self.branchingSum)
-
-    def __eq__(self, other):
-        return (self.xpath == other.xpath and self.branchingSum == other.branchingSum)
 
 class ZAbalanceWarning( warning ):
     def __str__(self):
@@ -187,6 +261,17 @@ class threshold_mismatch( warning ):
         return (self.xpath == other.xpath and self.threshold == other.threshold
                 and self.thresholdCalc == other.thresholdCalc)
 
+class nonZero_crossSection_at_threshold( warning ):
+    def __init__(self, value, obj=None):
+        warning.__init__(self, obj)
+        self.value = value
+
+    def __str__(self):
+        return "First cross section point for threshold reaction should be 0, not %s" % self.value
+
+    def __eq__(self, other):
+        return (self.xpath == other.xpath and self.value == other.value)
+
 class gapInCrossSection( warning ):
     def __init__(self, minGapEnergy, maxGapEnergy, obj=None):
         warning.__init__(self, obj)
@@ -212,6 +297,27 @@ class negativeCrossSection( warning ):
     def __eq__(self, other):
         return (self.xpath == other.xpath and self.energy_in == other.energy_in
                 and self.index == other.index)
+
+class badCrossSectionReference( warning ):
+    def __str__(self):
+        return "Cross section reference outside of current reactionSuite not allowed!"
+
+class summedCrossSectionMismatch( warning ):
+    def __init__(self, maxPercentDiff, obj=None):
+        warning.__init__(self, obj)
+        self.maxPercentDiff = maxPercentDiff
+
+    def __str__(self):
+        msg = ("Cross section does not match sum of linked reaction cross sections! Max diff: %.2f%%" %
+                self.maxPercentDiff)
+        return msg
+
+    def __eq__(self, other):
+        return (self.xpath == other.xpath and self.maxDiff == other.maxDiff)
+
+class summedCrossSectionDomainMismatch( warning ):
+    def __str__(self):
+        return "Cross section domain does not match domain of linked reaction cross section sum"
 
 class negativeMultiplicity( warning ):
     def __init__(self, value, obj=None):
@@ -380,13 +486,30 @@ class negativeProbability( warning ):
         return (self.xpath == other.xpath and self.energy_in == other.energy_in
                 and self.energy_out == other.energy_out and self.mu == other.mu)
 
+class extraOutgoingEnergy( warning ):
+    """If an outgoing energy distribution ends with more than one energy with probability=0,
+    proper unitbase treatment is unclear. Distribution should end with exactly one P=0 point."""
+
+    def __init__(self, energy_in, obj=None):
+        warning.__init__(self, obj)
+        self.energy_in = energy_in
+
+    def __str__(self):
+        msg = "Extra zero-probability outgoing energies found at incident energy %s" % self.energy_in
+        return msg
+
+    def __eq__(self, other):
+        return (self.xpath == other.xpath and self.energy_in == other.energy_in)
+
 class energyImbalance( warning ):
-    def __init__(self, energy_in, index, deposition_per_product, obj=None):
+    def __init__(self, energy_in, index, availableEnergy, deposition_per_product, obj=None):
         warning.__init__(self, obj)
         self.energy_in = energy_in
         self.index = index
+        self.availableEnergy = availableEnergy
         self.deposition_per_product = deposition_per_product
         self.total_deposited = sum( [val[1] for val in deposition_per_product] )
+        if self.availableEnergy == 0: self.total_deposited = float('inf')
 
     def __str__(self):
         per_product = ', '.join(["%s = %.4g%%" % (key,val) for key,val in self.deposition_per_product[:5]])
@@ -396,7 +519,8 @@ class energyImbalance( warning ):
 
     def __eq__(self, other):
         return (self.xpath == other.xpath and self.energy_in == other.energy_in
-                and self.index == other.index and self.deposition_per_product == other.deposition_per_product
+                and self.index == other.index and self.availableEnergy == other.availableEnergy
+                and self.deposition_per_product == other.deposition_per_product
                 and self.total_deposited == other.total_deposited)
 
 class fissionEnergyImbalance( energyImbalance ):

@@ -1,5 +1,30 @@
 /*
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 */
 
@@ -18,7 +43,7 @@
 
 #define ptwXY_minimumSize 10            /* This must be > 0 otherwise some logic will fail. */
 #define ptwXY_minimumOverflowSize 4     /* This must be > 0 otherwise some logic will fail. */
-#define ptwXY_maxBiSectionMax 16
+#define ptwXY_maxBiSectionMax 20
 #define ptwXY_minAccuracy 1e-14
 #define ptwXY_sectionSubdivideMax 1 << 16
 #define ClosestAllowXFactor 10
@@ -27,8 +52,9 @@ typedef enum ptwXY_dataFrom_e { ptwXY_dataFrom_Unknown, ptwXY_dataFrom_Points, p
 typedef enum ptwXY_group_normType_e { ptwXY_group_normType_none, ptwXY_group_normType_dx, ptwXY_group_normType_norm } ptwXY_group_normType;
 
 /* The next macro are used in the routine ptwXY_union. */
-#define ptwXY_union_fill 1      /* If filling, union is filled with y value of first ptw. */
-#define ptwXY_union_trim 2      /* If trimming, union in only over common domain of ptw1 and ptw2. */
+#define ptwXY_union_fill 1              /* If filling, union is filled with y value of first ptw. */
+#define ptwXY_union_trim 2              /* If trimming, union in only over common domain of ptw1 and ptw2. */
+#define ptwXY_union_mergeClosePoints 4  /* If true, union calls ptwXY_mergeClosePoints with eps = 4 * DBL_EPSILON. */
 typedef enum ptwXY_sigma_e { ptwXY_sigma_none, ptwXY_sigma_plusMinus, ptwXY_sigma_Minus, ptwXY_sigma_plus } ptwXY_sigma;
 typedef enum ptwXY_interpolation_e { ptwXY_interpolationLinLin, ptwXY_interpolationLinLog, ptwXY_interpolationLogLin, ptwXY_interpolationLogLog,
     ptwXY_interpolationFlat, ptwXY_interpolationOther } ptwXY_interpolation;
@@ -165,6 +191,8 @@ nfu_status ptwXY_trim( ptwXYPoints *ptwXY );
 
 ptwXYPoints *ptwXY_union( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_status *status, int unionOptions );
 
+nfu_status ptwXY_scaleOffsetXAndY( ptwXYPoints *ptwXY, double xScale, double xOffset, double yScale, double yOffset );
+
 /*
 * Functions in ptwXY_unitaryOperators.c
 */
@@ -232,6 +260,8 @@ ptwXYPoints *ptwXY_createFromFunction( int n, double *xs, ptwXY_createFromFuncti
 ptwXYPoints *ptwXY_createFromFunction2( ptwXPoints *xs, ptwXY_createFromFunction_callback func, void *argList, double accuracy, int checkForRoots,
     int biSectionMax, nfu_status *status );
 nfu_status ptwXY_applyFunction( ptwXYPoints *ptwXY1, ptwXY_applyFunction_callback func, void *argList, int checkForRoots );
+ptwXYPoints *ptwXY_fromString( char const *str, ptwXY_interpolation interpolation, double biSectionMax, double accuracy, char **endCharacter, nfu_status *status );
+
 void ptwXY_showInteralStructure( ptwXYPoints *ptwXY, FILE *f, int printPointersAsNull );
 void ptwXY_simpleWrite( ptwXYPoints *ptwXY, FILE *f, char *format );
 void ptwXY_simplePrint( ptwXYPoints *ptwXY, char *format );

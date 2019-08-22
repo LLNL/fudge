@@ -11,7 +11,7 @@ the XML or HDF5 formats.  The ``fudge`` Python package provides tools to read, w
 manipulate and process nuclear reaction evaluations in either the ENDF format or GND 
 formats.  You can find more about ``fudge`` from the `GND Project Page 
 <https://ndclx4.bnl.gov/gf/project/gnd/>`_ and about GND from `C. Mattoon, et al., 
-Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145–3171 
+Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145--3171 
 <http://dx.doi.org/10.1016/j.nds.2012.11.008>`_.
  
 In this tutorial, we will work through the development of several simple

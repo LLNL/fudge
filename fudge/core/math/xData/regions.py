@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 from fudge.core.utilities import brb
@@ -105,7 +130,7 @@ class regionsXYs( regions ) :
 
         regions.__init__( self, XYs.XYs, axes_, parent = parent, isPrimaryXData = isPrimaryXData )
 
-    def toPointwiseLinear( self, accuracy, lowerEps, upperEps, removeOverAdjustedPoints = False, axes_ = None ) :
+    def toPointwise_withLinearXYs( self, accuracy, lowerEps, upperEps, removeOverAdjustedPoints = False, axes_ = None ) :
         """
         Converts the regions of self into a single ``XYs.XYs`` instance that has 'linear,linear' interpolation. At the
         boundary between two abutting regions, the x-values are the same, which is not allowed for an ``XYs.XYs`` instance.
@@ -175,12 +200,14 @@ class regionsXYs( regions ) :
         return( pointwise )
 
     @classmethod
-    def parseXMLNode( cls, regionsElement, linkData={} ):
+    def parseXMLNode( cls, regionsElement, xPath=[], linkData={} ):
+        xPath.append( regionsElement.tag )
         attrs = dict( regionsElement.items() )
-        axes_ = axes.parseXMLNode( regionsElement[0] )
+        axes_ = axes.parseXMLNode( regionsElement[0], xPath )
         regions_ = cls( axes_ )
         for region in regionsElement[1:]:
-            xys = XYs.XYs.parseXMLNode( region, linkData )
+            xys = XYs.XYs.parseXMLNode( region, xPath, linkData )
             xys.parent = regions_; xys.tag = region.tag; xys.isPrimaryXData=False
             regions_.append( xys )
+        xPath.pop()
         return regions_

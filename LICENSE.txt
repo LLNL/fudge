@@ -96,7 +96,7 @@ indicate your acceptance of this License to do so, and all its terms and conditi
 modifying the Program or works based on it.
 3	Each time you redistribute the Program (or any work based on the Program), the recipient automatically receives
 a license from the original licensor to copy, distribute or modify the Program subject to these terms and conditions.
-You may not impose any further restrictions on the recipients’ exercise of the rights granted herein. You are not
+You may not impose any further restrictions on the recipients' exercise of the rights granted herein. You are not
 responsible for enforcing compliance by third parties to this License.
 4	If, as a consequence of a court judgment or allegation of patent infringement or for any other reason (not
 limited to patent issues), conditions are imposed on you (whether by court order, agreement or otherwise) that
@@ -126,7 +126,7 @@ License.
 to time. Such new versions will be similar in spirit to the present version, but may differ in detail to address new
 problems or concerns.
 Each version is given a distinguishing version number. If the Program specifies a version number of this License which
-applies to it and “any later version,” you have the option of following the terms and conditions either of that version
+applies to it and "any later version," you have the option of following the terms and conditions either of that version
 of any later version published by the Free Software Foundation. If the Program does not specify a version number of this
 License, you may choose any version ever published by the Free Software Foundation. 2	If you wish to incorporate parts
 of the Program into other free programs whose distribution conditions are different, write to the author to ask for

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>gnuplot Package &mdash; Fudge and GND 1.2 beta documentation</title>
+    <title>gnuplot Package &mdash; Fudge and GND 1.3 beta documentation</title>
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.2 beta',
+        VERSION:     '1.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +25,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
-    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../index.html" />
+    <link rel="top" title="Fudge and GND 1.3 beta documentation" href="../index.html" />
     <link rel="up" title="vis Package" href="fudge.vis.html" />
     <link rel="next" title="matplotlib Package" href="fudge.vis.matplotlib.html" />
     <link rel="prev" title="vis Package" href="fudge.vis.html" /> 
@@ -47,7 +46,7 @@
         <li class="right" >
           <a href="fudge.vis.html" title="vis Package"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="index.html" >fudge Package</a> &raquo;</li>
           <li><a href="fudge.vis.html" accesskey="U">vis Package</a> &raquo;</li> 
       </ul>
@@ -94,14 +93,36 @@ fudgeNdMultiPlotData and fudgeNdMultiPlotFile objects in a single plot window.</
 </dd></dl>
 
 <dl class="method">
-<dt id="fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsASCII">
-<tt class="descname">plotSaveAsASCII</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/vis/gnuplot/fudge2dMultiPlotClass.html#fudge2dMultiPlotClass.plotSaveAsASCII"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsASCII" title="Permalink to this definition">¶</a></dt>
-<dd><p>Currently not implemented.</p>
+<dt id="fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsEps">
+<tt class="descname">plotSaveAsEps</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/vis/gnuplot/fudge2dMultiPlotClass.html#fudge2dMultiPlotClass.plotSaveAsEps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsEps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when &#8220;File -&gt; SaveAs eps&#8221; menu is selected. Uses a FileDialog to get the output 
+file name and produces an eps file of the current plot.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsEps">
-<tt class="descname">plotSaveAsEps</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/vis/gnuplot/fudge2dMultiPlotClass.html#fudge2dMultiPlotClass.plotSaveAsEps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsEps" title="Permalink to this definition">¶</a></dt>
+<dt id="fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsPDF">
+<tt class="descname">plotSaveAsPDF</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/vis/gnuplot/fudge2dMultiPlotClass.html#fudge2dMultiPlotClass.plotSaveAsPDF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsPDF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when &#8220;File -&gt; SaveAs pdf&#8221; menu is selected. Uses a FileDialog to get the output 
+file name and produces an eps file of the current plot.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsPNG">
+<tt class="descname">plotSaveAsPNG</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/vis/gnuplot/fudge2dMultiPlotClass.html#fudge2dMultiPlotClass.plotSaveAsPNG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsPNG" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when &#8220;File -&gt; SaveAs png&#8221; menu is selected. Uses a FileDialog to get the output 
+file name and produces an eps file of the current plot.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsSVG">
+<tt class="descname">plotSaveAsSVG</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/fudge/vis/gnuplot/fudge2dMultiPlotClass.html#fudge2dMultiPlotClass.plotSaveAsSVG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsSVG" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when &#8220;File -&gt; SaveAs svg&#8221; menu is selected. Uses a FileDialog to get the output 
+file name and produces an eps file of the current plot.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAs_terminal">
+<tt class="descname">plotSaveAs_terminal</tt><big>(</big><em>terminal</em>, <em>suffix=None</em>, <em>color=True</em><big>)</big><a class="reference internal" href="../_modules/fudge/vis/gnuplot/fudge2dMultiPlotClass.html#fudge2dMultiPlotClass.plotSaveAs_terminal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAs_terminal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when &#8220;File -&gt; SaveAs eps&#8221; menu is selected. Uses a FileDialog to get the output 
 file name and produces an eps file of the current plot.</p>
 </dd></dl>
@@ -143,10 +164,11 @@ file name and produces an eps file of the current plot.</p>
 <p>This module contains routines for plotting multiple data sets on the same plot.</p>
 <dl class="function">
 <dt id="fudge.vis.gnuplot.fudgeMultiPlots.multiPlot">
-<tt class="descclassname">fudge.vis.gnuplot.fudgeMultiPlots.</tt><tt class="descname">multiPlot</tt><big>(</big><em>dataList</em>, <em>xylog=0</em>, <em>xMin=None</em>, <em>xMax=None</em>, <em>yMin=None</em>, <em>yMax=None</em>, <em>xLabel='Energy (MeV)'</em>, <em>yLabel='Cross section (barn)'</em>, <em>title=None</em>, <em>lineWidth=1</em>, <em>fontSize=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/vis/gnuplot/fudgeMultiPlots.html#multiPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.gnuplot.fudgeMultiPlots.multiPlot" title="Permalink to this definition">¶</a></dt>
-<dd><p>This routine sends all data objects of the first argument, dataList, to the module fudge2dMultiPlot for interactive plotting. 
-Here, dataList must be a list or tuple, and each element must be an endl2dmath object or subclass of it. 
-The legend for each data element of dataList is taken from that object&#8217;s label member.&#8221;</p>
+<tt class="descclassname">fudge.vis.gnuplot.fudgeMultiPlots.</tt><tt class="descname">multiPlot</tt><big>(</big><em>datasets</em>, <em>xylog=0</em>, <em>xMin=None</em>, <em>xMax=None</em>, <em>yMin=None</em>, <em>yMax=None</em>, <em>xLabel='Energy (MeV)'</em>, <em>yLabel='Cross section (barn)'</em>, <em>title=None</em>, <em>lineWidth=1</em>, <em>fontSize=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/vis/gnuplot/fudgeMultiPlots.html#multiPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.gnuplot.fudgeMultiPlots.multiPlot" title="Permalink to this definition">¶</a></dt>
+<dd><p>This routine sends all data objects of the first argument, datasets, to the module fudge2dMultiPlot for interactive plotting. 
+Here, datasets must be a list or tuple, and each element must be an object at has the method copyDataToXYs. The copyDataToXYs
+must return the [x, y] pairs of data to plot as a python list of [x_i,y_i] pairs.  The legend for each data element of datasets 
+is taken from that object&#8217;s label member.&#8221;</p>
 <dl class="docutils">
 <dt>See module fudge2dMultiPlot for a description of the following parameters::</dt>
 <dd>xylog    xMin     xMax     yMin     
@@ -187,7 +209,7 @@ title</dd>
 
 <dl class="function">
 <dt id="fudge.vis.gnuplot.fudgeMultiPlots.qmultiPlot">
-<tt class="descclassname">fudge.vis.gnuplot.fudgeMultiPlots.</tt><tt class="descname">qmultiPlot</tt><big>(</big><em>dataList</em>, <em>xylog=0</em>, <em>xMin=None</em>, <em>xMax=None</em>, <em>yMin=None</em>, <em>yMax=None</em>, <em>xLabel='Energy (MeV)'</em>, <em>yLabel='Cross section (barn)'</em>, <em>title=None</em>, <em>legends=</em><span class="optional">[</span><span class="optional">]</span>, <em>lineWidth=1</em>, <em>fontSize=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/vis/gnuplot/fudgeMultiPlots.html#qmultiPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.gnuplot.fudgeMultiPlots.qmultiPlot" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">fudge.vis.gnuplot.fudgeMultiPlots.</tt><tt class="descname">qmultiPlot</tt><big>(</big><em>dataList</em>, <em>xylog=0</em>, <em>xMin=None</em>, <em>xMax=None</em>, <em>yMin=None</em>, <em>yMax=None</em>, <em>xLabel='Energy (MeV)'</em>, <em>yLabel='Cross section (barn)'</em>, <em>title=None</em>, <em>legends=</em>, <span class="optional">[</span><span class="optional">]</span><em>lineWidth=1</em>, <em>fontSize=None</em><big>)</big><a class="reference internal" href="../_modules/fudge/vis/gnuplot/fudgeMultiPlots.html#qmultiPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fudge.vis.gnuplot.fudgeMultiPlots.qmultiPlot" title="Permalink to this definition">¶</a></dt>
 <dd><p>This routine plots the data objects of the first argument, dataList, to a non-interactive plot.
 The argument lineWidth sets the width of the lines and fontSize sets the font size for the plot.
 The argument legends is a deprecated argument. To specify a legend for a data set, use that data&#8217;s
@@ -586,14 +608,14 @@ label member.</p>
         <li class="right" >
           <a href="fudge.vis.html" title="vis Package"
              >previous</a> |</li>
-        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="index.html" >fudge Package</a> &raquo;</li>
           <li><a href="fudge.vis.html" >vis Package</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

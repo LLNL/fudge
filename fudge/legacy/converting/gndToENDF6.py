@@ -1,8 +1,32 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 from pqu import physicalQuantityWithUncertainty
-from fudge.core.math import endl2dmathClasses
 from fudge.core.math.xData import axes, XYs
 from fudge.core.utilities import fudgeZA
 from fudge.gnd import tokens
@@ -57,7 +81,7 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, tempInfo, gammas ) :
             if( len( form.axes ) == 3 ) :
                 independent, dependent, dummy = form.axes[1].interpolation.getInterpolationTokens( )
                 if( dependent == axes.flatToken ) : discreteLEP = 1
-        if( frame is None ) : frame = form.axes[1].frame
+        if( frame is None ) : frame = form.getProductFrame( )
         incident_e_vals = []
         for EInCl in form :
             EIn = EInCl.value
@@ -88,7 +112,7 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, tempInfo, gammas ) :
                     if( frame is not None ) : raise Exception( "Oops, cannot handle continuum and ( discrete and/or primary )." )
                 else :
                     interpolationEIn = axisToEndfInterpolationFlag( form.axes[0] )
-                    if( frame is None ) : frame = form.axes[1].frame
+                    if( frame is None ) : frame = form.getProductFrame( )
                     if( LEP < 0 ) :
                         LEP = 2
                         if( len( form.axes ) == 3 ) :
@@ -133,9 +157,12 @@ def gammasToENDF6_MF6( MT, endfMFList, flags, tempInfo, gammas ) :
 def toENDF6_MF6( MT, endfMFList, flags, tempInfo, LAW, frame, MF6 ) :
 
     tempInfo['MF6LCTs'].append( { axes.labToken : 1, axes.centerOfMassToken : 2 }[frame] )
-    #LIP = tempInfo['product'].particle.getLevelIndex()
-    #if( LIP in ( 'c', 'u', 's' ) ) : LIP = 0  # for product in unknown or continuum level
-    LIP = tempInfo['product'].particle.getMetaStableIndex()
+    LIP = 0
+    if tempInfo['product'].particle.name in tempInfo['metastables'] and not (50<=MT<=91 or 600<=MT<=850):
+        # set LIP to metastable index of product UNLESS excited state of product is encoded in MT number:
+        alias, = [ alias for alias in tempInfo['reactionSuite'].aliases.values() if
+                alias.getValue() == tempInfo['product'].particle.name ]
+        LIP = int( alias.getAttribute('nuclearMetaStable') )
     if( MT not in endfMFList[6] ) : endfMFList[6][MT] = []
     particleID = tempInfo[ 'zapID' ]    # get ZAP for the outgoing particle
     if( particleID == 'gamma' ) :
@@ -160,56 +187,52 @@ def upDateENDFMF8Data( endfMFList, tempInfo ) :
 
 def upDateENDF_MT_MF8Data( MT, endfMFList, tempInfo ) :
 
+    from fudge.gnd.reactionData import crossSection
+
     MF8Channels = tempInfo['MF8'][MT]
     ZA, mass = tempInfo[ 'ZA' ], tempInfo[ 'mass' ]
     LIS, LISO, NO, NS = tempInfo['LIS'], tempInfo['LISO'], 1, len( MF8Channels )
     firstReaction = MF8Channels[0]
-    residual = firstReaction.product
+    residual = firstReaction.outputChannel[0]
 
-    # LMF determines which MF section to write back to:
-    LMF = 10
-    if( ( firstReaction.crossSection.nativeData == fudge.gnd.tokens.weightedPointwiseFormToken ) or 
-        ( firstReaction.crossSection.nativeData == fudge.gnd.tokens.resonancesWithBackgroundFormToken ) and
-        ( firstReaction.crossSection.forms[ firstReaction.crossSection.nativeData ].tabulatedData.form == fudge.gnd.tokens.weightedPointwiseFormToken ) ) : 
-            LMF = 9
-    if LMF == 9 and firstReaction.crossSection.nativeData == fudge.gnd.tokens.weightedPointwiseFormToken:
-        weights = firstReaction.crossSection.forms[ fudge.gnd.tokens.weightedPointwiseFormToken ].weights
-        if weights.yMin() == 1.0 and weights.yMax() == 1.0:
+    crossSection_ = firstReaction.crossSection.getNativeData( )  # LMF determines which MF section to write to.
+    if( isinstance( crossSection_, crossSection.reference ) ) : 
+        multiplicity_ = residual.multiplicity.getNativeData( )
+        if(   isinstance( multiplicity_, multiplicity.constant ) ) :
             LMF = 3
+        elif( isinstance( multiplicity_, multiplicity.reference ) ) :
+            LMF = 6
+        else :
+            LMF = 9
+    else :
+        LMF = 10
+
     level = residual.getLevelAsFloat( 'eV' )
     endfMFList[8][MT]  = [ endfFormats.endfHeadLine( ZA, mass, LIS, LISO, NS, NO ) ]
     if( LMF != 3 ) : endfMFList[LMF][MT] = [ endfFormats.endfHeadLine( ZA, mass, LIS,    0, NS,  0 ) ]
-    crossSectionData = endl2dmathClasses.endl2dmath( )
 
     for reaction in MF8Channels :
-        Z, A, suffix, ZAP = reaction.product.getZ_A_SuffixAndZA( )
-        QI = reaction.getQ( 'eV', groundStateQ = True )
-        LFS2, level2 = reaction.product.getLevelIndex(), reaction.product.getLevelAsFloat( 'eV' )
+        outputChannel = reaction.outputChannel
+        if( len( outputChannel ) != 1 ) : raise Exception( 'Currently, production channel can only have one product; not %d' % len( outputChannel ) )
+        product = outputChannel[0]
+
+        Z, A, suffix, ZAP = product.particle.getZ_A_SuffixAndZA( )
+        QI = outputChannel.getConstantQAs( 'eV', final = True )
+        LFS2, level2 = product.particle.getLevelIndex(), product.particle.getLevelAsFloat( 'eV' )
         QM = QI + level2
-        crossSection = reaction.crossSection
-        interpolationFlatData, crossSectionFlatData = crossSection.forms[crossSection.nativeData].toENDF6Data( MT, endfMFList, tempInfo, level2 )
+
         endfMFList[8][MT].append( endfFormats.endfHeadLine( ZAP, level2, LMF, LFS2, 0, 0 ) )
-        if( LMF != 3 ) :
-            endfMFList[LMF][MT].append( endfFormats.endfHeadLine( QM, QI, ZAP, LFS2, len( interpolationFlatData ) / 2, 
-                len( crossSectionFlatData ) / 2 ) )
+
+        if( LMF == 9 ) :        # Currenty, multiplicity_.toENDF6List only has one interpolation and its linear.
+            multiplicity_ = product.multiplicity.getNativeData( )
+            nRegions, nPoints, dataListAsStrings = multiplicity_.toENDF6List( )
+            endfMFList[LMF][MT].append( endfFormats.endfHeadLine( QM, QI, ZAP, LFS2, nRegions, nPoints ) )
+            endfMFList[LMF][MT] += dataListAsStrings
+        elif( LMF == 10 ) :
+            interpolationFlatData, flatData = reaction.crossSection.getNativeData( ).toENDF6Data( MT, endfMFList, tempInfo, level2 )
+            endfMFList[LMF][MT].append( endfFormats.endfHeadLine( QM, QI, ZAP, LFS2, len( interpolationFlatData ) / 2, len( flatData ) / 2 ) )
             endfMFList[LMF][MT] += endfFormats.endfInterpolationList( interpolationFlatData )
-            endfMFList[LMF][MT] += endfFormats.endfDataList( crossSectionFlatData )
-            if( LMF == 10 ) :
-                crossSectionXY = [ [ crossSectionFlatData[i], crossSectionFlatData[i+1] ] for i in xrange( 0, len( crossSectionFlatData ), 2 ) ]
-                crossSectionData = crossSectionData + endl2dmathClasses.endl2dmath( crossSectionXY )
-    """
-    if( LMF == 9 ) :
-        crossSection = firstReaction.crossSection
-        if crossSection.nativeData == fudge.gnd.tokens.resonancesWithBackgroundFormToken :
-            crossSection = crossSection.forms[crossSection.nativeData].tabulatedData.crossSection
-        else:
-            crossSection = crossSection.forms[crossSection.nativeData].crossSection
-        interpolationFlatData, crossSectionFlatData = crossSection.forms[crossSection.nativeData].toENDF6Data( MT, endfMFList, tempInfo, level )
-    elif( LMF == 10 ) :
-        crossSectionFlatData = []
-        for xy in crossSectionData.data : crossSectionFlatData += xy
-        interpolationFlatData = [ len( crossSectionData ), 2 ]
-    """
+            endfMFList[LMF][MT] += endfFormats.endfDataList( flatData )
 
     endfMFList[8][MT].append( endfFormats.endfSENDLineNumber( ) )
     if( LMF != 3 ) : endfMFList[LMF][MT].append( endfFormats.endfSENDLineNumber( ) )
@@ -264,6 +287,7 @@ def gammasToENDF6_MF12_13( MT, MF, endfMFList, flags, tempInfo, gammas ) :
             LI, LTT = 0, 1
         else :
             raise Exception( 'Angular form = %s is not supported: MT=%s MF=%s' % ( angularForm.moniker, MT, MF ) )
+
         if( MF == 12 ) :
             LO = 1
             multiplicity_ = gamma.multiplicity.getFormByToken( gamma.multiplicity.getNativeDataToken( ) )
@@ -276,8 +300,14 @@ def gammasToENDF6_MF12_13( MT, MF, endfMFList, flags, tempInfo, gammas ) :
                     for index, NRsub in enumerate( endfFormats.endfInterpolationList( NR ) ) : MF12or13Data.insert( index, NRsub )
                 NR = len( NR ) / 2
             if( isinstance( multiplicity_, multiplicity.piecewise ) ) :
-                if( piecewise is not None ) : raise Exception( 'Only one piecewise is currently supported for MF=12 multiplicity data' )
-                piecewise = multiplicity_
+                if( piecewise is not None ) :
+                    if len(piecewise) == len(multiplicity_) and all( [piecewise[i].getDomain() == multiplicity_[i].getDomain()
+                            for i in range(len(piecewise))] ):
+                        for i in range(len(piecewise)):
+                            piecewise[i].setData( (piecewise[i] + multiplicity_[i]).copyDataToXYs() )
+                    else:
+                        raise Exception( 'MF=12 piecewise multiplicities must all have same energy boundaries' )
+                else: piecewise = multiplicity_
             elif( total is None )  :
                 total = multiplicity_
             else :
@@ -286,16 +316,30 @@ def gammasToENDF6_MF12_13( MT, MF, endfMFList, flags, tempInfo, gammas ) :
             MFGammas.append( [ isNotIsotropic, gammaEnergy, originationLevel, MF12, MF14 ] )
         elif( MF == 13 ) :
             LO = 0
-            multiplicity_ = gamma.multiplicity.getFormByToken( gamma.multiplicity.getNativeDataToken( ) )
-            xsec_mult = [ [ x, y * tempInfo['crossSection'].getValue( x ) ] for x, y in multiplicity_ ]
-            xsec_mult = XYs.XYs( multiplicity_.axes, xsec_mult, 1e-3 )
+            multiplicity_ = gamma.multiplicity.getNativeData( )
+            if( isinstance( multiplicity_, multiplicity.constant ) ) :
+                try :
+                    crossSectionMF13 = tempInfo['crossSectionMF13']
+                except :
+                    crossSectionMF13 = None
+                if( 'crossSectionMF13' is not None ) :
+                    crossSection = crossSectionMF13[gammaIndex]
+                else :
+                    crossSection = tempInfo['crossSection']
+                axes_ = crossSection.axes
+                xsec_mult = [ [ x, y * multiplicity_.getValue( x ) ] for x, y in crossSection ]
+            else :
+                axes_ = multiplicity_.axes
+                xsec_mult = [ [ x, y * tempInfo['crossSection'].getValue( x ) ] for x, y in multiplicity_ ]
+            xsec_mult = XYs.XYs( axes_, xsec_mult, 1e-3 )
             if( total is None ) :
                 total = xsec_mult
             else :
-                total += xsec_mult
+                total, xsec_mult_ = total.mutualify( 1e-6, 1e-6, True, xsec_mult, 1e-6, 1e-6, True )
+                total = total + xsec_mult_
             NR = 1; NP = len( xsec_mult )
             MF13 = [ endfFormats.endfContLine( gammaEnergy, originationLevel, LP, LF, NR, NP ) ]
-            MF13 += [ endfFormats.endfInterpolationLine( [ len( xsec_mult ), endfFormats.twoAxesToENDFInterpolation( multiplicity_.axes, 0 ) ] ) ]
+            MF13 += [ endfFormats.endfInterpolationLine( [ len( xsec_mult ), endfFormats.twoAxesToENDFInterpolation( axes_, 0 ) ] ) ]
             MF13 += endfFormats.endfNdDataList( xsec_mult )
             MFGammas.append( [ isNotIsotropic, gammaEnergy, originationLevel, MF13, MF14 ] )
         else:
@@ -306,6 +350,11 @@ def gammasToENDF6_MF12_13( MT, MF, endfMFList, flags, tempInfo, gammas ) :
         if( piecewise is None ) :
             NR, NP, interpolationList = 1, len( total ), [ len( total ), 2 ]
             totalMultiplicityData = total
+        elif( total is None ):  # all multiplicities are piecewise
+            interpolationList, NP, MF12or13Data = piecewise.toENDF6List( )
+            NR = len( interpolationList ) / 2
+            totalMultiplicityData = []
+            for region in piecewise: totalMultiplicityData.extend( region.copyDataToXYs() )
         else :          # This is not very robust, it is actually a kludge.
             axes_ = piecewise[0].axes.copy( standAlone = True )
             axes_[0].unit = 'eV'

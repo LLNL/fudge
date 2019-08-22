@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>fudge.gnd.xParticleList &mdash; Fudge and GND 1.2 beta documentation</title>
+    <title>fudge.gnd.xParticleList &mdash; Fudge and GND 1.3 beta documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '1.2 beta',
+        VERSION:     '1.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +25,7 @@
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../../../_static/gnd-20121206-favicon.ico"/>
-    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../index.html" />
+    <link rel="top" title="Fudge and GND 1.3 beta documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
@@ -39,7 +38,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -88,10 +87,6 @@
         <span class="k">elif</span><span class="p">(</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span> <span class="s">&#39;_c&#39;</span> <span class="p">)</span> <span class="ow">or</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span> <span class="s">&#39;_s&#39;</span> <span class="p">)</span> <span class="p">):</span>
             <span class="n">baseName</span><span class="p">,</span> <span class="n">levelId</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">name</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="n">baseName</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">levelId</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">baseName</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span> <span class="p">)</span> <span class="p">)</span>
-        <span class="k">elif</span><span class="p">(</span> <span class="s">&#39;_m&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="p">):</span>
-            <span class="n">baseName</span><span class="p">,</span> <span class="n">m_index</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_m&#39;</span><span class="p">)</span>
-            <span class="k">return</span><span class="p">(</span> <span class="p">(</span> <span class="n">baseName</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="nb">bool</span><span class="p">(</span> <span class="p">[</span> <span class="n">lev</span> <span class="k">for</span> <span class="n">lev</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">baseName</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-                <span class="k">if</span><span class="p">(</span> <span class="n">lev</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;metaStableIndex&#39;</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span> <span class="n">m_index</span> <span class="p">)</span> <span class="p">)</span> <span class="p">]</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
         <span class="k">return</span><span class="p">(</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="xParticleList.getParticle"><a class="viewcode-back" href="../../../fudge/fudge.gnd.html#fudge.gnd.xParticleList.xParticleList.getParticle">[docs]</a>    <span class="k">def</span> <span class="nf">getParticle</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
@@ -103,10 +98,6 @@
             <span class="k">elif</span><span class="p">(</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;_c&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;_s&#39;</span><span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
                 <span class="n">baseName</span><span class="p">,</span> <span class="n">levelId</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">name</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
                 <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="n">baseName</span><span class="p">][</span> <span class="n">levelId</span> <span class="p">]</span> <span class="p">)</span>
-            <span class="k">elif</span><span class="p">(</span> <span class="s">&#39;_m&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="p">)</span> <span class="p">:</span>
-                <span class="n">baseName</span><span class="p">,</span> <span class="n">m_index</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_m&#39;</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">lev</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">baseName</span><span class="p">]</span><span class="o">.</span><span class="n">levels</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="p">:</span>
-                    <span class="k">if</span><span class="p">(</span> <span class="n">lev</span><span class="o">.</span><span class="n">getMetaStableIndex</span><span class="p">()</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">m_index</span><span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="k">return</span><span class="p">(</span> <span class="n">lev</span> <span class="p">)</span>
             <span class="k">return</span><span class="p">(</span> <span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">,</span> <span class="p">(</span><span class="s">&quot;Particle &#39;</span><span class="si">%s</span><span class="s">&#39; is missing from the particle list!&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
@@ -201,13 +192,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

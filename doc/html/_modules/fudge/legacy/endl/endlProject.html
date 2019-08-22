@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>fudge.legacy.endl.endlProject &mdash; Fudge and GND 1.2 beta documentation</title>
+    <title>fudge.legacy.endl.endlProject &mdash; Fudge and GND 1.3 beta documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '1.2 beta',
+        VERSION:     '1.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +25,7 @@
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
-    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../../index.html" />
+    <link rel="top" title="Fudge and GND 1.3 beta documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
@@ -39,7 +38,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -60,7 +59,7 @@
 <span class="sd">    1) Uses the bdflsFileName argument if it is None; else,</span>
 <span class="sd">    2) Uses &quot;./bdfls&quot; if it exists; else,</span>
 <span class="sd">    3) Uses the bdfls in the database (at the same level as the &quot;ascii&quot; file) if it exists; else,</span>
-<span class="sd">    4) Uses the bdlfs pointed to by the environmental variable BDFLSPATH if it exists; else,</span>
+<span class="sd">    4) Uses the bdfls pointed to by the environmental variable BDFLSPATH if it exists; else,</span>
 <span class="sd">    5) Uses &quot;/usr/gapps/data/nuclear/bdfls&quot;.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
@@ -71,7 +70,7 @@
 <span class="kn">import</span> <span class="nn">types</span>
 
 <span class="kn">from</span> <span class="nn">fudge</span> <span class="kn">import</span> <span class="n">fudgeDefaults</span><span class="p">,</span> <span class="n">fudgeParameters</span>
-<span class="kn">from</span> <span class="nn">fudge.processing</span> <span class="kn">import</span> <span class="n">bdfls</span>
+<span class="kn">import</span> <span class="nn">bdfls</span>
 <span class="kn">from</span> <span class="nn">fudge.core.utilities</span> <span class="kn">import</span> <span class="n">brb</span>
 <span class="kn">import</span> <span class="nn">fudgeDocumentationFile</span>
 <span class="kn">import</span> <span class="nn">endlZA</span>
@@ -189,7 +188,7 @@
             <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="o">=</span> <span class="n">endlmisc</span><span class="o">.</span><span class="n">appendyiDirIfNeeded</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yiTags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
             <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="ow">is</span> <span class="bp">None</span> <span class="p">)</span> <span class="ow">and</span> <span class="n">cleanWorkDirOfZAs</span> <span class="p">)</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span> <span class="s">&#39;rm -rf </span><span class="si">%s</span><span class="s">/za[0-9][0-9][0-9][0-9][0-9][0-9]*&#39;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="ow">not</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="ow">is</span> <span class="bp">None</span> <span class="p">)</span> <span class="ow">and</span> <span class="n">cleanWorkDirOfZAs</span> <span class="p">)</span> <span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span> <span class="s">&#39;rm -rf </span><span class="si">%s</span><span class="s">/za[0-9][0-9][0-9][0-9][0-9][0-9]*&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">workDir</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">zas</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">documentation</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">database</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span>
@@ -485,13 +484,13 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

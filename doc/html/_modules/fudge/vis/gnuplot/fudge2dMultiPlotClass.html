@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>fudge.vis.gnuplot.fudge2dMultiPlotClass &mdash; Fudge and GND 1.2 beta documentation</title>
+    <title>fudge.vis.gnuplot.fudge2dMultiPlotClass &mdash; Fudge and GND 1.3 beta documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '1.2 beta',
+        VERSION:     '1.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +25,7 @@
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../../../../_static/gnd-20121206-favicon.ico"/>
-    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../../../../index.html" />
+    <link rel="top" title="Fudge and GND 1.3 beta documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
@@ -39,7 +38,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -51,31 +50,6 @@
             
   <h1>Source code for fudge.vis.gnuplot.fudge2dMultiPlotClass</h1><div class="highlight"><pre>
 <span class="c"># &lt;&lt;BEGIN-copyright&gt;&gt;</span>
-<span class="c"># Copyright (c) 2011, Lawrence Livermore National Security, LLC.</span>
-<span class="c"># Produced at the Lawrence Livermore National Laboratory.</span>
-<span class="c"># Written by the LLNL Computational Nuclear Physics group</span>
-<span class="c">#         (email: mattoon1@llnl.gov)</span>
-<span class="c"># LLNL-CODE-494171 All rights reserved.</span>
-<span class="c"># </span>
-<span class="c"># This file is part of the FUDGE package (For Updating Data and </span>
-<span class="c">#         Generating Evaluations)</span>
-<span class="c"># </span>
-<span class="c"># </span>
-<span class="c">#     Please also read this link - Our Notice and GNU General Public License.</span>
-<span class="c"># </span>
-<span class="c"># This program is free software; you can redistribute it and/or modify it under </span>
-<span class="c"># the terms of the GNU General Public License (as published by the Free Software</span>
-<span class="c"># Foundation) version 2, dated June 1991.</span>
-<span class="c"># This program is distributed in the hope that it will be useful, </span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY </span>
-<span class="c"># or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of </span>
-<span class="c"># the GNU General Public License for more details.</span>
-<span class="c"># You should have received a copy of the GNU General Public License along with </span>
-<span class="c"># this program; if not, write to </span>
-<span class="c"># </span>
-<span class="c"># the Free Software Foundation, Inc.,</span>
-<span class="c"># 59 Temple Place, Suite 330,</span>
-<span class="c"># Boston, MA 02111-1307 USA</span>
 <span class="c"># &lt;&lt;END-copyright&gt;&gt;</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
@@ -161,7 +135,15 @@
         <span class="n">menubar</span><span class="o">.</span><span class="n">insert_cascade</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s">&quot;Data&quot;</span><span class="p">,</span> <span class="n">menu</span> <span class="o">=</span> <span class="n">dataMenu</span> <span class="p">)</span>
 
         <span class="n">fileMenu</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">Menu</span><span class="p">(</span> <span class="n">menubar</span><span class="p">,</span> <span class="n">tearoff</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span>
-        <span class="n">fileMenu</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span> <span class="n">label</span> <span class="o">=</span> <span class="s">&quot;SaveAs eps&quot;</span><span class="p">,</span> <span class="n">command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotSaveAsEps</span> <span class="p">)</span>
+
+        <span class="n">savePlotAs</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">Menu</span><span class="p">(</span> <span class="n">fileMenu</span><span class="p">,</span> <span class="n">tearoff</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">)</span>
+        <span class="n">savePlotAs</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span> <span class="n">label</span> <span class="o">=</span> <span class="s">&quot;pdf&quot;</span><span class="p">,</span> <span class="n">command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotSaveAsPDF</span> <span class="p">)</span>
+        <span class="n">savePlotAs</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span> <span class="n">label</span> <span class="o">=</span> <span class="s">&quot;png&quot;</span><span class="p">,</span> <span class="n">command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotSaveAsPNG</span> <span class="p">)</span>
+        <span class="n">savePlotAs</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span> <span class="n">label</span> <span class="o">=</span> <span class="s">&quot;svg&quot;</span><span class="p">,</span> <span class="n">command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotSaveAsSVG</span> <span class="p">)</span>
+        <span class="n">savePlotAs</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span> <span class="n">label</span> <span class="o">=</span> <span class="s">&quot;eps&quot;</span><span class="p">,</span> <span class="n">command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotSaveAsEps</span> <span class="p">)</span>
+        <span class="n">fileMenu</span><span class="o">.</span><span class="n">add_cascade</span><span class="p">(</span> <span class="n">label</span> <span class="o">=</span> <span class="s">&quot;Save plot as&quot;</span><span class="p">,</span> <span class="n">menu</span> <span class="o">=</span> <span class="n">savePlotAs</span> <span class="p">)</span>
+
+
         <span class="n">fileMenu</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span> <span class="n">label</span> <span class="o">=</span> <span class="s">&quot;Print&quot;</span><span class="p">,</span> <span class="n">command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotPrint</span> <span class="p">)</span>
         <span class="n">fileMenu</span><span class="o">.</span><span class="n">add_separator</span><span class="p">(</span> <span class="p">)</span>
         <span class="n">fileMenu</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span> <span class="n">label</span> <span class="o">=</span> <span class="s">&quot;Exit&quot;</span><span class="p">,</span> <span class="n">command</span> <span class="o">=</span> <span class="n">rootWindow</span><span class="o">.</span><span class="n">quit</span> <span class="p">)</span>
@@ -240,12 +222,12 @@
 
         <span class="k">def</span> <span class="nf">xrange_Callback</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">e</span> <span class="p">)</span> <span class="p">:</span>
             <span class="sd">&quot;&quot;&quot;Called when the &lt;Return&gt; key is pressed in the xrange entry window.&quot;&quot;&quot;</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;set xrange [ </span><span class="si">%s</span><span class="s"> ]&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">xrange</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;set xrange [ </span><span class="si">%s</span><span class="s"> ] noreverse&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">xrange</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">replot</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">xrange</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame</span> <span class="p">)</span>
         <span class="n">RangeStr</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> : </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s">&quot;xMin&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s">&quot;xMax&quot;</span><span class="p">]</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set xrange [ </span><span class="si">%s</span><span class="s"> ]&quot;</span> <span class="o">%</span> <span class="n">RangeStr</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set xrange [ </span><span class="si">%s</span><span class="s"> ] noreverse&quot;</span> <span class="o">%</span> <span class="n">RangeStr</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xrange</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="n">RangeStr</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xrange</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span> <span class="n">row</span> <span class="o">=</span> <span class="n">Row</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">columnspan</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sticky</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">W</span> <span class="o">+</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">E</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xrange</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span> <span class="s">&quot;&lt;Return&gt;&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">e</span><span class="p">,</span> <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">xrange_Callback</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">e</span> <span class="p">)</span> <span class="p">)</span>
@@ -259,12 +241,12 @@
 
         <span class="k">def</span> <span class="nf">yrange_Callback</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">e</span> <span class="p">)</span> <span class="p">:</span>
             <span class="sd">&quot;&quot;&quot;Called when the &lt;Return&gt; key is pressed in the yrange entry window.&quot;&quot;&quot;</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;set yrange [ </span><span class="si">%s</span><span class="s"> ]&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">yrange</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;set yrange [ </span><span class="si">%s</span><span class="s"> ] noreverse&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">yrange</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">replot</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">yrange</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame</span> <span class="p">)</span>
         <span class="n">RangeStr</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> : </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s">&quot;yMin&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s">&quot;yMax&quot;</span><span class="p">]</span> <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set yrange [ </span><span class="si">%s</span><span class="s"> ]&quot;</span> <span class="o">%</span> <span class="n">RangeStr</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set yrange [ </span><span class="si">%s</span><span class="s"> ] noreverse&quot;</span> <span class="o">%</span> <span class="n">RangeStr</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">yrange</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="n">RangeStr</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">yrange</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span> <span class="n">row</span> <span class="o">=</span> <span class="n">Row</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">columnspan</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sticky</span> <span class="o">=</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">W</span> <span class="o">+</span> <span class="n">Tkinter</span><span class="o">.</span><span class="n">E</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">yrange</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span> <span class="s">&quot;&lt;Return&gt;&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">e</span><span class="p">,</span> <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span> <span class="p">:</span> <span class="n">yrange_Callback</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">e</span> <span class="p">)</span> <span class="p">)</span>
@@ -290,8 +272,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">gnuplotCommandComboBox</span><span class="p">[</span><span class="s">&#39;history&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gnuplotCommandComboBox</span><span class="p">[</span><span class="s">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;normal&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gnuplotCommandComboBox</span><span class="o">.</span><span class="n">entry</span><span class="p">[</span><span class="s">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;normal&#39;</span>
-<span class="c">#            for k in self.gnuplotCommandComboBox.keys( ) : print &quot;%-20s %s&quot; % ( k, self.gnuplotCommandComboBox[k] )</span>
-<span class="c">#            for k in self.gnuplotCommandComboBox.entry.keys( ) : print &quot;%-20s %s&quot; % ( k, self.gnuplotCommandComboBox.entry[k] )</span>
         <span class="k">except</span> <span class="n">TclError</span><span class="p">:</span> <span class="k">pass</span>
 
 <div class="viewcode-block" id="fudge2dMultiPlotClass.redraw"><a class="viewcode-back" href="../../../../fudge/fudge.vis.gnuplot.html#fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.redraw">[docs]</a>    <span class="k">def</span> <span class="nf">redraw</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
@@ -310,29 +290,22 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lastTitle</span> <span class="o">=</span> <span class="n">plotTitle</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rootWindow</span><span class="o">.</span><span class="n">title</span><span class="p">(</span> <span class="n">dialogTitle</span> <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set nokey&quot;</span> <span class="p">)</span>
         <span class="n">legendBox</span> <span class="o">=</span> <span class="s">&quot;no&quot;</span>
-        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">legendOnVar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set key </span><span class="si">%s</span><span class="s">box&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">legendBox</span> <span class="p">)</span> <span class="p">)</span>
-<span class="c">#        if( self.legendOnVar.get( ) ) : self.g( &quot;set key %sbox right top at graph %e, %e&quot; % ( legendBox, self.legendX.get( ), self.legendY.get( ) ) )</span>
-
         <span class="k">if</span><span class="p">(</span> <span class="ow">not</span> <span class="n">gnuplot_old</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">legendBoxVar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">legendBox</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
-<span class="c">#           self.g( &quot;set tics scale %e&quot; % self.ticsVar.get( ) )</span>
-            <span class="n">fs_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fontSizeVar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span>
-            <span class="n">fs</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="mi">8</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span> <span class="n">fs_</span><span class="p">,</span> <span class="mi">72</span> <span class="p">)</span> <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&#39;set ylabel &quot;</span><span class="si">%s</span><span class="s">&quot; font &quot;times,</span><span class="si">%d</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">yAxisVar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">),</span> <span class="n">fs</span> <span class="p">)</span> <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&#39;set terminal X11 font &quot;times,</span><span class="si">%d</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="n">fs</span> <span class="p">)</span>
+           <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">legendBoxVar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="n">legendBox</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+           <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set tics scale </span><span class="si">%e</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">ticsVar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
+           <span class="n">fs_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fontSizeVar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span>
+           <span class="n">fs</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="mi">8</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span> <span class="n">fs_</span><span class="p">,</span> <span class="mi">72</span> <span class="p">)</span> <span class="p">)</span>
+           <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&#39;set terminal X11 font &quot;times,</span><span class="si">%d</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="n">fs</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set nokey&quot;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">legendOnVar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set key </span><span class="si">%s</span><span class="s">box right top at graph </span><span class="si">%e</span><span class="s">, </span><span class="si">%e</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">legendBox</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">legendX</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">legendY</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&#39;set xlabel &quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">xAxisVar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&#39;set ylabel &quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">yAxisVar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set nologscale xy&quot;</span> <span class="p">)</span>
-        <span class="n">xlog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlogVar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span>
-        <span class="n">ylog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylogVar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span> <span class="n">xlog</span> <span class="ow">or</span> <span class="n">ylog</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;set logscale &quot;</span>
-            <span class="k">if</span> <span class="p">(</span> <span class="n">xlog</span> <span class="p">)</span> <span class="p">:</span> <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="s">&quot;x&quot;</span>
-            <span class="k">if</span> <span class="p">(</span> <span class="n">ylog</span> <span class="p">)</span> <span class="p">:</span> <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="s">&quot;y&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="n">s</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlogVar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set logscale x&quot;</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ylogVar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="s">&quot;set logscale y&quot;</span> <span class="p">)</span>
 
         <span class="n">activeCurves</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotItemEditting</span><span class="o">.</span><span class="n">getActiveCurves</span><span class="p">(</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">extraGnuplotCommand</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">(</span> <span class="n">extraGnuplotCommand</span> <span class="p">)</span>
@@ -355,27 +328,49 @@
         <span class="n">fileName</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">fudgeNdMultiPlotMisc</span><span class="o">.</span><span class="n">fudgeNdMultiPlotFileRead</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">rootWindow</span><span class="p">,</span> <span class="mi">2</span> <span class="p">)</span>
         <span class="k">if</span><span class="p">(</span> <span class="n">columns</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">add2dFile</span><span class="p">(</span> <span class="n">fileName</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">xColumn</span> <span class="o">=</span> <span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">yColumn</span> <span class="o">=</span> <span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
 </div>
+<div class="viewcode-block" id="fudge2dMultiPlotClass.plotSaveAs_terminal"><a class="viewcode-back" href="../../../../fudge/fudge.vis.gnuplot.html#fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAs_terminal">[docs]</a>    <span class="k">def</span> <span class="nf">plotSaveAs_terminal</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">terminal</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="bp">True</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Called when &quot;File -&gt; SaveAs eps&quot; menu is selected. Uses a FileDialog to get the output </span>
+<span class="sd">        file name and produces an eps file of the current plot.&quot;&quot;&quot;</span>
+
+        <span class="k">global</span> <span class="n">saveAsCounter</span>
+
+        <span class="k">if</span><span class="p">(</span> <span class="n">suffix</span> <span class="ow">is</span> <span class="bp">None</span> <span class="p">)</span> <span class="p">:</span> <span class="n">suffix</span> <span class="o">=</span> <span class="n">terminal</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="s">&quot;Fudge</span><span class="si">%d</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">saveAsCounter</span><span class="p">,</span> <span class="n">suffix</span> <span class="p">)</span>
+        <span class="n">FileName</span> <span class="o">=</span> <span class="n">tkFileDialog</span><span class="o">.</span><span class="n">asksaveasfilename</span><span class="p">(</span> <span class="n">initialfile</span> <span class="o">=</span> <span class="n">fn</span> <span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">FileName</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">FileName</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span> <span class="n">color</span> <span class="p">)</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">hardcopy</span><span class="p">(</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">FileName</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">terminal</span> <span class="o">=</span> <span class="n">terminal</span> <span class="p">)</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">hardcopy</span><span class="p">(</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">FileName</span><span class="p">,</span> <span class="n">terminal</span> <span class="o">=</span> <span class="n">terminal</span> <span class="p">)</span>
+            <span class="n">saveAsCounter</span> <span class="o">+=</span> <span class="mi">1</span>
+</div>
 <div class="viewcode-block" id="fudge2dMultiPlotClass.plotSaveAsEps"><a class="viewcode-back" href="../../../../fudge/fudge.vis.gnuplot.html#fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsEps">[docs]</a>    <span class="k">def</span> <span class="nf">plotSaveAsEps</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Called when &quot;File -&gt; SaveAs eps&quot; menu is selected. Uses a FileDialog to get the output </span>
 <span class="sd">        file name and produces an eps file of the current plot.&quot;&quot;&quot;</span>
-        <span class="k">global</span> <span class="n">saveAsCounter</span>
-        <span class="n">fn</span> <span class="o">=</span> <span class="s">&quot;Fudge</span><span class="si">%d</span><span class="s">.eps&quot;</span> <span class="o">%</span> <span class="n">saveAsCounter</span>
-        <span class="n">FileName</span> <span class="o">=</span> <span class="n">tkFileDialog</span><span class="o">.</span><span class="n">asksaveasfilename</span><span class="p">(</span> <span class="n">initialfile</span> <span class="o">=</span> <span class="n">fn</span> <span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">FileName</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">FileName</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">hardcopy</span><span class="p">(</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">FileName</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">)</span>
-            <span class="n">saveAsCounter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotSaveAs_terminal</span><span class="p">(</span> <span class="s">&#39;postscript&#39;</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="s">&#39;ps&#39;</span> <span class="p">)</span>
 </div>
-<div class="viewcode-block" id="fudge2dMultiPlotClass.plotSaveAsASCII"><a class="viewcode-back" href="../../../../fudge/fudge.vis.gnuplot.html#fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsASCII">[docs]</a>    <span class="k">def</span> <span class="nf">plotSaveAsASCII</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Currently not implemented.&quot;&quot;&quot;</span>
-        <span class="k">global</span> <span class="n">saveAsCounter</span>
-        <span class="n">fn</span> <span class="o">=</span> <span class="s">&quot;Fudge</span><span class="si">%d</span><span class="s">.asc&quot;</span> <span class="o">%</span> <span class="n">saveAsCounter</span>
-        <span class="n">FileName</span> <span class="o">=</span> <span class="n">tkFileDialog</span><span class="o">.</span><span class="n">asksaveasfilename</span><span class="p">(</span> <span class="n">initialfile</span> <span class="o">=</span> <span class="n">fn</span> <span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="p">(</span> <span class="nb">type</span><span class="p">(</span> <span class="n">FileName</span> <span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="n">FileName</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="p">)</span> <span class="p">:</span>
-            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span> <span class="n">InputFileName</span><span class="p">,</span> <span class="n">FileName</span> <span class="p">)</span>
-            <span class="n">saveAsCounter</span> <span class="o">+=</span> <span class="mi">1</span>
+<div class="viewcode-block" id="fudge2dMultiPlotClass.plotSaveAsPDF"><a class="viewcode-back" href="../../../../fudge/fudge.vis.gnuplot.html#fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsPDF">[docs]</a>    <span class="k">def</span> <span class="nf">plotSaveAsPDF</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Called when &quot;File -&gt; SaveAs pdf&quot; menu is selected. Uses a FileDialog to get the output </span>
+<span class="sd">        file name and produces an eps file of the current plot.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotSaveAs_terminal</span><span class="p">(</span> <span class="s">&#39;pdf&#39;</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="fudge2dMultiPlotClass.plotSaveAsPNG"><a class="viewcode-back" href="../../../../fudge/fudge.vis.gnuplot.html#fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsPNG">[docs]</a>    <span class="k">def</span> <span class="nf">plotSaveAsPNG</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Called when &quot;File -&gt; SaveAs png&quot; menu is selected. Uses a FileDialog to get the output </span>
+<span class="sd">        file name and produces an eps file of the current plot.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotSaveAs_terminal</span><span class="p">(</span> <span class="s">&#39;png&#39;</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="bp">False</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="fudge2dMultiPlotClass.plotSaveAsSVG"><a class="viewcode-back" href="../../../../fudge/fudge.vis.gnuplot.html#fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotSaveAsSVG">[docs]</a>    <span class="k">def</span> <span class="nf">plotSaveAsSVG</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Called when &quot;File -&gt; SaveAs svg&quot; menu is selected. Uses a FileDialog to get the output </span>
+<span class="sd">        file name and produces an eps file of the current plot.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">plotSaveAs_terminal</span><span class="p">(</span> <span class="s">&#39;svg&#39;</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="bp">False</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="fudge2dMultiPlotClass.plotPrint"><a class="viewcode-back" href="../../../../fudge/fudge.vis.gnuplot.html#fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.plotPrint">[docs]</a>    <span class="k">def</span> <span class="nf">plotPrint</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Called when &quot;File -&gt; Print&quot; menu is selected. Prints the current plot.&quot;&quot;&quot;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">hardcopy</span><span class="p">(</span> <span class="p">)</span>
 </div>
 <div class="viewcode-block" id="fudge2dMultiPlotClass.legendCallback"><a class="viewcode-back" href="../../../../fudge/fudge.vis.gnuplot.html#fudge.vis.gnuplot.fudge2dMultiPlotClass.fudge2dMultiPlotClass.legendCallback">[docs]</a>    <span class="k">def</span> <span class="nf">legendCallback</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span> <span class="p">:</span>
@@ -418,13 +413,13 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../../../../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="../../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

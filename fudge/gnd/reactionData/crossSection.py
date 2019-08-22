@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 import math
@@ -10,10 +35,9 @@ from fudge.core.math.xData import XYs, axes, regions
 __metaclass__ = type
 
 #: List of valid cross section forms 
-crossSectionForms = [ \
-    tokens.pointwiseFormToken, tokens.linearFormToken, \
-    tokens.piecewiseFormToken, tokens.resonancesWithBackgroundFormToken, \
-    tokens.weightedPointwiseFormToken, tokens.groupedFormToken ] 
+crossSectionForms = [ tokens.pointwiseFormToken,                tokens.linearFormToken,             tokens.piecewiseFormToken, 
+                      tokens.resonancesWithBackgroundFormToken, tokens.weightedPointwiseFormToken,  tokens.groupedFormToken, 
+                      tokens.referenceFormToken ] 
 
 lowerEps = 1e-8
 upperEps = 1e-8
@@ -37,6 +61,13 @@ class component( baseClasses.componentBase ) :
 
         return( self.forms[self.nativeData].domainMax( unitTo = unitTo, asPQU = asPQU ) )
 
+    def domainUnitConversionFactor( self, unitTo ) :
+
+        from pqu import physicalQuantityWithUncertainty
+
+        if( unitTo is None ) : return( 1. )
+        return( physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty( '1 ' + self.getDomainUnit( ) ).getValueAs( unitTo ) )
+
     def getDomain( self, unitTo = None, asPQU = False ) :
 
         return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
@@ -53,16 +84,12 @@ class component( baseClasses.componentBase ) :
             interpolationAccuracy = 0.002, heatAllPoints = False, 
             doNotThin = True, heatBelowThreshold = True, heatAllEDomain = True ) : 
         """
-        Returns the result of self.toPointwiseLinear( ).heat( ... ). See method pointwise.heat for more information.
+        Returns the result of self.toPointwise_withLinearXYs( ).heat( ... ). See method pointwise.heat for more information.
         """
 
-        return( self.toPointwiseLinear( ).heat( self, temperature, EMin, 
+        return( self.toPointwise_withLinearXYs( ).heat( self, temperature, EMin, 
             lowerlimit, upperlimit, interpolationAccuracy, heatAllPoints, doNotThin,
             heatBelowThreshold, heatAllEDomain ) )
-
-    def toPointwiseLinear( self, lowerEps = lowerEps, upperEps = upperEps ) :
-
-        return( self.forms[self.nativeData].toPointwiseLinear( lowerEps, upperEps ) )
 
     def check( self, info ) :
         """
@@ -106,27 +133,32 @@ class component( baseClasses.componentBase ) :
             if bckDomain[0] > resDomain[1]:
                 warnings.append( warning.gapInCrossSection(resDomain[1],bckDomain[0], self ) )
 
-        # can it be converted to pointwise?
+        # can it be converted to pointwise linear?
         if tokens.linearFormToken not in self.forms:
             try:
-                self.forms[tokens.linearFormToken] = self.forms[ self.nativeData ].toPointwiseLinear(0,1e-8)
+                self.forms[tokens.linearFormToken] = self.forms[ self.nativeData ].toPointwise_withLinearXYs(0,1e-8)
             except Exception as e:
                 warnings.append( warning.ExceptionRaised( e, self ) )
                 return warnings
 
-        # check for negative cross sections
+        # following tests require a linearized cross section:
+        # test for negative values, and for non-zero cross section at threshold
         pw = self.forms[tokens.linearFormToken]
         if pw.yMin() < 0:
-            for i in range(len(pw)):
-                en, xsc = pw[i]
+            for i,(en,xsc) in enumerate(pw):
                 if xsc < 0:
                     warnings.append( warning.negativeCrossSection( PQU(en, pw.axes[0].unit), i, self ) )
+
+        if 'Q' in info and thresh.value>0:
+            if pw[0][1] != 0:
+                warnings.append( warning.nonZero_crossSection_at_threshold( pw[0][1], self ) )
 
         return warnings
 
     def process( self, processInfo, tempInfo, verbosityIndent ) :
         '''Process self into a form suitable for a specific application'''
-        crossSection = self.toPointwiseLinear( )
+
+        crossSection = self.toPointwise_withLinearXYs( )
         forms = crossSection.process( self, processInfo, tempInfo, verbosityIndent )
         for form in forms : self.addForm( form )
         return( crossSection )
@@ -249,6 +281,7 @@ class component( baseClasses.componentBase ) :
         raise NotImplementedError()
         # Construct an XYs instance that spans the same domain as self.
         # The x values are the E values and the y values are a Cf252 spectrum evaluated at x.
+        E=0 #Gotta write this
         Cf252SpectrumAve = math.exp( -0.789 * E ) * math.sinh( math.sqrt( 0.447 * E ) )
         return self.computeSpectrumAverage( Cf252SpectrumAve, covariance=covariance )
 
@@ -269,10 +302,12 @@ class component( baseClasses.componentBase ) :
 
     def computeRoomTempCS( self, covariance=None ): 
         '''
-        The cross section exactly at room temperature E=2.5e-4 eV or v=2200 m/s
+        The cross section exactly at room temperature E=0.0235339347844 eV or v=2200 m/s
 
-        If the covariance is provided, the uncertainty on the 2.5e-4 eV point will be computed.
+        If the covariance is provided, the uncertainty on the 0.0235339347844 eV point will be computed.
         
+        RoomTemp = 273.1 degK = 0.0235339347844 eV since kB = 8.6173324e-5 eV/degK
+
         :param covariance: covariance to use when computing uncertainty on the spectral average.  
             If None (default: None), no uncertainty is computed.
         :type covariance: covariance instance or None
@@ -280,7 +315,7 @@ class component( baseClasses.componentBase ) :
         '''
         raise NotImplementedError()
         # Check that covariance goes with this data
-        return self.getValue( '2.5e-4 eV' ), covariance.getUncertaintyVector( self, relative=False ).getValue( '2.5e-4 eV' )
+        return self.getValue( '0.0235339347844 eV' ), covariance.getUncertaintyVector( self, relative=False ).getValue( '0.0235339347844 eV' )
 
     def computeWestcottFactor( self, covariance=None ):
         '''
@@ -293,8 +328,8 @@ class component( baseClasses.componentBase ) :
         :type covariance: covariance instance or None
         :rtype: PQU
         '''
-        macs,dmacs = computeMACS( "298.15 K", covariance )
-        rt, drt = computeRoomTempCS( covariance ) 
+        macs,dmacs = self.computeMACS( "298.15 K", covariance )
+        rt, drt = self.computeRoomTempCS( covariance ) 
         westcott = macs/rt
         return westcott, westcott * math.sqrt( pow( dmacs/macs, 2.0 ) + pow( drt/rt, 2.0 ) )
 
@@ -376,7 +411,7 @@ class component( baseClasses.componentBase ) :
         :param LR:
         '''
 
-        from fudge.legacy.converting import endfFormats, gndToENDF6
+        from fudge.legacy.converting import endfFormats
         ZA, mass, QI = targetInfo['ZA'], targetInfo['mass'], targetInfo['Q']
         QM = targetInfo['QM']
         if( QM is None ) :
@@ -408,6 +443,7 @@ class pointwise( baseCrossSectionForm, XYs.XYs ) :
 
     tag = tokens.pointwiseFormToken
     form = tokens.pointwiseFormToken
+    mutableYUnit = False
 
     def __init__( self, axes, data, accuracy, **kwargs ) :
 
@@ -441,21 +477,24 @@ class pointwise( baseCrossSectionForm, XYs.XYs ) :
             gotT = PhysicalQuantityWithUncertainty( gotT.getValueAs( 'K' ), 'K' ) * PhysicalQuantityWithUncertainty( '1 k' )
         gotT = gotT.getValueAs( self.getIncidentEnergyUnit( ) )
 
+        if( isinstance( temperature, str ) ) : temperature = PhysicalQuantityWithUncertainty( temperature )
         temperature_ = temperature
         if( PhysicalQuantityWithUncertainty.isTemperature( temperature ) ) :
             temperature_ = PhysicalQuantityWithUncertainty( temperature.getValueAs( 'K' ), 'K' ) * PhysicalQuantityWithUncertainty( '1 k' )
         wantedT = temperature_.getValueAs( self.getIncidentEnergyUnit( ) )
 
         dT = wantedT - gotT
-        if( dT < 0 ) : raise Exception( 'Current temperature "%s" higher than desired temperature "%s"' % ( currentTemperature, temperature ) ) 
+        if( abs( dT ) <= 1e-2 * wantedT ) : dT = 0.
+        if( dT < 0 ) : raise Exception( 'Current temperature "%s" (%.4e) higher than desired temperature "%s" (%.4e)' % ( currentTemperature, gotT, temperature, wantedT ) ) 
 
         projectile, target = ancestors.findAttributeInAncestry( 'projectile' ), ancestors.findAttributeInAncestry( 'target' )
         if( projectile.getMass( 'amu' ) == 0 ) : raise Exception( 'Heating with gamma as projectile not supported.' )
         massRatio = target.getMass( 'amu' ) / projectile.getMass( 'amu' )
 
         heated = unheated = self
-        if( not( unheated.axes.isLinear( ) ) ) : unheated = self.toPointwiseLinear( lowerEps, upperEps )
+        if( not( unheated.axes.isLinear( ) ) ) : unheated = self.toPointwise_withLinearXYs( lowerEps, upperEps )
         if( ( len( unheated ) > 0 ) and ( dT > 0. ) ) :
+            if( isinstance( EMin, str ) ) : EMin = PhysicalQuantityWithUncertainty( EMin )
             EMin_ = EMin.getValueAs( self.getIncidentEnergyUnit( ) )
             if( not( heatBelowThreshold ) ) : EMin_ = max( unheated.domainMin( ), EMin_ )
             if( lowerlimit == None ) :
@@ -470,13 +509,13 @@ class pointwise( baseCrossSectionForm, XYs.XYs ) :
         accuracy = max( interpolationAccuracy, self.getAccuracy( ) )
         return( linear( unheated.axes, heated, accuracy ) )
 
-    def toPointwiseLinear( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
 
-        return( XYs.XYs.toPointwiseLinear( self, lowerEps = lowerEps, upperEps = upperEps, cls = linear ) )
+        return( XYs.XYs.toPointwise_withLinearXYs( self, lowerEps = lowerEps, upperEps = upperEps, cls = linear ) )
 
     def toENDF6Data( self, MT, endfMFList, targetInfo, level ) :
 
-        from fudge.legacy.converting import endfFormats, gndToENDF6
+        from fudge.legacy.converting import gndToENDF6
         endfInterpolation = gndToENDF6.axesToEndfInterpolationFlag( self.axes )
         crossSectionFlatData = []
         for xy in self.copyDataToXYs( xUnit = 'eV', yUnit = 'b' ) : crossSectionFlatData += xy
@@ -490,9 +529,8 @@ class pointwise( baseCrossSectionForm, XYs.XYs ) :
     def defaultAxes( energyUnit = 'eV', energyInterpolation = axes.linearToken, crossSectionUnit = 'b', crossSectionInterpolation = axes.linearToken ) :
 
         axes_ = axes.axes( dimension = 2 )
-        axes_[0] = axes.axis( 'energy_in', 0, energyUnit, frame = axes.labToken, \
-            interpolation = axes.interpolationXY( energyInterpolation, crossSectionInterpolation ) )
-        axes_[1] = axes.axis( base.crossSectionToken, 1, crossSectionUnit, frame = axes.labToken )
+        axes_[0] = axes.axis( 'energy_in', 0, energyUnit, interpolation = axes.interpolationXY( energyInterpolation, crossSectionInterpolation ) )
+        axes_[1] = axes.axis( base.crossSectionToken, 1, crossSectionUnit )
         return( axes_ )
 
 class linear( pointwise ) :
@@ -525,10 +563,10 @@ class linear( pointwise ) :
                     if( crossSection.axes.isLinear( qualifierOk = False ) ) : crossSection = None
                 except :        # Else, add self as it is linear pointwise
                     crossSection = self
-                if( crossSection is not None ) : forms.append( crossSection.toPointwiseLinear( 1e-8, 1e-8 ) )
+                if( crossSection is not None ) : forms.append( crossSection.toPointwise_withLinearXYs( 1e-8, 1e-8 ) )
 
         if( 'LLNL_Pn' in processInfo['styles'] ) :
-            crossSection = miscellaneous.groupOneFunctionsAndFlux( projectile, processInfo, self )
+            crossSection = miscellaneous.groupOneFunctionAndFlux( projectile, processInfo, self )
             tempInfo['groupedCrossSectionNorm'] = crossSection
 
             groupedFlux = tempInfo['groupedFlux']
@@ -558,16 +596,16 @@ class piecewise( baseCrossSectionForm, regions.regionsXYs ) :
 
         return( self[0].axes[0].getUnit( ) )
 
-    def toPointwiseLinear( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
 
         accuracy = 1e-3
         if( len( self ) > 0 ) : accuracy = self[0].getAccuracy( )
-        xys = regions.regionsXYs.toPointwiseLinear( self, accuracy, lowerEps, upperEps )
+        xys = regions.regionsXYs.toPointwise_withLinearXYs( self, accuracy, lowerEps, upperEps )
         return( linear( xys.axes, xys, accuracy = xys.getAccuracy( ) ) )
 
     def toENDF6Data( self, MT, endfMFList, targetInfo, level ) :
 
-        from fudge.legacy.converting import endfFormats, gndToENDF6
+        from fudge.legacy.converting import gndToENDF6
         interpolationFlatData, crossSectionFlatData = [], []
         counter = 0
         lastX, lastY = None, None
@@ -587,9 +625,8 @@ class piecewise( baseCrossSectionForm, regions.regionsXYs ) :
     def defaultAxes( energyUnit = 'eV', energyInterpolation = axes.byRegionToken, crossSectionUnit = 'b', crossSectionInterpolation = axes.byRegionToken ) :
 
         axes_ = axes.axes( dimension = 2 )
-        axes_[0] = axes.axis( 'energy_in', 0, energyUnit, frame = axes.labToken, \
-            interpolation = axes.interpolationXY( energyInterpolation, crossSectionInterpolation ) )
-        axes_[1] = axes.axis( base.crossSectionToken, 1, crossSectionUnit, frame = axes.labToken )
+        axes_[0] = axes.axis( 'energy_in', 0, energyUnit, interpolation = axes.interpolationXY( energyInterpolation, crossSectionInterpolation ) )
+        axes_[1] = axes.axis( base.crossSectionToken, 1, crossSectionUnit )
         return( axes_ )
 
 class grouped( baseClasses.groupedFormBase ) :
@@ -643,27 +680,97 @@ class resonancesWithBackground( baseCrossSectionForm ) :
         return( xmlList )
 
     @staticmethod
-    def parseXMLNode( BRelement, linkData={} ):
+    def parseXMLNode( element, xPath=[], linkData={} ):
+        xPath.append( element.tag )
         from fudge.gnd import link
-        xlink = link.parseXMLNode( BRelement[0] )
-        form = BRelement[1]
+        xlink = link.parseXMLNode( element[0] )
+        form = element[1]
         formClass = {tokens.pointwiseFormToken: pointwise,
                 tokens.linearFormToken: linear,
                 tokens.piecewiseFormToken: piecewise,
                 tokens.weightedPointwiseFormToken: weightedPointwise,
                 }.get( form.tag )
         if formClass is None: raise Exception("encountered unknown cross section form: %s" % form.tag)
-        return resonancesWithBackground( formClass.parseXMLNode(form,linkData), xlink )
+        resWithBack = resonancesWithBackground( formClass.parseXMLNode(form,xPath,linkData), xlink )
+        xPath.pop()
+        return resWithBack
     
     def toENDF6Data( self, MT, endfMFList, targetInfo, level ) :
         
         return self.tabulatedData.toENDF6Data( MT, endfMFList, targetInfo, level )
 
-    def toPointwiseLinear( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
 
         component_ = self.findClassInAncestry( component )
         if( tokens.linearFormToken in component_.forms ) : return( component_.forms[tokens.linearFormToken] )
         raise Exception( 'resonancesWithBackground cross section has not been reconstructed via reactionSuite.reconstructResonances' )
+
+class reference( baseCrossSectionForm ) :
+    """This cross section from contain a reference to the another cross section."""
+
+    form = tokens.referenceFormToken
+
+    def __init__( self, crossSection=None ) :
+
+        baseCrossSectionForm.__init__( self )
+        self.setReference( crossSection )
+
+    def getIncidentEnergyUnit( self ) :
+
+        return( self.crossSection.getIncidentEnergyUnit( ) )
+
+    def domainMin( self, unitTo = None, asPQU = False ) :
+
+        return( self.crossSection.domainMin( unitTo = unitTo, asPQU = asPQU ) )
+
+    def domainMax( self, unitTo = None, asPQU = False ) :
+
+        return( self.crossSection.domainMax( unitTo = unitTo, asPQU = asPQU ) )
+
+    def getDomain( self, unitTo = None, asPQU = False ) :
+
+        return( self.crossSection.getDomain( unitTo = unitTo, asPQU = asPQU ) )
+
+    def getDomainUnit( self ) :
+
+        return( self.crossSection.getDomainUnit( ) )
+
+    def getReference( self ) :
+
+        return( self.crossSection )
+
+    def setReference( self, crossSection ) :
+
+        if( not( isinstance( crossSection, (component, None.__class__) ) ) ) :
+            raise Exception( 'crossSection argument must be a cross section component not type %s' % type( crossSection ) )
+        self.crossSection = crossSection
+
+    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
+
+        return( self.crossSection.toPointwise_withLinearXYs( lowerEps, upperEps ) )
+
+    def check( self ) :
+
+        from fudge.gnd import warning
+        warnings = []
+        if self.getRootParent() != self.getReference().getRootParent():
+            warnings.append( warning.badCrossSectionReference() )
+        return warnings
+
+    def toXMLList( self, indent = "" ) :
+
+        xmlList = [ '%s<%s xlink:type="simple" xlink:href="%s"/>' % ( indent, self.form, self.crossSection.toXLink( ) ) ]
+        return( xmlList )
+
+    @staticmethod
+    def parseXMLNode( element, xPath = [], linkData = {} ):
+
+        from fudge.gnd import link
+
+        xlink = link.parseXMLNode( element ).path
+        ref = reference(None)
+        if( 'unresolvedLinks' in linkData ) : linkData['unresolvedLinks'].append( ( xlink, ref ) )
+        return( ref )
 
 class weightedPointwise( baseCrossSectionForm ) :
     """This class is used to store one cross section as a weighted multiple of another cross section.
@@ -680,7 +787,6 @@ class weightedPointwise( baseCrossSectionForm ) :
         baseCrossSectionForm.__init__( self )
         self.setReference( crossSection )
         self.weights = weights
-        self.toForms = {}
 
     def getIncidentEnergyUnit( self ) :
 
@@ -706,9 +812,9 @@ class weightedPointwise( baseCrossSectionForm ) :
 
         self.crossSection = crossSection
 
-    def toPointwiseLinear( self, lowerEps, upperEps ) :
+    def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
 
-        xys = self.crossSection.toPointwiseLinear( lowerEps, upperEps ) * self.weights
+        xys = self.crossSection.toPointwise_withLinearXYs( lowerEps, upperEps ) * self.weights
         return( linear( xys.axes, xys, accuracy = xys.getAccuracy( ) ) )
 
     def toXMLList( self, indent = "" ) :
@@ -719,7 +825,7 @@ class weightedPointwise( baseCrossSectionForm ) :
         return( xmlList )
 
     @staticmethod
-    def parseXMLNode( WPelement, linkData={} ):
+    def parseXMLNode( WPelement, xPath=[], linkData={} ):
         from fudge.gnd import link
         xlink = link.parseXMLNode(WPelement).path
         weights = XYs.XYs.parseXMLNode( WPelement[0] )
@@ -727,10 +833,9 @@ class weightedPointwise( baseCrossSectionForm ) :
         if 'unresolvedLinks' in linkData: linkData['unresolvedLinks'].append((xlink, ref))
         return ref
 
-
     def toENDF6Data( self, MT, endfMFList, targetInfo, level ) :
 
-        from fudge.legacy.converting import endfFormats, gndToENDF6
+        from fudge.legacy.converting import gndToENDF6
         endfInterpolation = gndToENDF6.axesToEndfInterpolationFlag( self.weights.axes )
         crossSectionFlatData = []
         for xy in self.weights.copyDataToXYs() : crossSectionFlatData += xy
@@ -756,7 +861,7 @@ def chargeParticle_changeInterpolationSubFunction( self, xInterpolation, yInterp
     if( yInterpolation != axes.linearToken ) : raise Exception( 'Only linear interpolation currently supported for y-axis, not %s' % yInterpolation )
     limitMax = self.getBiSectionMax( )
     T = self.findAttributeInAncestry( 'getThreshold' )( self.axes[0].getUnit( ) )
-    x1, data = None, []
+    x1, y1, data = None, 0.0, []
     for x2, y2 in self :
         if( x1 is not None ) :
             chargeParticle_changeInterpolationSubFunction2( x1, y1, x2, y2, 0 )
@@ -764,9 +869,10 @@ def chargeParticle_changeInterpolationSubFunction( self, xInterpolation, yInterp
         x1, y1 = x2, y2
     return( data )
 
-def parseXMLNode( crossSectionElement, linkData={} ):
+def parseXMLNode( crossSectionElement, xPath=[], linkData={} ):
     """Reads an xml <crossSection> element into fudge, including all cross section forms (pointwise, linear, piecewise etc)
     contained inside the crossSection. """
+    xPath.append( crossSectionElement.tag )
     xsc = component( nativeData=crossSectionElement.get('nativeData') )
     for form in crossSectionElement:
         formClass = {tokens.pointwiseFormToken: pointwise,
@@ -775,11 +881,10 @@ def parseXMLNode( crossSectionElement, linkData={} ):
                 tokens.resonancesWithBackgroundFormToken: resonancesWithBackground,
                 tokens.weightedPointwiseFormToken: weightedPointwise,
                 tokens.groupedFormToken: grouped,
+                tokens.referenceFormToken: reference,
                 }.get( form.tag )
         if formClass is None: raise Exception("encountered unknown cross section form: %s" % form.tag)
-        try:
-            newForm = formClass.parseXMLNode( form, linkData )
-        except Exception as e:
-            raise Exception, "/crossSection/%s: %s" % (form.tag, e)
+        newForm = formClass.parseXMLNode( form, xPath, linkData )
         xsc.addForm( newForm )
+    xPath.pop()
     return xsc

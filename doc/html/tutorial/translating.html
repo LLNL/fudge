@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>1. Basic translating between ENDF and GND &mdash; Fudge and GND 1.2 beta documentation</title>
+    <title>1. Basic translating between ENDF and GND &mdash; Fudge and GND 1.3 beta documentation</title>
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -15,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.2 beta',
+        VERSION:     '1.3 beta',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +25,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="shortcut icon" href="../_static/gnd-20121206-favicon.ico"/>
-    <link rel="top" title="Fudge and GND 1.2 beta documentation" href="../index.html" />
+    <link rel="top" title="Fudge and GND 1.3 beta documentation" href="../index.html" />
     <link rel="up" title="The Fudge Tutorial" href="index.html" />
     <link rel="next" title="2. Checking ENDF or GND files" href="checking.html" />
     <link rel="prev" title="The Fudge Tutorial" href="index.html" /> 
@@ -47,7 +46,7 @@
         <li class="right" >
           <a href="index.html" title="The Fudge Tutorial"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">The Fudge Tutorial</a> &raquo;</li> 
       </ul>
     </div>  
@@ -71,10 +70,11 @@ manage the command line options of the scripts.  Before we get to that, lets jus
 <div class="section" id="translating-from-endf-into-gnd">
 <h2>1.1. Translating from ENDF into GND<a class="headerlink" href="#translating-from-endf-into-gnd" title="Permalink to this headline">¶</a></h2>
 <p>Let&#8217;s experiment with fudge in the Python shell.</p>
-<div class="highlight-python"><pre>$ python
+<div class="highlight-python"><div class="highlight"><pre>$ python
 Python 2.7.1 (r271:86832, Jun 16 2011, 16:59:05)
 [GCC 4.2.1 (Based on Apple Inc. build 5658) (LLVM build 2335.15.00)] on darwin
-Type "help", "copyright", "credits" or "license" for more information.</pre>
+Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+</pre></div>
 </div>
 <p>First, import the <tt class="docutils literal"><span class="pre">endfFileToGND</span></tt> function from <tt class="docutils literal"><span class="pre">fudge.legacy.converting</span></tt>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fudge.legacy.converting.endfFileToGND</span> <span class="kn">import</span> <span class="n">endfFileToGND</span>
@@ -112,7 +112,7 @@ simply do:</p>
 </pre></div>
 </div>
 <p>Now you should quit Python (using ^d), and check out what you made.</p>
-<div class="highlight-python"><pre>$ diff junk.endf n-001_H_001.endf
+<div class="highlight-python"><div class="highlight"><pre>$ diff junk.endf n-001_H_001.endf
 1c1
 &lt;                                                                      1 0  0
 ---
@@ -166,7 +166,8 @@ simply do:</p>
 617c617
 &lt;           2          2          0          0          0          0 125 6102  200
 ---
-&gt;           2          2                                             125 6102  200</pre>
+&gt;           2          2                                             125 6102  200
+</pre></div>
 </div>
 <p>Not bad...  There are obviously several differences.  Let&#8217;s examine them:</p>
 <dl class="docutils">
@@ -218,9 +219,10 @@ non-zero data in a reserved field. After translation, the entry is reset to &#82
 <div class="section" id="setting-up-the-translator-scripts">
 <h2>1.4. Setting up the translator scripts<a class="headerlink" href="#setting-up-the-translator-scripts" title="Permalink to this headline">¶</a></h2>
 <p>In this final section of the first tutorial, we&#8217;ll actually make the two scripts <tt class="docutils literal"><span class="pre">endf2gnd.py</span></tt> and <tt class="docutils literal"><span class="pre">gnd2endf.py</span></tt>.  Let&#8217;s start by making the files and then editing the first:</p>
-<div class="highlight-python"><pre>$ touch endf2gnd.py gnd2endf.py
+<div class="highlight-python"><div class="highlight"><pre>$ touch endf2gnd.py gnd2endf.py
 $ chmod u+x endf2gnd.py gnd2endf.py
-$ vim endf2gnd.py</pre>
+$ vim endf2gnd.py
+</pre></div>
 </div>
 <p>For <tt class="docutils literal"><span class="pre">endf2gnd.py</span></tt>, we want to read one ENDF file and write the GND evaluation file and (if present) the GND covariance file. Since there are two output files, we want them to have the same prefix for bookkeeping purposes.  So, here is my version of <tt class="docutils literal"><span class="pre">endf2gnd.py</span></tt> (download it <a class="reference download internal" href="../_downloads/endf2gnd.py"><tt class="xref download docutils literal"><span class="pre">here</span></tt></a>):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
@@ -238,14 +240,14 @@ $ vim endf2gnd.py</pre>
     <span class="n">outEvalFile</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">outFilePrefix</span> <span class="o">+</span> <span class="s">&#39;.gnd.xml&#39;</span>
     <span class="n">outCovFile</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">outFilePrefix</span> <span class="o">+</span> <span class="s">&#39;.gndCov.xml&#39;</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="n">outEvalFile</span> <span class="o">=</span> <span class="n">inFile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s">&#39;.endf&#39;</span><span class="p">,</span> <span class="s">&#39;.gnd.xml&#39;</span> <span class="p">)</span>
-    <span class="n">outCovFile</span> <span class="o">=</span> <span class="n">inFile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s">&#39;.endf&#39;</span><span class="p">,</span> <span class="s">&#39;.gndCov.xml&#39;</span> <span class="p">)</span>
+    <span class="n">outEvalFile</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">inFile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s">&#39;.endf&#39;</span><span class="p">,</span> <span class="s">&#39;.gnd.xml&#39;</span> <span class="p">)</span>
+    <span class="n">outCovFile</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">inFile</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span> <span class="s">&#39;.endf&#39;</span><span class="p">,</span> <span class="s">&#39;.gndCov.xml&#39;</span> <span class="p">)</span>
 
 <span class="c"># Now translate</span>
 <span class="n">myEval</span><span class="p">,</span> <span class="n">myCov</span> <span class="o">=</span> <span class="n">endfFileToGND</span><span class="p">(</span> <span class="n">args</span><span class="o">.</span><span class="n">inFile</span><span class="p">,</span> <span class="n">toStdOut</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">skipBadData</span><span class="o">=</span><span class="bp">True</span> <span class="p">)</span>
-<span class="nb">open</span><span class="p">(</span> <span class="n">outEvalFile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;w&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span> <span class="n">myEval</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;verbosity&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">}</span> <span class="p">)</span> <span class="p">)</span>
+<span class="nb">open</span><span class="p">(</span> <span class="n">outEvalFile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;w&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span> <span class="n">line</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">myEval</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;verbosity&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">}</span> <span class="p">)</span> <span class="p">)</span>
 <span class="k">if</span> <span class="n">myCov</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-     <span class="nb">open</span><span class="p">(</span> <span class="n">outCovFile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;w&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span> <span class="n">myCov</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;verbosity&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">}</span> <span class="p">)</span> <span class="p">)</span>
+     <span class="nb">open</span><span class="p">(</span> <span class="n">outCovFile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;w&#39;</span> <span class="p">)</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span> <span class="n">line</span><span class="o">+</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">myCov</span><span class="o">.</span><span class="n">toXMLList</span><span class="p">(</span> <span class="p">{</span><span class="s">&#39;verbosity&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">}</span> <span class="p">)</span> <span class="p">)</span>
 </pre></div>
 </div>
 <p>I urge you to try it out.  If you are unsure how to use it, type <tt class="docutils literal"><span class="pre">./endf2gnd.py</span> <span class="pre">--help</span></tt>.</p>
@@ -343,13 +345,13 @@ $ vim endf2gnd.py</pre>
         <li class="right" >
           <a href="index.html" title="The Fudge Tutorial"
              >previous</a> |</li>
-        <li><a href="../index.html">Fudge and GND 1.2 beta documentation</a> &raquo;</li>
+        <li><a href="../index.html">Fudge and GND 1.3 beta documentation</a> &raquo;</li>
           <li><a href="index.html" >The Fudge Tutorial</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2012, B.Beck, D. Brown, C. Mattoon, N. Patel, N. Summers.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

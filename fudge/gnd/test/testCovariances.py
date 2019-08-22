@@ -2,6 +2,31 @@
 # encoding: utf-8
 
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -49,8 +74,8 @@ class grouping_test(unittest.TestCase):
 
         from fudge.core.math.xData import axes, XYs
         testXYsAxes = axes.axes( )
-        testXYsAxes[0] = axes.axis( 'energy_in', 0, 'MeV', frame = axes.labToken, interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-        testXYsAxes[1] = axes.axis( 'crossSection', 1, 'b', frame = axes.labToken )
+        testXYsAxes[0] = axes.axis( 'energy_in', 0, 'MeV', interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
+        testXYsAxes[1] = axes.axis( 'crossSection', 1, 'b' )
         testXYs = XYs.XYs( testXYsAxes, [ [ 1.0000E-07, 2.0 ], [ 1.9640E+01, 2.0 ] ], 1e-3, safeDivide = True, biSectionMax = 7 )
         aAbs = a.toAbsolute( rowData=testXYs )
         self.assertEqual( '\n'.join( aAbs.toXMLList() ), '<covarianceMatrix type="absolute">\n  <axes>\n    <axis index="0" label="row_energy_bounds" unit="MeV" interpolation="linear,flat" length="4"> 1e-7 0.11109 1.3534 19.64</axis>\n    <axis index="1" label="column_energy_bounds" unit="None" mirror_row_energy_bounds="true"/>\n    <axis index="2" label="matrix_elements" unit="b**2"/></axes>\n  <matrix rows="3" columns="3" form="symmetric">\n    16.0\n    4.0 36.0\n    0.0 0.0 100.0</matrix></covarianceMatrix>' )

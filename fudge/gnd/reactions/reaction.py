@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -21,19 +46,21 @@ __metaclass__ = type
 class reaction( base.base_reaction ) :
     """This is the class for a normal gnd reaction"""
 
-    def __init__( self, outputChannel, label, ENDF_MT, crossSection = None, URRProbabilityTable = None, documentation = None, attributes = {} ) :
-        """Creates a new reaction object. Reaction is two-body or uncorrelated-body, depending on
+    def __init__( self, outputChannel, label, ENDF_MT, crossSection = None, documentation = None, attributes = {} ) :
+        """
+        Creates a new reaction object. Reaction is two-body or uncorrelated-body, depending on
         the outputChannel type. This class is only meant to be used for 'distinct' reactions (distinct reactions
         do not overlap any other reactions; altogether they sum up to total).
-        To store a sum over these distinct reactions, use the summedReaction class instead. """
+        To store a sum over these distinct reactions, use the summedReaction class instead.
+        """
 
         base.base_reaction.__init__( self, base.reactionToken, label, ENDF_MT, crossSection, documentation, attributes )
 
+# ?????? BRB, I do not think this next line will work anymore. I think outputChannel must always be an instance of fudge.gnd.channels.channel.
         if( type( outputChannel ) == type( '' ) ) : outputChannel = fudge.gnd.channels.channel( 'output', outputChannel )
         if( not isinstance( outputChannel, fudge.gnd.channels.channel ) ) :
             raise fudgeExceptions.FUDGE_Exception( 'Input channel not instance of class channel.' )
         outputChannel.setParent( self )
-        self.URRProbabilityTable = URRProbabilityTable
         self.data = {}
         self.outputChannel = outputChannel
 
@@ -56,7 +83,7 @@ class reaction( base.base_reaction ) :
 
     def __str__( self ) :
 
-        return( str(self.outputChannel) )
+        return( str( self.outputChannel ) )
 
     def addData( self, data ) :
 
@@ -128,11 +155,6 @@ class reaction( base.base_reaction ) :
         if( Q >= 0. ) : return( 0. )
         return( -Q * ( 1. + self.parent.projectile.getMass( 'amu' ) / self.parent.target.getMass( 'amu' ) ) )
 
-    def getURRProbabilityTable( self ) :
-        """Returns the channel's URR probability table present, else None. This is a kludge"""
-
-        return( self.URRProbabilityTable )
-
     def heatCrossSection( self, temperature, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.002, heatAllPoints = False, 
         doNotThin = True, heatBelowThreshold = True, heatAllEDomain = True ) :
 
@@ -175,7 +197,6 @@ class reaction( base.base_reaction ) :
 
 #        if( isinstance( self.outputChannel, fudge.gnd.channels.sumOfRemainingOutputChannels ) ) : return
         crossSection = self.crossSection
-        tempInfo['incidentEnergyUnit'] = self.crossSection.getIncidentEnergyUnit( )
         if( 'LLNL_Pn' in processInfo['styles'] ) :
             if( processInfo['particles'][tempInfo['reactionSuite'].projectile.getName( )].groups[-1] <= crossSection.domainMin( ) ) : return
 
@@ -207,6 +228,8 @@ class reaction( base.base_reaction ) :
 
             tempInfo['transferMatrixComment'] = tempInfo['reactionSuite'].inputParticlesToReactionString( suffix = " --> " ) +  \
                 self.outputChannel.toString( simpleString = True )
+
+        processInfo['workFile'].append( 'c%s' % self.label )
         for productIndex, product in enumerate( self.outputChannel ) : 
             tempInfo['productIndex'] = str( productIndex )
             tempInfo['productToken'] = product.getToken( )
@@ -215,38 +238,7 @@ class reaction( base.base_reaction ) :
             tempInfo['productLabel'] = product.getLabel( )
             product.process( processInfo, tempInfo, verbosityIndent + '    ' )
 
-    def toLLNLSnCOut( self, toOtherData, moreOtherData, verbosityIndent ) :
-
-        from fudge.processing.deterministic import gndToLLNLSnCOut
-        if( toOtherData['verbosity'] >= 10 ) : print '%s%s' % ( verbosityIndent, self.outputChannel.toString( simpleString = True ) )
-        if( moreOtherData.temperature is None ) : moreOtherData.temperature = self.attributes['temperature']
-        crossSection = gndToLLNLSnCOut.LLNLSnCOutCrossSection( self )
-        isProductionChannel = self.getAttribute( 'genre' ) == 'production'
-        if( not isProductionChannel ) :
-            moreOtherData.CNumbers.append( self.getENDL_CS_ENDF_MT( )['C'] )
-            moreOtherData.coutData[5] = moreOtherData.coutData[5] + \
-                self.data[fudge.gnd.reactionData.base.availableEnergyToken].getFormByToken( fudge.gnd.tokens.groupedWithCrossSectionFormToken ).data
-            if( fudge.gnd.channelData.energyDependentQToken in self.data ) :
-                moreOtherData.coutData[6] = moreOtherData.coutData[6] + \
-                    self.getData( fudge.gnd.channelData.energyDependentQToken ).getFormByToken( fudge.gnd.tokens.groupedWithCrossSectionFormToken ).data
-            else :
-                Q = self.getQ( 'MeV' )
-                moreOtherData.coutData[6] = moreOtherData.coutData[6] + Q * self.crossSection.getFormByToken( fudge.gnd.tokens.groupedFormToken ).data
-        addToFissionMatrix = self.outputChannel.isFission( )
-        reactionWithProduct = { }
-        for product in moreOtherData.reactionWithProduct : reactionWithProduct[product] = 0
-        for product in self.outputChannel : 
-            product.toLLNLSnCOut( toOtherData, moreOtherData, crossSection, reactionWithProduct, addToFissionMatrix, verbosityIndent + '    ' )
-        projectile = toOtherData.getProjectileName( )
-        if( not isProductionChannel ) :
-            moreOtherData.coutData[4].append( crossSection )
-            if( projectile in reactionWithProduct ) : reactionWithProduct[projectile] = 1
-        for product in moreOtherData.reactionWithProduct : moreOtherData.reactionWithProduct[product] += reactionWithProduct[product]
-
-    def setURRProbabilityTable( self, URRProbabilityTable ) :
-        """Sets channel's URR probability table to URRProbabilityTable. This is a kludge"""
-
-        self.URRProbabilityTable = URRProbabilityTable
+        del processInfo['workFile'][-1]
 
     def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
         from fudge.legacy.converting import gndToENDF6
@@ -324,7 +316,9 @@ class reaction( base.base_reaction ) :
                         LR = MT_LR
                         break
                 if( ( LR == 32 ) and ( primaryResidualName == 'B10' ) and ( decayProducts[-1] == 'He4' ) ) : LR = 35   # Kludge for bad data.
-            if( LR != 0 ) : targetInfo['QM'] = decayChannel.Q.forms['constant'].getValue( 0, 'eV' )
+            if( LR != 0 ) :
+                QM = outputChannel.Q.forms['constant'].getValue( 0, 'eV' ) + decayChannel.Q.forms['constant'].getValue( 0, 'eV' )
+                targetInfo['QM'] = QM
         targetInfo['LRs'][MT] = LR
 
         for product in outputChannel :
@@ -416,13 +410,13 @@ class reaction( base.base_reaction ) :
             p = ' + '
         return( s + '\n' )
 
-def parseXMLNode( reactionElement, linkData={} ):
+def parseXMLNode( reactionElement, xPath=[], linkData={} ):
     """Translate a <reaction> element from xml into a reaction class instance."""
-    try:
-        crossSection = fudge.gnd.reactionData.crossSection.parseXMLNode( reactionElement.find('crossSection'), linkData )
-        outputChannel = fudge.gnd.channels.parseXMLNode( reactionElement.find('outputChannel'), linkData )
-    except Exception as e:
-        raise Exception, '/reactionSuite/reaction[@label="%s"]%s' % (reactionElement.get('label'),e)
+
+    xPath.append( '%s[@label="%s"]' % (reactionElement.tag, reactionElement.get('label') ) )
+    crossSection = fudge.gnd.reactionData.crossSection.parseXMLNode( reactionElement.find('crossSection'),
+        xPath, linkData )
+    outputChannel = fudge.gnd.channels.parseXMLNode( reactionElement.find('outputChannel'), xPath, linkData )
     outputChannel.fissionGenre = reactionElement.get("fissionGenre")
     MT = int( reactionElement.get('ENDF_MT') )
     attributes = {'date': reactionElement.get('date')}
@@ -435,8 +429,9 @@ def parseXMLNode( reactionElement, linkData={} ):
     # extra data may be present in derived files:
     if reactionElement.find('availableEnergy') is not None:
         reac.data['availableEnergy'] = fudge.gnd.reactionData.availableEnergy.parseXMLNode(
-                reactionElement.find('availableEnergy') )
+                reactionElement.find('availableEnergy'), xPath )
     if reactionElement.find('availableMomentum') is not None:
         reac.data['availableMomentum'] = fudge.gnd.reactionData.availableMomentum.parseXMLNode(
-                reactionElement.find('availableMomentum') )
+                reactionElement.find('availableMomentum'), xPath )
+    xPath.pop()
     return reac

@@ -1,4 +1,29 @@
 # <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# 
+#     Please also read this link - Our Notice and GNU General Public License.
+# 
+# This program is free software; you can redistribute it and/or modify it under 
+# the terms of the GNU General Public License (as published by the Free Software
+# Foundation) version 2, dated June 1991.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
+# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
+# the GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along with 
+# this program; if not, write to 
+# 
+# the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330,
+# Boston, MA 02111-1307 USA
 # <<END-copyright>>
 
 """
@@ -7,11 +32,11 @@ This module contains all the classes for the various types of ENDL I data.
 
 import copy
 
-from fudge.core.math import endl2dmathClasses, endl2dmathmisc, endl3dmathClasses, endl3dmathmisc, \
-        endl4dmathClasses, endl4dmathmisc, fudgemath, fudge2dGrouping
+import endl2dmathClasses, endl2dmathmisc, endl3dmathClasses, endl3dmathmisc, endl4dmathClasses, endl4dmathmisc
+from fudge.core.math import fudge2dGrouping
+import endlmath
 from fudge.core.utilities import fudgeExceptions
 from fudge.vis.gnuplot import plotbase
-from fudge import gnd
 import endlIClassesParameters
 import endlNd
 import endlmisc
@@ -232,6 +257,8 @@ class endlI10( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         """Constructor for the endlI10 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure."""
 
+        from fudge import gnd
+
         self.name = gnd.productData.base.energyDepositionToken
         endlNd.endlNd.__init__( self, f, 10, yo, C, I, S, h, points, bdflsFile = bdflsFile )
         self.variablesUnits = 'energy_in[MeV];energy_deposition[MeV]'
@@ -275,6 +302,8 @@ class endlI11( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
     def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
         """Constructor for the endlI11 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure."""
+
+        from fudge import gnd
 
         self.name = gnd.productData.base.energyDepositionToken
         endlNd.endlNd.__init__( self, f, 11, yo, C, I, S, h, points, bdflsFile = bdflsFile )
@@ -363,6 +392,8 @@ class endlI13( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
     def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
         """Constructor for the endlI13 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure."""
+
+        from fudge import gnd
 
         self.name = gnd.productData.base.momentumDepositionToken
         endlNd.endlNd.__init__( self, f, 13, yo, C, I, S, h, points, bdflsFile = bdflsFile )
@@ -528,6 +559,8 @@ class endlI941( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         """Constructor for the endlI941 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure."""
 
+        from fudge import gnd
+
         self.name = gnd.productData.distributions.base.pointwiseFormToken
         endlNd.endlNd.__init__( self, f, 941, yo, C, I, S, h, points, bdflsFile = bdflsFile )
         self.variablesUnits = 'energy_in[MeV];form_factor'
@@ -564,6 +597,8 @@ class endlI942( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
     def __init__( self, f, yo, C, I, S, h, points, bdflsFile = None ) :
         """Constructor for the endlI942 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl2dmath class data structure."""
+
+        from fudge import gnd
 
         self.name = gnd.productData.distributions.base.pointwiseFormToken
         endlNd.endlNd.__init__( self, f, 942, yo, C, I, S, h, points, bdflsFile = bdflsFile )
@@ -626,6 +661,8 @@ class endlI1( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
         """Constructor for the endlI1 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl3dmath class data structure."""
 
+        from fudge import gnd
+
         self.name = gnd.productData.distributions.base.pointwiseFormToken
         endlNd.endlNd.__init__( self, f, 1, yo, C, I, S, h, points, i2 = 2, bdflsFile = bdflsFile )
         self.variablesUnits = 'energy_in[MeV];mu;P(mu|energy_in)'
@@ -638,7 +675,7 @@ class endlI1( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
         normTolerance = max( normTolerance, normCheckTolerance )
         ErrMsgs = []
         messages = []
-        d2 = fudgemath.ZSum( self.data )
+        d2 = endlmath.ZSum( self.data )
         for E, y in d2.data :
             if( abs( 1. - y ) > normTolerance ) : messages.append( 'endlI1.check: bad normalize = %.8e for E = %e' % ( y, E ) )
         messages += endl3dmathmisc.check3dData( self.data, allowNegativeX = False, allowZeroX = allowZeroE, allowNegativeY = True, allowZeroY = True, \
@@ -652,7 +689,7 @@ class endlI1( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
     def fixThreshold( self, threshold, dThreshold_MeV = 10e-3, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
         """Calls endlIClasses.fixThresholdFor3d to fix threshold."""
 
-        fixThresholdFor3d( self, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
+        fixThresholdFor3d( self, self.I, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
             threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getEMin_EMinNext( self ) :
@@ -695,7 +732,7 @@ class endlI1( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
     def normalize( self ) :
         """Normalizes the data so that the integral P(E, mu ) dmu = 1."""
 
-        d2 = fudgemath.ZSum( self.data )
+        d2 = endlmath.ZSum( self.data )
         i = 0
         for x_zy in self.data :
             s = d2.data[i][1]
@@ -706,7 +743,7 @@ class endlI1( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
     def runningMuSum( self ) :
         """Does a running sum of the mu data, returning an endl3dmath object of the results."""
 
-        d3 = fudgemath.runningZSum( self.data, xLabel = self.xLabel, yLabel = self.yLabel, zLabel = "running Sum of P( E, mu ) vs mu" )
+        d3 = endlmath.runningZSum( self.data, xLabel = self.xLabel, yLabel = self.yLabel, zLabel = "running Sum of P( E, mu ) vs mu" )
         return d3
 
     def setEData( self, E, muP ) :
@@ -744,6 +781,8 @@ class endlI21( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
         """Constructor for the endlI21 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl3dmath class data structure."""
 
+        from fudge import gnd
+
         self.name = ''
         self.form = gnd.productData.distributions.base.pointwiseFormToken
         endlNd.endlNd.__init__( self, f, 21, yo, C, I, S, h, points, i2 = 2, bdflsFile = bdflsFile )
@@ -762,7 +801,7 @@ class endlI21( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
     def fixThreshold( self, threshold, dThreshold_MeV = 10e-3, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
         """Calls endlIClasses.fixThresholdFor3d to fix threshold."""
 
-        fixThresholdFor3d( self, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
+        fixThresholdFor3d( self, self.I, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
             threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getEMin_EMinNext( self ) :
@@ -805,7 +844,7 @@ class endlI22( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
     def fixThreshold( self, threshold, dThreshold_MeV = 10e-3, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
         """Calls endlIClasses.fixThresholdFor3d to fix threshold."""
 
-        fixThresholdFor3d( self, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
+        fixThresholdFor3d( self, self.I, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
             threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getEMin_EMinNext( self ) :
@@ -906,6 +945,8 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
         """Constructor for the endlI3 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl4dmath class data structure."""
 
+        from fudge import gnd
+
         self.name = gnd.productData.distributions.base.pointwiseFormToken
         endlNd.endlNd.__init__( self, f, 3, yo, C, I, S, h, points, i2 = 2, i3 = 3, bdflsFile = bdflsFile )
         self.xInterpolation = 'linear,linear,unitbase:x:linear,unitbase:y:linear'
@@ -928,7 +969,7 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
                 if( ( self.C >= 50 ) and ( self.C < 58 ) ) : continue
                 if( EpP[-1][0] > E + Q ) : messages.append( "endlI3.check: E' = %.8e > E + Q = %e for E = %e, mu = %e" % \
                     ( EpP[-1][0], E + Q, E, mu ) )
-            d2 = fudgemath.ZSum( muEpP )
+            d2 = endlmath.ZSum( muEpP )
             for mu, y in d2.data :
                 if( abs( 1. - y ) > normTolerance ) : messages.append( 'endlI3.check: bad normalize = %.8e for E = %e and mu = %e' % ( y, E, mu ) )
         messages += endl4dmathmisc.check4dData( self.data, allowNegativeT = False, allowZeroT = allowZeroE, allowNegativeX = True, allowZeroX = True, \
@@ -1147,6 +1188,8 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
     def convertToI4( self, i1=None, lmax=0 ):
         "Converts the self and the I=1 data given as an argument to an endlI4 instance where the new object has Legendre orders 0, 1, ..., lmax"
 
+        from fudge.core.math.xData import LegendreSeries
+
         # Set up the I=4 file, especially the header crap
         dummy = endlI3( None, self.yo, self.C, self.I, self.S, self.h, [] )
         dummy.setI( 4 )
@@ -1154,10 +1197,9 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
         endlmisc.copyEndlHeader( i4, self )
 
         # Loop through l's expanding the product of the I=1 and I=3 files into Legendre polynomials
-        boundaries = [ -1.0, 1.0 ]
         for l in range( 0, lmax+1 ):
             thisLTerm = endl3dmathClasses.endl3dmath()
-            legPoly = endl2dmathmisc.convertFunctionToLinLin( lambda x: ( 2 * l + 1 ) * fudgemath.Legendre( l, x ), -1.0, 1.0, 1e-4 )
+            legPoly = endl2dmathmisc.convertFunctionToLinLin( lambda x: ( 2 * l + 1 ) * LegendreSeries.Legendre( l, x ), -1.0, 1.0, 1e-4 )
             for iE in range( len ( self.data ) ):
                 E = self.E( iE )
                 i1_muP = endl2dmathClasses.endl2dmath( data = i1.data[ iE ][1] ) 
@@ -1170,8 +1212,8 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
                 EpP = []
                 for Ep in EpList :
                     i3_muP = endl2dmathClasses.endl2dmath( data = [ [ x, i3_muEpP.getValue( x, Ep ) ] for x in i3_muEpP.xArray() ] )
-                    P = fudge2dGrouping.groupThreeFunctions( boundaries, i1_muP, i3_muP, legPoly, norm = None )
-                    EpP.append( [ Ep, P[0] ] )
+                    P = i1_muP.integrateThreeFunctions( i3_muP, legPoly, -1., 1. )
+                    EpP.append( [ Ep, P ] )
                 thisLTerm.data.append( [ E, EpP ] )
             i4.setlData( l, thisLTerm )    
         return i4
@@ -1231,7 +1273,7 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
         for E_uEpP in self.data :
             d3 = []
             for u_EpP in E_uEpP[1] :
-                d3.append( [ u_EpP[0], fudgemath.runningYSum( u_EpP[1] ).data ] )
+                d3.append( [ u_EpP[0], endlmath.runningYSum( u_EpP[1] ).data ] )
             d4.append( [ E_uEpP[0], d3 ] )
         return endl4dmathClasses.endl4dmath( d4, tLabel = self.tLabel, xLabel = self.xLabel, yLabel = self.yLabel,
             zLabel = "running Sum of P( E, mu, E' ) vs E'" )
@@ -1284,6 +1326,8 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
         """Constructor for the endlI4 class.  See the module endlNd.py for the meanings of
         f, yo, C, I, S and h. Points must be a valid endl4dmath class data structure."""
 
+        from fudge import gnd
+
         self.name = gnd.productData.distributions.base.pointwiseFormToken
         endlNd.endlNd.__init__( self, f, 4, yo, C, I, S, h, points, i0 = 2, i1 = 0, i2 = 1, i3 = 3, bdflsFile = bdflsFile )
         self.xInterpolation = 'none,linear,unitbase:x:linear,unitbase:y:linear'
@@ -1305,7 +1349,7 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
                 if( ( self.C >= 50 ) and ( self.C < 58 ) ) : continue
                 if( EpP[-1][0] > E + Q ) : messages.append( "endlI4.check: E' = %.8e > E + Q = %e for l = %.0f, E = %e" % \
                     ( EpP[-1][0], E + Q, l, E ) )
-        d2 = fudgemath.ZSum( self.data[0][1] )
+        d2 = endlmath.ZSum( self.data[0][1] )
         for E, y in d2.data :
             if( abs( 1. - y ) > normTolerance ) : messages.append( 'endlI4.check: bad normalize = %.8e for l = 0 and E = %e' % ( y, E ) )
         messages += endl4dmathmisc.check4dData( self.data, allowNegativeT = False, allowZeroT = False, allowNegativeX = False, allowZeroX = allowZeroE, \
@@ -1323,7 +1367,7 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
         for E, muEpP in I3.data :
             I1MuP = []
             for mu, EpP in muEpP :
-                I1MuP.append( [ mu, fudgemath.YSum( EpP ) ] )
+                I1MuP.append( [ mu, endlmath.YSum( EpP ) ] )
             I1Data.append( [ E, I1MuP ] )
         dummy = endlI4( None, self.yo, self.C, self.I, self.S, self.h, [] )
         dummy.setI( 1 )
@@ -1335,11 +1379,13 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
     def convertToUI3( self, nMu = 21, lMax = None ) :
         """This methods converts the I = 4 data into unnormalized I = 3 data using nMu equally spaced mu 
         values.  Note that the data is not normalized; hence, the normalized method should be called on the
-        returned object. This method will only convert up to Legendre order l = min( lMax, fudgemath.maxLegendre ) 
+        returned object. This method will only convert up to Legendre order l = min( lMax, LegendreSeries.maxLegendreOrder ) 
         of self's data."""
 
-        if( lMax == None ) : lMax = fudgemath.maxLegendre
-        lMax = max( 0, min( lMax, fudgemath.maxLegendre ) )
+        from fudge.core.math.xData import LegendreSeries
+
+        if( lMax == None ) : lMax = LegendreSeries.maxLegendreOrder
+        lMax = max( 0, min( lMax, LegendreSeries.maxLegendreOrder ) )
             
         I3Data = []
         if ( len( self ) == 1 ) :
@@ -1370,7 +1416,7 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
             for l, EEpP in self.data :
                 if( l > lMax ) : break
                 LArray = []
-                for mu in muArray : LArray.append( fudgemath.Legendre( l, mu ) )
+                for mu in muArray : LArray.append( LegendreSeries.Legendre( l, mu ) )
                 l_LArray.append( LArray )
             iE = -1
             for E in EArray :
@@ -1443,7 +1489,7 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
 
         for l, EEpP in self.data :
             d = endl3dmathClasses.endl3dmath( data = EEpP, checkDataType = 0 )
-            fixThresholdFor3d( d, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, realSelf = self, fixThresholdMode = fixThresholdMode,
+            fixThresholdFor3d( d, self.I, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, realSelf = self, fixThresholdMode = fixThresholdMode,
                 threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getEMin_EMinNext( self ) :
@@ -1743,7 +1789,7 @@ def fixThresholdFor2d( self, threshold, dThreshold_MeV, EMin = 0., fixThresholdM
             Ey[0] += dE
             ELast = Ey[0]
 
-def fixThresholdFor3d( self, threshold, dThreshold_MeV, EMin = 0., realSelf = None, fixThresholdMode = fixThresholdMode_RaiseOnly,
+def fixThresholdFor3d( self, I, threshold, dThreshold_MeV, EMin = 0., realSelf = None, fixThresholdMode = fixThresholdMode_RaiseOnly,
         threshold_MeV_shiftWarning = 0.1 ) :
 
     if( len( self ) == 0 ) : return
@@ -1755,22 +1801,29 @@ def fixThresholdFor3d( self, threshold, dThreshold_MeV, EMin = 0., realSelf = No
         dE = threshold - EMin_
         if( abs( dE ) > threshold_MeV_shiftWarning ) :
             endlmisc.printWarning( 'Moving threshold %e by %e for ZA = %d, %s' % ( self.data[0][0], dE, self_.ZA, `self_` ) )
-        ELast = EMin_ + 1.                                 # Make sure the first point is always done.
-        firstPass = True
-        EyzPrepend = None
-        for Eyz in self.data :
-            if( Eyz[0] > ELast ) : break
-            if( firstPass and ( Eyz[0] > 1.2 * EMin ) ) :
-                endlmisc.printWarning( 'Prepending %d %s' % ( self_.ZA, `self_` ) )
-                yz = []
-                for y, z in Eyz[1] :
-                    yz.append( [ y, z ] )
-                EyzPrepend = [ EMin, yz ]
+        if( dE > 0. ) :                                     # Move lower data up.
+            ELast = EMin_ + 1.                              # Make sure the first point is always done.
+            firstPass = True
+            EyzPrepend = None
+            for Eyz in self.data :
+                if( Eyz[0] > ELast ) : break
+                if( firstPass and ( Eyz[0] > 1.2 * EMin ) ) :
+                    endlmisc.printWarning( 'Prepending %d %s' % ( self_.ZA, `self_` ) )
+                    yz = []
+                    for y, z in Eyz[1] :
+                        yz.append( [ y, z ] )
+                    EyzPrepend = [ EMin, yz ]
+                else :
+                    Eyz[0] += dE
+                firstPass = False
+                ELast = Eyz[0]
+            if( EyzPrepend != None ) : self.data.insert( 0, EyzPrepend )
+        else :                                              # Create point at threshold.
+            if( I == 1 ) :
+                self.data.insert( 0, [ threshold, [ [ -1, 0.5 ], [ 1, 0.5 ] ] ] )
             else :
-                Eyz[0] += dE
-            firstPass = False
-            ELast = Eyz[0]
-        if( EyzPrepend != None ) : self.data.insert( 0, EyzPrepend )
+                endlmisc.printWarning( 'Creating data at threshold not supported for %s' % `self` )
+                return
 
 def fixThresholdFor4d( self, threshold, dThreshold_MeV, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
 
@@ -1781,11 +1834,19 @@ def fixThresholdFor4d( self, threshold, dThreshold_MeV, EMin = 0., fixThresholdM
         dE = threshold - EMin_
         if( abs( dE ) > threshold_MeV_shiftWarning ) :
             endlmisc.printWarning( 'Moving threshold %e by %e for ZA = %d, %s' % ( self.data[0][0], dE, self.ZA, `self` ) )
-        ELast = EMin_ + 1.                                 # Make sure the first point is always done.
-        for Exyz in self.data :
-            if( Exyz[0] > ELast ) : break
-            Exyz[0] += dE
-            ELast = Exyz[0]
+        if( dE > 0 ) :                                      # Move lower data up.
+            ELast = EMin_ + 1.                              # Make sure the first point is always done.
+            for Exyz in self.data :
+                if( Exyz[0] > ELast ) : break
+                Exyz[0] += dE
+                ELast = Exyz[0]
+        else :                                              # Create point at threshold.
+            Eps = [ [ 0, 0 ], [ 1e-9, 2e9 ] ]
+            if( self.I == 3 ) :
+                self.data.insert( 0, [ threshold, [ [ -1, Eps ], [ 1, Eps ] ] ] )
+            else :
+                endlmisc.printWarning( 'Creating data at threshold not supported for %s' % `self` )
+                return
 
 def I1sToCommonGrids( I1List, muGridPerE = True ) :
     """This routine takes a list of I = 1 data and puts their E and mu data onto a common grid. Note, this function may add
