@@ -9,22 +9,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 */
 
@@ -43,6 +54,15 @@ static nfu_status ptwXY_applyFunction2( ptwXYPoints *ptwXY1, double y1, double y
     void *argList, int level, int checkForRoots );
 static nfu_status ptwXY_applyFunctionZeroCrossing( ptwXYPoints *ptwXY1, double y1, double y2, ptwXYPoint *p1, ptwXYPoint *p2, 
     ptwXY_applyFunction_callback func, void *argList );
+/*
+************************************************************
+*/
+double ptwXY_limitAccuracy( double accuracy ) {
+
+    if( accuracy < ptwXY_minAccuracy ) accuracy = ptwXY_minAccuracy;
+    if( accuracy > 1 ) accuracy = 1.;
+    return( accuracy );
+}
 /*
 ************************************************************
 */
@@ -72,7 +92,7 @@ ptwXYPoints *ptwXY_createFromFunction( int n, double *xs, ptwXY_createFromFuncti
 
     x1 = xs[0];
     if( ( *status = func( x1, &y1, argList ) ) != nfu_Okay ) return( NULL );
-    if( ( ptwXY = ptwXY_new( ptwXY_interpolationLinLin, biSectionMax, accuracy, 500, 50, status, 0 ) ) == NULL ) return( NULL );
+    if( ( ptwXY = ptwXY_new( ptwXY_interpolationLinLin, NULL, biSectionMax, accuracy, 500, 50, status, 0 ) ) == NULL ) return( NULL );
     for( i = 1; i < n; i++ ) {
         if( ( *status = ptwXY_setValueAtX_overrideIfClose( ptwXY, x1, y1, eps, 0 ) ) != nfu_Okay ) goto err;
         x2 = xs[i];
@@ -245,16 +265,19 @@ static nfu_status ptwXY_applyFunctionZeroCrossing( ptwXYPoints *ptwXY1, double y
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_fromString( char const *str, ptwXY_interpolation interpolation, double biSectionMax, double accuracy, char **endCharacter, nfu_status *status ) {
+ptwXYPoints *ptwXY_fromString( char const *str, char sep, ptwXY_interpolation interpolation, char const *interpolationString,
+    double biSectionMax, double accuracy, char **endCharacter, nfu_status *status ) {
 
     int64_t numberConverted;
     double  *doublePtr;
     ptwXYPoints *ptwXY = NULL;
 
-    if( ( *status = nfu_stringToListOfDoubles( str, &numberConverted, &doublePtr, endCharacter ) ) != nfu_Okay ) return( NULL );
+    if( ( doublePtr = nfu_stringToListOfDoubles( str, sep, &numberConverted, endCharacter, status ) ) == NULL ) return( NULL );
     *status = nfu_oddNumberOfValues;
-    if( ( numberConverted % 2 ) == 0 )
-        ptwXY = ptwXY_create( interpolation, biSectionMax, accuracy, numberConverted, 10, numberConverted / 2, doublePtr, status, 0 );
+    if( ( numberConverted % 2 ) == 0 ) {
+        *status = nfu_Okay;
+        ptwXY = ptwXY_create( interpolation, interpolationString, biSectionMax, accuracy, numberConverted, 10, numberConverted / 2, doublePtr, status, 0 );
+    }
     nfu_free( doublePtr );
     return( ptwXY );
 }
@@ -269,6 +292,9 @@ void ptwXY_showInteralStructure( ptwXYPoints *ptwXY, FILE *f, int printPointersA
 
     fprintf( f, "status = %d  interpolation = %d  length = %d  allocatedSize = %d\n", 
         (int) ptwXY->status, (int) ptwXY->interpolation, (int) ptwXY->length, (int) ptwXY->allocatedSize );
+    fprintf( f, "userFlag = %d  biSectionMax = %.8e  accuracy = %.2e  minFractional_dx = %.6e\n", 
+        ptwXY->userFlag, ptwXY->biSectionMax, ptwXY->accuracy, ptwXY->minFractional_dx );
+    fprintf( f, "interpolationString = %s\n", ptwXY->interpolationString );
     fprintf( f, "  overflowLength = %d  overflowAllocatedSize = %d  mallocFailedSize = %d\n", 
         (int) ptwXY->overflowLength, (int) ptwXY->overflowAllocatedSize, (int) ptwXY->mallocFailedSize );
     fprintf( f, "  Points data, points = %20p\n", ( printPointersAsNull ? NULL : ptwXY->points ) );

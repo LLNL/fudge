@@ -9,22 +9,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 */
 
@@ -105,7 +116,7 @@ ptwXYPoints *ptwXY_flatInterpolationToLinear( ptwXYPoints *ptwXY, double lowerEp
     if( ( upperEps != 0 ) && ( upperEps < minEps ) ) upperEps = minEps;
 
     length = ptwXY->length * ( 1 + ( lowerEps == 0 ? 0 : 1 ) + ( lowerEps == 0 ? 0 : 1 ) );
-    if( ( n = ptwXY_new( ptwXY_interpolationLinLin, ptwXY->biSectionMax, ptwXY->accuracy, length, ptwXY->overflowLength, status, ptwXY->userFlag ) ) == NULL ) return( NULL );
+    if( ( n = ptwXY_new( ptwXY_interpolationLinLin, NULL, ptwXY->biSectionMax, ptwXY->accuracy, length, ptwXY->overflowLength, status, ptwXY->userFlag ) ) == NULL ) return( NULL );
 
     p3 = ptwXY->points;
     if( ptwXY->length > 0 ) ptwXY_setValueAtX( n, p3->x, p3->y );
@@ -166,42 +177,60 @@ static double ptwXY_flatInterpolationToLinear_eps( double px, double eps ) {
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_toOtherInterpolation( ptwXYPoints *ptwXY, ptwXY_interpolation interpolation, double accuracy, nfu_status *status ) {
-
-    ptwXYPoints *n;
+ptwXYPoints *ptwXY_toOtherInterpolation( ptwXYPoints *ptwXY, ptwXY_interpolation interpolationTo, double accuracy, nfu_status *status ) {
+/*
+*   This function only works when 'ptwXY->interpolation == interpolationTo' or when interpolationTo is ptwXY_interpolationLinLin.
+*/
+    int i1, logX = 0, logY = 0;
+    ptwXYPoints *n1;
     interpolation_func func = NULL;
 
     if( ( *status = ptwXY->status ) != nfu_Okay ) return( NULL );
-/* ?????? need to test interpolation also */
-    if( ptwXY->interpolation == interpolation ) {
+    if( ptwXY->interpolation == interpolationTo ) {
         *status = nfu_Okay;
         return( ptwXY_clone( ptwXY, status ) ); }
     else {
-        switch( ptwXY->interpolation ) {
-        case ptwXY_interpolationLogLog :
-            func = ptwXY_LogLogToLinLin; break;
-        case ptwXY_interpolationLinLog :
-            func = ptwXY_LinLogToLinLin; break;
-        case ptwXY_interpolationLogLin :
-            func = ptwXY_LogLinToLinLin; break;
-        case ptwXY_interpolationLinLin :        /* Stops compilers from complaining. */
-        case ptwXY_interpolationFlat :
-        case ptwXY_interpolationOther :
-            break;
+        if( interpolationTo == ptwXY_interpolationLinLin ) {
+            switch( ptwXY->interpolation ) {
+            case ptwXY_interpolationLogLog :
+                logX = logY = 1;
+                func = ptwXY_LogLogToLinLin; break;
+            case ptwXY_interpolationLinLog :
+                logY = 1;
+                func = ptwXY_LinLogToLinLin; break;
+            case ptwXY_interpolationLogLin :
+                logX = 1;
+                func = ptwXY_LogLinToLinLin; break;
+            case ptwXY_interpolationLinLin :        /* Stops compilers from complaining. */
+            case ptwXY_interpolationFlat :
+            case ptwXY_interpolationOther :
+                break;
+            }
         }
     }
     *status = nfu_unsupportedInterpolationConversion;
     if( func == NULL ) return( NULL );
 
-    *status = nfu_Okay;
-    if( ( n = ptwXY_clone( ptwXY, status ) ) == NULL ) return( NULL );
-    n->interpolation = interpolation;
-    if( accuracy < ptwXY->accuracy ) accuracy = ptwXY->accuracy;
-    n->accuracy = accuracy;
+    if( ( logX != 0 ) || ( logY != 0 ) ) {
+        ptwXYPoint *point;
 
-    *status = ptwXY_toOtherInterpolation2( n, ptwXY, func );
-    if( *status != nfu_Okay ) n = ptwXY_free( n );
-    return( n );
+        if( ( *status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( NULL );
+
+        *status = nfu_badLogValue;
+        for( i1 = 0, point = ptwXY->points; i1 < ptwXY->length; ++i1, ++point ) {
+            if( ( logX != 0 ) && ( point->x <= 0 ) ) return( NULL );
+            if( ( logY != 0 ) && ( point->y <= 0 ) ) return( NULL );
+        }
+    }
+
+    *status = nfu_Okay;
+    if( ( n1 = ptwXY_cloneToInterpolation( ptwXY, interpolationTo, status ) ) == NULL ) return( NULL );
+    n1->accuracy = ptwXY_limitAccuracy( accuracy );
+
+    *status = ptwXY_toOtherInterpolation2( n1, ptwXY, func );
+    if( n1->accuracy < ptwXY->accuracy ) n1->accuracy = ptwXY->accuracy;
+    if( *status != nfu_Okay ) n1 = ptwXY_free( n1 );
+    return( n1 );
 }
 /*
 ************************************************************
@@ -209,16 +238,16 @@ ptwXYPoints *ptwXY_toOtherInterpolation( ptwXYPoints *ptwXY, ptwXY_interpolation
 static nfu_status ptwXY_toOtherInterpolation2( ptwXYPoints *desc, ptwXYPoints *src, interpolation_func func ) {
 
     nfu_status status;
-    int64_t i;
+    int64_t i1;
     double x1, y1, x2, y2;
 
     if( ( status = ptwXY_simpleCoalescePoints( src ) ) != nfu_Okay ) return( status );
 
     x1 = src->points[0].x;
     y1 = src->points[0].y;
-    for( i = 1; i < src->length; i++ ) {
-        x2 = src->points[i].x;
-        y2 = src->points[i].y;
+    for( i1 = 1; i1 < src->length; i1++ ) {
+        x2 = src->points[i1].x;
+        y2 = src->points[i1].y;
         if( ( x1 != x2 ) && ( y1 != y2 ) ) {
             if( ( status = func( desc, x1, y1, x2, y2, 0 ) ) != nfu_Okay ) break;
         }
@@ -237,13 +266,17 @@ static nfu_status ptwXY_LogLogToLinLin( ptwXYPoints *desc, double x1, double y1,
 
     logYXs = logYs / logXs;
 
-    if( depth > 16 ) return( nfu_Okay );
+    if( depth > ptwXY_maxBiSectionMax ) return( nfu_Okay );
     if( fabs( logYXs  - 1 ) < 1e-5 ) {
         u = 0.5 * ( 1 + u2 );
         w = ( logYXs  - 1 ) * logXs;
         vLog = u * ( 1. + w * ( 1 + 0.5 * w ) ); }
     else {
-        u = logYXs * ( u2 - v2 ) / ( ( 1 - logYXs ) * ( v2 - 1 ) );
+        if( u2 > 10 ) {
+            u = sqrt( u2 ); }
+        else {
+            u = logYXs * ( u2 - v2 ) / ( ( 1 - logYXs ) * ( v2 - 1 ) );
+        }
         vLog = pow( u, logYXs );
     }
     vLin = ( u2 - u + v2 * ( u - 1 ) ) / ( u2 - 1 );
@@ -262,7 +295,7 @@ static nfu_status ptwXY_LinLogToLinLin( ptwXYPoints *desc, double x1, double y1,
     nfu_status status = nfu_Okay;
     double x, y, logYs = log( y2 / y1 ), yLinLin;
 
-    if( depth > 16 ) return( nfu_Okay );
+    if( depth > ptwXY_maxBiSectionMax ) return( nfu_Okay );
     x = ( x2 - x1 ) / ( y2 - y1 ) * ( ( y2 - y1 ) / logYs - y1 ) + x1;
     y = y1 * exp( logYs / ( x2 - x1 ) * ( x - x1 ) );
     yLinLin = ( y1 * ( x2 - x ) + y2 * ( x - x1 ) ) / ( x2 - x1 );
@@ -279,13 +312,13 @@ static nfu_status ptwXY_LogLinToLinLin( ptwXYPoints *desc, double x1, double y1,
     nfu_status status = nfu_Okay;
     double x = sqrt( x2 * x1 ), y, logXs = log( x2 / x1 ), yLinLin;
 
-    if( depth > 16 ) return( nfu_Okay );
+    if( depth > ptwXY_maxBiSectionMax ) return( nfu_Okay );
 #if 0 /* The next line is very unstable at determineing x. Initial x must be chosen better. */
     x = ( y1 * x2 - y2 * x1 ) / ( y1 * logXs + ( y2 - y1 ) * ( log( x / x1 ) - 1 ) );
 #endif
     y = ( y2 - y1 ) * log( x / x1 ) / logXs + y1;
     yLinLin = ( y1 * ( x2 - x ) + y2 * ( x - x1 ) ) / ( x2 - x1 );
-    if( fabs( y - yLinLin ) <= ( y * desc->accuracy ) ) return( status );
+    if( fabs( y - yLinLin ) <= fabs( y * desc->accuracy ) ) return( status );
     if( ( status = ptwXY_setValueAtX( desc, x, y ) ) != nfu_Okay ) return( status );
     if( ( status = ptwXY_LogLinToLinLin( desc, x1, y1, x, y, depth + 1 ) ) != nfu_Okay ) return( status );
     return( ptwXY_LogLinToLinLin( desc, x, y, x2, y2, depth + 1 ) );
@@ -298,18 +331,18 @@ ptwXYPoints *ptwXY_toUnitbase( ptwXYPoints *ptwXY, nfu_status *status ) {
     int64_t i;
     ptwXYPoints *n;
     ptwXYPoint *p;
-    double xMin, xMax, dx, inverseDx;
+    double domainMin, domainMax, dx, inverseDx;
 
     *status = nfu_tooFewPoints;
     if( ptwXY->length < 2 ) return( NULL );
     if( ( n = ptwXY_clone( ptwXY, status ) ) == NULL ) return( NULL );
 
-    xMin = n->points[0].x;
-    xMax = n->points[n->length-1].x;
-    dx = xMax - xMin;
+    domainMin = n->points[0].x;
+    domainMax = n->points[n->length-1].x;
+    dx = domainMax - domainMin;
     inverseDx = 1. / dx;
     for( i = 0, p = n->points; i < n->length; i++, p++ ) {
-        p->x = ( p->x - xMin ) * inverseDx;
+        p->x = ( p->x - domainMin ) * inverseDx;
         p->y = p->y * dx;
     }
     n->points[n->length-1].x = 1.;                          /* Make sure last point is realy 1. */
@@ -318,7 +351,7 @@ ptwXYPoints *ptwXY_toUnitbase( ptwXYPoints *ptwXY, nfu_status *status ) {
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_fromUnitbase( ptwXYPoints *ptwXY, double xMin, double xMax, nfu_status *status ) {
+ptwXYPoints *ptwXY_fromUnitbase( ptwXYPoints *ptwXY, double domainMin, double domainMax, nfu_status *status ) {
 
     int64_t i, length;
     ptwXYPoints *n;
@@ -329,11 +362,11 @@ ptwXYPoints *ptwXY_fromUnitbase( ptwXYPoints *ptwXY, double xMin, double xMax, n
     if( ptwXY->length < 2 ) return( NULL );
     if( ( n = ptwXY_clone( ptwXY, status ) ) == NULL ) return( NULL );
 
-    dx = xMax - xMin;
+    dx = domainMax - domainMin;
     inverseDx = 1. / dx;
     length = n->length;
     for( i = 0, p2 = p = n->points; i < length; ++i, ++p ) {
-        p2->x = p->x * dx + xMin;
+        p2->x = p->x * dx + domainMin;
         if( i > 0 ) {
             if( fabs( p2->x - xLast ) <= 10. * DBL_EPSILON * ( fabs( p2->x ) + fabs( xLast ) ) ) {
                 --(n->length);
@@ -344,7 +377,7 @@ ptwXYPoints *ptwXY_fromUnitbase( ptwXYPoints *ptwXY, double xMin, double xMax, n
         xLast = p2->x;
         ++p2;
     }
-    n->points[n->length-1].x = xMax;                          /* Make sure last point is realy xMax. */
+    n->points[n->length-1].x = domainMax;                          /* Make sure last point is realy domainMax. */
     return( n );
 }
 /*
@@ -357,7 +390,7 @@ ptwXYPoints *ptwXY_unitbaseInterpolate( double w, double w1, ptwXYPoints *ptwXY1
     int64_t i;
     ptwXYPoints *n1 = NULL, *n2 = NULL, *a = NULL, *r = NULL;
     ptwXYPoint *p;
-    double f, g, xMin, xMax;
+    double f, g, domainMin, domainMax;
 
     *status = nfu_XOutsideDomain;
     if( w <= w1 ) {
@@ -376,9 +409,9 @@ ptwXYPoints *ptwXY_unitbaseInterpolate( double w, double w1, ptwXYPoints *ptwXY1
     for( i = 0, p = n2->points; i < n2->length; i++, p++ ) p->y *= f;
     if( ( a = ptwXY_add_ptwXY( n1, n2, status ) ) == NULL ) goto Err;
 
-    xMin = g * ptwXY1->points[0].x + f * ptwXY2->points[0].x;
-    xMax = g * ptwXY1->points[ptwXY1->length-1].x + f * ptwXY2->points[ptwXY2->length-1].x;
-    if( ( r = ptwXY_fromUnitbase( a, xMin, xMax, status ) ) == NULL ) goto Err;
+    domainMin = g * ptwXY1->points[0].x + f * ptwXY2->points[0].x;
+    domainMax = g * ptwXY1->points[ptwXY1->length-1].x + f * ptwXY2->points[ptwXY2->length-1].x;
+    if( ( r = ptwXY_fromUnitbase( a, domainMin, domainMax, status ) ) == NULL ) goto Err;
     ptwXY_free( n1 );
     ptwXY_free( n2 );
     ptwXY_free( a );

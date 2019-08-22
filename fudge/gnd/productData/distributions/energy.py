@@ -8,22 +8,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 """ energy distribution (spectra) classes """
@@ -31,52 +42,162 @@
 import math
 import base, miscellaneous
 import fudge
-from fudge.core.math.xData import axes, XYs, W_XYs, regions
-from pqu.physicalQuantityWithUncertainty import PhysicalQuantityWithUncertainty
+from pqu import PQU
 from fudge.core.utilities import brb
-from fudge.core import ancestry
+import xData.ancestry as ancestryModule
+
+from xData import standards as standardsModule
+from xData import axes as axesModule
+from xData import XYs as XYsModule
+from xData import multiD_XYs as multiD_XYsModule
+from xData import regions as regionsModule
+
+from . import base as baseModule
 
 __metaclass__ = type
 
-class component( base.component ) :
+class pdfOfEp :
 
-    def __init__( self, nativeData = base.noneFormToken ) :
+    class pointwise( XYsModule.XYs ) :
 
-        base.component.__init__( self, base.energyComponentToken, nativeData )
+        def averageEnergy( self ) :
 
-    def getSpectrumAtEnergy( self, energy ) :
-        """Returns the energy spectrum for self at projectile energy using nativeData."""
+            allowedInterpolations = [ standardsModule.interpolation.linlinToken,
+                                      standardsModule.interpolation.flatToken ]
+            xys = self.changeInterpolationIfNeeded( allowedInterpolations = allowedInterpolations )
+            return( xys.integrateWithWeight_x( ) )
 
-        return( self.getNativeData( ).getSpectrumAtEnergy( energy ) )
+    class piecewise( regionsModule.regions ) :
 
-    def toENDF6( self, MT, endfMFList, flags, targetInfo ) :
+        def averageEnergy( self ) :
 
-        from fudge.legacy.converting import endfFormats, gndToENDF6
-        weight = targetInfo['delayedNubarWeight']
-        if( hasattr( self.forms[self.nativeData], 'toENDF6' ) ) :
-            NK, MF5 = self.forms[self.nativeData].toENDF6( flags, targetInfo, weight = weight )
-            if( MT == 455 ) :
-                endfMFList[5][MT].append( MF5 ) 
-            else :
-                endfMFList[5][MT] = [ endfFormats.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], 0, 0, NK, 0 ) ] + MF5 + \
-                    [ endfFormats.endfSENDLineNumber( ) ]
-        else :
-            print 'WARNING: form %s does not have method toENDF6 for component %s' % ( self.nativeData, self.moniker )
+            averageEnergy = 0
+            for region in self : averageEnergy += region.averageEnergy( )
+            return( averageEnergy )
 
-class form( base.form ) :
+        def integrateWithWeight_x( self ) :
+
+            sum = 0
+            for region in self : sum += region.integrateWithWeight_x( )
+            return( sum )
+
+        def toLinearXYsClass( self ) :
+
+            return pdfOfEp.pointwise
+
+        @staticmethod
+        def allowedSubElements():
+
+            return (pdfOfEp.pointwise,)
+
+class subform( baseModule.subform ) :
     """Abstract base class for energy forms."""
 
     pass
 
-class pointwise( form, W_XYs.W_XYs ) :
+class constant( subform ) :
 
-    tag = base.pointwiseFormToken
-    moniker = base.pointwiseFormToken
+    moniker = 'constant'
 
-    def __init__( self, axes, productFrame, **kwargs ):
+    def __init__( self, value ) :
+
+        subform.__init__( self )
+        self.value = PQU.PQU( value )
+
+    def check( self, info ) :
+
+        from fudge.gnd import warning
+
+        warnings = []
+        if self.value <= PQU.PQU(0,'eV'):
+            warnings.append( warning.negativeDiscreteGammaEnergy() )
+        return warnings
+
+    def copy( self ):
+
+        return constant( self.value )
+
+    __copy__ = __deepcopy__ = copy
+
+    def getEnergyArray( self, EMin = None, EMax = None ) :
+
+        return( [ EMin, EMax ] )
+
+    def averageEp( self, E ) :
+
+        return( float( self.value ) )
+
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        attributeStr = ''
+        if( self.label is not None ) : attributeStr += ' label="%s"' % self.label
+        return( [ '%s<%s%s value="%s"/>' % ( indent, self.moniker, attributeStr, self.value ) ] )
+
+    @staticmethod
+    def parseXMLNode( energyElement, xPath, linkData ) :
+
+        value = energyElement.get( 'value' )
+        return( constant( value ) )
+
+class primaryGamma( subform ) :
+
+    moniker = 'primaryGamma'
+
+    def __init__( self, value ) :
+
+        subform.__init__( self )
+        self.value = PQU.PQU( value )
+        self.__massRatio = None     # In ENDF lingo this is AWR / ( AWR + 1 ).
+
+    @property
+    def massRatio( self ) :
+
+        if( self.__massRatio is None ) :
+            self.__massRatio = self.findAttributeInAncestry( "getMassRatio" )( )
+        return self.__massRatio
+
+    def check( self, info ) :
+
+        from fudge.gnd import warning
+
+        warnings = []
+        Qvalue = self.findAttributeInAncestry('getQ')('eV')
+        if self.value.getValueAs('eV') > Qvalue:
+            warnings.append( warning.primaryGammaEnergyTooLarge( self.value,
+                            100 * self.value.getValueAs('eV') / Qvalue ) )
+        return warnings
+
+    def copy( self ):
+
+        return primaryGamma( self.value )
+
+    __copy__ = __deepcopy__ = copy
+
+    def getEnergyArray( self, EMin = None, EMax = None ) :
+
+        return( [ EMin, EMax ] )
+
+    def averageEp( self, E ) :
+
+        return( float( self.value ) + self.massRatio * E )
+
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        attributeStr = ''
+        if( self.label is not None ) : attributeStr += ' label="%s"' % self.label
+        return( [ '%s<%s%s value="%s"/>' % ( indent, self.moniker, attributeStr, self.value ) ] )
+
+    @staticmethod
+    def parseXMLNode( energyElement, xPath, linkData ) :
+
+        value = energyElement.get( 'value' )
+        return primaryGamma( value )
+
+class pointwise( subform, multiD_XYsModule.multiD_XYs ) :
+
+    def __init__( self, **kwargs ):
         """
-        @param: axes is an instance of xData.axes.axes
-        >epointwise = pointwise( axes, productFrame )
+        >epointwise = pointwise( )
         followed by:
         >epointwise[ 0 ] = XYs_data_1
         >epointwise[ 1 ] = XYs_data_2
@@ -84,13 +205,10 @@ class pointwise( form, W_XYs.W_XYs ) :
         >epointwise[ n-1 ] = XYs_data_n
         """
 
-        form.__init__( self, base.pointwiseFormToken, productFrame )
-        kwargs['isPrimaryXData'] = True
-        W_XYs.W_XYs.__init__( self, axes, **kwargs )
-
-    def extraXMLAttributeString( self ) :
-
-        return( 'productFrame="%s"' % self.productFrame )
+        if( 'dimension' not in kwargs ) : kwargs['dimension'] = 2
+        if( kwargs['dimension'] != 2 ) : raise ValueError( 'Dimension = %s != 2' % ( kwargs['dimension'] ) )
+        multiD_XYsModule.multiD_XYs.__init__( self, **kwargs )
+        subform.__init__( self )
 
     def getAtEnergy( self, energy ) :
         "This method is deprecated, use getSpectrumAtEnergy."
@@ -100,9 +218,9 @@ class pointwise( form, W_XYs.W_XYs ) :
     def getSpectrumAtEnergy( self, energy ) :
         """Returns the energy spectrum for self at projectile energy."""
 
-        unitBase = self.axes[0].interpolation.isQualifierUnitBase( ) or self.axes[0].interpolation.isQualifierCorrespondingPoints( )
+#        unitBase = self.axes[0].interpolation.isQualifierUnitBase( ) or self.axes[0].interpolation.isQualifierCorrespondingPoints( )
         unitBase = True
-        return( self.interpolateAtW( energy, unitBase = unitBase, extrapolation = W_XYs.flatExtrapolationToken ) )
+        return( self.interpolateAtValue( energy, unitBase = unitBase, extrapolation = standardsModule.flatExtrapolationToken ) )
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
 
@@ -113,24 +231,41 @@ class pointwise( form, W_XYs.W_XYs ) :
             if( EMax > Es[-1] ) : Es.append( EMax )
         return( Es )
 
-    def EpAverageAtE( self, E ) :
+    def averageEp( self, energy ) :
 
-        return( self.getAtEnergy( E ).integrateWithWeight_x( ) )
+        code, lower, upper, frac = self.getBoundingSubFunctions( energy )
+        if( code is None ) :
+            raise Exception( 'No distribution' )
+        elif( code == '' ) :
+            EpLowerMin, EpLowerMax = lower.domain( )
+            EpUpperMin, EpUpperMax = upper.domain( )
+            ELower = lower.value            # BRB FIXME after xData getValue is fixed.
+            EUpper = upper.value
+            EFraction = ( energy - ELower ) / ( EUpper - ELower )
+            EpMidMin = ( 1 - EFraction ) * EpLowerMin + EFraction * EpUpperMin
+            EpMidMax = ( 1 - EFraction ) * EpLowerMax + EFraction * EpUpperMax
+            EpLower = ( lower.integrateWithWeight_x( ) - EpLowerMin ) / ( EpLowerMax - EpLowerMin ) * \
+                    ( EpMidMax - EpMidMin ) + EpMidMin
+            EpUpper = ( upper.integrateWithWeight_x( ) - EpUpperMin ) / ( EpUpperMax - EpUpperMin ) * \
+                    ( EpMidMax - EpMidMin ) + EpMidMin
+            return( ( 1 - EFraction ) * EpLower + EFraction * EpUpper )
+        else :
+            return( lower.integrateWithWeight_x( ) )
 
     def check( self, info ) :
 
         from fudge.gnd import warning
 
         warnings = []
-        for i in range(len(self)):
-            integral = self[i].integrate()
+        for idx in range(len(self)):
+            integral = self[idx].integrate()
             if abs(integral - 1.0) > info['normTolerance']:
-                warnings.append( warning.unnormalizedDistribution( PhysicalQuantityWithUncertainty(self[i].value,self.axes[0].unit),
-                    i, integral, self[i] ) )
+                warnings.append( warning.unnormalizedDistribution( PQU.PQU(self[idx].value,self.axes[-1].unit),
+                    idx, integral, self[idx] ) )
 
-            if self[i].yMin() < 0.0:
-                warnings.append( warning.negativeProbability( PhysicalQuantityWithUncertainty(self[i].value,self.axes[0].unit),
-                    value=self[i].yMin(), obj=self[i] ) )
+            if self[idx].rangeMin() < 0.0:
+                warnings.append( warning.negativeProbability( PQU.PQU(self[idx].value,self.axes[-1].unit),
+                    value=self[idx].rangeMin(), obj=self[idx] ) )
 
         return warnings
 
@@ -140,254 +275,109 @@ class pointwise( form, W_XYs.W_XYs ) :
 
     def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
-        return( W_XYs.W_XYs.toPointwise_withLinearXYs( self, accuracy, lowerEps = lowerEps,
-            upperEps = upperEps, cls = linear ) )
-
-    def toENDF6( self, flags, targetInfo, weight = None ) :
-
-        from fudge.legacy.converting import endfFormats, gndToENDF6
-        NE = len( self )
-        if( weight is None ) : weight = [ [ self[0].value, 1.0 ], [ self[-1].value, 1.0 ] ]
-        EInInterpolation = gndToENDF6.axisToEndfInterpolationFlag( self.axes[0] )
-        ENDFDataList = [ endfFormats.endfContLine( 0, 0, 0, 1, 1, len( weight ) ) ] + \
-            endfFormats.endfInterpolationList( [ len( weight ), 2 ] ) + endfFormats.endfNdDataList( weight ) + \
-            [ endfFormats.endfContLine( 0, 0, 0, 0, 1, NE ) ] + endfFormats.endfInterpolationList( [ NE, EInInterpolation ] )
-        independent, dependent, qualifier = self.axes[1].interpolation.getInterpolationTokens( )
-        interpolation = gndToENDF6.gndToEndfInterpolationFlag( independent, dependent )
-        for energy in self :
-            ENDFDataList.append( endfFormats.endfContLine( 0, energy.value, 0, 0, 1, len( energy ) ) )
-            ENDFDataList += endfFormats.endfInterpolationList( [ len( energy ), interpolation ] )
-            ENDFDataList += endfFormats.endfNdDataList( energy, xUnit = 'eV', yUnit = '1/eV' )
-        return( 1, ENDFDataList )
+        return( multiD_XYsModule.multiD_XYs.toPointwise_withLinearXYs( self, accuracy, lowerEps = lowerEps,
+            upperEps = upperEps, cls = pointwise ) )
 
     @staticmethod
-    def defaultAxes( energyUnit = 'eV', energyInterpolation = axes.linearToken, energyFunctionInterpolation = axes.linearToken, 
-            energyInterpolationQualifier = axes.unitBaseToken, energy_outInterpolation = axes.linearToken, probabilityInterpolation = axes.linearToken ) :
+    def defaultAxes( energyUnit = 'eV' ) :
 
-        axes_ = axes.axes( dimension = 3 )
-        axes_[0] = axes.axis( 'energy_in',  0, energyUnit, 
-            interpolation = axes.interpolationXY( energyInterpolation, energyFunctionInterpolation, energyInterpolationQualifier ) )
-        axes_[1] = axes.axis( 'energy_out', 1, energyUnit, interpolation = axes.interpolationXY( energy_outInterpolation, probabilityInterpolation ) )
-        axes_[2] = axes.axis( 'P(energy_out|energy_in)', 2, '1/' + energyUnit )
-        return( axes_ )
+        axes = axesModule.axes( rank = 3 )
+        axes[0] = axesModule.axis( 'P(energy_out|energy_in)', 0, '1/' + energyUnit )
+        axes[1] = axesModule.axis( 'energy_out', 1, energyUnit )
+        axes[2] = axesModule.axis( 'energy_in',  2, energyUnit )
+        return( axes )
 
-class linear( pointwise ) :
+    @staticmethod
+    def allowedSubElements( ) :
 
-    tag = base.linearFormToken
-    moniker = base.linearFormToken
+        return( ( pdfOfEp.pointwise, pdfOfEp.piecewise ) )
 
-    def __init__( self, axes, productFrame, **kwargs ) :
+class piecewise( subform, regionsModule.regions ) :
 
-        if( not axes.isLinear( qualifierOk = True ) ) : raise Exception( 'interpolation not linear: %s' % axes )
-        pointwise.__init__( self, axes, productFrame = productFrame, **kwargs )
+    def __init__( self, **kwargs ):
 
-class semiPiecewise( form ) :
+        if( 'dimension' not in kwargs ) : kwargs['dimension'] = 2
+        if( kwargs['dimension'] != 2 ) : raise ValueError( 'Dimension = %s != 2' % ( kwargs['dimension'] ) )
+        regionsModule.regions.__init__( self, **kwargs )
+        subform.__init__( self )
 
-    def __init__( self, axes_, productFrame ) :
-
-        form.__init__( self, base.semiPiecewiseFormToken, productFrame )
-        self.axes = axes_.copy( parent = self )
-        self.energies = []
-
-    def __len__( self ) :
-
-        return( len( self.energies ) )
-
-    def __getitem__( self, index ) :
-
-        return( self.energies[index] )
-
-    def append( self, energy, region ) :
-
-        if( len( self.energies ) > 0 ) :
-            if( self.energies[-1].energy >= energy ) : raise Exception( 'energy = %e not greater than %e' % ( energy, self.energies[-1].energy ) )
-        self.energies.append( semiPiecewiseEnergy( len( self.energies ), energy, region, self ) )
-
-    def check( self, info ):
+    def check( self, info ) :
 
         from fudge.gnd import warning
 
         warnings = []
-        for i in range(len(self)):
-            pointwise = self[i].regions.toPointwise_withLinearXYs(0.001, 1e-8, 1e-8)
-            integral = pointwise.integrate()
-            if abs(integral - 1.0) > info['normTolerance']:
-                warnings.append( warning.unnormalizedDistribution( PhysicalQuantityWithUncertainty(self[i].energy, self.axes[0].unit), i,
-                    integral, self ) )
-
-            if pointwise.yMin() < 0.0:
-                warnings.append( warning.negativeProbability( PhysicalQuantityWithUncertainty(self[i].energy, self.axes[0].unit),
-                    value=pointwise.yMin(), obj=self[i] ) )
-
+        for idx, region in enumerate( self ):
+            regionWarnings = region.check( info )
+            if regionWarnings:
+                warnings.append( warning.context("Region %d:" % idx, regionWarnings) )
         return warnings
 
-    def getAtEnergy( self, energy ) :
-
-        accuracy = 1e-3
-        epsilon = 1e-8
-        energyRegion1 = None
-        for energyRegion2 in self :
-            if( energy <= energyRegion2.energy ) : break
-            energyRegion1 = energyRegion2
-        if( energyRegion1 is None ) : energy = energyRegion2.energy
-        if( energy >= energyRegion2.energy ) : return( energyRegion2.regions.toPointwise_withLinearXYs( accuracy, epsilon, epsilon, removeOverAdjustedPoints = True ) )
-        f = ( energy - energyRegion1.energy ) / ( energyRegion2.energy - energyRegion1.energy )
-        p1 = energyRegion1.regions.toPointwise_withLinearXYs( accuracy, epsilon, epsilon, removeOverAdjustedPoints = True )
-        p2 = energyRegion2.regions.toPointwise_withLinearXYs( accuracy, epsilon, epsilon, removeOverAdjustedPoints = True )
-        try :
-            distribution = ( 1. - f ) * p1 + f * p2
-        except :                        # This is a kludge for some bad data. If it fails a raise will be executed.
-            m1, m2 = p1.mutualify( 0, epsilon, 1, p2, epsilon, 0, 1 )
-            distribution = ( 1. - f ) * m1 + f * m2
-        return( distribution )
-
-    def getEnergyArray( self, EMin = None, EMax = None ) :
-
-        return( [ energy.energy for energy in self ] )
-
-    def EpAverageAtE( self, E ) :
-
-        return( self.getAtEnergy( E ).integrateWithWeight_x( ) )
-
-    def sqrtEp_AverageAtE( self, E ) :
-
-        return( self.getAtEnergy( E ).integrateWithWeight_sqrt_x( ) )
-
     def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
-        independent, dependent, qualifier = self.axes[0].interpolation.getInterpolationTokens( )
-        if( independent not in [ axes.linearToken ] ) : raise Exception( 'independent = %s not supported' % independent )
-        if( dependent not in [ axes.linearToken ] ) : raise Exception( 'dependent = %s not supported' % dependent )
-        axes_ = pointwise.defaultAxes( )
-        pwl = linear( axes_, self.productFrame )
-        axesXY = axes.referenceAxes( pwl, dimension = 2 )
-        for region in self :
-            r = region.toPointwise_withLinearXYs( accuracy = accuracy, lowerEps = lowerEps, upperEps = upperEps )
-            r.value = region.energy
-            pwl.append( r )
-        return( pwl )
-
-    def toXMLList( self, indent = '' ) :
-        """Returns the xml string representation of self."""
-
-        indent2 = indent + '  '
-        xmlString = [ self.XMLStartTagString( indent = indent ) ]
-        xmlString += self.axes.toXMLList( indent = indent2 )
-        for energy in self.energies : xmlString += energy.toXMLList( indent2 )
-        xmlString[-1] += '</%s>' % self.moniker
-        return( xmlString )
-
-    def toENDF6( self, flags, targetInfo, weight = None ) :
-
-        from fudge.legacy.converting import endfFormats, gndToENDF6
-        NE = len( self.energies )
-        if( weight is None ) : weight = [ [ self.energies[0].getValue( ), 1.0 ], [ self.energies[-1].getValue( ), 1.0 ] ]
-        data = weight
-        EInInterpolation = gndToENDF6.axisToEndfInterpolationFlag( self.axes[0] )
-        ENDFDataList = [ endfFormats.endfContLine( 0, 0, 0, 1, 1, len( data ) ) ] + \
-            endfFormats.endfInterpolationList( [ len( data ), 2 ] ) + endfFormats.endfNdDataList( data ) + \
-            [ endfFormats.endfContLine( 0, 0, 0, 0, 1, NE ) ] + endfFormats.endfInterpolationList( [ NE, EInInterpolation ] )
-        for energy in self.energies : ENDFDataList += energy.toENDF6( flags, targetInfo )
-        return( 1, ENDFDataList )
+        return( regionsModule.regions.toPointwise_withLinearXYs( self, accuracy, lowerEps = lowerEps,
+            upperEps = upperEps, cls = pointwise ) )
 
     @staticmethod
-    def defaultAxes( ) :
+    def allowedSubElements( ) :
 
-        axes_ = axes.axes( dimension = 3 )
-        axes_[0] = axes.axis( 'energy_in',  0, 'eV',   interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-        axes_[1] = axes.axis( 'energy_out', 1, 'eV',   interpolation = axes.interpolationXY( axes.byRegionToken, axes.byRegionToken ) )
-        axes_[2] = axes.axis( 'P(energy_out|energy_in)', 2, '1/eV' )
-        return( axes_ )
+        return( ( pointwise, ) )
 
     @staticmethod
-    def parseXMLNode( element, xPath=[], linkData={} ):
+    def defaultAxes( energyUnit = 'eV' ) :
 
-        xPath.append( element.tag )
-        axes_ = axes.parseXMLNode( element[0], xPath )
-        spw = semiPiecewise( axes_, element.get( 'productFrame' ) )
-        for energy_in in element[1:]:
-            regions_ = regions.regionsXYs( axes.referenceAxes(spw), parent=spw, isPrimaryXData = False )
-            for region_ in energy_in[0]:
-                interp = axes.interpolationXY.stringToInterpolationXY( region_[0].get("interpolation") )
-                axes_ = axes.interpolationAxes( int(region_[0].get("index")), interp,
-                        regions_ )
-                data = map(float, region_[1].text.split() )
-                data = zip( data[::2], data[1::2] )
-                regions_.regions.append( XYs.XYs( axes_, data, float( region_.get( "accuracy" ) ), parent = regions_,
-                    index = int( region_.get( "index" ) ), moniker = "region", isPrimaryXData = False ) )
-            spw.append( float( energy_in.get( "value" ) ), regions_ )
-        xPath.pop()
-        return spw
+        return( pointwise.defaultAxes( energyUnit = energyUnit ) )
 
-class semiPiecewiseEnergy( ancestry.ancestry ) :
+class energyFunctionalData( ancestryModule.ancestry ) :
 
-    def __init__( self, index, energy, regions_, parent ) :
+    def __init__( self, moniker, data ) :
 
-        if( not( isinstance( regions_, regions.regions ) ) ) : raise Exception( 'regions_ not an instance of regions.regions: is an instance of %s' % \
-            brb.getType( regions_ ) )
-        ancestry.ancestry.__init__( self, 'semiPiecewiseEnergy', parent )
-        self.index = index
-        self.energy = energy
-        self.regions = regions_
-
-    def __len__( self ) :
-
-        return( len( self.regions ) )
-
-    def __getitem__( self, index ) :
-
-        return( self.regions[index] )
-
-    def getValue( self ) :
-
-        return( self.energy )
-
-    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
-
-        return( self.regions.toPointwise_withLinearXYs( accuracy = accuracy, lowerEps = lowerEps, upperEps = upperEps ) )
-
-    def toXMLList( self, indent = '' ) :
-        """Returns the xml string representation of self."""
-
-        xmlString = [ '%s<energy_in value="%s" index="%d">' % ( indent, fudge.gnd.miscellaneous.floatToString( self.energy ), self.index ) ]
-        xmlString += self.regions.toXMLList( indent + '  ' )
-        xmlString[-1] += '</energy_in>'
-        return xmlString
-
-    def toENDF6( self, flags, targetInfo ) :
-
-        from fudge.legacy.converting import endfFormats, gndToENDF6
-        interpolations, ENDFData = [], []
-        for index, region in enumerate( self.regions ) :
-            data = region.copyDataToXYs( xUnit = 'eV', yUnit = '1/eV' )
-            if( index > 0 ) :
-                if( ENDFData[-1] == data[0] ) : data = data[1:]
-            ENDFData += data
-            interpolations += [ len( ENDFData ), gndToENDF6.axesToEndfInterpolationFlag( region.axes ) ]
-        return( [ endfFormats.endfContLine( 0., self.energy, 0, 0, len( interpolations ) / 2, len( ENDFData ) ) ] + \
-            endfFormats.endfInterpolationList( interpolations ) + endfFormats.endfNdDataList( ENDFData ) )
-
-class energyFunctionalData( XYs.XYs ) :
-
-    mutableYUnit = False
-
-    def __init__( self, axes, data, accuracy, dataForm = 'xys', **kwargs ) :
-
-        moniker = kwargs['moniker']
         if( moniker not in [ 'theta', 'a', 'b', 'g', 'T_M' ] ) : raise Exception( 'Invalid moniker = "%s"' % moniker )
         self.moniker = moniker
-        self.tag = moniker
-        XYs.XYs.__init__( self, axes, data, accuracy, dataForm = dataForm, isPrimaryXData = True )
+        ancestryModule.ancestry.__init__( self )
+        self.data = data
+        self.data.label = moniker
 
-class functionalBase( form ) :
+    def copy( self ):
 
-    def __init__( self, productFrame, moniker, LF, U, parameter1, parameter2 = None ) :
+        return energyFunctionalData( self.moniker, self.data )
 
-        form.__init__( self, moniker, productFrame )
+    __copy__ = __deepcopy__ = copy
+
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        return self.data.toXMLList( indent, **kwargs )
+
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ):
+
+        xPath.append( element.tag )
+        subClass = {
+            XYsModule.XYs.moniker:  XYsModule.XYs,
+            regionsModule.regions.moniker:  regionsModule.regions,
+        }.get( element.tag )
+        if( subClass is None ) : raise Exception( "encountered unknown energy functional subform: %s" % element[0].tag )
+        EFD = energyFunctionalData( element.get('label'), subClass.parseXMLNode( element, xPath, linkData ) )
+        xPath.pop()
+        return EFD
+
+class functionalBase( subform ) :
+
+    def __init__( self, LF, U, parameter1, parameter2 = None ) :
+
+        subform.__init__( self )
         self.U = U
         self.LF = LF
         self.parameter1 = parameter1
         self.parameter2 = parameter2
+
+    def copy( self ):
+
+        if( self.parameter2 is None ) :
+            return self.__class__( self.U, self.parameter1 )
+        else :
+            return self.__class__( self.U, self.parameter1, self.parameter2 )
+
+    __copy__ = __deepcopy__ = copy
 
     def check( self, info ):
 
@@ -400,84 +390,62 @@ class functionalBase( form ) :
 
     def domainMin( self, unitTo = None, asPQU = False ) :
 
-        return( self.parameter1.domainMin( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.parameter1.data.domainMin( unitTo = unitTo, asPQU = asPQU ) )
 
     def domainMax( self, unitTo = None, asPQU = False ) :
 
-        return( self.parameter1.domainMax( unitTo = unitTo, asPQU = asPQU ) )
+        return( self.parameter1.data.domainMax( unitTo = unitTo, asPQU = asPQU ) )
 
-    def getDomain( self, unitTo = None, asPQU = False ):
+    def domain( self, unitTo = None, asPQU = False ):
 
         return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
 
-        Es = [ E for E, p in self.parameter1 ]
+        if( isinstance( self.parameter1.data, regionsModule.regions ) ) :
+            Es = []
+            for region in self.parameter1.data :
+                Es = Es[:-1] + [ E for E, p in region ]
+        else :
+            Es = [ E for E, p in self.parameter1.data ]
         if( EMin is not None ) :
             if( EMin < Es[0] ) : Es.insert( 0, EMin )
         if( EMax is not None ) :
             if( EMax > Es[-1] ) : Es.append( EMax )
         return( Es )
 
-    def toXMLList( self, indent = '' ) :
+    def toXMLList( self, indent = '', **kwargs ) :
         """Returns the xml string representation of self."""
 
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
         if( self.LF == 12 ) : 
-            qualifiers = 'EFL="%s" EFH="%s"' % ( self.EFL, self.EFH )
+            EFL = self.EFL.toString( keepPeriod = False )
+            EFH = self.EFH.toString( keepPeriod = False )
+            qualifiers = ' EFL="%s" EFH="%s"' % ( EFL, EFH )
         else :
-            qualifiers = 'U="%s"' % self.U
+            qualifiers = ' U="%s"' % self.U.toString( keepPeriod = False )
         xmlString = [ self.XMLStartTagString( indent = indent, extraAttributesAsStrings = qualifiers ) ]
-        xmlString += self.parameter1.toXMLList( indent = indent + '  ' )
-        if( not( self.parameter2 is None ) ) : xmlString += self.parameter2.toXMLList( indent = indent + '  ' )
+        xmlString += self.parameter1.toXMLList( indent2, **kwargs )
+        if( not( self.parameter2 is None ) ) : xmlString += self.parameter2.toXMLList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return( xmlString )
 
-    def toENDF6( self, flags, targetInfo, weight = None ) :
-
-        from fudge.legacy.converting import endfFormats, gndToENDF6
-        U, EFL, EFH = 0, 0, 0
-        if( self.LF == 12 ) :
-            EFL, EFH = self.EFL.getValueAs( 'eV' ), self.EFH.getValueAs( 'eV' )
-        else :
-            U = self.U.getValueAs( 'eV' )
-        energyFactor = PhysicalQuantityWithUncertainty( '1 eV' ) / PhysicalQuantityWithUncertainty( 1, self.parameter1.axes[0].getUnit( ) )
-        if( weight is None ) :
-            weight = [ [ energyFactor * self.parameter1[0][0], 1.0 ], [ energyFactor * self.parameter1[-1][0], 1.0 ] ]
-            interp = 2
-        elif( hasattr(weight, 'axes') ):
-            interp = {axes.linearToken: 2, axes.flatToken: 1}.get( weight.axes[0].interpolation.dependent )
-            if interp is None:
-                raise Exception("Only linear and flat interpolations supported for functional energy distributions!")
-        else:
-            interp = 2
-        ENDFDataList = [ endfFormats.endfContLine( U, 0, 0, self.LF, 1, len( weight ) ) ] + \
-            endfFormats.endfInterpolationList( [ len( weight ), interp ] ) + endfFormats.endfNdDataList( weight )
-        ENDFDataList += [ endfFormats.endfContLine( EFL, EFH, 0, 0, 1, len( self.parameter1 ) ) ] + \
-            endfFormats.endfInterpolationList( [ len( self.parameter1 ), \
-            gndToENDF6.axesToEndfInterpolationFlag( self.parameter1.axes ) ] )
-        ENDFDataList += endfFormats.endfNdDataList( self.parameter1, xUnit = 'eV', yUnit = 'eV' )
-        if( self.parameter2 is not None ) :
-            yUnit = ''
-            if( self.LF in [ 5, 11 ] ) : yUnit = '1/eV'
-            ENDFDataList += [ endfFormats.endfContLine( 0, 0, 0, 0, 1, len( self.parameter2 ) ) ]
-            ENDFDataList += endfFormats.endfInterpolationList( [ len( self.parameter2 ), 
-                gndToENDF6.axesToEndfInterpolationFlag( self.parameter2.axes ) ] )
-            ENDFDataList += endfFormats.endfNdDataList( self.parameter2, yUnit = yUnit )
-        return( 1, ENDFDataList )
-
 class generalEvaporationSpectrum( functionalBase ) :
 
-    def __init__( self, productFrame, U, thetas, gs ) :
+    moniker = 'generalEvaporation'
 
-        functionalBase.__init__( self, productFrame, base.generalEvaporationFormToken, 5, U, thetas, gs )
+    def __init__( self, U, thetas, gs ) :
 
-    def EpAverageAtE( self, E ) :
+        functionalBase.__init__( self, 5, U, thetas, gs )
 
-        return( self.parameter1.getValue( E ) * self.parameter2.integrateWithWeight_x( ) )
+    def averageEp( self, E ) :
+
+        return( self.parameter1.data.evaluate( E ) * self.parameter2.data.integrateWithWeight_x( ) )
 
     def sqrtEp_AverageAtE( self, E ) :
 
-        return( math.sqrt( self.parameter1.getValue( E ) ) * self.parameter2 ).integrateWithWeight_sqrt_x( )
+        return( math.sqrt( self.parameter1.data.evaluate( E ) ) * self.parameter2.data ).integrateWithWeight_sqrt_x( )
 
     def isLinear( self, qualifierOk = False, flatIsOk = False ) :
         """
@@ -488,38 +456,38 @@ class generalEvaporationSpectrum( functionalBase ) :
 
     def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
-        axes_ = pointwise.defaultAxes( )
-        pwl = linear( axes_ )
-        axesXY = axes.referenceAxes( pwl, dimension = 2 )
-        thetas = self.parameter1.toPointwise_withLinearXYs( accuracy = None, lowerEps = lowerEps, upperEps = upperEps )
-        gs = self.parameter2.toPointwise_withLinearXYs( accuracy = None, lowerEps = lowerEps, upperEps = upperEps )
+        pwl = pointwise( axes = pointwise.defaultAxes( ) )
+        thetas = self.parameter1.data.toPointwise_withLinearXYs( accuracy = None, lowerEps = lowerEps, upperEps = upperEps )
+        gs = self.parameter2.data.toPointwise_withLinearXYs( accuracy = None, lowerEps = lowerEps, upperEps = upperEps )
         for E_in, theta in thetas :
             data = [ [ theta * x, y / theta ] for x, y in gs ]
-            data = XYs.XYs( axesXY, data, accuracy, value = E_in )
+            data = pdfOfEp.pointwise( data, accuracy = accuracy, value = E_in )
             data.normalize( insitu = True )
             pwl.append( data )
         return( pwl )
 
     @staticmethod
-    def parseXMLNode( element, xPath=[], linkData={} ):
+    def parseXMLNode( element, xPath, linkData ) :
         """Translate <generalEvaporation> element from xml."""
 
         xPath.append( element.tag )
-        theta, g = [energyFunctionalData.parseXMLNode(node,xPath) for node in element]
-        U = PhysicalQuantityWithUncertainty( element.get("U") )
-        GES = generalEvaporationSpectrum( element.get( 'productFrame' ), U, theta, g )
+        theta, g = [ energyFunctionalData.parseXMLNode( node, xPath, linkData ) for node in element ]
+        U = PQU.PQU( element.get( "U" ) )
+        GES = generalEvaporationSpectrum( U, theta, g )
         xPath.pop()
         return GES
 
 class simpleMaxwellianFissionSpectrum( functionalBase ) :
 
-    def __init__( self, productFrame, U, thetas ) :
+    moniker = 'simpleMaxwellianFission'
 
-        functionalBase.__init__( self, productFrame, base.simpleMaxwellianFissionFormToken, 7, U, thetas )
+    def __init__( self, U, thetas ) :
 
-    def EpAverageAtE( self, E ) :
+        functionalBase.__init__( self, 7, U, thetas )
 
-        theta = self.parameter1.getValue( E )
+    def averageEp( self, E ) :
+
+        theta = self.parameter1.data.evaluate( E )
         a = ( E - self.U.getValue( ) ) / theta
         if( a < 1e-4 ) : return( theta * a * ( 1575. - a * ( 180. + 8 * a ) ) / 2625. )
         sqrt_a = math.sqrt( a )
@@ -529,7 +497,7 @@ class simpleMaxwellianFissionSpectrum( functionalBase ) :
 
     def sqrtEp_AverageAtE( self, E ) :
 
-        theta = self.parameter1.getValue( E )
+        theta = self.parameter1.data.evaluate( E )
         a = ( E - self.U.getValue( ) ) / theta
         if( a < 1e-4 ) : return( math.sqrt( theta * a ) * ( 2100. - a * ( 140. + 9. * a ) ) / 2800. )
         sqrt_a = math.sqrt( a )
@@ -547,24 +515,31 @@ class simpleMaxwellianFissionSpectrum( functionalBase ) :
         return( ef.toPointwise_withLinearXYs( accuracy, lowerEps = lowerEps, upperEps = upperEps ) )
 
     @staticmethod
-    def parseXMLNode( MFelement, xPath=[], linkData={} ):
+    def parseXMLNode( MFelement, xPath, linkData ) :
 
         xPath.append( MFelement.tag )
-        theta = energyFunctionalData.parseXMLNode(MFelement[0],xPath)
-        U = PhysicalQuantityWithUncertainty( MFelement.get("U") )
-        SMF = simpleMaxwellianFissionSpectrum( MFelement.get( 'productFrame' ), U, theta )
+        theta = energyFunctionalData.parseXMLNode( MFelement[0], xPath, linkData )
+        U = PQU.PQU( MFelement.get("U") )
+        SMF = simpleMaxwellianFissionSpectrum( U, theta )
         xPath.pop()
         return SMF
 
 class evaporationSpectrum( functionalBase ) :
 
-    def __init__( self, productFrame, U, thetas ) :
+    moniker = 'evaporation'
 
-        functionalBase.__init__( self, productFrame, base.evaporationFormToken, 9, U, thetas )
+    def __init__( self, U, thetas ) :
 
-    def EpAverageAtE( self, E ) :
+        functionalBase.__init__( self, 9, U, thetas )
 
-        theta = self.parameter1.getValue( E )
+    def averageEp( self, E ) :
+
+        if( isinstance( self.parameter1.data, regionsModule.regions ) ) :
+            for region in self.parameter1.data :
+                if( E <= region[-1][0] ) : break
+            theta = region.evaluate( E )
+        else :
+            theta = self.parameter1.data.evaluate( E )
         a = ( E - self.U.getValue( ) ) / theta
         if( a < 1e-4 ) : return( theta * a * ( 180. - a * ( 15. + a ) ) / 270. )
         exp_a = math.exp( -a )
@@ -572,7 +547,7 @@ class evaporationSpectrum( functionalBase ) :
 
     def sqrtEp_AverageAtE( self, E ) :
 
-        theta = self.parameter1.getValue( E )
+        theta = self.parameter1.data.evaluate( E )
         a = ( E - self.U.getValue( ) ) / theta
         if( a < 1e-4 ) : return( math.sqrt( theta * a ) * ( 252. - a * ( 12. + a ) ) / 315. )
         sqrt_a = math.sqrt( a )
@@ -589,49 +564,51 @@ class evaporationSpectrum( functionalBase ) :
         return( ef.toPointwise_withLinearXYs( accuracy, lowerEps = lowerEps, upperEps = upperEps ) )
 
     @staticmethod
-    def parseXMLNode( evapElement, xPath=[], linkData={} ):
+    def parseXMLNode( evapElement, xPath, linkData ) :
 
         xPath.append( evapElement.tag )
-        theta = energyFunctionalData.parseXMLNode( evapElement[0], xPath )
-        U = PhysicalQuantityWithUncertainty( evapElement.get("U") )
-        ES = evaporationSpectrum( evapElement.get( 'productFrame' ), U, theta )
+        theta = energyFunctionalData.parseXMLNode( evapElement[0], xPath, linkData )
+        U = PQU.PQU( evapElement.get( "U" ) )
+        ES = evaporationSpectrum( U, theta )
         xPath.pop()
         return ES
 
 class WattSpectrum( functionalBase ) :
 
-    def __init__( self, productFrame, U, a, b ) :
+    moniker = 'Watt'
 
-        functionalBase.__init__( self, productFrame, base.WattFormToken, 11, U, a, b )
+    def __init__( self, U, a, b ) :
 
-    def EpAverageAtE( self, E ) :
+        functionalBase.__init__( self, 11, U, a, b )
 
-        a, b = self.parameter1.getValue( E ), self.parameter2.getValue( E )
-        xMax_a  = ( E - self.U.getValue( ) ) / a
-        xMax_b  = math.sqrt( b * ( E - self.U.getValue( ) ) )
+    def averageEp( self, E ) :
+
+        a, b = self.parameter1.data.evaluate( E ), self.parameter2.data.evaluate( E )
+        domainMax_a  = ( E - self.U.getValue( ) ) / a
+        domainMax_b  = math.sqrt( b * ( E - self.U.getValue( ) ) )
         ab = a * b
         sqrt_ab = math.sqrt( ab )
         I = 0.25 * math.sqrt( math.pi * ab ) * math.exp( 0.25 * ab ) * \
-            ( math.erf( math.sqrt( xMax_a ) - 0.5 * sqrt_ab ) + math.erf( math.sqrt( xMax_a ) + 0.5 * sqrt_ab ) ) \
-            - math.exp( -xMax_a ) * math.sinh( xMax_b )
+            ( math.erf( math.sqrt( domainMax_a ) - 0.5 * sqrt_ab ) + math.erf( math.sqrt( domainMax_a ) + 0.5 * sqrt_ab ) ) \
+            - math.exp( -domainMax_a ) * math.sinh( domainMax_b )
         EI = a * math.sqrt( math.pi * ab ) * ( ab + 6 ) * math.exp( 0.25 * ab ) * \
-            ( math.erf( math.sqrt( xMax_a ) - 0.5 * sqrt_ab ) + math.erf( math.sqrt( xMax_a ) + 0.5 * sqrt_ab ) ) \
-            - 0.25 * a * math.exp( -xMax_a ) * math.sinh( xMax_b ) * ( 2. * xMax_b + ab + 4. + 4. * xMax_a )
+            ( math.erf( math.sqrt( domainMax_a ) - 0.5 * sqrt_ab ) + math.erf( math.sqrt( domainMax_a ) + 0.5 * sqrt_ab ) ) \
+            - 0.25 * a * math.exp( -domainMax_a ) * math.sinh( domainMax_b ) * ( 2. * domainMax_b + ab + 4. + 4. * domainMax_a )
         return( EI / ( 16 * I ) )
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
 
-        aMin, aMax = self.parameter1.getDomain( )
+        aMin, aMax = self.parameter1.data.domain( )
         if( EMin is None ) : EMin = aMin
         if( EMax is None ) : EMax = aMax
         if( EMin < aMin ) : EMin = aMin
         if( EMax < aMax ) : EMax = aMax
         Es = [ EMin, EMax ]
-        for E, a in self.parameter1 :
+        for E, a in self.parameter1.data :
             if( E <= EMin ) : continue
             if( E >= EMax ) : continue
             if( E not in Es ) : Es.append( E )
-        for E, b in self.parameter2 :
+        for E, b in self.parameter2.data :
             if( E <= EMin ) : continue
             if( E >= EMax ) : continue
             if( E not in Es ) : Es.append( E )
@@ -648,42 +625,50 @@ class WattSpectrum( functionalBase ) :
         return( ef.toPointwise_withLinearXYs( accuracy, lowerEps = lowerEps, upperEps = upperEps ) )
 
     @staticmethod
-    def parseXMLNode( WattElement, xPath=[], linkData={} ):
+    def parseXMLNode( WattElement, xPath, linkData ):
         """ translate <Watt> element from xml """
 
         xPath.append( WattElement.tag )
-        a, b = [energyFunctionalData.parseXMLNode(node,xPath) for node in WattElement]
-        U = PhysicalQuantityWithUncertainty( WattElement.get("U") )
-        WS = WattSpectrum( WattElement.get( 'productFrame' ), U, a, b )
+        a, b = [energyFunctionalData.parseXMLNode(node,xPath,linkData) for node in WattElement]
+        U = PQU.PQU( WattElement.get( "U" ) )
+        WS = WattSpectrum( U, a, b )
         xPath.pop()
         return WS
 
 class MadlandNix( functionalBase ) :
 
-    def __init__( self, productFrame, EFL, EFH, Ts ) :
+    moniker = 'MadlandNix'
 
-        functionalBase.__init__( self, productFrame, base.MadlandNixFormToken, 12, None, Ts )
+    def __init__( self, EFL, EFH, Ts ) :
+
+        functionalBase.__init__( self, 12, None, Ts )
         self.EFL = EFL
         self.EFH = EFH
+
+    def copy( self ):
+
+        return MadlandNix( self.EFL, self.EFH, self.parameter1 )
+
+    __copy__ = __deepcopy__ = copy
 
     def check( self, info ) :
 
         from fudge.gnd import warning
 
         warnings = []
-        if self.EFL.value <= 0 or self.EFH.value <= 0 or self.parameter1.yMin() <= 0:
-            warnings.append( warning.MadlandNixBadParameters( self.EFL, self.EFH, self.parameter1.yMin(), self ) )
+        if self.EFL.value <= 0 or self.EFH.value <= 0 or self.parameter1.data.rangeMin() <= 0:
+            warnings.append( warning.MadlandNixBadParameters( self.EFL, self.EFH, self.parameter1.data.rangeMin(), self ) )
 
         return warnings
 
-    def EpAverageAtE( self, E ) :
+    def averageEp( self, E ) :
 
-        unit = self.parameter1.axes[1].getUnit( )
-        return( 0.5 * ( self.EFL.getValueAs( unit ) + self.EFH.getValueAs( unit ) ) + 4. * self.parameter1.getValue( E ) / 3. )
+        unit = self.parameter1.data.axes[-1].unit
+        return( 0.5 * ( self.EFL.getValueAs( unit ) + self.EFH.getValueAs( unit ) ) + 4. * self.parameter1.data.evaluate( E ) / 3. )
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
 
-        return( [ x for x, y in self.parameter1 ] )
+        return( [ x for x, y in self.parameter1.data ] )
 
     def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
 
@@ -710,49 +695,57 @@ class MadlandNix( functionalBase ) :
             EFL, EFH, T_M = parameters
             return( 0.5 * ( g( Ep, EFL, T_M ) + g( Ep, EFH, T_M ) ) )
 
-        axes_ = pointwise.defaultAxes( )
-        pwl = linear( axes_ )
-        axesXY = axes.referenceAxes( pwl, dimension = 2 )
-        E_in_unit = self.parameter1.axes[0].getUnit( )
+        if( accuracy is None ) : accuracy = 1e-3
+        axes = pointwise.defaultAxes( )
+        pwl = pointwise( axes )
+        E_in_unit = self.parameter1.data.axes[-1].unit
         EFL, EFH = self.EFL.getValueAs( E_in_unit ), self.EFH.getValueAs( E_in_unit )
-        factor = PhysicalQuantityWithUncertainty( 1, 'eV' ).getValueAs( E_in_unit )
+        factor = PQU.PQU( 1, 'eV' ).getValueAs( E_in_unit )
         xs_ = [ 1e-5, 1e-3, 1e-1, 1e1, 1e3, 1e5, 3e7 ]
         xs = [ factor * x for x in xs_ ]
-        for E, T_M in self.parameter1 :             # This logic ignores the interpolation of parameter1 as the only two forms in ENDF/B-VII shows 
+        for E, T_M in self.parameter1.data :        # This logic ignores the interpolation of parameter1 as the only two subforms in ENDF/B-VII shows 
             parameters = [ EFL, EFH, T_M ]          # that linear-linear is better than the 'log-log' given in the ENDF/B-VII/data.
-            g_Ep = XYs.XYs.createFromFunction( axesXY, xs, MadlandNixFunc, parameters, accuracy, biSectionMax = 12 )
+            g_Ep = pdfOfEp.pointwise.createFromFunction( xs, MadlandNixFunc, parameters, accuracy, biSectionMax = 12 )
             g_Ep.value = E                          # ????????? Class XYs does not the a proper setValue method. One should be added.
             g_Ep.normalize( insitu = True )
             pwl.append( g_Ep )
         return( pwl )
 
     @staticmethod
-    def parseXMLNode( MNelement, xPath=[], linkData={} ):
+    def parseXMLNode( MNelement, xPath, linkData ):
         """ translate <MadlandNix> element from xml """
 
         xPath.append( MNelement.tag )
-        T_M = energyFunctionalData.parseXMLNode( MNelement[0], xPath )
-        EFL, EFH = [PhysicalQuantityWithUncertainty(tmp) for tmp in (MNelement.get("EFL"),MNelement.get("EFH") )]
-        MN = MadlandNix( MNelement.get( 'productFrame' ), EFL, EFH, T_M )
+        T_M = energyFunctionalData.parseXMLNode( MNelement[0], xPath, linkData )
+        EFL, EFH = [PQU.PQU(tmp) for tmp in (MNelement.get("EFL"),MNelement.get("EFH") )]
+        MN = MadlandNix( EFL, EFH, T_M )
         xPath.pop()
         return MN
 
-class NBodyPhaseSpace( form ) :
+class NBodyPhaseSpace( subform ) :
+
+    moniker = 'NBodyPhaseSpace'
 
     def __init__( self, numberOfProducts, numberOfProductsMasses ) :
 
-        form.__init__( self, base.NBodyPhaseSpaceFormToken, axes.centerOfMassToken )
+        subform.__init__( self )
         self.numberOfProducts = numberOfProducts
         self.numberOfProductsMasses = numberOfProductsMasses
 
+    def copy( self ):
+
+        return NBodyPhaseSpace( self.numberOfProducts, self.numberOfProductsMasses )
+
+    __copy__ = __deepcopy__ = copy
+
     def check( self, info ) :
 
-        #if ( abs( self.numberOfProductsMasses - info['reactionSuite'].particles['n'].getMass('amu') * self.numberOfProducts ) >
+        #if ( abs( self.numberOfProductsMasses - info['reactionSuite'].products['n'].getMass('amu') * self.numberOfProducts ) >
         #        self.numberOfProductsMasses * 0.1 ) :    # return warning?
 
         return []
 
-    def EpAverageAtE( self, E, massUnit, projectileMass, targetMass, productMass, Q ) :
+    def averageEp( self, E, massUnit, projectileMass, targetMass, productMass, Q ) :
         """
         Calculate the average energy of the product in the center-of-mass frame for projectile energy E. This method only works for
         a one-step reaction.
@@ -792,8 +785,8 @@ class NBodyPhaseSpace( form ) :
         productMass = p.getMass( massUnit )
 
         r = self.findClassInAncestry( reaction.reaction )
-        energyUnit = r.getDomainUnit( )
-        EMin, EMax = r.getDomain( )
+        energyUnit = r.domainUnit( )
+        EMin, EMax = r.domain( )
 
         rs = self.findClassInAncestry( reactionSuite.reactionSuite )
         projectileMass, targetMass = rs.projectile.getMass( massUnit ), rs.target.getMass( massUnit )
@@ -801,63 +794,62 @@ class NBodyPhaseSpace( form ) :
         c = self.findClassInAncestry( channels.channel )
         Q = c.Q.getConstantAs( energyUnit )
 
-        axes_ = pointwise.defaultAxes( axes.centerOfMassToken, energyUnit = energyUnit )
-        pwl = linear( axes_ )
-        axesXY = axes.referenceAxes( pwl, dimension = 2 )
+        axes = pointwise.defaultAxes( standardsModule.frames.centerOfMassToken, energyUnit = energyUnit )
+        pwl = pointwise( axes )
 
         t = tester( accuracy, 1e-10, self.numberOfProducts )
         n = 21
         f = math.pow( EMax / EMin, 1. / n )
-        E_ins = [ EMin * f**i for i in xrange( n ) ]
+        E_ins = [ EMin * f**idx for idx in xrange( n ) ]
         E_ins[-1] = EMax        # Fix possible round off issue.
-        for i, E_in in enumerate( E_ins ) :
+        for idx, E_in in enumerate( E_ins ) :
             Ea = targetMass / ( targetMass + projectileMass ) * E_in + Q
             EMax_i = Ea * ( numberOfProductsMasses - productMass ) / numberOfProductsMasses
-            if( EMax_i < 0 ) : EMax_i = 1e-5                # This is a klude
+            if( EMax_i < 0 ) : EMax_i = 1e-5                # This is a kludge
             t.setEMax_i( EMax_i )
             t.absoluteTolerance = 1e-10 * t.evaluateAtX( 0.5 * EMax_i )
             data = fudgemath.thickenXYList( [ [ 0., 0. ], [ EMax_i, 0. ] ], t, biSectionMax = 10 )
-            data = XYs.XYs( axesXY, data, accuracy, value = E_in )
+            data = pdfOfEp.pointwise( data, accuracy = accuracy, value = E_in )
             data.normalize( insitu = True )
             pwl.append( data )
         return( pwl )
 
-    def toXMLList( self, indent = '' ) :
+    def toXMLList( self, indent = '', **kwargs ) :
         """Returns the xml string representation of self."""
 
-        xmlString = [ self.XMLStartTagString( indent = indent, extraAttributesAsStrings = 'numberOfProducts="%s" mass="%s"' %
+        xmlString = [ self.XMLStartTagString( indent = indent, extraAttributesAsStrings = ' numberOfProducts="%s" mass="%s"' %
             ( self.numberOfProducts, self.numberOfProductsMasses ), emptyTag = True ) ]
         return( xmlString )
 
-    def toENDF6( self, flags, tempInfo ) :
-
-        from fudge.legacy.converting import endfFormats, gndToENDF6
-        mass = self.numberOfProductsMasses.getValueAs( 'eV/c**2' ) / tempInfo['neutronMass']
-        ENDFDataList = [ endfFormats.endfContLine( mass, 0, 0, 0, 0, self.numberOfProducts ) ]
-        return( 6, self.getProductFrame( ), ENDFDataList )
-
     @staticmethod
-    def parseXMLNode( NBodyElement, xPath=[], linkData={} ):
-        return NBodyPhaseSpace( int( NBodyElement.get( "numberOfProducts" ) ), PhysicalQuantityWithUncertainty(NBodyElement.get("mass")) )
+    def parseXMLNode( NBodyElement, xPath, linkData ):
+        return NBodyPhaseSpace( int( NBodyElement.get( "numberOfProducts" ) ), PQU.PQU(NBodyElement.get("mass")) )
 
-class weighted( ancestry.ancestry ) :
+class weighted( ancestryModule.ancestry ) :
 
     moniker = 'weighted'
 
     def __init__( self, weight, functional ) :
 
+        ancestryModule.ancestry.__init__( self )
         self.weight = weight
+        self.weight.label = 'weight'
         self.functional = functional
-        self.W_index = 0    # applies to the weighted section, not to the weights
+
+    def copy( self ):
+
+        return weighted( self.weight.copy(), self.functional.copy() )
+
+    __copy__ = __deepcopy__ = copy
 
     def checkProductFrame( self ) :
         "Calls checkProductFrame on self's functional."
 
         self.functional.checkProductFrame( )
 
-    def EpAverageAtE( self, E ) :
+    def averageEp( self, E ) :
 
-        return( self.weight.getValue( E ) * self.functional.EpAverageAtE( E ) )
+        return( self.weight.evaluate( E ) * self.functional.averageEp( E ) )
 
     def getEnergyArray( self, EMin = None, EMax = None ) :
 
@@ -867,30 +859,24 @@ class weighted( ancestry.ancestry ) :
         energyArray.sort( )
         return( energyArray )
 
-    def getPrductFrame( self ) :
-        "Returns the results of calling getPrductFrame on self's functional."
-
-        return( self.functional.getProductFrame( ) )
-
-    def toXMLList( self, indent = '' ) :
+    def toXMLList( self, indent = '', **kwargs ) :
         """Returns the xml string representation of self."""
 
-        indent2 = indent + '  '
-        xmlString = [ '%s<%s index="%i">' %(  indent, self.moniker, self.W_index ) ]
-        xmlString += self.weight.toXMLList( tag = 'weight', indent = indent2 )
-        xmlString += self.functional.toXMLList( indent = indent2 )
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
+        xmlString = [ '%s<%s>' %(  indent, self.moniker ) ]
+        xmlString += self.weight.toXMLList( indent2, **kwargs )
+        xmlString += self.functional.toXMLList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return( xmlString )
 
-    def toENDF6( self, flags, targetInfo ) :
+class weightedFunctionals( subform ) :
 
-        return( self.functional.toENDF6( flags, targetInfo, weight = self.weight )[1] )
+    moniker = 'weightedFunctionals'
 
-class weightedFunctionals( form ) :
+    def __init__( self ) :
 
-    def __init__( self, productFrame ) :
-
-        form.__init__( self, base.weightedFunctionalsFormToken, productFrame )
+        subform.__init__( self )
         self.weights = []
 
     def __len__( self ) :
@@ -901,10 +887,17 @@ class weightedFunctionals( form ) :
 
         return( self.weights[i] )
 
+    def copy( self ):
+        newWF = weightedFunctionals()
+        for weight in self:
+            newWF.addWeight( weight.copy() )
+        return newWF
+
+    __copy__ = __deepcopy__ = copy
+
     def addWeight( self, weight ) :
 
         if( not( isinstance( weight, weighted ) ) ) : raise Exception( 'Invalid weight of type %s' % brb.getType( weight ) )
-        weight.W_index = len(self.weights)
         self.weights.append( weight )
 
     def check( self, info ) :
@@ -913,7 +906,7 @@ class weightedFunctionals( form ) :
 
         warnings = []
         totalWeight = sum( [w.weight for w in self.weights] )
-        if (totalWeight.yMin() != 1.0) and (totalWeight.yMax() != 1.0):
+        if (totalWeight.rangeMin() != 1.0) and (totalWeight.rangeMax() != 1.0):
             warnings.append( warning.weightsDontSumToOne( obj=self ) )
 
         for weight in self:
@@ -921,27 +914,14 @@ class weightedFunctionals( form ) :
 
         return warnings
 
-    def checkProductFrame( self ) :
-        """
-        Checks that the productFrames for the each weight is valid and that all frames are the same. Overrides the
-        method in base.form. Returns None if all is okay. Otherwise, executes a raises from base.form.checkProductFrame
-        or a ValueError if frames differ.
-        """
-
-        frames = set( )
-        for weight in self :
-            weight.checkProductFrame( )
-            frames.add( weight.getPrductFrame( ) )
-        if( len( frames ) != 1 ) : raise ValueError( 'multiple frames present :%s' % frames )
-
-    def EpAverageAtE( self, E ) :
+    def averageEp( self, E ) :
 
         Ep = 0
-        for weight in self : Ep += weight.EpAverageAtE( E )
+        for weight in self : Ep += weight.averageEp( E )
         return( Ep )
 
     def sqrtEp_AverageAtE( self, E ) :
-        """This method has not been implemented. It returns None so the method uncorrelated.calculateDepositionData will still work 
+        """This method has not been implemented. It returns None so the method uncorrelated.calculateDepositionData will still work
         when calculating the momentum deposition for isotropic scattering in the lab frame, but will execute a raise otherwise."""
 
         return( None )
@@ -959,26 +939,24 @@ class weightedFunctionals( form ) :
 
         if( len( self ) > 2 ) : raise Exception( 'more than two weights currently not supported' )
         E_ins, data = [], []
-        for weight in self :
-            w = weight.toPointwise_withLinearXYs( accuracy = accuracy, lowerEps = lowerEps, upperEps = upperEps )
-            e = weight.functional.toPointwise_withLinearXYs( accuracy = accuracy, lowerEps = lowerEps, upperEps = upperEps )
+        for weighted_ in self :
+            w = weighted_.weight.toPointwise_withLinearXYs( accuracy = accuracy, lowerEps = lowerEps, upperEps = upperEps )
+            e = weighted_.functional.toPointwise_withLinearXYs( accuracy = accuracy, lowerEps = lowerEps, upperEps = upperEps )
             data.append( [ w, e ] )
             for x, y in w :
                 if( x not in E_ins ) : E_ins.append( x )
             for x in e :
                 if( x.value not in E_ins ) : E_ins.append( x.value )
         E_ins.sort( )
-        axes_ = pointwise.defaultAxes( )
-        pwl = linear( axes_ )
-        axesXY = axes.referenceAxes( pwl, dimension = 2 )
+        pwl = pointwise( axes = pointwise.defaultAxes() )
         for E_in in E_ins :
             wv1, ev1 = data[0]
             wv2, ev2 = data[1]
-            w1, w2 = wv1.getValue( E_in ), wv2.getValue( E_in )
+            w1, w2 = wv1.evaluate( E_in ), wv2.evaluate( E_in )
             if( w1 == 1 ) :
-                e = ev1.interpolateAtW( E_in, unitBase = True )
+                e = ev1.getSpectrumAtEnergy( E_in )
             elif( w2 == 1 ) :
-                e = ev2.interpolateAtW( E_in, unitBase = True )
+                e = ev2.getSpectrumAtEnergy( E_in )
             else :
                 raise Exception( 'One weight must be zero: %s, %s' % ( w1, w2 ) )
             e.value = E_in
@@ -986,46 +964,36 @@ class weightedFunctionals( form ) :
             pwl.append( e )
         return( pwl )
 
-    def toXMLList( self, indent = '' ) :
+    def toXMLList( self, indent = '', **kwargs ) :
         """Returns the xml string representation of self."""
 
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
         xmlString = [ self.XMLStartTagString( indent = indent ) ]
-        for form in self.weights : xmlString += form.toXMLList( indent + '  ' )
+        for _subform in self.weights : xmlString += _subform.toXMLList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return( xmlString )
 
-    def toENDF6( self, flags, targetInfo, weight = None ) :                 # The weight is ignored in this method, only for compatibility with other toENDF6's.
-
-        ENDFDataList = []
-        for weight in self.weights : ENDFDataList += weight.toENDF6( flags, targetInfo )
-        return( len( self.weights ), ENDFDataList )
-
     @staticmethod
-    def parseXMLNode( WFelement, xPath=[], linkData={} ):
+    def parseXMLNode( WFelement, xPath, linkData ) :
 
         xPath.append( WFelement.tag )
-        WF = weightedFunctionals( WFelement.get( 'productFrame' ) )
-        for weightSection in WFelement:
+        WF = weightedFunctionals( )
+        for weightSection in WFelement :
             weights, functional = weightSection
-            weight_ = XYs.XYs.parseXMLNode( weights, xPath )
-            # functional data:
-            formClass = {
-                    base.generalEvaporationFormToken: generalEvaporationSpectrum,
-                    base.WattFormToken: WattSpectrum,
-                    base.MadlandNixFormToken: MadlandNix,
-                    base.evaporationFormToken: evaporationSpectrum,
-                    }.get(functional.tag)
-            functional = formClass.parseXMLNode( functional, xPath )
+            weight_ = XYsModule.XYs.parseXMLNode( weights, xPath, linkData )
+            subformClass = {
+                    pointwise.moniker :                         pointwise,
+                    generalEvaporationSpectrum.moniker :        generalEvaporationSpectrum,
+                    WattSpectrum.moniker :                      WattSpectrum,
+                    MadlandNix.moniker :                        MadlandNix,
+                    simpleMaxwellianFissionSpectrum.moniker :   simpleMaxwellianFissionSpectrum,
+                    evaporationSpectrum.moniker :               evaporationSpectrum,
+                }.get( functional.tag )
+            functional = subformClass.parseXMLNode( functional, xPath, linkData )
             WF.weights.append( weighted( weight_, functional ) )
-            WF.weights[-1].W_index = len(WF.weights)-1
-        xPath.pop()
+        xPath.pop( )
         return WF
-
-class equalProbableBins( base.equalProbableBinsFormBase ) :
-
-    def __init__( self, productFrame ) :
-
-        base.equalProbableBinsFormBase.__init__( self, productFrame )
 
 class energyFunctionalDataToPointwise :
 
@@ -1034,7 +1002,7 @@ class energyFunctionalDataToPointwise :
         self.data = data
         self.evaluateAtX = evaluateAtX
 
-    def toPointwise_withLinearXYs( self, accuracy = None, lowerEps = 0, upperEps = 0 ) :
+    def toPointwise_withLinearXYs( self, accuracy = 0.001, lowerEps = 0, upperEps = 0 ) :
 
         from fudge.core.math import fudgemath
 
@@ -1060,15 +1028,14 @@ class energyFunctionalDataToPointwise :
 
                 self.p2 = p2
 
-        parameter1 = self.data.parameter1.toPointwise_withLinearXYs( accuracy = None, lowerEps = lowerEps, upperEps = upperEps )
-        axes_ = pointwise.defaultAxes( )
-        pwl = linear( axes_ )
-        axesXY = axes.referenceAxes( pwl, dimension = 2 )
-        one_eV = PhysicalQuantityWithUncertainty( '1 eV' ).getValueAs( axesXY[0].getUnit( ) )
+        parameter1 = self.data.parameter1.data.toPointwise_withLinearXYs( accuracy = None, lowerEps = lowerEps, upperEps = upperEps )
+        axes = pointwise.defaultAxes( )
+        pwl = pointwise( axes = axes )
+        one_eV = PQU.PQU( '1 eV' ).getValueAs( axes[-1].unit )
 
         t = tester( accuracy, 1e-10, self.evaluateAtX )
         parameter2 = self.data.parameter2
-        if( parameter2 is not None ) : parameter2 = parameter2.toPointwise_withLinearXYs( accuracy = None, lowerEps = lowerEps, upperEps = upperEps )
+        if( parameter2 is not None ) : parameter2 = parameter2.data.toPointwise_withLinearXYs( accuracy = None, lowerEps = lowerEps, upperEps = upperEps )
         for i, E_in_p1 in enumerate( parameter1 ) :
             E_in, p1 = E_in_p1
             EpMax = E_in - self.data.U.getValue( )
@@ -1082,7 +1049,7 @@ class energyFunctionalDataToPointwise :
                 data = [ [ EpMin, 1. ], [ EpMax, 1e-10 ] ]
             else :
                 t.setParameter1( p1 )
-                if( parameter2 is not None ) : t.setParameter2( parameter2.getValue( E_in ) )
+                if( parameter2 is not None ) : t.setParameter2( parameter2.evaluate( E_in ) )
                 level, data = 0, [ [ EpMin, t.evaluateAtX( EpMin ) ], [ EpMax, t.evaluateAtX( EpMax ) ] ]
                 while( data[1][1] < 1e-10 ) :               # Fill in some tail points while they are < 1e-10
                     level, EpMax = level + 1, 0.5 * EpMax
@@ -1093,30 +1060,59 @@ class energyFunctionalDataToPointwise :
                     if( data[1][0] > 1e3 * one_eV ) : data.insert( 1,  [ 1e3 * one_eV, t.evaluateAtX( 1e3 * one_eV ) ] )
                     if( data[1][0] > one_eV ) : data.insert( 1,  [ one_eV, t.evaluateAtX( one_eV ) ] )
                 data = fudgemath.thickenXYList( data, t, biSectionMax = 10 )
-            data = XYs.XYs( axesXY, data, accuracy, value = E_in )
+            data = pdfOfEp.pointwise( data = data, value = E_in )
             data.normalize( insitu = True )
             pwl.append( data )
         return( pwl )
 
-def parseXMLNode( energyElement, xPath=[], linkData={} ):
-    """ translate <energy> element from xml """
+class energyLoss( subform, XYsModule.XYs ) :
 
-    xPath.append( energyElement.tag )
-    energy = component( nativeData = energyElement.get('nativeData') )
-    for formElement in energyElement:
-        formClass = {base.pointwiseFormToken: pointwise,
-                base.linearFormToken : linear,
-                base.semiPiecewiseFormToken: semiPiecewise,
-                base.generalEvaporationFormToken: generalEvaporationSpectrum,
-                base.WattFormToken: WattSpectrum,
-                base.MadlandNixFormToken: MadlandNix,
-                base.simpleMaxwellianFissionFormToken: simpleMaxwellianFissionSpectrum,
-                base.evaporationFormToken: evaporationSpectrum,
-                base.weightedFunctionalsFormToken: weightedFunctionals,
-                base.NBodyPhaseSpaceFormToken: NBodyPhaseSpace,
-                }.get(formElement.tag)
-        if formClass is None: raise Exception("encountered unknown energy form: %s" % formElement.tag)
-        newForm = formClass.parseXMLNode( formElement, xPath, linkData )
-        energy.addForm( newForm )
-    xPath.pop()
-    return energy
+    def __init__( self, **kwargs ) :
+
+        XYsModule.XYs.__init__( self, **kwargs )
+        subform.__init__( self )
+
+    @staticmethod
+    def defaultAxes( ) :
+
+        axes = axesModule.axes( rank = 2 )
+        axes[0] = axesModule.axis( 'energy_loss(energy_in)', 0, 'eV' )
+        axes[1] = axesModule.axis( 'energy_in',  1, 'eV' )
+        return( axes )
+
+class form( baseModule.form ) :
+
+    moniker = 'energy'
+    subformAttributes = ( 'energySubform', )
+
+    def __init__( self, label, productFrame, energySubform, makeCopy = True ) :
+
+        if( not( isinstance( energySubform, subform ) ) ) : raise TypeError( 'instance is not an energy subform' )
+        if( makeCopy ) : energySubform = energySubform.copy()
+        baseModule.form.__init__( self, label, productFrame, ( energySubform, ) )
+
+    def getSpectrumAtEnergy( self, energy ) :
+        """Returns the energy spectrum for self at projectile energy."""
+
+        return( self.evaluated.getSpectrumAtEnergy( energy ) )
+
+    @staticmethod
+    def parseXMLNode( energyElement, xPath, linkData ) :
+        """Translate energy component from xml."""
+
+        subformClass = {
+                constant.moniker :                          constant,
+                primaryGamma.moniker :                      primaryGamma,
+                pointwise.moniker :                         pointwise,
+                piecewise.moniker :                         piecewise,
+                generalEvaporationSpectrum.moniker :        generalEvaporationSpectrum,
+                WattSpectrum.moniker :                      WattSpectrum,
+                MadlandNix.moniker :                        MadlandNix,
+                simpleMaxwellianFissionSpectrum.moniker :   simpleMaxwellianFissionSpectrum,
+                evaporationSpectrum.moniker :               evaporationSpectrum,
+                weightedFunctionals.moniker :               weightedFunctionals,
+                NBodyPhaseSpace.moniker :                   NBodyPhaseSpace,
+            }.get( energyElement.tag )
+        if( subformClass is None ) : raise Exception( "encountered unknown energy subform: %s" % energyElement.tag )
+        energyForm = subformClass.parseXMLNode( energyElement, xPath, linkData )
+        return( energyForm )

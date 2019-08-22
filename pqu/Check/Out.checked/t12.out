@@ -1,0 +1,18 @@
+value = 3.141590000000000e+05, significantDigits = 6, order = 5, isPercent = False, unit = "s"
+uncertainty = 
+
+3.00000 d 
+value = 3.000000000000000e+00, significantDigits = 6, order = 0, isPercent = False, unit = "d"
+uncertainty = 
+
+15.000 h 
+value = 1.500000000000000e+01, significantDigits = 5, order = 1, isPercent = False, unit = "h"
+uncertainty = 
+
+15.0 min 
+value = 1.500000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "min"
+uncertainty = 
+
+59. s 
+value = 5.900000000000000e+01, significantDigits = 2, order = 1, isPercent = False, unit = "s"
+uncertainty = 

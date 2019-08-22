@@ -1,0 +1,101 @@
+# <<BEGIN-copyright>>
+# Copyright (c) 2011, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory.
+# Written by the LLNL Computational Nuclear Physics group
+#         (email: mattoon1@llnl.gov)
+# LLNL-CODE-494171 All rights reserved.
+# 
+# This file is part of the FUDGE package (For Updating Data and 
+#         Generating Evaluations)
+# 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
+# 
+# 
+#     Please also read this link - Our Notice and Modified BSD License
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# <<END-copyright>>
+
+from fudge.core.utilities import brb
+
+import fudge.particles.nuclear as nuclearModule
+import fudge.gnd.xParticle as xParticleModule
+
+import pqu.PQU as PQUModule
+import endfFileToGNDMisc
+from ENDF_ITYPE_3_6_Misc import MT_AtomicConfigurations
+
+def ITYPE_6( Z, MTDatas, info, verbose = False ) :
+
+    MT = 533
+    errors = []
+    elementSymbol = nuclearModule.elementSymbolFromZ( Z )
+    element = xParticleModule.element( elementSymbol )
+    MTs = sorted( MTDatas.keys( ) )
+    if( 451 in MTs ) : MTs.remove( 451 )
+    if( MTs != [ MT ] ) : raise Exception( 'Only allowed MT is %s (and 451): %s' % ( MT, MTs ) )
+    warningList = []
+
+    MFData = MTDatas[MT]
+    info.logs.write( '    %3d %s' % ( MT, sorted( MFData.keys( ) ) ) )
+    if( MFData.keys( ) != [ 28 ] ) : raise Exception( 'For MT %s data, only allowed MF is 28: %s' % ( MT, MFData.keys( ) ) )
+
+    MF28 = MFData[28]
+
+    offset = 0
+    ZA, AWP, dummy, dummy, NSS, dummy = endfFileToGNDMisc.sixFunkyFloatStringsToIntsAndFloats( MF28[offset], intIndices = [ 4 ], logFile = info.logs )
+    offset += 1
+    for subshell in range( NSS ) :
+        SUBI, dummy, dummy, dummy, dummy, NTR = endfFileToGNDMisc.sixFunkyFloatStringsToIntsAndFloats( MF28[offset], intIndices = [ 0, 5 ], logFile = info.logs )
+        offset += 1
+        EBI, ELN, dummy, dummy, dummy, dummy = endfFileToGNDMisc.sixFunkyFloatStringsToIntsAndFloats( MF28[offset], intIndices = [ ], logFile = info.logs )
+        offset += 1
+        atomicConfiguration = xParticleModule.atomicConfiguration( MT_AtomicConfigurations[534 + SUBI - 1], 
+                PQUModule.PQU( EBI, 'eV' ), ELN )
+        probabilitySum = 0.
+        info.logs.write( ' : %s' % MT_AtomicConfigurations[534 + SUBI - 1] )
+        for transition in range( NTR ) :
+            SUBJ, SUBK, ETR, FTF, dummy, dummy = endfFileToGNDMisc.sixFunkyFloatStringsToIntsAndFloats( MF28[offset], intIndices = [ 0, 1 ], logFile = info.logs )
+            offset += 1
+            secondAC = '     '
+            if( SUBK > 0 ) : secondAC = MT_AtomicConfigurations[534 + SUBK - 1]
+            daughters = []
+            if( SUBK == 0 ) :
+                daughters.append( 'photon' )
+                daughters.append( '%s{%s}' % ( elementSymbol, MT_AtomicConfigurations[534 + SUBJ - 1] ) )
+            else :
+                daughters.append( 'e-' )
+                daughters.append( '%s{%s,%s}' % ( elementSymbol, MT_AtomicConfigurations[534 + SUBJ - 1], MT_AtomicConfigurations[534 + SUBK - 1] ) )
+            atomicDecay = xParticleModule.atomicDecay( FTF, daughters )
+            atomicConfiguration.addDecay( atomicDecay )
+            probabilitySum += FTF
+        if( NTR > 0 ) :
+            if( abs( 1 - probabilitySum ) > 1e-4 ) : warningList.append( 'decay probabilities sum to %.6f not 1.' % probabilitySum )
+        element.addConfiguration( atomicConfiguration.subshell, atomicConfiguration )
+
+    if( offset != len( MF28 ) ) : raise Exception( 'Not allow lines of MF 28 data processed: offset = %d, len( MF28 ) = %d' % ( offset, len( MF28 ) ) )
+    info.logs.write( '\n' )
+    for warning in warningList : info.logs.write( "       WARNING: %s\n" % warning, stderrWriting = True )
+
+    return( { 'element' : element, 'errors' : errors } )

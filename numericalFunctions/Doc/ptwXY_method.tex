@@ -1,0 +1,67 @@
+\subsection{Methods}
+This section decribes all the routines in the file "ptwXY\_method.c".
+
+\subsubsection{ptwXY\_clip}
+This routine clips the y-values of \highlight{ptwXY} to be within the range \highlight{yMin} and \highlight{yMax}.
+\setargumentNameLengths{allocatedSize}
+\CallingC{fnu\_status ptwXY\_clip(}{ptwXYPoints *ptwXY, 
+    \addArgument{double yMin,}
+    \addArgument{double yMax );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{yMin}{All y-values in \highlight{ptwXY} will be greater than or equal to this value.}
+    \argumentBox{yMax}{All y-values in \highlight{ptwXY} will be less than or equal to this value.}
+
+\subsubsection{ptwXY\_thicken}
+This routine thicken the points in \highlight{ptwXY} by adding points as determined by the input parameters.
+\setargumentNameLengths{sectionSubdivideMax}
+\CallingC{fnu\_status ptwXY\_thicken(}{ptwXYPoints *ptwXY, 
+    \addArgument{int sectionSubdivideMax,}
+    \addArgument{double dxMax,}
+    \addArgument{double fxMax );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{sectionSubdivideMax}{The maximum number of points to add between two initial consecutive points.}
+    \argumentBox{dxMax}{The desired maximum absolute x step between consecutive points.}
+    \argumentBox{fxMax}{The desired maximum relative x step between consecutive points.}
+This routine adds points so that $x_{j+1} - x_j \le \highlight{dxMax}$ and $x_{j+1} / x_j \le \highlight{fxMax}$ but will never add
+more then \highlight{sectionSubdivideMax} points bewteen any of the orginal points. If \highlight{sectionSubdivideMax} $<$ 1
+or \highlight{dxMax} $<$ 0 or \highlight{fxMax} $<$ 1, the error \highlight{nfu\_badInput} is return.
+
+\subsubsection{ptwXY\_thin}
+This routine thins (i.e., removes) points from \highlight{ptwXY} while maintaining interpolation \highlight{accuracy} with \highlight{ptwXY}.
+\setargumentNameLengths{accuracy}
+\CallingC{ptwXPoints *ptwXY\_thin(}{ptwXYPoints *ptwXY,
+    \addArgument{double accuracy,}
+    \addArgument{nfu\_status *status );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{accuracy}{The accuracy of the thinned \highlight{ptwXYPoints} object.}
+    \argumentBox{status}{On return, the status value.}
+    \vskip 0.05 in \noindent
+
+\subsubsection{ptwXY\_trim}
+This routine removes all extra 0.'s at the beginning and end of \highlight{ptwXY}.
+\CallingC{fnu\_status ptwXY\_trim(}{ptwXYPoints *ptwXY );}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+If \highlight{ptwXYPoints} starts (ends) with more than two 0.'s then all intermediary are removed.
+
+\subsubsection{ptwXY\_union}
+This routine creates a new \highlight{ptwXY} instance whose x-values are the union of \highlight{ptwXY1}'s and \highlight{ptwXY2}'s 
+x-values. The domains of \highlight{ptwXY1} and \highlight{ptwXY2} do not have to be mutual.
+\CallingC{ptwXYPoints *ptwXY\_union(}{ptwXYPoints *ptwXY1, 
+    \addArgument{ptwXYPoints *ptwXY2,}
+    \addArgument{fnu\_status *status,}
+    \addArgument{int unionOptions );}}
+    \argumentBox{ptwXY1}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{ptwXY2}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{status}{On return, the status value.}
+    \argumentBox{unionOptions}{Specifies options (see below).}
+    \vskip 0.05 in \noindent
+If an error occurs, NULL is returned. The default behavior of this routine can be altered by setting bits
+in the argument \highlight{unionOptions} . Currently, there are two bits, set via the C marcos
+\highlight{ptwXY\_union\_fill} and \highlight{ptwXY\_union\_trim},
+that alter \highlight{ptwXY\_union}'s behavior. The macro \highlight{ptwXY\_\-union\_\-fill} causes all y-values of the new \highlight{ptwXYPoints} object
+to be filled via the y-values of \highlight{ptwXY1}; otherwise, the y-values are all zero. 
+Normally, the new \highlight{ptwXYPoints} object's x domain spans all x-values
+in both \highlight{ptwXY1} and \highlight{ptwXY2}. The macro \highlight{ptwXY\_\-union\_\-trim} limits the x domain to the common x domain
+of \highlight{ptwXY1} and \highlight{ptwXY2}.
+
+The returned \highlight{ptwXYPoints} object will always contain no points in the \highlight{overflowPoints} region.

@@ -1,0 +1,4 @@
+Change name to ptwxY
+
+-) Add more documentation to python module, __init__ and other methods.
+-) check why ptwXY/Test/UnitTesting/convolution/convolution.c.bruteForce does not work.

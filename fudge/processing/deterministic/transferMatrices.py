@@ -8,36 +8,46 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 import os, subprocess
 from fudge.core.utilities import fudgeFileMisc, subprocessing, times
-from pqu.physicalQuantityWithUncertainty import PhysicalQuantityWithUncertainty
 
-from fudge.core.math.xData import axes, XYs, LegendreSeries
+from fudge.core.math._xData import axes, XYs, LegendreSeries
 linlin = axes.linearToken + axes.linearToken
 linlog = axes.linearToken + axes.logToken
 loglin = axes.logToken + axes.linearToken
 loglog = axes.logToken + axes.logToken
 
 GND2ProcessingInterpolations = { axes.unitBaseToken : 'unit base', axes.correspondingPointsToken : 'corresponding energies', 
-        axes.flatToken : 'flat', linlin : 'linear-linear', linlog : 'linear-log', loglin : 'log-linear', loglog : 'log-log' }
+        axes.flatToken : 'flat', linlin : 'lin-lin', linlog : 'lin-log', loglin : 'log-lin', loglog : 'log-log' }
 
 versionStr = "xndfgenTransferMatrix: version 1.0"
 doubleFmt = "%19.12e"
@@ -63,8 +73,8 @@ def twoBodyTransferMatrix( processInfo, projectile, product, crossSection, angul
 
     if( isinstance( angularData, distributions.angular.mixedRanges ) ) :    # Legendre and tabulated data can still be piecewise.
         boundaries = [angularData.LegendreForm.domainMin(), angularData.LegendreForm.domainMax(), angularData.tabulatedForm.domainMax()]
-        crossSectionLower = crossSection.xSlice( xMax = boundaries[1] )
-        crossSectionUpper = crossSection.xSlice( xMin = boundaries[1] )
+        crossSectionLower = crossSection.domainSlice( domainMax = boundaries[1] )
+        crossSectionUpper = crossSection.domainSlice( domainMin = boundaries[1] )
 
         weightLower = XYs.XYs( weightAxes, zip(boundaries, [1,1,0]), 1e-6 )
         weightUpper = XYs.XYs( weightAxes, zip(boundaries, [0,1,1]), 1e-6 )
@@ -333,8 +343,8 @@ def primaryGammaAngularData( processInfo, projectile, product, bindingEnergy, ma
                 if( Eg2 > productGroupBoundaries[indexEo + 1] ) :
                     incrementIndexEo = 1
                     EiMax = ( productGroupBoundaries[indexEo + 1] - bindingEnergy ) / massRatio
-            TM_1[indexEi][indexEo] = crossSection.integrateTwoFunctions( fluxes[0], xMin = EiMin, xMax = EiMax ) / groupedFlux[indexEi]
-            TM_E[indexEi][indexEo] = crossSection.integrateThreeFunctions( fluxes[0], Egp, xMin = EiMin, xMax = EiMax ) / groupedFlux[indexEi]
+            TM_1[indexEi][indexEo] = crossSection.integrateTwoFunctions( fluxes[0], domainMin = EiMin, domainMax = EiMax ) / groupedFlux[indexEi]
+            TM_E[indexEi][indexEo] = crossSection.integrateThreeFunctions( fluxes[0], Egp, domainMin = EiMin, domainMax = EiMax ) / groupedFlux[indexEi]
             if( incrementIndexEo == 0 ) : break
             EiMin = EiMax
             if( indexEo < ( nProd - 1 ) ) : indexEo += 1
@@ -391,7 +401,7 @@ def executeCommand( logFile, file, cmd, workDir, workFile ) :
 
     if( workFile == [] ) :
         dataFile = fudgeFileMisc.fudgeTempFile( dir = workDir, suffix = "_in" )
-        fullFileName = dataFile.getName( )
+        fullFileName = dataFile.name
     else :
         workFile = '_'.join( workFile ) + '_in'
         if( workDir is not None ) :

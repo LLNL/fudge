@@ -8,22 +8,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 """
@@ -47,7 +58,7 @@ For example, consider the following nuclear interaction:
 
         n + O16 --> n + ( O16_e6 -> He4 + C12 )
 
-This intereaction represent a neutron hitting an Oxygen-16 target producing a n and Oxygen-16 in the 6th excited. The
+This interaction represents a neutron hitting an Oxygen-16 target producing a n and Oxygen-16 in the 6th excited. The
 excited Oxygen-16 subsequently decays into He4 and C12. The output channel for this interaction is "n + O16_e6" and
 the "O16_e6" contains the decay channel "He4 + C12".
 
@@ -56,7 +67,7 @@ Output and decay channels can be further divided into twoBody or NBody channels.
     :twoBody:       The channel initially has two products whose angular and energy correlates are known. Only the 
                     center-of-mass angular data for one of the products is needed. The products' outgoing energies can 
                     be calculated from their center-of-mass angular information and other data like the masses of the 
-                    particles involved in a reaction or decay.
+                    products involved in a reaction or decay.
 
     :NBody:         The channel has two or more products whose angular and energy correlates are not known. The full double
                     differential data for each product must be given.
@@ -94,37 +105,48 @@ fissionGenreFourthChance = 'fourthChance'
 manyToken = 'many'
 
 from fudge.core.utilities import fudgeExceptions, brb
-from fudge.core.ancestry import ancestry
-import channelData
-from pqu.physicalQuantityWithUncertainty import PhysicalQuantityWithUncertainty
+import xData.ancestry as ancestryModule
 
-class channel( ancestry ) :
-    """This is the class for a gnd channel which is a list of particles (i.e., product class objects)."""
+import channelData
+
+from . import tokens as tokensModule
+
+from .channelData import Q as QModule
+
+
+class channel( ancestryModule.ancestry ) :
+    """This is the class for a gnd channel which is a list of products (i.e., product class objects)."""
 
     moniker = outputChannelToken
 
-    def __init__( self, genre, Q = None, numberOfAllowedParticles = manyToken, fissionGenre = None ) :
+    def __init__( self, genre, numberOfAllowedParticles = manyToken, fissionGenre = None, process = None ) :
         """Creates a new channel object."""
 
-        ancestry.__init__( self, self.moniker, None )
+        from . import product as productModule
+
+        ancestryModule.ancestry.__init__( self )
         self.genre = genre
         self.numberOfAllowedParticles = numberOfAllowedParticles
         self.fissionGenre = fissionGenre
+        self.process = process
         self.fissionEnergyReleased = None
-        self.setQ( Q )
-        self.particles = []
-        self._labels = []
+
+        self.Q = QModule.component( )
+        self.Q.setAncestor( self )
+
+        self.products = productModule.products( )
+        self.products.setAncestor( self )
 
     def __cmp__( self, other ) :
         """Compares self to other."""
 
-        if( other == None ) : return( -1 )
+        if( other is None ) : return( -1 )
         n1 = len( self )
         n2 = len( other )
         n = min( n1, n2 )
-        for i in xrange( n ) :
-            if( self[i] < other[i] ) : return( -1 )
-            if( self[i] > other[i] ) : return(  1 )
+        for i1 in xrange( n ) :
+            if( self[i1] < other[i1] ) : return( -1 )
+            if( self[i1] > other[i1] ) : return(  1 )
         if( n1 < n2 ) : return( -1 )
         if( n1 > n2 ) : return(  1 )
         return( 0 )
@@ -132,43 +154,17 @@ class channel( ancestry ) :
     def __getitem__( self, i ) :
         """Returns the i^th product in the channel."""
 
-        return( self.particles[i] )
+        return( self.products[i] )
 
     def __len__( self ) :
         """Returns the number of products for this channel."""
 
-        return( len( self.particles ) )
+        return( len( self.products ) )
 
     def  __str__( self ) :
         """Converts channel object to a string representation."""
 
         return( self.toString( simpleString = False ) )
-
-    def addProduct( self, product_ ) :
-        """Adds particle to the end of this channel's particle list. Also generates a unique label if not supplied."""
-
-        import product
-
-        if( not( isinstance( product_, product.product ) ) ) :
-            raise Exception( 'Only products (not %s) can be added to a channel!' % type( product_ ) )
-        if( ( self.numberOfAllowedParticles != manyToken ) and ( len( self.particles ) >= self.numberOfAllowedParticles ) ) :
-            raise fudgeExceptions.FUDGE_Exception( 'Adding more particles than channel allows (=%s)' % self.numberOfAllowedParticles )
-        if not product_.getLabel() or product_.getLabel() in self._labels:
-            name = product_.getName()
-            index = len([prod for prod in self if prod.getName() == name])
-            if index>0:
-                import string
-                suffixCharacters = string.ascii_lowercase
-                suffix = ''
-                while index>0:
-                    index, index1 = divmod( index-1, 26 )
-                    suffix = suffixCharacters[index1] + suffix
-                product_.label = name+'__'+suffix
-            else:
-                product_.label = name
-        product_.setParent( self )
-        self.particles.append( product_ )
-        self._labels.append( product_.getLabel() )
 
     def addFissionEnergyReleased( self, fissionEnergyReleased ) :
 
@@ -176,7 +172,7 @@ class channel( ancestry ) :
 
     def removeProductAtIndex( self, index ) :
 
-        del self.particles[index]
+        del self.products[index]
 
     def checkProductFrame( self ) :
         """Calls checkProductFrame for self's products."""
@@ -188,12 +184,12 @@ class channel( ancestry ) :
 
         mP = []
         for particle in self :
-            if( particle.decayChannel == None ) :
+            if( particle.decayChannel is None ) :
                 try :
                     multiplicity = particle.multiplicity.getConstant( )
                 except :
                     multiplicity = "(?)"                        # ????? This needs work.
-                mP += [ [ multiplicity, particle.particle.getToken( )] ]
+                mP += [ [ multiplicity, particle.particle.name] ]
             else :
                 mP += particle.decayChannel.getFinalProductList( )
         return( mP )
@@ -201,7 +197,7 @@ class channel( ancestry ) :
     def getProductsWithName( self, name ) :
         """Returns a list of all the channel's products with given name ('gamma','n', etc)."""
 
-        return [prod for prod in self if prod.getName() == name]
+        return [ prod for prod in self if prod.name == name ]
 
     def getProductWithName( self, name ) :
         """Return the product with given name. If no such product is found, or if more than one are found,
@@ -227,11 +223,11 @@ class channel( ancestry ) :
             Q = self.Q.getConstantAs( unit )
         else:  # calculate from particle masses
             massUnit = unit + '/c**2'
-            Q = self.getRootParent().target.getMass(massUnit) + self.getRootParent().projectile.getMass(massUnit)
+            Q = self.getRootAncestor().target.getMass(massUnit) + self.getRootAncestor().projectile.getMass(massUnit)
             for product in self:
                 try: Q -= product.getMass(massUnit) * product.multiplicity.getConstant()
                 except:
-                    if product.getName() == 'gamma': continue
+                    if product.name == 'gamma': continue
                     raise ValueError( "Non-constant Q-value must be explicitly listed in GND!" )
         # Q????? need recursion for final = True
         return( Q )  
@@ -240,34 +236,20 @@ class channel( ancestry ) :
 
         return( not( self.fissionGenre is None ) )
 
-    def setQ( self, Q ) :
-        """
-        Sets channel's Q. Q can be None, a string, a PhysicalQuantityWithUncertainty, a Q form or a Q component. 
-        Both string and PhysicalQuantityWithUncertainty must have units of energy.
-        """
+    def toXMLList( self, indent = '', **kwargs ) :
 
-        if( Q is None ) :
-            self.Q = Q
-        else :
-            Q_ = Q
-            if( ( type( Q_ ) == str ) or ( isinstance( Q_, PhysicalQuantityWithUncertainty ) ) ) : Q_ = channelData.Q.constant( Q_ )
-            if( not ( isinstance( Q_, channelData.Q.component ) ) ) : Q_ = channelData.Q.component( Q_ )
-            self.Q = Q_
-            self.Q.setParent( self )
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-    def toXMLList( self, flags, indent = '' ) :
+        qualifiers = ''
+        if( self.process is not None ) : qualifiers += ' process="%s"' % str( self.process )
+        xmlStringList = [ '%s<%s genre="%s"%s>' % ( indent, self.moniker, self.genre, qualifiers ) ]
+        xmlStringList += self.Q.toXMLList( indent2, **kwargs )
+        if ( self.fissionEnergyReleased is not None ) : xmlStringList += self.fissionEnergyReleased.toXMLList( indent2, **kwargs )
+        xmlStringList += self.products.toXMLList( indent2, **kwargs )
+        xmlStringList[-1] += '</%s>' % self.moniker
+        return( xmlStringList )
 
-        indent2 = indent + '  '
-        Qstr = ''
-        if self.Q is not None: Qstr = ' Q="%s"' % self.Q.getXMLAttribute()
-        xmlString = [ '%s<%s genre="%s"%s>' % ( indent, self.moniker, self.genre, Qstr ) ]
-        if( not( self.fissionEnergyReleased is None ) ) : xmlString += self.fissionEnergyReleased.toXMLList( indent = indent2 )
-        if self.Q is not None: xmlString += self.Q.toXMLList( indent = indent2 )
-        for particle in self : xmlString += particle.toXMLList( flags, indent = indent2 )
-        xmlString[-1] += '</%s>' % self.moniker
-        return( xmlString )
-
-    def setFissionGenre( self ) :
+    def setFissionGenre( self, fissionGenre ) :
         """Sets the channel's fission genre."""
 
         self.fissionGenre = fissionGenre
@@ -298,23 +280,23 @@ class channel( ancestry ) :
 
     def toString( self, simpleString = False, exposeGammaMultiplicity = False ) :
         """Returns a string representation of self. If simpleString is True, the string contains only the initial
-        particles, and not any decay particles."""
+        products, and not any decay products."""
 
         if( self.genre in [ sumOfRemainingOutputChannelsGenre ] ) : return( self.genre )
         s, p, gammaString, delayNeutrons = '', '', None, 0
-        for particle in self.particles :
+        for product in self.products :
             addParticle = True
-            if( self.isFission( ) and ( particle.getName( ) == 'n' ) ) :
-                if( particle.getAttribute( 'emissionMode' ) == 'delayed' ) :
+            if( self.isFission( ) and ( product.name == 'n' ) ) :
+                if( product.getAttribute( 'emissionMode' ) == tokensModule.delayedToken ) :
                     addParticle = False
                     delayNeutrons += 1
             if( addParticle ) :
-                if( particle.getName( ) == 'gamma' ) :
-                    gammaStringP = particle.toString( simpleString = True, exposeGammaMultiplicity = exposeGammaMultiplicity )
+                if( product.name == 'gamma' ) :
+                    gammaStringP = product.toString( simpleString = True, exposeGammaMultiplicity = exposeGammaMultiplicity )
                     if( gammaString is None ) : gammaString = gammaStringP
                     if( 'energyDependent' in gammaStringP ) : gammaString = gammaStringP
                 else :
-                    s += '%s%s' % ( p, particle.toString( simpleString = simpleString, exposeGammaMultiplicity = exposeGammaMultiplicity ) )
+                    s += '%s%s' % ( p, product.toString( simpleString = simpleString, exposeGammaMultiplicity = exposeGammaMultiplicity ) )
                     p = ' + '
         if( delayNeutrons > 0 ) :
             s += '%s%s' % ( p, "n[emissionMode:'%s delayed']" % delayNeutrons )
@@ -323,14 +305,16 @@ class channel( ancestry ) :
         process = []
         if( self.isFission( ) ) :
             process.append( "%s fission" % self.fissionGenre )
+        elif( self.process is not None ) :
+            process.append( str( self.process ) )
         if( len( process ) > 0 ) : s += " [%s]" % ":".join( process )
         return( s )
 
 class outputChannel( channel ) :
 
-    def __init__( self, genre, Q = None, numberOfAllowedParticles = manyToken ) :
+    def __init__( self, genre, numberOfAllowedParticles = manyToken, process = None ) :
 
-        channel.__init__( self, genre, Q, numberOfAllowedParticles = numberOfAllowedParticles )
+        channel.__init__( self, genre, numberOfAllowedParticles = numberOfAllowedParticles, process = process )
 
 class twoBodyOutputChannel( outputChannel ) :
     """This is a two-body class version of channel. In particular, two-body is an output channel where only the
@@ -339,106 +323,106 @@ class twoBodyOutputChannel( outputChannel ) :
 
     moniker = outputChannelToken
 
-    def __init__( self, Q = None ) :
+    def __init__( self, process = None ) :
         """This is the constructor for the twoBodyOutputChannel class. See class channel for more information."""
 
-        outputChannel.__init__( self, twoBodyGenre, Q, numberOfAllowedParticles = 2 )
+        outputChannel.__init__( self, twoBodyGenre, numberOfAllowedParticles = 2, process = process )
 
 class NBodyOutputChannel( outputChannel ) :
     """This is a N-body class version of channel. It is for all output channels that do not fit under the 
     twoBodyOutputChannel class. In particular, the going energy/angular information for each particle is 
-    not correlated with the other particles. Any of the bodies may decay/breakup."""
+    not correlated with the other products. Any of the bodies may decay/breakup."""
 
-    def __init__( self, Q = None ) :
+    def __init__( self, process = None ) :
         """This is the constructor for the NBodyOutputChannel class. See this class's documentation and
         the class channel for more information."""
 
-        outputChannel.__init__( self, NBodyGenre, Q )
+        outputChannel.__init__( self, NBodyGenre, process = process )
 
 class decayChannel( channel ) :
 
-    def __init__( self, genre, Q = None, numberOfAllowedParticles = manyToken ) :
+    def __init__( self, genre, numberOfAllowedParticles = manyToken, process = None ) :
 
-        channel.__init__( self, genre, Q, numberOfAllowedParticles = numberOfAllowedParticles )
+        channel.__init__( self, genre, numberOfAllowedParticles = numberOfAllowedParticles, process = process )
 
 class twoBodyDecayChannel( decayChannel ) :
     """A decay channel producing exactly two products: gamma or alpha decays."""
 
     moniker = decayChannelToken
 
-    def __init__( self, Q = None ) :
+    def __init__( self, process = None ) :
 
-        decayChannel.__init__( self, twoBodyGenre, Q, numberOfAllowedParticles = 2 )
+        decayChannel.__init__( self, twoBodyGenre, numberOfAllowedParticles = 2, process = process )
 
 class NBodyDecayChannel( decayChannel ) :
     """A decay channel producing more than two products: beta decay, spontaneous fission """
 
     moniker = decayChannelToken
 
-    def __init__( self, Q = None ) :
+    def __init__( self, process = None ) :
 
-        decayChannel.__init__( self, NBodyGenre, Q )
+        decayChannel.__init__( self, NBodyGenre, process = process )
 
 class fissionChannel( channel ) :
 
-    def __init__( self, Q, fissionGenre ) :
+    def __init__( self, fissionGenre ) :
 
-        channel.__init__( self, NBodyGenre, Q, numberOfAllowedParticles = manyToken, fissionGenre = fissionGenre )
+        channel.__init__( self, NBodyGenre, numberOfAllowedParticles = manyToken, fissionGenre = fissionGenre )
 
 class sumOfRemainingOutputChannels( channel ) :
     """This channel is a catchall for all output channels not described for a given input channel."""
 
-    def __init__( self, Q = None ) :
+    def __init__( self ) :
         """This is the constructor for the sumOfRemainingOutputChannels class. See this class's documentation and
         the class channel for more information."""
 
-        channel.__init__( self, sumOfRemainingOutputChannelsGenre, Q )
+        channel.__init__( self, sumOfRemainingOutputChannelsGenre )
 
 class productionChannel( channel ) :
     """
     This is a production channel version of the channel class. A production channel is one that contains
-    information about the production of outgoing particles for various outgoing channels (that is, independent 
+    information about the production of outgoing products for various outgoing channels (that is, independent 
     of the actual outgoing channel).
     """
 
-    def __init__( self, Q = None ) :
+    def __init__( self ) :
         """
         This is the constructor for the productionChannel class. See this class's documentation and
         the class channel for more information.
         """
 
-        if( Q is None ) : Q = channelData.Q.component( channelData.Q.notApplicable( ) )
-        channel.__init__( self, productionGenre, Q, numberOfAllowedParticles = manyToken )
+        channel.__init__( self, productionGenre, numberOfAllowedParticles = manyToken )
 
-def parseXMLNode( channelElement, xPath=[], linkData={} ):
-    """Translate '<outputChannel>' or '<decayChannel>' from xml. """
+def parseXMLNode( channelElement, xPath, linkData ) :
+    """Translate '<outputChannel>' or '<decayChannel>' from xml."""
+
     xPath.append( channelElement.tag )
     from fudge import gnd
-    Q_str = channelElement.get( channelData.base.QToken )
-    if Q_str is not None:
-        try:
-            Q = channelData.Q.constant( PhysicalQuantityWithUncertainty( Q_str ) )
-        except:
-            if Q_str == 'N/A': Q = channelData.Q.notApplicable()
-            else: raise ValueError("Can't extract a Q-value from string '%s'!" % Q_str)
-        Q = channelData.Q.component( Q )
-    else: Q = None
     outputChannelClass = {
-            outputChannelToken: { 
-                twoBodyGenre: twoBodyOutputChannel, NBodyGenre: NBodyOutputChannel,
-                sumOfRemainingOutputChannelsGenre: sumOfRemainingOutputChannels,
-                productionGenre: productionChannel },
-            decayChannelToken: {
-                twoBodyGenre: twoBodyDecayChannel, NBodyGenre: NBodyDecayChannel }
-            } [ channelElement.tag ] [ channelElement.get('genre') ]
-    outputChannel = outputChannelClass( Q )
+            outputChannelToken : {
+                twoBodyGenre : twoBodyOutputChannel, NBodyGenre : NBodyOutputChannel,
+                sumOfRemainingOutputChannelsGenre : sumOfRemainingOutputChannels,
+                productionGenre : productionChannel },
+            decayChannelToken : {
+                twoBodyGenre : twoBodyDecayChannel, NBodyGenre : NBodyDecayChannel }
+            }[channelElement.tag][channelElement.get( 'genre' )]
+    outputChannel = outputChannelClass( )
+    # FIXME: next lines only needed for discrete gammas. If we convert them to 'uncorrelated', this can be removed
+    parentChannelGenre = linkData.get( 'channelGenre', None )
+    linkData['channelGenre'] = channelElement.get( 'genre' )
 
-    for dat in channelElement:
-        if dat.tag==channelData.base.fissionEnergyReleasedToken:
+    for dat in channelElement :
+        if( dat.tag == 'Q' ) :
+            Q = channelData.Q.parseXMLNode( dat, xPath, linkData )
+            for QForm in Q : outputChannel.Q.add( QForm )
+        elif( dat.tag == channelData.base.fissionEnergyReleasedToken ) :
             outputChannel.addFissionEnergyReleased( 
                     gnd.channelData.fissionEnergyReleased.component.parseXMLNode( dat, xPath, linkData ) )
-        elif dat.tag=='product':
-            outputChannel.addProduct( gnd.product.parseXMLNode( dat, xPath, linkData ) )
-        else: raise ValueError("Parsing %s not yet supported" % dat.tag)
-    xPath.pop()
-    return outputChannel
+        elif( dat.tag == 'products' ) :
+            outputChannel.products.parseXMLNode( dat, xPath, linkData )
+        else :
+            raise ValueError( "Parsing %s not yet supported" % dat.tag )
+    xPath.pop( )
+    del linkData['channelGenre']
+    if( parentChannelGenre ) : linkData['channelGenre'] = parentChannelGenre
+    return( outputChannel )

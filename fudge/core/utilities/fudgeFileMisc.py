@@ -8,22 +8,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 """
@@ -44,11 +55,11 @@ class fudgeTempFile :
         """Contructor for the fudgeTempFile class. Calls tempfile.mkstemp to open a temporary file.
         If deleteOnClose is 'True', file will be deleted when it is close."""
 
-        if( dir == None ) :
+        if( dir is None ) :
             dir = tempfile.gettempdir( )
         else :
             if( not os.path.exists( dir ) ) : os.makedirs( dir )
-        if( prefix == None ) : prefix = tempfile.gettempprefix( )
+        if( prefix is None ) : prefix = tempfile.gettempprefix( )
 
         self.fd, self.name = tempfile.mkstemp( suffix = suffix, prefix = prefix, dir = dir )
         self.deleted = False
@@ -57,13 +68,13 @@ class fudgeTempFile :
     def __del__( self ) :
         """If class instance is deleted, the file is proprely closed."""
 
-        if( self.fd != None ) : self.close( )
+        if( self.fd is not None ) : self.close( )
 
     def close( self, raiseIfClosed = True ) :
         """Closes the file if still opened. If raiseIfClosed is 'True' and file is already
         closed, a raise is executed."""
 
-        if( self.fd != None ) :
+        if( self.fd is not None ) :
             os.close( self.fd )
             self.fd = None
             if( self.deleteOnClose ) : self.delete( )
@@ -77,7 +88,7 @@ class fudgeTempFile :
         if( self.deleted ) :
             raise Exception( 'Error from fudgeTempFile.delete: file already deleted' )
         else :
-            if( self.fd != None ) : self.close( )
+            if( self.fd is not None ) : self.close( )
             os.remove( self.name )
             self.deleted = True
 
@@ -94,7 +105,7 @@ class fudgeTempFile :
     def isOpened( self ) :
         """Returns 'True' if the file is still opened."""
 
-        return( self.fd != None )
+        return( self.fd is not None )
 
     def isDeleted( self ) :
         """Returns 'True' if the file has been deleted."""
@@ -104,7 +115,7 @@ class fudgeTempFile :
     def write( self, str ) :
         """Write str to file. If file is closed or not all characters were written then a raise is executed."""
 
-        if( self.fd != None ) :
+        if( self.fd is not None ) :
             n = os.write( self.fd, str )
             if( n != len( str ) ) : raise Exception( 'Error from fudgeTempFile.write: only %d of %d characters written' % ( n, len( str ) ) )
         else :

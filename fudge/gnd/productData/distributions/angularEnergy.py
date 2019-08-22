@@ -8,133 +8,161 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 """ energy/angular double differential distribution classes """
 
 import math
-import base, miscellaneous
+import miscellaneous
 import fudge
-from fudge.core.math.xData import axes, XYs, W_XYs, V_W_XYs
+from fudge.core.utilities import brb
+
+from xData import standards as standardsModule
+from xData import axes as axesModule
+from xData import XYs as XYsModule
+from xData import multiD_XYs as multiD_XYsModule
+
+from fudge.gnd.productData import energyDeposition as energyDepositionModule
+from fudge.gnd.productData import momentumDeposition as momentumDepositionModule
+
+from . import base as baseModule
+from . import angular as angularModule
 
 __metaclass__ = type
 
-class component( base.component ) :
+class pdfOfEp :
 
-    def __init__( self, nativeData = base.noneFormToken ) :
+    class pointwise( XYsModule.XYs ) :
 
-        base.component.__init__( self, base.angularEnergyComponentToken, nativeData )
+        def averageEnergy( self ) :
 
-    def calculateDepositionData( self, processInfo, tempInfo ) :
+            return( self.integrateWithWeight_x( ) )
+    
+        def averageMomentum( self ) :
 
-        return( self.forms[self.nativeData].calculateDepositionData( processInfo, tempInfo ) )
+            return( self.integrateWithWeight_sqrt_x( ) )
+    
+class pdfOfMuAndEp :
 
-    def process( self, processInfo, tempInfo, verbosityIndent ) :
+    class pointwise( multiD_XYsModule.multiD_XYs ) :
 
-        return( self.forms[self.nativeData].process( processInfo, tempInfo, verbosityIndent ) )
+        def averageEnergy( self ) :
 
-    def toENDF6( self, MT, endfMFList, flags, tempInfo ) :
+            EpOfMu = [ [ pdfOfEpAtMu.value, pdfOfEpAtMu.averageEnergy( ) ] for pdfOfEpAtMu in self ]
+            return( float( XYsModule.XYs( EpOfMu ).integrate( ) ) )
 
-        from fudge.legacy.converting import gndToENDF6
-        if( hasattr( self.forms[self.nativeData], 'toENDF6' ) ) :
-            nativeData = self.forms[self.nativeData]
-            LAW, frame, MF6 = nativeData.toENDF6( flags, tempInfo )
-            gndToENDF6.toENDF6_MF6( MT, endfMFList, flags, tempInfo, LAW, frame, MF6 )
-        else :
-            print 'WARNING: Component, no toENDF6 for nativeData = %s' % self.nativeData, self.forms[self.nativeData].__class__
+        def averageMomentum( self ) :
 
-class form( base.form ) :
+            MpOfMu = [ [ pdfOfMpAtMu.value, pdfOfMpAtMu.averageMomentum( ) ] for pdfOfMpAtMu in self ]
+            return( float( XYsModule.XYs( MpOfMu ).integrate( ) ) )
+
+        @staticmethod
+        def allowedSubElements( ) :
+
+            return( ( pdfOfEp.pointwise, ) )
+
+class subform( baseModule.subform ) :
     """Abstract base class for angularEnergy forms."""
 
     pass
 
-class pointwise( form, V_W_XYs.V_W_XYs ) :
+class pointwise( subform, multiD_XYsModule.multiD_XYs ) :
 
-    tag = base.pointwiseFormToken
-    moniker = base.pointwiseFormToken
+    def __init__( self, **kwargs ) :
 
-    def __init__( self, axes, productFrame ) :
-
-        form.__init__( self, base.pointwiseFormToken, productFrame )
-        V_W_XYs.V_W_XYs.__init__( self, axes )
+        if( 'dimension' not in kwargs ) : kwargs['dimension'] = 3
+        if( kwargs['dimension'] != 3 ) : raise ValueError( 'Dimension = %s != 3' % ( kwargs['dimension'] ) )
+        multiD_XYsModule.multiD_XYs.__init__( self, **kwargs )
+        subform.__init__( self )
 
     def check( self, info ) :
-        """ check for incomplete angular distributions + any negative probabilities.
-        Ignore normalization for this double-differential distribution """
+        """
+        Check for incomplete angular distributions + any negative probabilities.
+        Ignore normalization for this double-differential distribution.
+        """
 
         from fudge.gnd import warning
-        from pqu.physicalQuantityWithUncertainty import PhysicalQuantityWithUncertainty as PQU
+        from pqu import PQU
         warnings = []
 
-        for energy_in in self:
+        for index, energy_in in enumerate(self):
             integral = energy_in.integrate()
             if abs(integral - 1.0) > info['normTolerance']:
-                warnings.append( warning.unnormalizedDistribution( PQU(energy_in.value, self.axes[0].unit),
-                    energy_in.index, integral, self.toXLink() ) )
+                warnings.append( warning.unnormalizedDistribution( PQU.PQU(energy_in.value, self.axes[0].unit),
+                    index, integral, self.toXLink() ) )
             if energy_in.domainMin() != -1 or energy_in.domainMax() != 1 :
-                warnings.append( warning.incompleteDistribution( PQU(energy_in.value, self.axis[0].unit),
+                warnings.append( warning.incompleteDistribution( PQU.PQU(energy_in.value, self.axis[0].unit),
                         energy_in.domainMin(), energy_in.domainMax(), energy_in.value, self.toXLink() ) )
             for mu in energy_in:
                 if mu.domainMin() < 0:
                     warnings.append( warning.valueOutOfRange("Negative outgoing energy for energy_in=%s!"
-                        % PQU(energy_in.value, self.axes[0].unit), mu.domainMin(), 0, 'inf', self.toXLink() ) )
-                if mu.yMin() < 0:
-                    warnings.append( warning.negativeProbability( PQU(energy_in.value, self.axes[0].unit),
+                        % PQU.PQU(energy_in.value, self.axes[0].unit), mu.domainMin(), 0, 'inf', self.toXLink() ) )
+                if mu.rangeMin() < 0:
+                    warnings.append( warning.negativeProbability( PQU.PQU(energy_in.value, self.axes[-1].unit),
                         mu=mu.value, obj=mu ) )
 
         return warnings
 
-    def calculateDepositionData( self, processInfo, tempInfo ) :
+    def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
 
-        if( self.getProductFrame( ) == axes.centerOfMassToken ) : raise Exception( 'center of mass calculation not supported for %s' % self.moniker )
+        if( self.productFrame == standardsModule.frames.centerOfMassToken ) : raise Exception( 'center of mass calculation not supported for %s' % self.moniker )
 
-        energyUnit = self.axes[2].getUnit( )
+        energyUnit = tempInfo['incidentEnergyUnit']
         momentumDepositionUnit = energyUnit + '/c'
         massUnit = energyUnit + '/c**2'
-        energyAccuracy, momentumAccuracy = 1e-6, 1e-3
+        energyAccuracy, momentumAccuracy = processInfo.energyAccuracy, processInfo.momentumAccuracy
         multiplicity = tempInfo['multiplicity']
         productMass = tempInfo['product'].getMass( massUnit )
 
         depEnergy = []
-        for E_MuEpPs in self :
-            muEp = [ [ mu_EpPs.value, mu_EpPs.integrateWithWeight_x( ) ] for mu_EpPs in E_MuEpPs ]
-            Ep = multiplicity.getValue( E_MuEpPs.value ) * XYs.XYs( axes.defaultAxes( ), muEp, energyAccuracy ).integrate( )
-            depEnergy.append( [ E_MuEpPs.value, Ep ] )
+
+        for pdfOfMuEpAtE in self :
+            energy = pdfOfMuEpAtE.value
+            depEnergy.append( [ energy, multiplicity.getValue( energy ) * pdfOfMuEpAtE.averageEnergy( ) ] )
 
         const = math.sqrt( 2. * productMass )
         depMomentum = []
-        for E_MuEpPs in self :
-            muEp = [ [ mu_EpPs.value, mu_EpPs.integrateWithWeight_sqrt_x( ) ] for mu_EpPs in E_MuEpPs ]
-            pp = const * multiplicity.getValue( E_MuEpPs.value ) * XYs.XYs( axes.defaultAxes( ), muEp, energyAccuracy ).integrate( )
-            if( pp < 1e-12 ) : pp = 0.                          # This should be less arbitrary????????
-            depMomentum.append( [ E_MuEpPs.value, pp ] )
+        for pdfOfMuEpAtE in self :
+            energy = pdfOfMuEpAtE.value
+            momemtum = const * multiplicity.getValue( energy ) * pdfOfMuEpAtE.averageMomentum( )
+            if( momemtum < 1e-12 ) : momemtum = 0.          # This should be less arbitrary????????
+            depMomentum.append( [ energy, momemtum ] )
 
-        axes_ = fudge.gnd.productData.energyDeposition.pointwise.defaultAxes( energyUnit = energyUnit, energyDepositionUnit = energyUnit )
-        depEnergy = fudge.gnd.productData.energyDeposition.pointwise( axes_, depEnergy, energyAccuracy )
-        axes_ = fudge.gnd.productData.momentumDeposition.pointwise.defaultAxes( energyUnit = energyUnit, momentumDepositionUnit = momentumDepositionUnit )
-        depMomentum = fudge.gnd.productData.momentumDeposition.pointwise( axes_, depMomentum, momentumAccuracy )
+        axes = energyDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit, energyDepositionUnit = energyUnit )
+        depEnergy = energyDepositionModule.pointwise( data = depEnergy, axes = axes,
+                label = processInfo.style.label, accuracy = energyAccuracy )
+        axes = momentumDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit, momentumDepositionUnit = momentumDepositionUnit )
+        depMomentum = momentumDepositionModule.pointwise( data = depMomentum, axes = axes,
+                label = processInfo.style.label, accuracy = momentumAccuracy )
 
         return( [ depEnergy, depMomentum ] )
-
-    def extraXMLAttributeString( self ) :
-
-        return( 'productFrame="%s"' % self.productFrame )
 
     def normalize( self, insitu = True ) :
 
@@ -151,13 +179,10 @@ class pointwise( form, V_W_XYs.V_W_XYs ) :
 
         newComponents = []
 
-        if( 'LLNL_MC' in processInfo['styles'] ) :
-            if( not( self.axes.isLinear( qualifierOk = True ) ) ) : raise Exception( 'Not implemented: %s' % self.moniker )
-
         if( 'LLNL_Pn' in processInfo['styles'] ) :
-            if( processInfo['verbosity'] >= 30 ) : print '%sGrouping %s' % ( verbosityIndent, self.moniker )
+            if( processInfo.verbosity >= 30 ) : print '%sGrouping %s' % ( verbosityIndent, self.moniker )
             outputChannel = tempInfo['outputChannel'].outputChannel
-            projectile, product = processInfo.getProjectileName( ), tempInfo['product'].particle.getToken( )
+            projectile, product = processInfo.getProjectileName( ), tempInfo['product'].particle.name
             TM_1, TM_E = transferMatrices.ENDFEMuEpP_TransferMatrix( processInfo, projectile, product, tempInfo['masses'], tempInfo['crossSection'], self, 
                 tempInfo['multiplicity'], comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
             fudge.gnd.miscellaneous.TMs2Form( processInfo, tempInfo, newComponents, TM_1, TM_E, self.axes )
@@ -168,118 +193,84 @@ class pointwise( form, V_W_XYs.V_W_XYs ) :
 
         return( V_W_XYs.V_W_XYs.toPointwise_withLinearXYs( self, accuracy, lowerEps = lowerEps, upperEps = upperEps, cls = pointwise ) )
 
-    def toENDF6( self, flags, tempInfo ) :
+    @staticmethod
+    def allowedSubElements( ) :
 
-        from fudge.legacy.converting import gndToENDF6, endfFormats
-        MF6 = [ endfFormats.endfContLine( 0, 0, 0, 0, 1, len( self ) ) ]
-        EinInterp = gndToENDF6.axisToEndfInterpolationFlag( self.axes[0] )
-        MF6 += endfFormats.endfInterpolationList( [ len( self ), EinInterp ] )
-        muInterpolation = gndToENDF6.axisToEndfInterpolationFlag( self.axes[1] )
-        independent, dependent, qualifier = self.axes[2].interpolation.getInterpolationTokens( )
-        pdf_of_EpInterpolation = gndToENDF6.gndToEndfInterpolationFlag( independent, dependent )
-        for oneEin in self :
-            Ein = oneEin.value
-            numMu = len( oneEin )
-            MF6 += [ endfFormats.endfContLine( 0, Ein, 0, 0, 1, numMu ) ]
-            MF6 += endfFormats.endfInterpolationList( [ numMu, muInterpolation ] )
-            for entries in oneEin :
-                mu = entries.value
-                numEout = len( entries )
-                MF6 += [ endfFormats.endfContLine( 0, mu, 0, 0, 1, numEout ) ]
-                MF6 += endfFormats.endfInterpolationList( [ numEout, pdf_of_EpInterpolation ] )
-                xys = entries.copyDataToXYs( xUnit = 'eV', yUnit = '1/eV' )
-                MF6 += endfFormats.endfNdDataList( xys )
-        return( 7, axes.labToken, MF6 )
+        return( ( pdfOfMuAndEp.pointwise, ) )
 
     @staticmethod
-    def defaultAxes( energyUnit = 'eV', energyInterpolation = axes.linearToken, energyFunctionInterpolation = axes.linearToken, 
-        energyInterpolationQualifier = None, muInterpolation = axes.linearToken, energy_outInterpolation = axes.linearToken, 
-        energy_outUnit = 'eV', probabilityInterpolation = axes.linearToken, probabilityUnit = '1/eV' ) :
+    def defaultAxes( energyUnit = 'eV', energy_outUnit = 'eV', probabilityUnit = '1/eV', probabilityLabel = 'P(mu,energy_out|energy_in)' ) :
 
-        axes_ = axes.axes( dimension = 4 )
-        axes_[0] = axes.axis( 'energy_in', 0, energyUnit, interpolation = axes.interpolationXY( energyInterpolation, energyFunctionInterpolation, energyInterpolationQualifier ) )
-        axes_[1] = axes.axis( 'mu', 1, '', interpolation = axes.interpolationXY( muInterpolation, probabilityInterpolation ) )
-        axes_[2] = axes.axis( 'energy_out', 2, energy_outUnit, interpolation = axes.interpolationXY( energy_outInterpolation, probabilityInterpolation ) )
-        axes_[3] = axes.axis( 'P(mu,energy_out|energy_in)', 3, probabilityUnit )
-        return( axes_ )
+        axes = axesModule.axes( rank = 4 )
+        axes[3] = axesModule.axis( 'energy_in', 3, energyUnit )
+        axes[2] = axesModule.axis( 'mu', 2, '' )
+        axes[1] = axesModule.axis( 'energy_out', 1, energy_outUnit )
+        axes[0] = axesModule.axis( probabilityLabel, 0, probabilityUnit )
+        return( axes )
 
-    @staticmethod
-    def parseXMLNode( element, xPath=[], linkData={} ):
+class LLNLAngularOfAngularEnergySubform( baseModule.subform ) :
 
-        xPath.append( element.tag )
-        axes_ = axes.parseXMLNode( element[0], xPath )
-        pw = pointwise( axes_, element.get( 'productFrame' ) )
-        for energy_in in element[1:]:
-            w_xys = W_XYs.W_XYs(
-                    axes.referenceAxes(pw, 3), index=int(energy_in.get('index')),
-                    value=float(energy_in.get("value")), parent=pw)
-            for mu in energy_in:
-                data = map(float,mu.text.split())
-                data = zip( data[::2], data[1::2] )
-                xys = XYs.XYs(
-                        axes.referenceAxes(w_xys), data, float(mu.get('accuracy')),
-                        value=float(mu.get('value')) )
-                w_xys.append( xys )
-            pw.append( w_xys )
-        xPath.pop()
-        return pw
+    moniker = 'LLNLAngularOfAngularEnergy'
 
-class LLNLComponent( base.component ) :
+    def __init__( self, angularSubform, makeCopy = True ) :
 
-    def __init__( self, nativeData = base.noneFormToken ) :
+        if( not( isinstance( angularSubform, angularModule.pointwise ) ) ) : raise TypeError( 'instance is not an angular.pointwise' )
+        if( makeCopy ) : angularSubform = angularSubform.copy( )
+        baseModule.subform.__init__( self )
+        self.angularSubform = angularSubform
 
-        base.component.__init__( self, base.LLNLAngularEnergyComponentToken, nativeData )
+    def copy( self ) :
 
-    @staticmethod
-    def parseXMLNode( element, xPath=[], linkData={} ):
+        return( LLNLAngularOfAngularEnergySubform( self.angularSubform, makeCopy = True ) )
 
-        xPath.append( element.tag )
-        if element.get('nativeData') != base.pointwiseFormToken:
-            raise Exception, "Only pointwise distribution currently handled inside LLNLAngularEnergy"
-        pointwise_ = pointwise.parseXMLNode( element[0], xPath )
-        component = LLNLComponent( pointwise_.moniker )
-        component.addForm( pointwise_ )
-        xPath.pop()
-        return component
+    def toXMLList( self, indent = "", **kwargs ) :
 
-class LLNLEqualProbableBins( form ) :
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        xmlStringList = [ '%s<%s>' % ( indent, self.moniker ) ]
+        xmlStringList += self.angularSubform.toXMLList( indent = indent2, **kwargs )
+        xmlStringList[-1] += '</%s>' % self.moniker
+        return( xmlStringList )
 
-    def __init__( self, productFrame ) :
+class LLNLAngularEnergyOfAngularEnergySubform( baseModule.subform ) :
 
-        form.__init__( self, base.equalProbableBinsFormToken, productFrame )
-        self.numberOfBins = len( data[0][1][0][1] )
+    moniker = 'LLNLAngularEnergyOfAngularEnergy'
 
-    def toXMLList( self, indent = '' ) :
-        """Returns the xml string representation of self."""
+    def __init__( self, angularEnergySubform, makeCopy = True ) :
 
-        indent2 = indent + '  '
-        indent3 = indent2 + '  '
-        xmlString = [ '%s<%s>' % ( indent, self.moniker ) ]
-        xmlString[-1] += '<equalProbableBins3d bins="%d">' % ( self.numberOfBins )
-        xmlString += self.axes.toXMLList( indent = indent2 )
-        for indexE, energyMuEp in enumerate( self.data ) :
-            energy, muEps = energyMuEp
-            xmlString.append( '%s<energy value="%s" index="%d">' % ( indent2, fudge.gnd.miscellaneous.floatToString( energy ), indexE ) )
-            for indexMu, muEp in enumerate( muEps ) :
-                mu, Ep = muEp
-                EpString = base.list1dToXMLEqualProbableBins1dString( Ep )
-                xmlString.append( '%s<mu value="%s" index="%d">%s</energy>' % ( indent3, fudge.gnd.miscellaneous.floatToString( mu ), indexMu, EpString ) )
-            xmlString[-1] += '</energy>'
-        xmlString[-1] += '</equalProbableBins3d></%s>' % self.moniker
-        return( xmlString )
+        if( not( isinstance( angularEnergySubform, pointwise ) ) ) : raise TypeError( 'instance is not an angular.pointwise' )
+        if( makeCopy ) : angularEnergySubform = angularEnergySubform.copy( )
+        baseModule.subform.__init__( self )
+        self.angularEnergySubform = angularEnergySubform
 
-class LLNL_withAngularComponent( base.component ) :
+    def copy( self ) :
+
+        return( LLNLAngularEnergyOfAngularEnergySubform( self.angularEnergySubform, makeCopy = True ) )
+
+    def toXMLList( self, indent = "", **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        xmlStringList = [ '%s<%s>' % ( indent, self.moniker ) ]
+        xmlStringList += self.angularEnergySubform.toXMLList( indent = indent2, **kwargs )
+        xmlStringList[-1] += '</%s>' % self.moniker
+        return( xmlStringList )
+
+class LLNLAngularEnergyForm( baseModule.form ) :
     """This class is for legacy LLNL ENDL I = 1 and 3 data and is deprecated. Only use for the legacy ENDL data."""
 
-    def __init__( self, angularComponent, angularEnergyComponent ) :
+    moniker = 'LLNLAngularEnergy'
+    subformAttributes = ( 'angularSubform', 'angularEnergySubform' )
 
-        nativeData = '%s=%s:%s=%s' % ( base.angularComponentToken, angularComponent.nativeData, base.LLNLAngularEnergyComponentToken, 
-            angularEnergyComponent.nativeData )
-        base.component.__init__( self, base.LLNL_withAngularComponentToken, nativeData )
-        self.angularComponent = angularComponent
-        self.angularEnergyComponent = angularEnergyComponent
+    def __init__( self, label, productFrame, angularSubform, angularEnergySubform, makeCopy = True ) :
 
-    def calculateDepositionData( self, processInfo, tempInfo ) :
+        if( not( isinstance( angularSubform, LLNLAngularOfAngularEnergySubform ) ) ) :
+            raise TypeError( 'instance is not an LLNLAngularOfAngularEnergySubform subform' )
+        if( not( isinstance( angularEnergySubform, LLNLAngularEnergyOfAngularEnergySubform ) ) ) :
+            raise TypeError( 'instance is not an LLNLAngularEnergyOfAngularEnergySubform subform' )
+        if( makeCopy ) : angularSubform = angularSubform.copy( )
+        if( makeCopy ) : angularEnergySubform = angularEnergySubform.copy( )
+        baseModule.form.__init__( self, label, productFrame, ( angularSubform, angularEnergySubform ) )
+
+    def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
 
         from fudge.core.math import fudgemath
 
@@ -316,44 +307,46 @@ class LLNL_withAngularComponent( base.component ) :
 
         class calculateDepositionMomentumThicken :
 
-            def __init__( self, angularForm, angularEnergyForm, relativeTolerance, absoluteTolerance ) :
+            def __init__( self, angularSubform, angularEnergySubform, relativeTolerance, absoluteTolerance ) :
 
-                self.angularForm = angularForm
-                self.angularEnergyForm = angularEnergyForm
+                self.angularSubform = angularSubform
+                self.angularEnergySubform = angularEnergySubform
                 self.relativeTolerance = relativeTolerance
                 self.absoluteTolerance = absoluteTolerance
 
             def evaluateAtX( self, E ) :
 
-                muPs = self.angularForm.getAtEnergy( E )
-                muEpPs = self.angularEnergyForm.interpolateAtV( E, unitBase = True )
+                muPs = self.angularSubform.getAtEnergy( E )
+                muEpPs = self.angularEnergySubform.interpolateAtV( E, unitBase = True )
                 return( calculateDepositionMomentum( muPs, muEpPs ) )
 
         depData = []
-        angularForm = self.angularComponent.forms[self.angularComponent.nativeData]
-        angularEnergyForm = self.angularEnergyComponent.forms[self.angularEnergyComponent.nativeData]
+        angularSubform = self.angularSubform
+        angularEnergySubform = self.angularEnergySubform
         multiplicity = tempInfo['multiplicity']
-        energyUnit = angularEnergyForm.axes[0].getUnit( )
-        energyPrimeUnit = angularEnergyForm.axes[2].getUnit( )
+        energyUnit = angularEnergySubform.axes[0].getUnit( )
+        energyPrimeUnit = angularEnergySubform.axes[2].getUnit( )
         momentumDepositionUnit = energyPrimeUnit + '/c'
-        energyAccuracy, momentumAccuracy = 1e-6, 1e-3
+        energyAccuracy, momentumAccuracy = processInfo.energyAccuracy, processInfo.momentumAccuracy
 
-        depData.append( miscellaneous.calculateDepositionEnergyFromAngular_angularEnergy( angularForm, angularEnergyForm, multiplicity, 
-            accuracy = energyAccuracy ) )
+        depData.append( miscellaneous.calculateDepositionEnergyFromAngular_angularEnergy( processInfo, 
+                angularSubform, angularEnergySubform, multiplicity, accuracy = energyAccuracy ) )
 
-        if( tempInfo['product'].getName( ) == 'gamma' ) :
-            depMomentum = miscellaneous.calculateDepositionEnergyFromAngular_angularEnergy( angularForm, angularEnergyForm, multiplicity, 
-                True, accuracy = momentumAccuracy )
+        if( tempInfo['product'].name == 'gamma' ) :
+            depMomentum = miscellaneous.calculateDepositionEnergyFromAngular_angularEnergy( processInfo, 
+                    angularSubform, angularEnergySubform, multiplicity, True, accuracy = momentumAccuracy )
         else :
             relativeTolerance, absoluteTolerance = momentumAccuracy, momentumAccuracy
             depMomentum = []
-            for indexE, muPs in enumerate( angularForm ) :
-                depMomentum.append( [ muPs.value, calculateDepositionMomentum( muPs, angularEnergyForm[indexE] ) ] )
-#            depMomentum = fudgemath.thickenXYList( depMomentum, calculateDepositionMomentumThicken( angularForm, angularEnergyForm, relativeTolerance, absoluteTolerance ) )
+            for indexE, muPs in enumerate( angularSubform ) :
+                depMomentum.append( [ muPs.value, calculateDepositionMomentum( muPs, angularEnergySubform[indexE] ) ] )
+#            depMomentum = fudgemath.thickenXYList( depMomentum, calculateDepositionMomentumThicken( angularSubform, angularEnergySubform, relativeTolerance, absoluteTolerance ) )
             const = math.sqrt( 2. * tempInfo['product'].getMass( energyPrimeUnit + '/c**2' ) )
             for EMomenutem in depMomentum : EMomenutem[1] *= const * multiplicity.getValue( EMomenutem[0] )
-        axes_ = fudge.gnd.productData.momentumDeposition.pointwise.defaultAxes( energyUnit = energyUnit, momentumDepositionUnit = momentumDepositionUnit )
-        depData.append( fudge.gnd.productData.momentumDeposition.pointwise( axes_, depMomentum, momentumAccuracy ) )
+
+        axes = momentumDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit, momentumDepositionUnit = momentumDepositionUnit )
+        depData.append( momentumDepositionModule.pointwise( data = depMomentum, axes = axes,
+                        label = processInfo.style.label, accuracy = momentumAccuracy ) )
 
         return( depData )
 
@@ -362,91 +355,85 @@ class LLNL_withAngularComponent( base.component ) :
         import angular 
         from fudge.processing.deterministic import transferMatrices
 
-        newComponents = []
-        angularForm = self.angularComponent.forms[self.angularComponent.nativeData]
-        angularEnergyForm = self.angularEnergyComponent.forms[self.angularEnergyComponent.nativeData]
-        if( 'LLNL_MC' in processInfo['styles'] ) :
-            if( processInfo['verbosity'] >= 30 ) : print '%sEqual probably binning %s' % ( verbosityIndent, self.moniker )
-            raise Exception( 'Not implemented: %s' % self.moniker )
+        newForms = []
+        angularSubform = self.angularSubform
+        angularEnergySubform = self.angularEnergySubform
 
         if( 'LLNL_Pn' in processInfo['styles'] ) :
-            if( processInfo['verbosity'] >= 30 ) : print '%sGrouping %s' % ( verbosityIndent, self.moniker )
+            if( processInfo.verbosity >= 30 ) : print '%sGrouping %s' % ( verbosityIndent, self.moniker )
             outputChannel = tempInfo['outputChannel'].outputChannel
-            projectile, product = processInfo.getProjectileName( ), tempInfo['product'].particle.getToken( )
+            projectile, product = processInfo.getProjectileName( ), tempInfo['product'].particle.name
             TM_1, TM_E = transferMatrices.EMuEpP_TransferMatrix( processInfo, projectile, product, tempInfo['masses'],
-                tempInfo['crossSection'], angularForm, angularEnergyForm, tempInfo['multiplicity'],
+                tempInfo['crossSection'], angularSubform, angularEnergySubform, tempInfo['multiplicity'],
                 comment = tempInfo['transferMatrixComment'] + ' outgoing data for %s' % tempInfo['productLabel'] )
-            fudge.gnd.miscellaneous.TMs2Form( processInfo, tempInfo, newComponents, TM_1, TM_E, angularForm.axes )
+            fudge.gnd.miscellaneous.TMs2Form( processInfo, tempInfo, newForms, TM_1, TM_E, angularSubform.axes )
 
-        return( newComponents )
+        return( newForms )
 
-    def toXMLList( self, indent = "" ) : 
+    def toXMLList( self, indent = "", **kwargs ) : 
 
-        indent2 = indent + '  '
-        xmlString = [ '%s<%s>' % ( indent, self.moniker ) ]
-        xmlString += self.angularComponent.toXMLList( indent = indent2 )
-        xmlString += self.angularEnergyComponent.toXMLList( indent = indent2 )
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+        indent3 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
+        attributeStr = ''
+        if( self.label is not None ) : attributeStr += ' label="%s"' % self.label
+        if( self.productFrame is not None ) : attributeStr += ' productFrame="%s"' % self.productFrame
+        xmlString = [ '%s<%s%s>' % ( indent, self.moniker, attributeStr ) ]
+
+        xmlString += self.angularSubform.toXMLList( indent3, **kwargs )
+
+        xmlString += self.angularEnergySubform.toXMLList( indent3, **kwargs )
+
         xmlString[-1] += '</%s>' % self.moniker 
         return( xmlString )
 
-    def toENDF6( self, MT, endfMFList, flags, tempInfo ) :
-
-        from fudge.legacy.converting import gndToENDF6
-        from pqu.physicalQuantityWithUncertainty import PhysicalQuantityWithUncertainty as PQU
-
-        angularForm = self.angularComponent.forms[self.angularComponent.nativeData]
-        angularEnergyForm = self.angularEnergyComponent.forms[self.angularEnergyComponent.nativeData]
-
-        energy_inInterpolation, energy_inFunctionInterpolation, energy_inInterpolationQualifier = angularEnergyForm.axes[0].interpolation.getInterpolationTokens( )
-        muInterpolation, muFunctionInterpolation, muQualifier = angularEnergyForm.axes[1].interpolation.getInterpolationTokens( )
-        energy_outInterpolation, probabilityInterpolation, energy_outQualifier = angularEnergyForm.axes[2].interpolation.getInterpolationTokens( )
-        frame = angularEnergyForm.getProductFrame( )
-        axes_ = pointwise.defaultAxes( energyInterpolation = energy_inInterpolation, energyFunctionInterpolation = energy_inFunctionInterpolation, 
-                energyInterpolationQualifier = energy_inInterpolationQualifier, muInterpolation = muInterpolation, 
-                energy_outInterpolation = energy_outInterpolation, probabilityInterpolation = probabilityInterpolation )
-        E_inRatio = PQU( 1, angularEnergyForm.axes[0].getUnit( ) ).getValueAs( 'eV' )
-        E_outRatio = PQU( 1, angularEnergyForm.axes[2].getUnit( ) ).getValueAs( 'eV' )
-        LAW7 = pointwise( axes_, self.angularComponent.getProductFrame( ) )
-        axesW_XY = axes.referenceAxes( LAW7, dimension = 3 )
-        axesXY = axes.referenceAxes( LAW7 )
-
-        if( len( angularForm ) != len( angularEnergyForm ) ) :
-            raise Exception( "len( angularForm ) = %s != len( angularEnergyForm ) = %s" % ( len( angularForm ), len( angularEnergyForm ) ) )
-        for indexE, EMuP in enumerate( angularForm ) :
-            EMuEpP = angularEnergyForm[indexE]
-            if( EMuP.value != EMuEpP.value ) : raise Exception( "At indexE = %d, EMuP.value %s != EMuEpP.value = %s" % ( indexE, EMuP.value, EMuEpP.value ) )
-            if( len( EMuP ) != len( EMuEpP ) ) :
-                raise Exception( "At indexE = %d (E_in = %s), len( EMuP ) %s != len( EMuEpP ) = %s" % ( indexE, EMuP.value, len( EMuP ), len( EMuEpP ) ) )
-            w_xys = W_XYs.W_XYs( axesW_XY, index = indexE, value = EMuP.value )
-            for indexMu, muP in enumerate( EMuP ) :
-                muEpP = EMuEpP[indexMu]
-                if( muP[0] != muEpP.value ) : raise Exception( "At indexE = %d, mu = %s != muEpP.value = %s" % ( indexE, muP[0], muEpP.value ) )
-                xys = [ [ E_outRatio * Ep, muP[1] * P / E_outRatio ] for Ep, P in muEpP ]
-                xys = XYs.XYs( axesXY, xys, accuracy = muEpP.getAccuracy( ), value = muP[0], index = indexMu, parent = w_xys )
-                w_xys.append( XYs.XYs( axesXY, muEpP * muP[1], accuracy = muEpP.getAccuracy( ), value = muP[0], index = indexMu, parent = w_xys ) )
-            LAW7.append( w_xys )
-
-        LAW, frame, MF6 = LAW7.toENDF6( flags, tempInfo )
-        gndToENDF6.toENDF6_MF6( MT, endfMFList, flags, tempInfo, LAW, frame, MF6 )
-
     @staticmethod
-    def parseXMLNode( element, xPath=[], linkData={} ):
+    def parseXMLNode( element, xPath, linkData ) :
+
+        import fudge.gnd.productData.distributions.angular as angularModule
 
         xPath.append( element.tag )
-        angularComponent = fudge.gnd.productData.distributions.angular.parseXMLNode( element[0], xPath )
-        angularEnergyComponent = LLNLComponent.parseXMLNode( element[1], xPath )
-        LwAC = LLNL_withAngularComponent( angularComponent, angularEnergyComponent )
+        for child in element :
+            label = child.get( 'label' )
+            if( label == 'angular' ) :                  # BRB - FIXME
+                angularSubform = angularModule.form.parseXMLNode( child, xPath, linkData )
+            elif( label == 'angularEnergy' ) :          # BRB - FIXME
+                angularEnergySubform = pointwise.parseXMLNode( child, xPath, linkData )
+            else :
+                raise ValueError( 'unsupported label = "%s"' % label )
+        component = LLNLAngularEnergyForm( element.get( 'label' ), element.get( 'productFrame' ), angularSubform, angularEnergySubform )
+        xPath.pop( )
+        return( component )
+
+class form(  baseModule.form ) :
+
+    moniker = 'angularEnergy'
+    subformAttributes = ( 'angularEnergySubform', )
+
+    def __init__( self, label, productFrame, angularEnergySubform, makeCopy = True ) :
+
+        if( not( isinstance( angularEnergySubform, subform ) ) ) : raise TypeError( 'instance is not an angularEnergy subform' )
+        if( makeCopy ) : angularEnergySubform = angularEnergySubform.copy( )
+        baseModule.form.__init__( self, label, productFrame, ( angularEnergySubform, ) )
+
+    def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
+
+        return( self.angularEnergySubform.calculateDepositionData( processInfo, tempInfo, verbosityIndent ) )
+
+    def process( self, processInfo, tempInfo, verbosityIndent ) :
+
+        return( self.angularEnergySubform.process( processInfo, tempInfo, verbosityIndent ) )
+
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ):
+
+        xPath.append( element.tag )
+        formElement = element[0]
+        subformClass = {
+            pointwise.moniker:  pointwise,
+        }[ formElement.tag ]
+        if subformClass is None: raise Exception("encountered unknown angularEnergy subform: %s" % formElement.tag)
+        subform = pointwise.parseXMLNode( formElement, xPath, linkData )
+        AEC = form( element.get( 'label' ), element.get('productFrame'), subform )
         xPath.pop()
-        return LwAC
-
-def parseXMLNode( angularEnergyElement, xPath=[], linkData={} ):
-
-    xPath.append( angularEnergyElement.tag )
-    angularEnergy = component( angularEnergyElement.get("nativeData") )
-    for formElement in angularEnergyElement:
-        if formElement.tag==base.pointwiseFormToken:
-            angularEnergy.addForm( pointwise.parseXMLNode( formElement, xPath, linkData ) )
-        else: raise Exception("encountered unknown angularEnergy form: %s" % formElement.tag )
-    xPath.pop()
-    return angularEnergy
-
+        return AEC

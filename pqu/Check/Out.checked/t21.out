@@ -1,0 +1,7 @@
+1.234(56) eV
+<type 'float'> 1.234e-06
+<class 'pqu.PQU.PQU'> 1.234e-6 MeV
+<type 'float'> 0.056
+<type 'float'> 5.6e-08
+<class 'pqu.PQU.PQU'> 0.056 eV
+<class 'pqu.PQU.PQU'> 5.6e-8 MeV

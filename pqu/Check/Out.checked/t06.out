@@ -1,0 +1,198 @@
+
+-------------
+12
+12.
+value = 1.200000000000000e+01, significantDigits = 2, order = 1, isPercent = False, unit = ""
+uncertainty = 
+
+38.
+value = 3.840000000000001e+01, significantDigits = 2, order = 1, isPercent = False, unit = ""
+uncertainty = 
+
+38. MeV
+value = 3.840000000000001e+01, significantDigits = 2, order = 1, isPercent = False, unit = "MeV"
+uncertainty = 
+
+0.38
+value = 3.840000000000000e-01, significantDigits = 2, order = -1, isPercent = False, unit = ""
+uncertainty = 
+
+-------------
+12%
+12.%
+value = 1.200000000000000e-01, significantDigits = 2, order = -1, isPercent = True, unit = ""
+uncertainty = 
+
+0.38
+value = 3.840000000000000e-01, significantDigits = 2, order = -1, isPercent = False, unit = ""
+uncertainty = 
+
+0.38 MeV
+value = 3.840000000000000e-01, significantDigits = 2, order = -1, isPercent = False, unit = "MeV"
+uncertainty = 
+
+3.8e-3
+value = 3.840000000000000e-03, significantDigits = 2, order = -3, isPercent = False, unit = ""
+uncertainty = 
+
+-------------
+12 J
+12. J
+value = 1.200000000000000e+01, significantDigits = 2, order = 1, isPercent = False, unit = "J"
+uncertainty = 
+
+38. J
+value = 3.840000000000001e+01, significantDigits = 2, order = 1, isPercent = False, unit = "J"
+uncertainty = 
+
+38. J*MeV
+value = 3.840000000000001e+01, significantDigits = 2, order = 1, isPercent = False, unit = "J*MeV"
+uncertainty = 
+
+0.38 J
+value = 3.840000000000000e-01, significantDigits = 2, order = -1, isPercent = False, unit = "J"
+uncertainty = 
+
+-------------
+12(3)
+12.(3)
+value = 1.200000000000000e+01, significantDigits = 2, order = 1, isPercent = False, unit = ""
+uncertainty = value = 3.000000000000000e+00, significantDigits = 1, order = 0, isPercent = False
+
+38. +/- 10.
+value = 3.840000000000001e+01, significantDigits = 2, order = 1, isPercent = False, unit = ""
+uncertainty = value = 9.600000000000001e+00, significantDigits = 1, order = 0, isPercent = False
+
+38. +/- 10. MeV
+value = 3.840000000000001e+01, significantDigits = 2, order = 1, isPercent = False, unit = "MeV"
+uncertainty = value = 9.600000000000001e+00, significantDigits = 1, order = 0, isPercent = False
+
+0.38 +/- 0.1
+value = 3.840000000000000e-01, significantDigits = 2, order = -1, isPercent = False, unit = ""
+uncertainty = value = 9.600000000000000e-02, significantDigits = 1, order = -2, isPercent = False
+
+-------------
+12(3) J
+12.(3) J
+value = 1.200000000000000e+01, significantDigits = 2, order = 1, isPercent = False, unit = "J"
+uncertainty = value = 3.000000000000000e+00, significantDigits = 1, order = 0, isPercent = False
+
+38. +/- 10. J
+value = 3.840000000000001e+01, significantDigits = 2, order = 1, isPercent = False, unit = "J"
+uncertainty = value = 9.600000000000001e+00, significantDigits = 1, order = 0, isPercent = False
+
+38. +/- 10. J*MeV
+value = 3.840000000000001e+01, significantDigits = 2, order = 1, isPercent = False, unit = "J*MeV"
+uncertainty = value = 9.600000000000001e+00, significantDigits = 1, order = 0, isPercent = False
+
+0.38 +/- 0.1 J
+value = 3.840000000000000e-01, significantDigits = 2, order = -1, isPercent = False, unit = "J"
+uncertainty = value = 9.600000000000000e-02, significantDigits = 1, order = -2, isPercent = False
+
+-------------
+12 +/- 3
+12. +/- 3.
+value = 1.200000000000000e+01, significantDigits = 2, order = 1, isPercent = False, unit = ""
+uncertainty = value = 3.000000000000000e+00, significantDigits = 1, order = 0, isPercent = False
+
+38. +/- 10.
+value = 3.840000000000001e+01, significantDigits = 2, order = 1, isPercent = False, unit = ""
+uncertainty = value = 9.600000000000001e+00, significantDigits = 1, order = 0, isPercent = False
+
+38. +/- 10. MeV
+value = 3.840000000000001e+01, significantDigits = 2, order = 1, isPercent = False, unit = "MeV"
+uncertainty = value = 9.600000000000001e+00, significantDigits = 1, order = 0, isPercent = False
+
+0.38 +/- 0.1
+value = 3.840000000000000e-01, significantDigits = 2, order = -1, isPercent = False, unit = ""
+uncertainty = value = 9.600000000000000e-02, significantDigits = 1, order = -2, isPercent = False
+
+-------------
+12 +/- 3 J
+12. +/- 3. J
+value = 1.200000000000000e+01, significantDigits = 2, order = 1, isPercent = False, unit = "J"
+uncertainty = value = 3.000000000000000e+00, significantDigits = 1, order = 0, isPercent = False
+
+38. +/- 10. J
+value = 3.840000000000001e+01, significantDigits = 2, order = 1, isPercent = False, unit = "J"
+uncertainty = value = 9.600000000000001e+00, significantDigits = 1, order = 0, isPercent = False
+
+38. +/- 10. J*MeV
+value = 3.840000000000001e+01, significantDigits = 2, order = 1, isPercent = False, unit = "J*MeV"
+uncertainty = value = 9.600000000000001e+00, significantDigits = 1, order = 0, isPercent = False
+
+0.38 +/- 0.1 J
+value = 3.840000000000000e-01, significantDigits = 2, order = -1, isPercent = False, unit = "J"
+uncertainty = value = 9.600000000000000e-02, significantDigits = 1, order = -2, isPercent = False
+
+-------------
+12(3)%
+12.(3)%
+value = 1.200000000000000e-01, significantDigits = 2, order = -1, isPercent = True, unit = ""
+uncertainty = value = 3.000000000000000e-02, significantDigits = 1, order = -2, isPercent = False
+
+0.38 +/- 0.1
+value = 3.840000000000000e-01, significantDigits = 2, order = -1, isPercent = False, unit = ""
+uncertainty = value = 9.600000000000000e-02, significantDigits = 1, order = -2, isPercent = False
+
+0.38 +/- 0.1 MeV
+value = 3.840000000000000e-01, significantDigits = 2, order = -1, isPercent = False, unit = "MeV"
+uncertainty = value = 9.600000000000000e-02, significantDigits = 1, order = -2, isPercent = False
+
+3.8e-3 +/- 1.e-3
+value = 3.840000000000000e-03, significantDigits = 2, order = -3, isPercent = False, unit = ""
+uncertainty = value = 9.600000000000000e-04, significantDigits = 1, order = -4, isPercent = False
+
+-------------
+12 +/- 3%
+12.0 +/- 3.%
+value = 1.200000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = ""
+uncertainty = value = 3.000000000000000e-02, significantDigits = 1, order = -2, isPercent = True
+
+38. +/- 1.
+value = 3.840000000000001e+01, significantDigits = 2, order = 1, isPercent = False, unit = ""
+uncertainty = value = 1.152000000000000e+00, significantDigits = 1, order = 0, isPercent = False
+
+38. +/- 1. MeV
+value = 3.840000000000001e+01, significantDigits = 2, order = 1, isPercent = False, unit = "MeV"
+uncertainty = value = 1.152000000000000e+00, significantDigits = 1, order = 0, isPercent = False
+
+0.38 +/- 0.01
+value = 3.840000000000000e-01, significantDigits = 2, order = -1, isPercent = False, unit = ""
+uncertainty = value = 1.152000000000000e-02, significantDigits = 1, order = -2, isPercent = False
+
+-------------
+(12 +/- 3)%
+(12. +/- 3.)%
+value = 1.200000000000000e-01, significantDigits = 2, order = -1, isPercent = True, unit = ""
+uncertainty = value = 3.000000000000000e-02, significantDigits = 1, order = -2, isPercent = False
+
+0.38 +/- 0.1
+value = 3.840000000000000e-01, significantDigits = 2, order = -1, isPercent = False, unit = ""
+uncertainty = value = 9.600000000000000e-02, significantDigits = 1, order = -2, isPercent = False
+
+0.38 +/- 0.1 MeV
+value = 3.840000000000000e-01, significantDigits = 2, order = -1, isPercent = False, unit = "MeV"
+uncertainty = value = 9.600000000000000e-02, significantDigits = 1, order = -2, isPercent = False
+
+3.8e-3 +/- 1.e-3
+value = 3.840000000000000e-03, significantDigits = 2, order = -3, isPercent = False, unit = ""
+uncertainty = value = 9.600000000000000e-04, significantDigits = 1, order = -4, isPercent = False
+
+-------------
+12 +/- 3% J
+12.0 +/- 3.% J
+value = 1.200000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "J"
+uncertainty = value = 3.000000000000000e-02, significantDigits = 1, order = -2, isPercent = True
+
+38. +/- 1. J
+value = 3.840000000000001e+01, significantDigits = 2, order = 1, isPercent = False, unit = "J"
+uncertainty = value = 1.152000000000000e+00, significantDigits = 1, order = 0, isPercent = False
+
+38. +/- 1. J*MeV
+value = 3.840000000000001e+01, significantDigits = 2, order = 1, isPercent = False, unit = "J*MeV"
+uncertainty = value = 1.152000000000000e+00, significantDigits = 1, order = 0, isPercent = False
+
+0.38 +/- 0.01 J
+value = 3.840000000000000e-01, significantDigits = 2, order = -1, isPercent = False, unit = "J"
+uncertainty = value = 1.152000000000000e-02, significantDigits = 1, order = -2, isPercent = False

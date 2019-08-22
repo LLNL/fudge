@@ -1,0 +1,133 @@
+status = 0  interpolation = 0  length = 0  allocatedSize = 10
+  overflowLength = 0  overflowAllocatedSize = 4  mallocFailedSize = 0
+  Points data, points =                (nil)
+  Overflow points data;                (nil)
+  Points in order
+
+Setting x, y to 1.0 -1
+status = 0  interpolation = 0  length = 1  allocatedSize = 10
+  overflowLength = 0  overflowAllocatedSize = 4  mallocFailedSize = 0
+  Points data, points =                (nil)
+     1.0000000e+00 -1.0000000e+00
+  Overflow points data;                (nil)
+  Points in order
+     1.0000000e+00 -1.0000000e+00
+
+Setting x, y to 0.1 -2
+status = 0  interpolation = 0  length = 2  allocatedSize = 10
+  overflowLength = 1  overflowAllocatedSize = 4  mallocFailedSize = 0
+  Points data, points =                (nil)
+     1.0000000e+00 -1.0000000e+00
+  Overflow points data;                (nil)
+     1.0000000e-01 -2.0000000e+00        0                (nil)                (nil)                (nil)
+  Points in order
+     1.0000000e-01 -2.0000000e+00
+     1.0000000e+00 -1.0000000e+00
+
+Setting x, y to 0.091 -1.2
+status = 0  interpolation = 0  length = 3  allocatedSize = 10
+  overflowLength = 2  overflowAllocatedSize = 4  mallocFailedSize = 0
+  Points data, points =                (nil)
+     1.0000000e+00 -1.0000000e+00
+  Overflow points data;                (nil)
+     9.1000000e-02 -1.2000000e+00        0                (nil)                (nil)                (nil)
+     1.0000000e-01 -2.0000000e+00        1                (nil)                (nil)                (nil)
+  Points in order
+     9.1000000e-02 -1.2000000e+00
+     1.0000000e-01 -2.0000000e+00
+     1.0000000e+00 -1.0000000e+00
+
+Setting x, y to 0.91 -1.3
+status = 0  interpolation = 0  length = 4  allocatedSize = 10
+  overflowLength = 3  overflowAllocatedSize = 4  mallocFailedSize = 0
+  Points data, points =                (nil)
+     1.0000000e+00 -1.0000000e+00
+  Overflow points data;                (nil)
+     9.1000000e-02 -1.2000000e+00        0                (nil)                (nil)                (nil)
+     1.0000000e-01 -2.0000000e+00        1                (nil)                (nil)                (nil)
+     9.1000000e-01 -1.3000000e+00        2                (nil)                (nil)                (nil)
+  Points in order
+     9.1000000e-02 -1.2000000e+00
+     1.0000000e-01 -2.0000000e+00
+     9.1000000e-01 -1.3000000e+00
+     1.0000000e+00 -1.0000000e+00
+
+Setting x, y to 91 -1.6
+status = 0  interpolation = 0  length = 5  allocatedSize = 10
+  overflowLength = 3  overflowAllocatedSize = 4  mallocFailedSize = 0
+  Points data, points =                (nil)
+     1.0000000e+00 -1.0000000e+00
+     9.1000000e+01 -1.6000000e+00
+  Overflow points data;                (nil)
+     9.1000000e-02 -1.2000000e+00        0                (nil)                (nil)                (nil)
+     1.0000000e-01 -2.0000000e+00        1                (nil)                (nil)                (nil)
+     9.1000000e-01 -1.3000000e+00        2                (nil)                (nil)                (nil)
+  Points in order
+     9.1000000e-02 -1.2000000e+00
+     1.0000000e-01 -2.0000000e+00
+     9.1000000e-01 -1.3000000e+00
+     1.0000000e+00 -1.0000000e+00
+     9.1000000e+01 -1.6000000e+00
+
+Setting x, y to 0.001 -1.05
+status = 0  interpolation = 0  length = 6  allocatedSize = 10
+  overflowLength = 4  overflowAllocatedSize = 4  mallocFailedSize = 0
+  Points data, points =                (nil)
+     1.0000000e+00 -1.0000000e+00
+     9.1000000e+01 -1.6000000e+00
+  Overflow points data;                (nil)
+     1.0000000e-03 -1.0500000e+00        0                (nil)                (nil)                (nil)
+     9.1000000e-02 -1.2000000e+00        1                (nil)                (nil)                (nil)
+     1.0000000e-01 -2.0000000e+00        2                (nil)                (nil)                (nil)
+     9.1000000e-01 -1.3000000e+00        3                (nil)                (nil)                (nil)
+  Points in order
+     1.0000000e-03 -1.0500000e+00
+     9.1000000e-02 -1.2000000e+00
+     1.0000000e-01 -2.0000000e+00
+     9.1000000e-01 -1.3000000e+00
+     1.0000000e+00 -1.0000000e+00
+     9.1000000e+01 -1.6000000e+00
+
+Setting x, y to 1e-09 -1.15
+status = 0  interpolation = 0  length = 7  allocatedSize = 10
+  overflowLength = 0  overflowAllocatedSize = 4  mallocFailedSize = 0
+  Points data, points =                (nil)
+     1.0000000e-09 -1.1500000e+00
+     1.0000000e-03 -1.0500000e+00
+     9.1000000e-02 -1.2000000e+00
+     1.0000000e-01 -2.0000000e+00
+     9.1000000e-01 -1.3000000e+00
+     1.0000000e+00 -1.0000000e+00
+     9.1000000e+01 -1.6000000e+00
+  Overflow points data;                (nil)
+  Points in order
+     1.0000000e-09 -1.1500000e+00
+     1.0000000e-03 -1.0500000e+00
+     9.1000000e-02 -1.2000000e+00
+     1.0000000e-01 -2.0000000e+00
+     9.1000000e-01 -1.3000000e+00
+     1.0000000e+00 -1.0000000e+00
+     9.1000000e+01 -1.6000000e+00
+
+Setting x, y to 1e-06 -1.25
+status = 0  interpolation = 0  length = 8  allocatedSize = 10
+  overflowLength = 1  overflowAllocatedSize = 4  mallocFailedSize = 0
+  Points data, points =                (nil)
+     1.0000000e-09 -1.1500000e+00
+     1.0000000e-03 -1.0500000e+00
+     9.1000000e-02 -1.2000000e+00
+     1.0000000e-01 -2.0000000e+00
+     9.1000000e-01 -1.3000000e+00
+     1.0000000e+00 -1.0000000e+00
+     9.1000000e+01 -1.6000000e+00
+  Overflow points data;                (nil)
+     1.0000000e-06 -1.2500000e+00        1                (nil)                (nil)                (nil)
+  Points in order
+     1.0000000e-09 -1.1500000e+00
+     1.0000000e-06 -1.2500000e+00
+     1.0000000e-03 -1.0500000e+00
+     9.1000000e-02 -1.2000000e+00
+     1.0000000e-01 -2.0000000e+00
+     9.1000000e-01 -1.3000000e+00
+     1.0000000e+00 -1.0000000e+00
+     9.1000000e+01 -1.6000000e+00

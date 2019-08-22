@@ -9,22 +9,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 */
 
@@ -34,14 +45,14 @@
 #include "ptwXY.h"
 
 static nfu_status ptwXY_clip2( ptwXYPoints *ptwXY1, double y, double x1, double y1, double x2, double y2 );
-static double ptwXY_thicken_linear_dx( int sectionSubdivideMax, double dxMax, double x1, double x2 );
+static double ptwXY_thicken_linear_dx( int sectionSubdivideMax, double dDomainMax, double x1, double x2 );
 static nfu_status ptwXY_thin2( ptwXYPoints *thinned, char *thin, double accuracy, int64_t i1, int64_t i2 );
 /*
 ************************************************************
 */
-nfu_status ptwXY_clip( ptwXYPoints *ptwXY1, double yMin, double yMax ) {
+nfu_status ptwXY_clip( ptwXYPoints *ptwXY1, double rangeMin, double rangeMax ) {
 /*
-    This function acts oddly for xy = [ [ 1, 0 ], [ 3, -2 ], [ 4, 1 ] ] and yMin = 0.2, why???????
+    This function acts oddly for xy = [ [ 1, 0 ], [ 3, -2 ], [ 4, 1 ] ] and rangeMin = 0.2, why???????
     This function probably only works for linear, linear interpolation (mainly because of ptwXY_clip2).
 */
     int64_t i, j, n;
@@ -55,63 +66,64 @@ nfu_status ptwXY_clip( ptwXYPoints *ptwXY1, double yMin, double yMax ) {
     n = ptwXY1->length;
     if( n > 0 ) {
         i = 0;
-        if( ptwXY_getYMax( ptwXY1 ) < yMin ) i = 1;
-        if( ptwXY_getYMin( ptwXY1 ) > yMax ) i = 1;
+        if( ptwXY_rangeMax( ptwXY1 ) < rangeMin ) i = 1;
+        if( ptwXY_rangeMin( ptwXY1 ) > rangeMax ) i = 1;
         if( i == 1 ) return( ptwXY_clear( ptwXY1 ) );
     }
     if( n == 1 ) {
         y2 = ptwXY1->points[0].y;
-        if( y2 < yMin ) {
-            ptwXY1->points[0].y = yMin; }
-        else if( y2 > yMax ) {
-            ptwXY1->points[0].y = yMax;
+        if( y2 < rangeMin ) {
+            ptwXY1->points[0].y = rangeMin; }
+        else if( y2 > rangeMax ) {
+            ptwXY1->points[0].y = rangeMax;
         } }
     else if( n > 1 ) {
-        if( ( clipped = ptwXY_new( ptwXY1->interpolation, ptwXY1->biSectionMax, ptwXY1->accuracy, n, 10, &status, ptwXY1->userFlag ) ) == NULL )
+        if( ( clipped = ptwXY_new( ptwXY1->interpolation, ptwXY1->interpolationString, 
+                ptwXY1->biSectionMax, ptwXY1->accuracy, n, 10, &status, ptwXY1->userFlag ) ) == NULL )
             return( ptwXY1->status = status );
         for( i = 0; i < n; i++ ) {
             x2 = ptwXY1->points[i].x;
             y2 = ptwXY1->points[i].y;
-            if( y2 < yMin ) {
+            if( y2 < rangeMin ) {
                 if( i > 0 ) {
                     points = ptwXY_getPointAtIndex_Unsafely( clipped, clipped->length - 1 );
-                    if( points->y > yMin ) {
-                        if( ( status = ptwXY_clip2( clipped, yMin, points->x, points->y, x2, y2 ) ) != nfu_Okay ) goto Err;
+                    if( points->y > rangeMin ) {
+                        if( ( status = ptwXY_clip2( clipped, rangeMin, points->x, points->y, x2, y2 ) ) != nfu_Okay ) goto Err;
                     }
                 }
-                if( ( status = ptwXY_setValueAtX( clipped, x2, yMin ) ) != nfu_Okay ) goto Err;
+                if( ( status = ptwXY_setValueAtX( clipped, x2, rangeMin ) ) != nfu_Okay ) goto Err;
                 j = i;
-                for( i++; i < n; i++ ) if( !( ptwXY1->points[i].y < yMin ) ) break;
+                for( i++; i < n; i++ ) if( !( ptwXY1->points[i].y < rangeMin ) ) break;
                 if( i < n ) {
                     x2 = ptwXY1->points[i].x;
                     y2 = ptwXY1->points[i].y;
-                    if( ( status = ptwXY_clip2( clipped, yMin, ptwXY1->points[i-1].x, ptwXY1->points[i-1].y, x2, y2 ) ) != nfu_Okay ) goto Err;
-                    if( y2 > yMax ) {
-                        if( ( status = ptwXY_clip2( clipped, yMax, ptwXY1->points[i-1].x, ptwXY1->points[i-1].y, x2, y2 ) ) != nfu_Okay ) goto Err;
+                    if( ( status = ptwXY_clip2( clipped, rangeMin, ptwXY1->points[i-1].x, ptwXY1->points[i-1].y, x2, y2 ) ) != nfu_Okay ) goto Err;
+                    if( y2 > rangeMax ) {
+                        if( ( status = ptwXY_clip2( clipped, rangeMax, ptwXY1->points[i-1].x, ptwXY1->points[i-1].y, x2, y2 ) ) != nfu_Okay ) goto Err;
                     } }
                 else if( j != n - 1 ) {
-                    if( ( status = ptwXY_setValueAtX( clipped, ptwXY1->points[n - 1].x, yMin ) ) != nfu_Okay ) goto Err;
+                    if( ( status = ptwXY_setValueAtX( clipped, ptwXY1->points[n - 1].x, rangeMin ) ) != nfu_Okay ) goto Err;
                 }
                 i--; }
-            else if( y2 > yMax ) {
+            else if( y2 > rangeMax ) {
                 if( i > 0 ) {
                     points = ptwXY_getPointAtIndex_Unsafely( clipped, clipped->length - 1 );
-                    if( points->y < yMax ) {
-                        if( ( status = ptwXY_clip2( clipped, yMax, points->x, points->y, x2, y2 ) ) != nfu_Okay ) goto Err;
+                    if( points->y < rangeMax ) {
+                        if( ( status = ptwXY_clip2( clipped, rangeMax, points->x, points->y, x2, y2 ) ) != nfu_Okay ) goto Err;
                     }
                 }
-                if( ( status = ptwXY_setValueAtX( clipped, x2, yMax ) ) != nfu_Okay ) goto Err;
+                if( ( status = ptwXY_setValueAtX( clipped, x2, rangeMax ) ) != nfu_Okay ) goto Err;
                 j = i;
-                for( i++; i < n; i++ ) if( !( ptwXY1->points[i].y > yMax ) ) break;
+                for( i++; i < n; i++ ) if( !( ptwXY1->points[i].y > rangeMax ) ) break;
                 if( i < n ) {
                     x2 = ptwXY1->points[i].x;
                     y2 = ptwXY1->points[i].y;
-                    if( ( status = ptwXY_clip2( clipped, yMax, ptwXY1->points[i-1].x, ptwXY1->points[i-1].y, x2, y2 ) ) != nfu_Okay ) goto Err;
-                    if( y2 < yMin ) {
-                        if( ( status = ptwXY_clip2( clipped, yMin, ptwXY1->points[i-1].x, ptwXY1->points[i-1].y, x2, y2 ) ) != nfu_Okay ) goto Err;
+                    if( ( status = ptwXY_clip2( clipped, rangeMax, ptwXY1->points[i-1].x, ptwXY1->points[i-1].y, x2, y2 ) ) != nfu_Okay ) goto Err;
+                    if( y2 < rangeMin ) {
+                        if( ( status = ptwXY_clip2( clipped, rangeMin, ptwXY1->points[i-1].x, ptwXY1->points[i-1].y, x2, y2 ) ) != nfu_Okay ) goto Err;
                     } }
                 else if( j != n - 1 ) {
-                    if( ( status = ptwXY_setValueAtX( clipped, ptwXY1->points[n - 1].x, yMax ) ) != nfu_Okay ) goto Err;
+                    if( ( status = ptwXY_setValueAtX( clipped, ptwXY1->points[n - 1].x, rangeMax ) ) != nfu_Okay ) goto Err;
                 }
                 i--; }
             else {
@@ -157,7 +169,7 @@ static nfu_status ptwXY_clip2( ptwXYPoints *clipped, double y, double x1, double
 /*
 ************************************************************
 */
-nfu_status ptwXY_thicken( ptwXYPoints *ptwXY1, int sectionSubdivideMax, double dxMax, double fxMax ) {
+nfu_status ptwXY_thicken( ptwXYPoints *ptwXY1, int sectionSubdivideMax, double dDomainMax, double fDomainMax ) {
 
     double x1, x2 = 0., y1, y2 = 0., fx = 1.1, x, dx, dxp, lfx, y;    /* fx initialized so compilers want complain. */
     int64_t i, notFirstPass = 0;
@@ -165,14 +177,14 @@ nfu_status ptwXY_thicken( ptwXYPoints *ptwXY1, int sectionSubdivideMax, double d
     nfu_status status;
 
     if( ptwXY1->interpolation == ptwXY_interpolationOther ) return( nfu_otherInterpolation );
-    if( ( sectionSubdivideMax < 1 ) || ( dxMax < 0. ) || ( fxMax < 1. ) ) return( nfu_badInput );
+    if( ( sectionSubdivideMax < 1 ) || ( dDomainMax < 0. ) || ( fDomainMax < 1. ) ) return( nfu_badInput );
     if( sectionSubdivideMax > ptwXY_sectionSubdivideMax ) sectionSubdivideMax = ptwXY_sectionSubdivideMax;
     if( ( status = ptwXY_simpleCoalescePoints( ptwXY1 ) ) != nfu_Okay ) return( status );
     for( i = ptwXY1->length - 1; i >= 0; i-- ) {
         x1 = ptwXY1->points[i].x;
         y1 = ptwXY1->points[i].y;
         if( notFirstPass ) {
-            dx = ptwXY_thicken_linear_dx( sectionSubdivideMax, dxMax, x1, x2 );
+            dx = ptwXY_thicken_linear_dx( sectionSubdivideMax, dDomainMax, x1, x2 );
 
             if( x1 == 0. ) {
                 doLinear = 1; }
@@ -180,10 +192,10 @@ nfu_status ptwXY_thicken( ptwXYPoints *ptwXY1, int sectionSubdivideMax, double d
                 fx = x2 / x1;
                 if( fx > 0. ) {
                     lfx = log( fx );
-                    if( fxMax == 1. ) {
+                    if( fDomainMax == 1. ) {
                         nfx = sectionSubdivideMax; }
                     else {
-                        nfx = ( (int) ( lfx / log( fxMax ) ) ) + 1;
+                        nfx = ( (int) ( lfx / log( fDomainMax ) ) ) + 1;
                         if( nfx > sectionSubdivideMax ) nfx = sectionSubdivideMax;
                     }
                     if( nfx > 0 ) fx = exp( lfx / nfx );
@@ -200,7 +212,7 @@ nfu_status ptwXY_thicken( ptwXYPoints *ptwXY1, int sectionSubdivideMax, double d
                 if( doLinear ) {
                     x += dx; }
                 else {
-                    dx = ptwXY_thicken_linear_dx( sectionSubdivideMax - nDone, dxMax, x, x2 );
+                    dx = ptwXY_thicken_linear_dx( sectionSubdivideMax - nDone, dDomainMax, x, x2 );
                     if( dx <= ( fx - 1 ) * x ) {
                         dxp = dx;
                         doLinear = 1;
@@ -228,15 +240,18 @@ ptwXYPoints *ptwXY_thin( ptwXYPoints *ptwXY1, double accuracy, nfu_status *statu
 
     int64_t i, j, length = ptwXY1->length;
     ptwXYPoints *thinned = NULL;
-    double y1, y2, y3;
+    double y1, y2, y3, accuracyNew;
     char *thin = NULL;
 
     if( length < 3 ) return( ptwXY_clone( ptwXY1, status ) );   /* Logic below requires at least 2 points. */
     if( ( *status = ptwXY_simpleCoalescePoints( ptwXY1 ) ) != nfu_Okay ) return( NULL );
     *status = nfu_otherInterpolation;
     if( ptwXY1->interpolation == ptwXY_interpolationOther ) return( NULL );
-    if( accuracy < ptwXY1->accuracy ) accuracy = ptwXY1->accuracy;
-    if( ( thinned = ptwXY_new( ptwXY1->interpolation, ptwXY1->biSectionMax, accuracy, length, ptwXY1->overflowLength, status, ptwXY1->userFlag ) ) == NULL ) return( NULL );
+    accuracy = ptwXY_limitAccuracy( accuracy );
+    accuracyNew = accuracy;
+    if( accuracyNew < ptwXY1->accuracy ) accuracyNew = ptwXY1->accuracy;
+    if( ( thinned = ptwXY_new( ptwXY1->interpolation, ptwXY1->interpolationString, 
+        ptwXY1->biSectionMax, accuracyNew, length, ptwXY1->overflowLength, status, ptwXY1->userFlag ) ) == NULL ) return( NULL );
 
     thinned->points[0] = ptwXY1->points[0];                     /* This sections removes middle point if surrounding points have the same y-value. */
     y1 = ptwXY1->points[0].y;
@@ -279,7 +294,7 @@ Err:
 static nfu_status ptwXY_thin2( ptwXYPoints *thinned, char *thin, double accuracy, int64_t i1, int64_t i2 ) {
 
     int64_t i, iMax = 0;
-    double y, s, dY, dYMax = 0., dYR, dYRMax = 0;
+    double y, s, dRange, dRangeMax = 0., dRangeR, dRangeRMax = 0;
     double x1 = thinned->points[i1].x, y1 = thinned->points[i1].y, x2 = thinned->points[i2].x, y2 = thinned->points[i2].y;
     nfu_status status;
 
@@ -287,16 +302,16 @@ static nfu_status ptwXY_thin2( ptwXYPoints *thinned, char *thin, double accuracy
     for( i = i1 + 1; i < i2; i++ ) {
         if( ( status = ptwXY_interpolatePoint( thinned->interpolation, thinned->points[i].x, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) return( status );
         s = 0.5 * ( fabs( y ) + fabs( thinned->points[i].y ) );
-        dY = fabs( y - thinned->points[i].y );
-        dYR = 0;
-        if( s != 0 ) dYR = dY / s;
-        if( ( dYR > dYRMax ) || ( ( dYR >= 0.9999 * dYRMax ) && ( dY > dYMax ) ) ) {    /* The choice of 0.9999 is not exact science. */
-            iMax = i;
-            if( dY > dYMax ) dYMax = dY;
-            if( dYR > dYRMax ) dYRMax = dYR;
+        dRange = fabs( y - thinned->points[i].y );
+        dRangeR = 0;
+        if( s != 0 ) dRangeR = dRange / s;
+        if( ( dRangeR > dRangeRMax ) || ( ( dRangeR >= 0.9999 * dRangeRMax ) && ( dRange > dRangeMax ) ) ) {
+            iMax = i;							/* The choice of 0.9999 is not exact science. */
+            if( dRange > dRangeMax ) dRangeMax = dRange;
+            if( dRangeR > dRangeRMax ) dRangeRMax = dRangeR;
         }
     }
-    if( dYRMax < accuracy ) {
+    if( dRangeRMax < accuracy ) {
         for( i = i1 + 1; i < i2; i++ ) thin[i] = 1; }
     else {
         if( ( status = ptwXY_thin2( thinned, thin, accuracy, i1, iMax ) ) != nfu_Okay ) return( status );
@@ -307,15 +322,15 @@ static nfu_status ptwXY_thin2( ptwXYPoints *thinned, char *thin, double accuracy
 /*
 ************************************************************
 */
-static double ptwXY_thicken_linear_dx( int sectionSubdivideMax, double dxMax, double x1, double x2 ) {
+static double ptwXY_thicken_linear_dx( int sectionSubdivideMax, double dDomainMax, double x1, double x2 ) {
 
     int ndx;
     double dx = x2 - x1, dndx;
 
-    if( dxMax == 0. ) {
+    if( dDomainMax == 0. ) {
         dx = ( x2 - x1 ) / sectionSubdivideMax; }
     else {
-        dndx = dx / dxMax;
+        dndx = dx / dDomainMax;
         ndx = (int) dndx;
         if( ( dndx  - ndx ) > 1e-6 ) ndx++;
         if( ndx > sectionSubdivideMax ) ndx = sectionSubdivideMax;
@@ -430,7 +445,7 @@ ptwXYPoints *ptwXY_union( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_status *
     if( biSectionMax < ptwXY2->biSectionMax ) biSectionMax = ptwXY2->biSectionMax;
     accuracy = ptwXY1->accuracy;
     if( accuracy < ptwXY2->accuracy ) accuracy = ptwXY2->accuracy;
-    n = ptwXY_new( ptwXY1->interpolation, biSectionMax, accuracy, length, overflowSize, status, ptwXY1->userFlag );
+    n = ptwXY_new( ptwXY1->interpolation, NULL, biSectionMax, accuracy, length, overflowSize, status, ptwXY1->userFlag );
     if( n == NULL ) return( NULL );
 
     for( i = 0; ( i1 < n1 ) && ( i2 < n2 ); i++ ) {

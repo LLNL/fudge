@@ -8,22 +8,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 import glob, os
@@ -40,51 +51,51 @@ except ImportError:
     print "Warning: numpy was not found! Extensions requiring numpy will not be built"
     NUMPYSETUPOK = False
 
-import fudge
+# import fudge
 setup( 
-    name = 'fudge',\
-    version = fudge.__version__,\
-    author = 'Computational Nuclear Physics Group, LLNL',\
-    author_email  = 'mattoon1@llnl.gov',\
-    maintainer_email = 'mattoon1@llnl.gov',\
-    packages = [ \
-        'fudge', \
-        'fudge.core', \
-        'fudge.core.math', \
-        'fudge.core.math.test', \
-        'fudge.core.math.xData', \
-        'fudge.core.utilities', \
-        'fudge.core.utilities.test', \
-        'fudge.evaluationBuilder',\
-        'fudge.gnd', \
-        'fudge.gnd.channelData', \
-        'fudge.gnd.covariances',\
-        'fudge.gnd.productData', \
-        'fudge.gnd.productData.distributions', \
-        'fudge.gnd.productData.distributions.test', \
-        'fudge.gnd.reactionData', \
-        'fudge.gnd.reactionData.test', \
-        'fudge.gnd.reactions', \
-        'fudge.gnd.test', \
-        'fudge.legacy', \
-        'fudge.legacy.converting', \
-        'fudge.legacy.endl', \
-        'fudge.legacy.endl.test', \
-        'fudge.particles', \
-        'fudge.processing', \
-        'fudge.processing.deterministic', \
-        'fudge.processing.montecarlo', \
-        'fudge.processing.resonances', \
-        'fudge.structure', \
-        'fudge.vis', \
-        'fudge.vis.gnuplot', \
-        'fudge.vis.matplotlib', \
-        'pqu', \
-        'pqu.test' \
-    ],\
-    package_data = { \
-        'fudge.legacy.endl.test': [ 'testdb/ascii/yi01/za001001/y*','testdb/ascii/yi01/za001001/*.txt', 'testdb/ascii/yi01/za001001/*xml' ], \
-    }, \
+    name = 'fudge',
+    #    version = fudge.__version__,\
+    version = '4.2.0',
+    author = 'Computational Nuclear Physics Group, LLNL',
+    author_email  = 'mattoon1@llnl.gov',
+    maintainer_email = 'mattoon1@llnl.gov',
+    packages = [
+        'fudge',
+        'fudge.core',
+        'fudge.core.math',
+        'fudge.core.math.test',
+        'fudge.core.utilities',
+        'fudge.core.utilities.test',
+        'fudge.evaluationBuilder',
+        'fudge.gnd',
+        'fudge.gnd.channelData',
+        'fudge.gnd.covariances',
+        'fudge.gnd.productData',
+        'fudge.gnd.productData.distributions',
+        'fudge.gnd.productData.distributions.test',
+        'fudge.gnd.reactionData',
+        'fudge.gnd.reactionData.test',
+        'fudge.gnd.reactions',
+        'fudge.gnd.test',
+        'fudge.legacy',
+        'fudge.legacy.converting',
+        'fudge.legacy.endl',
+        'fudge.legacy.endl.test',
+        'fudge.particles',
+        'fudge.processing',
+        'fudge.processing.deterministic',
+        'fudge.processing.montecarlo',
+        'fudge.processing.resonances',
+        'fudge.structure',
+        'fudge.vis',
+        'fudge.vis.gnuplot',
+        'fudge.vis.matplotlib',
+        'pqu'
+#        'pqu.test' \
+    ],
+    package_data = {
+        'fudge.legacy.endl.test': [ 'testdb/ascii/yi01/za001001/y*','testdb/ascii/yi01/za001001/*.txt', 'testdb/ascii/yi01/za001001/*xml' ],
+    },
     ext_modules=[
         Extension( 'fudge.processing.resonances._getScatteringMatrices',
             sources = ['fudge/processing/resonances/getScatteringMatrices.c'],
@@ -92,11 +103,11 @@ setup(
         Extension( 'fudge.processing.resonances._getCoulombWavefunctions',
             sources = ['fudge/processing/resonances/getCoulombWavefunctions.c', 'fudge/processing/resonances/coulfg2.c'],
             include_dirs = [ numpyPath ], ),
-    ], \
-    url = 'http://nuclear.llnl.gov/fudge',\
-    license = open( 'LICENSE.txt' ).read(),\
-    description = '',\
-    long_description = open( 'README.txt' ).read()\
+    ],
+    url = 'http://nuclear.llnl.gov/fudge',
+    license = open( 'LICENSE.txt' ).read(),
+    description = '',
+    long_description = open( 'README.txt' ).read(), requires=['numpy']
 )
 
 # Also call the setup.py in externals packages

@@ -1,0 +1,173 @@
+\subsection{Convenient}
+This section decribes all the routines in the file "ptwXY\_convenient.c".
+
+\subsubsection{ptwXY\_getXArray}
+This routine returns, as an \highlight{ptwXPoints}, the list of x values in \highlight{ptwXY}. The returned object is allocated
+by \highlight{ptwXY\_getXArray} and must be freed by the user.
+\CallingC{ptwXPoints *ptwXY\_getXArray(}{ptwXYPoints *ptwXY,
+    \addArgument{fnu\_status *status );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{*status}{The status.}
+Returns NULL if an error occured.
+
+\subsubsection{ptwXY\_dullEdges}
+This function insures that the y-values at the end-points of  \highlight{ptwXY} are 0. This can be usefull for making
+sure two \highlight{ptwXYPoints} instances have mutual domains.
+\setargumentNameLengths{positiveXOnly}
+\CallingC{nfu\_status ptwXY\_dullEdges(}{ptwXYPoints *ptwXY,
+    \addArgument{double lowerEps,}
+    \addArgument{double upperEps,}
+    \addArgument{int positiveXOnly );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{lowerEps}{The amount to adjust the first points.}
+    \argumentBox{upperEps}{The amount to adjust the last points.}
+    \argumentBox{positiveXOnly}{The next point in the linked list.}
+The description here will mainly focuses on the dulling of the low point of ptwXY, the upper point's dulling is similar.
+Let $\epsilon_l =$ lowerEps, $x_0$ and $y_0$ be the first point of ptwXY and $x_1$ and $y_1$ be the second point of ptwXY.
+Also, if $x_0 \ne 0$ then let $\Delta x = |\epsilon_l| x_0$ otherwise let $\Delta x = |\epsilon_l|$.
+Then, the points around $x_0$ are modified only if lowerEps $\ne 0$ and $y_0 \ne 0$.
+The dulling of the lower edge can have one of the four outcomes listed here,
+\begin{eqnarray}
+                        & x_0, 0    & \hskip .5 in x_p, y_p            \hskip .5 in x_1, y_1 \hskip .5 in {\rm outcome \ 1} \nonumber \\
+                        & x_0, 0    & \hskip .5 in \hphantom{x_p, y_p} \hskip .5 in x_1, y_1 \hskip .5 in {\rm outcome \ 2} \nonumber \\
+    x_m, 0 \hskip .5 in & x_0, y'_0 & \hskip .5 in x_p, y_p            \hskip .5 in x_1, y_1 \hskip .5 in {\rm outcome \ 3} \nonumber \\
+    x_m, 0 \hskip .5 in & x_0, y'_0 & \hskip .5 in \hphantom{x_p, y_p} \hskip .5 in x_1, y_1 \hskip .5 in {\rm outcome \ 4} \nonumber
+\end{eqnarray}
+In all outcomes, the lower point now has $y = 0$.
+The point is added at $x_p = x_0 + \Delta x$ with $y = f(x_p)$ only if $x_0 + 2 \Delta x < x_2$.
+If the point at $x_m = x_0 - \Delta x$ is not added, then $y_0$ is set to 0 as shown in outcomes 1 and 2.
+The point $x_m$ is not added if $\epsilon_l > 0$, or positiveXOnly is true and $x_m < 0$ and $x_0 \ge 0$.
+
+The dulling of the upper edge can have one of the four outcomes listed here,
+\begin{eqnarray}
+    x_{k-1}, y_{k-1} \hskip .5 in x_m, y_m \hskip .5 in            & x_k, 0 & \hskip .5 in  \hphantom{x_p, 0} \hskip .5 in {\rm outcome \ 1} \nonumber \\
+    x_{k-1}, y_{k-1} \hskip .5 in \hphantom{x_m, y_m} \hskip .5 in & x_k, 0 & \hskip .5 in  \hphantom{x_p, 0} \hskip .5 in {\rm outcome \ 2} \nonumber \\
+    x_{k-1}, y_{k-1} \hskip .5 in x_m, y_m \hskip .5 in            & x_k, y_k & \hskip .5 in x_p, 0 \hskip .5 in {\rm outcome \ 3} \nonumber \\
+    x_{k-1}, y_{k-1} \hskip .5 in \hphantom{x_m, y_m} \hskip .5 in & x_k, y_k & \hskip .5 in x_p, 0 \hskip .5 in {\rm outcome \ 4} \nonumber
+\end{eqnarray}
+where $k$ is the index of the last point.
+
+\subsubsection{ptwXY\_mergeClosePoints}
+Removes and/or moves points so that no two consecutive points are too close to others.
+\CallingC{fnu\_status ptwXY\_mergeClosePoints(}{ptwXYPoints *ptwXY,
+    \addArgument{double epsilon);}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{epsilon}{The minimum relative spacing desired.}
+Points are removed and/or moved so the $x_{i+1} - x_i \le \highlight{epsilon} \times ( x_i + x_{i+1} ) / 2$.
+
+\subsubsection{ptwXY\_intersectionWith\_ptwX}
+This routine returns an \highlight{ptwXYPoints} instance whose x-values are the intersection of \highlight{ptwXY}'s and
+\highlight{ptwX}'s x-values. The domains of \highlight{ptwXY} and \highlight{ptwX} do not have to be mutual.
+\CallingC{ptwXY\_intersectionWith\_ptwX(}{ptwXYPoints *ptwXY,
+    \addArgument{ptwXPoints *ptwX,}
+    \addArgument{nfu\_status *status );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{ptwX}{A pointer to the \highlight{ptwXPoints} object.}
+    \argumentBox{status}{On return, the status value.}
+
+\subsubsection{ptwXY\_areDomainsMutual}
+This routine returns \highlight{nfu\_Okay} if \highlight{ptwXY1} and \highlight{ptwXY2} are mutual.
+\CallingC{fnu\_status ptwXY\_areDomainsMutual(}{ptwXYPoints *ptwXY1,
+    \addArgument{ptwXYPoints *ptwXY2 );}}
+    \argumentBox{ptwXY1}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{ptwXY2}{A pointer to a \highlight{ptwXYPoints} object.}
+If one or both of \highlight{ptwXY1} and \highlight{ptwXY2} are empty, \highlight{nfu\_empty} is returned.
+If one or both of \highlight{ptwXY1} and \highlight{ptwXY2} has only one point, \highlight{nfu\_tooFewPoints} is returned.
+If the domains are not mutual, \highlight{nfu\_domainsNotMutual} is returned.
+
+\subsubsection{ptwXY\_mutualifyDomains}
+If possible and needed, this routine mutualifies the domains of \highlight{ptwXY1} and \highlight{ptwXY2} by calling 
+\highlight{ptwXY\_dullEdges} on one or both of \highlight{ptwXY1} and \highlight{ptwXY2} if needed.
+\setargumentNameLengths{positiveXOnly1}
+\CallingC{fnu\_status ptwXY\_mutualifyDomains(}{ptwXYPoints *ptwXY1,
+    \addArgument{double lowerEps1,}
+    \addArgument{double upperEps1,}
+    \addArgument{int positiveXOnly1,}
+    \addArgument{ptwXYPoints *ptwXY2,}
+    \addArgument{double lowerEps2,}
+    \addArgument{double upperEps2,}
+    \addArgument{int positiveXOnly2 );}}
+    \argumentBox{ptwXY1}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{lowerEps1}{If needed the value of \highlight{lowerEps} passed to \highlight{ptwXY\_dullEdges} when dulling \highlight{ptwXY1}.}
+    \argumentBox{upperEps1}{If needed the value of \highlight{upperEps} passed to \highlight{ptwXY\_dullEdges} when dulling \highlight{ptwXY1}.}
+    \argumentBox{positiveXOnly1}{The value of \highlight{positiveXOnly} passed to \highlight{ptwXY\_dullEdges} when dulling \highlight{ptwXY1}.}
+    \argumentBox{ptwXY2}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{lowerEps2}{If needed the value of \highlight{lowerEps} passed to \highlight{ptwXY\_dullEdges} when dulling \highlight{ptwXY2}.}
+    \argumentBox{upperEps2}{If needed the value of \highlight{upperEps} passed to \highlight{ptwXY\_dullEdges} when dulling \highlight{ptwXY2}.}
+    \argumentBox{positiveXOnly2}{The value of \highlight{positiveXOnly} passed to \highlight{ptwXY\_dullEdges} when dulling \highlight{ptwXY2}.}
+
+\setargumentNameLengths{llocatedSize}
+\subsubsection{ptwXY\_copyToC\_XY}
+This routine copies the points from index \highlight{index1} inclusive to \highlight{index2} exclusive of \highlight{ptwXY}
+into the address pointed to by \highlight{xys}.
+\setargumentNameLengths{allocatedSize}
+\CallingC{fnu\_status ptwXY\_copyToC\_XY(}{ptwXYPoints *ptwXY, 
+    \addArgument{int64\_t index1,}
+    \addArgument{int64\_t index2,}
+    \addArgument{int64\_t allocatedSize,}
+    \addArgument{int64\_t numberOfPoints,}
+    \addArgument{double *xys );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{index1}{The lower index.}
+    \argumentBox{index2}{The upper index.}
+    \argumentBox{allocatedSize}{The size of the space allocated for xys in pairs of C-double.}
+    \argumentBox{numberOfPoints}{The number of (x,y) points filled into *xys.}
+    \argumentBox{xys}{A pointer to the space to write the data.}
+    \vskip 0.05 in \noindent
+The size of \highlight{xys} must be at least 2 $\times$ sizeof( double ) $\times$ \highlight{allocatedSize} bytes.
+The values of \highlight{index1} and \highlight{index2} are ajusted as follows. If \highlight{index1} is less than 0, it is set to 0. Then 
+if \highlight{index2} is less than \highlight{index1}, it is set to \highlight{index1}. Finally,
+if \highlight{index2} is greater than the length of \highlight{ptwXY}, it is set to the length of \highlight{ptwXY}.
+If \highlight{allocatedSize} is less than the number of points to be copied (i.e., \highlight{index2} - \highlight{index1} 
+after \highlight{index1} and \highlight{index2} are adjusted) then \highlight{nfu\_insufficientMemory} is returned;
+
+The returned \highlight{ptwXYPoints} object will always contain no points in the \highlight{overflowPoints} region.
+
+\setargumentNameLengths{interpolation}
+\subsubsection{ptwXY\_valueTo\_ptwXY}
+This routine creates a \highlight{ptwXYPoints} object with the two points (x1,y), (x2,y) where x1 $<$ x2.
+\CallingC{ptwXYPoints *ptwXY\_valueTo\_ptwXY(}{ptwXY\_interpolation interpolation, 
+    \addArgument{double x1,}
+    \addArgument{double x2,}
+    \addArgument{double y,}
+    \addArgument{fnu\_status *status );}}
+    \argumentBox{interpolation}{Type of interpolation to perform (see Section~\ref{interpolationSection}).}
+    \argumentBox{x1}{x value for the lower point.}
+    \argumentBox{x2}{x value for the upper point.}
+    \argumentBox{y}{y value for both points.}
+    \argumentBox{status}{On return, the status value.}
+    \vskip 0.05 in \noindent
+If an error occurs, NULL is returned.
+
+\subsubsection{ptwXY\_createGaussianCenteredSigma1}
+This routine returns a \highlight{ptwXYPoints} instance of the simple Gaussian $y(x) = \exp( -x^2 / 2 )$.
+\setargumentNameLengths{status}
+\CallingC{ptwXYPoints *ptwXY\_createGaussianCenteredSigma1(}{double accuracy, 
+    \addArgument{nfu\_status *status );}}
+    \argumentBox{accuracy}{The returned points are accurate to accuracy.}
+    \argumentBox{status}{On return, the status value.}
+    \vskip 0.05 in \noindent
+The domain ranges from $-\sqrt{ 2 \log( {\rm yMin} )}$ to $\sqrt{ 2 \log( {\rm yMin} )}$ where yMin = $10^{-10}$.
+
+\subsubsection{ptwXY\_createGaussian}
+This routine returns a \highlight{ptwXYPoints} instance of the Gaussian $y(x) = a \exp( -( x - c )^2 / ( 2 s ) )$.
+\setargumentNameLengths{amplitude}
+\CallingC{ptwXYPoints *ptwXY\_createGaussian(}{double accuracy,
+    \addArgument{double xCenter,}
+    \addArgument{double sigma,}
+    \addArgument{double amplitude,}
+    \addArgument{double xMin,}
+    \addArgument{double xMax,}
+    \addArgument{double dullEps,}
+    \addArgument{nfu\_status *status );}}
+    \argumentBox{accuracy}{The returned points are accurate to accuracy.}
+    \argumentBox{xCenter}{The center of the Gaussian.}
+    \argumentBox{sigma}{The width of the Gaussian.}
+    \argumentBox{amplitude}{The amplitude of the Gaussian.}
+    \argumentBox{xMin}{The lower domain of the returned Gaussian.}
+    \argumentBox{xMax}{The upper lower domain of the returned Gaussian.}
+    \argumentBox{dullEps}{Currently not implemented.}
+    \argumentBox{status}{On return, the status value.}
+    \vskip 0.05 in \noindent
+In the equation $a = $ \highlight{amplitude}, $c = $ \highlight{xCenter} and $s = $ \highlight{sigma}. This routine calls 
+\highlight{ptwXY\_create\-GaussianCenteredSigma1} and then scales the x and y values.

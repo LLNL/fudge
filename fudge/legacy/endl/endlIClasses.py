@@ -8,22 +8,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 """
@@ -41,11 +52,13 @@ import endlIClassesParameters
 import endlNd
 import endlmisc
 import endlParameters
+from endl2 import yoToZA
 
 normCheckTolerance = 1e-5
 fixThresholdMode_None = endlIClassesParameters.fixThresholdMode_None
 fixThresholdMode_RaiseOnly = endlIClassesParameters.fixThresholdMode_RaiseOnly
 fixThresholdMode_All = endlIClassesParameters.fixThresholdMode_All
+fixThreshold_deltaFunctionEpsilon = 1e-4
 
 def endlAddIObject( f, yo, C, I, S, h, points, bdflsFile = None ) :
     "For internal use only."
@@ -95,10 +108,11 @@ class endlI0( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         if( len( messages2d ) > 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
         return( ErrMsgs )
 
-    def fixThreshold( self, threshold, dThreshold_MeV = 10e-3, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
         """Calls endlIClasses.fixThresholdFor2d to fix threshold."""
 
-        fixThresholdFor2d( self, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode, 
+        fixThresholdFor2d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, 0., EMin = EMin, fixThresholdMode = fixThresholdMode, 
             threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getEMin_EMinNext( self ) :
@@ -133,8 +147,8 @@ class endlI0( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
             if( upperlimit == None ) : upperlimit = 'constant'
             if( not heatBelowThreshold ) : EMin = max( unheated.data[0][0], EMin )
             import crossSectionAdjustForHeatedTarget
-            d  = crossSectionAdjustForHeatedTarget.crossSectionAdjustForHeatedTarget( massRatio, dT, unheated.data, lowerlimit = lowerlimit, \
-                upperlimit = upperlimit, interpolationAccuracy = interpolationAccuracy, heatAllPoints = heatAllPoints, EMin = EMin, doNotThin = doNotThin,
+            d  = crossSectionAdjustForHeatedTarget.crossSectionAdjustForHeatedTarget( massRatio, dT, EMin, unheated.data, lowerlimit = lowerlimit, \
+                upperlimit = upperlimit, interpolationAccuracy = interpolationAccuracy, heatAllPoints = heatAllPoints, doNotThin = doNotThin,
                 heatAllEDomain = heatAllEDomain )
             heated = endl2dmathClasses.endl2dmath( d )
             if( removeClosePoints ) : heated.removeClosePoints( )
@@ -177,10 +191,11 @@ class endlI7( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         if( len( messages2d ) > 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
         return( ErrMsgs )
 
-    def fixThreshold( self, threshold, dThreshold_MeV = 10e-3, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
         """Calls endlIClasses.fixThresholdFor2d to fix threshold."""
 
-        fixThresholdFor2d( self, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode, 
+        fixThresholdFor2d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, None, EMin = EMin, fixThresholdMode = fixThresholdMode, 
             threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getEMin_EMinNext( self ) :
@@ -221,10 +236,11 @@ class endlI9( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         if( len( messages2d ) > 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
         return( ErrMsgs )
 
-    def fixThreshold( self, threshold, dThreshold_MeV = 10e-3, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
         """Calls endlIClasses.fixThresholdFor2d to fix threshold."""
 
-        fixThresholdFor2d( self, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
+        fixThresholdFor2d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, None, EMin = EMin, fixThresholdMode = fixThresholdMode,
             threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getEMin_EMinNext( self ) :
@@ -273,10 +289,11 @@ class endlI10( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         if( len( messages2d ) > 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
         return( ErrMsgs )
 
-    def fixThreshold( self, threshold, dThreshold_MeV = 10e-3, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
         """Calls endlIClasses.fixThresholdFor2d to fix threshold."""
 
-        fixThresholdFor2d( self, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
+        fixThresholdFor2d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, None, EMin = EMin, fixThresholdMode = fixThresholdMode,
             threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getEMin_EMinNext( self ) :
@@ -319,10 +336,11 @@ class endlI11( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         if( len( messages2d ) > 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
         return( ErrMsgs )
 
-    def fixThreshold( self, threshold, dThreshold_MeV = 10e-3, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
         """Calls endlIClasses.fixThresholdFor2d to fix threshold."""
 
-        fixThresholdFor2d( self, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
+        fixThresholdFor2d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, None, EMin = EMin, fixThresholdMode = fixThresholdMode,
             threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getEMin_EMinNext( self ) :
@@ -363,10 +381,11 @@ class endlI12( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         if( len( messages2d ) > 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
         return( ErrMsgs )
 
-    def fixThreshold( self, threshold, dThreshold_MeV = 10e-3, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
         """Calls endlIClasses.fixThresholdFor2d to fix threshold."""
 
-        fixThresholdFor2d( self, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
+        fixThresholdFor2d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, None, EMin = EMin, fixThresholdMode = fixThresholdMode,
             threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getEMin_EMinNext( self ) :
@@ -409,10 +428,11 @@ class endlI13( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
         if( len( messages2d ) > 0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( data = self, message = messages2d ) )
         return( ErrMsgs )
 
-    def fixThreshold( self, threshold, dThreshold_MeV = 10e-3, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
         """Calls endlIClasses.fixThresholdFor2d to fix threshold."""
 
-        fixThresholdFor2d( self, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
+        fixThresholdFor2d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, None, EMin = EMin, fixThresholdMode = fixThresholdMode,
             threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getEMin_EMinNext( self ) :
@@ -561,7 +581,7 @@ class endlI941( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
 
         from fudge import gnd
 
-        self.name = gnd.productData.distributions.base.pointwiseFormToken
+        self.name = 'pointwise'
         endlNd.endlNd.__init__( self, f, 941, yo, C, I, S, h, points, bdflsFile = bdflsFile )
         self.variablesUnits = 'energy_in[MeV];form_factor'
 
@@ -600,7 +620,7 @@ class endlI942( endlNd.endlNd, endl2dmathClasses.endl2dmath ) :
 
         from fudge import gnd
 
-        self.name = gnd.productData.distributions.base.pointwiseFormToken
+        self.name = 'pointwise'
         endlNd.endlNd.__init__( self, f, 942, yo, C, I, S, h, points, bdflsFile = bdflsFile )
         self.variablesUnits = 'energy_in[MeV];scattering_function'
 
@@ -663,14 +683,16 @@ class endlI1( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
 
         from fudge import gnd
 
-        self.name = gnd.productData.distributions.base.pointwiseFormToken
+        self.name = 'pointwise'
         endlNd.endlNd.__init__( self, f, 1, yo, C, I, S, h, points, i2 = 2, bdflsFile = bdflsFile )
         self.variablesUnits = 'energy_in[MeV];mu;P(mu|energy_in)'
 
     def check( self, normTolerance = 1e-5, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
-        """Checks to see that the data is consistance with I = 1 data and returns a list of 
+        """
+        Checks to see that the data is consistance with I = 1 data and returns a list of 
         endlCheckerObject instances. Also, calls the endl3dmathmisc.check3dData function. 
-        See endl3dmathmisc.check3dData for meaning of printWarning and printErrors."""
+        See endl3dmathmisc.check3dData for meaning of printWarning and printErrors.
+        """
 
         normTolerance = max( normTolerance, normCheckTolerance )
         ErrMsgs = []
@@ -683,13 +705,53 @@ class endlI1( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
         for E, muP in self.data :
             if( muP[0][0] < -1. ) : messages.append( 'endlI1.check: mu = %.8e < -1 for E = %e' % ( muP[0][0], E ) )
             if( muP[-1][0] > 1. ) : messages.append( 'endlI1.check: mu = %.8e > 1 for E = %e' % ( muP[-1][0], E ) )
+        messages += self.checkMus( True )
         if( len( messages ) > 0 ) : ErrMsgs = [ endlmisc.endlCheckerObject( data = self, message = messages ) ]
         return( ErrMsgs )
 
-    def fixThreshold( self, threshold, dThreshold_MeV = 10e-3, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+    def checkMus( self, internal = False ) :
+        """
+        This method checks that the mu values are reasonable. For two-body reactions, the mu domain must range from -1 to 1.
+        For other data, the first mu value must starts at -1 if above threshold and must be greater than -1 if at (near) threshold.
+        """
+
+        import math
+
+        messages, yo = [], self.yo
+        if( yo > 9 ) : yo -= 10
+
+        if( ( self.C == 10 ) or ( self.S == 1 ) ) :        # Two-body.
+            for e_in, muPs in self.data :
+                if( ( muPs[0][0] != -1 ) or ( muPs[-1][0] != 1 ) ) :
+                    messages.append( 'endlI1.checkMus: for two-body, mu domain invalid: domain is %.5f for %.5f for E = %e' % ( muPs[0][0], muPs[-1][0], e_in ) )
+        else :
+            if( yo == 7 ) : return( [] )
+
+            projectileMass, targetMass, productMass = self.bdflsFile.mass( self.yi ), self.bdflsFile.mass( self.ZA ), self.bdflsFile.mass( yo )
+            compoundMass = projectileMass + targetMass
+            Q = self.getQ( )
+
+            for i1, e_muPs in enumerate( self.data ) :
+                e_in, muPs = e_muPs
+                uMax2 = 2 * ( e_in * targetMass / compoundMass + Q ) / productMass  # maximum speed of product squared in COM frame.
+                vCOM2 = 2 * projectileMass * e_in / compoundMass**2                 # speed of COM squared.
+                atThreshold = ( i1 == 0 ) and ( Q < 0 )
+                if( atThreshold ) :
+                    if( muPs[0][0] == -1 ) : messages.append( 'endlI1.checkMus: need delta function in mu, mu = -1 for E = %e' % ( e_in ) )
+                else :
+                    if( uMax2 >= vCOM2 ) :
+                        if( muPs[0][0] > -1 ) : messages.append( 'endlI1.checkMus: mu range too short, mu = %.5e > -1 for E = %e' % ( muPs[0][0], e_in ) )
+                    else :
+                        if( muPs[0][0] == -1 ) : messages.append( 'endlI1.checkMus: need delta function, mu = %.8e == -1 for E = %e' % ( muPs[0][0], e_in ) )
+        if( not( internal ) ) :
+            if( len( messages ) > 0 ) : messages = [ endlmisc.endlCheckerObject( data = self, message = messages ) ]
+        return( messages )
+
+    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
         """Calls endlIClasses.fixThresholdFor3d to fix threshold."""
 
-        fixThresholdFor3d( self, self.I, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
+        fixThresholdFor3d( self, thresholdCrossSectionIsZero, self.I, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
             threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getEMin_EMinNext( self ) :
@@ -784,7 +846,7 @@ class endlI21( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
         from fudge import gnd
 
         self.name = ''
-        self.form = gnd.productData.distributions.base.pointwiseFormToken
+        self.form = 'pointwise'
         endlNd.endlNd.__init__( self, f, 21, yo, C, I, S, h, points, i2 = 2, bdflsFile = bdflsFile )
 
     def check( self, printWarning = True, printErrors = True, xCloseEps = None, allowZeroE = False, maxAbsFloatValue = None, **arg ) :
@@ -798,10 +860,11 @@ class endlI21( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
         if( len( messages ) > 0 ) : ErrMsgs = [ endlmisc.endlCheckerObject( data = self, message = messages ) ]
         return( ErrMsgs )
 
-    def fixThreshold( self, threshold, dThreshold_MeV = 10e-3, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
         """Calls endlIClasses.fixThresholdFor3d to fix threshold."""
 
-        fixThresholdFor3d( self, self.I, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
+        fixThresholdFor3d( self, thresholdCrossSectionIsZero, self.I, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
             threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getEMin_EMinNext( self ) :
@@ -841,10 +904,11 @@ class endlI22( endlNd.endlNd, endl3dmathClasses.endl3dmath ) :
         if( len( messages ) > 0 ) : ErrMsgs = [ endlmisc.endlCheckerObject( data = self, message = messages ) ]
         return( ErrMsgs )
 
-    def fixThreshold( self, threshold, dThreshold_MeV = 10e-3, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
         """Calls endlIClasses.fixThresholdFor3d to fix threshold."""
 
-        fixThresholdFor3d( self, self.I, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
+        fixThresholdFor3d( self, thresholdCrossSectionIsZero, self.I, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
             threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getEMin_EMinNext( self ) :
@@ -947,7 +1011,7 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
 
         from fudge import gnd
 
-        self.name = gnd.productData.distributions.base.pointwiseFormToken
+        self.name = 'pointwise'
         endlNd.endlNd.__init__( self, f, 3, yo, C, I, S, h, points, i2 = 2, i3 = 3, bdflsFile = bdflsFile )
         self.xInterpolation = 'linear,linear,unitbase:x:linear,unitbase:y:linear'
         self.variablesUnits = 'energy_in[MeV];mu;energy_out[MeV];pdf(energy_out|mu,energy_in)'
@@ -983,10 +1047,11 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
 
         return endlI3( None, self.yo, self.C, self.I, self.S, self.h, endl4dmathClasses.endl4dmath.copyData( self ) )
 
-    def fixThreshold( self, threshold, dThreshold_MeV = 10e-3, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
         """Calls endlIClasses.fixThresholdFor4d to fix threshold."""
 
-        fixThresholdFor4d( self, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
+        fixThresholdFor4d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, fixThresholdMode = fixThresholdMode,
             threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getMuEpPAtE( self, E, extrapolation = endl3dmathmisc.noExtrapolation ) :
@@ -1188,7 +1253,7 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
     def convertToI4( self, i1=None, lmax=0 ):
         "Converts the self and the I=1 data given as an argument to an endlI4 instance where the new object has Legendre orders 0, 1, ..., lmax"
 
-        from fudge.core.math.xData import LegendreSeries
+        from xData import series1d as seriesModule
 
         # Set up the I=4 file, especially the header crap
         dummy = endlI3( None, self.yo, self.C, self.I, self.S, self.h, [] )
@@ -1199,7 +1264,7 @@ class endlI3( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
         # Loop through l's expanding the product of the I=1 and I=3 files into Legendre polynomials
         for l in range( 0, lmax+1 ):
             thisLTerm = endl3dmathClasses.endl3dmath()
-            legPoly = endl2dmathmisc.convertFunctionToLinLin( lambda x: ( 2 * l + 1 ) * LegendreSeries.Legendre( l, x ), -1.0, 1.0, 1e-4 )
+            legPoly = endl2dmathmisc.convertFunctionToLinLin( lambda x: ( 2 * l + 1 ) * seriesModule.Legendre( l, x ), -1.0, 1.0, 1e-4 )
             for iE in range( len ( self.data ) ):
                 E = self.E( iE )
                 i1_muP = endl2dmathClasses.endl2dmath( data = i1.data[ iE ][1] ) 
@@ -1328,7 +1393,7 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
 
         from fudge import gnd
 
-        self.name = gnd.productData.distributions.base.pointwiseFormToken
+        self.name = 'pointwise'
         endlNd.endlNd.__init__( self, f, 4, yo, C, I, S, h, points, i0 = 2, i1 = 0, i2 = 1, i3 = 3, bdflsFile = bdflsFile )
         self.xInterpolation = 'none,linear,unitbase:x:linear,unitbase:y:linear'
         self.variablesUnits = 'l;energy_in[MeV];energy_out[MeV];C_l(energy_out|energy_in)'
@@ -1379,13 +1444,13 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
     def convertToUI3( self, nMu = 21, lMax = None ) :
         """This methods converts the I = 4 data into unnormalized I = 3 data using nMu equally spaced mu 
         values.  Note that the data is not normalized; hence, the normalized method should be called on the
-        returned object. This method will only convert up to Legendre order l = min( lMax, LegendreSeries.maxLegendreOrder ) 
+        returned object. This method will only convert up to Legendre order l = min( lMax, series1d.maxLegendreOrder ) 
         of self's data."""
 
-        from fudge.core.math.xData import LegendreSeries
+        from xData import series1d as seriesModule
 
-        if( lMax == None ) : lMax = LegendreSeries.maxLegendreOrder
-        lMax = max( 0, min( lMax, LegendreSeries.maxLegendreOrder ) )
+        if( lMax == None ) : lMax = seriesModule.maxLegendreOrder
+        lMax = max( 0, min( lMax, seriesModule.maxLegendreOrder ) )
             
         I3Data = []
         if ( len( self ) == 1 ) :
@@ -1416,7 +1481,7 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
             for l, EEpP in self.data :
                 if( l > lMax ) : break
                 LArray = []
-                for mu in muArray : LArray.append( LegendreSeries.Legendre( l, mu ) )
+                for mu in muArray : LArray.append( seriesModule.Legendre( l, mu ) )
                 l_LArray.append( LArray )
             iE = -1
             for E in EArray :
@@ -1484,12 +1549,13 @@ class endlI4( endlNd.endlNd, endl4dmathClasses.endl4dmath ) :
                 if( len( EEpP ) > 0 ) : EMin = min( EMin, EEpP[0][0] )
         return( EMin )
 
-    def fixThreshold( self, threshold, dThreshold_MeV = 10e-3, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+    def fixThreshold( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV = 10e-3, EMin = 0., 
+            fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
         """Calls endlIClasses.fixThresholdFor3d to fix threshold for each l-order data."""
 
         for l, EEpP in self.data :
             d = endl3dmathClasses.endl3dmath( data = EEpP, checkDataType = 0 )
-            fixThresholdFor3d( d, self.I, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, realSelf = self, fixThresholdMode = fixThresholdMode,
+            fixThresholdFor3d( d, thresholdCrossSectionIsZero, self.I, threshold, dThreshold_MeV = dThreshold_MeV, EMin = EMin, realSelf = self, fixThresholdMode = fixThresholdMode,
                 threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getEMin_EMinNext( self ) :
@@ -1764,7 +1830,7 @@ def getThresholdsForChecker2d( self ) :
 
 def fixThresholdTest( threshold, dThreshold_MeV, EMin, EMin_, fixThresholdMode ) :
 
-    if( fixThresholdMode == None ) : fixThresholdMode = fixThresholdMode_RaiseOnly
+    if( fixThresholdMode is None ) : fixThresholdMode = fixThresholdMode_RaiseOnly
     if( fixThresholdMode == fixThresholdMode_None ) :
         return( False )
     elif( fixThresholdMode == fixThresholdMode_RaiseOnly ) :
@@ -1774,7 +1840,8 @@ def fixThresholdTest( threshold, dThreshold_MeV, EMin, EMin_, fixThresholdMode )
     if( fixThreshold or ( EMin_ < EMin ) ) : return( True )
     return( False )
 
-def fixThresholdFor2d( self, threshold, dThreshold_MeV, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+def fixThresholdFor2d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, thresholdValue, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, 
+        threshold_MeV_shiftWarning = 0.1 ) :
 
     if( len( self ) == 0 ) : return
     if( EMin > threshold ) : threshold = EMin
@@ -1782,14 +1849,20 @@ def fixThresholdFor2d( self, threshold, dThreshold_MeV, EMin = 0., fixThresholdM
     if( fixThresholdTest( threshold, dThreshold_MeV, EMin, EMin_, fixThresholdMode ) ) :
         dE = threshold - EMin_
         if( abs( dE ) > threshold_MeV_shiftWarning ) :
-            endlmisc.printWarning( 'Moving threshold %e by %e for ZA = %d, %s' % ( self.data[0][0], dE, self.ZA, `self` ) )
-        ELast = EMin_ + 1.                                 # Make sure the first point is always done.
-        for Ey in self.data :
-            if( Ey[0] > ELast ) : break
-            Ey[0] += dE
-            ELast = Ey[0]
+            endlmisc.printWarning( '    2d: Moving threshold %e by %e for ZA = %d, %s' % ( self.data[0][0], dE, self.ZA, `self` ) )
+        if( dE < 0 ) :
+            if( not( thresholdCrossSectionIsZero ) ) :
+                endlmisc.printWarning( '    Warning 2d: adding point at threshold where prior cross section was not 0: %s' % `self` )
+            if( thresholdValue is None ) : thresholdValue = self.data[0][1]
+            self.data.insert( 0, [ threshold, thresholdValue ] )
+        else :
+            ELast = EMin_ + 1.                                 # Make sure the first point is always done.
+            for Ey in self.data :
+                if( Ey[0] > ELast ) : break
+                Ey[0] += dE
+                ELast = Ey[0]
 
-def fixThresholdFor3d( self, I, threshold, dThreshold_MeV, EMin = 0., realSelf = None, fixThresholdMode = fixThresholdMode_RaiseOnly,
+def fixThresholdFor3d( self, thresholdCrossSectionIsZero, I, threshold, dThreshold_MeV, EMin = 0., realSelf = None, fixThresholdMode = fixThresholdMode_RaiseOnly,
         threshold_MeV_shiftWarning = 0.1 ) :
 
     if( len( self ) == 0 ) : return
@@ -1797,35 +1870,37 @@ def fixThresholdFor3d( self, I, threshold, dThreshold_MeV, EMin = 0., realSelf =
     EMin_ = self.xMin( )
     if( fixThresholdTest( threshold, dThreshold_MeV, EMin, EMin_, fixThresholdMode ) ) :
         self_ = self
-        if( realSelf != None ) : self_ = realSelf
+        if( realSelf is not None ) : self_ = realSelf
         dE = threshold - EMin_
         if( abs( dE ) > threshold_MeV_shiftWarning ) :
-            endlmisc.printWarning( 'Moving threshold %e by %e for ZA = %d, %s' % ( self.data[0][0], dE, self_.ZA, `self_` ) )
+            endlmisc.printWarning( '    3d: Moving threshold %e by %e for ZA = %d, %s' % ( self.data[0][0], dE, self_.ZA, `self_` ) )
         if( dE > 0. ) :                                     # Move lower data up.
             ELast = EMin_ + 1.                              # Make sure the first point is always done.
-            firstPass = True
             EyzPrepend = None
             for Eyz in self.data :
                 if( Eyz[0] > ELast ) : break
-                if( firstPass and ( Eyz[0] > 1.2 * EMin ) ) :
-                    endlmisc.printWarning( 'Prepending %d %s' % ( self_.ZA, `self_` ) )
-                    yz = []
-                    for y, z in Eyz[1] :
-                        yz.append( [ y, z ] )
-                    EyzPrepend = [ EMin, yz ]
-                else :
-                    Eyz[0] += dE
-                firstPass = False
+                Eyz[0] += dE
                 ELast = Eyz[0]
-            if( EyzPrepend != None ) : self.data.insert( 0, EyzPrepend )
+            if( EyzPrepend is not None ) : self.data.insert( 0, EyzPrepend )
         else :                                              # Create point at threshold.
+            if( not( thresholdCrossSectionIsZero ) ) :
+                endlmisc.printWarning( '    Warning 3d: adding point at threshold where prior cross section was not 0: %s' % `self_` )
+            delta = fixThreshold_deltaFunctionEpsilon
             if( I == 1 ) :
-                self.data.insert( 0, [ threshold, [ [ -1, 0.5 ], [ 1, 0.5 ] ] ] )
+                if( ( self_.C == 10 ) or ( self_.S == 1 ) ) :
+                    endlmisc.printWarning( '    3d: Adding isotropic at threshold for com data: %s' % `self_` )
+                    self.data.insert( 0, [ threshold, [ [ -1, 0.5 ], [ 1.0, 0.5 ] ] ] )
+                else :
+                    endlmisc.printWarning( '    3d: Adding forward peaked delta function at threshold: %s' % `self_` )
+                    self.data.insert( 0, [ threshold, [ [ 1 - delta, 0.0 ], [ 1.0, 2 / delta ] ] ] )
             else :
-                endlmisc.printWarning( 'Creating data at threshold not supported for %s' % `self` )
-                return
+                if( I in [ 21, 22 ] ) :
+                    endlmisc.printWarning( '    3d: I = %d data not support by fixThresholdFor3d: ZA = %d: %s' % ( I, self_.ZA, `self_` ) )
+                else :
+                    endlmisc.printWarning( '    3d: Creating data at threshold %e for I = %d data' % ( threshold, I ) )
+                    self.data.insert( 0, [ threshold, [ [ delta, 2 / delta ], [ 2 * delta, 0.0 ] ] ] )
 
-def fixThresholdFor4d( self, threshold, dThreshold_MeV, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
+def fixThresholdFor4d( self, thresholdCrossSectionIsZero, threshold, dThreshold_MeV, EMin = 0., fixThresholdMode = fixThresholdMode_RaiseOnly, threshold_MeV_shiftWarning = 0.1 ) :
 
     if( len( self ) == 0 ) : return
     if( EMin > threshold ) : threshold = EMin
@@ -1833,7 +1908,7 @@ def fixThresholdFor4d( self, threshold, dThreshold_MeV, EMin = 0., fixThresholdM
     if( fixThresholdTest( threshold, dThreshold_MeV, EMin, EMin_, fixThresholdMode ) ) :
         dE = threshold - EMin_
         if( abs( dE ) > threshold_MeV_shiftWarning ) :
-            endlmisc.printWarning( 'Moving threshold %e by %e for ZA = %d, %s' % ( self.data[0][0], dE, self.ZA, `self` ) )
+            endlmisc.printWarning( '    4d: Moving threshold %e by %e for ZA = %d, %s' % ( self.data[0][0], dE, self.ZA, `self` ) )
         if( dE > 0 ) :                                      # Move lower data up.
             ELast = EMin_ + 1.                              # Make sure the first point is always done.
             for Exyz in self.data :
@@ -1841,12 +1916,24 @@ def fixThresholdFor4d( self, threshold, dThreshold_MeV, EMin = 0., fixThresholdM
                 Exyz[0] += dE
                 ELast = Exyz[0]
         else :                                              # Create point at threshold.
-            Eps = [ [ 0, 0 ], [ 1e-9, 2e9 ] ]
+            if( not( thresholdCrossSectionIsZero ) ) :
+                endlmisc.printWarning( '    Warning 4d: adding point at threshold where prior cross section was not 0: %s' % `self` )
+            delta = fixThreshold_deltaFunctionEpsilon
             if( self.I == 3 ) :
-                self.data.insert( 0, [ threshold, [ [ -1, Eps ], [ 1, Eps ] ] ] )
+                yo = self.yo
+                if( yo > 9 ) : yo -= 10
+                mass1, mass2, mass3 = self.bdflsFile.mass( self.yi ), self.bdflsFile.mass( self.ZA ), self.bdflsFile.mass( yo )
+                EpLab = mass1 * mass3 * threshold / ( mass1 + mass2 )**2
+                if( EpLab - delta < 0 ) :
+                    EpP = [ [ 0.0, 2 / delta ], [ delta, 0 ] ]
+                else :
+                    EpP = [ [ EpLab - delta, 0.0 ],
+                            [         EpLab, 1 / delta ],
+                            [ EpLab + delta, 0.0 ] ]
+                self.data.insert( 0, [ threshold, [ [ 1 - delta, EpP ],
+                                                    [       1.0, EpP ] ] ] )
             else :
-                endlmisc.printWarning( 'Creating data at threshold not supported for %s' % `self` )
-                return
+                endlmisc.printWarning( '    4d: Creating data at threshold not supported for %s' % `self` )
 
 def I1sToCommonGrids( I1List, muGridPerE = True ) :
     """This routine takes a list of I = 1 data and puts their E and mu data onto a common grid. Note, this function may add

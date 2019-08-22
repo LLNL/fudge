@@ -9,22 +9,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 */
 
@@ -34,20 +45,27 @@
 
 #include "ptwXY.h"
 
+/* Need to change these when conversion to Fudge3 is complete. */
+static char const linLinInterpolationString[] = "lin,lin";
+static char const linLogInterpolationString[] = "lin,log";
+static char const logLinInterpolationString[] = "log,lin";
+static char const logLogInterpolationString[] = "log,log";
+static char const flatInterpolationString[] = "flat";
+
 static void ptwXY_initialOverflowPoint( ptwXYOverflowPoint *overflowPoint, ptwXYOverflowPoint *prior, ptwXYOverflowPoint *next );
 static nfu_status ptwXY_mergeFrom( ptwXYPoints *ptwXY, int incY, int length, double *xs, double *ys );
-static int ptwXY_mergeCompareFunction( void const *x1p, void const *x2p );
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_new( ptwXY_interpolation interpolation, double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize, 
-    nfu_status *status, int userFlag ) {
+ptwXYPoints *ptwXY_new( ptwXY_interpolation interpolation, char const *interpolationString, double biSectionMax, 
+    double accuracy, int64_t primarySize, int64_t secondarySize, nfu_status *status, int userFlag ) {
 
     ptwXYPoints *ptwXY = (ptwXYPoints *) nfu_calloc( sizeof( ptwXYPoints ), 1 );
 
     *status = nfu_mallocError;
     if( ptwXY == NULL ) return( NULL );
-    ptwXY_setup( ptwXY, interpolation, biSectionMax, accuracy, primarySize, secondarySize, userFlag );
+    ptwXY_setup( ptwXY, interpolation, interpolationString, biSectionMax, accuracy, primarySize, 
+        secondarySize, userFlag );
     if( ( *status = ptwXY->status ) != nfu_Okay ) {
         ptwXY = (ptwXYPoints *) nfu_free( ptwXY );
     }
@@ -56,13 +74,32 @@ ptwXYPoints *ptwXY_new( ptwXY_interpolation interpolation, double biSectionMax, 
 /*
 ************************************************************
 */
-nfu_status ptwXY_setup( ptwXYPoints *ptwXY, ptwXY_interpolation interpolation, double biSectionMax, double accuracy, int64_t primarySize, 
-    int64_t secondarySize, int userFlag ) {
+nfu_status ptwXY_setup( ptwXYPoints *ptwXY, ptwXY_interpolation interpolation, char const *interpolationString,
+    double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize, int userFlag ) {
 
     ptwXY->status = nfu_Okay;
     ptwXY->typeX =  ptwXY_sigma_none;
     ptwXY->typeY =  ptwXY_sigma_none;
     ptwXY->interpolation = interpolation;
+    ptwXY->interpolationString = NULL;
+    switch( interpolation ) {
+    case ptwXY_interpolationLinLin :
+        ptwXY->interpolationString = linLinInterpolationString; break;
+    case ptwXY_interpolationLinLog :
+        ptwXY->interpolationString = linLogInterpolationString; break;
+    case ptwXY_interpolationLogLin :
+        ptwXY->interpolationString = logLinInterpolationString; break;
+    case ptwXY_interpolationLogLog :
+        ptwXY->interpolationString = logLogInterpolationString; break;
+    case ptwXY_interpolationFlat :
+        ptwXY->interpolationString = flatInterpolationString; break;
+    case ptwXY_interpolationOther :         /* For ptwXY_interpolationOther, interpolationString must be defined. */
+        if( interpolationString == NULL ) {              
+                ptwXY->status = nfu_otherInterpolation; }
+        else {
+            if( ( ptwXY->interpolationString = strdup( interpolationString ) ) == NULL ) ptwXY->status = nfu_mallocError;
+        }
+    }
     ptwXY->userFlag = 0;
     ptwXY_setUserFlag( ptwXY, userFlag );
     ptwXY->biSectionMax = ptwXY_maxBiSectionMax;
@@ -89,13 +126,15 @@ nfu_status ptwXY_setup( ptwXYPoints *ptwXY, ptwXY_interpolation interpolation, d
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_create( ptwXY_interpolation interpolation, double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize,
-    int64_t length, double *xy, nfu_status *status, int userFlag ) {
+ptwXYPoints *ptwXY_create( ptwXY_interpolation interpolation, char const *interpolationString,
+    double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize, int64_t length, double const *xy, 
+    nfu_status *status, int userFlag ) {
 
     ptwXYPoints *ptwXY;
 
     if( primarySize < length ) primarySize = length;
-    if( ( ptwXY = ptwXY_new( interpolation, biSectionMax, accuracy, primarySize, secondarySize, status, userFlag ) ) != NULL ) {
+    if( ( ptwXY = ptwXY_new( interpolation, interpolationString, biSectionMax, accuracy, primarySize, 
+            secondarySize, status, userFlag ) ) != NULL ) {
         if( ( *status = ptwXY_setXYData( ptwXY, length, xy ) ) != nfu_Okay ) {
             ptwXY = ptwXY_free( ptwXY );
         }
@@ -105,14 +144,16 @@ ptwXYPoints *ptwXY_create( ptwXY_interpolation interpolation, double biSectionMa
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_createFrom_Xs_Ys( ptwXY_interpolation interpolation, double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize,
-    int64_t length, double *Xs, double *Ys, nfu_status *status, int userFlag ) {
+ptwXYPoints *ptwXY_createFrom_Xs_Ys( ptwXY_interpolation interpolation, char const *interpolationString,
+    double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize, int64_t length, double const *Xs, 
+    double const *Ys, nfu_status *status, int userFlag ) {
 
     int i;
     ptwXYPoints *ptwXY;
 
     if( primarySize < length ) primarySize = length;
-    if( ( ptwXY = ptwXY_new( interpolation, biSectionMax, accuracy, primarySize, secondarySize, status, userFlag ) ) != NULL ) {
+    if( ( ptwXY = ptwXY_new( interpolation, interpolationString, biSectionMax, accuracy, primarySize, 
+            secondarySize, status, userFlag ) ) != NULL ) {
         for( i = 0; i < length; i++ ) {
             ptwXY->points[i].x = Xs[i];
             ptwXY->points[i].y = Ys[i];
@@ -135,36 +176,49 @@ nfu_status ptwXY_copy( ptwXYPoints *dest, ptwXYPoints *src ) {
     if( src->status != nfu_Okay ) return( src->status );
 
     ptwXY_clear( dest );
+    if( dest->interpolation == ptwXY_interpolationOther ) {
+        if( dest->interpolationString != NULL ) {
+            dest->interpolationString= (char const *) nfu_free( (void *) dest->interpolationString );
+        }
+    }
+    dest->interpolation = ptwXY_interpolationLinLin; /* This and prior lines are in case interpolation is 'other' and ptwXY_reallocatePoints fails. */
     if( dest->allocatedSize < src->length ) ptwXY_reallocatePoints( dest, src->length, 0 );
-    if( dest->status == nfu_Okay ) {
-        dest->interpolation = src->interpolation;
-        dest->userFlag = src->userFlag;
-        dest->biSectionMax = src->biSectionMax;
-        dest->accuracy = src->accuracy;
-        dest->minFractional_dx = src->minFractional_dx;
-        pointFrom = src->points;
-        o = src->overflowHeader.next;
-        pointTo = dest->points;
-        i = 0;
-        while( o != overflowHeader ) {
-            if( i < nonOverflowLength ) {
-                if( pointFrom->x < o->point.x ) {
-                    *pointTo = *pointFrom;
-                    i++;
-                    pointFrom++; }
-                else {
-                    *pointTo = o->point;
-                    o = o->next;
-                } }
+    if( dest->status != nfu_Okay ) return( dest->status );
+    dest->interpolation = src->interpolation;
+    if( dest->interpolation == ptwXY_interpolationOther ) {
+        if( src->interpolationString != NULL ) {
+            if( ( dest->interpolationString = strdup( src->interpolationString ) ) == NULL ) 
+                return( dest->status = nfu_mallocError );
+        } }
+    else {
+        dest->interpolationString = src->interpolationString;
+    }
+    dest->userFlag = src->userFlag;
+    dest->biSectionMax = src->biSectionMax;
+    dest->accuracy = src->accuracy;
+    dest->minFractional_dx = src->minFractional_dx;
+    pointFrom = src->points;
+    o = src->overflowHeader.next;
+    pointTo = dest->points;
+    i = 0;
+    while( o != overflowHeader ) {
+        if( i < nonOverflowLength ) {
+            if( pointFrom->x < o->point.x ) {
+                *pointTo = *pointFrom;
+                i++;
+                pointFrom++; }
             else {
                 *pointTo = o->point;
                 o = o->next;
-            }
-            pointTo++;
+            } }
+        else {
+            *pointTo = o->point;
+            o = o->next;
         }
-        for( ; i < nonOverflowLength; i++, pointFrom++, pointTo++ ) *pointTo = *pointFrom;
-        dest->length = src->length;
+        pointTo++;
     }
+    for( ; i < nonOverflowLength; i++, pointFrom++, pointTo++ ) *pointTo = *pointFrom;
+    dest->length = src->length;
     return( dest->status );
 }
 /*
@@ -173,6 +227,37 @@ nfu_status ptwXY_copy( ptwXYPoints *dest, ptwXYPoints *src ) {
 ptwXYPoints *ptwXY_clone( ptwXYPoints *ptwXY, nfu_status *status ) {
 
     return( ptwXY_slice( ptwXY, 0, ptwXY->length, ptwXY->overflowAllocatedSize, status ) );
+}
+/*
+************************************************************
+*/
+ptwXYPoints *ptwXY_cloneToInterpolation( ptwXYPoints *ptwXY, ptwXY_interpolation interpolationTo, nfu_status *status ) {
+
+    ptwXYPoints *n1;
+
+    if( interpolationTo == ptwXY_interpolationOther ) {
+        *status = nfu_otherInterpolation;
+        return( NULL );
+    }
+    if( ( n1 = ptwXY_clone( ptwXY, status ) ) != NULL ) {
+        if( n1->interpolation == ptwXY_interpolationOther ) nfu_free( (void *) n1->interpolationString );
+        n1->interpolation = interpolationTo;
+        switch( interpolationTo ) {
+            case ptwXY_interpolationLinLin :
+                n1->interpolationString = linLinInterpolationString; break;
+            case ptwXY_interpolationLinLog :
+                n1->interpolationString = linLogInterpolationString; break;
+            case ptwXY_interpolationLogLin :
+                n1->interpolationString = logLinInterpolationString; break;
+            case ptwXY_interpolationLogLog :
+                n1->interpolationString = logLogInterpolationString; break;
+            case ptwXY_interpolationFlat :
+                n1->interpolationString = flatInterpolationString; break;
+            case ptwXY_interpolationOther :     /* Does not happen, but needed to stop compilers from complaining. */
+                break;
+        }
+    }
+    return( n1 );
 }
 /*
 ************************************************************
@@ -192,7 +277,8 @@ ptwXYPoints *ptwXY_slice( ptwXYPoints *ptwXY, int64_t index1, int64_t index2, in
 
     length = index2 - index1;
     if( ( *status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( NULL );
-    if( ( n = ptwXY_new( ptwXY->interpolation, ptwXY->biSectionMax, ptwXY->accuracy, length, secondarySize, status, ptwXY->userFlag ) ) == NULL ) return( NULL );
+    if( ( n = ptwXY_new( ptwXY->interpolation, ptwXY->interpolationString, ptwXY->biSectionMax, 
+        ptwXY->accuracy, length, secondarySize, status, ptwXY->userFlag ) ) == NULL ) return( NULL );
 
     *status = n->status = ptwXY->status;
     for( i = index1; i < index2; i++ ) n->points[i - index1] = ptwXY->points[i];
@@ -202,7 +288,7 @@ ptwXYPoints *ptwXY_slice( ptwXYPoints *ptwXY, int64_t index1, int64_t index2, in
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_xSlice( ptwXYPoints *ptwXY, double xMin, double xMax, int64_t secondarySize, int fill, nfu_status *status ) {
+ptwXYPoints *ptwXY_domainSlice( ptwXYPoints *ptwXY, double domainMin, double domainMax, int64_t secondarySize, int fill, nfu_status *status ) {
 
     int64_t i, i1, i2;
     double y;
@@ -210,22 +296,23 @@ ptwXYPoints *ptwXY_xSlice( ptwXYPoints *ptwXY, double xMin, double xMax, int64_t
 
     if( ( *status = ptwXY->status ) != nfu_Okay ) return( NULL );
 
-    if( ( ptwXY->length == 0 ) || ( ptwXY_getXMin( ptwXY ) >= xMax ) || ( ptwXY_getXMax( ptwXY ) <= xMin ) ) {
-        n = ptwXY_new( ptwXY->interpolation, ptwXY->biSectionMax, ptwXY->accuracy, 0, secondarySize, status, ptwXY->userFlag ); }
+    if( ( ptwXY->length == 0 ) || ( ptwXY_domainMin( ptwXY ) >= domainMax ) || ( ptwXY_domainMax( ptwXY ) <= domainMin ) ) {
+        n = ptwXY_new( ptwXY->interpolation, ptwXY->interpolationString, ptwXY->biSectionMax, 
+            ptwXY->accuracy, 0, secondarySize, status, ptwXY->userFlag ); }
     else {
         if( ( n = ptwXY_clone( ptwXY, status ) ) == NULL ) return( NULL );
-        if( ( n->points[0].x < xMin ) || ( n->points[n->length - 1].x > xMax ) ) {
-            if( fill && ( n->points[n->length - 1].x > xMax ) ) {
-                if( ( *status = ptwXY_getValueAtX( n, xMax, &y ) ) != nfu_Okay ) goto Err;
-                if( ( *status = ptwXY_setValueAtX( n, xMax,  y ) ) != nfu_Okay ) goto Err;
+        if( ( n->points[0].x < domainMin ) || ( n->points[n->length - 1].x > domainMax ) ) {
+            if( fill && ( n->points[n->length - 1].x > domainMax ) ) {
+                if( ( *status = ptwXY_getValueAtX( n, domainMax, &y ) ) != nfu_Okay ) goto Err;
+                if( ( *status = ptwXY_setValueAtX( n, domainMax,  y ) ) != nfu_Okay ) goto Err;
             }
-            if( fill && ( n->points[0].x < xMin ) ) {
-                if( ( *status = ptwXY_getValueAtX( n, xMin, &y ) ) != nfu_Okay ) goto Err;
-                if( ( *status = ptwXY_setValueAtX( n, xMin,  y ) ) != nfu_Okay ) goto Err;
+            if( fill && ( n->points[0].x < domainMin ) ) {
+                if( ( *status = ptwXY_getValueAtX( n, domainMin, &y ) ) != nfu_Okay ) goto Err;
+                if( ( *status = ptwXY_setValueAtX( n, domainMin,  y ) ) != nfu_Okay ) goto Err;
             }
             ptwXY_coalescePoints( n, n->length + n->overflowAllocatedSize, NULL, 0 );
-            for( i1 = 0; i1 < n->length; i1++ ) if( n->points[i1].x >= xMin ) break;
-            for( i2 = n->length - 1; i2 > 0; i2-- ) if( n->points[i2].x <= xMax ) break;
+            for( i1 = 0; i1 < n->length; i1++ ) if( n->points[i1].x >= domainMin ) break;
+            for( i2 = n->length - 1; i2 > 0; i2-- ) if( n->points[i2].x <= domainMax ) break;
             i2++;
             if( i1 > 0 ) {
                 for( i = i1; i < i2; i++ ) n->points[i- i1] = n->points[i];
@@ -242,24 +329,24 @@ Err:
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_xMinSlice( ptwXYPoints *ptwXY, double xMin, int64_t secondarySize, int fill, nfu_status *status ) {
+ptwXYPoints *ptwXY_domainMinSlice( ptwXYPoints *ptwXY, double domainMin, int64_t secondarySize, int fill, nfu_status *status ) {
 
-    double xMax = 1.1 * xMin + 1;
+    double domainMax = 1.1 * domainMin + 1;
 
-    if( xMin < 0 ) xMax = 0.9 * xMin + 1;
-    if( ptwXY->length > 0 ) xMax = ptwXY_getXMax( ptwXY );
-    return( ptwXY_xSlice( ptwXY, xMin, xMax, secondarySize, fill, status ) );
+    if( domainMin < 0 ) domainMax = 0.9 * domainMin + 1;
+    if( ptwXY->length > 0 ) domainMax = ptwXY_domainMax( ptwXY );
+    return( ptwXY_domainSlice( ptwXY, domainMin, domainMax, secondarySize, fill, status ) );
 }
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_xMaxSlice( ptwXYPoints *ptwXY, double xMax, int64_t secondarySize, int fill, nfu_status *status ) {
+ptwXYPoints *ptwXY_domainMaxSlice( ptwXYPoints *ptwXY, double domainMax, int64_t secondarySize, int fill, nfu_status *status ) {
 
-    double xMin = 0.9 * xMax - 1;
+    double domainMin = 0.9 * domainMax - 1;
 
-    if( xMax < 0 ) xMin = 1.1 * xMax - 1;
-    if( ptwXY->length > 0 ) xMin = ptwXY_getXMin( ptwXY );
-    return( ptwXY_xSlice( ptwXY, xMin, xMax, secondarySize, fill, status ) );
+    if( domainMax < 0 ) domainMin = 1.1 * domainMax - 1;
+    if( ptwXY->length > 0 ) domainMin = ptwXY_domainMin( ptwXY );
+    return( ptwXY_domainSlice( ptwXY, domainMin, domainMax, secondarySize, fill, status ) );
 }
 /*
 ************************************************************
@@ -267,6 +354,13 @@ ptwXYPoints *ptwXY_xMaxSlice( ptwXYPoints *ptwXY, double xMax, int64_t secondary
 ptwXY_interpolation ptwXY_getInterpolation( ptwXYPoints *ptwXY ) {
 
     return( ptwXY->interpolation );
+}
+/*
+************************************************************
+*/
+char const *ptwXY_getInterpolationString( ptwXYPoints *ptwXY ) {
+
+    return( ptwXY->interpolationString );
 }
 /*
 ************************************************************
@@ -301,10 +395,8 @@ double ptwXY_getAccuracy( ptwXYPoints *ptwXY ) {
 */
 double ptwXY_setAccuracy( ptwXYPoints *ptwXY, double accuracy ) {
 
-    if( accuracy < ptwXY_minAccuracy ) accuracy = ptwXY_minAccuracy;
-    if( accuracy < ptwXY->accuracy ) accuracy = ptwXY->accuracy;
-    if( accuracy > 1 ) accuracy = 1.;
-    ptwXY->accuracy = accuracy;
+    accuracy = ptwXY_limitAccuracy( accuracy );
+    if( accuracy > ptwXY->accuracy ) ptwXY->accuracy = accuracy;
     return( ptwXY->accuracy );
 }
 /*
@@ -473,6 +565,12 @@ nfu_status ptwXY_release( ptwXYPoints *ptwXY ) {
 /*
 *   Note, this routine does not free ptwXY (i.e., it does not undo all of ptwXY_new).
 */
+
+    if( ptwXY->interpolation == ptwXY_interpolationOther ) {
+        if( ptwXY->interpolationString != NULL ) 
+            ptwXY->interpolationString = (char const *) nfu_free( (void *) ptwXY->interpolationString );
+    }
+    ptwXY->interpolation = ptwXY_interpolationLinLin;
     ptwXY->length = 0;
     ptwXY->allocatedSize = 0;
     ptwXY->points = (ptwXYPoint *) nfu_free( ptwXY->points );
@@ -488,7 +586,7 @@ nfu_status ptwXY_release( ptwXYPoints *ptwXY ) {
 */
 ptwXYPoints *ptwXY_free( ptwXYPoints *ptwXY ) {
 
-    ptwXY_release( ptwXY );
+    if( ptwXY != NULL ) ptwXY_release( ptwXY );
     nfu_free( ptwXY );
     return( (ptwXYPoints *) NULL );
 }
@@ -502,19 +600,20 @@ int64_t ptwXY_length( ptwXYPoints *ptwXY ) {
 /*
 ************************************************************
 */
-int64_t ptwXY_getNonOverflowLength( ptwXYPoints *ptwXY ) {
+int64_t ptwXY_getNonOverflowLength( ptwXYPoints const *ptwXY ) {
 
     return( ptwXY->length - ptwXY->overflowLength );
 }
 /*
 ************************************************************
 */
-nfu_status ptwXY_setXYData( ptwXYPoints *ptwXY, int64_t length, double *xy ) {
+nfu_status ptwXY_setXYData( ptwXYPoints *ptwXY, int64_t length, double const *xy ) {
 
     nfu_status status = nfu_Okay;
     int64_t i;
     ptwXYPoint *p;
-    double *d = xy, xOld = 0.;
+    double const *d = xy;
+    double xOld = 0.;
 
     if( length > ptwXY->allocatedSize ) {
         status = ptwXY_reallocatePoints( ptwXY, length, 0 );
@@ -542,7 +641,7 @@ nfu_status ptwXY_setXYData( ptwXYPoints *ptwXY, int64_t length, double *xy ) {
 /*
 ************************************************************
 */  
-nfu_status ptwXY_setXYDataFromXsAndYs( ptwXYPoints *ptwXY, int64_t length, double *x, double *y ) {
+nfu_status ptwXY_setXYDataFromXsAndYs( ptwXYPoints *ptwXY, int64_t length, double const *x, double const *y ) {
 
     nfu_status status;
     int64_t i;
@@ -636,8 +735,8 @@ ptwXY_lessEqualGreaterX ptwXY_getPointsAroundX_closeIsEqual( ptwXYPoints *ptwXY,
 
     int64_t overflowIndex, nonOverflowLength = ptwXY_getNonOverflowLength( ptwXY );
     int64_t indexMin, indexMid, indexMax;
-    ptwXY_dataFrom xMinFrom, xMaxFrom;
-    double xMin = ptwXY_getXMinAndFrom( ptwXY, &xMinFrom ), xMax = ptwXY_getXMaxAndFrom( ptwXY, &xMaxFrom );
+    ptwXY_dataFrom domainMinFrom, domainMaxFrom;
+    double domainMin = ptwXY_domainMinAndFrom( ptwXY, &domainMinFrom ), domainMax = ptwXY_domainMaxAndFrom( ptwXY, &domainMaxFrom );
     ptwXYOverflowPoint *overflowPoint, *overflowHeader = &(ptwXY->overflowHeader);
     ptwXY_lessEqualGreaterX status = ptwXY_lessEqualGreaterX_empty;
     ptwXYPoint *lowerPoint = NULL, *upperPoint = NULL;
@@ -645,9 +744,9 @@ ptwXY_lessEqualGreaterX ptwXY_getPointsAroundX_closeIsEqual( ptwXYPoints *ptwXY,
     ptwXY_initialOverflowPoint( lessThanEqualXPoint, overflowHeader, NULL );
     ptwXY_initialOverflowPoint( greaterThanXPoint, overflowHeader, NULL );
     if( ptwXY->length != 0 ) {
-        if( x < xMin ) {
+        if( x < domainMin ) {
             status = ptwXY_lessEqualGreaterX_lessThan;
-            if( xMinFrom == ptwXY_dataFrom_Points ) {
+            if( domainMinFrom == ptwXY_dataFrom_Points ) {
                 greaterThanXPoint->prior = overflowHeader;
                 greaterThanXPoint->index = 0;
                 greaterThanXPoint->point = ptwXY->points[0];
@@ -656,9 +755,9 @@ ptwXY_lessEqualGreaterX ptwXY_getPointsAroundX_closeIsEqual( ptwXYPoints *ptwXY,
                 *greaterThanXPoint = *(overflowHeader->next);
                 *closePoint = &(overflowHeader->next->point);
             } }
-        else if( x > xMax ) {
+        else if( x > domainMax ) {
             status = ptwXY_lessEqualGreaterX_greater;
-            if( xMaxFrom == ptwXY_dataFrom_Points ) {
+            if( domainMaxFrom == ptwXY_dataFrom_Points ) {
                 lessThanEqualXPoint->prior = overflowHeader->prior;
                 lessThanEqualXPoint->index = nonOverflowLength - 1;
                 lessThanEqualXPoint->point = ptwXY->points[lessThanEqualXPoint->index];
@@ -667,7 +766,7 @@ ptwXY_lessEqualGreaterX ptwXY_getPointsAroundX_closeIsEqual( ptwXYPoints *ptwXY,
                 *lessThanEqualXPoint = *(overflowHeader->prior);
                 *closePoint = &(overflowHeader->prior->point);
             } }
-        else {                                                  /* xMin <= x <= xMax */
+        else {                                                  /* domainMin <= x <= domainMax */
             status = ptwXY_lessEqualGreaterX_between;           /* Default for this condition, can only be between or equal. */
             for( overflowPoint = overflowHeader->next, overflowIndex = 0; overflowPoint != overflowHeader; 
                 overflowPoint = overflowPoint->next, overflowIndex++ ) if( overflowPoint->point.x > x ) break;
@@ -702,7 +801,7 @@ ptwXY_lessEqualGreaterX ptwXY_getPointsAroundX_closeIsEqual( ptwXYPoints *ptwXY,
                 else {
                     if( ptwXY->points[indexMin].x > x ) indexMax = 0;
                     if( ptwXY->points[indexMax].x < x ) indexMin = indexMax;
-                    if( ( overflowPoint == overflowHeader ) ||     /* x < xMin of overflow points. */
+                    if( ( overflowPoint == overflowHeader ) ||     /* x < domainMin of overflow points. */
                             ( ( ptwXY->points[indexMin].x > overflowPoint->point.x ) && ( ptwXY->points[indexMin].x < x ) ) ) {
                         if( overflowPoint != overflowHeader ) lessThanEqualXPoint->prior = overflowPoint;
                         lowerPoint = &(ptwXY->points[indexMin]);
@@ -712,7 +811,7 @@ ptwXY_lessEqualGreaterX ptwXY_getPointsAroundX_closeIsEqual( ptwXYPoints *ptwXY,
                         lowerPoint = &(overflowPoint->point);
                         *lessThanEqualXPoint = *overflowPoint;
                     }
-                    if( ( overflowPoint->next == overflowHeader ) ||     /* x > xMax of overflow points. */
+                    if( ( overflowPoint->next == overflowHeader ) ||     /* x > domainMax of overflow points. */
                             ( ( ptwXY->points[indexMax].x < overflowPoint->next->point.x ) && ( ptwXY->points[indexMax].x > x ) ) ) {
                         upperPoint = &(ptwXY->points[indexMax]);
                         greaterThanXPoint->index = indexMax;
@@ -774,7 +873,7 @@ nfu_status ptwXY_getValueAtX( ptwXYPoints *ptwXY, double x, double *y ) {
         break;
     case ptwXY_lessEqualGreaterX_between :
         status = ptwXY_interpolatePoint( ptwXY->interpolation, x, y, lessThanEqualXPoint.point.x, lessThanEqualXPoint.point.y, 
-            greaterThanXPoint.point.x, greaterThanXPoint.point.y );
+                greaterThanXPoint.point.x, greaterThanXPoint.point.y );
         break;
     }
     return( status );
@@ -899,8 +998,8 @@ nfu_status ptwXY_mergeFromXYs( ptwXYPoints *ptwXY, int length, double *xys ) {
 */
 static nfu_status ptwXY_mergeFrom( ptwXYPoints *ptwXY, int incY, int length, double *xs, double *ys ) {
 
-    int i, j,  n;
-    double *sortedXs, *p1, *p2;
+    int i1, j1,  n1 = 0;
+    double *p1, priorX;
     nfu_status status;
     ptwXYPoint *point1, *point2;
 
@@ -908,58 +1007,89 @@ static nfu_status ptwXY_mergeFrom( ptwXYPoints *ptwXY, int incY, int length, dou
     if( length == 0 ) return( nfu_Okay );
     if( ( status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( status );
 
-    if( ( sortedXs = (double *) nfu_malloc( length * sizeof( double * ) ) ) == NULL ) return( nfu_mallocError );
-
-    for( i = 0, p1 = sortedXs, p2 = xs; i < length; i++, p1++, p2++ ) *p1 = *p2;
-    qsort( sortedXs, length, sizeof( double * ), ptwXY_mergeCompareFunction );
-
-    for( i = 0, p1 = sortedXs, j = 0, n = 0; i < length; i++, p1++, n++ ) {
-        for( ; j < ptwXY->length; j++, n++ ) {
-            if( *p1 <= ptwXY->points[j].x ) break;
-        }
-        if( j == ptwXY->length ) break;             /* Completed all ptwXY points. */
+    if( xs[0] < 0 ) {
+        priorX = 1.1 * xs[0]; }
+    else {
+        priorX = 0.9 * xs[0] - 1;
     }
-    n += (int) ( ( length - i ) + ( ptwXY->length - j ) );
+    for( i1 = 0, p1 = xs; i1 < length; ++i1, ++p1 ) {
+        if( *p1 <= priorX ) return( nfu_XNotAscending );
+        priorX = *p1;
+    }
 
-    if( ( status = ptwXY_reallocatePoints( ptwXY, n, 0 ) ) == nfu_Okay ) {
-        point1 = &(ptwXY->points[n-1]);
-        point2 = &(ptwXY->points[length-1]);
-        for( i = 0, j = 0, p1 = &(sortedXs[length-1]); ( i < length ) && ( j < length ) && ( n > 0 ); n--, point1-- ) {
+    for( i1 = 0, p1 = xs, j1 = 0; i1 < length; ++i1, ++p1 ) { /* Count the number of x-values same in xs and ptwXY. */
+        for( ; j1 < ptwXY->length; ++j1 ) {
+            if( *p1 <= ptwXY->points[j1].x ) break;
+        }
+        if( j1 == ptwXY->length ) break;             /* Completed all ptwXY points. */
+        if( *p1 == ptwXY->points[j1].x ) ++n1;
+    }
+    n1 = length + (int) ptwXY->length - n1;
+
+    if( ( status = ptwXY_reallocatePoints( ptwXY, n1, 0 ) ) == nfu_Okay ) {
+        point1 = &(ptwXY->points[n1-1]);            /* Go backwards through arrays. */
+        point2 = &(ptwXY->points[ptwXY->length-1]);
+        p1 = &(xs[length-1]);
+        for( i1 = length - 1, j1 = (int) ptwXY->length - 1; ( i1 >= 0 ) && ( j1 >= 0 ); --point1 ) {
             if( *p1 >= point2->x ) {
                 point1->x = *p1;
-                point1->y = ys[(int)(p1 - xs)];
-                if( *p1 >= point2->x ) {
-                    point2++;
-                    j++;
+                point1->y = ys[i1];
+                if( *p1 == point2->x ) {
+                    --point2;
+                    --j1;
                 }
-                p1--;
-                i--; }
+                --p1;
+                --i1; }
             else {
                 *point1 = *point2;
-                point2++;
-                j++;
+                --point2;
+                --j1;
             }
         }
-        for( ; i < length; i++, p1--, point1-- ) {
+        for( ; i1 >= 0; --i1, --p1, --point1 ) {
             point1->x = *p1;
-            point1->y = ys[(int)(p1 - xs)];
+            point1->y = ys[i1];
         }
-        for( ; j < length; j++, point1--, point2-- ) *point1 = *point2;
     }
-    nfu_free( sortedXs );
+    ptwXY->length = n1;
 
     return( status );
 }
 /*
 ************************************************************
 */
-int ptwXY_mergeCompareFunction( void const *x1p, void const *x2p ) {
+nfu_status ptwXY_appendXY( ptwXYPoints *ptwXY, double x, double y ) {
 
-    double d1 = *((double *) x1p), d2 = *((double *) x2p);
+    int64_t nonOverflowLength = ptwXY_getNonOverflowLength( ptwXY );
+    ptwXY_dataFrom dataFrom;
 
-    if( d1  < d2 ) return( -1 );
-    if( d1 == d2 ) return(  0 );
-    return( 0 );
+    if( ptwXY->length != 0 ) {
+        double domainMax = ptwXY_domainMaxAndFrom( ptwXY, &dataFrom );
+        if( domainMax >= x ) return( nfu_XNotAscending );
+    }
+
+    if( nonOverflowLength < ptwXY->allocatedSize ) {      /* Room at end of points. Also handles the case when length = 0. */
+        ptwXY->points[nonOverflowLength].x = x;
+        ptwXY->points[nonOverflowLength].y = y; }
+    else {
+        if( ptwXY->overflowLength == ptwXY->overflowAllocatedSize ) {
+            ptwXYPoint newPoint = { x, y };
+            return( ptwXY_coalescePoints( ptwXY, ptwXY->length + ptwXY->overflowAllocatedSize, &newPoint, 0 ) ); }
+        else {                                              /* Add to end of overflow. */
+            ptwXYOverflowPoint *overflowPoint = &(ptwXY->overflowPoints[ptwXY->overflowLength]);
+
+            overflowPoint->prior = ptwXY->overflowHeader.prior;
+            overflowPoint->next = overflowPoint->prior->next;
+            overflowPoint->index = ptwXY->length;
+            overflowPoint->prior->next = overflowPoint;
+            overflowPoint->next->prior = overflowPoint;
+            overflowPoint->point.x = x;
+            overflowPoint->point.y = y;
+            ptwXY->overflowLength++;
+        }
+    }
+    ptwXY->length++;
+    return( nfu_Okay );
 }
 /*
 ************************************************************
@@ -1048,110 +1178,142 @@ nfu_status ptwXY_getSlopeAtX( ptwXYPoints *ptwXY, double x, const char side, dou
 /*
 ************************************************************
 */
-double ptwXY_getXMinAndFrom( ptwXYPoints *ptwXY, ptwXY_dataFrom *dataFrom ) {
+double ptwXY_domainMinAndFrom( ptwXYPoints *ptwXY, ptwXY_dataFrom *dataFrom ) {
 
     int64_t nonOverflowLength = ptwXY_getNonOverflowLength( ptwXY );
-    double xMin = nfu_getNAN( );
+    double domainMin = nfu_getNAN( );
 
     *dataFrom = ptwXY_dataFrom_Unknown;
     if( ptwXY->overflowLength > 0 ) {
         *dataFrom = ptwXY_dataFrom_Overflow;
-        xMin = ptwXY->overflowHeader.next->point.x;
+        domainMin = ptwXY->overflowHeader.next->point.x;
         if( nonOverflowLength >= 0 ) {
-            if( xMin > ptwXY->points[0].x ) {
+            if( domainMin > ptwXY->points[0].x ) {
                 *dataFrom = ptwXY_dataFrom_Points;
-                xMin = ptwXY->points[0].x;
+                domainMin = ptwXY->points[0].x;
             }
         } }
     else if( nonOverflowLength > 0 ) {
         *dataFrom = ptwXY_dataFrom_Points;
-        xMin = ptwXY->points[0].x;
+        domainMin = ptwXY->points[0].x;
     }
-    return( xMin );
+    return( domainMin );
 }
 /*
 ************************************************************
 */
-double ptwXY_getXMin( ptwXYPoints *ptwXY ) {
+double ptwXY_domainMin( ptwXYPoints *ptwXY ) {
 
     ptwXY_dataFrom dataFrom;
 
-    return( ptwXY_getXMinAndFrom( ptwXY, &dataFrom ) );
+    return( ptwXY_domainMinAndFrom( ptwXY, &dataFrom ) );
 }
 /*
 ************************************************************
 */
-double ptwXY_getXMaxAndFrom( ptwXYPoints *ptwXY, ptwXY_dataFrom *dataFrom ) {
+double ptwXY_domainMaxAndFrom( ptwXYPoints *ptwXY, ptwXY_dataFrom *dataFrom ) {
 
     int64_t nonOverflowLength = ptwXY_getNonOverflowLength( ptwXY );
-    double xMax = nfu_getNAN( );
+    double domainMax = nfu_getNAN( );
 
     *dataFrom = ptwXY_dataFrom_Unknown;
     if( ptwXY->overflowLength > 0 ) {
         *dataFrom = ptwXY_dataFrom_Overflow;
-        xMax = ptwXY->overflowHeader.prior->point.x;
+        domainMax = ptwXY->overflowHeader.prior->point.x;
         if( ( nonOverflowLength > 0 ) ) {
-            if( xMax < ptwXY->points[nonOverflowLength-1].x ) {
+            if( domainMax < ptwXY->points[nonOverflowLength-1].x ) {
                 *dataFrom = ptwXY_dataFrom_Points;
-                xMax = ptwXY->points[nonOverflowLength-1].x;
+                domainMax = ptwXY->points[nonOverflowLength-1].x;
             }
         } }
     else if( ptwXY->length > 0 ) {
         *dataFrom = ptwXY_dataFrom_Points;
-        xMax = ptwXY->points[nonOverflowLength-1].x;
+        domainMax = ptwXY->points[nonOverflowLength-1].x;
     }
-    return( xMax );
+    return( domainMax );
 }
 /*
 ************************************************************
 */
-double ptwXY_getXMax( ptwXYPoints *ptwXY ) {
+double ptwXY_domainMax( ptwXYPoints *ptwXY ) {
 
     ptwXY_dataFrom dataFrom;
 
-    return( ptwXY_getXMaxAndFrom( ptwXY, &dataFrom ) );
+    return( ptwXY_domainMaxAndFrom( ptwXY, &dataFrom ) );
 }
 /*
 ************************************************************
 */
-double ptwXY_getYMin( ptwXYPoints *ptwXY ) {
+nfu_status ptwXY_range( ptwXYPoints *ptwXY, double *rangeMin, double *rangeMax ) {
 
     int64_t i, n = ptwXY_getNonOverflowLength( ptwXY  );
     ptwXYPoint *p = ptwXY->points;
     ptwXYOverflowPoint *overflowPoint = ptwXY->overflowHeader.next;
-    double yMin;
+
+    *rangeMin = *rangeMax = 0.;
+    if( ptwXY->length == 0 ) return( nfu_empty );
+    if( n > 0 ) {
+        *rangeMin = *rangeMax = p->y;
+        for( i = 1, p++; i < n; i++, p++ ) {
+            *rangeMin = ( ( *rangeMin < p->y ) ? *rangeMin : p->y );
+            *rangeMax = ( ( *rangeMax > p->y ) ? *rangeMax : p->y );
+        } }
+    else {
+        *rangeMin = *rangeMax = overflowPoint->point.y;
+    }
+    for( ; overflowPoint != &(ptwXY->overflowHeader); overflowPoint = overflowPoint->next ) {
+        *rangeMin = ( ( *rangeMin < overflowPoint->point.y ) ? *rangeMin : overflowPoint->point.y );
+        *rangeMax = ( ( *rangeMax < overflowPoint->point.y ) ? *rangeMax : overflowPoint->point.y );
+    }
+    return( nfu_Okay );
+
+
+
+
+
+
+}
+/*
+************************************************************
+*/
+double ptwXY_rangeMin( ptwXYPoints *ptwXY ) {
+
+    int64_t i, n = ptwXY_getNonOverflowLength( ptwXY  );
+    ptwXYPoint *p = ptwXY->points;
+    ptwXYOverflowPoint *overflowPoint = ptwXY->overflowHeader.next;
+    double rangeMin;
 
     if( ptwXY->length == 0 ) return( 0. );
     if( n > 0 ) {
-        yMin = p->y;
-        for( i = 1, p++; i < n; i++, p++ ) yMin = ( ( yMin < p->y ) ? yMin : p->y ); }
+        rangeMin = p->y;
+        for( i = 1, p++; i < n; i++, p++ ) rangeMin = ( ( rangeMin < p->y ) ? rangeMin : p->y ); }
     else {
-        yMin = overflowPoint->point.y;
+        rangeMin = overflowPoint->point.y;
     }
     for( ; overflowPoint != &(ptwXY->overflowHeader); overflowPoint = overflowPoint->next ) 
-        yMin = ( ( yMin < overflowPoint->point.y ) ? yMin : overflowPoint->point.y );
-    return( yMin );
+        rangeMin = ( ( rangeMin < overflowPoint->point.y ) ? rangeMin : overflowPoint->point.y );
+    return( rangeMin );
 }
 /*
 ************************************************************
 */
-double ptwXY_getYMax( ptwXYPoints *ptwXY ) {
+double ptwXY_rangeMax( ptwXYPoints *ptwXY ) {
 
     int64_t i, n = ptwXY_getNonOverflowLength( ptwXY  );
     ptwXYPoint *p = ptwXY->points;
     ptwXYOverflowPoint *overflowPoint = ptwXY->overflowHeader.next;
-    double yMax;
+    double rangeMax;
 
     if( ptwXY->length == 0 ) return( 0. );
     if( n > 0 ) {
-        yMax = p->y;
-        for( i = 1, p++; i < n; i++, p++ ) yMax = ( ( yMax > p->y ) ? yMax : p->y ); }
+        rangeMax = p->y;
+        for( i = 1, p++; i < n; i++, p++ ) rangeMax = ( ( rangeMax > p->y ) ? rangeMax : p->y ); }
     else {
-        yMax = overflowPoint->point.y;
+        rangeMax = overflowPoint->point.y;
     }
     for( ; overflowPoint != &(ptwXY->overflowHeader); overflowPoint = overflowPoint->next )
-        yMax = ( ( yMax > overflowPoint->point.y ) ? yMax : overflowPoint->point.y );
-    return( yMax );
+        rangeMax = ( ( rangeMax > overflowPoint->point.y ) ? rangeMax : overflowPoint->point.y );
+    return( rangeMax );
 }
 /*
 ************************************************************

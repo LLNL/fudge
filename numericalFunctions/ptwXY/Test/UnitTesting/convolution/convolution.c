@@ -9,22 +9,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 */
 
@@ -91,46 +102,46 @@ int main( int argc, char **argv ) {
     }
     if( echo ) printf( "%s\n", __FILE__ );
 
-    if( ( box1XY = ptwXY_create( ptwXY_interpolationLinLin, 10., accuracy, 10, 10, nBox1, box1, &status, 0 ) ) == NULL ) 
+    if( ( box1XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nBox1, box1, &status, 0 ) ) == NULL ) 
         nfu_printErrorMsg( "ERROR %s: box1 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( box2XY = ptwXY_create( ptwXY_interpolationLinLin, 10., accuracy, 10, 10, nBox2, box2, &status, 0 ) ) == NULL ) 
+    if( ( box2XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nBox2, box2, &status, 0 ) ) == NULL ) 
         nfu_printErrorMsg( "ERROR %s: box2 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
     checkConvolution( "box 1 & 2", box1XY, box2XY, 1, accuracy, 3.7 );
 
-    if( ( box1XY = ptwXY_create( ptwXY_interpolationLinLin, 10., accuracy, 10, 10, nBox1, box1, &status, 0 ) ) == NULL ) 
+    if( ( box1XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nBox1, box1, &status, 0 ) ) == NULL ) 
         nfu_printErrorMsg( "ERROR %s: box1 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( wedgeXY = ptwXY_create( ptwXY_interpolationLinLin, 10., accuracy, 10, 10, 3, wedge, &status, 0 ) ) == NULL ) 
+    if( ( wedgeXY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, 3, wedge, &status, 0 ) ) == NULL ) 
         nfu_printErrorMsg( "ERROR %s: box1 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
     checkConvolution( "box 1 + wedge", box1XY, wedgeXY, 1, accuracy, 1.85 );
 
-    if( ( wedgeXY = ptwXY_create( ptwXY_interpolationLinLin, 10., accuracy, 10, 10, 3, wedge, &status, 0 ) ) == NULL ) 
+    if( ( wedgeXY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, 3, wedge, &status, 0 ) ) == NULL ) 
         nfu_printErrorMsg( "ERROR %s: wedge creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
     checkConvolution( "wedge + wedge", wedgeXY, wedgeXY, 1, accuracy, 0.25 );
 
-    if( ( triangle1XY = ptwXY_create( ptwXY_interpolationLinLin, 10., accuracy, 10, 10, nTriangles, triangle, &status, 0 ) ) == NULL ) 
+    if( ( triangle1XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle, &status, 0 ) ) == NULL ) 
         nfu_printErrorMsg( "ERROR %s: triangle creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( box1XY = ptwXY_create( ptwXY_interpolationLinLin, 10., accuracy, 10, 10, nBox1, box1, &status, 0 ) ) == NULL ) 
+    if( ( box1XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nBox1, box1, &status, 0 ) ) == NULL ) 
         nfu_printErrorMsg( "ERROR %s: box1 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
     checkConvolution( "box 1 + triangle", triangle1XY, box1XY, 1, accuracy, 3.70 );
 
-    if( ( triangle1XY = ptwXY_create( ptwXY_interpolationLinLin, 10., accuracy, 10, 10, nTriangles, triangle, &status, 0 ) ) == NULL ) 
+    if( ( triangle1XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle, &status, 0 ) ) == NULL ) 
         nfu_printErrorMsg( "ERROR %s: triangle creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( wedgeXY = ptwXY_create( ptwXY_interpolationLinLin, 10., accuracy, 10, 10, 3, wedge, &status, 0 ) ) == NULL ) 
+    if( ( wedgeXY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, 3, wedge, &status, 0 ) ) == NULL ) 
         nfu_printErrorMsg( "ERROR %s: wedge creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
     checkConvolution( "triangle + wedge", triangle1XY, wedgeXY, 1, accuracy, 0.5 );
 
-    if( ( triangle1XY = ptwXY_create( ptwXY_interpolationLinLin, 10., accuracy, 10, 10, nTriangles, triangle1, &status, 0 ) ) == NULL ) 
+    if( ( triangle1XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle1, &status, 0 ) ) == NULL ) 
         nfu_printErrorMsg( "ERROR %s: triangle1 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( triangle2XY = ptwXY_create( ptwXY_interpolationLinLin, 10., accuracy, 10, 10, nTriangles, triangle2, &status, 0 ) ) == NULL ) 
+    if( ( triangle2XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle2, &status, 0 ) ) == NULL ) 
         nfu_printErrorMsg( "ERROR %s: triangle2 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
     checkConvolution( "triangles 1 & 2", triangle1XY, triangle2XY, 0, accuracy, 12. );
     ptwXY_thicken( triangle1XY, 100, 1e-5, 1. + 1e-5 );
     ptwXY_thicken( triangle2XY, 100, 1e-5, 1. + 1e-5 );
     checkConvolution( "triangles 1 & 2 thickened", triangle1XY, triangle2XY, 1, accuracy, 12. );
 
-    if( ( triangle1XY = ptwXY_create( ptwXY_interpolationLinLin, 10., accuracy, 10, 10, nTriangles, triangle3, &status, 0 ) ) == NULL ) 
+    if( ( triangle1XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle3, &status, 0 ) ) == NULL ) 
         nfu_printErrorMsg( "ERROR %s: triangle3 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
-    if( ( triangle2XY = ptwXY_create( ptwXY_interpolationLinLin, 10., accuracy, 10, 10, nTriangles, triangle4, &status, 0 ) ) == NULL ) 
+    if( ( triangle2XY = ptwXY_create( ptwXY_interpolationLinLin, NULL, 10., accuracy, 10, 10, nTriangles, triangle4, &status, 0 ) ) == NULL ) 
         nfu_printErrorMsg( "ERROR %s: triangle4 creation status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
     checkConvolution( "triangles 3 & 4", triangle2XY, triangle1XY, 0, accuracy, 21.0 );
     ptwXY_thicken( triangle1XY, 100, 1e-5, 1. + 1e-5 );
@@ -201,7 +212,7 @@ static void bruteForce( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, double accurac
 
     int64_t i, j, k, n = 101;
     double s, ds, sMin, sMax, x11, x12, t, v;
-    double x1Min = ptwXY_getXMin( ptwXY1 ), x1Max = ptwXY_getXMax( ptwXY1 ), x2Min = ptwXY_getXMin( ptwXY2 ), x2Max = ptwXY_getXMax( ptwXY2 );
+    double x1Min = ptwXY_domainMin( ptwXY1 ), x1Max = ptwXY_domainMax( ptwXY1 ), x2Min = ptwXY_domainMin( ptwXY2 ), x2Max = ptwXY_domainMax( ptwXY2 );
     nfu_status status;
     ptwXYPoints *f2, *clone, *mulXY, *bfXY, *d1, *d2;
 
@@ -228,7 +239,7 @@ static void bruteForce( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, double accurac
     if( ( status = ptwXY_dullEdges( d2, 1e-14, 1e-14, 0 ) ) != nfu_Okay )
         nfu_printErrorMsg( "ERROR %s: dullEdges = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
 
-    if( ( bfXY = ptwXY_new( ptwXY_interpolationLinLin, 10., accuracy, n, 10, &status, 0 ) ) == NULL ) 
+    if( ( bfXY = ptwXY_new( ptwXY_interpolationLinLin, NULL, 10., accuracy, n, 10, &status, 0 ) ) == NULL ) 
         nfu_printErrorMsg( "ERROR %s: brute new status = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
 
     if( ( status = ptwXY_setValueAtX( bfXY, sMin, 0. ) ) != nfu_Okay )
@@ -253,8 +264,8 @@ static void bruteForce( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, double accurac
             clone->points[j].y = t;
         }
         if( ( 2 * ( clone->length / 2 ) ) != clone->length ) clone->points[k].x = s - clone->points[k].x;
-        if( ( f2 = ptwXY_xSlice( clone, x11, x12, 10, 1, &status ) ) == NULL )
-            nfu_printErrorMsg( "ERROR %s: xSlice = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
+        if( ( f2 = ptwXY_domainSlice( clone, x11, x12, 10, 1, &status ) ) == NULL )
+            nfu_printErrorMsg( "ERROR %s: domainSlice = %d: %s", __FILE__, status, nfu_statusMessage( status ) );
         ptwXY_free( clone );
 
         if( ( mulXY = ptwXY_mul2_ptwXY( d1, f2, &status ) ) == NULL )

@@ -1,0 +1,206 @@
+{
+    "plotStyles":{ 
+        "crossSection":{
+            "title":"",
+            "show_legend":true,
+            "xAxis":{
+                "unit":"MeV",
+                "min":1e-5,
+                "max":20.0,
+                "log":true,
+                "label":"Incident energy" },
+            "yAxis":{
+                "unit":"b",
+                "min":0.0,
+                "max":5.0,
+                "log":false,
+                "label":"Cross section" } },
+        "crossSectionIntegrals":{
+            "title":"",
+            "show_legend":true,
+            "xAxis":{
+                "unit":"MeV",
+                "min":1e-5,
+                "max":20.0,
+                "log":true,
+                "label":"Incident energy" },
+            "yAxis":{
+                "unit":"b",
+                "min":0.0,
+                "max":2.0,
+                "log":false,
+                "label":"C/E" } },
+        "mubar":{            
+            "title":"",
+            "show_legend":true,
+            "xAxis":{
+                "unit":"MeV",
+                "min":1e-5,
+                "max":20.0,
+                "log":true,
+                "label":"Incident energy" },
+            "yAxis":{
+                "unit":"",
+                "min":0.0,
+                "max":1.0,
+                "log":false,
+                "label":"<mu>" } },
+        "momentumDeposit":{            
+            "title":"",
+            "show_legend":false,
+            "xAxis":{
+                "unit":"MeV",
+                "min":1e-5,
+                "max":20.0,
+                "log":true,
+                "label":"Incident energy" },
+            "yAxis":{
+                "unit":"MeV/c",
+                "min":0.0,
+                "max":1.0,
+                "log":false,
+                "label":"<pz>" } },
+        "energyDeposit":{            
+            "title":"",
+            "show_legend":false,
+            "xAxis":{
+                "unit":"MeV",
+                "min":1e-5,
+                "max":20.0,
+                "log":true,
+                "label":"Incident energy" },
+            "yAxis":{
+                "unit":"MeV",
+                "min":0.0,
+                "max":10.0,
+                "log":false,
+                "label":"<E'>" } },
+        "LegendreMoment":{            
+            "title":"",
+            "show_legend":true,
+            "xAxis":{
+                "unit":"MeV",
+                "min":1e-5,
+                "max":20.0,
+                "log":true,
+                "label":"Incident energy" },
+            "yAxis":{
+                "unit":"1/MeV",
+                "min":0.0,
+                "max":1.0,
+                "log":false,
+                "label":"Legendre moment" } },
+        "formFactor":{            
+            "title":"",
+            "show_legend":true,
+            "xAxis":{
+                "unit":"MeV",
+                "min":1e-5,
+                "max":20.0,
+                "log":true,
+                "label":"Incident energy" },
+            "yAxis":{
+                "unit":"",
+                "min":0.0,
+                "max":5.0,
+                "log":false,
+                "label":"Form factor" } },
+        "nubar":{            
+            "title":"",
+            "show_legend":true,
+            "xAxis":{
+                "unit":"MeV",
+                "min":1e-5,
+                "max":20.0,
+                "log":true,
+                "label":"Incident energy" },
+            "yAxis":{
+                "unit":"",
+                "min":0.0,
+                "max":5.0,
+                "log":false,
+                "label":"nubar" } } },
+    "evaluations": {
+        "ACEFile": {
+            "filePattern":"*.ace.endf", 
+            "legend":"ACE, 293.6 K", 
+            "lineStyle":"-", 
+            "lineColor":"SandyBrown", 
+            "lineWidth":1, 
+            "errorColor":"None" },
+        "ENDFFile": {
+            "filePattern":"*.endf",
+            "legend":"ENDF, 0 K", 
+            "lineStyle":"-", 
+            "lineColor":"b", 
+            "lineWidth":3, 
+            "errorColor":"b" },
+        "heatedPREPROFile": {
+            "filePattern":"*.prepro.293.6K",
+            "legend":"PREPRO, 293.6 K", 
+            "lineStyle":"-.", 
+            "lineColor":"k", 
+            "lineWidth":2, 
+            "errorColor":"k"},
+        "PREPROFile": {
+            "filePattern":"*.prepro",
+            "legend":"PREPRO, 0 K", 
+            "lineStyle":"--", 
+            "lineColor":"k", 
+            "lineWidth":2,
+            "errorColor":"k"},
+        "GNDFile": {
+            "filePattern":"*.gnd*",
+            "legend":"GND", 
+            "lineStyle":"-", 
+            "lineColor":"b", 
+            "lineWidth":2,
+            "errorColor":"b"},
+        "AMPXFile": {
+            "filePattern":"*.ampx*",
+            "legend":"AMPX", 
+            "lineStyle":"-", 
+            "lineColor":"DarkGreen", 
+            "lineWidth":1,
+            "errorColor":"None"},
+        "default": {
+            "filePattern":"*",
+            "legend":"*", 
+            "lineStyle":"-", 
+            "lineColor":"b", 
+            "lineWidth":3, 
+            "errorColor":"b" } },
+    "xyCurves":{
+        "default":{
+                "filePattern":"*.xy.dat",
+                "legend":"XY Pairs", 
+                "symbol":"",
+                "dataType":"line",
+                "lineStyle":"-", 
+                "lineColor":"k", 
+                "lineWidth":1,
+                "errorColor":"None"} },
+    "xydyCurves":{
+        "default":{
+                "filePattern":"*.xydy.dat",
+                "legend":"XYdY Triplets", 
+                "symbol":"",
+                "dataType":"line",
+                "lineStyle":"-", 
+                "lineColor":"k", 
+                "lineWidth":1,
+                "errorColor":"k"} },
+    "C4Sets":{},
+    "EXFORSets":{},
+    "examples":{
+        "allOptions":{
+                "filePattern":"*.match.with.fnmatch",
+                "legend":"just a string", 
+                "symbol":"o",
+                "lineStyle":"-", 
+                "lineColor":"k", 
+                "lineWidth":1,
+                "errorColor":"k"
+                } } }
+
+  

@@ -1,0 +1,23 @@
+len( f ) = 4
+f.allocatedSize( ) = 40
+f.overflowAllocatedSize( ) = 10
+f.overflowLength( ) = 0
+f[2] =  [4.5, -5.0]
+f.getValue( 2. ) = 2.07
+f.getValue( 5.5 ) = -1.66666666667
+f.getValue( 7. ) = None
+f.xMin( ) =  1.0
+f.xMax( ) =  6.6
+
+printing each element of f
+   [1.0, 1.0]
+   [3.0, 3.1400000000000001]
+   [4.5, -5.0]
+   [6.5999999999999996, 2.0]
+
+printing f
+   1.00000000e+00   1.00000000e+00
+   3.00000000e+00   3.14000000e+00
+   4.50000000e+00  -5.00000000e+00
+   6.60000000e+00   2.00000000e+00
+

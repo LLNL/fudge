@@ -1,0 +1,154 @@
+\subsection{Binary operators}
+This section decribes all the routines in the file "ptwXY\_binaryOperators.c".
+
+\subsubsection{ptwXY\_slopeOffset}
+This routine applies the math operation ( $y_i$ = slope $\times$ $y_i$ + offset ) to the y-values of \highlight{ptwXY}.
+\setargumentNameLengths{offset}
+\CallingC{fnu\_status ptwXY\_slopeOffset(}{ptwXYPoints *ptwXY,
+    \addArgument{double slope,}
+    \addArgument{double offset );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{slope}{The slope.}
+    \argumentBox{offset}{The offset.}
+    \vskip 0.05 in \noindent
+
+\subsubsection{ptwXY\_add\_double}
+This routine applies the math operation ( $y_i$ = $y_i$ + offset ) to the y-values of \highlight{ptwXY}.
+\CallingC{fnu\_status ptwXY\_add\_double(}{ptwXYPoints *ptwXY,
+    \addArgument{double offset );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{offset}{The offset.}
+
+\subsubsection{ptwXY\_sub\_doubleFrom}
+This routine applies the math operation ( $y_i$ = $y_i$ - offset ) to the y-values of \highlight{ptwXY}.
+\CallingC{fnu\_status ptwXY\_sub\_double(}{ptwXYPoints *ptwXY,
+    \addArgument{double offset );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{offset}{The offset.}
+
+\subsubsection{ptwXY\_sub\_fromDouble}
+This routine applies the math operation ( $y_i$ = offset - $y_i$ ) to the y-values of \highlight{ptwXY}.
+\CallingC{fnu\_status ptwXY\_sub\_fromDouble(}{ptwXYPoints *ptwXY,
+    \addArgument{double offset );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{offset}{The offset.}
+
+\subsubsection{ptwXY\_mul\_double}
+This routine applies the math operation ( $y_i$ = slope $\times$ $y_i$ ) to the y-values of \highlight{ptwXY}.
+\CallingC{fnu\_status ptwXY\_mul\_double(}{ptwXYPoints *ptwXY,
+    \addArgument{double slope );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{slope}{The slope.}
+
+\subsubsection{ptwXY\_div\_doubleFrom}
+This routine applies the math operation ( $y_i$ = $y_i$ / divisor ) to the y-values of \highlight{ptwXY}.
+\CallingC{fnu\_status ptwXY\_div\_doubleFrom(}{ptwXYPoints *ptwXY,
+    \addArgument{double divisor );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{divisor}{The divisor.}
+If \highlight{divisor} is zero, the error \highlight{nfu\_divByZero} is returned.
+
+\subsubsection{ptwXY\_div\_fromDouble}
+This routine applies the math operation ( $y_i$ = dividend / $y_i$ ) to the y-values of \highlight{ptwXY}.
+\setargumentNameLengths{dividend}
+\CallingC{fnu\_status ptwXY\_div\_fromDouble(}{ptwXYPoints *ptwXY,
+    \addArgument{double dividend );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{dividend}{The dividend.}
+    \vskip 0.05 in \noindent
+This routine does not handle safe division (see Section~\ref{ptwXYdivptwXY}). One way to do safe division is
+to use the routine \highlight{ptwXY\_valueTo\_ptwXY} to convert the \highlight{dividend} value to a \highlight{ptwXYPoints} object and
+then use \highlight{ptwXY\_div\_ptwXY}.
+
+\subsubsection{ptwXY\_mod}
+\setargumentNameLengths{ptwXY}
+This routine gives the remainer of $y_i$ divide by $m$. That is, it set \highlight{ptwXY}'s y-values to 
+\begin{equation}
+    y_i = {\rm mod}( y_i, m ) \ \ \ \ .
+\end{equation}
+\setargumentNameLengths{pythonMod}
+\CallingC{fnu\_status ptwXY\_mod(}{ptwXYPoints *ptwXY,
+    \addArgument{double m,}
+    \addArgument{int pythonMod );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{m}{The modulus.}
+    \argumentBox{pythonMod}{Controls whether the Python or C form of mod is implemented.}
+    \vskip 0.05 in \noindent
+Python's and C's mod functions act differently for negative values. If \highlight{pythonMod} then the Python form is executed;
+otherwise, the C form is executed.
+
+\subsubsection{ptwXY\_binary\_ptwXY}
+This routine creates a new \highlight{ptwXYPoints} object from the union of \highlight{ptwXY1} and \highlight{ptwXY2} and then
+applies the math operation
+\begin{equation}
+    y_i(x_i) = s_1 \times y_1(x_i) + s_2 \times y_2(x_i) + s_{12} \times y_1(x_i) \times y_2(x_i)
+\end{equation}
+to the new object. Here ($x_i,y_i$) is a point in the new object, $y_1(x_i)$ is \highlight{ptwXY1}'s y-value at $x_i$ and 
+$y_2(x_i)$ is \highlight{ptwXY2}'s y-value at $x_i$.
+This routine is used internally to add, subtract and multiply two \highlight{ptwXYPoints} objects. For example, addition is performed
+by setting $s_1$ and $s_2$ to 1. and $s_{12}$ to 0.
+\setargumentNameLengths{ptwXY1}
+\CallingC{ptwXYPoints *ptwXY\_binary\_ptwXY(}{ptwXYPoints *ptwXY1,
+    \addArgument{ptwXYPoints *ptwXY2,}
+    \addArgument{double s1,}
+    \addArgument{double s2,}
+    \addArgument{double s12,}
+    \addArgument{fnu\_status *status );}}
+    \argumentBox{ptwXY1}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{ptwXY2}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{s1}{The value $s_1$.}
+    \argumentBox{s2}{The value $s_2$.}
+    \argumentBox{s12}{The value $s_{12}$.}
+    \argumentBox{status}{On return, the status value.}
+
+\subsubsection{ptwXY\_add\_ptwXY}
+This routine adds two \highlight{ptwXYPoints} objects and returns the result as a new \highlight{ptwXYPoints} object
+(i.e., it calls ptwXY\_binary\_ptwXY with $s_1 = s_2 = 1.$ and $s_{12} = 0.$).
+\CallingC{ptwXYPoints *ptwXY\_add\_ptwXY(}{ptwXYPoints *ptwXY1,
+    \addArgument{ptwXYPoints *ptwXY2,}
+    \addArgument{fnu\_status *status );}}
+    \argumentBox{ptwXY1}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{ptwXY2}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{status}{On return, the status value.}
+
+\subsubsection{ptwXY\_sub\_ptwXY}
+This routine subtracts one \highlight{ptwXYPoints} objects from another, and returns the result as a new \highlight{ptwXY} object
+(i.e., it calls ptwXY\_binary\_ptwXY with $s_1 = 1.$, $s_2 = -1.$ and $s_{12} = 0.$).
+\CallingC{ptwXYPoints *ptwXY\_sub\_ptwXY(}{ptwXYPoints *ptwXY1,
+    \addArgument{ptwXYPoints *ptwXY2,}
+    \addArgument{fnu\_status *status );}}
+    \argumentBox{ptwXY1}{A pointer to a \highlight{ptwXYPoints} object which is the minuend.}
+    \argumentBox{ptwXY2}{A pointer to a \highlight{ptwXYPoints} object which is the subtrahend.}
+    \argumentBox{status}{On return, the status value.}
+
+\subsubsection{ptwXY\_mul\_ptwXY}
+This routine multiplies two \highlight{ptwXYPoints} objects and returns the result as a new \highlight{ptwXY} object
+(i.e., it calls ptwXY\_binary\_ptwXY with $s_1 = s_2 = 0.$ and $s_{12} = 1.$).
+\CallingC{ptwXYPoints *ptwXY\_mul\_ptwXY(}{ptwXYPoints *ptwXY1,
+    \addArgument{ptwXYPoints *ptwXY2,}
+    \addArgument{fnu\_status *status );}}
+    \argumentBox{ptwXY1}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{ptwXY2}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{status}{On return, the status value.}
+
+\subsubsection{ptwXY\_mul2\_ptwXY}
+This routine multiplies two \highlight{ptwXYPoints} objects and returns the result as a new \highlight{ptwXY} object.
+Unlike \highlight{ptwXY\_mul\_ptwXY}, this routine will infill to obtain the desired accuracy.
+\CallingC{ptwXYPoints *ptwXY\_mul2\_ptwXY(}{ptwXYPoints *ptwXY1,
+    \addArgument{ptwXYPoints *ptwXY2,}
+    \addArgument{fnu\_status *status );}}
+    \argumentBox{ptwXY1}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{ptwXY2}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{status}{On return, the status value.}
+
+\subsubsection{ptwXY\_div\_ptwXY} \label{ptwXYdivptwXY}
+This routine divides two \highlight{ptwXYPoints} objects and returns the result as a new \highlight{ptwXY} object.
+\setargumentNameLengths{safeDivide}
+\CallingC{ptwXYPoints *ptwXY\_div\_ptwXY(}{ptwXYPoints *ptwXY1,
+    \addArgument{ptwXYPoints *ptwXY2,}
+    \addArgument{fnu\_status *status,;}
+    \addArgument{int safeDivide );}}
+    \argumentBox{ptwXY1}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{ptwXY2}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{status}{On return, the status value.}
+    \argumentBox{safeDivide}{If true safe division is performed.}

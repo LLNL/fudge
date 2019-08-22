@@ -8,25 +8,36 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
-from fudge.core.ancestry import ancestry
+from xData.ancestry import ancestry
 
 matrixToken = 'matrix'
 diagonalFormToken = 'diagonal'
@@ -42,13 +53,15 @@ class matrix( ancestry ):
     Matrix data is stored as a list of lists, which is easily converted into a numpy array.
     """
 
+    moniker = matrixToken
+
     def __init__(self, data, form=None, precision=None):
         """
         @data: list-of-lists containing matrix data
         @form: diagonal, symmetric, sparse, etc
         @precision: number of digits when printing. Necessary only if 'pretty' matrix output is desired.
         """
-        ancestry.__init__( self, matrixToken, None )
+        ancestry.__init__( self )
         self.form = form
         self.data = data
         self.precision = precision
@@ -85,7 +98,7 @@ class matrix( ancestry ):
                 warnings.append( warning.negativeEigenvalues( len(vals[vals<0]), min(vals), self ))
             minpos, maxpos = min(vals[vals>=0]),max(vals[vals>=0])
             # Check that the condition number of the matrix is reasonable
-            if minpos/maxpos < info['eigenvalueRatioTolerance']: 
+            if minpos/maxpos < info['eigenvalueRatioTolerance'] and A.size != 1: 
                 warnings.append( warning.badEigenvalueRatio( minpos/maxpos, self ) )
         return warnings
 
@@ -127,16 +140,18 @@ class matrix( ancestry ):
         show()
 
 
-    def toXMLList(self, flags=None, indent=''):
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        if( self.precision ) :
+            format = '%% -.%de' % self.precision
+        else :
+            format = kwargs.get( 'incrementalIndent', '%s' )
+
         xmlString = [indent+'<matrix rows="%s" columns="%s" form="%s"' 
                 % (self.nrows, self.ncols, self.form)]
-        if self.precision: xmlString[0]+=' precision="%i"' % self.precision
-        xmlString[0]+= '>'
+        if( self.precision ) : xmlString[0] += ' precision="%d"' % self.precision
+        xmlString[0] += '>'
         
-        if self.precision: format = '%% -.%ie' % self.precision
-        elif flags: format = flags.get('covarianceFormat') or '%s'
-        else: format = '%s'
-
         # for some matrix forms we can save lots of space on xml output:
         if self.form == diagonalFormToken:
             for row in range(self.nrows):
@@ -190,7 +205,7 @@ class matrix( ancestry ):
         xmlString[-1] += '</matrix>'
         return xmlString
 
-def parseXMLNode( mat, xPath=[], linkData={} ):
+def parseXMLNode( mat, xPath, linkData ):
 
     xPath.append( mat.tag )
     import numpy

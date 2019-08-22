@@ -9,22 +9,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 */
 
@@ -32,7 +43,20 @@
 #include <float.h>
 
 #include "ptwXY.h"
+#include <nf_Legendre.h>
+#include <nf_integration.h>
 
+typedef struct ptwXY_integrateWithFunctionInfo_s {
+    int degree;
+    ptwXY_createFromFunction_callback func;
+    void *argList;
+    ptwXY_interpolation interpolation;
+    double x1, x2, y1, y2;
+} ptwXY_integrateWithFunctionInfo;
+
+static nfu_status ptwXY_integrateWithFunction2( nf_Legendre_GaussianQuadrature_callback integrandFunction, void *argList, double x1,
+        double x2, double *integral );
+static nfu_status ptwXY_integrateWithFunction3( double x, double *y, void *argList );
 /*
 ************************************************************
 */
@@ -120,7 +144,7 @@ nfu_status ptwXY_f_integrate( ptwXY_interpolation interpolation, double x1, doub
 /*
 ************************************************************
 */
-double ptwXY_integrate( ptwXYPoints *ptwXY, double xMin, double xMax, nfu_status *status ) {
+double ptwXY_integrate( ptwXYPoints *ptwXY, double domainMin, double domainMax, nfu_status *status ) {
 
     int64_t i, n = ptwXY->length;
     double sum = 0., dSum, x, y, x1, x2, y1, y2, _sign = 1.;
@@ -130,34 +154,34 @@ double ptwXY_integrate( ptwXYPoints *ptwXY, double xMin, double xMax, nfu_status
     *status = nfu_otherInterpolation;
     if( ptwXY->interpolation == ptwXY_interpolationOther ) return( 0. );
 
-    if( xMax < xMin ) {
-        x = xMin;
-        xMin = xMax;
-        xMax = x;
+    if( domainMax < domainMin ) {
+        x = domainMin;
+        domainMin = domainMax;
+        domainMax = x;
         _sign = -1.;
     }
     if( n < 2 ) return( 0. );
 
     if( ( *status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( 0. );
     for( i = 0, point = ptwXY->points; i < n; i++, point++ ) {
-        if( point->x >= xMin ) break;
+        if( point->x >= domainMin ) break;
     }
     if( i == n ) return( 0. );
     x2 = point->x;
     y2 = point->y;
     if( i > 0 ) {
-        if( x2 > xMin ) {
+        if( x2 > domainMin ) {
             x1 = point[-1].x;
             y1 = point[-1].y;
-            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, xMin, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
-            if( x2 > xMax ) {
-                double yMax;
+            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, domainMin, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
+            if( x2 > domainMax ) {
+                double rangeMax;
 
-                if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, xMax, &yMax, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
-                if( ( *status = ptwXY_f_integrate( ptwXY->interpolation, xMin, y, xMax, yMax, &sum ) ) != nfu_Okay ) return( 0. );
+                if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, domainMax, &rangeMax, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
+                if( ( *status = ptwXY_f_integrate( ptwXY->interpolation, domainMin, y, domainMax, rangeMax, &sum ) ) != nfu_Okay ) return( 0. );
                 return( sum ); }
             else {
-                if( ( *status = ptwXY_f_integrate( ptwXY->interpolation, xMin, y, x2, y2, &sum ) ) != nfu_Okay ) return( 0. );
+                if( ( *status = ptwXY_f_integrate( ptwXY->interpolation, domainMin, y, x2, y2, &sum ) ) != nfu_Okay ) return( 0. );
             }
         }
     }
@@ -168,9 +192,9 @@ double ptwXY_integrate( ptwXYPoints *ptwXY, double xMin, double xMax, nfu_status
         y1 = y2;
         x2 = point->x;
         y2 = point->y;
-        if( x2 > xMax ) {
-            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, xMax, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
-            if( ( *status = ptwXY_f_integrate( ptwXY->interpolation, x1, y1, xMax, y, &dSum ) ) != nfu_Okay ) return( 0. );
+        if( x2 > domainMax ) {
+            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, domainMax, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
+            if( ( *status = ptwXY_f_integrate( ptwXY->interpolation, x1, y1, domainMax, y, &dSum ) ) != nfu_Okay ) return( 0. );
             sum += dSum;
             break;
         }
@@ -186,7 +210,7 @@ double ptwXY_integrate( ptwXYPoints *ptwXY, double xMin, double xMax, nfu_status
 double ptwXY_integrateDomain( ptwXYPoints *ptwXY, nfu_status *status ) {
 
     if( ( *status = ptwXY->status ) != nfu_Okay ) return( 0. );
-    if( ptwXY->length > 0 ) return( ptwXY_integrate( ptwXY, ptwXY_getXMin( ptwXY ), ptwXY_getXMax( ptwXY ), status ) );
+    if( ptwXY->length > 0 ) return( ptwXY_integrate( ptwXY, ptwXY_domainMin( ptwXY ), ptwXY_domainMax( ptwXY ), status ) );
     return( 0. );
 }
 /*
@@ -216,41 +240,42 @@ double ptwXY_integrateDomainWithWeight_x( ptwXYPoints *ptwXY, nfu_status *status
 
     if( ( *status = ptwXY->status ) != nfu_Okay ) return( 0. );
     if( ptwXY->length < 2 ) return( 0. );
-    return( ptwXY_integrateWithWeight_x( ptwXY, ptwXY_getXMin( ptwXY ), ptwXY_getXMax( ptwXY ), status ) );
+    return( ptwXY_integrateWithWeight_x( ptwXY, ptwXY_domainMin( ptwXY ), ptwXY_domainMax( ptwXY ), status ) );
 }
 /*
 ************************************************************
 */
-double ptwXY_integrateWithWeight_x( ptwXYPoints *ptwXY, double xMin, double xMax, nfu_status *status ) {
+double ptwXY_integrateWithWeight_x( ptwXYPoints *ptwXY, double domainMin, double domainMax, nfu_status *status ) {
 
     int64_t i, n = ptwXY->length;
-    double sum = 0., x, y, x1, x2, y1, y2, _sign = 1.;
+    double sum = 0., x, y, x1, x2, y1, y2, _sign = 1., a1, inv_a1, a1x1, a1x2;
     ptwXYPoint *point;
 
     if( ( *status = ptwXY->status ) != nfu_Okay ) return( 0. );
     *status = nfu_unsupportedInterpolation;
     if( ( ptwXY->interpolation != ptwXY_interpolationLinLin ) && 
+        ( ptwXY->interpolation != ptwXY_interpolationLinLog ) &&
         ( ptwXY->interpolation != ptwXY_interpolationFlat ) ) return( 0. );
 
     if( n < 2 ) return( 0. );
-    if( xMax < xMin ) {
-        x = xMin;
-        xMin = xMax;
-        xMax = x;
+    if( domainMax < domainMin ) {
+        x = domainMin;
+        domainMin = domainMax;
+        domainMax = x;
         _sign = -1.;
     }
 
     if( ( *status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( 0. );
     for( i = 0, point = ptwXY->points; i < n; ++i, ++point ) {
-        if( point->x >= xMin ) break;
+        if( point->x >= domainMin ) break;
     }
     if( i == n ) return( 0. );
     x2 = point->x;
     y2 = point->y;
     if( i > 0 ) {
-        if( x2 > xMin ) {
-            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, xMin, &y, point[-1].x, point[-1].y, x2, y2 ) ) != nfu_Okay ) return( 0. );
-            x2 = xMin;
+        if( x2 > domainMin ) {
+            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, domainMin, &y, point[-1].x, point[-1].y, x2, y2 ) ) != nfu_Okay ) return( 0. );
+            x2 = domainMin;
             y2 = y;
             --i;
             --point;
@@ -263,25 +288,32 @@ double ptwXY_integrateWithWeight_x( ptwXYPoints *ptwXY, double xMin, double xMax
         y1 = y2;
         x2 = point->x;
         y2 = point->y;
-        if( x2 > xMax ) {
-            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, xMax, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
-            x2 = xMax;
+        if( x2 > domainMax ) {
+            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, domainMax, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
+            x2 = domainMax;
             y2 = y;
         }
         switch( ptwXY->interpolation ) {
         case ptwXY_interpolationFlat :
-            sum += ( x2 - x1 ) * y1 * 3 * ( x1 + x2 );
+            sum += 0.5 * ( x2 - x1 ) * y1 * ( x1 + x2 );
             break;
         case ptwXY_interpolationLinLin :
-            sum += ( x2 - x1 ) * ( y1 * ( 2 * x1 + x2 ) + y2 * ( x1 + 2 * x2 ) );
+            sum += ( x2 - x1 ) * ( y1 * ( 2 * x1 + x2 ) + y2 * ( x1 + 2 * x2 ) ) / 6.;
+            break;
+        case ptwXY_interpolationLinLog :
+            inv_a1 = ( x2 - x1 ) / log( y2 / y1 );
+            a1 = 1 / inv_a1;
+            a1x1 = a1 * x1;
+            a1x2 = a1 * x2;
+            sum += inv_a1 * inv_a1 * ( exp( a1x2 ) * ( a1x2 - 1 ) - exp( a1x1 ) * ( a1x1 - 1 ) );
             break;
         default :       /* Only to stop compilers from complaining. */
             break;
         }
-        if( x2 == xMax ) break;
+        if( x2 == domainMax ) break;
     }
 
-    return( _sign * sum / 6 );
+    return( _sign * sum );
 }
 /*
 ************************************************************
@@ -290,12 +322,12 @@ double ptwXY_integrateDomainWithWeight_sqrt_x( ptwXYPoints *ptwXY, nfu_status *s
 
     if( ( *status = ptwXY->status ) != nfu_Okay ) return( 0. );
     if( ptwXY->length < 2 ) return( 0. );
-    return( ptwXY_integrateWithWeight_sqrt_x( ptwXY, ptwXY_getXMin( ptwXY ), ptwXY_getXMax( ptwXY ), status ) );
+    return( ptwXY_integrateWithWeight_sqrt_x( ptwXY, ptwXY_domainMin( ptwXY ), ptwXY_domainMax( ptwXY ), status ) );
 }
 /*
 ************************************************************
 */
-double ptwXY_integrateWithWeight_sqrt_x( ptwXYPoints *ptwXY, double xMin, double xMax, nfu_status *status ) {
+double ptwXY_integrateWithWeight_sqrt_x( ptwXYPoints *ptwXY, double domainMin, double domainMax, nfu_status *status ) {
 
     int64_t i, n = ptwXY->length;
     double sum = 0., x, y, x1, x2, y1, y2, _sign = 1., sqrt_x1, sqrt_x2, inv_apb, c;
@@ -307,24 +339,24 @@ double ptwXY_integrateWithWeight_sqrt_x( ptwXYPoints *ptwXY, double xMin, double
         ( ptwXY->interpolation != ptwXY_interpolationFlat ) ) return( 0. );
 
     if( n < 2 ) return( 0. );
-    if( xMax < xMin ) {
-        x = xMin;
-        xMin = xMax;
-        xMax = x;
+    if( domainMax < domainMin ) {
+        x = domainMin;
+        domainMin = domainMax;
+        domainMax = x;
         _sign = -1.;
     }
 
     if( ( *status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( 0. );
     for( i = 0, point = ptwXY->points; i < n; ++i, ++point ) {
-        if( point->x >= xMin ) break;
+        if( point->x >= domainMin ) break;
     }
     if( i == n ) return( 0. );
     x2 = point->x;
     y2 = point->y;
     if( i > 0 ) {
-        if( x2 > xMin ) {
-            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, xMin, &y, point[-1].x, point[-1].y, x2, y2 ) ) != nfu_Okay ) return( 0. );
-            x2 = xMin;
+        if( x2 > domainMin ) {
+            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, domainMin, &y, point[-1].x, point[-1].y, x2, y2 ) ) != nfu_Okay ) return( 0. );
+            x2 = domainMin;
             y2 = y;
             --i;
             --point;
@@ -339,9 +371,9 @@ double ptwXY_integrateWithWeight_sqrt_x( ptwXYPoints *ptwXY, double xMin, double
         sqrt_x1 = sqrt_x2;
         x2 = point->x;
         y2 = point->y;
-        if( x2 > xMax ) {
-            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, xMax, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
-            x2 = xMax;
+        if( x2 > domainMax ) {
+            if( ( *status = ptwXY_interpolatePoint( ptwXY->interpolation, domainMax, &y, x1, y1, x2, y2 ) ) != nfu_Okay ) return( 0. );
+            x2 = domainMax;
             y2 = y;
         }
         sqrt_x2 = sqrt( x2 );
@@ -357,7 +389,7 @@ double ptwXY_integrateWithWeight_sqrt_x( ptwXYPoints *ptwXY, double xMin, double
         default :       /* Only to stop compilers from complaining. */
             break;
         }
-        if( x2 == xMax ) break;
+        if( x2 == domainMax ) break;
     }
 
     return( 2. / 15. * _sign * sum );
@@ -392,6 +424,7 @@ ptwXPoints *ptwXY_groupOneFunction( ptwXYPoints *ptwXY, ptwXPoints *groupBoundar
     }
 
     if( ( f = ptwXY_intersectionWith_ptwX( ptwXY, groupBoundaries, status ) ) == NULL ) return( NULL );
+    if( f->length == 0 ) return( ptwX_createLine( ngs, ngs, 0, 0, status ) );
 
     if( ( groupedData = ptwX_new( ngs, status ) ) == NULL ) goto err;
     xg1 = groupBoundaries->points[0];
@@ -466,8 +499,13 @@ ptwXPoints *ptwXY_groupTwoFunctions( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, p
 
     if( ( ff = ptwXY_intersectionWith_ptwX( ptwXY1, groupBoundaries, status ) ) == NULL ) return( NULL );
     if( ( gg = ptwXY_intersectionWith_ptwX( ptwXY2, groupBoundaries, status ) ) == NULL ) goto err;
+    if( ( ff->length == 0 ) || ( gg->length == 0 ) ) {
+        ptwXY_free( ff );
+        ptwXY_free( gg );
+        return( ptwX_createLine( ngs, ngs, 0, 0, status ) );
+    }
 
-    if( ( *status = ptwXY_areDomainsMutual( ff, gg ) ) != nfu_Okay ) goto err;
+    if( ( *status = ptwXY_tweakDomainsToMutualify( ff, gg, 4, 0 ) ) != nfu_Okay ) goto err;
     if( ( f = ptwXY_union( ff, gg, status, ptwXY_union_fill ) ) == NULL ) goto err;
     if( ( g = ptwXY_union( gg, f, status, ptwXY_union_fill ) ) == NULL ) goto err;
 
@@ -556,10 +594,11 @@ ptwXPoints *ptwXY_groupThreeFunctions( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2,
     if( ( ff = ptwXY_intersectionWith_ptwX( ptwXY1, groupBoundaries, status ) ) == NULL ) return( NULL );
     if( ( gg = ptwXY_intersectionWith_ptwX( ptwXY2, groupBoundaries, status ) ) == NULL ) goto err;
     if( ( hh = ptwXY_intersectionWith_ptwX( ptwXY3, groupBoundaries, status ) ) == NULL ) goto err;
+    if( ( ff->length == 0 ) || ( gg->length == 0 ) || ( hh->length == 0 ) ) return( ptwX_createLine( ngs, ngs, 0, 0, status ) );
 
-    if( ( *status = ptwXY_areDomainsMutual( ff, gg ) ) != nfu_Okay ) goto err;
-    if( ( *status = ptwXY_areDomainsMutual( ff, hh ) ) != nfu_Okay ) goto err;
-    if( ( *status = ptwXY_areDomainsMutual( gg, hh ) ) != nfu_Okay ) goto err;
+    if( ( *status = ptwXY_tweakDomainsToMutualify( ff, gg, 4, 0 ) ) != nfu_Okay ) goto err;
+    if( ( *status = ptwXY_tweakDomainsToMutualify( ff, hh, 4, 0 ) ) != nfu_Okay ) goto err;
+    if( ( *status = ptwXY_tweakDomainsToMutualify( gg, hh, 4, 0 ) ) != nfu_Okay ) goto err;
     if( ( fff = ptwXY_union(  ff,  gg, status, ptwXY_union_fill ) ) == NULL ) goto err;
     if( (   h = ptwXY_union(  hh, fff, status, ptwXY_union_fill ) ) == NULL ) goto err;
     if( (   f = ptwXY_union( fff,   h, status, ptwXY_union_fill ) ) == NULL ) goto err;
@@ -648,4 +687,93 @@ err:
     if( runningIntegral != NULL ) ptwX_free( runningIntegral );
     return( NULL );
 }
+/*
+************************************************************
+*/
+double ptwXY_integrateWithFunction( ptwXYPoints *ptwXY, ptwXY_createFromFunction_callback func, void *argList,
+        double domainMin, double domainMax, int degree, int recursionLimit, double tolerance, nfu_status *status ) {
 
+    int64_t i1, i2, n1 = ptwXY->length;
+    long evaluations;
+    double integral = 0., integral_, sign = -1., xa, xb;
+    ptwXY_integrateWithFunctionInfo integrateWithFunctionInfo;
+    ptwXYPoint *point;
+
+    if( ( *status = ptwXY->status ) != nfu_Okay ) return( 0. );
+
+    if( domainMin == domainMax ) return( 0. );
+    if( n1 < 2 ) return( 0. );
+
+    ptwXY_simpleCoalescePoints( ptwXY );
+
+    if( domainMin > domainMax ) {
+        sign = domainMin;
+        domainMin = domainMax;
+        domainMax = sign;
+        sign = -1.;
+    }
+    if( domainMin >= ptwXY->points[n1-1].x ) return( 0. );
+    if( domainMax <= ptwXY->points[0].x ) return( 0. );
+
+    for( i1 = 0; i1 < ( n1 - 1 ); i1++ ) {
+        if( ptwXY->points[i1+1].x > domainMin ) break;
+    }
+    for( i2 = n1 - 1; i2 > i1; i2-- ) {
+        if( ptwXY->points[i2-1].x < domainMax ) break;
+    }
+    point = &(ptwXY->points[i1]);
+
+    integrateWithFunctionInfo.degree = degree;
+    integrateWithFunctionInfo.func = func;
+    integrateWithFunctionInfo.argList = argList;
+    integrateWithFunctionInfo.interpolation = ptwXY->interpolation;
+    integrateWithFunctionInfo.x2 = point->x;
+    integrateWithFunctionInfo.y2 = point->y;
+
+    xa = domainMin;
+    for( ; i1 < i2; i1++ ) {
+        integrateWithFunctionInfo.x1 = integrateWithFunctionInfo.x2;
+        integrateWithFunctionInfo.y1 = integrateWithFunctionInfo.y2;
+        ++point;
+        integrateWithFunctionInfo.x2 = point->x;
+        integrateWithFunctionInfo.y2 = point->y;
+        xb = point->x;
+        if( xb > domainMax ) xb = domainMax;
+        *status = nf_GnG_adaptiveQuadrature( ptwXY_integrateWithFunction2, ptwXY_integrateWithFunction3, &integrateWithFunctionInfo,
+            xa, xb, recursionLimit, tolerance, &integral_, &evaluations );
+        if( *status != nfu_Okay ) return( 0. );
+        integral += integral_;
+        xa = xb;
+    }
+
+    return( integral );
+}
+/*
+************************************************************
+*/
+static nfu_status ptwXY_integrateWithFunction2( nf_Legendre_GaussianQuadrature_callback integrandFunction, void *argList, double x1,
+        double x2, double *integral ) {
+
+    ptwXY_integrateWithFunctionInfo *integrateWithFunctionInfo = (ptwXY_integrateWithFunctionInfo *) argList;
+    nfu_status status;
+
+    status = nf_Legendre_GaussianQuadrature( integrateWithFunctionInfo->degree, x1, x2, integrandFunction, argList, integral );
+    return( status );
+}
+/*
+************************************************************
+*/
+static nfu_status ptwXY_integrateWithFunction3( double x, double *y, void *argList ) {
+
+    double yf;
+    ptwXY_integrateWithFunctionInfo *integrateWithFunctionInfo = (ptwXY_integrateWithFunctionInfo *) argList;
+    nfu_status status;
+
+    if( ( status = ptwXY_interpolatePoint( integrateWithFunctionInfo->interpolation, x, &yf, 
+            integrateWithFunctionInfo->x1, integrateWithFunctionInfo->y1, 
+            integrateWithFunctionInfo->x2, integrateWithFunctionInfo->y2 ) ) == nfu_Okay ) {
+        status = integrateWithFunctionInfo->func( x, y, integrateWithFunctionInfo->argList );
+        *y *= yf;
+    }
+    return( status );
+}

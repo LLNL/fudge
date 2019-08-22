@@ -9,69 +9,110 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 */
 
 #include <stdlib.h>
 #include <math.h>
+#include <ctype.h>
 
 #include "nf_utilities.h"
 
+#ifdef WIN32
+#include <float.h>
+#define isfinite _finite
+#endif
+
 #define numberOfStaticDoubles ( 100 * 1000 )
 
-static nfu_status nfu_stringToListOfDoubles2( char const *str, int64_t *numberConverted, double **doublePtr, char **endCharacter );
+static double *nfu_stringToListOfDoubles2( char const *str, char sep, int64_t *numberConverted, char **endCharacter, nfu_status *status );
 /*
 ========================================================================
 */
-nfu_status nfu_stringToListOfDoubles( char const *str, int64_t *numberConverted, double **doublePtr, char **endCharacter ) {
+double *nfu_stringToListOfDoubles( char const *str, char sep, int64_t *numberConverted, char **endCharacter, nfu_status *status ) {
+
+    if( strchr( "0123456789.+-eE", sep ) != NULL ) {
+        *status = nfu_badInput;
+        return( NULL );
+    }
 
     *numberConverted = 0;
-    *doublePtr = NULL;
-    return( nfu_stringToListOfDoubles2( str, numberConverted, doublePtr, endCharacter ) );
+    *endCharacter = (char *) str;
+    if( isspace( sep ) ) sep = ' ';             /* Make it the space character if any white space as it simplifies logic below. */
+    *status = nfu_Okay;
+    return( nfu_stringToListOfDoubles2( str, sep, numberConverted, endCharacter, status ) );
 }
 /*
 ========================================================================
 */
-static nfu_status nfu_stringToListOfDoubles2( char const *str, int64_t *numberConverted, double **doublePtr, char **endCharacter ) {
+static double *nfu_stringToListOfDoubles2( char const *str, char sep, int64_t *numberConverted, char **endCharacter, nfu_status *status ) {
 
     int64_t i1, i2, numberConverted_initial = *numberConverted;
-    double staticDoubles[numberOfStaticDoubles];
-    nfu_status status = nfu_Okay;
+    double *doublePtr = NULL, staticDoubles[numberOfStaticDoubles];
 
     for( i1 = 0; i1 < numberOfStaticDoubles; i1++, (*numberConverted)++ ) {
-        staticDoubles[i1] = strtod( str, endCharacter );
-        if( str == (char const *) *endCharacter ) {
-            if( *numberConverted > 0 ) {
-                if( ( *doublePtr = (double *) nfu_malloc( (size_t) *numberConverted * sizeof( double ) ) ) == NULL ) status = nfu_mallocError;
+        if(  *numberConverted == 0 ) {
+            staticDoubles[i1] = strtod( str, endCharacter ); }
+        else {                                  /* Check that there is one sep character and allow for arbitrary number of white spaces. */
+            char const *str2 = str;
+
+            while( isspace( *str2 ) ) ++str2;   /* Only need to check for white spaces before sep character as strtod will ignore after. */
+            if( sep != ' ' ) {
+                if( *str2 == sep ) {
+                    ++str2; }
+                else {
+                    str2 = str;
+                }
             }
+            if( str < str2 ) staticDoubles[i1] = strtod( str2, endCharacter );
+            if( str2 == (char const *) *endCharacter ) *endCharacter = (char *) str;
+        }
+        if( str == (char const *) *endCharacter ) {
+            int64_t number = *numberConverted;
+            if( *numberConverted == 0 ) number = 1;
+            if( ( doublePtr = (double *) nfu_malloc( (size_t) number * sizeof( double ) ) ) == NULL ) *status = nfu_mallocError;
             break;
         }
         str = (char const *) *endCharacter;
     }
 
-    if( ( status == nfu_Okay ) && ( *doublePtr == NULL ) ) status = nfu_stringToListOfDoubles2( str, numberConverted, doublePtr, endCharacter );
-    if( *doublePtr != NULL ) {
-        double *doublePtr2 = &((*doublePtr)[numberConverted_initial]);
+    if( ( *status == nfu_Okay ) && ( doublePtr == NULL ) ) doublePtr = nfu_stringToListOfDoubles2( str, sep, numberConverted, endCharacter, status );
+    if( doublePtr != NULL ) {
+        double *doublePtr2 = &(doublePtr[numberConverted_initial]);
+        char *end = *endCharacter;
 
         for( i2 = 0; i2 < i1; i2++, doublePtr2++ ) *doublePtr2 = staticDoubles[i2];
+        while( isspace( *end ) ) ++end;
+        if( *end == 0 ) *endCharacter = end;
     }
-    return( status );
+    return( doublePtr );
 }
 /*
 ============================================================
@@ -79,7 +120,8 @@ static nfu_status nfu_stringToListOfDoubles2( char const *str, int64_t *numberCo
 char *nf_floatToShortestString( double value, int significantDigits, int favorEFormBy, int flags ) {
 
     int n1, ne, nf, digitsRightOfPeriod_f, exponent;
-    char Str_e[512], Str_f[512], *Str_r = Str_e, Fmt[32], *e1, *e2, *sign = "";
+    char Str_e[512], Str_f[512], *Str_r = Str_e, Fmt[32], *e1, *e2;
+    const char *sign = "";
 
     if( flags & nf_floatToShortestString_includeSign ) sign = "+";
 

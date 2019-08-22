@@ -1,0 +1,1600 @@
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) Ym
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Ym"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.001e26 +/- 4.e23 m
+value = 1.001000000000000e+26, significantDigits = 4, order = 26, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+23, significantDigits = 1, order = 23, isPercent = False
+
+100.1(4) Ym
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Ym"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1 +/- 0.4 Ym
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Ym"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) Zm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Zm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.001e23 +/- 4.e20 m
+value = 1.001000000000000e+23, significantDigits = 4, order = 23, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+20, significantDigits = 1, order = 20, isPercent = False
+
+100.1(4) Zm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Zm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1 +/- 0.4 Zm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Zm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) Em
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Em"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.001e20 +/- 4.e17 m
+value = 1.001000000000000e+20, significantDigits = 4, order = 20, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+17, significantDigits = 1, order = 17, isPercent = False
+
+100.1(4) Em
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Em"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1 +/- 0.4 Em
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Em"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) Pm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Pm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.001e17 +/- 4.e14 m
+value = 1.001000000000001e+17, significantDigits = 4, order = 17, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+14, significantDigits = 1, order = 14, isPercent = False
+
+100.1(4) Pm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Pm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1 +/- 0.4 Pm
+value = 1.001000000000001e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Pm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) Tm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Tm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.001e14 +/- 4.e11 m
+value = 1.001000000001001e+14, significantDigits = 4, order = 14, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+11, significantDigits = 1, order = 11, isPercent = False
+
+100.1(4) Tm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Tm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1 +/- 0.4 Tm
+value = 1.001000000001001e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Tm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) Gm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Gm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.001e11 +/- 4.e8 m
+value = 1.001000001001000e+11, significantDigits = 4, order = 11, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+08, significantDigits = 1, order = 8, isPercent = False
+
+100.1(4) Gm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Gm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1 +/- 0.4 Gm
+value = 1.001000001001000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Gm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) Mm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Mm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.001e8 +/- 4.e5 m
+value = 1.001001001000000e+08, significantDigits = 4, order = 8, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000002000e+05, significantDigits = 1, order = 5, isPercent = False
+
+100.1(4) Mm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Mm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1 +/- 0.4 Mm
+value = 1.001001001000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "Mm"
+uncertainty = value = 4.000000000002000e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) km
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "km"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.002e5 +/- 4.e2 m
+value = 1.002001000000000e+05, significantDigits = 4, order = 5, isPercent = False, unit = "m"
+uncertainty = value = 4.000001999999500e+02, significantDigits = 1, order = 2, isPercent = False
+
+100.1(4) km
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "km"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.2 +/- 0.4 km
+value = 1.002001000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "km"
+uncertainty = value = 4.000001999999500e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) hm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "hm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10110. +/- 4.e1 m
+value = 1.011010000000000e+04, significantDigits = 4, order = 4, isPercent = False, unit = "m"
+uncertainty = value = 4.000199995000250e+01, significantDigits = 1, order = 1, isPercent = False
+
+100.1(4) hm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "hm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+101.1 +/- 0.4 hm
+value = 1.011010000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "hm"
+uncertainty = value = 4.000199995000250e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) dam
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "dam"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1101. +/- 4. m
+value = 1.101100000000000e+03, significantDigits = 4, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.019950248448356e+00, significantDigits = 1, order = 0, isPercent = False
+
+100.1(4) dam
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "dam"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+110.1 +/- 0.4 dam
+value = 1.101100000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "dam"
+uncertainty = value = 4.019950248448356e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) dm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "dm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+110.1 +/- 0.4 m
+value = 1.101100000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.019950248448356e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) dm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "dm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1101. +/- 4. dm
+value = 1.101100000000000e+03, significantDigits = 4, order = 3, isPercent = False, unit = "dm"
+uncertainty = value = 4.019950248448356e+00, significantDigits = 1, order = 0, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) cm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "cm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+101.1 +/- 0.4 m
+value = 1.011010000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000199995000250e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) cm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "cm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10110. +/- 4.e1 cm
+value = 1.011010000000000e+04, significantDigits = 4, order = 4, isPercent = False, unit = "cm"
+uncertainty = value = 4.000199995000250e+01, significantDigits = 1, order = 1, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) mm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "mm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.2 +/- 0.4 m
+value = 1.002001000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000001999999500e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) mm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "mm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.002e5 +/- 4.e2 mm
+value = 1.002001000000000e+05, significantDigits = 4, order = 5, isPercent = False, unit = "mm"
+uncertainty = value = 4.000001999999500e+02, significantDigits = 1, order = 2, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) mum
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "mum"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1 +/- 0.4 m
+value = 1.001001001000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000002000e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) mum
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "mum"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.001e8 +/- 4.e5 mum
+value = 1.001001001000000e+08, significantDigits = 4, order = 8, isPercent = False, unit = "mum"
+uncertainty = value = 4.000000000002000e+05, significantDigits = 1, order = 5, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) nm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "nm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1 +/- 0.4 m
+value = 1.001000001001000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) nm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "nm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.001e11 +/- 4.e8 nm
+value = 1.001000001001000e+11, significantDigits = 4, order = 11, isPercent = False, unit = "nm"
+uncertainty = value = 4.000000000000000e+08, significantDigits = 1, order = 8, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) pm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "pm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1 +/- 0.4 m
+value = 1.001000000001001e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) pm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "pm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.001e14 +/- 4.e11 pm
+value = 1.001000000001001e+14, significantDigits = 4, order = 14, isPercent = False, unit = "pm"
+uncertainty = value = 4.000000000000000e+11, significantDigits = 1, order = 11, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) fm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "fm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1 +/- 0.4 m
+value = 1.001000000000001e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) fm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "fm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.001e17 +/- 4.e14 fm
+value = 1.001000000000001e+17, significantDigits = 4, order = 17, isPercent = False, unit = "fm"
+uncertainty = value = 4.000000000000000e+14, significantDigits = 1, order = 14, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) am
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "am"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1 +/- 0.4 m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) am
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "am"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.001e20 +/- 4.e17 am
+value = 1.001000000000000e+20, significantDigits = 4, order = 20, isPercent = False, unit = "am"
+uncertainty = value = 4.000000000000000e+17, significantDigits = 1, order = 17, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) zm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "zm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1 +/- 0.4 m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) zm
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "zm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.001e23 +/- 4.e20 zm
+value = 1.001000000000000e+23, significantDigits = 4, order = 23, isPercent = False, unit = "zm"
+uncertainty = value = 4.000000000000001e+20, significantDigits = 1, order = 20, isPercent = False
+
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) ym
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "ym"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1 +/- 0.4 m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+100.1(4) ym
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "ym"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100.1(4) m
+value = 1.001000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.001e26 +/- 4.e23 ym
+value = 1.001000000000000e+26, significantDigits = 4, order = 26, isPercent = False, unit = "ym"
+uncertainty = value = 4.000000000000001e+23, significantDigits = 1, order = 23, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) Ym
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Ym"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.01e25 +/- 4.e23 m
+value = 1.010000000000000e+25, significantDigits = 3, order = 25, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+23, significantDigits = 1, order = 23, isPercent = False
+
+10.1(4) Ym
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Ym"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1 +/- 0.4 Ym
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Ym"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) Zm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Zm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.01e22 +/- 4.e20 m
+value = 1.010000000000000e+22, significantDigits = 3, order = 22, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+20, significantDigits = 1, order = 20, isPercent = False
+
+10.1(4) Zm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Zm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1 +/- 0.4 Zm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Zm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) Em
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Em"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.01e19 +/- 4.e17 m
+value = 1.010000000000000e+19, significantDigits = 3, order = 19, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+17, significantDigits = 1, order = 17, isPercent = False
+
+10.1(4) Em
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Em"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1 +/- 0.4 Em
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Em"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) Pm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Pm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.01e16 +/- 4.e14 m
+value = 1.010000000000055e+16, significantDigits = 3, order = 16, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+14, significantDigits = 1, order = 14, isPercent = False
+
+10.1(4) Pm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Pm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1 +/- 0.4 Pm
+value = 1.010000000000055e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Pm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) Tm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Tm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.01e13 +/- 4.e11 m
+value = 1.010000000055010e+13, significantDigits = 3, order = 13, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+11, significantDigits = 1, order = 11, isPercent = False
+
+10.1(4) Tm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Tm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1 +/- 0.4 Tm
+value = 1.010000000055010e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Tm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) Gm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Gm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.01e10 +/- 4.e8 m
+value = 1.010000055010000e+10, significantDigits = 3, order = 10, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+08, significantDigits = 1, order = 8, isPercent = False
+
+10.1(4) Gm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Gm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1 +/- 0.4 Gm
+value = 1.010000055010000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Gm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) Mm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Mm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.01e7 +/- 4.e5 m
+value = 1.010055010000000e+07, significantDigits = 3, order = 7, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000002000e+05, significantDigits = 1, order = 5, isPercent = False
+
+10.1(4) Mm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Mm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1 +/- 0.4 Mm
+value = 1.010055010000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Mm"
+uncertainty = value = 4.000000000002000e-01, significantDigits = 1, order = -1, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) km
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "km"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.07e4 +/- 4.e2 m
+value = 1.065010000000000e+04, significantDigits = 3, order = 4, isPercent = False, unit = "m"
+uncertainty = value = 4.000001999999500e+02, significantDigits = 1, order = 2, isPercent = False
+
+10.1(4) km
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "km"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.7 +/- 0.4 km
+value = 1.065010000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "km"
+uncertainty = value = 4.000001999999500e-01, significantDigits = 1, order = -1, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) hm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "hm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1560. +/- 4.e1 m
+value = 1.560100000000000e+03, significantDigits = 3, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000199995000250e+01, significantDigits = 1, order = 1, isPercent = False
+
+10.1(4) hm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "hm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+15.6 +/- 0.4 hm
+value = 1.560100000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "hm"
+uncertainty = value = 4.000199995000250e-01, significantDigits = 1, order = -1, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) dam
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "dam"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+651. +/- 4. m
+value = 6.511000000000000e+02, significantDigits = 3, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.019950248448356e+00, significantDigits = 1, order = 0, isPercent = False
+
+10.1(4) dam
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "dam"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+65.1 +/- 0.4 dam
+value = 6.511000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "dam"
+uncertainty = value = 4.019950248448356e-01, significantDigits = 1, order = -1, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) dm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "dm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+551.1 +/- 0.4 m
+value = 5.511100000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.019950248448356e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) dm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "dm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+5511. +/- 4. dm
+value = 5.511100000000000e+03, significantDigits = 4, order = 3, isPercent = False, unit = "dm"
+uncertainty = value = 4.019950248448356e+00, significantDigits = 1, order = 0, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) cm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "cm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.2 +/- 0.4 m
+value = 5.502010000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000199995000250e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) cm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "cm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+55020. +/- 4.e1 cm
+value = 5.502010000000000e+04, significantDigits = 4, order = 4, isPercent = False, unit = "cm"
+uncertainty = value = 4.000199995000250e+01, significantDigits = 1, order = 1, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) mm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "mm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1 +/- 0.4 m
+value = 5.501101000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000001999999500e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) mm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "mm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+5.501e5 +/- 4.e2 mm
+value = 5.501101000000000e+05, significantDigits = 4, order = 5, isPercent = False, unit = "mm"
+uncertainty = value = 4.000001999999500e+02, significantDigits = 1, order = 2, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) mum
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "mum"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1 +/- 0.4 m
+value = 5.501000101000001e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000002000e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) mum
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "mum"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+5.501e8 +/- 4.e5 mum
+value = 5.501000101000000e+08, significantDigits = 4, order = 8, isPercent = False, unit = "mum"
+uncertainty = value = 4.000000000002000e+05, significantDigits = 1, order = 5, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) nm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "nm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1 +/- 0.4 m
+value = 5.501000000101001e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) nm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "nm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+5.501e11 +/- 4.e8 nm
+value = 5.501000000101000e+11, significantDigits = 4, order = 11, isPercent = False, unit = "nm"
+uncertainty = value = 4.000000000000000e+08, significantDigits = 1, order = 8, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) pm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "pm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1 +/- 0.4 m
+value = 5.501000000000101e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) pm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "pm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+5.501e14 +/- 4.e11 pm
+value = 5.501000000000101e+14, significantDigits = 4, order = 14, isPercent = False, unit = "pm"
+uncertainty = value = 4.000000000000000e+11, significantDigits = 1, order = 11, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) fm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "fm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1 +/- 0.4 m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) fm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "fm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+5.501e17 +/- 4.e14 fm
+value = 5.500999999999999e+17, significantDigits = 4, order = 17, isPercent = False, unit = "fm"
+uncertainty = value = 4.000000000000000e+14, significantDigits = 1, order = 14, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) am
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "am"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1 +/- 0.4 m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) am
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "am"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+5.501e20 +/- 4.e17 am
+value = 5.500999999999999e+20, significantDigits = 4, order = 20, isPercent = False, unit = "am"
+uncertainty = value = 4.000000000000000e+17, significantDigits = 1, order = 17, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) zm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "zm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1 +/- 0.4 m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) zm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "zm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+5.501e23 +/- 4.e20 zm
+value = 5.501000000000001e+23, significantDigits = 4, order = 23, isPercent = False, unit = "zm"
+uncertainty = value = 4.000000000000001e+20, significantDigits = 1, order = 20, isPercent = False
+
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) ym
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "ym"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1 +/- 0.4 m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) ym
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "ym"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+550.1(4) m
+value = 5.501000000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+5.501e26 +/- 4.e23 ym
+value = 5.501000000000001e+26, significantDigits = 4, order = 26, isPercent = False, unit = "ym"
+uncertainty = value = 4.000000000000001e+23, significantDigits = 1, order = 23, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) Ym
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Ym"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.01e25 +/- 4.e23 m
+value = 1.010000000000000e+25, significantDigits = 3, order = 25, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+23, significantDigits = 1, order = 23, isPercent = False
+
+10.1(4) Ym
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Ym"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1 +/- 0.4 Ym
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Ym"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) Zm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Zm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.01e22 +/- 4.e20 m
+value = 1.010000000000000e+22, significantDigits = 3, order = 22, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+20, significantDigits = 1, order = 20, isPercent = False
+
+10.1(4) Zm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Zm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1 +/- 0.4 Zm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Zm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) Em
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Em"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.01e19 +/- 4.e17 m
+value = 1.010000000000001e+19, significantDigits = 3, order = 19, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+17, significantDigits = 1, order = 17, isPercent = False
+
+10.1(4) Em
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Em"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1 +/- 0.4 Em
+value = 1.010000000000001e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Em"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) Pm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Pm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.01e16 +/- 4.e14 m
+value = 1.010000000001000e+16, significantDigits = 3, order = 16, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+14, significantDigits = 1, order = 14, isPercent = False
+
+10.1(4) Pm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Pm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1 +/- 0.4 Pm
+value = 1.010000000001000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Pm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) Tm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Tm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.01e13 +/- 4.e11 m
+value = 1.010000000999910e+13, significantDigits = 3, order = 13, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+11, significantDigits = 1, order = 11, isPercent = False
+
+10.1(4) Tm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Tm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1 +/- 0.4 Tm
+value = 1.010000000999910e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Tm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) Gm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Gm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.01e10 +/- 4.e8 m
+value = 1.010000999910000e+10, significantDigits = 3, order = 10, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e+08, significantDigits = 1, order = 8, isPercent = False
+
+10.1(4) Gm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Gm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1 +/- 0.4 Gm
+value = 1.010000999910000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Gm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) Mm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Mm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.01e7 +/- 4.e5 m
+value = 1.010999910000000e+07, significantDigits = 3, order = 7, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000002000e+05, significantDigits = 1, order = 5, isPercent = False
+
+10.1(4) Mm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Mm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1 +/- 0.4 Mm
+value = 1.010999910000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Mm"
+uncertainty = value = 4.000000000002000e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) km
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "km"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+2.01e4 +/- 4.e2 m
+value = 2.009910000000000e+04, significantDigits = 3, order = 4, isPercent = False, unit = "m"
+uncertainty = value = 4.000001999999500e+02, significantDigits = 1, order = 2, isPercent = False
+
+10.1(4) km
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "km"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+20.1 +/- 0.4 km
+value = 2.009910000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "km"
+uncertainty = value = 4.000001999999500e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) hm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "hm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+11009. +/- 4.e1 m
+value = 1.100910000000000e+04, significantDigits = 4, order = 4, isPercent = False, unit = "m"
+uncertainty = value = 4.000199995000250e+01, significantDigits = 1, order = 1, isPercent = False
+
+10.1(4) hm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "hm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+110.1 +/- 0.4 hm
+value = 1.100910000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "hm"
+uncertainty = value = 4.000199995000250e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) dam
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "dam"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10100. +/- 4. m
+value = 1.010010000000000e+04, significantDigits = 5, order = 4, isPercent = False, unit = "m"
+uncertainty = value = 4.019950248448356e+00, significantDigits = 1, order = 0, isPercent = False
+
+10.1(4) dam
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "dam"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1010.0 +/- 0.4 dam
+value = 1.010010000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "dam"
+uncertainty = value = 4.019950248448356e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) dm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "dm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10000.1 +/- 0.4 m
+value = 1.000011000000000e+04, significantDigits = 6, order = 4, isPercent = False, unit = "m"
+uncertainty = value = 4.019950248448356e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) dm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "dm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100001. +/- 4. dm
+value = 1.000011000000000e+05, significantDigits = 6, order = 5, isPercent = False, unit = "dm"
+uncertainty = value = 4.019950248448356e+00, significantDigits = 1, order = 0, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) cm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "cm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.2 +/- 0.4 m
+value = 9.999201000000001e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000199995000250e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) cm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "cm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+999920. +/- 4.e1 cm
+value = 9.999201000000000e+05, significantDigits = 5, order = 5, isPercent = False, unit = "cm"
+uncertainty = value = 4.000199995000250e+01, significantDigits = 1, order = 1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) mm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "mm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1 +/- 0.4 m
+value = 9.999110100000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000001999999500e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) mm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "mm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.9991e6 +/- 4.e2 mm
+value = 9.999110100000000e+06, significantDigits = 5, order = 6, isPercent = False, unit = "mm"
+uncertainty = value = 4.000001999999500e+02, significantDigits = 1, order = 2, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) mum
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "mum"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1 +/- 0.4 m
+value = 9.999100010100001e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000002000e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) mum
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "mum"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.9991e9 +/- 4.e5 mum
+value = 9.999100010100000e+09, significantDigits = 5, order = 9, isPercent = False, unit = "mum"
+uncertainty = value = 4.000000000002000e+05, significantDigits = 1, order = 5, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) nm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "nm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1 +/- 0.4 m
+value = 9.999100000010101e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) nm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "nm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.9991e12 +/- 4.e8 nm
+value = 9.999100000010100e+12, significantDigits = 5, order = 12, isPercent = False, unit = "nm"
+uncertainty = value = 4.000000000000000e+08, significantDigits = 1, order = 8, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) pm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "pm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1 +/- 0.4 m
+value = 9.999100000000011e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) pm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "pm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.9991e15 +/- 4.e11 pm
+value = 9.999100000000010e+15, significantDigits = 5, order = 15, isPercent = False, unit = "pm"
+uncertainty = value = 4.000000000000000e+11, significantDigits = 1, order = 11, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) fm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "fm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1 +/- 0.4 m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) fm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "fm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.9991e18 +/- 4.e14 fm
+value = 9.999100000000000e+18, significantDigits = 5, order = 18, isPercent = False, unit = "fm"
+uncertainty = value = 4.000000000000000e+14, significantDigits = 1, order = 14, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) am
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "am"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1 +/- 0.4 m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) am
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "am"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.9991e21 +/- 4.e17 am
+value = 9.999100000000000e+21, significantDigits = 5, order = 21, isPercent = False, unit = "am"
+uncertainty = value = 4.000000000000000e+17, significantDigits = 1, order = 17, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) zm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "zm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1 +/- 0.4 m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) zm
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "zm"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.9991e24 +/- 4.e20 zm
+value = 9.999100000000001e+24, significantDigits = 5, order = 24, isPercent = False, unit = "zm"
+uncertainty = value = 4.000000000000001e+20, significantDigits = 1, order = 20, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10.1(4) ym
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "ym"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1 +/- 0.4 m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+10.1(4) ym
+value = 1.010000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "ym"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.9991e27 +/- 4.e23 ym
+value = 9.999100000000001e+27, significantDigits = 5, order = 27, isPercent = False, unit = "ym"
+uncertainty = value = 4.000000000000001e+23, significantDigits = 1, order = 23, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) Ym
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Ym"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.91e25 +/- 1.e23 m
+value = 9.910000000000000e+25, significantDigits = 3, order = 25, isPercent = False, unit = "m"
+uncertainty = value = 1.000000000000000e+23, significantDigits = 1, order = 23, isPercent = False
+
+99.1(1) Ym
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Ym"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1 +/- 0.1 Ym
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Ym"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) Zm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Zm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.91e22 +/- 1.e20 m
+value = 9.910000000000000e+22, significantDigits = 3, order = 22, isPercent = False, unit = "m"
+uncertainty = value = 1.000000000000000e+20, significantDigits = 1, order = 20, isPercent = False
+
+99.1(1) Zm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Zm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1 +/- 0.1 Zm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Zm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) Em
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Em"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.91e19 +/- 1.e17 m
+value = 9.910000000000002e+19, significantDigits = 3, order = 19, isPercent = False, unit = "m"
+uncertainty = value = 1.000000000000000e+17, significantDigits = 1, order = 17, isPercent = False
+
+99.1(1) Em
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Em"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1 +/- 0.1 Em
+value = 9.910000000000001e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Em"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) Pm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Pm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.91e16 +/- 1.e14 m
+value = 9.910000000001000e+16, significantDigits = 3, order = 16, isPercent = False, unit = "m"
+uncertainty = value = 1.000000000000000e+14, significantDigits = 1, order = 14, isPercent = False
+
+99.1(1) Pm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Pm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1 +/- 0.1 Pm
+value = 9.910000000001000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Pm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) Tm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Tm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.91e13 +/- 1.e11 m
+value = 9.910000000999909e+13, significantDigits = 3, order = 13, isPercent = False, unit = "m"
+uncertainty = value = 1.000000000000000e+11, significantDigits = 1, order = 11, isPercent = False
+
+99.1(1) Tm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Tm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1 +/- 0.1 Tm
+value = 9.910000000999909e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Tm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) Gm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Gm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.91e10 +/- 1.e8 m
+value = 9.910000999910001e+10, significantDigits = 3, order = 10, isPercent = False, unit = "m"
+uncertainty = value = 1.000000000000000e+08, significantDigits = 1, order = 8, isPercent = False
+
+99.1(1) Gm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Gm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1 +/- 0.1 Gm
+value = 9.910000999910000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Gm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) Mm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Mm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.91e7 +/- 1.e5 m
+value = 9.910999909999999e+07, significantDigits = 3, order = 7, isPercent = False, unit = "m"
+uncertainty = value = 1.000000000008000e+05, significantDigits = 1, order = 5, isPercent = False
+
+99.1(1) Mm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Mm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1 +/- 0.1 Mm
+value = 9.910999910000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "Mm"
+uncertainty = value = 1.000000000008000e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) km
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "km"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1.091e5 +/- 1.e2 m
+value = 1.090991000000000e+05, significantDigits = 4, order = 5, isPercent = False, unit = "m"
+uncertainty = value = 1.000007999968000e+02, significantDigits = 1, order = 2, isPercent = False
+
+99.1(1) km
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "km"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+109.1 +/- 0.1 km
+value = 1.090991000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "km"
+uncertainty = value = 1.000007999968000e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) hm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "hm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+19909. +/- 1.e1 m
+value = 1.990910000000000e+04, significantDigits = 4, order = 4, isPercent = False, unit = "m"
+uncertainty = value = 1.000799680255744e+01, significantDigits = 1, order = 1, isPercent = False
+
+99.1(1) hm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "hm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+199.1 +/- 0.1 hm
+value = 1.990910000000000e+02, significantDigits = 4, order = 2, isPercent = False, unit = "hm"
+uncertainty = value = 1.000799680255744e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) dam
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "dam"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10990. +/- 1. m
+value = 1.099010000000000e+04, significantDigits = 5, order = 4, isPercent = False, unit = "m"
+uncertainty = value = 1.077032961426901e+00, significantDigits = 1, order = 0, isPercent = False
+
+99.1(1) dam
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "dam"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1099.0 +/- 0.1 dam
+value = 1.099010000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "dam"
+uncertainty = value = 1.077032961426901e-01, significantDigits = 1, order = -1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) dm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "dm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10009.0 +/- 0.4 m
+value = 1.000901000000000e+04, significantDigits = 6, order = 4, isPercent = False, unit = "m"
+uncertainty = value = 4.001249804748512e-01, significantDigits = 1, order = -1, isPercent = False
+
+99.1(1) dm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "dm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+100090. +/- 4. dm
+value = 1.000901000000000e+05, significantDigits = 6, order = 5, isPercent = False, unit = "dm"
+uncertainty = value = 4.001249804748512e+00, significantDigits = 1, order = 0, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) cm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "cm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+10000.1 +/- 0.4 m
+value = 1.000009100000000e+04, significantDigits = 6, order = 4, isPercent = False, unit = "m"
+uncertainty = value = 4.000012499980469e-01, significantDigits = 1, order = -1, isPercent = False
+
+99.1(1) cm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "cm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1000009. +/- 4.e1 cm
+value = 1.000009100000000e+06, significantDigits = 6, order = 6, isPercent = False, unit = "cm"
+uncertainty = value = 4.000012499980469e+01, significantDigits = 1, order = 1, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) mm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "mm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.2 +/- 0.4 m
+value = 9.999199100000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000124999998e-01, significantDigits = 1, order = -1, isPercent = False
+
+99.1(1) mm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "mm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.9992e6 +/- 4.e2 mm
+value = 9.999199100000000e+06, significantDigits = 5, order = 6, isPercent = False, unit = "mm"
+uncertainty = value = 4.000000124999998e+02, significantDigits = 1, order = 2, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) mum
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "mum"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1 +/- 0.4 m
+value = 9.999100099100000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000125e-01, significantDigits = 1, order = -1, isPercent = False
+
+99.1(1) mum
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "mum"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.9991e9 +/- 4.e5 mum
+value = 9.999100099100000e+09, significantDigits = 5, order = 9, isPercent = False, unit = "mum"
+uncertainty = value = 4.000000000000125e+05, significantDigits = 1, order = 5, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) nm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "nm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1 +/- 0.4 m
+value = 9.999100000099101e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+99.1(1) nm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "nm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.9991e12 +/- 4.e8 nm
+value = 9.999100000099100e+12, significantDigits = 5, order = 12, isPercent = False, unit = "nm"
+uncertainty = value = 4.000000000000000e+08, significantDigits = 1, order = 8, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) pm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "pm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1 +/- 0.4 m
+value = 9.999100000000099e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+99.1(1) pm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "pm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.9991e15 +/- 4.e11 pm
+value = 9.999100000000100e+15, significantDigits = 5, order = 15, isPercent = False, unit = "pm"
+uncertainty = value = 4.000000000000000e+11, significantDigits = 1, order = 11, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) fm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "fm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1 +/- 0.4 m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+99.1(1) fm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "fm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.9991e18 +/- 4.e14 fm
+value = 9.999100000000000e+18, significantDigits = 5, order = 18, isPercent = False, unit = "fm"
+uncertainty = value = 4.000000000000000e+14, significantDigits = 1, order = 14, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) am
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "am"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1 +/- 0.4 m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+99.1(1) am
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "am"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.9991e21 +/- 4.e17 am
+value = 9.999100000000000e+21, significantDigits = 5, order = 21, isPercent = False, unit = "am"
+uncertainty = value = 4.000000000000000e+17, significantDigits = 1, order = 17, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) zm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "zm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1 +/- 0.4 m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+99.1(1) zm
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "zm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.9991e24 +/- 4.e20 zm
+value = 9.999100000000001e+24, significantDigits = 5, order = 24, isPercent = False, unit = "zm"
+uncertainty = value = 4.000000000000001e+20, significantDigits = 1, order = 20, isPercent = False
+
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+99.1(1) ym
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "ym"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1 +/- 0.4 m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+99.1(1) ym
+value = 9.909999999999999e+01, significantDigits = 3, order = 1, isPercent = False, unit = "ym"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9999.1(4) m
+value = 9.999100000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "m"
+uncertainty = value = 4.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+9.9991e27 +/- 4.e23 ym
+value = 9.999100000000001e+27, significantDigits = 5, order = 27, isPercent = False, unit = "ym"
+uncertainty = value = 4.000000000000001e+23, significantDigits = 1, order = 23, isPercent = False

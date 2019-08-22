@@ -1,0 +1,145 @@
+
+14850. +/- 1000. eV/mm
+None
+1.48e4 +/- 1.0e3 eV/mm
+value = 1.485000000000000e+04, significantDigits = 3, order = 4, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.000000000000000e+03, significantDigits = 2, order = 3, isPercent = False
+1.48e4 +/- 1.0e3 eV/mm
+value = 1.480000000000000e+04, significantDigits = 3, order = 4, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.000000000000000e+03, significantDigits = 2, order = 3, isPercent = False
+
+14850. +/- 100. eV/mm
+None
+14850. +/- 1.0e2 eV/mm
+value = 1.485000000000000e+04, significantDigits = 4, order = 4, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.000000000000000e+02, significantDigits = 2, order = 2, isPercent = False
+14850. +/- 1.0e2 eV/mm
+value = 1.485000000000000e+04, significantDigits = 4, order = 4, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.000000000000000e+02, significantDigits = 2, order = 2, isPercent = False
+
+1485. +/- 10. eV/mm
+None
+1485. +/- 10. eV/mm
+value = 1.485000000000000e+03, significantDigits = 4, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.000000000000000e+01, significantDigits = 2, order = 1, isPercent = False
+1485. +/- 10. eV/mm
+value = 1.485000000000000e+03, significantDigits = 4, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.000000000000000e+01, significantDigits = 2, order = 1, isPercent = False
+
+1485. +/- 1. eV/mm
+None
+1485. +/- 1. eV/mm
+value = 1.485000000000000e+03, significantDigits = 4, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.000000000000000e+00, significantDigits = 1, order = 0, isPercent = False
+1485. +/- 1. eV/mm
+value = 1.485000000000000e+03, significantDigits = 4, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.000000000000000e+00, significantDigits = 1, order = 0, isPercent = False
+
+1485. +/- 1.1 eV/mm
+None
+1485.0 +/- 1.1 eV/mm
+value = 1.485000000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.100000000000000e+00, significantDigits = 2, order = 0, isPercent = False
+1485.0 +/- 1.1 eV/mm
+value = 1.485000000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.100000000000000e+00, significantDigits = 2, order = 0, isPercent = False
+
+1485. +/- 0.1 eV/mm
+None
+1485.0 +/- 0.1 eV/mm
+value = 1.485000000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+1485.0 +/- 0.1 eV/mm
+value = 1.485000000000000e+03, significantDigits = 5, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.000000000000000e-01, significantDigits = 1, order = -1, isPercent = False
+
+1485. +/- 0.11 eV/mm
+None
+1485.00 +/- 0.11 eV/mm
+value = 1.485000000000000e+03, significantDigits = 6, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.100000000000000e-01, significantDigits = 2, order = -1, isPercent = False
+1485.00 +/- 0.11 eV/mm
+value = 1.485000000000000e+03, significantDigits = 6, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.100000000000000e-01, significantDigits = 2, order = -1, isPercent = False
+
+1485. +/- 0.01 eV/mm
+None
+1485.00 +/- 0.01 eV/mm
+value = 1.485000000000000e+03, significantDigits = 6, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.000000000000000e-02, significantDigits = 1, order = -2, isPercent = False
+1485.00 +/- 0.01 eV/mm
+value = 1.485000000000000e+03, significantDigits = 6, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.000000000000000e-02, significantDigits = 1, order = -2, isPercent = False
+
+1485. +/- 0.011 eV/mm
+None
+1485.000 +/- 0.011 eV/mm
+value = 1.485000000000000e+03, significantDigits = 7, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.100000000000000e-02, significantDigits = 2, order = -2, isPercent = False
+1485.000 +/- 0.011 eV/mm
+value = 1.485000000000000e+03, significantDigits = 7, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.100000000000000e-02, significantDigits = 2, order = -2, isPercent = False
+
+14850. +/- 1780. eV/mm
+None
+1.48e4 +/- 1.8e3 eV/mm
+value = 1.485000000000000e+04, significantDigits = 3, order = 4, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.780000000000000e+03, significantDigits = 2, order = 3, isPercent = False
+1.48e4 +/- 1.8e3 eV/mm
+value = 1.480000000000000e+04, significantDigits = 3, order = 4, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.800000000000000e+03, significantDigits = 2, order = 3, isPercent = False
+
+14850. +/- 178. eV/mm
+None
+14850. +/- 1.8e2 eV/mm
+value = 1.485000000000000e+04, significantDigits = 4, order = 4, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.780000000000000e+02, significantDigits = 2, order = 2, isPercent = False
+14850. +/- 1.8e2 eV/mm
+value = 1.485000000000000e+04, significantDigits = 4, order = 4, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.800000000000000e+02, significantDigits = 2, order = 2, isPercent = False
+
+14850. +/- 17.8 eV/mm
+None
+14850. +/- 18. eV/mm
+value = 1.485000000000000e+04, significantDigits = 5, order = 4, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.780000000000000e+01, significantDigits = 2, order = 1, isPercent = False
+14850. +/- 18. eV/mm
+value = 1.485000000000000e+04, significantDigits = 5, order = 4, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.800000000000000e+01, significantDigits = 2, order = 1, isPercent = False
+
+14850. +/- 1.78 eV/mm
+None
+14850.0 +/- 1.8 eV/mm
+value = 1.485000000000000e+04, significantDigits = 6, order = 4, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.780000000000000e+00, significantDigits = 2, order = 0, isPercent = False
+14850.0 +/- 1.8 eV/mm
+value = 1.485000000000000e+04, significantDigits = 6, order = 4, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.800000000000000e+00, significantDigits = 2, order = 0, isPercent = False
+
+14850. +/- 0.178 eV/mm
+None
+14850.00 +/- 0.18 eV/mm
+value = 1.485000000000000e+04, significantDigits = 7, order = 4, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.780000000000000e-01, significantDigits = 2, order = -1, isPercent = False
+14850.00 +/- 0.18 eV/mm
+value = 1.485000000000000e+04, significantDigits = 7, order = 4, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.800000000000000e-01, significantDigits = 2, order = -1, isPercent = False
+
+
+1485. +/- 1e1 eV/mm
+None
+1485. +/- 1.e1 eV/mm
+value = 1.485000000000000e+03, significantDigits = 3, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.000000000000000e+01, significantDigits = 1, order = 1, isPercent = False
+1480. +/- 1.e1 eV/mm
+value = 1.480000000000000e+03, significantDigits = 3, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.000000000000000e+01, significantDigits = 1, order = 1, isPercent = False
+
+1485. eV/mm
+10.
+1485. +/- 1.e1 eV/mm
+value = 1.485000000000000e+03, significantDigits = 3, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.000000000000000e+01, significantDigits = 1, order = 1, isPercent = False
+1480. +/- 1.e1 eV/mm
+value = 1.480000000000000e+03, significantDigits = 3, order = 3, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.000000000000000e+01, significantDigits = 1, order = 1, isPercent = False

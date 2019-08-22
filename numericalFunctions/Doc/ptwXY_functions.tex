@@ -1,0 +1,36 @@
+\subsection{Functions}
+This section decribes all the routines in the file "ptwXY\_functions.c".
+
+\subsubsection{ptwXY\_pow}
+\setargumentNameLengths{ptwXY}
+This routine applies the math operation $y_i = y_i^{p}$ to the y-values of \highlight{ptwXY}.
+\CallingC{fnu\_status ptwXY\_pow(}{ptwXYPoints *ptwXY,
+    \addArgument{double p );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{p}{The exponent.}
+    \vskip 0.05 in \noindent
+This routine infills to maintain the initial accuracy.
+
+\subsubsection{ptwXY\_exp}
+\setargumentNameLengths{ptwXY}
+This routine applies the math operation $y_i = \exp( a \, y_i )$ to the y-values of \highlight{ptwXY}.
+\CallingC{fnu\_status ptwXY\_exp(}{ptwXYPoints *ptwXY,
+    \addArgument{double a );}}
+    \argumentBox{ptwXY}{A pointer to the \highlight{ptwXYPoints} object.}
+    \argumentBox{a}{The exponent coefficient.}
+    \vskip 0.05 in \noindent
+This routine infills to maintain the initial accuracy.
+
+\subsubsection{ptwXY\_convolution}
+This routine returns the convolution of \highlight{ptwXY1} and \highlight{ptwXY2}.
+\setargumentNameLengths{status}
+\CallingC{ptwXYPoints *ptwXY\_convolution(}{ptwXYPoints *ptwXY1,
+    \addArgument{ptwXYPoints *ptwXY2,}
+    \addArgument{nfu\_status *status,}
+    \addArgument{int mode );}}
+    \argumentBox{ptwXY1}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{ptwXY2}{A pointer to a \highlight{ptwXYPoints} object.}
+    \argumentBox{status}{On return, the status value.}
+    \argumentBox{mode}{Flag to determine the initial x-values for calculating the convolutions.}
+    \vskip 0.05 in \noindent
+User should set \highlight{mode} to 0. 

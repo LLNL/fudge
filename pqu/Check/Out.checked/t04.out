@@ -1,0 +1,185 @@
+1.2% 0.048
+1.2% 0.06
+1.3e-3 1.3e-3
+value = 1.200000000000000e-02, significantDigits = 2, order = -2, isPercent = True
+2.4e-3 value = 2.400000000000000e-03, significantDigits = 2, order = -3, isPercent = False
+417. value = 4.166666666666667e+02, significantDigits = 2, order = 2, isPercent = False
+
+value = 1.234567000000000e+10, significantDigits = 7, order = 10, isPercent = False
+value = -1.234558000000000e+10, significantDigits = 6, order = 10, isPercent = False
+9.e4 value = 9.000000000000000e+04, significantDigits = 1, order = 4, isPercent = False
+9.e4 value = 9.000000000000000e+04, significantDigits = 1, order = 4, isPercent = False
+-7.114e7 value = -7.114000000000000e+07, significantDigits = 4, order = 7, isPercent = False
+-6.7e5 value = -6.700000000000000e+05, significantDigits = 2, order = 5, isPercent = False
+True
+False
+True
+False
+False
+True
+True
+
+0.00 +/- 0.05 Ang
+value = 0.000000000000000e+00, significantDigits = 3, order = 0, isPercent = False, unit = "Ang"
+uncertainty = value = 5.000000000000000e-02, significantDigits = 1, order = -2, isPercent = False
+0.1350 +/- 1.2% eV/mm
+value = 1.350000000000000e-01, significantDigits = 4, order = -1, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.200000000000000e-02, significantDigits = 2, order = -2, isPercent = True
+1.1e5
+value = 1.100000000000000e+05, significantDigits = 2, order = 5, isPercent = False, unit = ""
+uncertainty = 
+13.50 +/- 3.2% eV/mm
+value = 1.350000000000000e+01, significantDigits = 4, order = 1, isPercent = False, unit = "eV/mm"
+uncertainty = value = 3.200000000000000e-02, significantDigits = 2, order = -2, isPercent = True
+12.1 +/- 12.% eV/mm
+value = 1.210000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.221000000000000e-01, significantDigits = 2, order = -1, isPercent = True
+12.10 +/- 1.2% eV/mm
+value = 1.210000000000000e+01, significantDigits = 4, order = 1, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.200000000000000e-02, significantDigits = 2, order = -2, isPercent = True
+
+===== ( 0.00 +/- 0.05 Ang ) * ( 0.1350 +/- 1.2% eV/mm ) =====
+0.000 +/- 7.e-3 Ang*eV/mm
+value = 0.000000000000000e+00, significantDigits = 4, order = 0, isPercent = False, unit = "Ang*eV/mm"
+uncertainty = value = 6.750485982505260e-03, significantDigits = 1, order = -3, isPercent = False
+
+===== ( 0.1350 +/- 1.2% eV/mm ) * ( 0.00 +/- 0.05 Ang ) =====
+0.000 +/- 7.e-3 eV*Ang/mm
+value = 0.000000000000000e+00, significantDigits = 4, order = 0, isPercent = False, unit = "eV*Ang/mm"
+uncertainty = value = 6.750485982505260e-03, significantDigits = 1, order = -3, isPercent = False
+
+===== ( 1.1e5 ) * ( 0.1350 +/- 1.2% eV/mm ) =====
+14850. +/- 1.8e2 eV/mm
+value = 1.485000000000000e+04, significantDigits = 4, order = 4, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.782000000000000e+02, significantDigits = 2, order = 2, isPercent = False
+
+===== ( 0.1350 +/- 1.2% eV/mm ) * ( 1.1e5 ) =====
+14850. +/- 1.8e2 eV/mm
+value = 1.485000000000000e+04, significantDigits = 4, order = 4, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.782000000000000e+02, significantDigits = 2, order = 2, isPercent = False
+
+===== ( 0.1350 +/- 1.2% eV/mm ) * ( 2.2 +/- 0.05 Ang ) =====
+0.297 +/- 8.e-3 eV*Ang/mm
+value = 2.970000000000000e-01, significantDigits = 3, order = -1, isPercent = False, unit = "eV*Ang/mm"
+uncertainty = value = 7.633554676557967e-03, significantDigits = 1, order = -3, isPercent = False
+
+===== ( 2.2 +/- 0.05 Ang ) * ( 0.1350 +/- 1.2% eV/mm ) =====
+0.297 +/- 8.e-3 eV*Ang/mm
+value = 2.970000000000000e-01, significantDigits = 3, order = -1, isPercent = False, unit = "eV*Ang/mm"
+uncertainty = value = 7.633554676557967e-03, significantDigits = 1, order = -3, isPercent = False
+
+===== ( 0.1350 +/- 1.2% eV/mm ) / ( 2.2 +/- 0.05 Ang ) =====
+0.0614 +/- 1.6e-3 eV/mm/Ang
+value = 6.136363636363636e-02, significantDigits = 3, order = -2, isPercent = False, unit = "eV/mm/Ang"
+uncertainty = value = 1.577180718297101e-03, significantDigits = 2, order = -3, isPercent = False
+
+===== ( 2.2 +/- 0.05 Ang ) / ( 0.1350 +/- 1.2% eV/mm ) =====
+16.3 +/- 0.4 mm*Ang/eV
+value = 1.629629629629629e+01, significantDigits = 3, order = 1, isPercent = False, unit = "mm*Ang/eV"
+uncertainty = value = 4.188507367109995e-01, significantDigits = 1, order = -1, isPercent = False
+
+===== ( 0.00 +/- 0.05 Ang ) / ( 0.1350 +/- 1.2% eV/mm ) =====
+0.0 +/- 0.4 mm*Ang/eV
+value = 0.000000000000000e+00, significantDigits = 2, order = 0, isPercent = False, unit = "mm*Ang/eV"
+uncertainty = value = 3.703970360771061e-01, significantDigits = 1, order = -1, isPercent = False
+
+===== ( 0.1350 +/- 1.2% eV/mm ) / ( 0.00 +/- 0.05 Ang ) =====
+ERROR 1/0: ( 0.1350 +/- 1.2% eV/mm ) / ( 0.00 +/- 0.05 Ang ) 
+
+===== ( 1.1e5 ) / ( 0.1350 +/- 1.2% eV/mm ) =====
+8.148e5 +/- 9.8e3 mm/eV
+value = 8.148148148148147e+05, significantDigits = 4, order = 5, isPercent = False, unit = "mm/eV"
+uncertainty = value = 9.777777777777777e+03, significantDigits = 2, order = 3, isPercent = False
+
+===== ( 0.1350 +/- 1.2% eV/mm ) / ( 1.1e5 ) =====
+1.227e-6 +/- 1.5e-8 eV/mm
+value = 1.227272727272727e-06, significantDigits = 4, order = -6, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.472727272727273e-08, significantDigits = 2, order = -8, isPercent = False
+
+===== ( 0.00 +/- 0.05 Ang ) / ( 1.234567e10 ) =====
+0.000000000000 +/- 4.e-12 Ang
+value = 0.000000000000000e+00, significantDigits = 13, order = 0, isPercent = False, unit = "Ang"
+uncertainty = value = 4.050002956502158e-12, significantDigits = 1, order = -12, isPercent = False
+
+===== ( 1.234567e10 ) / ( 0.00 +/- 0.05 Ang ) =====
+ERROR 1/0: ( 1.234567e10 ) / ( 0.00 +/- 0.05 Ang ) 
+
+===== ( 0.1350 +/- 1.2% eV/mm ) / ( 1.234567e10 ) =====
+1.094e-11 +/- 1.3e-13 eV/mm
+value = 1.093500798255583e-11, significantDigits = 4, order = -11, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.312200957906699e-13, significantDigits = 2, order = -13, isPercent = False
+
+===== ( 1.234567e10 ) / ( 0.1350 +/- 1.2% eV/mm ) =====
+9.14e10 +/- 1.1e9 mm/eV
+value = 9.144940740740739e+10, significantDigits = 3, order = 10, isPercent = False, unit = "mm/eV"
+uncertainty = value = 1.097392888888889e+09, significantDigits = 2, order = 9, isPercent = False
+
+===== ( 1.1e5 ) / ( 1.234567e10 ) =====
+8.9e-6
+value = 8.910006504304747e-06, significantDigits = 2, order = -6, isPercent = False, unit = ""
+uncertainty = 
+
+===== ( 1.234567e10 ) / ( 1.1e5 ) =====
+112233.4
+value = 1.122333636363636e+05, significantDigits = 7, order = 5, isPercent = False, unit = ""
+uncertainty = 
+
+===== ( 0.1350 +/- 1.2% eV/mm ) + ( 13.50 +/- 3.2% eV/mm ) =====
+13.63 +/- 0.43 eV/mm
+value = 1.363500000000000e+01, significantDigits = 4, order = 1, isPercent = False, unit = "eV/mm"
+uncertainty = value = 4.320030374893213e-01, significantDigits = 2, order = -1, isPercent = False
+
+===== ( 13.50 +/- 3.2% eV/mm ) + ( 0.1350 +/- 1.2% eV/mm ) =====
+13.63 +/- 0.43 eV/mm
+value = 1.363500000000000e+01, significantDigits = 4, order = 1, isPercent = False, unit = "eV/mm"
+uncertainty = value = 4.320030374893213e-01, significantDigits = 2, order = -1, isPercent = False
+
+===== ( 12.1 +/- 12.% eV/mm ) + ( 13.50 +/- 3.2% eV/mm ) =====
+25.6 +/- 1.5 eV/mm
+value = 2.560000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.539273954856640e+00, significantDigits = 2, order = 0, isPercent = False
+
+===== ( 13.50 +/- 3.2% eV/mm ) + ( 12.1 +/- 12.% eV/mm ) =====
+25.6 +/- 1.5 eV/mm
+value = 2.560000000000000e+01, significantDigits = 3, order = 1, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.539273954856640e+00, significantDigits = 2, order = 0, isPercent = False
+
+===== ( 12.10 +/- 1.2% eV/mm ) + ( 13.50 +/- 3.2% eV/mm ) =====
+25.60 +/- 0.46 eV/mm
+value = 2.560000000000000e+01, significantDigits = 4, order = 1, isPercent = False, unit = "eV/mm"
+uncertainty = value = 4.557488782213293e-01, significantDigits = 2, order = -1, isPercent = False
+
+===== ( 13.50 +/- 3.2% eV/mm ) + ( 12.10 +/- 1.2% eV/mm ) =====
+25.60 +/- 0.46 eV/mm
+value = 2.560000000000000e+01, significantDigits = 4, order = 1, isPercent = False, unit = "eV/mm"
+uncertainty = value = 4.557488782213293e-01, significantDigits = 2, order = -1, isPercent = False
+
+===== ( 0.1350 +/- 1.2% eV/mm ) - ( 13.50 +/- 3.2% eV/mm ) =====
+-13.37 +/- 0.43 eV/mm
+value = -1.336500000000000e+01, significantDigits = 4, order = 1, isPercent = False, unit = "eV/mm"
+uncertainty = value = 4.320030374893213e-01, significantDigits = 2, order = -1, isPercent = False
+
+===== ( 13.50 +/- 3.2% eV/mm ) - ( 0.1350 +/- 1.2% eV/mm ) =====
+13.37 +/- 0.43 eV/mm
+value = 1.336500000000000e+01, significantDigits = 4, order = 1, isPercent = False, unit = "eV/mm"
+uncertainty = value = 4.320030374893213e-01, significantDigits = 2, order = -1, isPercent = False
+
+===== ( 12.1 +/- 12.% eV/mm ) - ( 13.50 +/- 3.2% eV/mm ) =====
+-1.4 +/- 1.5 eV/mm
+value = -1.400000000000000e+00, significantDigits = 2, order = 0, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.539273954856640e+00, significantDigits = 2, order = 0, isPercent = False
+
+===== ( 13.50 +/- 3.2% eV/mm ) - ( 12.1 +/- 12.% eV/mm ) =====
+1.4 +/- 1.5 eV/mm
+value = 1.400000000000000e+00, significantDigits = 2, order = 0, isPercent = False, unit = "eV/mm"
+uncertainty = value = 1.539273954856640e+00, significantDigits = 2, order = 0, isPercent = False
+
+===== ( 12.10 +/- 1.2% eV/mm ) - ( 13.50 +/- 3.2% eV/mm ) =====
+-1.40 +/- 0.46 eV/mm
+value = -1.400000000000000e+00, significantDigits = 3, order = 0, isPercent = False, unit = "eV/mm"
+uncertainty = value = 4.557488782213293e-01, significantDigits = 2, order = -1, isPercent = False
+
+===== ( 13.50 +/- 3.2% eV/mm ) - ( 12.10 +/- 1.2% eV/mm ) =====
+1.40 +/- 0.46 eV/mm
+value = 1.400000000000000e+00, significantDigits = 3, order = 0, isPercent = False, unit = "eV/mm"
+uncertainty = value = 4.557488782213293e-01, significantDigits = 2, order = -1, isPercent = False

@@ -8,22 +8,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 __metaclass__ = type
@@ -31,6 +42,9 @@ __metaclass__ = type
 conserveParticle = 'conserveParticle'
 conserveEnergy = 'conserveEnergy'
 conserveParticleAndEnergy = 'conserveParticleAndEnergy'
+
+from fudge.gnd import styles as stylesModule
+from fudge.gnd import reactionSuite as reactionSuiteModule
 
 class tempInfo :
 
@@ -41,6 +55,10 @@ class tempInfo :
     def __contains__( self, key ) :
 
         return( key in self.dict )
+
+    def __delitem__( self, key ) :
+
+        del self.dict[key]
 
     def __getitem__( self, key ) :
 
@@ -57,6 +75,75 @@ class tempInfo :
     def keys( self ) :
 
         return( self.dict.keys( ) )
+
+class processInfo2 :
+
+    def __init__( self, style, reactionSuite, flux = None, logFile = None, verbosity = 0, verbosityIndentStep = '  ',
+            energyAccuracy = 1e-6, momentumAccuracy = 1e-3 ) :
+
+        if( not( isinstance( style, stylesModule.style ) ) ) : raise TypeError( 'invalid style' )
+        self.__style = style
+
+        if( not( isinstance( reactionSuite, reactionSuiteModule.reactionSuite ) ) ) : raise TypeError( 'invalid reactionSuite' )
+        self.__reactionSuite = reactionSuite
+
+        self.__flux = flux
+        self.__logFile = logFile
+        self.__verbosity = int( verbosity )
+
+        if( not( isinstance( verbosityIndentStep, str ) ) ) : raise TypeError( 'invalid verbosityIndentStep' )
+        if( len( verbosityIndentStep ) != verbosityIndentStep.count( ' ' ) ) :
+            raise ValueError( 'verbosityIndentStep must only contain the space character' )
+        self.__verbosityIndentStep = verbosityIndentStep
+
+        self.__energyAccuracy = energyAccuracy
+        self.__momentumAccuracy = momentumAccuracy
+
+    @property
+    def energyAccuracy( self ) :
+
+        return( self.__energyAccuracy )
+
+    @property
+    def momentumAccuracy( self ) :
+
+        return( self.__momentumAccuracy )
+
+    @property
+    def reactionSuite( self ) :
+
+        return( self.__reactionSuite )
+
+    @property
+    def style( self ) :
+
+        return( self.__style )
+
+    @property
+    def verbosityIndentStep( self ) :
+
+        return( self.__verbosityIndentStep )
+
+    @property
+    def flux( self ) :
+
+        return( self.__flux )
+
+    @property
+    def logFile( self ) :
+
+        return( self.__logFile )
+
+    @property
+    def verbosity( self ) :
+
+        return( self.__verbosity )
+
+    def checkStyle( self, _class ) :
+
+        if( not( issubclass( _class, stylesModule.style ) ) ) : raise TypeError( 'class not a sub-class of style' )
+        if( isinstance( self.style, _class ) ) : return
+        raise TypeError( 'style %s not of style %s' % ( _class.moniker, self.style.moniker ) )
 
 class processInfo :
 
@@ -94,11 +181,11 @@ class processInfo :
 
     def getProjectileName( self ) :
 
-        return( self.target.projectile.getName( ) )
+        return( self.target.projectile.name )
 
     def getTargetName( self ) :
 
-        return( self.target.target.getName( ) )
+        return( self.target.target.name )
 
     def isProcessParticle( self, name ) :
 
@@ -134,12 +221,12 @@ class processInfoParticle :
 
 class processInfoLLNL( processInfo ) :
 
-    def __init__( self, target, groups = None, flux = None, LLNL_MC = True, LLNL_Pn = True, lMax = 3, logFile = None, verbosity = 0 ) :
+    def __init__( self, target, groups = None, flux = None, LLNL_Pn = True, lMax = 3, logFile = None, verbosity = 0 ) :
 
         particles = {}
         for particle in groups :
             lMax_ = 0
-            if( particle == target.projectile.getName( ) ) : lMax_ = lMax
+            if( particle == target.projectile.name ) : lMax_ = lMax
             conservationFlag = conserveParticleAndEnergy
             if( particle == 'n' ) : conservationFlag = conserveParticle
             if( particle == 'gamma' ) : conservationFlag = conserveEnergy
@@ -147,6 +234,5 @@ class processInfoLLNL( processInfo ) :
         processInfo.__init__( self, target, particles, flux = flux, logFile = logFile, verbosity = verbosity )
         self['workDir'] = 'xndfgen.work'
         styles = []
-        if( LLNL_MC ) : styles.append( 'LLNL_MC' )
         if( LLNL_Pn ) : styles.append( 'LLNL_Pn' )
         self['styles'] = styles

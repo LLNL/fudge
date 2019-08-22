@@ -9,25 +9,37 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 */
 
+#include <stdlib.h>
 #include <math.h>
 #include <float.h>
 
@@ -166,7 +178,7 @@ nfu_status ptwXY_mergeClosePoints( ptwXYPoints *ptwXY, double epsilon ) {
 
     p2 = ptwXY->points;
     x = p2->x;
-    for( i1 = 1, p2++; i1 < n; i1++, p2++ ) {                 /* The first point shall remain the first point and all points close to it are deleted. */
+    for( i1 = 1, p2++; i1 < ( n - 1 ); i1++, p2++ ) {                 /* The first point shall remain the first point and all points close to it are deleted. */
         if( ( p2->x - x ) > 0.5 * epsilon * ( fabs( x ) + fabs( p2->x ) ) ) break;
     }
     if( i1 != 1 ) {
@@ -209,8 +221,8 @@ nfu_status ptwXY_mergeClosePoints( ptwXYPoints *ptwXY, double epsilon ) {
 */
 ptwXYPoints *ptwXY_intersectionWith_ptwX( ptwXYPoints *ptwXY, ptwXPoints *ptwX, nfu_status *status ) {
 
-    int64_t i, i1, i2, length = ptwX_length( ptwX );
-    double x, y, xMin, xMax;
+    int64_t i, i1, i2, lengthX = ptwX_length( ptwX );
+    double x, y, domainMin, domainMax;
     ptwXYPoints *n = NULL;
 
     if( ( *status = ptwXY->status ) != nfu_Okay ) return( NULL );
@@ -220,14 +232,18 @@ ptwXYPoints *ptwXY_intersectionWith_ptwX( ptwXYPoints *ptwXY, ptwXPoints *ptwX, 
     if( ptwXY->interpolation == ptwXY_interpolationOther ) return( NULL );
     if( ( n = ptwXY_clone( ptwXY, status ) ) == NULL ) return( NULL );
     if( ptwXY->length == 0 ) return( n );
-    xMin = ptwXY->points[0].x;
-    xMax = ptwXY->points[ptwXY->length - 1].x;
+    domainMin = ptwXY->points[0].x;
+    domainMax = ptwXY->points[ptwXY->length - 1].x;
 
+    if( ( domainMin >= ptwX->points[lengthX-1] ) || ( domainMax <= ptwX->points[0] ) ) {  /* No overlap. */
+        n->length = 0;
+        return( n );
+    }
 
-    for( i = 0; i < length; i++ ) {
+    for( i = 0; i < lengthX; i++ ) {        /* Fill in ptwXY at x-points in ptwX. */
         x = ptwX->points[i];
-        if( x <= xMin ) continue;
-        if( x >= xMax ) break;
+        if( x <= domainMin ) continue;
+        if( x >= domainMax ) break;
         if( ( *status = ptwXY_getValueAtX( ptwXY, x, &y ) ) != nfu_Okay ) goto Err;
         if( ( *status = ptwXY_setValueAtX( n, x, y ) ) != nfu_Okay ) goto Err;
     }
@@ -235,7 +251,7 @@ ptwXYPoints *ptwXY_intersectionWith_ptwX( ptwXYPoints *ptwXY, ptwXPoints *ptwX, 
 
     i1 = 0;
     i2 = n->length - 1;
-    if( length > 0 ) {
+    if( lengthX > 0 ) {
         x = ptwX->points[0];
         if( x > n->points[i1].x ) {
             for( ; i1 < n->length; i1++ ) {
@@ -243,7 +259,7 @@ ptwXYPoints *ptwXY_intersectionWith_ptwX( ptwXYPoints *ptwXY, ptwXPoints *ptwX, 
             }
         }
 
-        x = ptwX->points[length - 1];
+        x = ptwX->points[lengthX - 1];
         if( x < n->points[i2].x ) {
             for( ; i2 > i1; i2-- ) {
                 if( n->points[i2].x == x ) break;
@@ -296,6 +312,79 @@ nfu_status ptwXY_areDomainsMutual( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2 ) {
                 if( xy1->y != 0. ) status = nfu_domainsNotMutual; }
             else if( xy1->x > xy2->x ) {
                 if( xy2->y != 0. ) status = nfu_domainsNotMutual;
+            }
+        }
+    }
+    return( status );
+}
+/*
+************************************************************
+*/
+nfu_status ptwXY_tweakDomainsToMutualify( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, int epsilonFactor, double epsilon ) {
+
+    nfu_status status;
+    int64_t n1 = ptwXY1->length, n2 = ptwXY2->length;
+    double sum, diff;
+    ptwXYPoint *xy1, *xy2;
+
+    epsilon = fabs( epsilon ) + fabs( epsilonFactor * DBL_EPSILON );
+
+    if( ( status = ptwXY1->status ) != nfu_Okay ) return( status );
+    if( ( status = ptwXY2->status ) != nfu_Okay ) return( status );
+    if( n1 == 0 ) return( nfu_empty );
+    if( n2 == 0 ) return( nfu_empty );
+    if( n1 < 2 ) { 
+        status = nfu_tooFewPoints; }
+    else if( n2 < 2 ) { 
+        status = nfu_tooFewPoints; }
+    else {
+        xy1 = ptwXY_getPointAtIndex_Unsafely( ptwXY1, 0 );
+        xy2 = ptwXY_getPointAtIndex_Unsafely( ptwXY2, 0 );
+        if( xy1->x < xy2->x ) {
+            if( xy2->y != 0. ) {
+                sum = fabs( xy1->x ) + fabs( xy2->x );
+                diff = fabs( xy2->x - xy1->x );
+                if( diff > epsilon * sum ) {
+                    status = nfu_domainsNotMutual; }
+                else {
+                    xy1->x = xy2->x;
+                }
+            } }
+        else if( xy1->x > xy2->x ) {
+            if( xy1->y != 0. ) {
+                sum = fabs( xy1->x ) + fabs( xy2->x );
+                diff = fabs( xy2->x - xy1->x );
+                if( diff > epsilon * sum ) {
+                    status = nfu_domainsNotMutual; }
+                else {
+                    xy2->x = xy1->x;
+                }
+            }
+        }
+
+        if( status == nfu_Okay ) {
+            xy1 = ptwXY_getPointAtIndex_Unsafely( ptwXY1, n1 - 1 );
+            xy2 = ptwXY_getPointAtIndex_Unsafely( ptwXY2, n2 - 1 );
+            if( xy1->x < xy2->x ) {
+                if( xy1->y != 0. ) {
+                    sum = fabs( xy1->x ) + fabs( xy2->x );
+                    diff = fabs( xy2->x - xy1->x );
+                    if( diff > epsilon * sum ) {
+                        status = nfu_domainsNotMutual; }
+                    else {
+                        xy2->x = xy1->x;
+                    }
+                } }
+            else if( xy1->x > xy2->x ) {
+                if( xy2->y != 0. ) {
+                    sum = fabs( xy1->x ) + fabs( xy2->x );
+                    diff = fabs( xy2->x - xy1->x );
+                    if( diff > epsilon * sum ) {
+                        status = nfu_domainsNotMutual; }
+                    else {
+                        xy1->x = xy2->x;
+                    }
+                }
             }
         }
     }
@@ -386,14 +475,41 @@ nfu_status ptwXY_copyToC_XY( ptwXYPoints *ptwXY, int64_t index1, int64_t index2,
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_valueTo_ptwXY( ptwXY_interpolation interpolation, double x1, double x2, double y, nfu_status *status ) {
+nfu_status ptwXY_valuesToC_XsAndYs( ptwXYPoints *ptwXY, double **xs, double **ys ) {
+
+    int64_t i1, length = ptwXY_length( ptwXY );
+    double *xps, *yps;
+    ptwXYPoint *pointFrom;
+    nfu_status status;
+
+    if( ptwXY->status != nfu_Okay ) return( ptwXY->status );
+    if( ( status = ptwXY_simpleCoalescePoints( ptwXY ) ) != nfu_Okay ) return( status );
+
+    if( ( *xs = (double *) malloc( (size_t) length * sizeof( double ) ) ) == NULL ) return( nfu_mallocError );
+    if( ( *ys = (double *) malloc( (size_t) length * sizeof( double ) ) ) == NULL ) {
+        free( *xs );
+        *xs = NULL;
+        return( nfu_mallocError );
+    }
+
+    for( i1 = 0, pointFrom = ptwXY->points, xps = *xs, yps = *ys; i1 < length; ++i1, ++pointFrom, ++xps, ++yps ) {
+        *xps = pointFrom->x;
+        *yps = pointFrom->y;
+    }
+
+    return( nfu_Okay );
+}
+/*
+************************************************************
+*/
+ptwXYPoints *ptwXY_valueTo_ptwXY( double x1, double x2, double y, nfu_status *status ) {
 
     ptwXYPoints *n;
 
     *status = nfu_XNotAscending;
     if( x1 >= x2 ) return( NULL );
     *status = nfu_Okay;
-    if( ( n = ptwXY_new( interpolation, ptwXY_maxBiSectionMax, ptwXY_minAccuracy, 2, 0, status, 0 ) ) == NULL ) return( NULL );
+    if( ( n = ptwXY_new( ptwXY_interpolationLinLin, NULL, ptwXY_maxBiSectionMax, ptwXY_minAccuracy, 2, 0, status, 0 ) ) == NULL ) return( NULL );
     ptwXY_setValueAtX( n, x1, y );
     ptwXY_setValueAtX( n, x2, y );
     return( n );
@@ -405,17 +521,17 @@ ptwXYPoints *ptwXY_createGaussianCenteredSigma1( double accuracy, nfu_status *st
 
     int64_t i, n;
     ptwXYPoint *pm, *pp;
-    double x1, y1, x2, y2, accuracy2, yMin = 1e-10;
+    double x1, y1, x2, y2, accuracy2, rangeMin = 1e-10;
     ptwXYPoints *gaussian;
 
     if( accuracy < 1e-5 ) accuracy = 1e-5;
     if( accuracy > 1e-1 ) accuracy = 1e-1;
-    if( ( gaussian = ptwXY_new( ptwXY_interpolationLinLin, 1., accuracy, 200, 100, status, 0 ) ) == NULL ) return( NULL );
+    if( ( gaussian = ptwXY_new( ptwXY_interpolationLinLin, NULL, 1., accuracy, 200, 100, status, 0 ) ) == NULL ) return( NULL );
     accuracy2 = accuracy = gaussian->accuracy;
     if( accuracy2 > 5e-3 ) accuracy2 = 5e-3;
 
-    x1 = -sqrt( -2. * log( yMin ) );
-    y1 = yMin;
+    x1 = -sqrt( -2. * log( rangeMin ) );
+    y1 = rangeMin;
     x2 = -5.2;
     y2 = exp( -0.5 * x2 * x2 );
     if( ( *status = ptwXY_setValueAtX( gaussian, x1, y1 ) ) != nfu_Okay ) goto Err;
@@ -463,9 +579,9 @@ static nfu_status ptwXY_createGaussianCenteredSigma1_2( ptwXYPoints *ptwXY, doub
     nfu_status status = nfu_Okay;
     int morePoints = 0;
     double x = 0.5 * ( x1 + x2 );
-    double y = exp( -x * x / 2 ), yMin = ( y1 * ( x2 - x ) + y2 * ( x - x1 ) ) / ( x2 - x1 );
+    double y = exp( -x * x / 2 ), rangeMin = ( y1 * ( x2 - x ) + y2 * ( x - x1 ) ) / ( x2 - x1 );
 
-    if( fabs( y - yMin ) > y * ptwXY->accuracy ) morePoints = 1;
+    if( fabs( y - rangeMin ) > y * ptwXY->accuracy ) morePoints = 1;
     if( morePoints && ( status = ptwXY_createGaussianCenteredSigma1_2( ptwXY, x, y, x2, y2, 0 ) ) != nfu_Okay ) return( status );
     if( ( status = ptwXY_setValueAtX( ptwXY, x, y ) ) != nfu_Okay ) return( status );
     if( morePoints && ( status = ptwXY_createGaussianCenteredSigma1_2( ptwXY, x1, y1, x, y, 0 ) ) != nfu_Okay ) return( status );
@@ -475,7 +591,7 @@ static nfu_status ptwXY_createGaussianCenteredSigma1_2( ptwXYPoints *ptwXY, doub
 /*
 ************************************************************
 */
-ptwXYPoints *ptwXY_createGaussian( double accuracy, double xCenter, double sigma, double amplitude, double xMin, double xMax, 
+ptwXYPoints *ptwXY_createGaussian( double accuracy, double xCenter, double sigma, double amplitude, double domainMin, double domainMax, 
         double dullEps, nfu_status *status ) {
 
     int64_t i;
@@ -487,8 +603,8 @@ ptwXYPoints *ptwXY_createGaussian( double accuracy, double xCenter, double sigma
         point->x = point->x * sigma + xCenter;
         point->y *= amplitude;
     }
-    if( ( gaussian->points[0].x < xMin ) || ( gaussian->points[gaussian->length - 1].x > xMax ) ) {
-        if( ( sliced = ptwXY_xSlice( gaussian, xMin, xMax, 10, 1, status ) ) == NULL ) goto Err;
+    if( ( gaussian->points[0].x < domainMin ) || ( gaussian->points[gaussian->length - 1].x > domainMax ) ) {
+        if( ( sliced = ptwXY_domainSlice( gaussian, domainMin, domainMax, 10, 1, status ) ) == NULL ) goto Err;
         ptwXY_free( gaussian );
         gaussian = sliced;
     }

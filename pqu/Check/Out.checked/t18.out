@@ -1,0 +1,36 @@
+============
+2.300000 +/- 4.e-6 MeV
+value = 2.300000000000000e+00, significantDigits = 7, order = 0, isPercent = False, unit = "MeV"
+uncertainty = value = 4.000000000000000e-06, significantDigits = 1, order = -6, isPercent = False
+
+2.300000 +/- 2.e-4% MeV
+value = 2.300000000000000e+00, significantDigits = 7, order = 0, isPercent = False, unit = "MeV"
+uncertainty = value = 1.739130434782609e-06, significantDigits = 1, order = -6, isPercent = True
+
+2.300000 +/- 4.e-6 MeV
+value = 2.300000000000000e+00, significantDigits = 7, order = 0, isPercent = False, unit = "MeV"
+uncertainty = value = 3.999999999999999e-06, significantDigits = 1, order = -6, isPercent = False
+============
+2.3000e-12 +/- 0.41% MeV
+value = 2.300000000000000e-12, significantDigits = 5, order = -12, isPercent = False, unit = "MeV"
+uncertainty = value = 4.099999999999999e-03, significantDigits = 2, order = -3, isPercent = True
+
+2.3000e-12 +/- 9.4e-15 MeV
+value = 2.300000000000000e-12, significantDigits = 5, order = -12, isPercent = False, unit = "MeV"
+uncertainty = value = 9.429999999999999e-15, significantDigits = 2, order = -15, isPercent = False
+
+2.3000e-12 +/- 0.41% MeV
+value = 2.300000000000000e-12, significantDigits = 5, order = -12, isPercent = False, unit = "MeV"
+uncertainty = value = 4.099999999999999e-03, significantDigits = 2, order = -3, isPercent = True
+============
+8.3000e12 +/- 0.041% MeV
+value = 8.300000000000000e+12, significantDigits = 5, order = 12, isPercent = False, unit = "MeV"
+uncertainty = value = 4.100000000000000e-04, significantDigits = 2, order = -4, isPercent = True
+
+8.3000e12 +/- 3.4e9 MeV
+value = 8.300000000000000e+12, significantDigits = 5, order = 12, isPercent = False, unit = "MeV"
+uncertainty = value = 3.403000000000000e+09, significantDigits = 2, order = 9, isPercent = False
+
+8.3000e12 +/- 0.041% MeV
+value = 8.300000000000000e+12, significantDigits = 5, order = 12, isPercent = False, unit = "MeV"
+uncertainty = value = 4.100000000000001e-04, significantDigits = 2, order = -4, isPercent = True

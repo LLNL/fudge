@@ -9,22 +9,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 */
 
@@ -41,14 +52,14 @@
 
 static int verbose = 0;
 
-int xCompare( const void *, const void * );
-void printMsg( const char *fmt, ... );
+int xCompare( void const *, void const * );
+void printMsg( char const *fmt, ... );
 /*
 ****************************************************************
 */
 int main( int argc, char **argv ) {
 
-    int i, n = 10 * 1000, i1, i2, iarg, echo = 0;
+    int i3, n = 10 * 1000, i1, i2, iarg, echo = 0;
     unsigned short seed16v[3] = { 1242, 14213, 543 };
     double accuracy = 1e-3, biSectionMax = 3., xMin = -100, xMax = 100, yMin = 0, yMax = 10, r, x, y, *points, *p;
     nfu_status status;
@@ -71,10 +82,10 @@ int main( int argc, char **argv ) {
     if( ( points = malloc( 2 * sizeof( double ) * n ) ) == NULL ) printMsg( "Error allocating points\n" );
     for( i1 = ptwXY_minimumSize; i1 < ptwXY_minimumSize + 10; i1++ ) {
         for( i2 = ptwXY_minimumOverflowSize; i2 < ptwXY_minimumOverflowSize + 10; i2++ ) {
-            if( ( f = ptwXY_new( ptwXY_interpolationLinLin, biSectionMax, accuracy, i1, i2, &status, 0 ) ) == NULL ) 
+            if( ( f = ptwXY_new( ptwXY_interpolationLinLin, NULL, biSectionMax, accuracy, i1, i2, &status, 0 ) ) == NULL ) 
                 printMsg( "u creation: status = %d: %s", status, nfu_statusMessage( status ) );
 
-            for( i = 0, p = points; i < n; i++ ) {
+            for( i3 = 0, p = points; i3 < n; i3++ ) {
                 r = drand48( );
                 x = r * xMin + ( 1. - r ) * xMax;
                 *(p++) = x;
@@ -82,14 +93,16 @@ int main( int argc, char **argv ) {
                 y = r * yMin + ( 1. - r ) * yMax;
                 *(p++) = y;
                 if( ( status = ptwXY_setValueAtX( f, x, y ) ) != nfu_Okay ) printMsg( "Error setting x, y = %16e, %16e at index %d with status = %d\n", 
-                    x, y, i, status );
+                    x, y, i3, status );
             }
             qsort( points, n, 2 * sizeof( double ), xCompare );
-            for( i = 0, p = points; i < n; i++ ) {
-                point = ptwXY_getPointAtIndex( f, i );
+            for( i3 = 0, p = points; i3 < n; i3++ ) {
+                point = ptwXY_getPointAtIndex( f, i3 );
                 x = *(p++);
                 y = *(p++);
-                if( ( x != point->x ) || ( y != point->y ) ) printMsg( "Error x,y = %16e, %16e != point = %16e, %16e\n", x, y, point->x, point->y );
+                if( ( x != point->x ) || ( y != point->y ) ) 
+                    printMsg( "Error x,y = %16e, %16e != point = %16e, %16e: i1 = %d, i2 = %d, i3 = %d\n", 
+                            x, y, point->x, point->y, i1, i2, i3 );
             }
             ptwXY_free( f );
         }
@@ -100,16 +113,18 @@ int main( int argc, char **argv ) {
 /*
 ****************************************************************
 */
-int xCompare( const void *p1, const void *p2 ) {
+int xCompare( void const *p1, void const *p2 ) {
 
     double *x1 = (double *) p1, *x2 = (double *) p2;
 
-    return( *x1 > *x2 );
+    if( *x1 > *x2 ) return( 1 );
+    if( *x1 == *x2 ) return( 0 );
+    return( -1 );
 }
 /*
 ****************************************************************
 */
-void printMsg( const char *fmt, ... ) {
+void printMsg( char const *fmt, ... ) {
 
     va_list args;
 

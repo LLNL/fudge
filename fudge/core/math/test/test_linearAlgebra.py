@@ -30,7 +30,7 @@ class MatrixTests( unittest.TestCase ):
 
 
 # --------- basic tests -----------
-class BasicLinearAlgrbraTests( MatrixTests ):
+class BasicLinearAlgebraTests( MatrixTests ):
     '''Very basic matrix tests'''
     
     def test_transpose( self ):
@@ -152,14 +152,12 @@ class CGLSQRTests( MatrixTests ):
         self.assertMatrixAlmostEqual( ( self.answer - ans ).T, numpy.matrix(  [[ 0.04524624], [-0.05105358],[ 0.02455487],[-0.00895522],[ 0.00895522]] ) ) 
 
 # ------------- eigendecomposition tests -----------------
-class EigendecompositionTests( MatrixTests ):
+class Eigendecomposition_base( MatrixTests ):
 
     def setUpMtx( self ): 
-        '''Derived classes must override this'''
-        pass
+        raise Exception("Must be overridden by derived classes")
 
     def setUp( self ):   
-        if self.__class__==EigendecompositionTests: return
         # The starting matrix, it is symmetric and real, but maybe not positive definite
         self.setUpMtx()
         self.ndim = self.A.shape[0]
@@ -168,15 +166,20 @@ class EigendecompositionTests( MatrixTests ):
         self.v = []
         for i in range( self.ndim ): self.v.append( self.O.T[i] )
         
+class EigendecompositionTests:
+    """ Define some tests that should be run for DERIVED classes only.
+    This doesn't inherit from unittest.TestCase since the tests aren't meant to be run inside this class.
+    
+    Derived classes need to inherit from both this and from Eigendecomposition_base
+    """
+
     def test_eigenmodes_are_really_eigenmodes( self ):
         '''Check that A * v[i] = e[i] * v[i]'''
-        if self.__class__==EigendecompositionTests: return
         for i in range( self.ndim ):
             self.assertMatrixAlmostEqual( dot( self.A, self.v[i].T ), self.e[i] * self.v[i].T )
 
     def test_eigenvector_orthogonality( self ):
         """Eigenvector orthogonality test"""
-        if self.__class__==EigendecompositionTests: return
         for i in range( self.ndim ):
             for j in range( self.ndim ):
                 if i == j: continue
@@ -184,12 +187,10 @@ class EigendecompositionTests( MatrixTests ):
 
     def test_eigenvector_normalization( self ):
         '''Eigenvector normalization test:'''
-        if self.__class__==EigendecompositionTests: return
         for i in range( self.ndim ): self.assertAlmostEqual( ( self.v[i] * self.v[i].T )[0,0], 1.0 )
 
     def test_eigenvector_orthonormality( self ):
         '''Check that eigenvectors are orthonormal, better get back identity matrix here'''
-        if self.__class__==EigendecompositionTests: return
         self.assertMatrixAlmostEqual( self.O.T * self.O, identity( self.ndim ) )
         self.assertMatrixAlmostEqual( self.O * self.O.T, identity( self.ndim ) )
         I = zeros_like( self.A )
@@ -198,14 +199,11 @@ class EigendecompositionTests( MatrixTests ):
     
     def test_reconstruct_matrix_from_eigendecomposition( self ):
         '''Try to reconstruct the matrix using the eigenvalue decomposition'''
-        if self.__class__==EigendecompositionTests: return
         B = self.O * diag( self.e ) * self.O.T
         self.assertMatrixAlmostEqual( self.A, B ) 
 
-    @unittest.expectedFailure
     def test_construct_matrixinverse_from_eigendecomposition( self ):
         '''Try to construct the matrix inverse using the eigenvalue decomposition'''
-        if self.__class__==EigendecompositionTests: return
         B = self.O * diag( 1.0/self.e ) * self.O.T
         self.assertMatrixAlmostEqual( self.A * B, identity( self.ndim ) ) 
         self.assertMatrixAlmostEqual( B * self.A, identity( self.ndim ) ) 
@@ -213,58 +211,103 @@ class EigendecompositionTests( MatrixTests ):
     @unittest.expectedFailure
     def test_construct_matrixinverse_by_pruning( self ):
         '''Try to construct the matrix inverse using the PRUNED eigenvalue decomposition'''
-        if self.__class__==EigendecompositionTests: return
-        B = self.O * diag( 1.0/self.e ) * self.O.T
-        B = pruned_matrix_inverse( self.A )
+        with numpy.errstate(divide='ignore'):
+            B = pruned_matrix_inverse( self.A )
         self.assertMatrixAlmostEqual( B * self.A, identity( self.ndim ), rtol=1e-05, atol=1e-08 ) 
         
     def test_construct_matrix_by_pruning( self ): 
         '''Try to reconstruct the matix using the PRUNED eigenvalue decomposition'''
-        if self.__class__==EigendecompositionTests: return
-        B = self.O * diag( 1.0/self.e ) * self.O.T
         B = pruned_matrix( self.A )
         self.assertMatrixAlmostEqual( self.A, B, rtol=1e-04, atol=1e-06 )
     
+class EigendecompositionTests_allShouldFail( EigendecompositionTests ):
+    """ For some input matrices, all tests are expected to fail. They should inherit from
+    this class instead of EigendecompositionTests """
+
+    @unittest.expectedFailure    
+    def test_eigenmodes_are_really_eigenmodes( self ):
+        super(self).test_eigenmodes_are_really_eigenmodes()
+
+    @unittest.expectedFailure    
+    def test_eigenvector_orthogonality( self ):
+        super(self).test_eigenvector_orthogonality()
+
+    @unittest.expectedFailure    
+    def test_eigenvector_normalization( self ):
+        super(self).test_eigenvector_normalization()
+
+    @unittest.expectedFailure    
+    def test_eigenvector_orthonormality( self ):
+        super(self).test_eigenvector_orthonormality()
+    
+    @unittest.expectedFailure    
+    def test_reconstruct_matrix_from_eigendecomposition( self ):
+        super(self).test_reconstruct_matrix_from_eigendecomposition()
+
+    @unittest.expectedFailure    
+    def test_construct_matrixinverse_from_eigendecomposition( self ):
+        super(self).test_construct_matrixinverse_from_eigendecomposition()
+ 
+    @unittest.expectedFailure
+    def test_construct_matrixinverse_by_pruning( self ):
+        super(self).test_construct_matrixinverse_by_pruning() 
+        
+    @unittest.expectedFailure    
+    def test_construct_matrix_by_pruning( self ): 
+        super(self).test_construct_matrix_by_pruning() 
 
 # --------- Specific Covariance Test Cases -----------
 
-class BoringCovarianceTests( EigendecompositionTests ):
+class BoringCovarianceTests( Eigendecomposition_base, EigendecompositionTests ):
     '''boring, a diagonal matrix'''
     def setUpMtx( self ): self.A = mat( [[1.,0.,0.],[0.,2.,0.],[0.,0.,3.]] )
 
-class SomeOffDiagonalCovarianceTests( EigendecompositionTests ):
+class SomeOffDiagonalCovarianceTests( Eigendecomposition_base, EigendecompositionTests ):
     '''some off-diagonal-ness'''
     def setUpMtx( self ): self.A = mat( [[1.,1.,0.],[1.,2.,0.],[0.,0.,3.]] )
 
-class LotsOffDiagonalCovarianceTests( EigendecompositionTests ):
+class LotsOffDiagonalCovarianceTests( Eigendecomposition_base, EigendecompositionTests ):
     '''lots of off-diagonal'''
     def setUpMtx( self ): self.A = mat( [[1.,1.,1.],[1.,2.,1.],[1.,1.,3.]] )
 
-@unittest.expectedFailure
-class ZeroSubspaceCovarianceTests( EigendecompositionTests ):
+class ZeroSubspaceCovarianceTests( Eigendecomposition_base, EigendecompositionTests_allShouldFail ):
     '''zeros? it still works!, but has negative eigenvalues'''
     def setUpMtx( self ): self.A = mat( [[0.,0.,1.],[0.,2.,1.],[1.,1.,3.]] ) 
 
-class AllCorrelatedCovarianceTests( EigendecompositionTests ):
-    '''pathelogical, all correlated, legal, but NOT INVERTABLE'''
+class AllCorrelatedCovarianceTests( Eigendecomposition_base, EigendecompositionTests ):
+    '''pathological, all correlated, legal, but NOT INVERTIBLE'''
     def setUpMtx( self ): self.A = mat( [[1.,1.,1.],[1.,1.,1.],[1.,1.,1.]] ) 
 
-class AlmostAllCorrelatedCovarianceTests( EigendecompositionTests ):
-    '''pathelogical, all correlated, legal, but NOT INVERTABLE'''
+    @unittest.expectedFailure
+    def test_construct_matrixinverse_from_eigendecomposition( self ):
+        super(self).test_construct_matrixinverse_from_eigendecomposition()
+
+    @unittest.expectedFailure
+    def test_eigenvector_orthogonality( self ):
+        super(self).test_eigenvector_orthogonality()
+
+    @unittest.expectedFailure
+    def test_eigenvector_orthonormality( self ):
+        super(self).test_eigenvector_orthonormality()
+
+class AlmostAllCorrelatedCovarianceTests( Eigendecomposition_base, EigendecompositionTests ):
+    '''pathological, all correlated, legal, but NOT INVERTIBLE'''
     def setUpMtx( self ): self.A = mat( [[1.,1.,1.],[1.,1.,1.],[1.,1.,1.0001]] ) 
 
-@unittest.expectedFailure
-class OnDiagonalBarelyPathelogicalCovarianceTests( EigendecompositionTests ):
-    '''pathelogical, all correlated, barely illegal and very much not invertible'''
+    @unittest.expectedFailure
+    def test_construct_matrixinverse_from_eigendecomposition( self ):
+        super(self).test_construct_matrixinverse_from_eigendecomposition()
+
+
+class OnDiagonalBarelyPathologicalCovarianceTests( Eigendecomposition_base, EigendecompositionTests_allShouldFail ):
+    '''pathological, all correlated, barely illegal and very much not invertible'''
     def setUpMtx( self ): self.A = mat( [[1.,1.,1.],[1.,1.,1.],[1.,1.,0.9999]] ) 
 
-@unittest.expectedFailure
-class OffDiagonalBarelyPathelogicalCovarianceTests( EigendecompositionTests ):
-    '''pathelogical, all correlated, barely illegal and very much not invertible, and slightly off-diagonal'''
+class OffDiagonalBarelyPathologicalCovarianceTests( Eigendecomposition_base, EigendecompositionTests_allShouldFail ):
+    '''pathological, all correlated, barely illegal and very much not invertible, and slightly off-diagonal'''
     def setUpMtx( self ): self.A = mat( [[1.,1.,1.],[1.,1.,1.00001],[1.,1.,0.9999]] )  
 
-@unittest.expectedFailure
-class IllegalCovarianceTest( EigendecompositionTests ): 
+class IllegalCovarianceTest( Eigendecomposition_base, EigendecompositionTests_allShouldFail ): 
     '''
     A bad matrix for testing:
 
@@ -285,8 +328,15 @@ class IllegalCovarianceTest( EigendecompositionTests ):
     '''
     def setUpMtx( self ): self.A = mat( [[1.,2.,3.],[1.,2.,1.],[3.,2.,1.]] )
 
-@unittest.expectedFailure
-class RealCovarianceTests( EigendecompositionTests ):
+    @unittest.expectedFailure
+    def test_construct_matrix_by_pruning( self ):
+        super(self).test_construct_matrix_by_pruning()
+
+    @unittest.expectedFailure
+    def test_construct_matrixinverse_from_eigendecomposition( self ):
+        super(self).test_construct_matrixinverse_from_eigendecomposition()
+
+class RealCovarianceTests( Eigendecomposition_base, EigendecompositionTests ):
     '''real covariance for testing, H(n,tot) cs cov.'''
     def setUpMtx( self ):
         self.A = mat([

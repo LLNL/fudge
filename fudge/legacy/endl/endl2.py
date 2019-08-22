@@ -8,22 +8,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 """
@@ -32,7 +43,7 @@ This module contains miscellaneous functions.
 
 import math
 from fudge.core.utilities import brb
-from fudge.core.utilities import fudgeZA
+from fudge.particles import nuclear
 import endl_C
 import endl_I
 import endl_Z
@@ -174,8 +185,6 @@ def residualZA_yos_Q( yi_, ZA_, C, targetELevel = 0., X4 = 0, specialCases = 1, 
     if ( yos[0] == -2 ) : return ( ZA, ( yi, ), 0. )              # yo = yi.
     if ( yos[0] == -3 ) : return ( None, ( -3, ), None )          # Fission
     if ( yos[0] == -4 ) : return ( None, ( -4, yos[1] ), None )  # Xyo
-    if( specialCases ) :
-        if ( ZA == 4009 ) and ( C == 12 ) : yos = yos + (2004,) # Special case for n + Be9 -> 2 n + Be8 -> 2 n + 2 He
     if ( ZA >= 99000 ) and ( ZA <= 99200 ) : return( None, yos, None )
     Zr, Ar = ZandAFromZA( ZA )
     Z_A = ZandAFromZA( yoToZA_forNuclei( ZAToYo( yi ) ) )             # yi's Z and A.
@@ -191,19 +200,22 @@ def residualZA_yos_Q( yi_, ZA_, C, targetELevel = 0., X4 = 0, specialCases = 1, 
         if( Ar != 0 ) :
             Ar -= Z_A[1]
             ZAr -= yo_
-    if( Ar < 0 ) : Ar = 0
-    if( Ar == 0 ) : return( 1000 * Zr, yos, None )
     if( Zr < 0 ) :                                          # Check all ok.
         raise Exception( "\nError in residualZA_yos_Q: bad C-value = %d for ZA = %d and yi = %d" % ( C, ZA, yi ) )
-    Remove_yi = 1
+    if( specialCases and ( ZAr == 4008 ) ) :        # Special case for Be8 ->  2 He (e.g., n + Be9  -> 2 n + (Be8 ->  2 He)).
+        yos = yos + ( 2004, )
+        Zr, Ar, ZAr = 2, 4, 2004
+    if( Ar < 0 ) : Ar = 0
+    if( Ar == 0 ) : return( 1000 * Zr, yos, None )
+    Remove_yi = True
     yos_ = []
     for yo in yos :                                         # To make math better, do not add and then subtract when yo = yi.
         try :
             yo_ = ZAToYo( yo )
         except :
             yo_ = yo
-        if ( ( Remove_yi == 1 ) and ( yo_ == yi ) ) :
-            Remove_yi = 0
+        if( Remove_yi and ( yo_ == yi ) ) :
+            Remove_yi = False
         else :
             if ( yo != 0 ) : yos_.append( yo )
     if ( ZAr == ZA ) :
@@ -224,7 +236,7 @@ def residualZA_yos_Q( yi_, ZA_, C, targetELevel = 0., X4 = 0, specialCases = 1, 
         endlmisc.printWarning( "\n" )
         raise Exception( "Error in residualZA_yos_Q: ZAr == ZA, but yo list not empty" )
     q = 0.
-    if ( Remove_yi == 1 ) : q += bdflsFile.mass( yi )
+    if( Remove_yi ) : q += bdflsFile.mass( yi )
     for yo in yos_ : q -= bdflsFile.mass( yo )
     ZAm = bdflsFile.mass( ZA )
     if ( ZAm == None ) :
@@ -401,7 +413,7 @@ def symOrNameForYoOrZA( yoOrZA, wantName, ASep = "", ZAOnly = 0, AddNatural = 1,
         return endl_y.endl_yLongLabel( ZAyo )
     ZA, Suffix = endlmisc.intZASuffix( yoOrZA )
     if( m_to_m1 and ( Suffix == 'm' ) ) : Suffix = 'm1'
-    if( ZA > 99000 ) and ( ZA <= 99200 ) : return "FissionProduct_ENDL%d" % ZA
+    if( ZA > 99000 ) and ( ZA <= 99200 ) : return "FissionProductENDL%d" % ZA
     if( suffixSeperator is None ) : suffixSeperator = ASep
     if( Suffix != "" ) : Suffix = suffixSeperator + Suffix
     Z, A = ZandAFromZA( ZA )
@@ -423,7 +435,7 @@ def endlToGNDName( yoOrZA ) :
 def gndNameToEndlZ_A_Suffix( name ) :
     """Returns the tuple (Z, A, suffix, ZA) for a gnd isotope name (e.g., gnd name = 'Am242_m1' returns ( 95, 242, 'm1', 95242 )."""
 
-    return( fudgeZA.gndNameToZ_A_Suffix( name ) )
+    return( nuclear.getZ_A_suffix_andZAFromName( name ) )
 
 def fileInfo( yi, ZA, fileName ) :
     """Obtains yo, C, I and S from fileName and calls reactionInfo."""

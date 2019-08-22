@@ -69,10 +69,26 @@ class Test_Wigner6jSymbol(unittest.TestCase):
         self.assertAlmostEqual( nf_amc.wigner_6j( 0, 0, 0, 0, 0, 0 ), 1.0 )
 
     def test_nontrivial_values(self): 
-        self.assertAlmostEqual( nf_amc.wigner_6j( 8, 4, 4, 4, 4, 8 ), 0.111677, 6 )
-        self.assertAlmostEqual( nf_amc.wigner_6j( 4, 2, 2, 2, 2, 4 ), -0.223607, 6 )
-        self.assertAlmostEqual( nf_amc.wigner_6j( 4, 4, 2, 2, 2, 4 ), 0.0745356 )
+        '''
+        Values computed using "Anthony Stone's Wigner coefficient calculator"
+        http://www-stone.ch.cam.ac.uk/wigner.shtml
+        '''
+        self.assertAlmostEqual( nf_amc.wigner_6j( 8, 4, 4, 4, 4, 8 ), 0.11167656571008167, 6 ) # (1/21)*sqrt(11/2)
+        self.assertAlmostEqual( nf_amc.wigner_6j( 4, 2, 2, 2, 2, 4 ), -0.22360679774997896, 6 ) #-(1/2)*sqrt(1/5)
+        self.assertAlmostEqual( nf_amc.wigner_6j( 4, 4, 2, 2, 2, 4 ), 0.07453559924999298 ) # (1/6)*sqrt(1/5)
 
+    def test_nontrivial_values_sequence(self): 
+        '''
+        Values computed using "Anthony Stone's Wigner coefficient calculator"
+        http://www-stone.ch.cam.ac.uk/wigner.shtml
+        
+        Values checked against A.Simon, J.H. VanderSluis, L.C. Biedenharn "Tables of the Racah Coefficients", ORNL-1679, March 26, 1954
+        '''
+        self.assertAlmostEqual( nf_amc.wigner_6j(  5,  8, 5,  8, 11, 6 ),  0.0161413111 ) #  (1/18) * sqrt(13/154)
+        self.assertAlmostEqual( nf_amc.wigner_6j(  7,  8, 5,  8, 11, 6 ), -0.0435382494 ) # -(17/66)* sqrt(1/35)
+        self.assertAlmostEqual( nf_amc.wigner_6j(  9,  8, 5,  8, 11, 6 ),  0.0623609564 ) #  (1/30) * sqrt(7/2)
+        self.assertAlmostEqual( nf_amc.wigner_6j( 11,  8, 5,  8, 11, 6 ), -0.0341078118 ) # -(7/18) * sqrt(1/130)
+        self.assertAlmostEqual( nf_amc.wigner_6j( 13,  8, 5,  8, 11, 6 ), -0.0544676990 ) # -(1/11) * sqrt(14/39)
 
 
 class Test_Wigner9jSymbol(unittest.TestCase):
@@ -90,16 +106,27 @@ class Test_RacahCoefficient(unittest.TestCase):
     def test_all_zeroes(self): 
         self.assertAlmostEqual( nf_amc.racah( 0, 0, 0, 0, 0, 0 ), 1.0 )
 
-    def test_nontrivial_values(self): 
-        self.assertAlmostEqual( nf_amc.racah( 8, 4, 4, 4, 4, 8 ), 0.111677, 6 )
-        self.assertAlmostEqual( nf_amc.racah( 4, 2, 2, 2, 2, 4 ), 0.223607, 6 )
-        self.assertAlmostEqual( nf_amc.racah( 4, 4, 2, 2, 2, 4 ), 0.0745356 )
-        self.assertAlmostEqual( nf_amc.racah( 2, 11, 2, 11, 9, 0 ), 0.16666666666550894 )
-        self.assertAlmostEqual( nf_amc.racah( 2, 11, 2, 11, 9, 1 ), 0.03553345272565833 )
-        self.assertAlmostEqual( nf_amc.racah( 2, 11, 2, 11, 9, 2 ), -0.12811768579269484 )
-        self.assertAlmostEqual( nf_amc.racah( 2, 11, 2, 11, 9, 3 ), -0.040514369565350455 )
-        self.assertAlmostEqual( nf_amc.racah( 2, 11, 2, 11, 9, 4 ), 0.06779350703073678 )
-        self.assertAlmostEqual( nf_amc.racah( 2, 11, 2, 11, 9, 5 ), 0.022597835676191603 )
+    def test_nontrivial_values_from_6j_tests(self): 
+        '''
+        Values computed using "Anthony Stone's Wigner coefficient calculator"
+        http://www-stone.ch.cam.ac.uk/wigner.shtml
+        '''
+        self.assertAlmostEqual( nf_amc.racah( 8, 4, 4, 4, 4, 8 ), 0.11167656571008167, 6 ) # (1/21)*sqrt(11/2)
+        self.assertAlmostEqual( nf_amc.racah( 4, 2, 2, 2, 2, 4 ), 0.22360679774997896, 6 ) # (1/2)*sqrt(1/5)
+        self.assertAlmostEqual( nf_amc.racah( 4, 4, 2, 2, 2, 4 ), 0.07453559924999298, 6 ) # (1/6)*sqrt(1/5)
+        
+    def test_nontrivial_values_sequence(self): 
+        '''
+        Values computed using "Anthony Stone's Wigner coefficient calculator"
+        http://www-stone.ch.cam.ac.uk/wigner.shtml
+        
+        Values checked against A.Simon, J.H. Vander Sluis, L.C. Biedenharn "Tables of the Racah Coefficients", ORNL-1679, March 26, 1954
+        '''
+        self.assertAlmostEqual( nf_amc.racah(  5,  8, 11,  8, 5, 6 ),  0.0161413111 ) #  (1/18) * sqrt(13/154)
+        self.assertAlmostEqual( nf_amc.racah(  7,  8, 11,  8, 5, 6 ),  0.0435382494 ) #  (17/66)* sqrt(1/35)
+        self.assertAlmostEqual( nf_amc.racah(  9,  8, 11,  8, 5, 6 ),  0.0623609564 ) #  (1/30) * sqrt(7/2)
+        self.assertAlmostEqual( nf_amc.racah( 11,  8, 11,  8, 5, 6 ),  0.0341078118 ) #  (7/18) * sqrt(1/130)
+        self.assertAlmostEqual( nf_amc.racah( 13,  8, 11,  8, 5, 6 ), -0.0544676990 ) # -(1/11) * sqrt(14/39)
 
 
 
@@ -107,12 +134,12 @@ class Test_ZCoefficient(unittest.TestCase):
 
     def test_easy(self):
         '''
-        For L=0, have analytic form from Froehner:
+        For L=0, have analytic form from Froehner p. 49, eq. (149) (F. Froehner "Evaluation and Analysis of Nuclear Resonance Data", JEFF Report 18, OECD (2000)):
             ..math::
                 \bar{Z}( \ell_1, J_1, \ell_2, J_2, s, 0 ) = (-)^{ J_1 + s }\sqrt{ 2 J_1 + 1 }\delta_{J_1 J_2}\delta_{\ell_1 \ell_2}
-            '''
-        for J1 in [0]:
-            #print J1, nf_amc.z_coefficient( 0, int(2.*J1), 0, int(2.*J1), 1, 0 ), math.sqrt(2.*J1+1.)
+        Because we use spin 1/2 particles, only get non-zero results with 1/2-integer J1        
+        '''
+        for J1 in [0.5]:
             self.assertAlmostEqual( nf_amc.z_coefficient( 0, int(2.*J1), 0, int(2.*J1), 1, 0 ), math.sqrt(2.*J1+1.) )
          
     def test_something(self): 
@@ -124,11 +151,62 @@ class Test_ZCoefficient(unittest.TestCase):
         for L in range( 0, 11 ):
             cgc = nf_amc.clebsh_gordan( int(2*l1), int(2*l2), 0, 0, int(2*L) )
             racah = nf_amc.racah( int(2*l1), int(2*J1), int(2*l2), int(2*J2), int(2*s), int(2*L ) )
+            if ( L - l1 + l2 ) % 8 == 0 : sign = 1.0
+            else: sign = -1.0
             if L == 1:
                 self.assertAlmostEqual( racah, -0.12811768579269484 ) 
                 self.assertAlmostEqual( cgc, 0.0 )
-            self.assertAlmostEqual( nf_amc.z_coefficient( int(2.*l1), int(2.*J1), int(2.*l2), int(2.*J2), int(2.*s), int(2.*L) ), math.sqrt((2.*l1+1.)*(2.*l2+1.)*(2.*J1+1.)*(2.*J2+1.))*cgc*racah )
+            self.assertAlmostEqual( nf_amc.z_coefficient( int(2.*l1), int(2.*J1), int(2.*l2), int(2.*J2), int(2.*s), int(2.*L) ), sign*math.sqrt((2.*l1+1.)*(2.*l2+1.)*(2.*J1+1.)*(2.*J2+1.))*cgc*racah )
 
+    def test_ZCoefficient_Swave(self):
+        """
+        Values checked against L.C. Biedenharn, "Revised Z Tables of the Racah Coefficients", ORNL-1501, May 28, 1953.
+        """
+        self.assertAlmostEqual( math.sqrt(2.0),   nf_amc.z_coefficient(  0, 1,  0, 1, 1, 0 ) )
+        self.assertAlmostEqual( math.sqrt(2.0),   nf_amc.z_coefficient(  2, 1,  2, 1, 1, 0 ) )
+        self.assertAlmostEqual( math.sqrt(10.),   nf_amc.z_coefficient(  8, 9,  8, 9, 1, 0 ) )
+        self.assertAlmostEqual( math.sqrt(10.),   nf_amc.z_coefficient( 10, 9, 10, 9, 1, 0 ) )
+    
+    def test_ZCoefficient_Pwave(self):
+        """
+        Values checked against L.C. Biedenharn, "Revised Z Tables of the Racah Coefficients", ORNL-1501, May 28, 1953.
+        """
+        self.assertAlmostEqual( -math.sqrt(40./3.),  nf_amc.z_coefficient(  8, 9, 6, 7, 1, 2 ) )
+        self.assertAlmostEqual( -math.sqrt(40./3.),  nf_amc.z_coefficient( 10, 9, 8, 7, 1, 2 ) )
+
+
+    def test_ZCoefficient_Dwave(self):
+        """
+        Values checked against L.C. Biedenharn, "Revised Z Tables of the Racah Coefficients", ORNL-1501, May 28, 1953.
+        """
+        self.assertAlmostEqual(   math.sqrt(8.0/7.0),  nf_amc.z_coefficient( 8, 7, 4, 5, 1, 4 ) )
+        self.assertAlmostEqual(  -math.sqrt(8.0/7.0),  nf_amc.z_coefficient( 6, 7, 6, 5, 1, 4 ) )
+
+
+class Test_ZBarCoefficient(unittest.TestCase):
+    def test_ZBarCoefficient_Swave(self):
+        """
+        Values checked against L.C. Biedenharn, "Revised Z Tables of the Racah Coefficients", ORNL-1501, May 28, 1953.
+        """
+        self.assertAlmostEqual( math.sqrt(2.0),   nf_amc.zbar_coefficient(  0, 1,  0, 1, 1, 0 ) )
+        self.assertAlmostEqual( math.sqrt(2.0),   nf_amc.zbar_coefficient(  2, 1,  2, 1, 1, 0 ) )
+        self.assertAlmostEqual( math.sqrt(10.),   nf_amc.zbar_coefficient(  8, 9,  8, 9, 1, 0 ) )
+        self.assertAlmostEqual( math.sqrt(10.),   nf_amc.zbar_coefficient( 10, 9, 10, 9, 1, 0 ) )
+    
+    def test_ZBarCoefficient_Pwave(self):
+        """
+        Values checked against L.C. Biedenharn, "Revised Z Tables of the Racah Coefficients", ORNL-1501, May 28, 1953.
+        """
+        self.assertAlmostEqual( -math.sqrt(40./3.),  nf_amc.zbar_coefficient(  8, 9, 6, 7, 1, 2 ) )
+        self.assertAlmostEqual( -math.sqrt(40./3.),  nf_amc.zbar_coefficient( 10, 9, 8, 7, 1, 2 ) )
+
+
+    def test_ZBarCoefficient_Dwave(self):
+        """
+        Values checked against L.C. Biedenharn, "Revised Z Tables of the Racah Coefficients", ORNL-1501, May 28, 1953.
+        """
+        self.assertAlmostEqual(   math.sqrt(8.0/7.0),  nf_amc.zbar_coefficient( 8, 7, 4, 5, 1, 4 ) )
+        self.assertAlmostEqual(   math.sqrt(8.0/7.0),  nf_amc.zbar_coefficient( 6, 7, 6, 5, 1, 4 ) )
 
 
 class Test_ReducedMatrixElement(unittest.TestCase):

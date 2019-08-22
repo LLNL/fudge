@@ -7,6 +7,10 @@
 *   Modified by David Brown <dbrown@bnl.gov>
 *       No longer must precompute the logarithm of the factorials.  
 *       Also renamed things to make more Python friendly.
+*       Finally, fixed a bunch of bugs & confusing conventions
+*
+*   Additional modification by Caleb Mattoon <mattoon1@llnl.gov>:
+*       Comment out unused function 'triangle' to eliminate compilation warnings
 *
 *   Functions:
 *
@@ -28,16 +32,19 @@
 *               = | j4 j5 j6 |
 *                 \ j7 j8 j9 /
 *
-*   racah(j1,j2,j3,j4,j5,j6)
-*       Racah coefficient
-*               = W(j1 j2 j3 j4 ; j5 j6)
+*   racah(j1, j2, l2, l1, j3, l3)
+*               = W(j1, j2, l2, l1 ; j3, l3)
+*               = (-1)^(j1+j2+l1+l2) * { j1 j2 j3 }
+*                                      { l1 l2 l3 }
 *
 *   clebsh_gordan(j1,j2,m1,m2,j3)
 *       Clebsh-Gordan coefficient 
 *               = <j1,j2,m1,m2|j3,m1+m2>
+*               = (-)^(j1-j2+m1+m2) * sqrt(2*j3+1) * / j1 j2   j3   \
+*                                                    \ m1 m2 -m1-m2 /
 *
 *   z_coefficient(l1,j1,l2,j2,S,L)
-*       Biedenharn's Z-coefficientn coefficient
+*       Biedenharn's Z-coefficient coefficient
 *               =  Z(l1  j1  l2  j2 | S L )
 *
 *   reduced_matrix_element(L,S,J,l0,j0,l1,j1)
@@ -55,7 +62,6 @@
 #include "nf_specialFunctions.h"
 
 static const int    MAX_FACTORIAL    = 200;   // maximal factorial n!  (2 x Lmax)
-static const double ARRAY_OVER  = 1.0e+300;   // force overflow
 static const double nf_amc_log_fact[] = {0.0, 0.0, 0.69314718056, 1.79175946923, 3.17805383035, 4.78749174278, 6.57925121201, 8.52516136107, 10.6046029027, 12.8018274801, 15.1044125731, 17.5023078459, 19.9872144957, 22.5521638531, 25.1912211827, 27.8992713838, 30.6718601061, 33.5050734501, 36.395445208, 39.3398841872, 42.3356164608, 45.3801388985, 48.4711813518, 51.6066755678, 54.7847293981, 58.003605223, 61.261701761, 64.557538627, 67.8897431372, 71.2570389672, 74.6582363488, 78.0922235533, 81.5579594561, 85.0544670176, 88.5808275422, 92.1361756037, 95.7196945421, 99.3306124548, 102.968198615, 106.631760261, 110.320639715, 114.034211781, 117.7718814, 121.533081515, 125.317271149, 129.123933639, 132.952575036, 136.802722637, 140.673923648, 144.565743946, 148.477766952, 152.409592584, 156.360836303, 160.331128217, 164.320112263, 168.327445448, 172.352797139, 176.395848407, 180.456291418, 184.533828861, 188.628173424, 192.739047288, 196.866181673, 201.009316399, 205.168199483, 209.342586753, 213.532241495, 217.736934114, 221.956441819, 226.190548324, 230.439043566, 234.701723443, 238.978389562, 243.268849003, 247.572914096, 251.89040221, 256.22113555, 260.564940972, 264.921649799, 269.291097651, 273.673124286, 278.06757344, 282.474292688, 286.893133295, 291.323950094, 295.766601351, 300.220948647, 304.686856766, 309.16419358, 313.65282995, 318.15263962, 322.663499127, 327.185287704, 331.717887197, 336.261181979, 340.815058871, 345.379407062, 349.954118041, 354.539085519, 359.13420537, 363.739375556, 368.354496072, 372.979468886, 377.614197874, 382.258588773, 386.912549123, 391.575988217, 396.248817052, 400.930948279, 405.622296161, 410.322776527, 415.032306728, 419.7508056, 424.478193418, 429.214391867, 433.959323995, 438.712914186, 443.475088121, 448.245772745, 453.024896238, 457.812387981, 462.608178527, 467.412199572, 472.224383927, 477.044665493, 481.87297923, 486.709261137, 491.553448223, 496.405478487, 501.265290892, 506.132825342, 511.008022665, 515.890824588, 520.781173716, 525.679013516, 530.584288294, 535.49694318, 540.416924106, 545.344177791, 550.278651724, 555.220294147, 560.169054037, 565.124881095, 570.087725725, 575.057539025, 580.034272767, 585.017879389, 590.008311976, 595.005524249, 600.009470555, 605.020105849, 610.037385686, 615.061266207, 620.091704128, 625.128656731, 630.172081848, 635.221937855, 640.27818366, 645.340778693, 650.409682896, 655.484856711, 660.566261076, 665.653857411, 670.747607612, 675.84747404, 680.953419514, 686.065407302, 691.183401114, 696.307365094, 701.437263809, 706.573062246, 711.714725802, 716.862220279, 722.015511874, 727.174567173, 732.339353147, 737.509837142, 742.685986874, 747.867770425, 753.05515623, 758.248113081, 763.446610113, 768.6506168, 773.860102953, 779.07503871, 784.295394535, 789.521141209, 794.752249826, 799.988691789, 805.230438804, 810.477462876, 815.729736304, 820.987231676, 826.249921865, 831.517780024, 836.790779582, 842.068894242, 847.35209797, 852.640365001, 857.933669826, 863.231987192};
 
 static int parity( int x );
@@ -67,7 +73,9 @@ static double w6j1( int * );
 static double cg1( int, int, int );
 static double cg2( int, int, int, int, int, int, int, int );
 static double cg3( int, int, int, int, int, int );
+#if 0
 static double triangle( int, int, int );
+#endif
 /*
 ============================================================
 */
@@ -145,7 +153,7 @@ static double w6j0( int i, int *x ) {
         return( INFINITY );
     }
 
-    return( 1.0 / sqrt( ( x[0] + 1 ) * ( x[3] + 1 ) ) * ( ( ( x[0] + x[3] + x[5] ) / 2 ) % 2 != 0 ? -1 : 1 ) );
+    return( 1.0 / sqrt( (double) ( ( x[0] + 1 ) * ( x[3] + 1 ) ) ) * ( ( ( x[0] + x[3] + x[5] ) / 2 ) % 2 != 0 ? -1 : 1 ) );
 }
 /*
 ============================================================
@@ -232,51 +240,31 @@ double nf_amc_wigner_9j( int j1, int j2, int j3, int j4, int j5, int j6, int j7,
         if( rac == INFINITY ) return( INFINITY );
     }
 
-    return( ( ( (int)( ( j1 + j3 + j5 + j8 ) / 2 + j2 + j4 + j9 ) % 2 == 0 ) ?  1.0 : -1.0 ) * rac );
+    return( ( ( (int)( ( j1 + j3 + j5 + j8 ) / 2 + j2 + j4 + j9 ) % 4 == 0 ) ?  1.0 : -1.0 ) * rac );
 }
 /*
 ============================================================
 */
-double nf_amc_racah( int j1, int j2, int j3, int j4, int j5, int j6 ) {
+double nf_amc_racah( int j1, int j2, int l2, int l1, int j3, int l3 ) {
 /*
-*       Racah coefficient
-*           = W(j1 j2 j3 j4 ; j5 j6)
-*           = (-1)^(j1+j2+j4+j5) * { j1 j2 j3 }
-*                                  { j4 j5 j6 }
+*       Racah coefficient definition in Edmonds (AR Edmonds, "Angular Momentum in Quantum Mechanics", Princeton (1980) is
+*       W(j1, j2, l2, l1 ; j3, l3) = (-1)^(j1+j2+l1+l2) * { j1 j2 j3 }
+*                                                         { l1 l2 l3 }
+*       The call signature of W(...) appears jumbled, but hey, that's the convention.
+*
+*       This convention is exactly that used by Blatt-Biedenharn (Rev. Mod. Phys. 24, 258 (1952)) too
 */
 
-    int k, k0, k1, i1, i2, i3, i4, i5, i6, i7;
-    double tri, sig;
+    double sig;
 
-    if ( ( j1 + j2 + j3 + j4 + j5 + j6 ) >= 2 * MAX_FACTORIAL ) return( INFINITY );
-
-    i1 = ( j1 + j2 + j5 ) / 2;
-    i2 = ( j3 + j4 + j5 ) / 2;
-    i3 = ( j1 + j3 + j6 ) / 2;
-    i4 = ( j2 + j4 + j6 ) / 2;
-    i5 = ( j1 + j2 + j3 + j4 ) / 2;
-    i6 = ( j1 + j4 + j5 + j6 ) / 2;
-    i7 = ( j2 + j3 + j5 + j6 ) / 2;
-    if ( ( tri = triangle( j1, j2, j5 ) * triangle( j3, j4, j5 )
-          * triangle( j1, j3, j6 ) * triangle( j2, j4, j6 ) ) == 0.0 ) return( 0.0 );
-    if( tri == INFINITY ) return( INFINITY );
-
-    sig = 0.0;
-    k0 = i1; if ( i2 > k0 ) k0 = i2; if ( i3 > k0 ) k0 = i3; if ( i4 > k0 ) k0 = i4;
-    k1 = i5; if ( i6 < k1 ) k1 = i6; if ( i7 < k1 ) k1 = i7;
-    for ( k = k0; k <= k1; k++ ){
-        sig += ( ( ( k + i5 ) % 2 == 0 ) ?  1.0 : -1.0 )
-            * exp( nf_amc_log_fact[ k + 1] 
-            - ( nf_amc_log_fact[ k - i1 ] + nf_amc_log_fact[ k - i2 ] + nf_amc_log_fact[ k - i3 ] + nf_amc_log_fact[ k - i4 ]
-            +   nf_amc_log_fact[ i5 - k ] + nf_amc_log_fact[ i6 - k ] + nf_amc_log_fact[ i7 - k ] ) );
-        if( sig == INFINITY ) return( INFINITY );
-    }
-
-    return( tri * sig );
+    sig = ( ( ( j1 + j2 + l1 + l2 ) % 4 == 0 ) ?  1.0 : -1.0 );
+    return sig * nf_amc_wigner_6j( j1, j2, j3, l1, l2, l3 );
 }
+
 /*
 ============================================================
 */
+#if 0
 static double triangle( int a, int b, int c ) {
 
    int j1, j2, j3, j4;
@@ -288,6 +276,7 @@ static double triangle( int a, int b, int c ) {
 
    return( exp( 0.5 * ( nf_amc_log_fact[j1] + nf_amc_log_fact[j2] + nf_amc_log_fact[j3] - nf_amc_log_fact[j4] ) ) );
 }
+#endif
 /*
 ============================================================
 */
@@ -448,10 +437,30 @@ double nf_amc_z_coefficient( int l1, int j1, int l2, int j2, int s, int ll ) {
     double z, clebsh_gordan = nf_amc_clebsh_gordan( l1, l2, 0, 0, ll ), racah = nf_amc_racah( l1, j1, l2, j2, s, ll );
 
     if( ( clebsh_gordan == INFINITY ) || ( racah == INFINITY ) ) return( INFINITY );
-    z = ( ( ( -l1 + l2 + ll ) % 2 == 0 ) ? 1.0 : -1.0 )
+    z = ( ( ( -l1 + l2 + ll ) % 8 == 0 ) ? 1.0 : -1.0 )
         * sqrt( l1 + 1.0 ) * sqrt( l2 + 1.0 ) * sqrt( j1 + 1.0 ) * sqrt( j2 + 1.0 ) * clebsh_gordan * racah;
 
    return( z );
+}
+/*
+============================================================
+*/
+double nf_amc_zbar_coefficient( int l1, int j1, int l2, int j2, int s, int ll ) {
+/*
+*       Lane & Thomas's Zbar-coefficient coefficient
+*           = Zbar(l1  j1  l2  j2 | S L )
+*           = (-i)^( -l1 + l2 + ll ) * Z(l1  j1  l2  j2 | S L )
+*
+*       Lane & Thomas Rev. Mod. Phys. 30, 257-353 (1958).
+*       Note, Lane & Thomas define this because they did not like the different phase convention in Blatt & Biedenharn's Z coefficient.  They changed it to get better time-reversal behavior.
+*       Froehner uses Lane & Thomas convention as does T. Kawano.
+*/
+    double zbar, clebsh_gordan = nf_amc_clebsh_gordan( l1, l2, 0, 0, ll ), racah = nf_amc_racah( l1, j1, l2, j2, s, ll );
+
+    if( ( clebsh_gordan == INFINITY ) || ( racah == INFINITY ) ) return( INFINITY );
+    zbar = sqrt( l1 + 1.0 ) * sqrt( l2 + 1.0 ) * sqrt( j1 + 1.0 ) * sqrt( j2 + 1.0 ) * clebsh_gordan * racah;
+
+   return( zbar );
 }
 /*
 ============================================================

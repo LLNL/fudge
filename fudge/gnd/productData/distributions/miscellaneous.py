@@ -8,22 +8,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 import sys
@@ -32,22 +43,26 @@ import math
 
 import fudge
 from fudge.core.math import *
-from fudge.legacy.converting import endfFormats
 from fudge.core.utilities import brb
-from fudge.core.math.xData import axes, XYs
+from xData import axes as axesModule
+from xData import XYs as XYsModule
+
+from fudge.gnd.productData import energyDeposition as energyDepositionModule
+from fudge.gnd.productData import momentumDeposition as momentumDepositionModule
 
 __metaclass__ = type
 
 def calculateDepositionEnergyFromEpP( E, EpP ) :
     "EpP is a list of [ E', P(E') ]"
 
-    axes_ = axes.axes( )
-    axes_[0] = axes.axis( 'a', 0, EpP.axes[0].getUnit( ), interpolation = axes.interpolationXY( axes.linearToken, axes.linearToken ) )
-    axes_[1] = axes.axis( 'b', 1, EpP.axes[0].getUnit( ) )
-    Ep = XYs.XYs( axes_, [ [ EpP[0][0], EpP[0][0] ], [ EpP[-1][0], EpP[-1][0] ] ], 1e-12 )
+    axes = axesModule.axes( )
+    axes[0] = axesModule.axis( 'a', 0, EpP.axes[0].getUnit( ) )
+    axes[1] = axesModule.axis( 'b', 1, EpP.axes[0].getUnit( ) )
+    Ep = XYsModule.XYs( data = [ [ EpP[0][0], EpP[0][0] ], [ EpP[-1][0], EpP[-1][0] ] ], axes = axes, accuracy = 1e-12 )
     return( float( EpP.integrateTwoFunctions( Ep ) ) )
 
-def calculateDepositionEnergyFromAngular_angularEnergy( angular, energy, multiplicity, doingGammaMomentum = False, accuracy = 1e-6 ) :
+def calculateDepositionEnergyFromAngular_angularEnergy( processInfo, derivedStyles, angular, energy, multiplicity, 
+        doingGammaMomentum = False, accuracy = 1e-6 ) :
 
     energyUnit = energy.axes[0].getUnit( )
     energyPrimeUnit = energy.axes[2].getUnit( )
@@ -80,11 +95,10 @@ def calculateDepositionEnergyFromAngular_angularEnergy( angular, energy, multipl
             Ep1 = Ep2
         depEnergy.append( [ E, multiplicity.getValue( E ) * sum / 18. ] )
 
-    if( doingGammaMomentum ) :
-        axes_ = fudge.gnd.productData.momentumDeposition.pointwise.defaultAxes( energyUnit = energyUnit, momentumDepositionUnit = momentumDepositionUnit )
-        return( fudge.gnd.productData.momentumDeposition.pointwise( axes_, depEnergy, accuracy ) )
-    axes_ = fudge.gnd.productData.energyDeposition.pointwise.defaultAxes( energyUnit = energyUnit, energyDepositionUnit = energyUnit )
-    return( fudge.gnd.productData.energyDeposition.pointwise( axes_, depEnergy, accuracy ) )
+    if( doingGammaMomentum ) : return( depEnergy )
+
+    axes = energyDepositionModule.pointwise.defaultAxes( energyUnit = energyUnit, energyDepositionUnit = energyUnit )
+    return( energyDepositionModule.pointwise( data = depEnergy, axes = axes, label = processInfo.style.label, accuracy = accuracy ) )
 
 def GaussQuadrature2( function, parameters, a, b ) :
 

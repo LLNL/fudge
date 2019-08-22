@@ -1,0 +1,72 @@
+============
+2.300098(4) MeV
+value = 2.300098000000000e+00, significantDigits = 7, order = 0, isPercent = False, unit = "MeV"
+uncertainty = value = 4.000000000000001e-06, significantDigits = 1, order = -6, isPercent = False
+
+2.300098(4) MeV
+value = 2.300098000000000e+00, significantDigits = 7, order = 0, isPercent = False, unit = "MeV"
+uncertainty = value = 4.000000000000001e-06, significantDigits = 1, order = -6, isPercent = False
+
+2.300098 +/- 4.e-6 MeV
+value = 2.300098000000000e+00, significantDigits = 7, order = 0, isPercent = False, unit = "MeV"
+uncertainty = value = 4.000000000000001e-06, significantDigits = 1, order = -6, isPercent = False
+============
+2.300000 +/- 4.e-6 MeV
+value = 2.300000000000000e+00, significantDigits = 7, order = 0, isPercent = False, unit = "MeV"
+uncertainty = value = 4.000000000000000e-06, significantDigits = 1, order = -6, isPercent = False
+
+2.300000(4) MeV
+value = 2.300000000000000e+00, significantDigits = 7, order = 0, isPercent = False, unit = "MeV"
+uncertainty = value = 4.000000000000000e-06, significantDigits = 1, order = -6, isPercent = False
+
+2.300000 +/- 4.e-6 MeV
+value = 2.300000000000000e+00, significantDigits = 7, order = 0, isPercent = False, unit = "MeV"
+uncertainty = value = 4.000000000000000e-06, significantDigits = 1, order = -6, isPercent = False
+============
+2.300e12(4) MeV
+value = 2.300000000000000e+12, significantDigits = 4, order = 12, isPercent = False, unit = "MeV"
+uncertainty = value = 4.000000000000000e+09, significantDigits = 1, order = 9, isPercent = False
+
+2.300e12(4) MeV
+value = 2.300000000000000e+12, significantDigits = 4, order = 12, isPercent = False, unit = "MeV"
+uncertainty = value = 4.000000000000000e+09, significantDigits = 1, order = 9, isPercent = False
+
+2.300e12 +/- 4.e9 MeV
+value = 2.300000000000000e+12, significantDigits = 4, order = 12, isPercent = False, unit = "MeV"
+uncertainty = value = 4.000000000000000e+09, significantDigits = 1, order = 9, isPercent = False
+============
+2.300000e-12 +/- 4.e-18 MeV
+value = 2.300000000000000e-12, significantDigits = 7, order = -12, isPercent = False, unit = "MeV"
+uncertainty = value = 4.000000000000000e-18, significantDigits = 1, order = -18, isPercent = False
+
+2.300000e-12(4) MeV
+value = 2.300000000000000e-12, significantDigits = 7, order = -12, isPercent = False, unit = "MeV"
+uncertainty = value = 4.000000000000000e-18, significantDigits = 1, order = -18, isPercent = False
+
+2.300000e-12 +/- 4.e-18 MeV
+value = 2.300000000000000e-12, significantDigits = 7, order = -12, isPercent = False, unit = "MeV"
+uncertainty = value = 4.000000000000000e-18, significantDigits = 1, order = -18, isPercent = False
+============
+2.300e-12(4)%
+value = 2.300000000000000e-14, significantDigits = 4, order = -14, isPercent = True, unit = ""
+uncertainty = value = 4.000000000000000e-17, significantDigits = 1, order = -17, isPercent = False
+
+2.300e-12(4)%
+value = 2.300000000000000e-14, significantDigits = 4, order = -14, isPercent = True, unit = ""
+uncertainty = value = 4.000000000000000e-17, significantDigits = 1, order = -17, isPercent = False
+
+(2.300e-12 +/- 4.e-15)%
+value = 2.300000000000000e-14, significantDigits = 4, order = -14, isPercent = True, unit = ""
+uncertainty = value = 4.000000000000000e-17, significantDigits = 1, order = -17, isPercent = False
+============
+(2.300000e-12 +/- 4.e-18)%
+value = 2.300000000000000e-14, significantDigits = 7, order = -14, isPercent = True, unit = ""
+uncertainty = value = 4.000000000000000e-20, significantDigits = 1, order = -20, isPercent = False
+
+2.300000e-12(4)%
+value = 2.300000000000000e-14, significantDigits = 7, order = -14, isPercent = True, unit = ""
+uncertainty = value = 4.000000000000000e-20, significantDigits = 1, order = -20, isPercent = False
+
+(2.300000e-12 +/- 4.e-18)%
+value = 2.300000000000000e-14, significantDigits = 7, order = -14, isPercent = True, unit = ""
+uncertainty = value = 4.000000000000000e-20, significantDigits = 1, order = -20, isPercent = False

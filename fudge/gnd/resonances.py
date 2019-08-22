@@ -8,22 +8,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 """
@@ -41,36 +52,44 @@ class hierarchy:
       each of these subsections has a list of resonances and attributes
 """
 
+# TODO: move to a 'resonances' module
+
 import math
-from fudge.core.ancestry import ancestry
-from pqu import physicalQuantityWithUncertainty
-from fudge.core.math.xData import axes, XYs
-from fudge.legacy.converting import endfFormats
-from fudge.core.math import table as gndTable
-from fudge.gnd import xParticle
+from pqu import PQU
+from xData import XYs as XYsModule, link as linkModule, table as tableModule
+from fudge.gnd import xParticle, baseClasses
+from fudge.gnd import suites as suitesModule
+
+import xData.ancestry as ancestryModule
 
 __metaclass__ = type
 
-PQU = physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty
 
-class resonances(ancestry):
+class resonances( ancestryModule.ancestry ) :
     """ 
-    top-level class for resonances.
-    contains scatteringRadius and (usually) resolved and/or unresolved sections
+    This is the top-level class for storing resonance parameters.
+    For light targets it may contain only a scattering radius. For heavier targets it typically
+    contains a resolved and/or unresolved section.
     
-    bool reconstructCrossSection: tells whether we still need 
-    to do the reconstruction
+    resonances also has a boolean flag 'reconstructCrossSection'. If False, either the cross section
+    has already been reconstructed, or the parameters are given for information only and no reconstruction
+    should be performed.
     """
-    def __init__(self, scatteringRadius=None, resolved=None, unresolved=None, 
-            reconstructCrossSection=True):
-        ancestry.__init__(self,'resonances',None)
-        if scatteringRadius and (resolved or unresolved):
+
+    moniker = 'resonances'
+
+    def __init__(self, scatteringRadius=None, resolved=None, unresolved=None, reconstructCrossSection=True):
+
+        ancestryModule.ancestry.__init__( self )
+
+        if (scatteringRadius is not None) and (resolved is not None or unresolved is not None):
             raise TypeError, ("Resonances should contain scattering radius OR resonance parameters, not both")
         self.scatteringRadius = scatteringRadius
         self.resolved = resolved
         self.unresolved = unresolved
+
         for child in (self.scatteringRadius, self.resolved, self.unresolved):
-            if child is not None: child.parent = self
+            if child is not None: child.setAncestor( self )
         self.reconstructCrossSection = reconstructCrossSection
         
     def  __str__( self ) :
@@ -80,27 +99,36 @@ class resonances(ancestry):
     def check( self, info ):
         from fudge.gnd import warning
         warnings = []
-        for section in ('scatteringRadius','resolved','unresolved'):
-            if getattr(self, section) is not None:
-                warningList = getattr(self,section).check(info)
+        for section in (self.scatteringRadius, self.resolved, self.unresolved):
+            if section is not None:
+                warningList = section.check(info)
                 if warningList:
-                    warnings.append( warning.context( section, warningList ) )
+                    warnings.append( warning.context( section.moniker, warningList ) )
         return warnings
     
-    def toXMLList( self, flags, indent = '' ) :
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
     
-        xmlString = [indent+'<resonances reconstructCrossSection="%s">' % 
-                str(self.reconstructCrossSection).lower()]
-        if self.scatteringRadius:
-            xmlString += self.scatteringRadius.toXMLList( flags, indent = indent + '  ', writeConstant=True )
-        if self.resolved:
-            xmlString += self.resolved.toXMLList( flags, indent = indent + '  ' )
-        if self.unresolved:
-            xmlString += self.unresolved.toXMLList( flags, indent = indent + '  ' )
-        xmlString[-1] += '</resonances>'
+        xmlString = [ '%s<%s reconstructCrossSection="%s">' % 
+                ( indent, self.moniker, str(self.reconstructCrossSection).lower() ) ]
+        if self.scatteringRadius is not None:
+            xmlString += self.scatteringRadius.toXMLList( indent2, **kwargs )
+        if self.resolved is not None:
+            xmlString += self.resolved.toXMLList( indent2, **kwargs )
+        if self.unresolved is not None:
+            xmlString += self.unresolved.toXMLList( indent2, **kwargs )
+        xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
-    def getDomain( self, unitTo = None, asPQU = False ):
+    def domain( self, unitTo = None, asPQU = False ):
+        """ Return resonance region domain as a tuple of floats: (lowest edge, highest edge).
+
+        options:
+          unitTo: convert output to specified unit (given as a string).
+          asPQU = True: return a tuple of PhysicalQuantityWithUncertainty instances instead of floats.
+        """
+
         bounds = []
         if self.scatteringRadius:
             bounds.append( (self.scatteringRadius.lowerBound, self.scatteringRadius.upperBound) )
@@ -110,88 +138,38 @@ class resonances(ancestry):
             else: bounds.append( (self.resolved.lowerBound, self.resolved.upperBound) )
         if self.unresolved:
             bounds.append( (self.unresolved.lowerBound, self.unresolved.upperBound) )
-        for i in range(len(bounds)-1):
-            assert bounds[i][1] == bounds[i+1][0], "Resonance region boundaries don't match!"
-        if( asPQU ) : return (bounds[0][0], bounds[-1][1])
-        else: return (bounds[0][0].value, bounds[-1][1].value)
+
+        for idx in range(len(bounds)-1):
+            assert bounds[idx][1] == bounds[idx+1][0], "Resonance region boundaries don't match!"
+
+        if( asPQU ):
+            return (bounds[0][0], bounds[-1][1])
+        elif unitTo:
+            return (bounds[0][0].getValue(unitTo), bounds[-1][1].getValue(unitTo))
+        else:
+            return (bounds[0][0].value, bounds[-1][1].value)
 
     @staticmethod
-    def parseXMLNode( element, xPath=[], linkData={} ):
+    def parseXMLNode( element, xPath, linkData ):
         xPath.append( element.tag )
 
         scatRadius, RRR, URR = None,None,None
         kReconstruct = (element.get("reconstructCrossSection") == "true")
         for child in element:
-            if child.tag=='scatteringRadius': scatRadius = scatteringRadius.parseXMLNode( child, xPath )
-            elif child.tag=='resolved': RRR = resolved.parseXMLNode( child, xPath )
-            elif child.tag=='unresolved': URR = unresolved.parseXMLNode( child, xPath )
-            else: raise Exception("unknown element '%s' encountered in resonances!" % child.tag)
+            if child.tag==scatteringRadius.moniker:
+                scatRadius = scatteringRadius.parseXMLNode( child, xPath, linkData )
+            elif child.tag==resolved.moniker:
+                RRR = resolved.parseXMLNode( child, xPath, linkData )
+            elif child.tag==unresolved.moniker:
+                URR = unresolved.parseXMLNode( child, xPath, linkData )
+            else:
+                raise Exception("unknown element '%s' encountered in resonances!" % child.tag)
+
         res = resonances( scatteringRadius = scatRadius, resolved=RRR, unresolved=URR,
                 reconstructCrossSection=kReconstruct )
         xPath.pop()
         return res
     
-    def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = ''):
-        """ """
-        ZAM, AWT = targetInfo['ZA'], targetInfo['mass']
-        NIS, ABN = 1, 1.0; ZAI=ZAM  # assuming only one isotope per file
-        
-        # get target spin from the particle list:
-        target = targetInfo['reactionSuite'].getParticle( targetInfo['reactionSuite'].target.getName() )
-        targetInfo['spin'] = target.getSpin().value
-        
-        endf = [endfFormats.endfHeadLine( ZAM, AWT, 0, 0, NIS, 0)]
-        resolvedCount, unresolvedCount = 0, 0
-        # resolved may have multiple energy regions:
-        if self.resolved is not None: resolvedCount = max(1,len(self.resolved.regions))
-        if self.unresolved is not None: unresolvedCount = 1
-        
-        # resonances may only contain a scattering radius:
-        if not (resolvedCount + unresolvedCount) and self.scatteringRadius:
-            scatRadius = self.scatteringRadius
-            endf.append( endfFormats.endfHeadLine( ZAM, ABN, 0,0,1,0 ) )
-            endf.append( endfFormats.endfHeadLine(scatRadius.lowerBound.getValueAs('eV'),
-                scatRadius.upperBound.getValueAs('eV'), 0,0,0,0 ) )
-            AP = scatRadius.value.getValueAs('10*fm')
-            endf.append( endfFormats.endfHeadLine(targetInfo['spin'], AP, 0,0,0,0 ) )
-            endf.append( endfFormats.endfSENDLineNumber() )
-            endfMFList[2][151] = endf
-            return
-
-        # For now I'm storing the LRF/LFW flags in xml, since they are tricky to compute
-        # LFW is a pain: only applies to unresolved, but must be written at the start of MF2
-        LRFurr, LFW = 0,0
-        if unresolvedCount != 0:
-            LRF_LFW = self.unresolved.nativeData.ENDFconversionFlag
-            LRFurr, LFW = map(int, LRF_LFW.split('=')[-1].split(',') )
-        NER = resolvedCount + unresolvedCount
-        endf.append( endfFormats.endfHeadLine( ZAI, ABN, 0, LFW, NER, 0 ) )
-        for idx in range(resolvedCount):
-            if resolvedCount==1: region = self.resolved
-            else: region = self.resolved.regions[idx]
-            LRU = 1 #resolved
-            LRF = {'SingleLevel_BreitWigner':1,'MultiLevel_BreitWigner':2,'Reich_Moore':3,
-                    'R_Matrix_Limited':7}[region.nativeData.moniker]
-            EL, EH = region.lowerBound.getValueAs('eV'), region.upperBound.getValueAs('eV')
-            NRO = region.nativeData.scatteringRadius.isEnergyDependent()
-            NAPS = not( region.nativeData.calculateChannelRadius )
-            endf.append(endfFormats.endfHeadLine( EL,EH,LRU,LRF,NRO,NAPS ) )
-            endf += region.nativeData.toENDF6( flags, targetInfo, verbosityIndent )
-        if unresolvedCount != 0:
-            LRU = 2 #unresolved
-            region = self.unresolved
-            EL, EH = region.lowerBound.getValueAs('eV'), region.upperBound.getValueAs('eV')
-            NRO, NAPS = 0,0
-            endf.append(endfFormats.endfHeadLine( EL,EH,LRU,LRFurr,NRO,NAPS ) )
-            # pass LFW/LRF so we don't have to calculate twice:
-            targetInfo['unresolved_LFW'] = LFW
-            targetInfo['unresolved_LRF'] = LRFurr
-            targetInfo['regionEnergyBounds'] = (region.lowerBound, region.upperBound)
-            endf += region.nativeData.toENDF6( flags, targetInfo, verbosityIndent )
-        endf.append( endfFormats.endfSENDLineNumber() )
-        endfMFList[2][151] = endf
-
-
     def toString( self, simpleString = False ) :
         """Returns a string representation of self. If simpleString is True, 
         the string contains only an overview without listing resonances"""
@@ -205,82 +183,208 @@ class resonances(ancestry):
         return( s )
 
 
-# scatteringRadius can be constant or energy-dependent:
-class scatteringRadius(ancestry):
+# scatteringRadius can be constant, energy-dependent or L-dependent:
+class scatteringRadius( ancestryModule.ancestry ):
 
     moniker = 'scatteringRadius'
 
-    def __init__( self, value=None, lowerBound=None, upperBound=None ) :
+    def __init__( self, form=None ) :
 
-        ancestry.__init__(self, self.moniker, None)
-        self.value = value
-        self.lowerBound = lowerBound
-        self.upperBound = upperBound
+        ancestryModule.ancestry.__init__( self )
+        self.form = form
 
     def __eq__(self, other):
         if not isinstance(other, scatteringRadius): return False
-        return( self.value==other.value )
+        return( self.form==other.form )
 
     def __str__(self): return str( self.getXMLAttribute() )
 
-    def __nonzero__(self): return bool(self.value)
+    def __nonzero__(self): return bool(self.form)
 
     def check( self, info ):
         return []
 
     def isEnergyDependent(self):
-        return isinstance( self.value, XYs.XYs )
+        return isinstance( self.form, XYsModule.XYs )
 
-    def getValueAs( self, unit, energy_grid=None ):
+    def isLdependent(self):
+        return isinstance(self.form, LdependentScatteringRadii)
+
+    def getValueAs( self, unit, energy_grid=None, L=None ):
         if self.isEnergyDependent():
             if energy_grid is None:
                 raise Exception("Missing: energy grid to evaluate E-dependent scattering radius")
-            energy_unit = self.value.axes[0].unit
-            return [self.value.getValue_units( physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty( e, energy_unit )
-                ).getValueAs( unit ) for e in energy_grid]
+            energy_unit = self.form.axes[-1].unit
+            return [self.form.evaluate( PQU.PQU( e, energy_unit ), unitTo = unit ) for e in energy_grid]
+        elif self.isLdependent():
+            if L in self.form.lvals:
+                return self.form.lvals[L].getValueAs( unit )
+            return self.form.default.getValueAs( unit )
         else:
-            return self.value.getValueAs( unit )
+            return self.form.value.getValueAs( unit )
 
     def toString(self, simpleString = False):
         return ("Scattering radius: %s\n" % self.getXMLAttribute())
 
     def getXMLAttribute( self ):
-        if isinstance(self.value, physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty): return self.value
+        if isinstance(self.form, PQU.PQU ): return self.form.toString( keepPeriod = False )
         else: return 'energyDependent'
 
-    def toXMLList(self, flags, indent = '', writeConstant=False ):
+    def toXMLList( self, indent = '', **kwargs ):
 
-        xmlString = []
-        if( self.isEnergyDependent( ) ) :
-            xmlString = self.value.toXMLList( tag = self.moniker, indent = indent )
-        elif( writeConstant ) :       # for when the resonances section *only* contains a scattering radius
-            xmlString = [ indent + '<%s value="%s" lowerBound="%s" upperBound="%s"/>' %
-                    ( self.moniker, self.value, self.lowerBound, self.upperBound ) ]
-        return( xmlString )
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
 
-    @staticmethod
-    def parseXMLNode( element, xPath=[], linkData={} ):
+        xml = ['%s<%s>' % (indent, self.moniker)]
+        xml += self.form.toXMLList( indent2, **kwargs )
+        xml[-1] += '</%s>' % self.moniker
+        return xml
+
+    @classmethod
+    def parseXMLNode( cls, element, xPath, linkData ):
         xPath.append( element.tag )
-        lower, upper = None, None
-        if len(element)==0:
-            value = PQU(element.get('value'))
-            lower = PQU(element.get('lowerBound')); upper = PQU(element.get('upperBound'))
-        else:
-            value = XYs.XYs.parseXMLNode( element )
-        SR = scatteringRadius( value, lower, upper )
+        form = {
+            constantScatteringRadius.moniker: constantScatteringRadius,
+            LdependentScatteringRadii.moniker: LdependentScatteringRadii,
+            XYsModule.XYs.moniker: XYsModule.XYs,
+        }[ element[0].tag ].parseXMLNode( element[0], xPath, linkData )
+        SR = cls( form )
         xPath.pop()
         return SR
 
 
+class effectiveRadius( scatteringRadius ):
+
+    moniker = 'effectiveRadius'
+
+
+class constantScatteringRadius( baseClasses.formBase ):
+
+    moniker = 'constant'
+
+    def __init__( self, value, bounds = None, label = None ) :
+        if isinstance( value, str ):
+            value = PQU.PQU( value )
+        self.value = value
+        self.bounds = bounds
+
+        if( label is not None ) :
+            if not isinstance( label, str ):
+                raise TypeError( 'label must be a string' )
+        self.__label = label
+
+    @property
+    def label( self ) :
+
+        return( self.__label )
+
+    def toXMLList( self, indent = '', **kwargs ):
+
+        attributeStr, boundsString = '', ''
+        if( self.label is not None ) : attributeStr += ' label="%s"' % self.label
+        if self.bounds is not None:
+            boundsString = ' lowerBound="%s" upperBound="%s"' % self.bounds
+        return [ '%s<%s%s value="%s"%s/>' % ( indent, self.moniker, attributeStr, self.value, boundsString )]
+
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ):
+        xPath.append( element.tag )
+        value = PQU.PQU(element.get('value'))
+        bounds = None
+        if 'lowerBound' in element.keys():
+            bounds = tuple([PQU.PQU(element.get( bound )) for bound in ('lowerBound','upperBound') ])
+        CSR = constantScatteringRadius( value, bounds=bounds, label = element.get( 'label' ) )
+        xPath.pop()
+        return CSR
+
+
+class LdependentScatteringRadii( baseClasses.formBase ):
+
+    moniker = 'Ldependent'
+
+    def __init__( self, default, lvals, label = None ) :
+        self.default = default
+        self.lvals = lvals
+
+        if( label is not None ) :
+            if not isinstance( label, str ):
+                raise TypeError( 'label must be a string' )
+        self.__label = label
+
+    @property
+    def label( self ) :
+
+        return( self.__label )
+
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
+        attributeStr = ''
+        if( self.label is not None ) : attributeStr += ' label="%s"' % self.label
+        xml = [ '%s<%s%s>' % ( indent, self.moniker, attributeStr ) ]
+        xml.append( indent2 + '<default value="%s"/>' % self.default )
+        for lval in sorted(self.lvals.keys()):
+            xml.append( indent2 + '<Lspecific L="%d" value="%s"/>' % (lval, self.lvals[lval]) )
+        xml[-1] += '</%s>' % self.moniker
+        return xml
+
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ):
+
+        xPath.append( element.tag )
+        default = PQU.PQU( element.find('default').get('value') )
+        lvals = {}
+        for child in element:
+            if child.tag == 'Lspecific':
+                lval = int(child.get('L'))
+                lvals[lval] = PQU.PQU( child.get('value') )
+        result = LdependentScatteringRadii( default, lvals, element.get( 'label' ) )
+        xPath.pop()
+        return result
+
+
+class resonanceParameters( ancestryModule.ancestry ):   # FIXME: still needed? It's an extra level of nesting...
+    """
+    Light-weight wrapper around a table.
+    """
+
+    moniker = 'resonanceParameters'
+
+    def __init__(self, table):
+        self.table = table
+        self.table.setAncestor(self)
+
+    def toXMLList(self, indent = '', **kwargs):
+
+        indent2 = indent+'  '
+        xmlList = ['%s<%s>' % (indent, self.moniker)]
+        xmlList += self.table.toXMLList(indent2, **kwargs)
+        xmlList[-1] += '</%s>' % self.moniker
+        return xmlList
+
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ):
+
+        xPath.append( element.tag )
+        rps = resonanceParameters( tableModule.table.parseXMLNode(
+            element.find(tableModule.table.moniker), xPath, linkData ) )
+        xPath.pop()
+        return rps
+
+
 # resolved/unresolved regions:
-class resolved(ancestry):
+class resolved( ancestryModule.ancestry ):
     """ class for resolved resonances """
+
+    moniker = 'resolved'
+
     def __init__(self, nativeData=None, lowerBound='', upperBound='', multipleRegions=False):
-        ancestry.__init__(self,'resolved',None)
+
+        ancestryModule.ancestry.__init__( self )
         if not multipleRegions:
             setattr(self, nativeData.moniker, nativeData)
         self.nativeData = nativeData
-        if self.nativeData is not None: self.nativeData.parent = self
+        if self.nativeData is not None: self.nativeData.setAncestor( self )
         self.lowerBound = lowerBound
         self.upperBound = upperBound
         self.multipleRegions = multipleRegions
@@ -299,52 +403,61 @@ class resolved(ancestry):
             warnings.append( warning.RRmultipleRegions() )
         return warnings
     
-    def toXMLList( self, flags, indent = '' ) :
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
+        xmlString = [ '%s<%s' % ( indent, self.moniker ) ]
         if self.multipleRegions:
-            xmlString = [indent+'<resolved multipleRegions="true">']
+            xmlString[0] += ' multipleRegions="true">'
             for region in self.regions:
-                xmlString += region.toXMLList( flags, indent = indent + '  ' )
+                xmlString += region.toXMLList( indent2, **kwargs )
         else:
-            xmlString = [indent+'<resolved lowerBound="%s" upperBound="%s" nativeData="%s">' % (
-                    self.lowerBound, self.upperBound, self.nativeData.moniker ) ]
-            xmlString += self.nativeData.toXMLList( flags, indent + '  ')
-        xmlString[-1] += '</resolved>'
+            lowerBound = self.lowerBound.toString( keepPeriod = False )
+            upperBound = self.upperBound.toString( keepPeriod = False )
+            xmlString[0] += ' lowerBound="%s" upperBound="%s" formalism="%s">' % (
+                    lowerBound, upperBound, self.nativeData.moniker )
+            xmlString += self.nativeData.toXMLList( indent2, **kwargs )
+        xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
     @staticmethod
-    def parseXMLNode( element, xPath=[], linkData={} ):
+    def parseXMLNode( element, xPath, linkData ):
         xPath.append( element.tag )
         def readResolved( child ):
-            formClass = {'SingleLevel_BreitWigner': SLBW,
-                    'MultiLevel_BreitWigner': MLBW,
-                    'Reich_Moore': RM,
-                    'R_Matrix_Limited': RMatrix
+            formClass = {SLBW.moniker: SLBW,
+                    MLBW.moniker: MLBW,
+                    RM.moniker: RM,
+                    RMatrix.moniker: RMatrix
                     }.get( child.tag )
             if formClass is None: raise Exception("unknown resolved resonance form '%s'!" % child.tag)
-            return formClass.parseXMLNode( child )
+            return formClass.parseXMLNode( child, xPath, linkData )
 
         regions = getBool( element.get('multipleRegions','false') )
         if regions:
             regions = []
-            for region in element:
-                thisRegion = energyInterval( **getAttrs( region, exclude=('multipleRegions',) ) )
-                thisRegion.nativeData = readResolved( region[0] )
+            for region in element.findall('region'):
+                resonanceSection = readResolved( region[0] )
+                thisRegion = energyInterval( nativeData = resonanceSection, **getAttrs( region, exclude=('formalism') ) )
                 regions.append( thisRegion )
             RRR = resolved( multipleRegions = True )
             RRR.regions = regions
         else:
             nativeData = readResolved(element[0])
-            RRR = resolved( nativeData, **getAttrs( element, exclude=('nativeData',) ) )
+            RRR = resolved( nativeData, **getAttrs( element, exclude=('formalism',) ) )
         xPath.pop()
         return RRR
 
 
-class unresolved(ancestry):
-    def __init__(self, nativeData=None, lowerBound='', upperBound=''):
-        ancestry.__init__(self,'unresolved',None)
+class unresolved( ancestryModule.ancestry ):
+
+    moniker = 'unresolved'
+
+    def __init__(self, nativeData, lowerBound, upperBound):
+        ancestryModule.ancestry.__init__( self )
         setattr(self, nativeData.moniker, nativeData)
         self.nativeData = nativeData
-        if isinstance( nativeData, ancestry ): self.nativeData.parent = self
+        if isinstance( nativeData, ancestryModule.ancestry ): self.nativeData.setAncestor( self )
         self.lowerBound = lowerBound
         self.upperBound = upperBound
     
@@ -362,47 +475,36 @@ class unresolved(ancestry):
                 else:
                     if elist[0] > self.lowerBound.getValueAs('eV') or elist[-1] < self.upperBound.getValueAs('eV'):
                         warnings.append( warning.URRdomainMismatch( L.L, J.J.value, J ) )
-                    missingPoints = [i for i in range(1,len(elist)) if elist[i] > 3*elist[i-1]]
+                    missingPoints = [i1 for i1 in range(1,len(elist)) if elist[i1] > 3*elist[i1-1]]
                     for idx in missingPoints:
-                        warnings.append( warning.URRinsufficientEnergyGrid( L.L, J.J.value, PQU(elist[idx-1],'eV'),
-                            PQU(elist[idx],'eV'), J ) )
+                        warnings.append( warning.URRinsufficientEnergyGrid( L.L, J.J.value, PQU.PQU(elist[idx-1],'eV'),
+                            PQU.PQU(elist[idx],'eV'), J ) )
         return warnings
     
-    def toXMLList( self, flags, indent = '' ):
-        xmlString = [indent+'<unresolved lowerBound="%s" upperBound="%s" nativeData="%s">' % (
-            self.lowerBound, self.upperBound, self.nativeData.moniker ) ]
-        xmlString += self.nativeData.toXMLList( flags, indent = indent + '  ' )
-        xmlString[-1] += '</unresolved>'
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
+        lowerBound = self.lowerBound.toString( keepPeriod = False )
+        upperBound = self.upperBound.toString( keepPeriod = False )
+        xmlString = [ '%s<%s lowerBound="%s" upperBound="%s" formalism="%s">' %
+                ( indent, self.moniker, lowerBound, upperBound, self.nativeData.moniker ) ]
+        xmlString += self.nativeData.toXMLList( indent2, **kwargs )
+        xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
     @staticmethod
-    def parseXMLNode( element, xPath=[], linkData={} ):
+    def parseXMLNode( element, xPath, linkData ):
         xPath.append( element.tag )
-        L_values = []
-        for lval in element[0]:
-            J_values = []
-            for jval in lval:
-                consWid, edepWid = {}, None
-                for width in jval:
-                    if width.tag=='constantWidths':
-                        consWid = getAttrs( width )
-                    else: edepWid = gndTable.parseXMLNode( width[0], conversionTable={'index':int} )
-                if edepWid is None: edepWid = gndTable.table()
-                for quant in ('energy','levelSpacing','neutronWidth','captureWidth','fissionWidthA','competitiveWidth'):
-                    if ( quant not in consWid and quant not in [e.name for e in edepWid.columns] ):
-                        consWid[quant] = PQU(0,'eV')
-                J_values.append( URR_Jsection( xParticle.spin(jval.get('J')), edepWid, consWid,
-                    **getAttrs( jval, exclude=("J"), required=("neutronDOF","gammaDOF","fissionDOF","competitiveDOF") ) ) )
-            L_values.append( URR_Lsection( int(lval.get("L")), J_values ) )
-
-        table = unresolvedTabulatedWidths( L_values, **getAttrs( element[0], required=('forSelfShieldingOnly',) ) )
-        URR = unresolved( nativeData=table, **getAttrs( element, exclude=('nativeData',) ) )
+        table = unresolvedTabulatedWidths.parseXMLNode( element.find('tabulatedWidths'), xPath, linkData )
+        URR = unresolved( nativeData = table, **getAttrs( element, exclude=('formalism',) ) )
         xPath.pop()
         return URR
 
+
 class energyInterval:
     """ resolved region may be made up of multiple energy intervals (deprecated) """
-    def __init__(self,index=None,nativeData=None,lowerBound='',upperBound=''):
+    def __init__(self,index, nativeData, lowerBound, upperBound):
         self.index = index
         self.nativeData = nativeData
         self.lowerBound = lowerBound
@@ -413,14 +515,19 @@ class energyInterval:
     
     def toString(self, simpleString = False):
         return ("%s resonances, %s to %s. Contains %i resonances" % 
-                (self.lowerBound,self.upperBound, len(self.nativeData) ) )
+                (self.nativeData, self.lowerBound, self.upperBound, len(self.nativeData) ) )
     
-    def toXMLList( self, flags, indent = ''):
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
+        lowerBound = self.lowerBound.toString( keepPeriod = False )
+        upperBound = self.upperBound.toString( keepPeriod = False )
         xmlString = [indent+
-                '<region index="%s" lowerBound="%s" upperBound="%s" nativeData="%s">' 
-                % (self.index,self.lowerBound,self.upperBound,self.nativeData.moniker ) ]
+                '<region index="%s" lowerBound="%s" upperBound="%s" formalism="%s">'
+                % ( self.index, lowerBound, upperBound, self.nativeData.moniker ) ]
         if self.nativeData:
-            xmlString += self.nativeData.toXMLList( flags, indent = indent+'  ' )
+            xmlString += self.nativeData.toXMLList( indent2, **kwargs )
         else:
             raise Exception( "Resonance section contains no data!" )
         xmlString[-1] += '</region>'
@@ -430,53 +537,45 @@ class energyInterval:
 ################################################################
 # now we come to specific implementations for resolved region: #
 ################################################################
-class resonanceFormalismBaseClass( ancestry ) :
+class resonanceFormalismBaseClass( ancestryModule.ancestry ) :
 
-    optAttrList = ( 'scatteringRadius', 'calculateChannelRadius', 'computeAngularDistribution', 'LvaluesNeededForConvergence' )
-        # L-dependent AP also optional, but shouldn't appear in attributes list:
-    LdepOpt = ('LdependentScatteringRadii',)
-    
+    optAttrList = ( 'calculateChannelRadius', 'computeAngularDistribution', 'LvaluesNeededForConvergence' )
+
     def __init__(self, resonanceParameters=None, scatteringRadius=None, **kwargs):
         """LdependentScatteringRadii is a list of dictionaries, one for each L with APL != AP
         only used in ENDF for Reich_Moore form
         
         resonanceParameters should be a gnd.core.math.table.table instance."""
-        
+
         index = 0
-        for attr in self.optAttrList + self.LdepOpt:
-            #if kwargs.get(attr):
+        for attr in self.optAttrList:
             setattr( self, attr, kwargs.get(attr) )
         if self.computeAngularDistribution:
             self.computeAngularDistribution = bool(self.computeAngularDistribution)
+
         self.resonanceParameters = resonanceParameters or []
         if self.resonanceParameters:
-            self.resonanceParameters.parent = self
-            self.resonanceParameters.moniker = 'resonanceParameters'
+            self.resonanceParameters.setAncestor( self )
         self.scatteringRadius = scatteringRadius
-        if self.scatteringRadius: self.scatteringRadius.parent = self
-        ancestry.__init__( self, self.moniker, None )
+        if self.scatteringRadius: self.scatteringRadius.setAncestor( self )
+        ancestryModule.ancestry.__init__( self )
     
     def __getitem__(self, idx):
-        return self.resonanceParameters[idx]
+        return self.resonanceParameters.table[idx]
     
     def __len__(self):
-        return len(self.resonanceParameters)
+        return len(self.resonanceParameters.table)
     
     def addResonance(self, resonance):
         """ insert a new resonance in the resonance parameter table """
         #resonance = (energy, J, l, ... )
-        self.resonanceParameters.addRow( resonance )
+        self.resonanceParameters.table.addRow( resonance )
 
-    def getScatteringRadius(self, L=None):
-        if ( (L is not None) and (getattr(self, 'LdependentScatteringRadii') is not None)
-                and (L in self.LdependentScatteringRadii) ):
-            AP = self.LdependentScatteringRadii[L]
-        else: AP = self.scatteringRadius
-        if AP.value == 0:
-            print("WARNING: using scattering radius of 0.0 fm!")
-        return AP
-    
-    def toXMLList( self, flags, indent = '' ):
+    def toXMLList( self, indent = '', **kwargs ):
+
+        incrementalIndent = kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + incrementalIndent
+
         if not self.moniker :
             raise NotImplementedError ("Please use specific formalisms (MLBW, RM, etc) instead of the BaseClass")
         xmlString = '%s<%s' % ( indent, self.moniker )
@@ -486,123 +585,58 @@ class resonanceFormalismBaseClass( ancestry ) :
                 if type(attrVal) is bool: attrVal = str(attrVal).lower()
                 xmlString += ' %s="%s"' % (attr, attrVal )
         xmlString = [xmlString+'>']
-        xmlString += self.scatteringRadius.toXMLList( flags, indent=indent+'  ')
-        if self.LdependentScatteringRadii:
-            for Lval in self.LdependentScatteringRadii:
-                xmlString.append('%s<LdependentScatteringRadius L="%s" radius="%s"/>' % (
-                    indent+'  ', Lval, self.LdependentScatteringRadii[Lval]) )
+        xmlString += self.scatteringRadius.toXMLList( indent2, **kwargs )
         if self.resonanceParameters:
-            xmlString.extend( ['%s<resonanceParameters>' % (indent+'  ')] +
-                    self.resonanceParameters.toXMLList( indent+'    ' ) )
-        xmlString[-1] += '</resonanceParameters></%s>' % self.moniker
+            xmlString.extend( self.resonanceParameters.toXMLList( indent2, **kwargs ) )
+        xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
     @classmethod
-    def parseXMLNode( cls, element, linkData={} ):
-        resonanceParameters = gndTable.parseXMLNode( element.find('resonanceParameters/table'),
-                conversionTable={'index':int, 'L':int} )
+    def parseXMLNode( cls, element, xPath, linkData ):
+
+        xPath.append( element.tag )
+        radius = scatteringRadius.parseXMLNode( element.find('scatteringRadius'), xPath, linkData )
+        linkData['conversionTable'] = {'index':int, 'L':int}    # inform table class how to treat columns
+        parameters = resonanceParameters.parseXMLNode( element.find( resonanceParameters.moniker ),
+                xPath, linkData )
         attrs = getAttrs( element )
-        if attrs.get('scatteringRadius') is None:
-            attrs['scatteringRadius'] = scatteringRadius( PQU(0,'fm') )
-        elif attrs.get('scatteringRadius')=='energyDependent':
-            attrs['scatteringRadius'] = scatteringRadius.parseXMLNode( element.find('scatteringRadius') )
-        radii = [getAttrs(el) for el in element.findall('LdependentScatteringRadius')]
-        if radii:
-            attrs['LdependentScatteringRadii'] = dict( [(rad['L'],rad['radius']) for rad in radii] )
-        return cls( resonanceParameters, **attrs )
+        resonanceData = cls( parameters, radius, **attrs )
+        del linkData['conversionTable']
+        xPath.pop()
+        return resonanceData
     
-    def toENDF6( self, flags, targetInfo, verbosityIndent='' ):
-        endf = []
-        AP = getattr( self, 'scatteringRadius' )
-        if AP.isEnergyDependent():
-            scatRadius = AP.value
-            NR, NP = 1, len(scatRadius)
-            endf.append( endfFormats.endfHeadLine( 0,0,0,0, NR,NP ) )
-            endf += endfFormats.endfInterpolationList( (NP,
-                endfFormats.twoAxesToENDFInterpolation(scatRadius.axes,0)) )
-            endf += endfFormats.endfNdDataList( scatRadius.convertAxisToUnit( 1, '10*fm' ) )
-            AP = 0
-        else: AP = self.scatteringRadius.value.getValueAs('10*fm')
-        L_list = self.resonanceParameters.getColumn('L')
-        NLS = len( set(L_list) )
-        LAD = getattr(self, 'computeAngularDistribution') or 0
-        NLSC = getattr(self, 'LvaluesNeededForConvergence') or 0
-        endf += [endfFormats.endfHeadLine( targetInfo['spin'], AP, LAD, 0, NLS, NLSC )]
-        
-        table = [ self.resonanceParameters.getColumn('energy',units='eV'),
-                self.resonanceParameters.getColumn('J') ]
-        NE = len(table[0])
-        if "BreitWigner" in self.moniker :
-            attrList = ('totalWidth','neutronWidth','captureWidth','fissionWidthA')
-        elif "Reich_Moore" in self.moniker :
-            attrList = ('neutronWidth','captureWidth','fissionWidthA','fissionWidthB')
-        for attr in attrList:
-            column = self.resonanceParameters.getColumn( attr, units='eV' )
-            if not column: column = [0]*NE
-            table.append( column )
-        CS = self.resonanceParameters.getColumn('channelSpin')
-        if CS is not None:  # ENDF hack: J<0 -> use lower available channel spin
-            targetSpin = targetInfo['spin']
-            CS = [2*(cs-targetSpin) for cs in CS]
-            Js = [v[0]*v[1] for v in zip(table[1],CS)]
-            table[1] = Js
-        table = zip(*table)
-
-        for L in set(L_list):
-            APL = 0
-            if self.LdependentScatteringRadii is not None and L in self.LdependentScatteringRadii:
-                APL = self.LdependentScatteringRadii[L].getValueAs('10*fm')
-            resonances = [table[i] for i in range(NE) if L_list[i] == L]
-            NRS = len(resonances)
-            endf.append( endfFormats.endfHeadLine( targetInfo['mass'], APL, L, 0, 6*NRS, NRS ) )
-            for row in resonances:
-                endf.append( endfFormats.endfDataLine( row ) )
-        return endf
-
-
 class SLBW( resonanceFormalismBaseClass ) :
     """Resonance region in Single-Level Breit-Wigner form."""
 
-    moniker = "SingleLevel_BreitWigner"
-
-    def __init__(self, resonanceParameters, **kwargs):
-
-        resonanceFormalismBaseClass.__init__( self, resonanceParameters, **kwargs )
+    moniker = 'SingleLevel_BreitWigner'
 
 class MLBW( resonanceFormalismBaseClass ) :
     """Resonance region in Multi-Level Breit-Wigner form."""
 
-    moniker = "MultiLevel_BreitWigner"
-
-    def __init__(self, resonanceParameters, **kwargs):
-
-        resonanceFormalismBaseClass.__init__( self, resonanceParameters, **kwargs )
+    moniker = 'MultiLevel_BreitWigner'
 
 class RM( resonanceFormalismBaseClass ) :
     """Reich_Moore formalism."""
 
-    moniker = "Reich_Moore"
-
-    def __init__(self, resonanceParameters, **kwargs):
-
-        resonanceFormalismBaseClass.__init__( self, resonanceParameters, **kwargs )
+    moniker = 'Reich_Moore'
 
 #############################################
 # R-matrix (LRF=7 in ENDF) is more complex: #
 #############################################
-class RMatrix:
+class RMatrix( ancestryModule.ancestry ):
     """R-Matrix Limited formalism. """
 
-    moniker = "R_Matrix_Limited"
+    moniker = 'R_Matrix_Limited'
 
-    optAttrList = ('approximation','scatteringRadius','boundaryCondition','relativisticKinematics',
+    optAttrList = ('approximation','boundaryCondition','relativisticKinematics',
             'reducedWidthAmplitudes','calculatePenetrability','calculateShift','calculateChannelRadius')
 
-    def __init__(self, openChannels=None, spinGroups=None, **kwargs):
+    def __init__(self, openChannels, spinGroups, **kwargs):
         """R-matrix is sorted by 'spin groups', each with same Jpi (conserved)."""
 
-        self.openChannels = openChannels or []
-        self.spinGroups = spinGroups or []
+        ancestryModule.ancestry.__init__(self)
+        self.channels = openChannels
+        self.spinGroups = spinGroups
         for attr in self.optAttrList:
             setattr(self, attr, kwargs.get(attr))
 
@@ -612,7 +646,9 @@ class RMatrix:
     def __len__(self):
         return len(self.spinGroups)
 
-    def toXMLList( self, flags, indent = '' ):
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + '  '
         xmlString = ['%s<%s' % ( indent, self.moniker ) ]
         for attr in self.optAttrList:
             if getattr(self,attr):
@@ -620,153 +656,167 @@ class RMatrix:
                 if type(attrVal) is bool: attrVal = str(attrVal).lower()
                 xmlString[0] += ' %s="%s"' % (attr,attrVal)
         xmlString[0] += '>'
-        indent += '  '
-        for ch in self.openChannels:
-            xmlString.append(ch.toXMLList(indent=indent))
+        xmlString += self.channels.toXMLList( indent=indent2, **kwargs )
         for gr in self.spinGroups:
-            xmlString.append(gr.toXMLList(indent=indent))
+            xmlString.append( gr.toXMLList( indent, **kwargs ) )
         xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
     @staticmethod
-    def parseXMLNode( element, linkData={} ):
-        openChannels = [openChannel.parseXMLNode( el ) for el in element if el.tag=='openChannel']
+    def parseXMLNode( element, xPath, linkData ):
+        xPath.append( element.tag )
+        channels = openChannels()
+        channels.parseXMLNode( element.find(openChannels.moniker), xPath, linkData )
         spinGroups = []
+        linkData['conversionTable'] = {'index':int, 'L':int, 'channelSpin':float}
         for sg in [ch for ch in element if ch.tag=='spinGroup']:
-            resonanceParameters = gndTable.parseXMLNode( sg[0][0], conversionTable={'index':int, 'L':int,
-                'channelSpin':float, 'effectiveRadius':PQU,} )
-            spinGroups.append( spinGroup( resonanceParameters=resonanceParameters, **getAttrs(sg,
-                required=('background',) ) ) )
-        return RMatrix( openChannels, spinGroups, **getAttrs(element, 
+            parameters = resonanceParameters.parseXMLNode( sg.find(resonanceParameters.moniker), xPath, linkData )
+            spinGroups.append( spinGroup( resonanceParameters=parameters, **getAttrs(sg, required=('background',) ) ) )
+            if sg.find( overrides.moniker ):
+                spinGroups[-1].overrides.parseXMLNode( sg.find(overrides.moniker), xPath, linkData )
+        tmp = RMatrix( channels, spinGroups, **getAttrs(element,
             required=RMatrix.optAttrList ) )
+        del linkData['conversionTable']
+        xPath.pop()
+        return tmp
 
-    def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
-        """ """
-        KRM = {'SLBW':1, 'MLBW':2, 'Reich_Moore':3, 'Full R-Matrix':4} [self.approximation]
-        endf = [endfFormats.endfHeadLine(0,0,self.reducedWidthAmplitudes,KRM,
-            len(self.spinGroups),self.relativisticKinematics)]
-        
-        # first describe all the particle pairs (two-body output channels)
-        NPP = len(self.openChannels)
-        endf.append( endfFormats.endfHeadLine(0,0,NPP,0,12*NPP,2*NPP) )
+class openChannels( suitesModule.suite ):
 
-        def getENDFtuple( spin, parity ):
-            # ENDF combines spin & parity UNLESS spin==0. Then it wants (0,+/-1)
-            if spin.value: return (spin.value * parity.value, 0)
-            else: return (spin.value, parity.value)
-        
-        def MZIP( p ):  # helper: extract mass, z, spin and parity from particle list
-            mass = p.getMass( 'amu' ) / targetInfo['reactionSuite'].getParticle( 'n' ).getMass( 'amu' )
-            Z = p.getZ_A_SuffixAndZA()[0]
-            I,P = getENDFtuple( p.getSpin(), p.getParity() )
-            return mass, Z, I, P
-        
-        for pp in self.openChannels:
-            pA,pB = pp.channel.split(' + ')
-            # get the xParticle instances for pA and pB:
-            pA,pB = targetInfo['reactionSuite'].getParticle(pA), targetInfo['reactionSuite'].getParticle(pB)
-            MA, ZA, IA, PA = MZIP( pA )
-            MB, ZB, IB, PB = MZIP( pB )
-            MT = pp.ENDF_MT
-            PNT = pp.calculatePenetrability
-            if PNT is None: PNT = self.calculatePenetrability
-            SHF = pp.calculateShift
-            if SHF is None: SHF = self.calculateShift
-            if MT in (19,102): PNT = 0  # special case
-            try: Q = pp.Qvalue.inUnitsOf('eV').value
-            except:
-                Q = targetInfo['reactionSuite'].getReaction( pp.channel ).getQ('eV')
-                # getQ doesn't account for residual left in excited state:
-                for particle in targetInfo['reactionSuite'].getReaction( pp.channel ).outputChannel.particles:
-                    Q -= particle.getLevelAsFloat('eV')
-            if MT==102: Q = 0
-            endf.append( endfFormats.endfDataLine( [MA,MB,ZA,ZB,IA,IB] ) )
-            endf.append( endfFormats.endfDataLine( [Q,PNT,SHF,MT,PA,PB] ) )
-        
-        for spingrp in self.spinGroups:
-            AJ,PJ = getENDFtuple( spingrp.spin, spingrp.parity )
-            KBK = spingrp.background
-            KPS = spingrp.applyPhaseShift
-            NCH = len(spingrp.resonanceParameters.columns)-1    # skip the 'energy' column
-            endf.append( endfFormats.endfHeadLine( AJ,PJ,KBK,KPS,6*NCH,NCH ) )
-            for chan in spingrp.resonanceParameters.columns:
-                # which open channel does it correspond to?
-                if chan.name == 'energy': continue
-                name = chan.name.split(' width')[0]
-                openChannel = [ch for ch in self.openChannels if ch.channel == name][0]
-                PPI = self.openChannels.index( openChannel )+1  # 1-based index in ENDF
-                attr = chan.attributes
-                L = attr['L']
-                SCH = attr['channelSpin']
-                # some data may have been moved up to the channel list:
-                BND = attr.get('boundaryCondition') or self.boundaryCondition
-                APT = attr.get('scatteringRadius') or self.scatteringRadius
-                APE = attr.get('effectiveRadius') or openChannel.effectiveRadius or APT
-                APT = APT.getValueAs('10*fm')
-                APE = APE.getValueAs('10*fm')
-                if openChannel.ENDF_MT==102:
-                    APT, APE = 0,0
-                endf.append( endfFormats.endfDataLine( [PPI,L,SCH,BND,APE,APT] ) )
-            # resonances:
-            NRS = len(spingrp.resonanceParameters)
-            NX = (NCH//6 + 1)*NRS
-            if NRS==0: NX=1 # special case
-            endf.append( endfFormats.endfHeadLine( 0,0,0,NRS,6*NX,NX ) )
-            for res in spingrp.resonanceParameters:
-                #resproperties = [res.energy.inUnitsOf('eV').value] + [
-                #        w.inUnitsOf('eV').value for w in res.widths]
-                for jidx in range(NCH//6+1):
-                    endfLine = res[jidx*6:jidx*6+6]
-                    while len(endfLine)<6: endfLine.append(0)
-                    endf.append( endfFormats.endfDataLine( endfLine ) )
-            if NRS==0:
-                endf.append( endfFormats.endfDataLine( [0,0,0,0,0,0] ) )
-        return endf
+    moniker = 'channels'
 
+    def __init__( self ) :
 
-class openChannel:
-    """ describes one reaction channel that opens up in the resonance region. In an R-Matrix section,
-    all open reaction channels should be described in the list of openChannel elements """
-    reqAttrList = ('channel', 'ENDF_MT')
-    optAttrList = ('Qvalue', 'scatteringRadius', 'effectiveRadius','boundaryCondition',
-            'calculatePenetrability','calculateShift')
-    def __init__(self, index, **kwargs):
-        self.index = index
-        for attr in self.reqAttrList:
-            setattr(self, attr, kwargs[attr])
+        suitesModule.suite.__init__( self, [openChannel] )
+
+class openChannel( ancestryModule.ancestry ):
+    """
+    Describes one reaction channel that opens up in the resonance region. In an R-Matrix section,
+    all open reaction channels should be described in the list of openChannel elements
+    """
+
+    moniker = 'channel'
+
+    optAttrList = ('Q', 'boundaryCondition', 'calculatePenetrability','calculateShift')
+    def __init__(self, label, reactionLink, name, ENDF_MT, scatteringRadius=None, effectiveRadius=None, **kwargs):
+
+        ancestryModule.ancestry.__init__(self)
+        self.label = label
+        self.reactionLink = reactionLink
+        self.name = name
+        self.ENDF_MT = ENDF_MT
+        self.scatteringRadius = scatteringRadius
+        self.effectiveRadius = effectiveRadius
         for attr in self.optAttrList:
             setattr(self, attr, kwargs.get(attr,None))
     
-    def toXMLList( self, indent = ''):
-        xmlString = ('%s<openChannel index="%s"') % (indent, self.index)
-        for attr in self.reqAttrList:
-            xmlString += ' %s="%s"' % (attr,getattr(self,attr))
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent+'  '
+        xmlString = ['%s<%s label="%s" name="%s" ENDF_MT="%s"' % (indent, self.moniker, self.label, self.name, self.ENDF_MT) ]
         for attr in self.optAttrList:
             if getattr(self,attr):
-                attrVal = getattr(self,attr)
-                if type(attrVal) is bool: attrVal = str(attrVal).lower()
-                xmlString += ' %s="%s"' % (attr, attrVal)
-        xmlString += '/>'
+                if( attr in [ 'Q' ] ) :
+                    xmlString[-1] += ' %s="%s"' % ( attr, getattr( self, attr ).toString( keepPeriod = False ) )
+                else :
+                    attrVal = getattr(self,attr)
+                    if type(attrVal) is bool: attrVal = str(attrVal).lower()
+                    xmlString[-1] += ' %s="%s"' % (attr, attrVal)
+        xmlString[-1] += '>'
+        xmlString += self.reactionLink.toXMLList( indent=indent2, **kwargs )
+        if self.scatteringRadius is not None: xmlString += self.scatteringRadius.toXMLList( indent=indent2, **kwargs)
+        if self.effectiveRadius is not None: xmlString += self.effectiveRadius.toXMLList( indent=indent2, **kwargs)
+        xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
     @staticmethod
-    def parseXMLNode( element, linkData={} ):
+    def parseXMLNode( element, xPath, linkData ):
+        xPath.append( element.tag )
+        reactionLink = linkModule.link.parseXMLNode( element.find('link'), xPath, linkData )
         attrs = getAttrs( element )
-        if 'Qvalue' not in attrs:
-            attrs['Qvalue'] = physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty(0,'eV')
-        return openChannel( attrs.pop('index'), **attrs )
+        if 'Q' not in attrs : attrs['Q'] = PQU.PQU(0,'eV')
+        scatRad, effRad = None, None
+        if element.find( scatteringRadius.moniker ):
+            scatRad = scatteringRadius.parseXMLNode( element.find( scatteringRadius.moniker ), xPath, linkData )
+        if element.find( effectiveRadius.moniker ):
+            effRad = effectiveRadius.parseXMLNode( element.find( effectiveRadius.moniker ), xPath, linkData )
+        tmp = openChannel( attrs.pop('label'), reactionLink=reactionLink, scatteringRadius=scatRad,
+                effectiveRadius=effRad, **attrs )
+        xPath.pop()
+        return tmp
 
+class overrides( suitesModule.suite ):
 
-class spinGroup:
-    """ single group with same Jpi (conserved). spin group contains AP
-    (scattering radius), 1 or more resonance widths """
+    moniker = 'overrides'
+
+    def __init__( self ) :
+
+        suitesModule.suite.__init__( self, [channelOverride] )
+
+class channelOverride( ancestryModule.ancestry ):
+    """
+    Use if necessary to override the true scattering radius, effective radius, etc. for a single
+    spin-group / channel combination.
+    """
+
+    moniker = 'channelOverride'
+
+    def __init__(self, label, scatteringRadius=None, effectiveRadius=None, penetrability=None,
+                 shiftFactor=None, phaseShift=None):
+
+        ancestryModule.ancestry.__init__(self)
+        self.label = label
+        self.scatteringRadius = scatteringRadius
+        self.effectiveRadius = effectiveRadius
+        self.penetrability = penetrability
+        self.shiftFactor = shiftFactor
+        self.phaseShift = phaseShift
+
+    def __nonzero__(self):
+        return (self.scatteringRadius is not None or self.effectiveRadius is not None or self.penetrability is not None
+                or self.shiftFactor is not None or self.phaseShift is not None)
+
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent+'  '
+        xmlString = ['%s<%s label="%s">' % (indent, self.moniker, self.label) ]
+        for attr in ('scatteringRadius', 'effectiveRadius', 'penetrability', 'shiftFactor', 'phaseShift'):
+            if getattr(self, attr) is not None:
+                xmlString += getattr(self, attr).toXMLList( indent=indent2, **kwargs )
+        xmlString[-1] += '</%s>' % self.moniker
+        return xmlString
+
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ):
+        xPath.append( element.tag )
+        data = {}
+        for child in element:
+            childClass = {'scatteringRadius': scatteringRadius,
+                          'effectiveRadius': effectiveRadius,
+                          'penetrability': None,    # FIXME last three not yet implemented
+                          'shiftFactor': None,
+                          'phaseShift': None}.get( child.tag )
+            data[ child.tag ] = childClass.parseXMLNode( child, xPath, linkData )
+        tmp = channelOverride( element.get('label'), **data )
+        xPath.pop()
+        return tmp
+
+class spinGroup( ancestryModule.ancestry ):
+    """
+    Single group with same Jpi (conserved). Each spin group contains an AP (scattering radius),
+    along with 1 or more resonance widths.
+    """
+
+    moniker = 'spinGroup'
+
     def __init__(self, index=None, spin=None, parity=None, background=None, applyPhaseShift=False,
             resonanceParameters=None):
+        ancestryModule.ancestry.__init__(self)
         self.index = index
         self.spin = spin
         self.parity = parity
         self.background = background
         self.applyPhaseShift = applyPhaseShift
+        self.overrides = overrides()
         self.resonanceParameters = resonanceParameters
     
     def __getitem__(self, idx):
@@ -777,11 +827,15 @@ class spinGroup:
     
     def __lt__(self, other):
         # for sorting spin groups by Jpi. group J values together
-        return (self.Jpi.spin,self.Jpi.parity) < (
-                other.Jpi.spin,other.Jpi.parity)
+        return (self.spin,self.parity) < (
+                other.spin,other.parity)
     
-    def toXMLList( self, indent='' ):
-        xmlString = '%s<spinGroup index="%i" spin="%s" parity="%s"' % (indent, self.index, self.spin, self.parity)
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        incrementalIndent = kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + incrementalIndent
+
+        xmlString = '%s<%s index="%i" spin="%s" parity="%s"' % (indent, self.moniker, self.index, self.spin, self.parity)
         for opt in 'background','applyPhaseShift':
             if getattr(self, opt):
                 attrVal = getattr(self,opt)
@@ -789,11 +843,11 @@ class spinGroup:
                 xmlString += ' %s="%s"' % (opt, attrVal)
         xmlString = [xmlString + '>']
         #for ch in self.channelInfo:
-        #    xmlString.append( ch.toXMLList(indent=indent+'  ') )
-        if self.resonanceParameters.columns:    # need not contain any data
-            xmlString.extend( ['%s<resonanceParameters>' % (indent+'  ')] +
-                    self.resonanceParameters.toXMLList( indent+'    ' ) )
-        xmlString[-1] += '</resonanceParameters></spinGroup>'
+        #    xmlString.append( ch.toXMLList( indent2, **kwargs ) )
+        xmlString += self.overrides.toXMLList(indent=indent2, **kwargs)
+        if self.resonanceParameters.table.columns:    # need not contain any data
+            xmlString.extend( self.resonanceParameters.toXMLList( indent2, **kwargs ) )
+        xmlString[-1] += '</%s>' % self.moniker
         return '\n'.join(xmlString)
 
 #############################################
@@ -807,20 +861,25 @@ class spinGroup:
 class unresolvedTabulatedWidths:
 
     moniker = 'tabulatedWidths'
-    optAttrList = ('interpolation','scatteringRadius','forSelfShieldingOnly','ENDFconversionFlag')
+    optAttrList = ('interpolation','forSelfShieldingOnly','ENDFconversionFlag')
 
-    def __init__(self, L_values=None, **kwargs):
+    def __init__(self, L_values=None, scatteringRadius=None, **kwargs):
         """ L_values is a list of URR_Lsections, which in turn contains a list of J_sections. 
         The average widths are given in the J_sections """
         index = 0
         for attr in self.optAttrList:
             setattr(self, attr, kwargs.get(attr))
         self.L_values = L_values or []
+        self.scatteringRadius = scatteringRadius
+        if self.scatteringRadius: self.scatteringRadius.setAncestor( self )
     
     def __len__(self):
         return len(self.L_values)
     
-    def toXMLList( self, flags, indent = '' ):
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
         xmlString = '%s<%s' % (indent, self.moniker)
         for attr in self.optAttrList:
             if getattr(self,attr,None):
@@ -828,102 +887,58 @@ class unresolvedTabulatedWidths:
                 if type(attrVal) is bool: attrVal = str(attrVal).lower()
                 xmlString += ' %s="%s"' % (attr, attrVal)
         xmlString = [xmlString+'>']
+        xmlString += self.scatteringRadius.toXMLList( indent2, **kwargs )
         for L in self.L_values:
-            xmlString += L.toXMLList( flags, indent = indent+'  ' )
+            xmlString += L.toXMLList( indent2, **kwargs )
         xmlString[-1] += '</%s>' % self.moniker
         return xmlString
+
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ):
+
+        xPath.append( element.tag )
+        L_values = []
+        scatRadius = scatteringRadius.parseXMLNode( element.find('scatteringRadius'), xPath, linkData )
+        linkData['conversionTable'] = {'index':int}
+        for lval in element:
+            if lval.tag != URR_Lsection.moniker: continue
+            J_values = []
+            for jval in lval:
+                consWid, edepWid = {}, None
+                for width in jval:
+                    if width.tag=='constantWidths':
+                        consWid = getAttrs( width )
+                    else: edepWid = tableModule.table.parseXMLNode( width[0], xPath, linkData )
+                if edepWid is None: edepWid = tableModule.table()
+                for quant in ('energy','levelSpacing','neutronWidth','captureWidth','fissionWidthA','competitiveWidth'):
+                    if ( quant not in consWid and quant not in [e.name for e in edepWid.columns] ):
+                        consWid[quant] = PQU.PQU(0,'eV')
+                J_values.append( URR_Jsection( xParticle.spin(jval.get('J')), edepWid, consWid,
+                    **getAttrs( jval, exclude=("J"), required=("neutronDOF","gammaDOF","fissionDOF","competitiveDOF") ) ) )
+            L_values.append( URR_Lsection( int(lval.get("L")), J_values ) )
+
+        table = unresolvedTabulatedWidths( L_values, scatRadius, **getAttrs( element, required=('forSelfShieldingOnly',) ) )
+        del linkData['conversionTable']
+        xPath.pop()
+        return table
+
     
-    def toENDF6( self, flags, targetInfo, verbosityIndent = ''):
-        AP = self.scatteringRadius.value.inUnitsOf('10*fm').value
-        NLS = len(self.L_values)
-        LFW = targetInfo['unresolved_LFW']; LRF = targetInfo['unresolved_LRF']
-        
-        def v(val): # get value back from PhysicalQuantityWithUncertainty
-            if type(val)==type(None): return
-            return val.getValueAs('eV')
-        
-        if LFW==0 and LRF==1:   # 'Case A' from ENDF 2010 manual pg 70
-            endf = [endfFormats.endfHeadLine( targetInfo['spin'], AP, 
-                self.forSelfShieldingOnly,0,NLS,0) ]
-            for Lval in self.L_values:
-                NJS = len(Lval.J_values)
-                endf.append(endfFormats.endfHeadLine( targetInfo['mass'], 0, Lval.L, 0, 6*NJS, NJS ))
-                for Jval in Lval.J_values:
-                    # here we only have one width per J:
-                    ave = Jval.constantWidths
-                    endf.append( endfFormats.endfDataLine([v(ave.levelSpacing),Jval.J.value,
-                        Jval.neutronDOF,v(ave.neutronWidth),v(ave.captureWidth),0]) )
-        
-        elif LFW==1 and LRF==1: # 'Case B'
-            energies = self.L_values[0].J_values[0].energyDependentWidths.getColumn('energy',units='eV')
-            NE = len(energies)
-            endf = [endfFormats.endfHeadLine( targetInfo['spin'], AP,
-                self.forSelfShieldingOnly, 0, NE, NLS )]
-            nlines = int(math.ceil(NE/6.0))
-            for line in range(nlines):
-                endf.append( endfFormats.endfDataLine( energies[line*6:line*6+6] ) )
-            for Lval in self.L_values:
-                NJS = len(Lval.J_values)
-                endf.append( endfFormats.endfHeadLine( targetInfo['mass'], 0, Lval.L, 0, NJS, 0 ) )
-                for Jval in Lval.J_values:
-                    cw = Jval.constantWidths
-                    endf.append( endfFormats.endfHeadLine(0,0,Lval.L,Jval.fissionDOF,NE+6,0) )
-                    endf.append( endfFormats.endfDataLine([v(cw.levelSpacing),Jval.J.value,Jval.neutronDOF,
-                        v(cw.neutronWidth),v(cw.captureWidth),0]) )
-                    fissWidths = Jval.energyDependentWidths.getColumn('fissionWidthA',units='eV')
-                    for line in range(nlines):
-                        endf.append( endfFormats.endfDataLine( fissWidths[line*6:line*6+6] ) )
-        
-        elif LRF==2:            # 'Case C', most common in ENDF
-            endf = [endfFormats.endfHeadLine( targetInfo['spin'], AP, 
-                self.forSelfShieldingOnly,0,NLS,0) ]
-            INT = endfFormats.XYStringToENDFInterpolation( self.interpolation )
-            for Lval in self.L_values:
-                NJS = len(Lval.J_values)
-                endf.append( endfFormats.endfHeadLine( targetInfo['mass'], 0, Lval.L, 0, NJS, 0 ))
-                for Jval in Lval.J_values:
-                    NE = len( Jval.energyDependentWidths )
-                    useConstant = not NE
-                    if useConstant: NE = 2
-                    endf.append( endfFormats.endfHeadLine( Jval.J.value, 0, INT, 0, 6*NE+6, NE ) )
-                    endf.append( endfFormats.endfDataLine([0,0,Jval.competitiveDOF,
-                        Jval.neutronDOF,Jval.gammaDOF,Jval.fissionDOF]) )
-                    cws = Jval.constantWidths
-                    if useConstant:
-                        # widths are all stored in 'constantWidths' instead. get energies from parent class
-                        NE = 2; useConstant=True
-                        eLow,eHigh = targetInfo['regionEnergyBounds']
-                        for e in (eLow,eHigh):
-                            endf.append(endfFormats.endfDataLine([v(e),v(cws.levelSpacing),
-                                v(cws.competitiveWidth),v(cws.neutronWidth),v(cws.captureWidth),
-                                v(cws.fissionWidthA)]) )
-
-                    else:
-                        table = [ Jval.energyDependentWidths.getColumn('energy',units='eV') ]
-                        for attr in ('levelSpacing','competitiveWidth','neutronWidth','captureWidth',
-                                'fissionWidthA'):
-                            # find each attribute, in energy-dependent or constant width section
-                            column = ( Jval.energyDependentWidths.getColumn( attr, units='eV' ) or
-                                    [v(getattr( cws, attr ))]*NE )
-                            if not any(column): column = [0]*NE
-                            table.append( column )
-                        for row in zip(*table):
-                            endf.append( endfFormats.endfDataLine( row ) )
-        return endf
-
-
 # each of the above sections contains one or more 'L' sections, which each contain one or more 'J's:
 class URR_Lsection:
     """ unresolved average widths, grouped by L. Contains list of J-values: """
+    moniker = 'L_section'
     def __init__(self, L, J_values):
         self.L = L
         self.J_values = J_values
     
-    def toXMLList( self, flags, indent = '' ):
-        xmlString = ['%s<L_section L="%s">' % (indent, self.L)]
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
+        xmlString = ['%s<%s L="%s">' % (indent, self.moniker, self.L)]
         for J in self.J_values:
-            xmlString += J.toXMLList( flags, indent+'  ' )
-        xmlString[-1] += '</L_section>'
+            xmlString += J.toXMLList( indent2, **kwargs )
+        xmlString[-1] += '</%s>' % self.moniker
         return xmlString
 
 
@@ -950,8 +965,7 @@ class URR_Jsection:
             column = edep.columns[colId]
             columnData = edep.getColumn( column.name, units='eV' )
             if len(set( columnData ) ) == 1:
-                setattr( self.constantWidths, column.name, physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty(
-                    columnData[0], column.units ) )
+                setattr( self.constantWidths, column.name, PQU.PQU( PQU.pqu_float.surmiseSignificantDigits( columnData[0] ), column.units ) )
                 [d.pop(colId) for d in edep.data]
                 edep.columns.pop(colId)
         for idx, col in enumerate( edep.columns ): col.index = idx  #re-number
@@ -960,18 +974,22 @@ class URR_Jsection:
         #    allEliminated = True
         return allEliminated
     
-    def toXMLList( self, flags, indent='' ):
-        indent2 = indent+'  '; indent3 = indent+'    '
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        incrementalIndent = kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + incrementalIndent
+        indent3 = indent2 + incrementalIndent
+
         xmlString = ['%s<J_section J="%s"' % (indent,self.J) ]
         for attr in URR_Jsection.optAttrList:
             if getattr(self, attr):
                 xmlString[-1] += ' %s="%s"' % (attr, getattr(self,attr))
         xmlString[-1] += '>'
-        constwidth = self.constantWidths.toXMLList( indent=indent2 )
+        constwidth = self.constantWidths.toXMLList( indent2, **kwargs )
         if constwidth: xmlString.append(constwidth)
         if self.energyDependentWidths:
             xmlString.extend( ['%s<energyDependentWidths>' % (indent2)] +
-                    self.energyDependentWidths.toXMLList( indent3 ) )
+                    self.energyDependentWidths.toXMLList( indent3, **kwargs ) )
             xmlString[-1] += '</energyDependentWidths>'
         xmlString[-1] += '</J_section>'
         return xmlString
@@ -988,13 +1006,14 @@ class constantWidthSection:
         for attr in self.optAttrList:
             setattr(self, attr, kwargs.get(attr, None))
     
-    def toXMLList( self, indent = '' ):
+    def toXMLList( self, indent = '', **kwargs ) :
+
         if not any( [ getattr(self, attr) for attr in self.optAttrList ] ):
             return ''
         xmlString = '%s<constantWidths' % indent
         for attr in self.optAttrList:
             if getattr(self, attr):
-                xmlString += ' %s="%s"' % (attr, getattr(self, attr))
+                xmlString += ' %s="%s"' % ( attr, getattr(self, attr).toString( keepPeriod = False ) )
         xmlString += '/>'
         return xmlString
 
@@ -1002,22 +1021,24 @@ class constantWidthSection:
 # helper functions for reading in from xml:
 def getBool( value ):
     return {'true':True, '1':True, 'false':False, '0':False}[value]
+
 def floatOrint( value ):
     if float( value ).is_integer(): return int( value )
     return float( value )
+
 def getAttrs(element, exclude=(), required=()):
     """ read attributes from one xml element. Convert to PhysicalQuantityWithUncertainty (or bool, int, etc)
     where appropriate, and skip anything in the 'exclude' list: """
-    conversionTable = {'lowerBound':PQU, 'upperBound':PQU, 'value':PQU, 'energy':PQU,
-            'neutronWidth':PQU, 'captureWidth':PQU, 'fissionWidthA':PQU, 'fissionWidthB':PQU, 'competitiveWidth':PQU,
-            'levelSpacing':PQU, 'Qvalue':PQU, 'radius':PQU, 'effectiveRadius':PQU,
+    conversionTable = {'lowerBound':PQU.PQU, 'upperBound':PQU.PQU, 'value':PQU.PQU, 'energy':PQU.PQU,
+            'neutronWidth':PQU.PQU, 'captureWidth':PQU.PQU, 'fissionWidthA':PQU.PQU, 'fissionWidthB':PQU.PQU, 'competitiveWidth':PQU.PQU,
+            'levelSpacing':PQU.PQU, 'Q':PQU.PQU, 'radius':PQU.PQU, 'effectiveRadius':PQU.PQU,
             'reconstructCrossSection':getBool, 'multipleRegions': getBool, 'LdependentScatteringRadii': getBool,
             'calculateChannelRadius':getBool, 'computeAngularDistribution':getBool, 'forSelfShieldingOnly': getBool,
             'calculateShift':getBool,'calculatePenetrability':getBool,
             'LvaluesNeededForConvergence':int, 'ENDF_MT':int, 'index':int, 'L':int,
             'neutronDOF':floatOrint, 'gammaDOF':floatOrint, 'competitiveDOF':floatOrint, 'fissionDOF':floatOrint,
             'spin':xParticle.spin, 'parity':xParticle.parity,
-            'scatteringRadius':(lambda foo: scatteringRadius(PQU(foo)) if foo!='energyDependent' else foo),
+            'scatteringRadius':(lambda foo: scatteringRadius(PQU.PQU(foo)) if foo!='energyDependent' else foo),
             }
     attrs = dict( element.items() )
     for key in attrs.keys():

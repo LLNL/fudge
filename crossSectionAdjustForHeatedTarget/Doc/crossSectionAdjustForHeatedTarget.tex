@@ -1,0 +1,440 @@
+\documentclass[11pt,twoside]{article}
+\usepackage{verbatim}
+\pagestyle{headings}
+\setlength{\textwidth}{6.75 in}
+\setlength{\textheight}{8.5 in}
+\setlength{\oddsidemargin}{0. in}
+\setlength{\evensidemargin}{\oddsidemargin}
+\markboth{Cross section thermal broadening}{Cross section thermal broadening}
+
+\def\CRoutine{crossSectionAdjustForHeatedTarget}
+\def\CRoutineS{\CRoutine \ }
+\def\CLibrary{libcrossSectionAdjustForHeatedTarget.a}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\title{Correcting a cross section for a thermal target\footnote{
+This work was performed under the auspices of the U.S. Department of Energy by
+Lawrence Livermore National Laboratory under contract \#W-7405-ENG-48.} \\
+--------------------------- \\
+{\it Documentation for LLNL's routines that thermally broaden a cross section
+for a heated target
+}}
+\author{{Bret R. Beck}\\Lawrence Livermore National Laboratory}
+
+\begin{document}
+
+\maketitle
+
+\pagebreak
+
+\section{Introduction}
+
+Most cross section data are given as a function of the incident particle's velocity or energy (e.g., $\sigma(E)$) assuming that the target is
+at rest. Most targets, while at rest on average, have a thermal motion which must be included to obtain the actual reaction rate between incident
+particle and target.  This article explains how to correct - often called
+thermal broadening - a cross section for the thermal motion of the target (see section~\ref{Theory}) and 
+describes~\cite{Sigma1} routines that can be used to thermally broaden a cross section (see section~\ref{Routines}).
+
+\section{Theory}     \label{Theory}
+
+For a material at temperature T, the effective cross section ${\left<\sigma(v_{\rm n},T)\right>}$ for a reaction is defined 
+as the cross section at incident velocity $v_{\rm n}$ (or energy $E_{\rm n}$) that gives the same reaction rate for a stationary target as the real 
+cross section $\sigma(v_{\rm n})$ gives for a thermal target. For a target
+of density $\rho$ and incident particle velocity ${\bf v}_{\rm n}$, or speed $v_{\rm n}$, the reaction rate is, 
+\begin{equation}	\label{rrEq}
+	\rho \, v_{\rm n} \, \left<\sigma(v_{\rm n},T)\right> = \int d{\bf v}_{\rm t} \rho \, v_{\rm r} \, 
+		\sigma( v_{\rm r}) \, M({\rm v}_{\rm t}) \ \ \ \ .
+\end{equation}
+Here, $M(v_{\rm t})$ is the target velocity distribution function and $v_{\bf r} = |{\bf v}_{\rm n} - {\bf v}_{\rm t}|$ 
+is the relative speed between the incident particle and a target with velocity ${\bf v}_{\rm t}$.
+The relative speed can also be written as,
+\begin{equation}    \label{eqRelSpeed}
+    v_{\rm r}^2 = v_{\rm n}^2 + v_{\rm t}^2 - 2 \, \mu \, v_{\rm n} v_{\rm t} \ \ \ \ ,
+\end{equation}
+where $\mu$ is the angle between the incident particle's velocity and the target's velocity.
+In Eq.~\ref{rrEq} we can drop the factor $\rho$ appearing on both sides of the equation,
+divide by $v_{\rm n}$
+and replace $d\vec{v}_{\rm t}$ with $d\theta \, d\mu \, v_{\rm t}^2 \, dv_{\rm t}$ to obtain,
+\begin{equation} \label{eqSigmaAverage}
+    \left<\sigma(E_{\rm n},T)\right>
+    = {1 \over v_{\rm n}} \int_{\vec{v}_{\rm t}} v_{\rm r} \, \sigma(E_{\rm r}) \, M(v_{\rm t}) \, d\vec{v}_{\rm t}
+    = {1 \over v_{\rm n}} \int_0^{2 \pi} d\theta \int_{-1}^1 d\mu \int_0^\infty dv_{\rm t} v_{\rm t}^2 v_{\rm r}
+        \, \sigma(E_{\rm r}) \, M(v_{\rm t}) \ \ \ \ .
+\end{equation}
+Here, $\sigma(E_{\rm r})$ is written in terms of the incident particle's energy when its velocity is $v_{\rm r}$, 
+$E_{\rm r} = m_{\rm n} v_{\rm r}^2 / 2$, as that is how the data are typically stored in nuclear databases.
+The $\theta$ integral yields $2 \pi$ as no factor in the integrand depends on it.  The $\mu$ integration
+is performed by using Eq.~\ref{eqRelSpeed} to replace $d\mu$ by $dv_{\rm r}$,
+(i.e., $v_{\rm r} \, dv_{\rm r} = -v_{\rm t} \, v_{\rm n} \, d\mu$). Thus, the integral becomes,
+\begin{equation}
+    \int_0^{2 \pi} d\theta \int_{-1}^1 d\mu \int_0^\infty dv_{\rm t} v_{\rm t}^2 v_{\rm r} \, \sigma(E_{\rm r}) \, M(v_{\rm t})
+    = { 2 \pi \over v_{\rm n} } \int_0^\infty dv_{\rm r} \, v_{\rm r}^2 \, \sigma(E_{\rm r}) \,
+        \int_{v_{\rm r} - v_{\rm n}}^{v_{\rm r} + v_{\rm n}} dv_{\rm t} \, v_{\rm t} \, M(v_{\rm t})
+\end{equation}
+where the integration limits for $v_{\rm t}$ have changed to be consistent with Eq.~\ref{eqRelSpeed}.
+Using a Maxwellian for $M(v_{\rm t})$,
+\begin{equation}
+    M(v_{\rm t}) = \left({ m_{\rm t} \over 2 \pi T }\right)^{3/2} \, \exp( - m_{\rm t} v_{\rm t}^2 / ( 2 T ) ) \ \ \ \ ,
+\end{equation}
+the integral over $v_{\rm t}$ yields,
+\begin{equation}	\label{continuousEq}
+    \left<\sigma(E_{\rm n},T)\right> = { 1 \over v_{\rm n}^2 v_{\rm T} \sqrt{\pi} } \ \int_0^\infty dv_{\rm r} \,
+        v_{\rm r}^2 \, \sigma(E_{\rm r}) \left[ \exp\left( -\left( { v_{\rm r} - v_{\rm n} \over v_{\rm T} } \right)^2 \right)
+        - \exp\left( -\left( { v_{\rm r} + v_{\rm n} \over v_{\rm T } } \right)^2 \right) \right]
+\end{equation}
+where $v_{\rm T} = \sqrt{2T / m_{\rm t}}$ and $m_{\rm t}$ is the target mass.
+This can be broken up into two terms, $\sigma_-$ and $\sigma_+$. The $\sigma_-$ term contains the factor
+$\exp( -( ( v_{\rm r} - v_{\rm n} ) / v_{\rm T } )^2 )$
+and the other contains the factor $\exp( -( ( v_{\rm r} + v_{\rm n} ) / v_{\rm T } )^2 )$.
+The main contribution to $\sigma_-$ is from the region $ | v_{\rm r} - v_{\rm n} | < 5 v_{\rm T }$ and
+the main contribution to $\sigma_+$ is from the region $ v_{\rm r} < 5 v_{\rm T }$.
+
+\section{Numerical algorithm}
+
+This section describes how to numerically integrate Eq.~\ref{continuousEq}
+for a cross section given as a function of the incident particle's energy.
+
+\subsection{Linear interpolated, point-wise cross section data} \label{lin_pointxsec}
+In nuclear databases, $\sigma(E_{\rm r})$ is often given at $N$ points (i.e., $E_i, \sigma_i$) and intermediate values are
+interpolated using linear-linear interpolation. In other words, for $E_i < E < E_{i+1}$, $\sigma(E)$ is,
+\begin{equation}
+	\sigma(E) = \left( { \sigma_{i+1} - \sigma_i \over E_{i+1} - E_i } \right) \, \left( E - E_i \right) + \sigma_i 
+		= \left( { \sigma_{i+1} - \sigma_i \over v_{i+1}^2 - v_i^2 } \right) \, \left( v^2 - v_i^2 \right) + \sigma_i
+		\equiv s_i \, \left( v^2 - v_i^2 \right) + \sigma_i \ \ \ \ .
+\end{equation}
+Substituting this into Eq.~\ref{continuousEq} yields,
+\begin{eqnarray}    \label{discreteEq}
+    \left<\sigma(E_{\rm n},T)\right> & = & { 1 \over v_{\rm n}^2 v_{\rm T} \sqrt{\pi} } \ \sum_{i=1}^{N-1} \ 
+		\int_{v_i}^{v_{i+1}}dv_{\rm r} \, v_{\rm r}^2 \, 
+        \left( s_i \left( v_{\rm r}^2 - v_i^2 \right) + \sigma_i \right) \times \nonumber \\
+		& & \ \ \ \ \ \ \ \ \left[ \exp\left( -\left( { v_{\rm r} - v_{\rm n} \over v_{\rm T} } \right)^2 \right)
+        - \exp\left( -\left( { v_{\rm r} + v_{\rm n} \over v_{\rm T } } \right)^2 \right) \right] \ \ \ \ .
+\end{eqnarray}
+Breaking this into two parts, $\sigma_-$ for the exponential with the term
+$v_{\rm r} - v_{\rm n}$ and $\sigma_+$ for the $v_{\rm r} + v_{\rm n}$ term,
+and substituting $x_- = ( v_{\rm r} - v_{\rm n} ) / v_{\rm T}$ into the expression for $\sigma_-$,
+with a similar substitution for $\sigma_+$, produces
+\begin{equation}	\label{discreteEq2}
+	\left<\sigma_\mp(E_{\rm n},T)\right> = { 1 \over v_{\rm n}^2 \sqrt{\pi} } \ \sum_{i=1}^{N-1} \
+	\int_{( v_i \mp v_{\rm n} ) / v_{\rm T}}^{( v_{i+1} \mp v_{\rm n} ) / v_{\rm T}} dx \, e^{-x^2} \, g_\mp(x)
+\end{equation}
+where
+\begin{eqnarray}
+    g_\mp(x) & = & s_i \, v_{\rm T}^4 \, x^4 \pm 4 \, s_i \, v_{\rm n} \, v_{\rm T}^3 \, x^3 + 
+	\left( \sigma_i + s_i \, ( 6 v_{\rm n}^2 - v_i^2 ) \right) \, v_{\rm T}^2 \, x^2 \nonumber \\
+	& & \pm 2 \, v_{\rm n} \, \left( \sigma_i + s_i \, ( 2 v_{\rm n}^2 - v_i^2 ) \right) \, v_{\rm T} \, x +
+	v_{\rm n}^2 \, \left( \sigma_i + s_i \, ( v_{\rm n}^2 - v_i^2 ) \right) \ \ \ \ .
+\end{eqnarray}
+Defining $s_{E,i} = ( \sigma_{i+1} - \sigma_i ) / ( E_{i+1} - E_i )$ and $K = T \, m_{\rm n} / ( E_{\rm n} m_{\rm t} )$
+the expression for $g_\mp(x) / v_{\rm n}^2$ becomes,
+\begin{eqnarray}
+    { g_\mp(x) \over v_{\rm n}^2 } & = & s_{E,i} \, K^2 \, E_{\rm n} \, x^4 \pm 4 \, s_{E,i} \, K^{3/2} \, E_{\rm n} \, x^3 +
+    \left( \sigma_i + s_{E,i} \, ( 6 E_{\rm n} - E_i ) \right) \, K \, x^2 \nonumber \\
+    & & \pm 2 \, \left( \sigma_i + s_{E,i} \, ( 2 E_{\rm n} - E_i ) \right) \, K^{1/2} \, x +
+    \left( \sigma_i + s_{E,i} \, ( E_{\rm n} - E_i ) \right) \ \ \ \ .
+\end{eqnarray}
+
+\subsubsection{Dealing with end points.} \label{EndPoints}
+In equation~\ref{discreteEq} the thermally corrected cross sections for the last points (e.g., $E_N$, $E_{N-1}$
+or any point within $5 \, v_{\rm T}$ of $E_N$)
+will be incorrect unless the integral is extended beyond the last given point $E_N$. There are three trivial
+extensions one can make (and maybe more). The simplest extension is to do nothing. 
+For this extension it is easy to show that the last point will be low by about a factor-of-two, since the
+integral in Eq.~\ref{discreteEq} ignores the contribution for $E > E_N$. 
+
+A second possible extension is to assume that the cross section is flat for $E \ge E_N$ and to use
+the cross section at $E_N$ as its value. In this case the extension yields,
+\begin{eqnarray}
+	\sigma_{\rm extension} & = & { \sigma(E_N) \over v_n^2 \, \sqrt{\pi} }
+            \left[ 2 \, v_{\rm T} \, v_{\rm n} \, e^{-x_2^2} +
+            \int_{x1}^{x2} dx e^{-x^2} \, \Big( v_{\rm T}^2 \, x^2 + 2 \, v_{\rm T} \, v_{\rm n} \, x + v_{\rm n}^2 \Big) \right] \nonumber \\
+        & = & { \sigma(E_N) \over 4 \, v_{\rm n}^2 \, \sqrt{\pi} } 
+		    \Bigg[ \Big( 4 \, v_{\rm T} \, v_{\rm n} + 2 \, v_{\rm T}^2 x_1 \Big) \, e^{-x_1^2} + 
+            \Big( 4 \, v_{\rm T} \, v_{\rm n} + 2 \, v_{\rm T}^2 x_2 \Big) \, e^{-x_2^2} \nonumber \\
+        & & + \ \sqrt{\pi} \Big( 2 \, v_{\rm n}^2 + v_{\rm T}^2 \Big) \Big( {\rm erf}(x_2) - {\rm erf}(x_1) \Big) \Bigg]
+\end{eqnarray}
+where $x_1 = ( v_N - v_{\rm n} ) / v_{\rm T}$, $x_2 = ( v_N + v_{\rm n} ) / v_{\rm T}$ and $v_N$ 
+is the incident particle's speed evaluated at energy $E_N$.
+
+A third possible extension is to assume that the cross section is $ 1/v$ for $E \ge E_N$ and to use
+$\sigma(E > E_N) = \sigma(E_N) \, v_N / v(E)$.  In this case the extension yields,
+\begin{eqnarray}
+	\sigma_{\rm extension} & = & { \sigma(E_N) \, v_N \over v_{\rm n}^2 \, \sqrt{\pi} }
+            \left[ v_{\rm T} \, e^{-x_2^2} + \int_{x1}^{x2} dx \, e^{-x^2} \, ( v_{\rm T} \, x + v_{\rm n} ) \right] \nonumber \\
+        & = & { \sigma(E_N) \, v_N \over 2 \, v_{\rm n}^2 \sqrt{\pi} } 
+		    \left[ v_{\rm T} \left( e^{-x_2^2 } + e^{-x_1^2} \right) + \sqrt{\pi} \, v_{\rm n} \Big( {\rm erf}(x_2) - {\rm erf}(x_1) \Big) \right]
+\end{eqnarray}
+
+\subsection{Multi-group cross section data} \label{mgroupxsec}
+In deterministic transport, the cross section data are divided into $G$ groups with energy boundaries
+$E_i$ and the cross section $\sigma_g$ for group $g$ is a constant.
+Using $v_i = \sqrt{2 E_i / m_{\rm n}}$, Eq.~\ref{continuousEq} becomes,
+\begin{equation}
+    \left<\sigma_\mp(E_{\rm n},T)\right> = { 1 \over v_{\rm n}^2 \sqrt{\pi} } \ \sum_{i=1}^{G} \ \sigma_g \ 
+    \int_{( v_i \mp v_{\rm n} ) / v_{\rm T}}^{( v_{i+1} \mp v_{\rm n} ) / v_{\rm T}} dx \, e^{-x^2} \, 
+	\left( v_{\rm T}^2 \, x^2 \pm 2 v_{\rm n} \, v_{\rm T} \, x + v_{\rm n}^2 \right) \ \ \ \ .
+\end{equation}
+This equation is the same as Eq.~\ref{discreteEq2} with $s_i = 0$. Thus, $g_\mp(x) / v_{\rm n}^2$ becomes,
+\begin{equation}
+    { g_\mp(x) \over v_{\rm n}^2 } = \sigma_i K \, x^2 \pm 2 \, \sigma_i \, K^{1/2} \, x + \sigma_i \ \ \ \ .
+\end{equation}
+
+\subsection{Evaluating integrals of the form $\int dx \, x^n \exp(-x^2)$}
+In sections~\ref{lin_pointxsec} and~\ref{mgroupxsec}, integrals of the form
+\begin{equation}
+	h_{\rm n}(a, b) = { 1 \over \sqrt{\pi} } \int_a^b dx \, x^n e^{-x^2}
+\end{equation}
+are to be evaluated. These integrals are
+\begin{eqnarray}  \label{integrals1}
+	{ 1 \over \sqrt{\pi} } \int dx \,     e^{-x^2} & = & { {\rm erf}(x) \over 2 }   \nonumber \\
+	{ 1 \over \sqrt{\pi} } \int dx \, x   e^{-x^2} & = & { -e^{-x^2} \over 2 \sqrt{\pi} } \nonumber \\
+	{ 1 \over \sqrt{\pi} } \int dx \, x^2 e^{-x^2} & = & { {\rm erf}(x) \over 4 } - 
+		{ x \, e^{-x^2} \over 2 \sqrt{\pi} } \nonumber \\
+	{ 1 \over \sqrt{\pi} } \int dx \, x^3 e^{-x^2} & = & { -1 \over 2 \sqrt{\pi} } \left( x^2 + 1 \right) e^{-x^2} \nonumber \\
+	{ 1 \over \sqrt{\pi} } \int dx \, x^4 e^{-x^2} & = & { 3 \, {\rm erf}(x) \over 8 } - { x \over 4 \sqrt{\pi} } 
+		\left( 2 \, x^2 + 3 \right) e^{-x^2} \ \ \ \ .
+\end{eqnarray}
+When using a computer to evaluate these expressions, the forms in Eq.~\ref{integrals1} will not produce
+good results when $b - a$ is small. For small $b - a$ it is better to Taylor series expand the integrands
+about the mid point $x_0 = ( b + a ) / 2$. Let $C_{n,i}(x_0)$ be the coefficient for the term
+$\exp(-x_0^2) \, ( x - x_0 )^i / i!$ and $\epsilon = b - a$, then the Taylor series is,
+\begin{eqnarray}
+	\int_a^b dx \sum_{i=0}^{\infty} { C_{n,i}(x_0) \over i! } \, \exp(-x_0^2) \, ( x - x_0 )^i
+		& = & \exp(-x_0^2) \; \sum_{i=0}^{\infty} { C_{n,i}(x_0) \over i! } 
+		\int_{x_0 + \epsilon / 2}^{x_0 + \epsilon / 2} dx ( x - x_0 )^i \nonumber \\
+		& = & \exp(-x_0^2) \; \sum_{i=0 {\rm\;by\;2}}^{\infty} { C_{n,i}(x_0) \, \epsilon^{i+1} \over 2^i \, (i + 1)! } 
+\end{eqnarray}
+For even $i$ to 6 the $C_{n,i}(x)$ are, \\
+for n = 0,
+\begin{eqnarray}  \label{C0is}
+	C_{0,0} & = & 1 \nonumber \\
+	C_{0,2} & = & 2 ( 2 x^2 - 1 ) \nonumber \\
+	C_{0,4} & = & 4 ( 4 x^4 - 12 x^2 + 3 ) \nonumber \\
+	C_{0,6} & = & 8 ( 8 x^6 - 60 x^4 + 90 x^2 - 15 )                \hspace{1.55in}
+\end{eqnarray}
+for n = 1,
+\begin{eqnarray}  \label{C1is}
+    C_{1,0} & = &   x \nonumber \\
+    C_{1,2} & = & 2 x ( 2 x^2 - 3 ) \nonumber \\
+    C_{1,4} & = & 4 x ( 4 x^4 - 20 x^2 + 15 ) \nonumber \\
+    C_{1,6} & = & 8 x ( 8 x^6 - 84 x^4 + 210 x^2 - 105 )            \hspace{1.3in}
+\end{eqnarray}
+for n = 2,
+\begin{eqnarray}  \label{C2is}
+    C_{2,0} & = & x^2 \nonumber \\
+    C_{2,2} & = & 2 ( 2 x^4 - 5 x^2 + 1 ) \nonumber \\
+    C_{2,4} & = & 4 ( 4 x^6 - 28 x^4 + 39 x^2 - 6 ) \nonumber \\
+    C_{2,6} & = & 8 ( 8 x^8 - 108 x^6 + 390 x^4 - 375 x^2 + 45 )    \hspace{0.85in}
+\end{eqnarray}
+for n = 3,
+\begin{eqnarray}  \label{C3is}
+    C_{3,0} & = & x^3 \nonumber \\
+    C_{3,2} & = & 2 x ( 2 x^4 - 7 x^2 + 3 ) \nonumber \\
+    C_{3,4} & = & 4 x ( 4 x^6 - 36 x^4 + 75 x^2 - 30 ) \nonumber \\
+    C_{3,6} & = & 8 x ( 8 x^8 - 132 x^6 + 630 x^4 - 945 x^2 + 315 ) \hspace{.65in}
+\end{eqnarray}
+for n = 4,
+\begin{eqnarray}  \label{C4is}
+    C_{4,0} & = & x^4 \nonumber \\
+    C_{4,2} & = & 2 x^2 ( 2 x^4 - 9 x^2 + 6 ) \nonumber \\
+    C_{4,4} & = & 4 ( 4 x^8 - 44 x^6 + 123 x^4 - 84 x^2 + 6 ) \nonumber \\
+    C_{4,6} & = & 8 ( 8 x^{10} - 156 x^8 + 930 x^6 - 1935 x^4 + 1170 x^2 - 90 )
+\end{eqnarray}
+
+\section{Heating a heated cross section} \label{HeatingHeated}
+Often the cross section to be heated to temperature $T$ as already been heated to temperature $T_1$. As long as the $T \ge T_1$,
+Eq.~\ref{continuousEq} is still valid provided~\cite{RedC} the temperature used in Eq.~\ref{continuousEq} is $T_2 = T - T_1$. 
+This sections goes through the proof of this statement.
+
+If a cross section heated to temperature $T_1$ is inserted into the right-hand-side of Eq.~\ref{continuousEq}, we have
+\begin{eqnarray}	\label{continuousEq2}
+    \left<\sigma(v_{\rm n},T)\right> 
+        & = & { 1 \over v_{\rm n}^2 v_{{\rm T}_2} \sqrt{\pi} } \ \int_0^\infty dv_{\rm r} \,
+            v_{\rm r}^2 \, \left<\sigma(v_{\rm r},T_1)\right> \left[ e^{-( ( v_{\rm r} - v_{\rm n} ) / v_{{\rm T}_2} )^2 } 
+            - e^{-( ( { v_{\rm r} + v_{\rm n} ) / v_{{\rm T}_2} } )^2 } \right] \nonumber \\
+        & = & { 1 \over v_{\rm n}^2 v_{{\rm T}_2} \sqrt{\pi} } \ \int_0^\infty dv_{\rm r} \, v_{\rm r}^2 \, 
+            \Bigg\{ { 1 \over v_{\rm r}^2 v_{{\rm T}_1} \sqrt{\pi} } \ \int_0^\infty dv_{\rm r'} \, v_{\rm r'}^2 \, \sigma(v_{\rm r'}) \nonumber \\
+        & & \times \left[ e^{-( ( v_{\rm r'} - v_{\rm r} ) / v_{{\rm T}_1})^2 } - e^{-(( v_{\rm r'} + v_{\rm r} ) / v_{{\rm T}_1} )^2 } \right] \Bigg\} 
+            \left[ e^{-( ( v_{\rm r} - v_{\rm n} ) / v_{{\rm T}_2} )^2 }
+            - e^{-( ( v_{\rm r} + v_{\rm n} ) / v_{{\rm T}_2 } )^2 } \right] \nonumber \\
+        & = & { 1 \over v_{\rm n}^2 \, v_{{\rm T}_2} \, v_{{\rm T}_1} \, \pi } \ \int_0^\infty dv_{\rm r'} \, v_{\rm r'}^2 \, \sigma(v_{\rm r'}) \, 
+            \int_0^\infty dv_{\rm r} \nonumber \\
+        & & \times \left[ e^{-( ( v_{\rm r'} - v_{\rm r} ) / v_{{\rm T}_1} )^2 } - e^{-( ( v_{\rm r'} + v_{\rm r} ) / v_{{\rm T}_1} )^2 } \right]
+            \left[ e^{-( ( v_{\rm r} - v_{\rm n} ) / v_{{\rm T}_2} )^2} - e^{-( ( v_{\rm r} + v_{\rm n} ) / v_{{\rm T}_2 } )^2 } \right]
+\end{eqnarray}
+The integration over $v_{\rm r}$ is
+\begin{equation}
+    \int_0^\infty dv_{\rm r} \left[ e^{-( ( v_{\rm r'} - v_{\rm r} ) / v_{{\rm T}_1} )^2 } - e^{-( ( v_{\rm r'} + v_{\rm r} ) / v_{{\rm T}_1} )^2 } \right]
+        \left[ e^{-( ( v_{\rm r} - v_{\rm n} ) / v_{{\rm T}_2} )^2} - e^{-( ( v_{\rm r} + v_{\rm n} ) / v_{{\rm T}_2 } )^2 } \right]
+\end{equation}
+After substituting $v_{\rm r} \rightarrow -v_{\rm r}$ into two of the terms, one each of the positive and negative terms, this equation simplifies to
+\begin{equation} \label{vrIntegral}
+    \int_{-\infty}^\infty dv_{\rm r} \left\{
+    \left[ e^{-( ( v_{\rm r'} - v_{\rm r} ) / v_{{\rm T}_1} )^2 } \, e^{-( ( v_{\rm r} - v_{\rm n} ) / v_{{\rm T}_2} )^2 } \right] -
+    \left[ e^{-( ( v_{\rm r'} + v_{\rm r} ) / v_{{\rm T}_1} )^2 } \, e^{-( ( v_{\rm r} - v_{\rm n} ) / v_{{\rm T}_2} )^2 } \right] \right\}
+\end{equation}
+Using the equation for the convolution of two Gaussians,\footnote{The equation for the convolutions of two Gaussians is
+$$
+    \int_{-\infty}^\infty dx' \,
+    { e^{-(x' - x_1)^2/(2 \, \sigma_1^2)} \over \sqrt{2 \pi} \ \sigma_1 } \, 
+    { e^{-(x - x')^2/(2 \, \sigma_2^2)} \over \sqrt{2 \pi} \ \sigma_2 } \, 
+    = { e^{-(x - x_1)^2/( 2 \, ( \sigma_1^2 + \sigma_2^2 ) )} \over \sqrt{ 2 \pi \, ( \sigma_1^2 + \sigma_2^2 ) } }
+$$} Eq.~\ref{vrIntegral} integrates to
+\begin{equation} 
+    { \sqrt{ \pi } \, v_{{\rm T}_1} \, v_{{\rm T}_2} \over v_{\rm T} } \left[ e^{-( ( v_{\rm r'} - v_{\rm n} ) / v_{{\rm T}} )^2 } -
+        \, e^{-( ( v_{\rm r'} + v_{\rm n} ) / v_{{\rm T}} )^2 } \right]
+\end{equation}
+where $v_{\rm T} = \sqrt{v_{{\rm T}_1}^2 + v_{{\rm T}_2}^2} = \sqrt{ 2 \, ( T_1 + T_2 ) / m_{\rm n} } = \sqrt{ 2 \, T / m_{\rm n}}$.
+Therefore, Eq.~\ref{continuousEq2} becomes
+\begin{equation}
+    \left<\sigma(v_{\rm n},T)\right> = { 1 \over v_{\rm n}^2 v_{\rm T} \sqrt{\pi} } \ \int_0^\infty dv_{\rm r'} \,
+        v_{\rm r'}^2 \, \sigma(v_{\rm r'}) \left[ \exp\left( -\left( { v_{\rm r'} - v_{\rm n} \over v_{\rm T} } \right)^2 \right)
+        - \exp\left( -\left( { v_{\rm r'} + v_{\rm n} \over v_{\rm T } } \right)^2 \right) \right]
+\end{equation}
+and completes the proof.
+
+\section{Routine to thermally broaden a cross section}  \label{Routines}
+
+A C routine called \CRoutineS has been written to thermally broaden a piecewise, linear-linear cross section that
+is a function of the incident particle's energy.  This section describes it and a python interface to it.
+
+\subsection{\CRoutineS C library}
+
+A library called \CLibrary \ contains\footnote{This library also contains the external routine 
+\CRoutine\_\-integrate\_\-xn\_\-qauss. This routine is only for testing and should not, in general, be used.}
+the C-routine \CRoutineS for heating cross sections. The file \CRoutine.h is its header file. The routine \CRoutineS
+has the following C declaration:
+
+\begin{verbatim}
+int crossSectionAdjustForHeatedTarget( 
+        crossSectionAdjustForHeatedTarget_limit lowerlimit,     /* Input */
+        crossSectionAdjustForHeatedTarget_limit upperlimit,     /* Input */
+        crossSectionAdjustForHeatedTarget_info *info,           /* Input/Output */
+        double EMin,                                            /* Input */ 
+        double massRatio,                                       /* Input */
+        double T,                                               /* Input */
+        double fInterpolation,                                  /* Input */
+        int nPairs,                                             /* Input */
+        double *E_cs_in,                                        /* Input */
+        double **E_cs_out );                                    /* Output */
+\end{verbatim}
+Here, {\bf Input} ({\bf Output}) means the argument is used for input (output).
+The cross section to be heated (see section~\ref{HeatingHeated} if it has already been heated) contains {\bf nPairs} of piecewise, 
+linear-linear (energy,cross section) points given by {\bf E\_cs\_in}. For example, if at energies 1e-11, 1e-10, 1e-4, 1. and 20
+the cross section is 12.3, 9.2, 9.1, 4.3 and 11.9 respectively, then a C calling routine could define {\bf nPairs} and {\bf E\_cs\_in} as:
+\label{EcsinExample}
+\begin{verbatim}
+    int nPairs = 5;
+    double E_cs_in[10] = { 1e-11, 12.3, 1e-10, 9.2, 1e-4, 9.1, 1., 4.3, 20., 11.9 };
+\end{verbatim}
+{\bf T} is the temperature of the target (see section~\ref{HeatingHeated}), {\bf massRatio} is the ratio of the target's mass to the incident particle's mass
+and {\bf fInterpolation} is the desired accuracy of the heated, piecewise, linear-linear cross section (e.g., {\bf fInterpolation} = 1e-3 means that
+the heated cross section data should be piecewise, linear-linear to 0.1\%). Currenlty, {\bf fInterpolation} is restricted to be between
+$10^{-6}$ and 0.1.
+The arguments {\bf EMin}, {\bf T} and the energy values in {\bf E\_cs\_in} must all be in the same energy unit (e.g., MeV).
+If the return value from \CRoutineS is positive, then it is the number of (energy, cross section) data pairs return in {\bf E\_cs\_out}.
+The memory for {\bf E\_cs\_out} is allocated by \CRoutineS and must be freed by the calling routine. If the return value from \CRoutineS
+is negative, then an has error occurred. The following table list the error values and their meaning:
+
+\begin{verbatim}
+    -1      nPair is less than 2.
+    -2      massRatio is less than or equal to 0.
+    -3      The first energy point is less than or equal to 0.
+    -4      The temperature is less than or equal to 0.
+    -5      The i^th energy value is greater than the i^th + 1 energy value.
+    -6      Could not allocate internal memory.
+    -7      Could not allocate memory for E_cs_out.
+   -11      Could not allocate internal memory.
+\end{verbatim}
+
+The inputted cross section has domain $E_{\rm min}$ = E\_cs\_in[0] to $E_{\rm max}$ = E\_cs\_in[2 $\times$ nPairs - 2]. The arguments {\bf lowerlimit}
+and {\bf upperlimit} define how the cross section data should be extended below $E_{\rm min}$ and above $E_{\rm max}$, respectively (see 
+section~\ref{EndPoints}). The type crossSectionAdjustForHeatedTarget\_limit is a C enum with the following defined values:
+\begin{description}
+\item[crossSectionAdjustForHeatedTarget\_limit\_one\_over\_v:] The cross section is extended as $1/v$.
+
+\item[crossSectionAdjustForHeatedTarget\_limit\_constant:] The first (last) cross section point is used as the value below (above) the first (last)
+    point.
+
+\item[crossSectionAdjustForHeatedTarget\_limit\_threshold:] The cross section is zero outside the domain. For example, the reaction has
+    a threshold at $E_{\rm threshold}$. 
+\end{description}
+The heated data domain is never extended above $E_{\rm max}$. However, if {\bf lowerlimit} is 
+{\bf crossSectionAdjustForHeatedTarget\_\-limit\_\-threshold} the domain will be extended below $E_{\rm min}$ to the
+greater of {\bf EMin} and $E_{\rm cutoff}$ where $E_{\rm cutoff} = m_{\rm n} v_{\rm cutoff}^2 / 2$ and $v_{\rm cutoff}$ is
+the incident particle's velocity at $E_{\rm min}$ minus 5 times the target's thermal velocity $v_{\rm T}$. If the heated
+domain must not extend below the unheated domain, set {\bf EMin} = $E_{\rm min}$. Setting {\bf EMin} $>$ $E_{\rm min}$ is the
+same as setting {\bf EMin} = $E_{\rm min}$.
+
+The argument {\bf info} is a C struct with the following elements:
+\begin{verbatim}
+        int mode;                   /* Input */
+        int verbose;                /* Input */
+        int InfoStats;              /* Currently not used. */
+        int WarningStats;           /* Output */
+        int ErrorStats;             /* Currently not used. */
+        int bytes;                  /* Output */
+        int evaluations;            /* Output */
+        double fInterpolation;      /* Output */
+\end{verbatim}
+Bits in the element {\bf mode} are used to control how \CRoutineS choose the energy points to heat and whether the
+heated cross section data should be thinned. Currently, only two bits are used and they can be set with the following
+macros:
+\begin{description}
+\item[ crossSectionAdjustForHeatedTarget\_mode\_all:] By default, \CRoutineS does not heated every point in the input energy domain.
+    Instead, it attempts to judiciously pick the points to obtain the desired requested accuracy via {\bf fInterpolation} (e.g., for energies
+    less than T / massRatio the heated cross section will vary approximately as 1/v, and for a given {\bf fInterpolation} the required step size
+    can be calculated). By judiciously picking points, the code can be much faster (a-factor-of 100 as been observed) if the unheated cross section
+    contains many resonances (i.e., points). Or-ing this macro with {\bf mode} causes every point in the unheated data to be heated.
+    Independent of how the points are picked, \CRoutineS always test if a point should be added between to consecutive energy points
+    based on {\bf fInterpolation}. And it iterates this until one is not required.
+
+\item[crossSectionAdjustForHeatedTarget\_mode\_do\_not\_thin:] By default, the returned cross section is thinned. Or-ing this macro 
+    with {\bf mode} results in the data not being thinned.
+\end{description}
+
+This routines as 3-levels\footnote{Currently, only warning is implemented.} of messages (informative, warning and error). The number of occurrences
+of each is returned by {\bf mode} elements {\bf InfoStats}, {\bf WarningStats} and {\bf ErrorStats}. In addition, if {\bf mode} element {\bf verbose}
+is greater than 0, then a message is printed for each error. If it is greater than 1, a message is printed for each error and warning. And, if
+it is greater than 2, a message is printed for each error, warning and informative. If memory allocation fails, then {\bf mode} element {\bf bytes}
+is set to the number of bytes that were requested.
+
+The {\bf mode} element {\bf evaluations} is set to the number of points heated and the element {\bf fInterpolation} is set to the actual fInterpolation
+used.
+
+\subsection{Python interface to the \CRoutineS library}
+The routine \CRoutineS can be called from python via the module crossSectionAdjustForHeatedTarget. This
+module has one function, also called crossSectionAdjustForHeatedTarget, which has the effective\footnote{Effective
+because it is also a C-routine implementing python functions.} python definition of:
+
+\begin{verbatim}
+def crossSectionAdjustForHeatedTarget( massRatio, T, E_cs_in, 
+    lowerlimit = 'constant', upperlimit = 'oneOverV', fInterpolation = 2e-3,
+    heatAllPoints = False, doNotThin = False, EMin = 1e-11 )
+\end{verbatim}
+Currently, E\_cs\_in must be a python list of [E,$\sigma(E)$] points. Using the example on page~\pageref{EcsinExample}, E\_cs\_in would be:
+\begin{verbatim}
+    E_cs_in = [ [ 1e-11, 12.3 ], [ 1e-10, 9.2 ], [ 1e-4, 9.1 ],
+                [ 1., 4.3 ], [ 20., 11.9 ] ]
+\end{verbatim}
+The arguments {\bf massRatio}, {\bf T}, {\bf lowerlimit}, {\bf upperlimit}, {\bf fInterpolation} and {\bf EMin}
+are as per the C-routine's \CRoutineS arguments. However, the arguments {\bf lowerlimit} and {\bf upperlimit} require string values, and
+they must be one of the following: 'constant', 'oneOverV' or 'threshold'. Finally, the arguments {\bf heatAllPoints}
+and {\bf doNotThin} are used to set \CRoutine's {\bf mode} argument.
+
+The heated data is returned as a list of [E,$\sigma(E)$] points. If \CRoutineS returns an error, as raise is executed.
+
+\begin{thebibliography}{99}
+
+% \bibitem{OmegaDoc} R.J.\ Howerton, R.E.\ Dye, P.C.\ Giles, J.R.\ Kimlinger, S.T.\ Perkins
+%    and E.F.\ Plechaty, {\it Omega Documentation}, UCRL-50400 Vol 25 (1983)
+
+\bibitem{Sigma1} There is another heating package called SIGMA1 written by D. Cullen that heats ENDF formatted files. It is not described here but 
+can be found at http://www-nds.iaea.org as part of the PREPRO package.
+
+\bibitem{RedC} Private communications with Dermott (Red) Cullen.
+
+\end{thebibliography}
+
+\end{document}

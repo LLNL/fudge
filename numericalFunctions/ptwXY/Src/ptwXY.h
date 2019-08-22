@@ -9,22 +9,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 */
 
@@ -86,6 +97,10 @@ typedef
         double x, y;
     } ptwXYPoint;
 
+typedef nfu_status (*ptwXY_createFromFunction_callback)( double x, double *y, void *argList );
+typedef nfu_status (*ptwXY_applyFunction_callback)( ptwXYPoint *point, void *argList );
+typedef nfu_status (*ptwXY_getValue_callback)( void *argList, double x, double *y, double x1, double y1, double x2, double y2 );
+
 typedef
     struct ptwXYOverflowPoint_s {
         struct ptwXYOverflowPoint_s *prior;
@@ -99,6 +114,7 @@ typedef
         nfu_status status;
         ptwXY_sigma typeX, typeY;
         ptwXY_interpolation interpolation;
+        char const *interpolationString;
         int userFlag;
         double biSectionMax;
         double accuracy;
@@ -113,29 +129,30 @@ typedef
         ptwXYOverflowPoint *overflowPoints;
     } ptwXYPoints;
 
-typedef nfu_status (*ptwXY_createFromFunction_callback)( double x, double *y, void *argList );
-typedef nfu_status (*ptwXY_applyFunction_callback)( ptwXYPoint *point, void *argList );
-
 /*
 * Routines in ptwXY_core.c
 */
-ptwXYPoints *ptwXY_new( ptwXY_interpolation interpolation, double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize, 
+ptwXYPoints *ptwXY_new( ptwXY_interpolation interpolation, char const *interpolationString, double biSectionMax,
+    double accuracy, int64_t primarySize, int64_t secondarySize, nfu_status *status, int userFlag );
+nfu_status ptwXY_setup( ptwXYPoints *ptwXY, ptwXY_interpolation interpolation, char const *interpolationString, 
+    double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize, int userFlag );
+ptwXYPoints *ptwXY_create( ptwXY_interpolation interpolation, char const *interpolationString, 
+    double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize, int64_t length, double const *xy, 
     nfu_status *status, int userFlag );
-nfu_status ptwXY_setup( ptwXYPoints *ptwXY, ptwXY_interpolation interpolation, double biSectionMax, double accuracy, int64_t primarySize, 
-    int64_t secondarySize, int userFlag );
-ptwXYPoints *ptwXY_create( ptwXY_interpolation interpolation, double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize, 
-    int64_t length, double *xy, nfu_status *status, int userFlag );
-ptwXYPoints *ptwXY_createFrom_Xs_Ys( ptwXY_interpolation interpolation, double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize,
-    int64_t length, double *Xs, double *Ys, nfu_status *status, int userFlag );
+ptwXYPoints *ptwXY_createFrom_Xs_Ys( ptwXY_interpolation interpolation, char const *interpolationString, 
+    double biSectionMax, double accuracy, int64_t primarySize, int64_t secondarySize, int64_t length, double const *Xs, 
+    double const *Ys, nfu_status *status, int userFlag );
 
 nfu_status ptwXY_copy( ptwXYPoints *dest, ptwXYPoints *src );
 ptwXYPoints *ptwXY_clone( ptwXYPoints *ptwXY, nfu_status *status );
+ptwXYPoints *ptwXY_cloneToInterpolation( ptwXYPoints *ptwXY, ptwXY_interpolation interpolationTo, nfu_status *status );
 ptwXYPoints *ptwXY_slice( ptwXYPoints *ptwXY, int64_t index1, int64_t index2, int64_t secondarySize, nfu_status *status );
-ptwXYPoints *ptwXY_xSlice( ptwXYPoints *ptwXY, double xMin, double xMax, int64_t secondarySize, int fill, nfu_status *status );
-ptwXYPoints *ptwXY_xMinSlice( ptwXYPoints *ptwXY, double xMin, int64_t secondarySize, int fill, nfu_status *status );
-ptwXYPoints *ptwXY_xMaxSlice( ptwXYPoints *ptwXY, double xMax, int64_t secondarySize, int fill, nfu_status *status );
+ptwXYPoints *ptwXY_domainSlice( ptwXYPoints *ptwXY, double domainMin, double domainMax, int64_t secondarySize, int fill, nfu_status *status );
+ptwXYPoints *ptwXY_domainMinSlice( ptwXYPoints *ptwXY, double domainMin, int64_t secondarySize, int fill, nfu_status *status );
+ptwXYPoints *ptwXY_domainMaxSlice( ptwXYPoints *ptwXY, double domainMax, int64_t secondarySize, int fill, nfu_status *status );
 
 ptwXY_interpolation ptwXY_getInterpolation( ptwXYPoints *ptwXY );
+char const *ptwXY_getInterpolationString( ptwXYPoints *ptwXY );
 nfu_status ptwXY_getStatus( ptwXYPoints *ptwXY );
 int ptwXY_getUserFlag( ptwXYPoints *ptwXY );
 void ptwXY_setUserFlag( ptwXYPoints *ptwXY, int userFlag );
@@ -154,10 +171,10 @@ nfu_status ptwXY_release( ptwXYPoints *ptwXY );
 ptwXYPoints *ptwXY_free( ptwXYPoints *ptwXY );
 
 int64_t ptwXY_length( ptwXYPoints *ptwXY );
-int64_t ptwXY_getNonOverflowLength( ptwXYPoints *ptwXY );
+int64_t ptwXY_getNonOverflowLength( ptwXYPoints const *ptwXY );
 
-nfu_status ptwXY_setXYData( ptwXYPoints *ptwXY, int64_t length, double *xy );
-nfu_status ptwXY_setXYDataFromXsAndYs( ptwXYPoints *ptwXY, int64_t length, double *x, double *y );
+nfu_status ptwXY_setXYData( ptwXYPoints *ptwXY, int64_t length, double const *xy );
+nfu_status ptwXY_setXYDataFromXsAndYs( ptwXYPoints *ptwXY, int64_t length, double const *x, double const *y );
 nfu_status ptwXY_deletePoints( ptwXYPoints *ptwXY, int64_t i1, int64_t i2 );
 ptwXYPoint *ptwXY_getPointAtIndex( ptwXYPoints *ptwXY, int64_t index );
 ptwXYPoint *ptwXY_getPointAtIndex_Unsafely( ptwXYPoints *ptwXY, int64_t index );
@@ -170,22 +187,23 @@ nfu_status ptwXY_setValueAtX( ptwXYPoints *ptwXY, double x, double y );
 nfu_status ptwXY_setValueAtX_overrideIfClose( ptwXYPoints *ptwXY, double x, double y, double eps, int override );
 nfu_status ptwXY_mergeFromXsAndYs( ptwXYPoints *ptwXY, int length, double *xs, double *ys );
 nfu_status ptwXY_mergeFromXYs( ptwXYPoints *ptwXY, int length, double *xys );
+nfu_status ptwXY_appendXY( ptwXYPoints *ptwXY, double x, double y );
 nfu_status ptwXY_setXYPairAtIndex( ptwXYPoints *ptwXY, int64_t index, double x, double y );
 
 nfu_status ptwXY_getSlopeAtX( ptwXYPoints *ptwXY, double x, const char side, double *slope );
 
-double ptwXY_getXMinAndFrom( ptwXYPoints *ptwXY, ptwXY_dataFrom *dataFrom );
-double ptwXY_getXMin( ptwXYPoints *ptwXY );
-double ptwXY_getXMaxAndFrom( ptwXYPoints *ptwXY, ptwXY_dataFrom *dataFrom );
-double ptwXY_getXMax( ptwXYPoints *ptwXY );
-double ptwXY_getYMin( ptwXYPoints *ptwXY );
-double ptwXY_getYMax( ptwXYPoints *ptwXY );
+double ptwXY_domainMinAndFrom( ptwXYPoints *ptwXY, ptwXY_dataFrom *dataFrom );
+double ptwXY_domainMin( ptwXYPoints *ptwXY );
+double ptwXY_domainMaxAndFrom( ptwXYPoints *ptwXY, ptwXY_dataFrom *dataFrom );
+double ptwXY_domainMax( ptwXYPoints *ptwXY );
+double ptwXY_rangeMin( ptwXYPoints *ptwXY );
+double ptwXY_rangeMax( ptwXYPoints *ptwXY );
 
 /* 
 * Methods in ptwXY_methods.c 
 */
-nfu_status ptwXY_clip( ptwXYPoints *ptwXY1, double yMin, double yMax );
-nfu_status ptwXY_thicken( ptwXYPoints *ptwXY1, int sectionSubdivideMax, double dxMax, double fxMax );
+nfu_status ptwXY_clip( ptwXYPoints *ptwXY1, double rangeMin, double rangeMax );
+nfu_status ptwXY_thicken( ptwXYPoints *ptwXY1, int sectionSubdivideMax, double dDomainMax, double fDomainMax );
 ptwXYPoints *ptwXY_thin( ptwXYPoints *ptwXY1, double accuracy, nfu_status *status );
 nfu_status ptwXY_trim( ptwXYPoints *ptwXY );
 
@@ -224,6 +242,7 @@ ptwXYPoints *ptwXY_div_ptwXY( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_stat
 nfu_status ptwXY_pow( ptwXYPoints *ptwXY, double p );
 nfu_status ptwXY_exp( ptwXYPoints *ptwXY, double a );
 ptwXYPoints *ptwXY_convolution( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, nfu_status *status, int mode );
+ptwXYPoints *ptwXY_inverse( ptwXYPoints *ptwXY, nfu_status *status );
 
 /*
 * Functions in ptwXY_interpolation.c
@@ -233,7 +252,7 @@ ptwXYPoints *ptwXY_flatInterpolationToLinear( ptwXYPoints *ptwXY, double lowerEp
 ptwXYPoints *ptwXY_toOtherInterpolation( ptwXYPoints *ptwXY, ptwXY_interpolation interpolation, double accuracy, nfu_status *status );
 ptwXYPoints *ptwXY_unitbaseInterpolate( double w, double w1, ptwXYPoints *ptwXY1, double w2, ptwXYPoints *ptwXY2, nfu_status *status );
 ptwXYPoints *ptwXY_toUnitbase( ptwXYPoints *ptwXY, nfu_status *status );
-ptwXYPoints *ptwXY_fromUnitbase( ptwXYPoints *ptwXY, double xMin, double xMax, nfu_status *status );
+ptwXYPoints *ptwXY_fromUnitbase( ptwXYPoints *ptwXY, double domainMin, double domainMax, nfu_status *status );
 
 /* 
 * Functions in ptwXY_convenient.c 
@@ -243,24 +262,28 @@ nfu_status ptwXY_dullEdges( ptwXYPoints *ptwXY, double lowerEps, double upperEps
 nfu_status ptwXY_mergeClosePoints( ptwXYPoints *ptwXY, double epsilon );
 ptwXYPoints *ptwXY_intersectionWith_ptwX( ptwXYPoints *ptwXY, ptwXPoints *ptwX, nfu_status *status );
 nfu_status ptwXY_areDomainsMutual( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2 );
+nfu_status ptwXY_tweakDomainsToMutualify( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, int epsilonFactor, double epsilon );
 nfu_status ptwXY_mutualifyDomains( ptwXYPoints *ptwXY1, double lowerEps1, double upperEps1, int positiveXOnly1,
                                           ptwXYPoints *ptwXY2, double lowerEps2, double upperEps2, int positiveXOnly2 );
 nfu_status ptwXY_copyToC_XY( ptwXYPoints *ptwXY, int64_t index1, int64_t index2, int64_t allocatedSize, int64_t *numberOfPoints, double *xy );
-ptwXYPoints *ptwXY_valueTo_ptwXY( ptwXY_interpolation interpolation, double x1, double x2, double y, nfu_status *status );
+nfu_status ptwXY_valuesToC_XsAndYs( ptwXYPoints *ptwXY, double **xs, double **ys );
+ptwXYPoints *ptwXY_valueTo_ptwXY( double x1, double x2, double y, nfu_status *status );
 ptwXYPoints *ptwXY_createGaussianCenteredSigma1( double accuracy, nfu_status *status );
-ptwXYPoints *ptwXY_createGaussian( double accuracy, double xCenter, double sigma, double amplitude, double xMin, double xMax, 
+ptwXYPoints *ptwXY_createGaussian( double accuracy, double xCenter, double sigma, double amplitude, double domainMin, double domainMax, 
         double dullEps, nfu_status *status );
 
 /* 
 * Functions in ptwXY_misc.c 
 */
+double ptwXY_limitAccuracy( double accuracy );
 void ptwXY_update_biSectionMax( ptwXYPoints *ptwXY1, double oldLength );
 ptwXYPoints *ptwXY_createFromFunction( int n, double *xs, ptwXY_createFromFunction_callback func, void *argList, double accuracy, int checkForRoots,
     int biSectionMax, nfu_status *status );
 ptwXYPoints *ptwXY_createFromFunction2( ptwXPoints *xs, ptwXY_createFromFunction_callback func, void *argList, double accuracy, int checkForRoots,
     int biSectionMax, nfu_status *status );
 nfu_status ptwXY_applyFunction( ptwXYPoints *ptwXY1, ptwXY_applyFunction_callback func, void *argList, int checkForRoots );
-ptwXYPoints *ptwXY_fromString( char const *str, ptwXY_interpolation interpolation, double biSectionMax, double accuracy, char **endCharacter, nfu_status *status );
+ptwXYPoints *ptwXY_fromString( char const *str, char sep, ptwXY_interpolation interpolation, char const *interpolationString, 
+    double biSectionMax, double accuracy, char **endCharacter, nfu_status *status );
 
 void ptwXY_showInteralStructure( ptwXYPoints *ptwXY, FILE *f, int printPointersAsNull );
 void ptwXY_simpleWrite( ptwXYPoints *ptwXY, FILE *f, char *format );
@@ -270,19 +293,21 @@ void ptwXY_simplePrint( ptwXYPoints *ptwXY, char *format );
 * Functions in ptwXY_integration.c 
 */
 nfu_status ptwXY_f_integrate( ptwXY_interpolation interpolation, double x1, double y1, double x2, double y2, double *value );
-double ptwXY_integrate( ptwXYPoints *ptwXY, double xMin, double xMax, nfu_status *status );
+double ptwXY_integrate( ptwXYPoints *ptwXY, double domainMin, double domainMax, nfu_status *status );
 double ptwXY_integrateDomain( ptwXYPoints *ptwXY, nfu_status *status );
 nfu_status ptwXY_normalize( ptwXYPoints *ptwXY1 );
 double ptwXY_integrateDomainWithWeight_x( ptwXYPoints *ptwXY, nfu_status *status );
-double ptwXY_integrateWithWeight_x( ptwXYPoints *ptwXY, double xMin, double xMax, nfu_status *status );
+double ptwXY_integrateWithWeight_x( ptwXYPoints *ptwXY, double domainMin, double domainMax, nfu_status *status );
 double ptwXY_integrateDomainWithWeight_sqrt_x( ptwXYPoints *ptwXY, nfu_status *status );
-double ptwXY_integrateWithWeight_sqrt_x( ptwXYPoints *ptwXY, double xMin, double xMax, nfu_status *status );
+double ptwXY_integrateWithWeight_sqrt_x( ptwXYPoints *ptwXY, double domainMin, double domainMax, nfu_status *status );
 ptwXPoints *ptwXY_groupOneFunction( ptwXYPoints *ptwXY, ptwXPoints *groupBoundaries, ptwXY_group_normType normType, ptwXPoints *ptwX_norm, nfu_status *status );
 ptwXPoints *ptwXY_groupTwoFunctions( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, ptwXPoints *groupBoundaries, ptwXY_group_normType normType, 
         ptwXPoints *ptwX_norm, nfu_status *status );
 ptwXPoints *ptwXY_groupThreeFunctions( ptwXYPoints *ptwXY1, ptwXYPoints *ptwXY2, ptwXYPoints *ptwXY3, ptwXPoints *groupBoundaries,
         ptwXY_group_normType normType, ptwXPoints *ptwX_norm, nfu_status *status );
 ptwXPoints *ptwXY_runningIntegral( ptwXYPoints *ptwXY, nfu_status *status );
+double ptwXY_integrateWithFunction( ptwXYPoints *ptwXY, ptwXY_createFromFunction_callback func, void *argList,
+        double domainMin, double domainMax, int degree, int recursionLimit, double tolerance, nfu_status *status );
 
 #if defined __cplusplus
     }

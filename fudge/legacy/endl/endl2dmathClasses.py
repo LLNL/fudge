@@ -8,22 +8,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 """
@@ -47,6 +58,7 @@ from fudge.core import fudgemisc
 from fudge.core.utilities import fudgeFileMisc, fudgeExceptions
 from fudge.vis.gnuplot import plotbase
 from fudge.core.utilities import subprocessing
+from xData import XYs as XYsModule
 
 __metaclass__ = type
 
@@ -749,7 +761,12 @@ class endl2dmath :
 
         return( 2 )
 
-    def getDomain( self ) :
+    @property
+    def dimension( self ) :
+
+        return( self.getDimensions( ) )
+
+    def domain( self ) :
         "Returns the domain (minumum and maximum x values) for self."
 
         return( self.xMin( ), self.xMax( ) )
@@ -861,33 +878,27 @@ class endl2dmath :
     def integrateOneFunction( self, xMin = None, xMax = None ) :
         """Returns the integral of self from xMin to xMax."""
 
-        from fudge.core.math.xData import XYs
-
         if( xMin is None ) : xMin = self.xMin( )
         if( xMax is None ) : xMax = self.xMax( )
         xMin = max( xMin, self.xMin( ) )
         xMax = min( xMax, self.xMax( ) )
-        self_ = XYs.XYs( XYs.XYs.defaultAxes( ), self.data, 1e-5 )
-        return( self_.integrate( xMin, xMax ) )
+        self_ = XYsModule.XYs( self.data, accuracy = 1e-5, axes = XYsModule.XYs.defaultAxes( ) )
+        return( float( self_.integrate( xMin, xMax ) ) )
 
     def integrateTwoFunctions( self, other, xMin = None, xMax = None ) :
         """Returns the integral of self and other from xMin to xMax."""
-
-        from fudge.core.math.xData import XYs
 
         endl2dmathmisc.valid2dClassType( other, "endl2dmath.integrateTwoFunctions", "other" )
         if( xMin is None ) : xMin = self.xMin( )
         if( xMax is None ) : xMax = self.xMax( )
         xMin = max( xMin, self.xMin( ), other.xMin( ) )
         xMax = min( xMax, self.xMax( ), other.xMax( ) )
-        self_ = XYs.XYs( XYs.XYs.defaultAxes( ), self.data, 1e-5 )
-        other_ = XYs.XYs( XYs.XYs.defaultAxes( ), other.data, 1e-5 )
+        self_ = XYsModule.XYs( self.data, accuracy = 1e-5, axes = XYsModule.XYs.defaultAxes( ) )
+        other_ = XYsModule.XYs( other.data, accuracy = 1e-5, axes = XYsModule.XYs.defaultAxes( ) )
         return( self_.integrateTwoFunctions( other_, xMin, xMax ) )
 
     def integrateThreeFunctions( self, other1, other2, xMin = None, xMax = None ) :
         """Returns the integral of self, other1 and other2 from xMin to xMax."""
-
-        from fudge.core.math.xData import XYs
 
         endl2dmathmisc.valid2dClassType( other1, "endl2dmath.integrateThreeFunctions", "other1" )
         endl2dmathmisc.valid2dClassType( other2, "endl2dmath.integrateThreeFunctions", "other2" )
@@ -895,9 +906,9 @@ class endl2dmath :
         if( xMax is None ) : xMax = self.xMax( )
         xMin = max( xMin, self.xMin( ), other1.xMin( ), other1.xMin( ) )
         xMax = min( xMax, self.xMax( ), other1.xMax( ), other2.xMax( ) )
-        self_ = XYs.XYs( XYs.XYs.defaultAxes( ), self.data, 1e-5 )
-        other1_ = XYs.XYs( XYs.XYs.defaultAxes( ), other1.data, 1e-5 )
-        other2_ = XYs.XYs( XYs.XYs.defaultAxes( ), other2.data, 1e-5 )
+        self_ = XYsModule.XYs( self.data, accuracy = 1e-5, axes = XYsModule.XYs.defaultAxes( ) )
+        other1_ = XYsModule.XYs( other1.data, accuracy = 1e-5, axes = XYsModule.XYs.defaultAxes( ) )
+        other2_ = XYsModule.XYs( other2.data, accuracy = 1e-5, axes = XYsModule.XYs.defaultAxes( ) )
         return( self_.integrateThreeFunctions( other1_, other2_, xMin, xMax ) )
 
     def union( self, other, xDomainUnionOnly = False ) :
@@ -1450,12 +1461,10 @@ class endl2dmath :
         compatible with legacy fudge as the returned instance is of type XYs and not of type endl2dmath.
         """
 
-        from fudge.core.math.xData import axes, XYs
-
         if( accuracy == None ) : accuracy = 1e-3
         linear = self.toInterpolation( 0, accuracy )
-        linearXYs = XYs.XYs( axes.defaultAxes( ), linear.data, accuracy )
-        if( cls is not None ) : linearXYs = cls.returnAsClass( linearXYs, axes_ = axes_ )
+        linearXYs = XYsModule.XYs( linear.data, accuracy = accuracy, axes = XYsModule.XYs.defaultAxes( ) )
+        if( cls is not None ) : linearXYs = cls.returnAsClass( linearXYs )
         return( linearXYs )
 
     def copyDataToXYs( self ) :

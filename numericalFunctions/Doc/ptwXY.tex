@@ -1,0 +1,481 @@
+\documentclass[11pt]{article}
+\setlength{\textwidth}{6.5 in}
+\setlength{\oddsidemargin}{-0. in}
+\setlength{\evensidemargin}{\oddsidemargin}
+\usepackage{epic}
+\usepackage{eepic}
+\usepackage[usenames]{color}
+
+\newlength{\argumentOffset}
+\setlength{\argumentOffset}{0 in}
+
+\newlength{\argumentNameWidth}
+\newlength{\argumentNameOffset}
+\newcommand{\setargumentNameLengths}[1]{
+    \settowidth{\argumentNameWidth}{\tt #1: }
+    \setlength{\argumentNameOffset}{\linewidth}
+    \addtolength{\argumentNameOffset}{-1.\argumentNameWidth}
+    \addtolength{\argumentNameOffset}{-0.05\linewidth}
+}
+
+\newcommand{\highlight}[1]{{\bf #1}}
+\newcommand{\CallingCSub}[3]{\settowidth{\argumentOffset}{\tt #1 }
+    \vskip 0.1 in\noindent{\bf C declaration: #3} \\
+    \parbox[t]{\linewidth}{
+        \hskip 0.05\linewidth \parbox[t]{0.95\linewidth}{\raggedright \sloppy \tt #1 #2}
+    }
+\vskip 0.1 in}
+\newcommand{\CallingC}[2]{\CallingCSub{#1}{#2}{}}
+\newcommand{\CallingCLimited}[2]{\CallingCSub{#1}{#2}{ --- This routine is not intended for general use. --- }}
+\newcommand{\addArgument}[1]{\hfill \\ \hskip \argumentOffset #1}
+\newcommand{\argumentBox}[2]{\noindent\parbox{1.\linewidth}{\parbox[t]
+    {0.05\linewidth}{\hfill}\parbox[t]{\argumentNameWidth}{\tt #1:}\parbox[t]{\argumentNameOffset}{#2}}\hfill}
+
+\title{Manual for the numerical functions package\footnote{
+This work was performed under the auspices of the U.S. Department of Energy by
+Lawrence Livermore National Laboratory under contract \#W-7405-ENG-48.}}
+\author{{Bret R. Beck}\\Lawrence Livermore National Laboratory\\UCRL-}
+
+\begin{document}
+\setargumentNameLengths{interpolation}
+
+\maketitle
+
+\pagebreak
+\tableofcontents
+\listoftables
+\pagebreak
+
+\section{Introduction}
+The \highlight{ptwXY} C object (i.e., an instance of C typedef \highlight{ptwXYPoints}) and supporting C routines are designed to 
+handle point-wise interpolative data representing a function of one independent variable
+(i.e., y = f(x)). That is, a \highlight{ptwXY} object consist of an 
+list of pairs ($x_i,y_i$) where $x_{i} < x_{i+1}$ and $y_i = f(x_i)$. Henceforth, the \highlight{ptwXY} C object
+and supporting C routines are called the \highlight{ptwXY} model. Routines supporting common operations 
+on the points of f(x) are included in this package. As example, a function exists to add two \highlight{ptwXY} instances returning the sum
+as a \highlight{ptwXY} instances (i.e., $h(x) = f(x) + g(x)$ where $f(x)$, $g(x)$ and $h(x)$ 
+are all \highlight{ptwXY} objects). The main intent for developing this library is for a fast XY math object for LLNL's FUDGE package
+which manipulates nuclear data (e.g., it can be used to add cross section from different reactions). However,
+this library may be useful for other packages.
+
+As example of the usage of \highlight{ptwXY} objects consider the data in Table~\ref{B1Pop}. This table list the male and female populations of a
+bird species on an island for several census years. In this example, $x_i$ represents
+a census year and $y_i$ represents the population for that year. Note that the male population is not
+given for the year 1885. A portion of a simple C routine to put the male and female 
+populations into \highlight{ptwXY} objects and add them together to get the total population is:
+
+\begin{verbatim}
+
+#include <ptwXY.h>
+#define nPairs 7
+
+    double maleData[2 * (nPairs-1)] =   { 1871, 1212, 1883, 1215, 1889,  
+        51, 1895, 11, 1905,  9, 1915,  9 };
+    double femaleData[2 * nPairs] =     { 1871, 1231, 1883, 1241, 1885, 
+        621, 1889, 229, 1895, 31, 1905, 23, 1915, 21 };
+    ptwXYPoints *males, *females, *total;
+    ptwXY_interpolation linlin = ptwXY_interpolationLinLin;
+    nfu_status status;
+
+    males = ptwXY_new( linlin, 5, 1e-3, nPairs, 4, &status, 0 );
+    ptwXY_setXYData( males, nPairs - 1, maleData );
+
+    females = ptwXY_new( linlin, 5, 1e-3, nPairs, 4, &status, 0 );
+    ptwXY_setXYData( females, nPairs, femaleData );
+
+    total = ptwXY_add_ptwXY( males, females, &status );
+
+    printf( "\nMale population\n" );
+    printf( "  Year | Count\n" );
+    printf( " ------+------\n" );
+    ptwXY_simplePrint( males, " %5.0f | %5.0f\n" );
+
+    printf( "\nFemale population\n" );
+    printf( "  Year | Count\n" );
+    printf( " ------+------\n" );
+    ptwXY_simplePrint( females, " %5.0f | %5.0f\n" );
+
+    printf( "\nTotal population\n" );
+    printf( "  Year | Count\n" );
+    printf( " ------+------\n" );
+    ptwXY_simplePrint( total, " %5.0f | %5.0f\n" );
+\end{verbatim}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|r|r|}  \hline
+    year    & Male  & Female \\ \hline \hline
+    1871    & 1212  & 1231  \\ \hline
+    1883    & 1215  & 1241  \\ \hline
+    1885    &  ---  & 621   \\ \hline
+    1889    & 51    & 229   \\ \hline
+    1895    & 11    & 31    \\ \hline
+    1905    & 9     & 23    \\ \hline
+    1915    & 9     & 21    \\ \hline
+\end{tabular}
+\end{center}
+\caption{Males and females population of a bird species on an island for the years census were taken. There was
+no census taken of the male population in 1885.\label{B1Pop}}
+\end{table}
+
+\noindent
+The output of this code - compressed into fewer lines - is:
+
+\begin{verbatim}
+ Output from first  | Output from second  | Output from third
+ ptwXY_simplePrint | ptwXY_simplePrint  | ptwXY_simplePrint
+--------------------+---------------------+-------------------
+  Male population   |  Female population  |  Total population
+    Year | Count    |    Year | Count     |    Year | Count
+   ------+------    |   ------+------     |   ------+------
+    1871 |  1212    |    1871 |  1231     |    1871 |  2443
+    1883 |  1215    |    1883 |  1241     |    1883 |  2456
+    1889 |    51    |    1885 |   621     |    1885 |  1448
+    1895 |    11    |    1889 |   229     |    1889 |   280
+    1905 |     9    |    1895 |    31     |    1895 |    42
+    1915 |     9    |    1905 |    23     |    1905 |    32
+                    |    1915 |    21     |    1915 |    30
+\end{verbatim}
+
+\noindent
+In this example no error checking is shown. The routine \highlight{ptwXY\_new} allocates memory for
+a new \highlight{ptwXYPoints} object, initializes it and returns a pointer to the object. The first 
+argument of this routine in an interpolation flag. For all other arguments see Section~\ref{ptwXYnewSec} The
+routine \highlight{ptwXY\_setXYData} takes a pointer to a \highlight{ptwXYPoints} object as its first argument and copies 
+the list of doubles given by the third argument into the \highlight{ptwXYPoints} object's internal memory, deleting
+any data currently in the object. 
+The second argument is the number of pairs of points
+in the third argument's data. 
+
+The routine \highlight{ptwXY\_add\_ptwXY} takes a \highlight{ptwXYPoints} object
+as its first and second arguments and returns a new \highlight{ptwXYPoints} object that is the sum. 
+The summed object's $x$ values are a union between the $x$ value's of the operants.  As can be seen
+from the example, this routine interpolates to fill in missing data for either data set. That is, the male population
+was linear-linear interpolated to give 827 for the year 1885.
+
+\subsection{Important concepts}
+This section describes several important concepts and rules that the \highlight{ptwXY} model is build on.
+
+\subsubsection{accuracy}
+\subsubsection{Mutual domains}
+Most routines that have two or more \highlight{ptwXYPoints} instances as input (e.g., ptwXY\_add\_ptwXY, ptwXY\_groupThreeFunctions) require
+that their domains be mutual. This section explains why mutual domains are needed and what a mutual domain is.
+
+Consider the two point-wise linear-linear interpolable functions
+\begin{verbatim}
+        f1 = (1,1), (9,3)
+        f2 = (1,2), (9,4).
+\end{verbatim}
+where a point-wise function with $n$ points is written as
+\begin{eqnarray}
+        (x_0,y_0), \ (x_1,y_1), \ (x_2,y_2), \ ... \ (x_{n-1},y_{n-1}) \nonumber
+\end{eqnarray}
+and each point is the pair $(x_i,y_i)$ with $x_i < x_{i+1}$.
+Each of these functions contains only two points. The first has domain $1 \le x \le 9$ with the y-value 
+going from 1 to 3 and can be represented symbolically as $y = f1(x) = ( x - 1 ) / 4 + 1$ for the domain $1 \le x \le 9$. 
+The second has the same domain with the y-value going from 2 to 4 and can be represented symbolically as $y = f2(x) = ( x - 1 ) / 4 + 2$. 
+The rule that should be implemented for adding these two functions is clear and is
+$s(x) = ( x - 1 ) / 2 + 3 = f1(x) + f2(x)$ or in point-wise form
+\begin{verbatim}
+        (1,3), (9,7) = f1 + f2
+\end{verbatim}
+For the domain $1 \le x \le 9$, the point-wise linear-linear interpolable sum and the symbolic sum yield the
+same results. For example, both yield $s(3) = 4$. Figure~\ref{sum_f1_f2} graphically shows $f1$, $f2$ and $f1 + f2$.
+\include{sum_f1_f2}
+
+Now consider the point-wise linear-linear interpolable function
+\begin{verbatim}
+        f3 = (3,1), (7,3).
+\end{verbatim}
+This function also contains only two points and has domain $3 \le x \le 7$ with a y-value going of 1 to 3. This function
+can be represented symbolically as $y = f3(x) = ( x - 3 ) / 2 + 1$. The rule that should be implemented for 
+adding $f1$ and $f3$ is not obvious. For example, one could implement the rule which makes a union of the x-values 
+in $f1$ and $f3$ (i.e., 1, 3, 7 and 9),
+interpolate each function onto these points using 0 where the function is not defined and then add the y-values.
+Let $f1'$ and $f3'$ be the functions $f1$ and $f3$ with the union points and the y-values filled in. In
+point-wise representation, $f1'$ and $f3'$ are
+\begin{verbatim}
+        f1' = (1,1), (3,1.5), (7,2.5), (9,3)
+        f3' = (1,0), (3,1),   (7,3),   (9,0).
+\end{verbatim}
+The sum resulting from this rule is then
+\begin{verbatim}
+        (1,1), (3,2.5), (7,5.5), (9,3) = f1' + f3' = f1 + f3.
+\end{verbatim}
+and is shown as the blue curve in Fgure~\ref{sum_f1_f3}. The blue curve is not vary appealing in part because for this addition rule the
+sum of $f3$ with $f1$ makes the assumption that $f3(x) = ( x - 1 ) / 2$ for $1 \le x \le 3$.
+But what is worse, this rule does not guarantee the associativity rule for addition. To see this, consider the three 
+linear-linear point-wise functions
+\begin{verbatim}
+        g1 = (1,0), (1,1),        (10,10)
+        g2 = (1,0),               (10,10)
+        g3 =               (2,1), (10,1).
+\end{verbatim}
+Note that $g1$ and $g2$ represent the same function.
+The addition $(g1 + g2) + g3$ is
+\begin{verbatim}
+        (0,0), (1,2), (2,5), (10,21) = ( g1 + g2 ) + g3
+\end{verbatim}
+while the addition $g1 + (g2 + g3)$ is
+\begin{verbatim}
+        (0,0), (1,2.5), (2,5), (10,21) = g1 + ( g2 + g3 ).
+\end{verbatim}
+\include{sum_f1_f3}
+
+Another rule one could implement would effectively add a point with $y = 0$ just below the first point of $f3$,
+one just above the last point of $f3$, one at $x = 1$ and one at $x = 9$ to yield an $f3'$ as
+\begin{verbatim}
+        f3' = (1,0), (2.99999,0), (3,1), (7,3), (7.00001,0), (9,0).
+\end{verbatim}
+and the sum $f1 + f3$ would then be
+\begin{verbatim}
+        (1,1), (2.99999,1.4999975, (3,2.5), (7,5.5), (7.00001, 2.5000025), (9,3)
+\end{verbatim}
+The sum resulting from this latter rule is shown as the black curve in Fgure~\ref{sum_f1_f3}. This rule looks much better and is.
+However, when designing the \highlight{ptwXYPoints} model, this rule was also rejected as it would require the 
+\highlight{ptwXYPoints} library to know the appropriate distance below and above the end-points to add 0's.
+
+The rule that the \highlight{ptwXYPoints} model implements is called ``mutual domain''. This rule states that the
+domains of the functions operated on must be the same with one exception. This exception will now be explained. 
+Let $h1$ and $h2$ be two \highlight{ptwXYPoints} instances with
+the lower and upper domain limits of $h1$ being $x_{1,l}$ and $x_{1,u}$ and that of $h2$ being $x_{2,l}$ and $x_{2,u}$. 
+If $x_{1,l} \ne x_{2,l}$ then the y-value for the greater lower-x-limit must be 0. For example, if
+$x_{1,l} > x_{2,l}$ then $h2(x_{2,l}) = 0$. If $x_{1,u} \ne x_{2,u}$ then the y-value for the lesser
+upper-x-limit must be 0. For example, if $x_{1,u} < x_{2,u}$ then $h1(x_{1,u}) = 0$. This rule works because
+the \highlight{ptwXYPoints} model assumes that if the y-value is 0 at the lower limit, then it is 0 for all
+$x$ less than the lower limit. Likewise if the y-value is 0 at the upper limit, then it is 0 for all
+$x$ greater than the upper limit.
+
+If $f4$ and $f5$ have mutual domains, and $f4$ and $f6$ have mutual domains, the it is not guaranteed that $f5$ and $f6$
+have mutual domains. As an example, let
+\begin{verbatim}
+        f4 = (1,4), (8,4)
+        f5 = (3,0), (8,2)
+        f6 = (4,3), (6,0).
+\end{verbatim}
+Then, $f4$ and $f5$ have mutual domains and so do $f5$ and $f6$. However, $f4$ and $f6$ do not have mutual domains.
+Because of this fact, the function \highlight{ptwXY\_groupThreeFunctions} has to check the domains of \highlight{ptwXY1} to 
+\highlight{ptwXY2}, \highlight{ptwXY1} to \highlight{ptwXY3} and \highlight{ptwXY2} to \highlight{ptwXY3}. Acutally,
+\highlight{ptwXY\_groupThreeFunctions} first limits the domains of \highlight{ptwXY1}, \highlight{ptwXY2} and
+\highlight{ptwXY3} to that of \highlight{groupBoundaries} first.
+\include{mutualDomain_f4_f5_f6}
+
+\subsubsection{Infill}
+The addition of two linear functions yields another linear function. As example, the sum of $f1(x) = s1 \times x + y1$
+and $f2(x) = s2 \times x + y2$ is $f1(x) + f2(x) = ( s1 + s2 ) \times x + y1 + y2$. Hence, when the function \highlight{ptwXY\_add\_ptwXY}
+adds two linear-linear pointwise functions, it only needs to make a union of the x-values of the two addends to maintain accuracy.
+However, the multiplication of $f1(x)$ and $f2(x)$ is not a linear function but a quadratic function (e.g., $ f1(x) \times f2(x) =
+s1 \times s2 \times x^2 + ( s1 \times y2 + s2 \times y1 ) \times x + y1 \times y2$). In an attempt to maintain accuracy, the
+function \highlight{ptwXY\_mul2\_ptwXY} may add additional points between the union points. For example, consider the following
+linear-linear point-wise functions $f3$ and $f4$,
+\begin{verbatim}
+        f3 = (0,0), (1,1)
+        f4 = (0,1), (1,0)
+\end{verbatim}
+which have the symbolic forms $f_3(x) = x$ and $f_4(x) = 1 - x$ over the domain $0 \le x \le 1$ and the symbolic
+product $x ( 1 - x )$. Making a union of the x-values and evaluating the product on the x-values yields
+\begin{verbatim}
+    (0,0), (1,0) = f3 * f4
+\end{verbatim}
+which is clearly inadequate. For this example, the only way to maintain the accuracy is to add points between $x = 0$ and $x = 1$. The adding of
+points in an attempt to maintain accuracy is called infilling and is done automatically by some \highlight{ptwXYPoints} functions
+including \highlight{ptwXY\_mul2\_ptwXY} but not by \highlight{ptwXY\_mul\_ptwXY}.
+
+Infilling is done by bisecting (i.e., generating the point midway between) two consecutive points and asking if 
+the accuracy of the operation (e.g., mutiplication) is satisfied. If it is, the midpoint is not added. However, if 
+the accurcay is not satisfied, the midpoint is added then the segments on both side of the midpoint are tested. 
+
+In some cases, infilling can add a lot of points, more than one may like. Each \highlight{ptwXYPoints}
+instance has a member called \highlight{biSectionMax} to limit bisecting. The union function sets the
+\highlight{biSectionMax} of the returned \highlight{ptwXYPoints} instance, to the maximum of \highlight{biSectionMax} of
+its inputted \highlight{ptwXYPoints} instances. For each initial segment of the union at most
+\highlight{biSectionMax} bisections are performed. Table~\ref{infillCode1} contains a snippet of code which
+demonstrates the multiplication $f3$ and $f4$, without any error checking of course, for \highlight{biSectionMax}
+set to 0, 1, 2, and 3, and Figure~\ref{mul_f3_f4_infill} show the output from this code.
+
+\begin{table}
+\begin{verbatim}
+int main( int argc, char **argc ) {
+
+    double f3[4] = { 0., 0., 1., 1. }, f4[4] = { 0., 1., 1., 0. };
+    double accuracy = 1e-3;
+    ptwXYPoints *ptwXY3, *ptwXY4;
+    nfu_status status;
+    ptwXY_interpolation linlin = ptwXY_interpolationLinLin;
+
+    ptwXY3 = ptwXY_create( linlin, 0, accuracy, 10, 10, 2, f3, &status, 0 );
+    ptwXY4 = ptwXY_create( linlin, 0, accuracy, 10, 10, 2, f4, &status, 0 );
+
+    doProduct( ptwXY3, ptwXY4, 0 );
+    doProduct( ptwXY3, ptwXY4, 1 );
+    doProduct( ptwXY3, ptwXY4, 2 );
+    doProduct( ptwXY3, ptwXY4, 3 );
+
+}
+
+void doProduct( ptwXYPoints *ptwXY3, ptwXYPoints *ptwXY4, double biSection ) {
+
+    ptwXYPoints *product;
+    nfu_status status;
+
+    ptwXY_setBiSectionMax( ptwXY3, biSection );
+    product = ptwXY_mul2_ptwXY( ptwXY3, ptwXY4, &status );
+}
+\end{verbatim}
+\caption{This table show a snippet of the code used to generate the curves in Figure~\ref{mul_f3_f4_infill}} \label{infillCode1}
+\end{table}
+\include{mul_f3_f4_infill}
+
+If infilling is needed, the \highlight{biSectionMax} member of the returned \highlight{ptwXYPoints} instance is reduced by 
+$\ln(l_f / l_u) / ln(2)$ where $l_u$ is the lenght of the union and $l_f$ is the final length after all bisections\footnote{This reduction is derived
+by setting $2^z = l_f/l_u$ and solving for $z$.}. An \highlight{ptwXYPoints} instance's \highlight{biSectionMax} can be set using
+\highlight{ptwXY\_setBiSectionMax} and got using \highlight{ptwXY\_setBiSectionMax}. A \highlight{ptwXYPoints}'s
+\highlight{biSectionMax} is limited to the range 0 to \highlight{ptwXY\_maxBiSectionMax}.
+
+\subsubsection{Safe divide}
+
+\section{Name convention}
+
+This section defines some of the names used in this document.
+
+\begin{description}
+    \item[point:] A point is a pair of $(x,y)$ values.
+    \item[cache and array:] In this document there is a distinction between a cache and an array of a cache. A cache 
+            is allocated memory used to store data. An array of a cache is a region of a cache containing valid data. As example, 
+            for the primary cache described in section~\ref{TCDGArray}, points are added to the cache as needed. The current points 
+            in the cache constitute the array of that cache.
+\end{description}
+
+\section{Two-cached, Dynamic-Growth Data Array} \label{TCDGArray}
+Built into the \highlight{ptwXY} model is the ability to insert a point at any $x$. The supporting routines will
+automatically increase the size of an internal data cache if needed to accommodate a new $x$ value. However, to make adding
+and deleting points potentially more efficient, the \highlight{ptwXY} model has two data caches, dubbed primary and secondary.
+In the primary cache, data are stored in a C array in ascending order which allows for quick accessing. However, inserting a new
+$x$ value at any place other than the end of the array can be slow as it requires moving all $x$ values that are greater than the new value
+up one element in the array.  To over come this, a newly added $x$ value
+is inserted into the secondary cache if: 1) the value cannot be inserted after the last element of the primary array\footnote{A value can
+only be inserted after the last element of the primary array if its $x$ is greater than the current maximum $x$ value and there is room in
+the primary cache.} and 2) space is available in the secondary cache. The secondary cache is a static, linked list. Here, static means that
+the elements of the linked list are allocated during setup so there is no overhead associated with allocating or freeing
+elements of the linked list later. Typically, re-allocation
+of the memory of the primary cache is only required when a new $x$ value cannot be inserted into either cache.
+
+There are four parameters, two for each cache, that describe the current state of the caches. Each cache has a size which is the 
+amount, in units of an element of that cache, of memory allocated for the cache and a length which is the amount, in units of an 
+element of that cache, of the cache that is currently used (i.e., the size of the array of that cache).
+
+The initial size of the two caches is set either through the routine \highlight{ptwXY\_new} or \highlight{ptwXY\_\-setup} via their
+\highlight{primarySize} and \highlight{secondarySize} arguments. The size of the primary and secondary caches can be directly altered after
+they have been created via the
+routines \highlight{ptwXY\_reallo\-cate\-Points} and \highlight{ptwXY\_\-reallo\-cate\-Overflow\-Points} respectively. 
+In general these last two routines should
+not be called by the users unless they know that the a cache is woefully too small.
+
+The routine \highlight{pwtXY\_coalescePoints} can be called to transfer all secondary points into the primary cache.
+
+\section{ptwXYPoints's C structs, macros and enums}
+The following definitions are defined in the C header file "ptwXY.h".
+
+\subsection{ptwXYPoints}
+The \highlight{ptwXYPoints} type is defined as:
+\begin{verbatim}
+typedef
+    struct ptwXYPoints_s {
+        nfu_status status;
+        ptwXY_sigma typeX, typeY;
+        ptwXY_interpolation interpolation;
+        int userFlag;
+        double biSectionMax;
+        double accuracy;
+        double minFractional_dx;
+        int64_t length;
+        int64_t allocatedSize;
+        int64_t overflowLength;
+        int64_t overflowAllocatedSize;
+        int64_t mallocFailedSize;
+        ptwXYOverflowPoint lessThanEqualXPoint, greaterThanXPoint;
+        ptwXYOverflowPoint overflowHeader;
+        ptwXYPoint *points;
+        ptwXYOverflowPoint *overflowPoints;
+    } ptwXYPoints;
+\end{verbatim}
+
+The \highlight{ptwXYPoint} type is defined as:
+\begin{verbatim}
+typedef
+    struct ptwXYPoint_s {
+        double x, y;
+    } ptwXYPoint;
+\end{verbatim}
+
+The type \highlight{ptwXYOverflowPoint} will not be described here as it is not used as an argument in any routine and
+its members in \highlight{ptwXYPoints} should not be accessed user codes.
+
+\subsection{C macros}
+This section lists some of the C macros defined in "ptwXY.h".
+
+\subsection{Interpolation} \label{interpolationSection}
+For an $x$ value that is within the domain of a \highlight{ptwXYPoints} object but not one of its points, the \highlight{ptwXYPoints} 
+routines interpolate, as instructed by the member \highlight{interpolation}, to obtain the $y$ value. Interpolation types are
+defined using the type \highlight{ptwXY\_interpolation} which is defined as:
+\begin{verbatim}
+typedef enum ptwXY_interpolation_e { 
+    ptwXY_interpolationLinLin,  /* x and y linear. */
+    ptwXY_interpolationLinLog,  /* x linear and y logarithmic. */
+    ptwXY_interpolationLogLin,  /* x logarithmic and y linear. */
+    ptwXY_interpolationLogLog,  /* x and y logarithmic. */
+    ptwXY_interpolationFlat,    /* see below */
+    ptwXY_interpolationOther    /* see below */
+} ptwXY_interpolation;
+\end{verbatim}
+The latter two interpolation types have many restrictions. For ptwXY\_interpolationFlat the $y$ for $x_i \le x < x_{i+1}$ is $y_i$.
+This type is good for storing histogram type data.
+Many of the functions in the \highlight{ptwXY} library cannot handle the flat interpolation and return the error
+nfu\_invalidInterpolation via their nfu\_status argument. The interpolation type ptwXY\_interpolationOther
+allows the use of ptwXY storage type for data that does not fit into one the other defined interpolation types. Most
+functions cannot handle the other interpolation and also return the error nfu\_invalidInterpolation.
+
+\subsection{Data types}
+Currently, the \highlight{ptwXY} model only supports a point as an $(x, y)$ pair. In the future uncertainty values may be added
+to both the $x$ and $y$ values. For examples, the $y$ value could have an uncertainty $dy$, in which case a point would require
+3 values $(x, y, dy)$. The data type \highlight{ptwXY\_sigma} specify the the number of values and their meaning for each axis
+and is defined as:
+\begin{verbatim}
+typedef enum ptwXY_sigma_e {
+    ptwXY_sigma_none,       /* Datum contains only x or y values. */
+    ptwXY_sigma_plusMinus,  /* Currently not supported. */
+    ptwXY_sigma_Minus,      /* Currently not supported. */
+    ptwXY_sigma_plus        /* Currently not supported. */
+} ptwXY_sigma;
+\end{verbatim}
+
+\subsection{Miscellaneous types}
+The routine \highlight{ptwXY\_getPointsAroundX} is used by other routines to determine
+where an $x$ value fits into a \highlight{ptwXYPoints} object. The return value of this
+routine is of type \highlight{ptwXY\_less\-Equal\-GreaterX} which is defined as:
+\begin{verbatim}
+typedef enum ptwXY_lessEqualGreaterX_e {
+    ptwXY_lessEqualGreaterX_empty,          /* The object has no points. */
+    ptwXY_lessEqualGreaterX_lessThan,       /* The x < xMin. */
+    ptwXY_lessEqualGreaterX_equal,          /* x = x_i. */
+    ptwXY_lessEqualGreaterX_between,        /* x_i < x < x_i+1. */
+    ptwXY_lessEqualGreaterX_greater         /* The x > xMax. */
+} ptwXY_lessEqualGreaterX;
+\end{verbatim}
+Here, xMin and xMax are the minimum and maximum $x$ values of the \highlight{ptwXYPoints} object, and
+$x_i$ and $x_{i+1}$ are the $(i-1)^{th}$ and $i^{th}$ $x$ values of the \highlight{ptwXYPoints} object respectively.
+
+\section{Routines}
+
+\include{ptwXY_core}
+\include{ptwXY_method}
+\include{ptwXY_unitaryOperators}
+\include{ptwXY_binaryOperators}
+\include{ptwXY_functions}
+\include{ptwXY_interpolation}
+\include{ptwXY_integration}
+\include{ptwXY_convenient}
+\include{ptwXY_misc}
+\include{ptwXY_appendix}
+
+\end{document}

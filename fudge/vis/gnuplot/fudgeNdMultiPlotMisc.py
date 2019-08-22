@@ -8,22 +8,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 import Gnuplot
@@ -119,7 +130,7 @@ class fudgeNdMultiPlotFileReadGetInfo( tkSimpleDialog.Dialog ):
                 s = 'y'
         except :
             s = 'x'
-        if( s == None ) :
+        if( s is None ) :
             if( x != y ) : 
                 self.values = ( x, y, None, None )
                 return( True )
@@ -213,7 +224,7 @@ class fudgeNdMultiPlotItem :
     def setColor( self, color ) :
 
         self.color = color
-        if( self.replot != None ) : self.replot( )
+        if( self.replot is not None ) : self.replot( )
 
     def getColor( self ) :
 
@@ -266,7 +277,7 @@ class fudgeNdMultiPlotItemsDialog :
         self.fudgeNdMultiPlotFile = []
         self.activeMenubar = activeMenubar
 
-        if( self.activeMenubar != None ) :
+        if( self.activeMenubar is not None ) :
             self.activeMenu = Tkinter.Menu( self.activeMenubar, tearoff = 1 )
             self.activeMenu.add_command( label = "all on", command = self.activeAllOnCallback )
             self.activeMenu.add_command( label = "all off", command = self.activeAllOffCallback )
@@ -369,7 +380,7 @@ class fudgeNdMultiPlotItemsDialog :
         
         # Final configuration
         self.frame.columnconfigure( bcolumn, weight = 10 )
-        self.frame.pack( )
+        self.frame.grid( row=2, column=0, sticky = Tkinter.E + Tkinter.W )
         self.addFudgeNdMultiPlotFile( self.systemPlotParameters )
         self.setUpdatingPlotParameters( self.systemPlotParameters )
 
@@ -419,7 +430,7 @@ class fudgeNdMultiPlotItemsDialog :
         self.fudgeNdMultiPlotFile.append( gnuPlotItem )
         self.selectedMenu.add_command( label = gnuPlotItem.title, command = gnuPlotItem.setToUpdate )
         gnuPlotItem.parent = self
-        if( ( self.activeMenubar != None ) and ( gnuPlotItem.gnuPlotItem != None ) ) :
+        if( ( self.activeMenubar is not None ) and ( gnuPlotItem.gnuPlotItem is not None ) ) :
             self.activeMenu.add_checkbutton( label = gnuPlotItem.title, variable = gnuPlotItem.active, command = self.activeChanged )
             self.updateColumnBreaks( )
 
@@ -520,7 +531,7 @@ class fudgeNdMultiPlotItemsDialog :
             i = 0
             while( True ) :
                 index = menu.index( i )
-                if( index == None ) : break
+                if( index is None ) : break
                 if( menu.entrycget( index, 'label' ) == label ) :
                     menu.entryconfigure( index, state = state )
                     break
@@ -529,7 +540,7 @@ class fudgeNdMultiPlotItemsDialog :
 
         removeState = Tkinter.NORMAL
         self.gnuPlotItem = gnuPlotItem
-        if( gnuPlotItem.gnuPlotItem == None ) : removeState = Tkinter.DISABLED
+        if( gnuPlotItem.gnuPlotItem is None ) : removeState = Tkinter.DISABLED
         self.removeButton['state'] = removeState
         setMenuItemState( self.lineTypeMenu, 'system', removeState )
         self.titleEntry['state'] = removeState
@@ -567,9 +578,9 @@ class fudgeNdMultiPlotItemsDialog :
     def removeCallback( self ) :
 
         index, listIndex, activeIndex = self.getIndicesForLabel( self.gnuPlotItem.title )
-        if( index != None ) :
+        if( index is not None ) :
             self.selectedMenu.delete( listIndex )
-            if( activeIndex != None ) : self.activeMenu.delete( activeIndex )
+            if( activeIndex is not None ) : self.activeMenu.delete( activeIndex )
             self.setUpdatingPlotParameters( self.fudgeNdMultiPlotFile[index-1] )
             del self.fudgeNdMultiPlotFile[index]
             self.updateColumnBreaks( )
@@ -587,7 +598,7 @@ class fudgeNdMultiPlotItemsDialog :
                 index = i
                 listIndex = j
                 break
-        if( self.activeMenubar != None ) :
+        if( self.activeMenubar is not None ) :
             for i in xrange( 3, n + 3 ) :
                 j = self.activeMenu.index( i )
                 if( self.activeMenu.entrycget( j, 'label' ) == label ) :
@@ -609,7 +620,7 @@ class fudgeNdMultiPlotItemsDialog :
         n = len( self.fudgeNdMultiPlotFile )
         systemGnuPlotItem = self.fudgeNdMultiPlotFile[0]
         for gnuPlotItem in self.fudgeNdMultiPlotFile :
-            if( gnuPlotItem.gnuPlotItem == None ) :
+            if( gnuPlotItem.gnuPlotItem is None ) :
                 continue
             elif( gnuPlotItem.isActive( ) ) :
                 gnuPlotItem.gnuPlotItem.set_option( title = gnuPlotItem.title )
@@ -665,7 +676,7 @@ class fudgeNdMultiPlotItemsDialog :
         """Called from activeAllOnCallback and activeAllOffCallback."""
 
         for gnuPlotItem in self.fudgeNdMultiPlotFile :
-            if( gnuPlotItem.gnuPlotItem == None ) : continue
+            if( gnuPlotItem.gnuPlotItem is None ) : continue
             gnuPlotItem.active.set( state )
         self.redraw( )
 
@@ -676,7 +687,7 @@ class fudgeNdMultiPlotItemsDialog :
         counter = 0
         i = 1
         for gnuPlotItem in self.fudgeNdMultiPlotFile :
-            if( gnuPlotItem.gnuPlotItem == None ) : continue
+            if( gnuPlotItem.gnuPlotItem is None ) : continue
             if( gnuPlotItem.isActive( ) ) :
                 index = i
                 counter += 1

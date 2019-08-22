@@ -1,0 +1,46 @@
+\section{The detail of the calculations}
+The following sub-sections describe the details on some of the calculations. 
+Consider two consecutive points $(x_1,y_1)$ and $(x_2,y_2)$ where $x_1 <= x <= x_2$ and $x_1 < x_2$, then interpolation is defined as
+
+\begin{description}
+    \item[Lin-lin interpolation] 
+    \begin{equation}
+        y = { y_2 ( x - x_1 ) + y_1 ( x_2 - x ) \over ( x_2 - x_1 ) }
+    \end{equation}
+    \item[Lin-log interpolation] 
+    \begin{equation}
+        y = y_1 \, \left( y_2 \over y_1 \right)^{x - x_1 \over x_2 - x_1}
+    \end{equation}
+    \item[Log-lin interpolation] 
+    \begin{equation}
+        y = { y_1 \log(x_2/x) + y_2 \log(x/x_1) \over \log(x_2/x_1) }
+    \end{equation}
+    \item[Log-log interpolation] 
+    \begin{equation}
+        y = y_1 \, \left( x \over x_1 \right)^{\log(y_2/y_1) \over \log(x_2/x_1)}
+    \end{equation}
+\end{description}
+
+In some calculation we will need the x location for the maximum of the relative error, $( y' - y ) / y$, between the 
+approximate value, $y'$, and the ``exact'' value, 
+$y$. This x location occurs where the derivative of the relative error is zero:
+\begin{equation}    \label{MaxXFormula}
+    { d(( y' - y ) / y ) \over dx} = { d(y'/y - 1) \over dx} = {d(y'/y) \over dx} = { 1 \over y^2 } \left( y {dy' \over dx } - y' { dy \over dx } \right) = 0
+\end{equation}
+
+
+\subsection{Converting log-log to lin-lin}
+This section describes how fudge2dmath converts a \highlight{fudge2dmathXY} object with interpolation of
+\highlight{f2dmC\_interpolationLogLog} (hence called log-log) to one with interpolation of \highlight{f2dmC\_inter-pol-ation-LinLin}
+(hence called lin--lin).
+
+From Eq.~\ref{MaxXFormula} the maximum of the relative error occurs where,
+\begin{equation}
+    { 1 \over y } \left( {dy' \over dx } - {y' \over y} { dy \over dx } \right) = \left({ 1 \over y }\right) \left\{
+        { y_2 - y_1 \over x_2 - x_1 } - \left({y' \over x}\right) {\log(y_2/y_1) \over \log(x_2/x_1)} \right\} = 0
+\end{equation}
+The solution is
+\begin{equation}
+    { x \over x_1 } = { a ( x_2 / x_1 - y_2 / y_1 ) \over ( 1 - a ) ( y_2 / y_1 - 1 ) }
+\end{equation}
+where $a = \log(y_2/y_1) / \log(x_2/x_1)$.

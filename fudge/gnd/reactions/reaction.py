@@ -8,45 +8,59 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 """
 This module contains the reaction class.
 """
 
-QNotApplicableToken = 'notApplicable'
+from fudge.core.utilities import brb
 
 from fudge.core.utilities import fudgeExceptions
-from pqu import physicalQuantityWithUncertainty
-from fudge.legacy.converting import endfFormats, endf_endl
+from pqu import PQU
 
-from ..productData import distributions
-from fudge.processing import processingInfo
 import fudge
-from . import base
+from . import base as baseModule
+from fudge.gnd.channelData import Q as QModule
+
+from fudge.gnd.reactionData import availableEnergy as availableEnergyModule
+from fudge.gnd.reactionData import availableMomentum as availableMomentumModule
 
 __metaclass__ = type
 
-class reaction( base.base_reaction ) :
-    """This is the class for a normal gnd reaction"""
+class reaction( baseModule.base_reaction ) :
+    """This is the class for a normal gnd reaction."""
 
-    def __init__( self, outputChannel, label, ENDF_MT, crossSection = None, documentation = None, attributes = {} ) :
+    moniker = 'reaction'
+
+    def __init__( self, outputChannel, label, ENDF_MT, documentation = None, date = None, EFL = None ) :
         """
         Creates a new reaction object. Reaction is two-body or uncorrelated-body, depending on
         the outputChannel type. This class is only meant to be used for 'distinct' reactions (distinct reactions
@@ -54,29 +68,36 @@ class reaction( base.base_reaction ) :
         To store a sum over these distinct reactions, use the summedReaction class instead.
         """
 
-        base.base_reaction.__init__( self, base.reactionToken, label, ENDF_MT, crossSection, documentation, attributes )
+        baseModule.base_reaction.__init__( self, label, ENDF_MT, documentation, date = date, EFL = EFL )
 
 # ?????? BRB, I do not think this next line will work anymore. I think outputChannel must always be an instance of fudge.gnd.channels.channel.
         if( type( outputChannel ) == type( '' ) ) : outputChannel = fudge.gnd.channels.channel( 'output', outputChannel )
         if( not isinstance( outputChannel, fudge.gnd.channels.channel ) ) :
             raise fudgeExceptions.FUDGE_Exception( 'Input channel not instance of class channel.' )
-        outputChannel.setParent( self )
-        self.data = {}
+        outputChannel.setAncestor( self )
         self.outputChannel = outputChannel
 
+        self.availableEnergy = availableEnergyModule.component( )
+        self.availableEnergy.setAncestor( self )
+
+        self.availableMomentum = availableMomentumModule.component( )
+        self.availableMomentum.setAncestor( self )
+
     def __eq__(self, other):
-        if (not base.isGNDReaction( other )): return False
-        return( ( self.parent.projectile == other.parent.projectile ) and ( self.parent.target == other.parent.target ) 
+        if (not baseModule.isGNDReaction( other )): return False
+        selfParent, otherParent = self.getReactionSuite( ), other.getReactionSuite( )
+        return( ( selfParent.projectile == otherParent.projectile ) and ( selfParent.target == otherParent.target ) 
             and ( self.outputChannel == other.outputChannel ) )
     
     def __cmp__( self, other ) :
         """Test if self is <, == or > other."""
 
-        if( not base.isGNDReaction( other ) ) : raise fudgeExceptions.FUDGE_Exception( "Other not an reaction object." )
-        if( self.parent.projectile < other.parent.projectile ) : return( -1 )
-        if( self.parent.projectile > other.parent.projectile ) : return(  1 )
-        if( self.parent.target < other.parent.target ) : return( -1 )
-        if( self.parent.target > other.parent.target ) : return(  1 )
+        if( not baseModule.isGNDReaction( other ) ) : raise fudgeExceptions.FUDGE_Exception( "Other not an reaction object." )
+        selfParent, otherParent = self.getReactionSuite( ), other.getReactionSuite( )
+        if( selfParent.projectile < otherParent.projectile ) : return( -1 )
+        if( selfParent.projectile > otherParent.projectile ) : return(  1 )
+        if( selfParent.target < otherParent.target ) : return( -1 )
+        if( selfParent.target > otherParent.target ) : return(  1 )
         if( self.outputChannel < other.outputChannel ) : return( -1 )
         if( self.outputChannel > other.outputChannel ) : return(  1 )
         return( 0 )
@@ -85,25 +106,19 @@ class reaction( base.base_reaction ) :
 
         return( str( self.outputChannel ) )
 
-    def addData( self, data ) :
-
-        if( data.genre not in self.data ) :
-            self.data[data.genre] = data
-        else :
-            raise Exception( 'self.data has genre %s' % data.genre )
-
     def getQ( self, unit, final = True, groundStateQ = False ) :        # ????? unit for Q is needed, badly.
         """Returns the Q-value for this input/output channel. It will be converted to a float if possible, otherwise a string value is returned."""
 
         def getLevel( particle, unit ) :
 
-            return( particle.getLevelAsFloat( unit = unit, default = 0. ) )
+            if( hasattr( particle, 'getLevelAsFloat' ) ) : return( particle.getLevelAsFloat( unit = unit ) )
+            return( 0. )
 
         def getFinalProductsLevelMultiplicity( particle, final ) :
             """Returns a list of [ productName, multiplicity ] for the final products of particle."""
 
-            if( ( final == False ) or ( particle.decayChannel == None ) ) :
-                if( particle.particle.getToken( ) == 'gamma' ) :
+            if( ( final == False ) or ( particle.decayChannel is None ) ) :
+                if( particle.particle.name == 'gamma' ) :
                     pms = [ [ particle, 0., 0. ] ]
                 else :
                     pms = [ [ particle, particle.multiplicity.getConstant( ), getLevel( particle, unit ) ] ]
@@ -113,47 +128,43 @@ class reaction( base.base_reaction ) :
                     pms += getFinalProductsLevelMultiplicity( product, final )
             return( pms )
 
-        if( self.getAttribute( 'genre' ) == 'production' ) :
-            Q = QNotApplicableToken
-        else :
-            return( self.outputChannel.getConstantQAs( unit, final = final ) )
-            Q = self.getAttribute( 'Q' )
-            if( not( Q is None ) ) :
-                if( isinstance( Q, physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty ) ) :
+        return( self.outputChannel.getConstantQAs( unit, final = final ) )
+        Q = self.Q
+        if( not( Q is None ) ) :
+                if( isinstance( Q, PQU.PQU ) ) :
                     Q = Q.getValueAs( unit )
                 else :
                     pass                                        # ????? This needs work. For example, check for energy dependent Q.
-            else :
-                pm = {}
-                for particle in [ self.parent.projectile, self.parent.target ] :
-                    if( particle.getToken( ) not in pm ) : pm[particle.getToken( )] = [ particle, 0, 0. ]
-                    pm[particle.getToken( )][1] += 1
-                    pm[particle.getToken( )][2] += getLevel( particle, unit )
-                for particle in self.outputChannel :
-                    pms = getFinalProductsLevelMultiplicity( particle, final = final )
-                    for p, m, level in pms :
-                        if( p.particle.getToken( ) not in pm ) : pm[p.particle.getToken( )] = [ p, 0, 0. ]
-                        pm[p.particle.getToken( )][1] -= m
-                        pm[p.particle.getToken( )][2] -= level
-                Q = 0.
-                levelQ = 0.
-                try :
-                    for p in pm :
-                        Q += pm[p][1] * pm[p][0].getMass( 'MeV/c**2' )  # Unit 'MeV' should not be hard-wired.
-                        levelQ += pm[p][2]
-                except :
-                    print p, pm[p]
-                    raise
-                if( groundStateQ ) : levelQ = 0.
-                Q = Q + levelQ
+        else :
+            pm = {}
+            for particle in [ self.getReactionSuite( ).projectile, self.getReactionSuite( ).target ] :
+                if( particle.name not in pm ) : pm[particle.name] = [ particle, 0, 0. ]
+                pm[particle.name][1] += 1
+                pm[particle.name][2] += getLevel( particle, unit )
+            for particle in self.outputChannel :
+                pms = getFinalProductsLevelMultiplicity( particle, final = final )
+                for p, m, level in pms :
+                    if( p.particle.name not in pm ) : pm[p.particle.name] = [ p, 0, 0. ]
+                    pm[p.particle.name][1] -= m
+                    pm[p.particle.name][2] -= level
+            Q = 0.
+            levelQ = 0.
+            try :
+                for p in pm :
+                    Q += pm[p][1] * pm[p][0].getMass( 'MeV/c**2' )  # Unit 'MeV' should not be hard-wired.
+                    levelQ += pm[p][2]
+            except :
+                print p, pm[p]
+                raise
+            if( groundStateQ ) : levelQ = 0.
+            Q = Q + levelQ
         return( Q )
 
     def getThreshold( self, unit ) :
 
         Q = self.getQ( unit = unit, final = False )
-        if( Q == QNotApplicableToken ) : return( Q )
         if( Q >= 0. ) : return( 0. )
-        return( -Q * ( 1. + self.parent.projectile.getMass( 'amu' ) / self.parent.target.getMass( 'amu' ) ) )
+        return( -Q * ( 1. + self.getReactionSuite( ).projectile.getMass( 'amu' ) / self.getReactionSuite( ).target.getMass( 'amu' ) ) )
 
     def heatCrossSection( self, temperature, EMin, lowerlimit = None, upperlimit = None, interpolationAccuracy = 0.002, heatAllPoints = False, 
         doNotThin = True, heatBelowThreshold = True, heatAllEDomain = True ) :
@@ -161,20 +172,26 @@ class reaction( base.base_reaction ) :
         return( self.crossSection.heat( temperature, EMin, lowerlimit, upperlimit, interpolationAccuracy, heatAllPoints, doNotThin, 
             heatBelowThreshold, heatAllEDomain ) )
 
-    def calculateDepositionData( self, processInfo, verbosityIndent ) :
+    def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
+        """
+        Calculate average energy deposited to the outgoing product.
 
-        if( isinstance( self.outputChannel, fudge.gnd.channels.sumOfRemainingOutputChannels ) ) : return
-        tempInfo = processingInfo.tempInfo( )
-        tempInfo['reactionSuite'] = self.getParent( )
+        :param processInfo: processingInfo.processInfo instance with style = gnd.styles.averageProductData instance
+        :tempInfo: dictionary for storing intermediary data.
+        :param verbosityIndent: string, indentation level
+        :return:
+        """
+
+        if( isinstance( self.outputChannel, fudge.gnd.channels.sumOfRemainingOutputChannels ) ) : return    # BRB FIXME - Why is this?
+        if( processInfo.verbosity >= 10 ) : print '%s%s' % ( verbosityIndent, self.outputChannel.toString( simpleString = True ) )
         tempInfo['outputChannel'] = self
-        tempInfo['EMin'], tempInfo['EMax'] = self.getDomain( )
-        tempInfo['incidentEnergyUnit'] = self.crossSection.getIncidentEnergyUnit( )
-        if( processInfo['verbosity'] >= 10 ) : print '%s%s' % ( verbosityIndent, self.outputChannel.toString( simpleString = True ) )
+        tempInfo['EMin'], tempInfo['EMax'] = self.domain( )
+        tempInfo['incidentEnergyUnit'] = self.crossSection.domainUnit( )
         for productIndex, product in enumerate( self.outputChannel ) : 
             tempInfo['productIndex'] = str( productIndex )
-            tempInfo['productToken'] = product.getToken( )
-            tempInfo['productLabel'] = product.getLabel( )
-            product.calculateDepositionData( processInfo, tempInfo, verbosityIndent + '    ' )
+            tempInfo['productToken'] = product.name
+            tempInfo['productLabel'] = product.label
+            product.calculateDepositionData( processInfo, tempInfo, verbosityIndent + processInfo.verbosityIndentStep )
 
     def check( self, info ) :
 
@@ -191,22 +208,23 @@ class reaction( base.base_reaction ) :
 
         return( True )
 
-    def process( self, processInfo, tempInfo, verbosityIndent ) :
+    def processSn( self, processInfo, tempInfo, verbosityIndent ) :
 
         from fudge.gnd import xParticle
 
 #        if( isinstance( self.outputChannel, fudge.gnd.channels.sumOfRemainingOutputChannels ) ) : return
         crossSection = self.crossSection
-        if( 'LLNL_Pn' in processInfo['styles'] ) :
-            if( processInfo['particles'][tempInfo['reactionSuite'].projectile.getName( )].groups[-1] <= crossSection.domainMin( ) ) : return
+# The next lines are probably not needed as grouping has been updated to handle grouping with domain is outside group boundaries. BRB Sept. 2014
+#        if( 'LLNL_Pn' in processInfo['styles'] ) :
+#            if( processInfo['particles'][tempInfo['reactionSuite'].projectile.name].groups[-1] <= crossSection.domainMin( ) ) : return
 
         tempInfo['outputChannel'] = self
-        if( processInfo['verbosity'] >= 10 ) : print '%s%s' % ( verbosityIndent, self.outputChannel.toString( simpleString = True ) )
+        if( processInfo.verbosity >= 10 ) : print '%s%s' % ( verbosityIndent, self.outputChannel.toString( simpleString = True ) )
         projectile, target = processInfo.getProjectileName( ), processInfo.getTargetName( )
         if( 'LLNL_Pn' in processInfo['styles'] ) :
             fluxl0 = processInfo['flux']['data'][0]
             tempInfo['groupedFlux'] = fluxl0.groupOneFunction( processInfo.getParticleGroups( projectile ) )
-        tempInfo['crossSection'] = crossSection.process( processInfo, tempInfo, verbosityIndent + '    ' )
+        tempInfo['crossSection'] = crossSection.processSn( processInfo, tempInfo, verbosityIndent + '    ' )
 
         if( 'LLNL_Pn' in processInfo['styles'] ) :
             try :
@@ -223,7 +241,7 @@ class reaction( base.base_reaction ) :
                 self.addData( availableMomentum )
             availableMomentum.makeGrouped( processInfo, tempInfo )
 
-            if( self.outputChannel.Q.nativeData in [ fudge.gnd.tokens.pointwiseFormToken ] ) :
+            if( isinstance( self.outputChannel.Q, QModule.pointwise ) ) :
                 self.getData( fudge.gnd.channelData.energyDependentQToken ).makeGrouped( processInfo, tempInfo )    # ????? This is not right.
 
             tempInfo['transferMatrixComment'] = tempInfo['reactionSuite'].inputParticlesToReactionString( suffix = " --> " ) +  \
@@ -232,175 +250,13 @@ class reaction( base.base_reaction ) :
         processInfo['workFile'].append( 'c%s' % self.label )
         for productIndex, product in enumerate( self.outputChannel ) : 
             tempInfo['productIndex'] = str( productIndex )
-            tempInfo['productToken'] = product.getToken( )
+            tempInfo['productToken'] = product.name
             tempInfo['productGroupToken'] = tempInfo['productToken']
-            if( isinstance( product.particle, xParticle.nuclearLevel ) ) : tempInfo['productGroupToken'] = product.particle.groundState.getToken( )
-            tempInfo['productLabel'] = product.getLabel( )
-            product.process( processInfo, tempInfo, verbosityIndent + '    ' )
+            if( isinstance( product.particle, xParticle.nuclearLevel ) ) : tempInfo['productGroupToken'] = product.particle.groundState.name
+            tempInfo['productLabel'] = product.label
+            product.processSn( processInfo, tempInfo, verbosityIndent + '    ' )
 
         del processInfo['workFile'][-1]
-
-    def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
-        from fudge.legacy.converting import gndToENDF6
-
-        def addDecayProducts( parent, products ) :
-
-            if( parent.decayChannel is None ) : return( False )
-            doMF4AsMF6 = False
-            for product in parent.decayChannel :
-                if( product.distributions.components and product.getName() != 'gamma' ) :
-                    doMF4AsMF6 = True
-                    products.append( product )
-            return( doMF4AsMF6 )
-
-        def divideIgnoring0DividedBy0( self, other ) :
-
-            from fudge.core.math.xData import XYs
-            d = self.union( other.xSlice( xMin = self.domainMin( ), xMax = self.domainMax( ) ) )
-            result = []
-            for p in d :
-                vp = other.getValue( p[0] )
-                if( vp == 0 ) :
-                    if( p[1] != 0 ) : raise Exception( 'Divide non-zero number by zero at %e' % p[0] )
-                else :
-                    p[1] = p[1] / vp
-                result.append( [ p[0], p[1] ] )
-            return( XYs.pointwiseXY( data = result ) )
-
-        def thinWeights( weights ) :
-
-            i, n, thinnedWeights = 1, len( weights ), [ weights[0] ]
-            if( n == 2 ) :
-                thinnedWeights.append( weights[-1] )
-            else :
-                while( i < n ) :
-                    y = thinnedWeights[-1][1]
-                    while( True ) :
-                        i += 1
-                        if( i == n ) : break
-                        if( abs( y - weights[i][1] ) > 1e-8 * y ) : break
-                        if( abs( y - weights[i-1][1] ) > 1e-8 * y ) : break
-                    thinnedWeights.append( weights[i-1] )
-            return( thinnedWeights )
-
-        outputChannel = self.outputChannel
-        if( outputChannel.genre == fudge.gnd.channels.productionGenre ) :
-            print '        toENDF6 does not support writing of "%s" channel' % outputChannel.genre
-            return
-        MT = int( self.attributes['ENDF_MT'] )
-        if( flags['verbosity'] >= 10 ) : print '%s%s' % ( verbosityIndent, outputChannel.toString( simpleString = True ) )
-        targetInfo['Q'] = self.getQ( 'eV', groundStateQ = True )
-        targetInfo['QM'] = None
-
-        LR, level, tryLR = 0, 0., False
-        if( outputChannel.getGenre( ) == fudge.gnd.channels.twoBodyGenre ) :
-            tryLR = True
-        elif( outputChannel.getGenre( ) == fudge.gnd.channels.NBodyGenre ) :
-            if( MT == 91 ) :
-                tryLR = True
-        if( tryLR ) :
-            secondProduct = outputChannel[1]
-            primaryResidualName, decayProducts, decayChannel, = secondProduct.getName( ).split( '_' )[0], [], secondProduct.decayChannel
-            if( not( decayChannel is None ) ) :
-                for decayProduct in decayChannel :
-                    decayProductName = decayProduct.getName( )
-                    if( decayProductName not in [ primaryResidualName, 'gamma' ] ) : decayProducts.append( decayProductName )
-            if( len( decayProducts ) == 1 ) :   # Kludge for Carbon breakup into 3 alphas.
-                if( ( primaryResidualName == 'C' ) and ( decayProducts == [ 'He4' ] ) ) : LR = 23
-            elif( len( decayProducts ) > 1 ) :                                        # This must be a breakup reaction.
-                MTProducts = endf_endl.endfMTtoC_ProductList( 0, '' )
-                MTProducts.productCounts[outputChannel[0].getName( )] += 1
-                for decayProduct in decayProducts[:-1] : MTProducts.productCounts[decayProduct] += 1
-                for MT_LR in [ 22, 23, 24, 25, 28, 29, 30, 32, 33, 34, 35, 36 ] :   # 39 and 40 not allowed in ENDF6
-                    if( endf_endl.endfMTtoC_ProductLists[MT_LR].productCounts == MTProducts.productCounts ) :
-                        LR = MT_LR
-                        break
-                if( ( LR == 32 ) and ( primaryResidualName == 'B10' ) and ( decayProducts[-1] == 'He4' ) ) : LR = 35   # Kludge for bad data.
-            if( LR != 0 ) :
-                QM = outputChannel.Q.forms['constant'].getValue( 0, 'eV' ) + decayChannel.Q.forms['constant'].getValue( 0, 'eV' )
-                targetInfo['QM'] = QM
-        targetInfo['LRs'][MT] = LR
-
-        for product in outputChannel :
-            tmp = product.getLevelAsFloat( 'eV' )
-            if tmp: level = tmp
-
-        crossSection = self.getCrossSection( )
-        targetInfo['EMin'], targetInfo['EMax'] = crossSection.getDomain( )
-        crossSection.toENDF6( MT, endfMFList, targetInfo, level, LR )
-
-        products = []
-        doMF4AsMF6 = False
-        for product in outputChannel :
-            if( ( outputChannel.getGenre( ) == fudge.gnd.channels.twoBodyGenre ) and
-                    ( distributions.base.angularComponentToken in product.distributions.components ) ) :
-                nativeData = product.getDistributionNativeData( )
-                if( nativeData != distributions.base.noneComponentToken ) :
-                    component = product.getDistributionComponentByToken( nativeData )
-                    if( component.nativeData in [ distributions.base.recoilFormToken ] ) : doMF4AsMF6 = True
-            if( product.distributions.components ) : products.append( product )
-            doMF4AsMF6 = doMF4AsMF6 or addDecayProducts( product, products )
-        if( outputChannel.isFission( ) ) : 
-            doMF4AsMF6 = False
-            if( not( outputChannel.fissionEnergyReleased is None ) ) :
-                outputChannel.fissionEnergyReleased.toENDF6( 1, endfMFList, flags, targetInfo )
-            delayedNubar = None                                 # Special work to get delayed nubar weights.
-            for product in outputChannel :
-                if( 'emissionMode' in product.attributes ) :
-                    if( product.getAttribute( 'emissionMode' ) == 'delayed' ) :
-                        if( delayedNubar is None ) :
-                            delayedNubar = product.multiplicity.getFormByToken( fudge.gnd.tokens.pointwiseFormToken )
-                        else :
-                            delayedNubar = delayedNubar + product.multiplicity.getFormByToken( fudge.gnd.tokens.pointwiseFormToken )
-                        targetInfo['delayedRates'].append( product.getAttribute( 'decayRate' ).getValueAs('1/s') )
-            if( delayedNubar is not None ) :
-                targetInfo['totalDelayedNubar'] = delayedNubar
-                for product in outputChannel :
-                    if( 'emissionMode' in product.attributes ) :
-                        if( product.getAttribute( 'emissionMode' ) == 'delayed' ) :
-                            weight = divideIgnoring0DividedBy0( product.multiplicity.getFormByToken( fudge.gnd.tokens.pointwiseFormToken ), delayedNubar )
-                            product.ENDF6_delayedNubarWeights = thinWeights( weight )
-        targetInfo['doMF4AsMF6'] = doMF4AsMF6
-        targetInfo['MF6LCTs'], targetInfo['gammas'] = [], []
-        for productIndex, product in enumerate( outputChannel ) :
-            if( ( product.getName( ) == 'gamma' ) and not( outputChannel.getGenre( ) == fudge.gnd.channels.twoBodyGenre ) ) :
-                targetInfo['gammas'].append( product )
-                continue
-            targetInfo['productIndex'] = str( productIndex )
-            targetInfo['productToken'] = product.getToken( )
-            targetInfo['productLabel'] = product.getLabel( )
-            product.toENDF6( MT, endfMFList, flags, targetInfo, verbosityIndent = verbosityIndent + '    ' )
-        gammas = targetInfo['gammas']
-        if( len( gammas ) ) :
-            gamma = gammas[0]
-            targetInfo['zapID'] = gamma.getName( )
-            targetInfo['particleMass'] = gamma.getMass( 'eV/c**2' )
-            multiplicity = gamma.multiplicity
-            if( gamma.getAttribute( 'ENDFconversionFlag' ) == 'MF6' ) :
-                targetInfo['multiplicity'] = gamma.multiplicity
-                gndToENDF6.gammasToENDF6_MF6( MT, endfMFList, flags, targetInfo, gammas )
-            elif( gamma.getAttribute( 'ENDFconversionFlag' ) == 'MF13' ) :
-                try :
-                    targetInfo['crossSection'] = self.crossSection.forms[fudge.gnd.tokens.pointwiseFormToken]
-                except :
-                    targetInfo['crossSection'] = self.crossSection.forms[fudge.gnd.tokens.linearFormToken]
-                gndToENDF6.gammasToENDF6_MF12_13( MT, 13, endfMFList, flags, targetInfo, gammas )
-            elif( multiplicity.nativeData == fudge.gnd.tokens.constantFormToken ) :      # This should probably be changed to unknown in some cases?????
-                pass
-            elif( multiplicity.nativeData == fudge.gnd.tokens.unknownFormToken ) :       # This should probably be changed to unknown in some cases?????
-                pass
-            else :
-                gndToENDF6.gammasToENDF6_MF12_13( MT, 12, endfMFList, flags, targetInfo, gammas )
-        if( len( targetInfo['MF6LCTs'] ) > 0 ) :
-            LCT = targetInfo['MF6LCTs'][0]
-            for i in targetInfo['MF6LCTs'] :
-                if( not( LCT is None ) ) : break
-            if( LCT is None ) : LCT = 2
-            for i in targetInfo['MF6LCTs'] :
-                if( i is None ) : continue
-                if( i != LCT ) : LCT = 3
-            endfMFList[6][MT].insert( 0, endfFormats.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], 0, LCT, len( targetInfo['MF6LCTs'] ), 0 ) )
-            endfMFList[6][MT].append( endfFormats.endfSENDLineNumber( ) )
 
     def toString( self, indent = '' ) :
 
@@ -410,28 +266,27 @@ class reaction( base.base_reaction ) :
             p = ' + '
         return( s + '\n' )
 
-def parseXMLNode( reactionElement, xPath=[], linkData={} ):
-    """Translate a <reaction> element from xml into a reaction class instance."""
+    @classmethod
+    def parseXMLNode( cls, element, xPath, linkData ) :
+        """Translate a <reaction> element from xml into a reaction class instance."""
 
-    xPath.append( '%s[@label="%s"]' % (reactionElement.tag, reactionElement.get('label') ) )
-    crossSection = fudge.gnd.reactionData.crossSection.parseXMLNode( reactionElement.find('crossSection'),
-        xPath, linkData )
-    outputChannel = fudge.gnd.channels.parseXMLNode( reactionElement.find('outputChannel'), xPath, linkData )
-    outputChannel.fissionGenre = reactionElement.get("fissionGenre")
-    MT = int( reactionElement.get('ENDF_MT') )
-    attributes = {'date': reactionElement.get('date')}
-    reac = reaction( outputChannel, reactionElement.get('label'), MT, crossSection, attributes = attributes )
+        xPath.append( '%s[@label="%s"]' % ( element.tag, element.get( 'label' ) ) )
 
-    if reactionElement.find('documentations'):
-        for doc in reactionElement.find('documentations'):
-            reac.addDocumentation( fudge.gnd.documentation.parseXMLNode(doc) )
+        crossSectionComponent = fudge.gnd.reactionData.crossSection.parseXMLNode( 
+                element.find( 'crossSection' ), xPath, linkData )
 
-    # extra data may be present in derived files:
-    if reactionElement.find('availableEnergy') is not None:
-        reac.data['availableEnergy'] = fudge.gnd.reactionData.availableEnergy.parseXMLNode(
-                reactionElement.find('availableEnergy'), xPath )
-    if reactionElement.find('availableMomentum') is not None:
-        reac.data['availableMomentum'] = fudge.gnd.reactionData.availableMomentum.parseXMLNode(
-                reactionElement.find('availableMomentum'), xPath )
-    xPath.pop()
-    return reac
+        outputChannel = fudge.gnd.channels.parseXMLNode( element.find( 'outputChannel' ), xPath, linkData )
+        outputChannel.fissionGenre = element.get( 'fissionGenre' )
+
+        reac = cls( outputChannel=outputChannel, label=element.get('label'), ENDF_MT=int(element.get('ENDF_MT')),
+                date=element.get('date') )
+        if 'process' in element:
+            reac.process = element.get('process')
+        for crossSection in crossSectionComponent : reac.crossSection.add( crossSection )
+
+        if( element.find( 'documentations' ) ) :
+            for doc in element.find( 'documentations' ) :
+                reac.addDocumentation( fudge.gnd.documentation.documentation.parseXMLNode( doc, xPath, linkData ) )
+
+        xPath.pop( )
+        return( reac )

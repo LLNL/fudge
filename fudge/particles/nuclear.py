@@ -8,22 +8,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 elementsZSymbolName = {
@@ -49,11 +60,20 @@ elementsZSymbolName = {
      95 : ( "Am", "Americium" ),     96 : ( "Cm", "Curium" ),        97 : ( "Bk", "Berkelium" ),     98 : ( "Cf", "Californium" ),  99 : ( "Es", "Einsteinium" ),
     100 : ( "Fm", "Fermium" ),      101 : ( "Md", "Mendelevium" ),  102 : ( "No", "Nobelium" ),     103 : ( "Lr", "Lawrencium" ),  104 : ( "Rf", "Rutherfordium" ), 
     105 : ( "Db", "Dubnium" ),      106 : ( "Sg", "Seaborgium" ),   107 : ( "Bh", "Bohrium" ),      108 : ( "Hs", "Hassium" ),     109 : ( "Mt", "Meitnerium" ), 
-    110 : ( "Ds", "Darmstadtium" ), 111 : ( "Rg", "Roentgenium" ),  112 : ( "Cn", "Copernicium" ),  113 : ( "Uut", "Ununtrium" ),  114 : ( "Uuq", "Ununquadium" ), 
-    115 : ( "Uup", "Ununpentium" ), 116 : ( "Uuh", "Ununhexium" ),  117 : ( "Uus", "Ununseptium" ), 118 : ( "Uuo", "Ununoctium" ) }
+    110 : ( "Ds", "Darmstadtium" ), 111 : ( "Rg", "Roentgenium" ),  112 : ( "Cn", "Copernicium" ),  113 : ( "Uut", "Ununtrium" ),  114 : ( "Fl", "Flerovium" ),
+    115 : ( "Uup", "Ununpentium" ), 116 : ( "Lv", "Livermorium" ),  117 : ( "Uus", "Ununseptium" ), 118 : ( "Uuo", "Ununoctium" ) }
 
 elementsSymbolZ = {}
 for Z in elementsZSymbolName : elementsSymbolZ[elementsZSymbolName[Z][0]] = Z
+
+elementsNameZ = {}
+for Z in elementsZSymbolName : elementsNameZ[elementsZSymbolName[Z][1]] = Z
+
+# temporary names that have since been changed
+legacyNames = {
+    114 : ("Uuq", "Ununquadium"),
+    116 : ("Uuh", "Ununhexium"),
+}
 
 def elementSymbolFromZ( Z ) :
 
@@ -65,11 +85,32 @@ def elementNameFromZ( Z ) :
     Z = int( Z )
     return( elementsZSymbolName[Z][1] )
 
+def elementZFromSymbol( symbol ) :
+
+    if symbol in elementsSymbolZ:
+        return elementsSymbolZ[symbol]
+    for Z,(Symbol,Name) in legacyNames.items():
+        if Symbol==symbol:
+            # FIXME print warning about deprecated name?
+            return Z
+    raise KeyError("Element with symbol '%s' not found" % symbol)
+
+def elementZFromName( name ) :
+
+    if name in elementsNameZ:
+        return elementsNameZ[name]
+    for Z,(Symbol,Name) in legacyNames.items():
+        if Name==name:
+            # FIXME print warning about deprecated name?
+            return Z
+    raise KeyError("Element with name '%s' not found" % name)
+
 def nucleusNameFromZAndA( Z, A ) :
 
     A = int( A )
-    if( A < 1 ) : raise Exception( 'Invalid A = %s for Z = %s' % ( A, Z ) )
-    AStr = str( A )
+    if( A < 0 ) : raise Exception( 'Invalid A = %s for Z = %s' % ( A, Z ) )
+    elif( A == 0 ) : AStr = '_natural'
+    else: AStr = str( A )
 
     Z = int( Z )
     if( Z == 0 ) :
@@ -80,7 +121,18 @@ def nucleusNameFromZAndA( Z, A ) :
 
 def nucleusNameFromZA( ZA ) :
 
-    return( nucleusNameFromZAndA( ZA / 1000, ZA % 1000 ) )
+    if type(ZA) in (int,float):
+        return( nucleusNameFromZAndA( ZA / 1000, ZA % 1000 ) )
+    elif type(ZA) is str:
+        # should be of form 'zaZZZAAA_suffix'
+        Z,A = divmod( int(ZA[2:8]),1000 )
+        sym = elementSymbolFromZ(Z)
+        suffix = ZA[8:].strip()
+        if A==0: A = '_natural'
+        if suffix:
+            if suffix=='m': suffix='m1'
+            return '%s%s_%s' % (sym,A,suffix)
+        return '%s%s' % (sym,A)
 
 def getZAOrNameAs_xParticle( particle ) :
 
@@ -88,7 +140,10 @@ def getZAOrNameAs_xParticle( particle ) :
     particle_ = particle
     if( type( particle_ ) == type( 1 ) ) : particle_ = nucleusNameFromZA( particle_ )
     if( type( particle_ ) != type( "" ) ) : raise Exception( "Invalid particle = %s type" % particle )
-    return( xParticle.xParticle( particle_, xParticle.particleType_Nuclear, getMassFromName( particle_ ) ) )
+    if( particle_ == 'gamma' ) :
+        return( xParticle.photon( ) )
+    else :
+        return( xParticle.isotope( particle_, getMassFromName( particle_ ) ) )
 
 def getMassFromName( name ) :
 
@@ -117,3 +172,63 @@ def getZandAFromName( name ) :
         if( not( l.isdigit( ) ) ) : break
     A = int( AStr[:i+1] )
     return (Z,A)
+
+def getZAFromName( name ):
+    Z,A=getZandAFromName(name)
+    return  Z*1000+int(A)
+
+def getZ_A_suffix_andZAFromName( name ) :
+    """Returns the tuple (Z, A, suffix, ZA) for an gnd isotope name (e.g., gnd name = 'Am242_m1'
+    returns ( 95, 242, 'm1', 95242 )."""
+
+    if( name == 'n' ) : return( 0, 1, '', 1 )
+    if( name == 'gamma' ) : return( 0, 0, '', 0 )
+    if( name[:18] == 'FissionProductENDL' ) :
+        ZA = int( name[18:] )
+        Z = ZA / 1000
+        A = 1000 * Z - ZA
+        return( Z, A, '', ZA )
+    if( '__' in name ) : raise Exception ( "Name = %s" % name )
+    naturalSuffix = ''
+    if( '_' in name ) :         # Isotope names can have level designator (e.g., 'O16_e3') and naturals are of the form 'S_natural' or 'S_natural_l'
+        s = name.split( '_' )   # where S is element's symbol and l is level designator (e.g., 'Xe_natural' or 'Xe_natural_c').
+        sZA, suffix = s[:2]
+        if( len( s ) > 2 ) :
+            if( ( len( s ) > 3 ) or ( suffix != 'natural' ) ) : raise Exception( 'Invalid name for endl ZA particle = %s' % name )
+            naturalSuffix = s[2]
+    else :
+        sZA = name
+        suffix = ''
+    for i, c in enumerate( sZA ) :
+        if( c.isdigit( ) ) : break
+    if( not c.isdigit( ) ) : i += 1
+    sZ, sA = sZA[:i], sZA[i:]
+    Z = elementZFromSymbol( sZ )
+    if( Z is None ) : raise Exception( 'No element symbol for particle named %s' % name )
+    if( sA == '' ) :
+        if( suffix == 'natural' ) : return( Z, 0, naturalSuffix, 1000 * Z )
+        if( suffix == '' ) : return( Z, 0, '', 1000 * Z )
+        raise Exception( 'No A for particle named %s' % name )
+    elif( suffix == 'natural' ) :
+        raise Exception( 'Natural element also has A defined for particle named %s' % name )
+    else :
+        try :
+            A = int( sA )
+        except :
+            raise Exception( 'Could not convert A to an integer for particle named %s' % name )
+    ZA = 1000 * Z + A
+    return( Z, A, suffix, ZA )
+
+# Crack the isotope name to get the A & symbol
+def elementAFromName( name ):
+    sym = ''
+    A = ''
+    if '_' in name: m = name.split('_')[1]
+    else: m = None
+    for c in name.split('_')[0]:
+        if c.isalpha(): sym += c
+        else: A += c
+    if sym == 'n': return sym, 1, None
+    if sym == 'g': return sym, 0, None
+    if m =='natural': A = '0'
+    return sym, A, m

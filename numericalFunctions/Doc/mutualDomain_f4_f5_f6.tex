@@ -1,0 +1,40 @@
+\begin{figure}
+\setlength{\unitlength}{1 cm}
+\begin{center}
+\begin{picture}(10, 5)(0, 0)
+    \color{Black}
+% yAxis
+    \drawline(0, 0)(0, 5) \drawline(10, 0)(10, 5)
+    \put( -0.3,  0 ){0}
+    \put( -0.3,  0.9 ){1} \drawline(0, 1)(.2, 1)
+    \put( -0.3,  1.9 ){2} \drawline(0, 2)(.2, 2)
+    \put( -0.3,  2.9 ){3} \drawline(0, 3)(.2, 3)
+    \put( -0.3,  3.9 ){4} \drawline(0, 4)(.2, 4)
+    \put( -0.3,  4.9 ){5} \drawline(0, 5)(.2, 5)
+
+% xAxis
+    \drawline(0, 0)(10, 0)  \drawline(0, 5)(10, 5)
+    \put( -0.1,  -0.4 ){0}
+    \put(  0.9,  -0.4 ){1} \put(1, 0){\line( 0, 1 ){.2}}
+    \put(  1.9,  -0.4 ){2} \put(2, 0){\line( 0, 1 ){.2}}
+    \put(  2.9,  -0.4 ){3} \put(3, 0){\line( 0, 1 ){.2}}
+    \put(  3.9,  -0.4 ){4} \put(4, 0){\line( 0, 1 ){.2}}
+    \put(  4.9,  -0.4 ){5} \put(5, 0){\line( 0, 1 ){.2}}
+    \put(  5.9,  -0.4 ){6} \put(6, 0){\line( 0, 1 ){.2}}
+    \put(  6.9,  -0.4 ){7} \put(7, 0){\line( 0, 1 ){.2}}
+    \put(  7.9,  -0.4 ){8} \put(8, 0){\line( 0, 1 ){.2}}
+    \put(  8.9,  -0.4 ){9} \put(9, 0){\line( 0, 1 ){.2}}
+    \put(  9.9,  -0.4 ){10} \put(10, 0){\line( 0, 1 ){.2}}
+
+% lines
+    \color{Red} \drawline(1, 4)(8, 4)
+    \color{Green} \drawline(3, 0)(8, 2)
+    \color{Blue} \drawline(3, 3)(6, 0)
+
+\end{picture}
+\caption{The red curve is $f4$, the green curve is $f5$ and the blue curve is $f6$. 
+    The domains of $f4$ and $f5$ are mutual as are the domains of $f5$ and $f6$. However,
+    the domains of $f4$ and $f6$ are not mutual.
+    \label{mutualDomain_f4_f5_f6}}
+\end{center}
+\end{figure}

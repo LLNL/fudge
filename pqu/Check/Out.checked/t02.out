@@ -1,0 +1,20 @@
+2.32(12)
+2.32(12)
+
+2.32(123)
+2.32(12)
+value = 2.320000000000000e+00, significantDigits = 3, order = 0, isPercent = False, unit = ""
+uncertainty = value = 1.200000000000000e-01, significantDigits = 2, order = -1, isPercent = False
+========= FAILED =========
+
+2.3237(1234)
+2.32(12)
+value = 2.320000000000000e+00, significantDigits = 3, order = 0, isPercent = False, unit = ""
+uncertainty = value = 1.200000000000000e-01, significantDigits = 2, order = -1, isPercent = False
+========= FAILED =========
+
+2.32374321(1234)
+2.32(12)
+value = 2.320000000000000e+00, significantDigits = 3, order = 0, isPercent = False, unit = ""
+uncertainty = value = 1.200000000000000e-01, significantDigits = 2, order = -1, isPercent = False
+========= FAILED =========

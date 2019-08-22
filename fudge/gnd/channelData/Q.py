@@ -8,95 +8,79 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
-from fudge.gnd import baseClasses
-import base
-from fudge.gnd import miscellaneous
-from fudge.core.math.xData import axes, XYs
-from fudge.gnd import tokens
+import base as baseModule
+
+from fudge.gnd import miscellaneous as miscellaneousModule
+from fudge.gnd import abstractClasses as abstractClassesModule
+from fudge.gnd import tokens as tokensModule
+
+from pqu import PQU as PQUModule
+
+import xData.axes as axesModule
+import xData.XYs as XYsModule
 
 __metaclass__ = type
 
-energyDependent = 'energyDependent'
-
-QForms = [ tokens.notApplicableFormToken, tokens.constantFormToken, tokens.pointwiseFormToken, tokens.groupedFormToken, tokens.groupedWithCrossSectionFormToken ]
-
 #
-# Q genre and forms
+# Q forms
 #
-class component( baseClasses.componentBase ) :
+class baseQForm( abstractClassesModule.form ) :
 
-    genre = base.QToken
+    __genre = baseModule.QToken
 
-    def __init__( self, form = None ) :
+class constant( baseQForm ) :
 
-        baseClasses.componentBase.__init__( self, QForms )
-        if( form is not None ) : self.addForm( form )
+    moniker = tokensModule.constantFormToken
 
-    def getConstantAs( self, unit ) :
-
-        if( self.nativeData in [ tokens.constantFormToken ]  ) : return( self.getValue( 0, unit ) )
-        raise Exception( 'Q type = %s does not have a single value' % self.nativeData )
-
-    def getValue( self, E, unit ) :
-
-        return( self.forms[self.nativeData].getValue( E, unit ) )
-
-    def getXMLAttribute( self ) :
-
-        return( self.forms[self.nativeData].getXMLAttribute( ) )
-
-    def process( self, processInfo, tempInfo, verbosityIndent ) :
-
-        keys = self.forms.keys( )
-        for form in keys :
-            if( form == tokens.pointwiseFormToken ) :
-                ps = self.forms[form].process( processInfo, tempInfo, verbosityIndent )
-                for p in ps : self.addForm( p )
-
-class constant( baseClasses.formBase ) :
-
-    genre = component.genre
-    form = tokens.constantFormToken
-
-    def __init__( self, Q ) :
+    def __init__( self, label, Q ) :
         """
-        Q can be a string, convertible to a PhysicalQuantityWithUncertainty, or a PhysicalQuantityWithUncertainty. The
-        Q must have units of energy.
+        Q can be a string, convertible to a PQU , or a PQU. The Q must have units of energy.
         """
-
-        from pqu.physicalQuantityWithUncertainty import PhysicalQuantityWithUncertainty
-        from fudge.core.utilities import brb
 
         Q_ = Q
-        if( type( Q_ ) == str ) :
+        if( isinstance( Q_, str ) ) :
             try :
-                Q_ = PhysicalQuantityWithUncertainty( Q_ )
+                Q_ = PQUModule.PQU( Q_ )
             except :
-                raise Exception( "Could not convert '%s' to PhysicalQuantityWithUncertainty" % Q_ )
-        if( isinstance( Q_, component ) ) : Q_ = Q_.getNativeData( )
+                raise Exception( "Could not convert '%s' to PQU" % Q_ )
+        if( isinstance( Q_, component ) ) : Q_ = Q_.getEvaluated( )
         if( isinstance( Q_, constant ) ) : Q_ = Q_.Q
-        if( not( isinstance( Q_, PhysicalQuantityWithUncertainty ) ) ) : raise Exception( "Invalid type for Q: type = '%s'" % brb.getType( Q ) )
-        if( not( Q_.isEnergy( Q_ ) ) ) : raise Exception( "Q must have units of energy, entered Q was '%s'" % Q )
-        baseClasses.formBase.__init__( self )
+        if( not( isinstance( Q_, PQUModule.PQU ) ) ) : raise TypeError( "Invalid type for Q: type = '%s'" % brb.getType( Q ) )
+        if( not( Q_.isEnergy( ) ) ) : raise ValueError( "Q must have units of energy, entered Q was '%s'" % Q )
         self.Q = Q_
+
+        if( label is not None ) :
+            if( not( isinstance( label, str ) ) ) : raise TypeError( 'label must be a string' )
+        self.__label = label
 
     def domainMin( self, unitTo = None, asPQU = False ) :
 
@@ -108,103 +92,136 @@ class constant( baseClasses.formBase ) :
         from fudge.gnd.reactions import reaction
         return( self.findClassInAncestry( reaction.reaction ).domainMax( unitTo = unitTo, asPQU = asPQU ) )
 
-    def getDomain( self, unitTo = None, asPQU = False ) :
+    def domain( self, unitTo = None, asPQU = False ) :
 
         return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
 
-    def getDomainUnit( self ) :
+    def domainUnit( self ) :
 
         from fudge.gnd.reactions import reaction
-        return( self.findClassInAncestry( reaction.reaction ).getDomainUnit( ) )
+        return( self.findClassInAncestry( reaction.reaction ).domainUnit( ) )
 
     def getValue( self, E, unit ) :
 
         return( self.Q.getValueAs( unit ) )
 
-    def getXMLAttribute( self ) :
+    @property
+    def label( self ) :
 
-        return( self.Q )
+        return( self.__label )
 
-    def toXMLList( self, indent ) :
+    def toXMLList( self, indent = '', **kwargs ) :
 
-        return( [] )
+        attributeStr = ''
+        if( self.label is not None ) : attributeStr += ' label="%s"' % self.label
+        return( [ '%s<%s%s value="%s"/>' % ( indent, self.moniker, attributeStr, self.Q ) ] )
 
     def toPointwise_withLinearXYs( self, lowerEps, upperEps ) :
         """This method returns the Q-value as linear-linear pointwise data which spans self's domain."""
 
-        axes_ = pointwise.defaultAxes( energyUnit = self.getDomainUnit( ), QUnit = self.Q.getUnitSymbol( ) )
-        return( pointwise( axes_, [ [ self.domainMin( ), self.Q.getValue( ) ], [ self.domainMax( ), self.Q.getValue( ) ] ], 1e-12 ) )
+        axes = pointwise.defaultAxes( energyUnit = self.domainUnit( ), QUnit = self.Q.getUnitSymbol( ) )
+        return( pointwise( [ [ self.domainMin( ), self.Q.getValue( ) ], [ self.domainMax( ), self.Q.getValue( ) ] ], axes = axes, accuracy = 1e-12 ) )
 
-class pointwise( baseClasses.formBase, XYs.XYs ) :
+    @staticmethod
+    def parseXMLNode( element, xPath, linkData ):
 
-    genre = component.genre
-    form = tokens.pointwiseFormToken
-    tag = tokens.pointwiseFormToken
+        xPath.append( element.tag )
+        Q = constant( element.get( 'label' ), element.get( 'value' ) )
+        xPath.pop( )
+        return( Q )
+
+class pointwise( baseQForm, XYsModule.XYs ) :
+
     mutableYUnit = False
 
-    def __init__( self, axes, data, accuracy, **keyWords ) :
+    def __init__( self, **kwargs ) :
 
-        baseClasses.formBase.__init__( self )
-        keyWords['isPrimaryXData'] = True
-        XYs.XYs.__init__( self, axes, data, accuracy, **keyWords )
-        self.toForms = { tokens.groupedFormToken : grouped }
+        baseQForm.__init__( self )
+        XYsModule.XYs.__init__( self, **kwargs )
 
-    def process( self, processInfo, tempInfo ) :
+    def process( self, processInfo, tempInfo, verbosityIndent ) :
 
         projectile, target = processInfo.getProjectileName( ), processInfo.getTargetName( )
         groups = processInfo.getParticleGroups( projectile )
-        Q_E = self.getFormByToken( tokens.pointwiseFormToken )
-        grouped = miscellaneous.makeGrouped( self, processInfo, tempInfo, Q_E )
+        grouped = miscellaneousModule.makeGrouped( self, processInfo, tempInfo, self )
         self.addForm( grouped( grouped ) )
-        grouped = miscellaneous.makeGrouped( self, processInfo, tempInfo, Q_E, normType = 'groupedFlux' )
+        grouped = miscellaneousModule.makeGrouped( self, processInfo, tempInfo, Q_E, normType = 'groupedFlux' )
         self.addForm( groupedWithCrossSection( grouped ) )
 
-    def getXMLAttribute( self ) :
-
-        return( energyDependent )
-
     @staticmethod
-    def defaultAxes( energyUnit = 'eV', energyInterpolation = axes.linearToken, QUnit = 'eV', QInterpolation = axes.linearToken ) :
+    def defaultAxes( energyUnit = 'eV', QUnit = 'eV' ) :
 
-        axes_ = axes.axes( )
-        axes_[0] = axes.axis( 'energy_in', 0, energyUnit, interpolation = axes.interpolationXY( energyInterpolation, QInterpolation ) )
-        axes_[1] = axes.axis( base.QToken, 1, QUnit )
-        return( axes_ )
+        axes = axesModule.axes( )
+        axes[0] = axesModule.axis( 'energy_in', 0, energyUnit )
+        axes[1] = axesModule.axis( baseModule.QToken, 1, QUnit )
+        return( axes )
 
-class grouped( baseClasses.groupedFormBase ) :
+class grouped( baseQForm, abstractClassesModule.multiGroup ) :
 
-    genre = component.genre
-
-    def __init__( self, axes, data ) :
-
-        baseClasses.groupedFormBase.__init__( self, axes, data )
-
-class groupedWithCrossSection( baseClasses.groupedWithCrossSectionFormBase ) :
-
-    genre = component.genre
+    moniker = tokensModule.groupedFormToken
 
     def __init__( self, axes, data ) :
 
-        baseClasses.groupedWithCrossSectionFormBase.__init__( self, axes, data )
+        baseQForm.__init__( self )
+        abstractClassesModule.multiGroup.__init__( self, axes, data )
 
-class notApplicable( baseClasses.formBase ) :
+class groupedWithCrossSection( baseQForm, abstractClassesModule.multiGroup ) :
 
-    genre = component.genre
-    form = tokens.notApplicableFormToken
+    moniker = tokensModule.groupedFormToken
+
+    def __init__( self, axes, data ) :
+
+        baseQForm.__init__( self )
+        abstractClassesModule.multiGroup.__init__( self, axes, data )
+
+#
+# Q component
+#
+class component( abstractClassesModule.component ) :
+
+    __genre = baseModule.QToken
+    moniker = baseModule.QToken
 
     def __init__( self ) :
 
-        baseClasses.formBase.__init__( self )
-        self.Q = 'N/A'
+        abstractClassesModule.component.__init__( self,
+                ( constant, pointwise, grouped, groupedWithCrossSection ) )
+
+    def getConstantAs( self, unit ) :
+
+        for form in self :
+            if( isinstance( form, constant ) ) : return( form.getValue( 0, unit ) )
+        raise ValueError( 'Q-value is not a contant' )
 
     def getValue( self, E, unit ) :
 
-        return( 0. )
+        return( self.getEvaluated( ).getValue( E, unit ) )
 
-    def getXMLAttribute( self ) :
+    def process( self, processInfo, tempInfo, verbosityIndent ) :
 
-        return( self.Q )
+        for form in self :
+            if( isinstance( form, pointwise ) ) :
+                ps = form.process( processInfo, tempInfo, verbosityIndent )
+                for p in ps : self.addForm( p )
 
-    def toXMLList( self, indent ) :
+def parseXMLNode( QElement, xPath, linkData ):
+    """
+    Reads an xml <Q> element into fudge, including all child forms
+    """
 
-        return( [] )
+    xPath.append( QElement.tag )
+    kwargs = {}     # In case we need special interpolation rules for Q, see gnd/reactionData/crossSection.py
+
+    Q = component( )
+    for form in QElement :
+        formClass = {
+                constant.moniker                : constant,
+                pointwise.moniker               : pointwise,
+                grouped.moniker                 : grouped,
+                groupedWithCrossSection.moniker : groupedWithCrossSection
+            }.get( form.tag )
+        if( formClass is None ) : raise Exception( "unknown Q form: %s" % form.tag )
+        newForm = formClass.parseXMLNode( form, xPath, linkData, **kwargs )
+        Q.add( newForm )
+    xPath.pop( )
+    return( Q )

@@ -8,130 +8,129 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 __metaclass__ = type
 
-from fudge.core.math.xData import XYs
-from fudge.legacy.converting import endfFormats
-import itertools
+from xData import XYs as XYsModule
 
 coherentElasticToken = 'coherentElastic'
 incoherentElasticToken = 'incoherentElastic'
 incoherentInelasticToken = 'incoherentInelastic'
 
 class thermalScattering:
-    def __init__(self, material=None, MAT=None, mass=None, documentation=None, coherentElastic=None,
+    def __init__(self, material=None, MAT=None, mass=None, emax=None, documentation=None, coherentElastic=None,
             incoherentElastic=None, incoherentInelastic=None):
         self.material = material
         self.MAT = MAT
         self.mass = mass
+        self.emax = emax
         self.documentation = documentation
         self.coherentElastic = coherentElastic
         self.incoherentElastic = incoherentElastic
         self.incoherentInelastic = incoherentInelastic
 
-    def toXMLList( self, indent='' ):
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
         xml = ['<?xml version="1.0" encoding="UTF-8"?>']
-        xml.append( indent+'<thermalScattering material="%s" MAT="%s" mass="%s">' % (self.material,self.MAT,self.mass) )
-        if self.documentation is not None: xml += self.documentation.toXMLList(indent+'  ')
+        xml.append( indent+'<thermalScattering material="%s" MAT="%s" mass="%s" emax="%s">'
+                    % (self.material,self.MAT,self.mass,self.emax) )
+        if self.documentation is not None: xml += self.documentation.toXMLList( indent2, **kwargs )
         for ts in (coherentElasticToken,incoherentElasticToken,incoherentInelasticToken):
             if getattr(self,ts) is not None:
-                xml += getattr(self,ts).toXMLList(indent+'  ')
+                xml += getattr(self,ts).toXMLList( indent2, **kwargs )
         xml.append(indent+'</thermalScattering>')
         return xml
+
+    def check( self, **kwargs ) :
+        """
+        Check all data in the reactionSuite, returning a list of warnings. 
+        """
+
+        from fudge.gnd import warning
+
+        options = { }
+        for key in kwargs:
+            if key in options: options[key] = kwargs[key]
+            else: raise KeyError, "check() received unknown keyword argument '%s'" % key
+
+        # assemble some useful info, to be handed down to children's check() functions:
+        info = { 'reactionSuite': self, }
+        info.update( options )
+
+        warnings = []
+
+
+        result = warning.context('ReactionSuite: %s + %s' % (self.projectile, self.target), warnings)
+        result.info = info
+        return result
+
 
     def saveToFile( self, filename ):
         with open(filename,'w') as fout:
             fout.write( '\n'.join( self.toXMLList() ) )
-
-    def toENDF6( self, flags = {}, verbosityIndent = '' ):
-        endfMFList = { 1 : { 451 : [] }, 7 : {} }
-        targetInfo = {'ZA':self.MAT + 100, 'mass':self.mass}
-        MAT = self.MAT
-        NSUB, NVER = 12, 7  # 12: thermal scattering sub-library, 7: ENDF/B-VII
-
-        for subsection in (coherentElasticToken,incoherentElasticToken,incoherentInelasticToken):
-            if getattr(self, subsection) is not None:
-                getattr(self, subsection).toENDF6( endfMFList, flags, targetInfo, verbosityIndent )
-
-        endfDoc = self.documentation.getLines()
-        docHeader = [
-                endfFormats.endfHeadLine( targetInfo['ZA'], targetInfo['mass'], -1, 0, 0, 0 ),
-                endfFormats.endfHeadLine( 0, 0, 0, 0, 0, 6 ),    # ENDF-6
-                endfFormats.endfHeadLine( 1.0, 0, 1, 0, NSUB, NVER ),
-                endfFormats.endfHeadLine( 0.0, 0.0, 0, 0, len(endfDoc), 0 ) ]
-        endfMFList[1][451] = docHeader + endfDoc
-
-        return endfFormats.endfMFListToFinalFile( endfMFList, MAT, lineNumbers=True )
 
 
 class coherentElastic:
     def __init__(self, S_table):
         self.S_table = S_table
 
-    def toXMLList( self, indent='' ):
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
         xml = [indent+'<%s>' % coherentElasticToken]
-        xml += self.S_table.toXMLList( indent=indent+'  ' )
+        xml += self.S_table.toXMLList( indent2, **kwargs )
         xml[-1] += '</%s>' % coherentElasticToken
         return xml
 
-    def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ):
-        ZAM, AWT = targetInfo['ZA'], targetInfo['mass']
-        LTHR = 1
-        endf = [endfFormats.endfHeadLine( ZAM, AWT, LTHR, 0, 0, 0 )]
-        endf += self.S_table.toENDF6( flags, targetInfo, verbosityIndent = '' )
-        endfMFList[7][2] = endf + [99999]
 
 class S_table:
     """ For elastic coherent, cumulative structure factor 'S' is given as function of incident energy and temp. """ 
-    def __init__(self, axes, table):
-        self.axes = axes
-        self.table = table
+    def __init__(self, form=None):
+        self.forms = []
+        if form is not None: self.forms.append( form )
 
-    def toXMLList( self, indent='' ):
+    def __getitem__(self, idx): return self.forms[idx]
+
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
         xml = [indent+'<S_table>']
-        xml += self.axes.toXMLList( indent+'  ' )
-        xml += self.table.toXMLList( indent+'  ' )
+        for form in self:
+            xml += form.toXMLList( indent2, **kwargs )
         xml[-1] += '</S_table>'
         return xml
-
-    def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
-
-        # first temperature also has energy list:
-        data = zip(*self.table.data)
-        Tlist = [float( temp['value'].getValueAs('K') ) for temp in self.table.columns[1:] ]
-
-        LT = len(Tlist)-1
-        # first temperature includes the energy list:
-        endf = [endfFormats.endfHeadLine( Tlist[0], 0, LT, 0, 1, len(data[0]) ) ]
-        independentInterp = endfFormats.twoAxesToENDFInterpolation( self.axes, 0 )
-        dependentInterp = endfFormats.twoAxesToENDFInterpolation( self.axes, 1 )
-        #endf += endfFormats.endfInterpolationList( (len(data[0])/2, independentInterp ) )
-        endf += ['%11i%11i%44s' % (len(data[0]), independentInterp, '' )]    # no trailing zeros
-        endf += endfFormats.endfDataList( list( itertools.chain( *zip(data[0], data[1]) ) ) )
-
-        # remaining temperatures:
-        for T, datList in zip( Tlist[1:], data[2:] ):
-            endf += [endfFormats.endfHeadLine( T, 0, dependentInterp, 0, len(datList), 0 )]
-            endf += endfFormats.endfDataList( datList )
-        return endf
 
 
 class incoherentElastic:
@@ -139,117 +138,53 @@ class incoherentElastic:
         self.characteristicCrossSection = characteristicCrossSection
         self.DebyeWaller = DebyeWaller
 
-    def toXMLList( self, indent='' ):
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
         xml = [indent+'<%s characteristicCrossSection="%s">' % (incoherentElasticToken, 
             self.characteristicCrossSection) ]
-        xml += self.DebyeWaller.toXMLList( indent=indent+'  ' )
+        xml += self.DebyeWaller.toXMLList( indent2, **kwargs )
         xml[-1] += '</%s>' % incoherentElasticToken
         return xml
 
-    def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ):
-        ZAM, AWT = targetInfo['ZA'], targetInfo['mass']
-        LTHR = 2
-        endf = [endfFormats.endfHeadLine( ZAM, AWT, LTHR, 0, 0, 0 )]
-        targetInfo['characteristicCrossSection'] = self.characteristicCrossSection.getValueAs('b')
-        endf += self.DebyeWaller.toENDF6( flags, targetInfo, verbosityIndent = '' )
-        del targetInfo['characteristicCrossSection']
-        endfMFList[7][2] = endf + [99999]
 
-class DebyeWaller( XYs.XYs ):
+class DebyeWaller( XYsModule.XYs ):
     """For incoherent elastic sections, all we need is a characteristic cross section and a
     temperature-dependent list of the Debye-Waller integral """
 
     mutableYUnit = False
 
     def __init__(self, *args, **kwargs):
-        XYs.XYs.__init__(self, *args, **kwargs)
+        XYsModule.XYs.__init__(self, *args, **kwargs)
         self.moniker = "DebyeWaller"
-
-    def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
-        NR = 1; NP = len(self)
-        endf = [endfFormats.endfHeadLine( targetInfo['characteristicCrossSection'], 0, 0, 0, NR, NP )]
-        interp = endfFormats.twoAxesToENDFInterpolation( self.axes, 0 )
-        endf += ['%11i%11i%44s' % (len(self), interp, '')]
-        endf += endfFormats.endfDataList( list( itertools.chain( *self.copyDataToXYs() ) ) )
-        return endf
 
 
 class incoherentInelastic:
-    def __init__(self, S_tables, calculatedAtThermal = False, asymmetric = False, atoms = []):
+    def __init__(self, S_alpha_beta, calculatedAtThermal = False, asymmetric = False, atoms = []):
         self.scatteringAtoms = atoms
-        self.S_tables = S_tables
+        self.S_alpha_beta = S_alpha_beta
         self.calculatedAtThermal = calculatedAtThermal
         self.asymmetric = asymmetric
 
-    def toXMLList( self, indent='' ):
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        incrementalIndent = kwargs.get( 'incrementalIndent', '  ' )
+        indent2 = indent + incrementalIndent
+        indent3 = indent2 + incrementalIndent
+
         xml = [indent+'<%s' % incoherentInelasticToken]
         if self.calculatedAtThermal: xml[0] += ' calculatedAtThermal="true"'
         if self.asymmetric: xml[0] += ' asymmetric="true"'
         xml[0] += '>'
         xml += [indent+'  <scatteringAtoms>']
         for atom in self.scatteringAtoms:
-            xml += atom.toXMLList( indent+'    ' )
+            xml += atom.toXMLList( indent3, **kwargs )
         xml[-1] += '</scatteringAtoms>'
-        xml += self.S_tables.toXMLList(indent+'  ')
+        xml += self.S_alpha_beta.toXMLList( indent2, **kwargs )
         xml[-1] += '</%s>' % incoherentInelasticToken
         return xml
 
-    def toENDF6( self, endfMFList, flags, targetInfo, verbosityIndent = '' ):
-        ZAM, AWT = targetInfo['ZA'], targetInfo['mass']
-        LTHR, LAT, LASYM = 0, self.calculatedAtThermal, self.asymmetric
-        endf = [endfFormats.endfHeadLine( ZAM, AWT, LTHR, LAT, LASYM, 0 )]
-        # describe scattering atoms:
-        LLN, NS = 0, len( self.scatteringAtoms ) - 1
-        NI = 6*(NS+1)
-        endf += [endfFormats.endfHeadLine( 0, 0, LLN, 0, NI, NS )]
-        # principal scattering atom:
-        atom = self.scatteringAtoms[0]
-        endf += [endfFormats.endfDataLine( [atom.freeAtomCrossSection.getValueAs('b'),
-            atom.e_critical, atom.mass, atom.e_max.getValueAs('eV'), 0, atom.numberPerMolecule] )]
-        for atom in self.scatteringAtoms[1:]:
-            a1 = {'SCT':0.0, 'free_gas':1.0, 'diffusive_motion':2.0} [ atom.functionalForm ]
-            endf += [endfFormats.endfDataLine( [a1, atom.freeAtomCrossSection.getValueAs('b'),
-                atom.mass, 0, 0, atom.numberPerMolecule] )]
-
-        # convert data form: sort first by beta, then E, then T
-        betas = [beta['value'] for beta in self.S_tables[0][1].columns[1:] ]
-        NR = 1; NB = len(betas)
-        endf += [endfFormats.endfHeadLine( 0, 0, 0, 0, NR, NB )]
-        #endf += endfFormats.endfInterpolationList( (NB, 4) )
-        endf += ['%11i%11i%44s' % ( NB, 4, '' )]
-
-        Tlist = [temp[0].getValueAs('K') for temp in self.S_tables]
-        elist = self.S_tables[0][1] [:,0]
-        LT = len(Tlist)-1
-
-        if LT:
-            T_interp = endfFormats.twoAxesToENDFInterpolation( self.S_tables.axes, 0 )
-            alpha_interp = endfFormats.twoAxesToENDFInterpolation( self.S_tables.axes, 1 )
-            beta_interp = endfFormats.twoAxesToENDFInterpolation( self.S_tables.axes, 2 )
-        else:
-            T_interp = None
-            alpha_interp = endfFormats.twoAxesToENDFInterpolation( self.S_tables.axes, 0 )
-            beta_interp = endfFormats.twoAxesToENDFInterpolation( self.S_tables.axes, 1 )
-
-
-        for index, beta in enumerate( betas ):
-            data = [dat[1][:,index+1] for dat in self.S_tables]
-
-            endf += [endfFormats.endfHeadLine( Tlist[0], beta, LT, 0, 1, len(data[0]) )]
-            #endf += endfFormats.endfInterpolationList( (len(data[0])/2, alpha_interp ) )
-            endf += ['%11i%11i%44s' % (len(data[0]), alpha_interp, '' )]    # no trailing zeros
-            # For each beta, the first temperature needs to include the energy list:
-            endf += endfFormats.endfDataList( list( itertools.chain( *zip(elist, data[0]) ) ) )
-
-            # remaining temperatures:
-            for T, datList in zip( Tlist[1:], data[1:] ):
-                endf += [endfFormats.endfHeadLine( T, beta, T_interp, 0, len(datList), 0 )]
-                endf += endfFormats.endfDataList( datList )
-
-        for atom in self.scatteringAtoms:
-            if atom.effectiveTemperature is not None:
-                endf += atom.effectiveTemperature.toENDF6( flags, targetInfo, verbosityIndent = '' )
-        endfMFList[7][4] = endf + [99999]
 
 class scatteringAtom:
     """ Inelastic incoherent scattering requires a description of each atom that is scattered off """
@@ -263,7 +198,10 @@ class scatteringAtom:
         self.functionalForm = functionalForm
         self.effectiveTemperature = effectiveTemperature
 
-    def toXMLList( self, indent='' ):
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
         xml = [indent+'<atom mass="%s" numberPerMolecule="%i" freeAtomCrossSection="%s"' % (self.mass,
             self.numberPerMolecule, self.freeAtomCrossSection)]
         for attribute in ('e_critical','e_max','functionalForm'):
@@ -271,45 +209,38 @@ class scatteringAtom:
                 xml[-1] += ' %s="%s"' % (attribute, getattr(self,attribute))
         if self.effectiveTemperature is not None:
             xml[-1] += '>'
-            xml += self.effectiveTemperature.toXMLList( indent=indent+'  ' )
+            xml += self.effectiveTemperature.toXMLList( indent2, **kwargs )
             xml[-1] += '</atom>'
         else:
             xml[-1] += '/>'
         return xml
 
-class T_effective( XYs.XYs ):
+class T_effective( XYsModule.XYs ):
     """ In incoherent inelastic sections, each scattering atom using the short collision time (SCT)
     approximation needs an effective temperature. """
 
     mutableYUnit = False
 
     def __init__(self, *args, **kwargs):
-        XYs.XYs.__init__(self, *args, **kwargs)
+        XYsModule.XYs.__init__(self, *args, **kwargs)
         self.moniker = "T_effective"
 
-    def toENDF6( self, flags, targetInfo, verbosityIndent = '' ):
-        NR = 1; NP = len(self)
-        endf = [endfFormats.endfHeadLine( 0, 0, 0, 0, NR, NP )]
-        interp = endfFormats.twoAxesToENDFInterpolation( self.axes, 0 )
-        endf += ['%11i%11i%44s' % (len(self), interp, '')]
-        endf += endfFormats.endfDataList( list( itertools.chain( *self.copyDataToXYs() ) ) )
-        return endf
 
 class S_alpha_beta:
     """ Inelastic incoherent section contains one S_ab table per temperature """
-    def __init__(self, axes, temperatures):
-        self.axes = axes
-        self.temperatures = temperatures
+    def __init__(self, form=None):
+        self.forms = []
+        if form is not None: self.forms.append( form )
 
-    def __getitem__(self, index): return self.temperatures[index]
+    def __getitem__(self, index): return self.forms[index]
 
-    def toXMLList( self, indent='' ):
-        xml = [indent+'<S_alpha_beta nTemperatures="%i">' % len(self.temperatures)]
-        xml += self.axes.toXMLList( indent+'  ' )
-        for temp, s_table in self.temperatures:
-            xml += [indent+'  <temperature value="%s">' % temp]
-            xml += s_table.toXMLList( indent+'    ' )
-            xml[-1] += '</temperature>'
+    def toXMLList( self, indent = '', **kwargs ) :
+
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
+        xml = [indent+'<S_alpha_beta>']
+        for form in self:
+            xml += form.toXMLList( indent2, **kwargs )
         xml[-1] += '</S_alpha_beta>'
         return xml
 

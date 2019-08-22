@@ -1,0 +1,46 @@
+2.31(1) MeV/cm
+
+152. +/- 4. MeV**6/cm**6
+value = 1.519399150848810e+02, significantDigits = 3, order = 2, isPercent = False, unit = "MeV**6/cm**6"
+uncertainty = value = 3.946491300906001e+00, significantDigits = 1, order = 0, isPercent = False
+
+351. +/- 1.e1 MeV**7/cm**7
+value = 3.509812038460752e+02, significantDigits = 2, order = 2, isPercent = False, unit = "MeV**7/cm**7"
+uncertainty = value = 1.063579405594167e+01, significantDigits = 1, order = 1, isPercent = False
+
+2.3e4 +/- 1.e3 MeV**12/cm**12
+value = 2.308573779600086e+04, significantDigits = 2, order = 4, isPercent = False, unit = "MeV**12/cm**12"
+uncertainty = value = 1.199259106285759e+03, significantDigits = 1, order = 3, isPercent = False
+value = 2.300000000000000e+00, significantDigits = 16, order = 0, isPercent = False, unit = "MeV"
+uncertainty = 
+False
+True
+False
+False
+True
+True
+
+2.31(1) MeV/cm
+351. +/- 1.e1 MeV**7/cm**7
+152. +/- 4. MeV**6/cm**6
+
+a =  2.3 MeV
+a1 =  2.30000000000000 +/- 1.e-14 MeV
+a2 =  2.30000000000003(1) MeV
+b =  3.e2 m
+c =  1. J
+1. m**2*kg/s**2
+
+3.685006019e-13 m**2*kg/s**2
+3.685006019e-13
+690. MeV*m
+2.3 MeV
+3.685006019e-13 J
+1.1055018057e-10 J*m
+3.685006019e-13 m**2*kg/s**2
+3.e2 m
+
+342.00 +/- 0.12%
+value = 3.420000000000000e+02, significantDigits = 5, order = 2, isPercent = False, unit = ""
+uncertainty = value = 1.200000000000000e-03, significantDigits = 2, order = -3, isPercent = True
+442.00 +/- 0.41

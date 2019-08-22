@@ -8,92 +8,123 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
-from fudge.gnd import baseClasses
-import base
-from fudge.core.math.xData import axes, XYs
-from fudge.gnd import tokens
+import base as baseModule
+
+from fudge.gnd import tokens as tokensModule
+from fudge.gnd import abstractClasses as abstractClassesModule
+
+import xData.axes as axesModule
 
 __metaclass__ = type
 
-momentumDepositionForms = [ tokens.constantFormToken, tokens.partialProductionFormToken, tokens.pointwiseFormToken, tokens.groupedFormToken ]
+class baseMomentumDepositionForm( abstractClassesModule.form ) :
+
+    __genre = baseModule.momentumDepositionToken
+
+class grouped( baseMomentumDepositionForm, abstractClassesModule.multiGroup ) :
+
+    def __init__( self, label, axes, data ) :
+
+        baseMomentumDepositionForm.__init__( self )
+        abstractClassesModule.multiGroup.__init__( self, label, axes, data )
+
+class pointwise( baseMomentumDepositionForm, baseModule.XYPointwiseFormBase ) :
+
+    def __init__( self, **kwargs ) :
+
+        baseMomentumDepositionForm.__init__( self )
+        baseModule.XYPointwiseFormBase.__init__( self, **kwargs )
+
+    @staticmethod
+    def defaultAxes( energyUnit = 'eV', momentumDepositionName = 'momentumDeposition', momentumDepositionUnit = 'eV/c' ) :
+
+        axes = axesModule.axes( rank = 2 )
+        axes[0] = axesModule.axis( momentumDepositionName, 0, momentumDepositionUnit )
+        axes[1] = axesModule.axis( 'energy_in', 1, energyUnit )
+        return( axes )
+
+class piecewise( baseMomentumDepositionForm, baseModule.XYPiecewiseFormBase ) :
+
+    def __init__( self, **kwargs ) :
+
+        baseMomentumDepositionForm.__init__( self )
+        baseModule.XYPiecewiseFormBase.__init__( self, **kwargs )
+
+    @staticmethod
+    def allowedSubElements( ) :
+
+        return( ( pointwise, ) )
+
+    @staticmethod
+    def defaultAxes( energyUnit = 'eV', momentumDepositionName = 'momentumDeposition', momentumDepositionUnit = 'eV/c' ) :
+
+        return( pointwise.defaultAxes( energyUnit = energyUnit, momentumDepositionName = momentumDepositionName,
+                momentumDepositionUnit = momentumDepositionUnit ) )
 
 #
-# momentumDeposition genre and forms
+# momentumDeposition component
 #
-class component( baseClasses.componentBase ) :
+class component( abstractClassesModule.component ) :
 
-    genre = base.momentumDepositionToken
+    __genre = baseModule.momentumDepositionToken
+    moniker = baseModule.momentumDepositionToken
 
-    def __init__( self, nativeData ) :
+    def __init__( self ) :
 
-        baseClasses.componentBase.__init__( self, momentumDepositionForms, nativeData )
+        abstractClassesModule.component.__init__( self, ( grouped, pointwise, piecewise ) )
 
     def process( self, processInfo, tempInfo, verbosityIndent ) :
 
-        keys = self.forms.keys( )
-        for form in keys :
-            if( form == tokens.pointwiseFormToken ) :
-                ps = self.forms[form].process( processInfo, tempInfo, verbosityIndent )
-                for p in ps : self.addForm( p )
-
-class grouped( baseClasses.groupedFormBase ) :
-
-    genre = component.genre
-
-    def __init__( self, axes, data ) :
-
-        baseClasses.groupedFormBase.__init__( self, axes, data )
-
-class pointwise( base.XYPointwiseFormBase ) :
-
-    genre = component.genre
-
-    def __init__( self, axes, data, accuracy, **kwargs ) :
-
-        base.XYPointwiseFormBase.__init__( self, axes, data, accuracy, **kwargs )
-        self.toForms = { tokens.groupedFormToken : grouped }
+        for form in self :
+            if( form.label == tokensModule.pointwiseFormToken ) :
+                ps = form.process( processInfo, tempInfo, verbosityIndent )
+                for p in ps : self.add( p )
 
     @staticmethod
-    def defaultAxes( energyUnit = 'eV', energyInterpolation = axes.linearToken, momentumDepositionName = 'momentumDeposition',
-        momentumDepositionInterpolation = axes.linearToken, momentumDepositionUnit = 'eV/c' ) :
+    def parseXMLNode( element, xPath, linkData ) :
+        """Reads an xml <depositionMomentum> component element into fudge, including all forms in the component."""
 
-        axes_ = axes.axes( dimension = 2 )
-        axes_[0] = axes.axis( 'energy_in', 0, energyUnit, interpolation = axes.interpolationXY( energyInterpolation, momentumDepositionInterpolation ) )
-        axes_[1] = axes.axis( momentumDepositionName, 1, momentumDepositionUnit )
-        return( axes_ )
-
-def parseXMLNode( element, xPath=[], linkData={} ):
-    """Reads an xml <depositionMomentum> component element into fudge, including all forms in the component."""
-
-    xPath.append( element.tag )
-    dmc = component( element.get('nativeData') )
-    for form in element:
-        formClass = {tokens.pointwiseFormToken: pointwise,
-                tokens.groupedFormToken: grouped,
-                }.get( form.tag )
-        if formClass is None: raise Exception(" encountered unknown depositionMomentum form: %s" % form.tag)
-        try:
-            newForm = formClass.parseXMLNode( form, xPath, linkData )
-        except Exception as e:
-            raise Exception, "/depositionMomentum/%s: %s" % (form.tag, e)
-        dmc.addForm( newForm )
-    xPath.pop()
-    return dmc
+        xPath.append( element.tag )
+        momentumDepositionComponent = component( )
+        for form in element :
+            formClass = {
+                    pointwise.moniker : pointwise,
+                    grouped.moniker :   grouped,
+               }.get( form.tag )
+            if( formClass is None ) : raise Exception( "encountered unknown depositionMomentum form: %s" % form.tag )
+            try :
+                newForm = formClass.parseXMLNode( form, xPath, linkData )
+            except Exception as e :
+                raise Exception, "/depositionMomentum/%s: %s" % ( form.tag, e )
+            momentumDepositionComponent.add( newForm )
+        xPath.pop()
+        return( momentumDepositionComponent )

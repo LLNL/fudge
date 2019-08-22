@@ -8,7 +8,7 @@ plus tools for testing and visualizing GND-formatted data.
 
 If you are encountering Fudge and GND for the first time, we strongly
 recommend you look at the html documentation and tutorial available inside the
-package at fudge-4.0.0/doc/html/index.html, where you will find much more
+package at fudge-4.2.0/doc/html/index.html, where you will find much more
 detail about installing and using the software.
 
 Contents of this README:
@@ -24,8 +24,8 @@ and is available for all platforms at www.python.org/getit
   To install the package:
     1) obtain the current version (available online at nuclear.llnl.gov), and place it on your system.
     2) to unzip the package, type
-        >tar -xvf fudge-4.0.0.tar.gz	(or latest version)
-    3) The unzipped directory is named 'fudge-4.0.0' (or latest version). Navigate into the new directory, and type 
+        >tar -xvf fudge-4.2.0.tar.gz	(or latest version)
+    3) The unzipped directory is named 'fudge-4.2.0’ (or latest version). Navigate into the new directory, and type 
         >make
        this builds extra tools for better performance. If you encounter errors at this step, you can still use the ENDF
        translation tool but advanced features will be unavailable.
@@ -64,7 +64,7 @@ well the translation works. Two tools for translating ENDF are included in the '
 
   rePrint.py: translate one ENDF-formatted file to GND, then translate back to ENDF for comparison with the original.
 Usage:
-    <path_to_fudge>/bin/rePrint.py filename.endf
+    <path_to_fudge>/bin/rePrint.py filename.endf -v
   Several files are produced:
     -test.endf6.xml	(the gnd-formatted file)
     -test.endf6-covar.xml  (covariances in gnd, produced only if the original file has covariances)
@@ -74,7 +74,7 @@ Usage:
   After running rePrint.py, you may wish to compare the original/new ENDF files using diff,kompare, etc:
     >diff test.endf6.orig.noLineNumbers test.endf6.noLineNumbers
 
-  See Section 5 below for a discussion of the most common differences between original/translated ENDF files.
+  See fudge-4.2.0/doc/GND_1.1_manual.pdf for a discussion of the most common differences between original/translated ENDF files
 
   Another tool included in the release is 'rePrintSample.py'. This is very similar to rePrint, except it randomly picks 
 an ENDF-formatted file from the included samples.

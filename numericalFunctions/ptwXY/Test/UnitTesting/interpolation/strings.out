@@ -1,0 +1,23 @@
+linear-linear string = <lin,lin>
+string = <lin,lin>
+string = <lin,lin>
+
+linear-log string = <lin,log>
+string = <lin,log>
+string = <lin,log>
+
+log-linear string = <log,lin>
+string = <log,lin>
+string = <log,lin>
+
+log-log string = <log,log>
+string = <log,log>
+string = <log,log>
+
+flat string = <flat>
+string = <flat>
+string = <flat>
+
+other string = <charged-particle>
+string = <charged-particle>
+string = <charged-particle>

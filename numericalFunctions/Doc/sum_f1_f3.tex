@@ -1,0 +1,42 @@
+\begin{figure}
+\setlength{\unitlength}{1 cm}
+\begin{center}
+\begin{picture}(10, 6)(0, 0)
+    \color{Black}
+% yAxis
+    \drawline(0, 0)(0, 6) \drawline(10, 0)(10, 6)
+    \put( -0.3,  0 ){0}
+    \put( -0.3,  0.9 ){1} \drawline(0, 1)(.2, 1)
+    \put( -0.3,  1.9 ){2} \drawline(0, 2)(.2, 2)
+    \put( -0.3,  2.9 ){3} \drawline(0, 3)(.2, 3)
+    \put( -0.3,  3.9 ){4} \drawline(0, 4)(.2, 4)
+    \put( -0.3,  4.9 ){5} \drawline(0, 5)(.2, 5)
+    \put( -0.3,  5.9 ){6} \drawline(0, 6)(.2, 6)
+
+% xAxis
+    \drawline(0, 0)(10, 0)  \drawline(0, 6)(10, 6)
+    \put( -0.1,  -0.4 ){0}
+    \put(  0.9,  -0.4 ){1} \put(1, 0){\line( 0, 1 ){.2}}
+    \put(  1.9,  -0.4 ){2} \put(2, 0){\line( 0, 1 ){.2}}
+    \put(  2.9,  -0.4 ){3} \put(3, 0){\line( 0, 1 ){.2}}
+    \put(  3.9,  -0.4 ){4} \put(4, 0){\line( 0, 1 ){.2}}
+    \put(  4.9,  -0.4 ){5} \put(5, 0){\line( 0, 1 ){.2}}
+    \put(  5.9,  -0.4 ){6} \put(6, 0){\line( 0, 1 ){.2}}
+    \put(  6.9,  -0.4 ){7} \put(7, 0){\line( 0, 1 ){.2}}
+    \put(  7.9,  -0.4 ){8} \put(8, 0){\line( 0, 1 ){.2}}
+    \put(  8.9,  -0.4 ){9} \put(9, 0){\line( 0, 1 ){.2}}
+    \put(  9.9,  -0.4 ){10} \put(10, 0){\line( 0, 1 ){.2}}
+
+% lines
+    \color{Red} \drawline(1, 1)(9, 3)
+    \color{Green} \drawline(3, 1)(7, 3)
+    \color{Blue} \drawline(1, 2)(3, 3.5) \drawline(3, 3.5)(7, 5.5)  \drawline(7, 5.5)(9, 3)
+
+    \color{Black} \drawline(1,1)(2.99999,1.4999975) \drawline(2.99999,1.4999975)(3,2.5) \drawline(3,2.5)(7,5.5)
+                  \drawline(7,5.5)(7.00001, 2.5000025) \drawline(7.00001, 2.5000025)(9,3)
+\end{picture}
+\caption{The red curve is $f1$, the green curve is $f2$ and the blue curve is $f1 + f3$ using the first rule and
+    the black curve is $f1 + f3$ using the second rule.
+    \label{sum_f1_f3}}
+\end{center}
+\end{figure}

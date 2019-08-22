@@ -10,22 +10,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 
@@ -51,7 +62,7 @@ def matrix_from_eigendecomposition( e, v, ndim, doInverse = False, onlyLargeEVs 
         B = B + numpy.outer( x*v[i], v[i].T ) # += operator causes casting exception for obscure numpy reasons
     return B
     
-def pruned_matrix_inverse( e, v, onlyLargeEVs = True, onlyPositiveEV = True, smallEVAbsTol = 1e-10, smallEVRelTol = 1e-6 ):
+def pruned_matrix_inverse( A, onlyLargeEVs = True, onlyPositiveEV = True, smallEVAbsTol = 1e-10, smallEVRelTol = 1e-6 ):
     '''Build inverse of :math:`A` \"by hand\", the safe way.   :math:`A` must admit an eigenvalue decomposition.'''
     e, O = numpy.linalg.eig( A )
     v = eigenvectors_from_orthoganal_matrix( O )
@@ -70,7 +81,7 @@ def scale_off_diagonals( A, onlyScaleThese = None, scaleFactor = 0.999999 ):
     for i in range( ndim ):
         for j in range( i ): 
             if i == j: continue
-            if onlyScaleThese == None or ( i, j ) in onlyScaleThese or ( j, i ) in onlyScaleThese: 
+            if onlyScaleThese is None or ( i, j ) in onlyScaleThese or ( j, i ) in onlyScaleThese: 
                 B[ i, j ] = scaleFactor * B[ i, j ]
                 B[ j, i ] = B[ i, j ]
     return B
@@ -101,7 +112,7 @@ def dot_product(*args):
     """
     Matrix multiplication (dot product) of all arguments:
         
-        >>> dotproduct(V.T, A, V) = V.T * A * V
+        >>> dotproduct(V.T, A, V)   # returns V.T * A * V
     """
     # py3000 has no built-in reduce function:
     """
@@ -144,6 +155,29 @@ def hist_interp_of_matrix(supergrid, mat, erows, ecols=None):
         for j in range(1,len(yidx)):
             ret_mat[xidx[i-1]:xidx[i], yidx[j-1]:yidx[j]] = mat[i-1,j-1]
     return ret_mat
+
+# ------------------------- symmetric matrix tools ------------------------------
+def switchSymmetry( mlist, upperToLower = True ):
+    """
+    A symmetric 2-d NxN array can be stored in memory as a list of (N*(N+1)/2) numbers. The order depends
+    on whether the upper-diagonal or lower-diagonal portion of the array is being stored.  This method switches
+    between the two representations.
+    Note that switching from upper to lower is the same as switching the memory order from 'column-major' to 'row-major'
+
+    :param mlist: list, tuple or 1d array representing input matrix
+    :param upperToLower: boolean, True = convert upper- to lower-symmetric, False = convert lower- to upper-symmetric
+    :return: list with output matrix
+    """
+    shape = int( math.sqrt( 2*len(mlist) ) )
+    arrays = [[] for i in xrange(shape)]
+    matiter = iter(mlist)
+    for idx in xrange(shape):
+        if upperToLower: lbound,ubound=idx,shape
+        else: lbound,ubound=0,idx+1
+        for jdx in xrange(lbound,ubound):
+            arrays[jdx].append( matiter.next() )
+
+    return [val for sublist in arrays for val in sublist]
 
 # ------------------------- covariance matrix checks ------------------------- 
 def check_real_and_finite( A ):
@@ -352,7 +386,7 @@ def plot_matrix( m, title = "a matrix", scaling=None, scalingFloor=0.0 ):
     # Make plot with vertical (default) colorbar
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    if scaling == None: mm = m
+    if scaling is None: mm = m
     elif scaling == 'asinh': mm = numpy.asinh(m)
     elif scaling == 'log': 
         mm = numpy.copy( m )
@@ -362,7 +396,7 @@ def plot_matrix( m, title = "a matrix", scaling=None, scalingFloor=0.0 ):
     minAbsVal = mm.min()
     cax = ax.imshow(mm, interpolation='nearest')
     ax.set_title(title)
-    if scaling == None: ticks = [minAbsVal, 0, maxAbsVal/2.0, maxAbsVal]
+    if scaling is None: ticks = [minAbsVal, 0, maxAbsVal/2.0, maxAbsVal]
     elif scaling == 'asinh': ticks = [ minAbsVal + i*( maxAbsVal-minAbsVal )/9 for i in range(9) ] + [ maxAbsVal ]
     elif scaling == 'log': ticks = [ minAbsVal + i*( maxAbsVal-minAbsVal )/9 for i in range(9) ] + [ maxAbsVal ]
     # Add colorbar, make sure to specify tick locations to match desired ticklabels
@@ -400,7 +434,7 @@ def stackVertical( l ):
 
         where n is the number of non-None elements in l
     '''
-    return numpy.vstack( filter( lambda x: x != None, l ) )
+    return numpy.vstack( filter( lambda x: x is not None, l ) )
         
 def stackHorizontal( l ):
     '''
@@ -418,7 +452,7 @@ def stackHorizontal( l ):
 
         where n is the number of non-None elements in l
     '''
-    return numpy.hstack( filter( lambda x: x != None, l ) )
+    return numpy.hstack( filter( lambda x: x is not None, l ) )
 
 def stackDiagonal( l ):
     '''
@@ -448,7 +482,7 @@ def stackDiagonal( l ):
     # Determine the size of the final results matrix
     newShape = [ 0, 0 ]
     for m in l: 
-        if m == None: continue
+        if m is None: continue
         newShape[0] += m.shape[0]       # Keep adding to the number of rows
         newShape[1] += m.shape[1]       # Keep adding to the number of columns
     result = numpy.zeros( newShape )
@@ -457,7 +491,7 @@ def stackDiagonal( l ):
     iStart = 0
     jStart = 0
     for m in l: 
-        if m == None: continue
+        if m is None: continue
         for i in range( m.shape[0] ):     # Loop over rows
             for j in range( m.shape[1] ): # Loop over columns
                 result[ iStart+i, jStart+j ] = m[ i, j ]
@@ -867,30 +901,30 @@ def cglsqrSolve( data, dataUnc = None, dataCov = None, \
     '''
     # Check types of all arguments
     for x in [ data, dataUnc, dataCov, kernel, prior, priorCov, constraintVector, constraintMatrix ]:
-        if x != None and not isinstance( x, numpy.matrixlib.defmatrix.matrix ): raise TypeError( "all arguments must be None or a numpy.mat, got "+str(type(x)))
+        if x is not None and not isinstance( x, numpy.matrixlib.defmatrix.matrix ): raise TypeError( "all arguments must be None or a numpy.mat, got "+str(type(x)))
     
     # Make sure the vector arguments are actually vectors
     if 1 not in data.shape: raise TypeError( "data argument has wrong shape "+str(data.shape)+', it should be a vector' )
-    if constraintVector != None and 1 not in constraintVector.shape: raise TypeError( "constraintVector argument has wrong shape "+str(constraintVector.shape)+', it should be a vector' )
-    if prior != None and 1 not in prior.shape: raise TypeError( "prior argument has wrong shape "+str(prior.shape)+', it should be a vector' )
+    if constraintVector is not None and 1 not in constraintVector.shape: raise TypeError( "constraintVector argument has wrong shape "+str(constraintVector.shape)+', it should be a vector' )
+    if prior is not None and 1 not in prior.shape: raise TypeError( "prior argument has wrong shape "+str(prior.shape)+', it should be a vector' )
     
     # Make sure all vectors are column vectors
     if data.shape[0] != 1: 
         print( "WARNING: data vector not a column vector, transposing it" )
         data = data.T
-    if constraintVector != None and constraintVector.shape[0] != 1: 
+    if constraintVector is not None and constraintVector.shape[0] != 1: 
         print( "WARNING: constraintVector vector not a column vector, transposing it" )
         constraintVector = constraintVector.T
-    if prior != None and prior.shape[0] != 1: 
+    if prior is not None and prior.shape[0] != 1: 
         print( "WARNING: prior vector not a column vector, transposing it" )
         prior = prior.T
 
     # Construct a data covariance if we don't have one or if we have only uncertainties
-    if dataCov == None and dataUnc != None: dataCov = numpy.diag( [ dataUnc[0,i]*dataUnc[0,i] for i in range( dataUnc.shape[1] ) ] )
-    if dataCov == None: dataCov = numpy.identity( data.shape[1] )
+    if dataCov is None and dataUnc is not None: dataCov = numpy.diag( [ dataUnc[0,i]*dataUnc[0,i] for i in range( dataUnc.shape[1] ) ] )
+    if dataCov is None: dataCov = numpy.identity( data.shape[1] )
 
     # Stack things to accomodate any possible prior for the model
-    if prior != None and priorCov != None:
+    if prior is not None and priorCov is not None:
         newData = stackHorizontal( [ data, prior ] )
         newKernel = stackVertical( [ kernel, numpy.identity( prior.shape[1] ) ] )
         newCov = stackVertical( [ stackHorizontal( [ dataCov, numpy.zeros( ( dataCov.shape[0], priorCov.shape[1] ) ) ] ), stackHorizontal( [ numpy.zeros( ( priorCov.shape[0], dataCov.shape[1] ) ), priorCov ] ) ] ) # incorrect -- 0 should be zeros() 
@@ -900,7 +934,7 @@ def cglsqrSolve( data, dataUnc = None, dataCov = None, \
         newCov = dataCov
         
     # No constraints, so perform the inversion using standard approach
-    if None in [ constraintVector, constraintMatrix ]:
+    if constraintVector is None or constraintMatrix is None:
         modelCov = numpy.linalg.pinv( newKernel.T * numpy.linalg.pinv( newCov ) * newKernel ) # use Moore-Penrose generalized inverse (ie SVD inversion)
         model = modelCov * newKernel.T * numpy.linalg.pinv( newCov ) * newData.T
 
@@ -936,7 +970,7 @@ def fit_statistics( data, dataCov, kernel, model ):
           
 # ------------------------- create test matrix ------------------------- 
 def get_test_matrix( endfFile = None, MT = None, MF = None ):
-    if endfFile == None:
+    if endfFile is None:
         endfFile = 'n-099_Es_254m1.endf'
         ENDF_MFMT = "33,52"
         dimensions = "36,36"
@@ -992,8 +1026,10 @@ def get_test_matrix( endfFile = None, MT = None, MF = None ):
 
 
 def get_covariances_from_endf( endfFile, MT, MF = 33 ):
-    from fudge.legacy.converting import endfFileToGND, endfFileToGNDMisc, endfFormats
+
+    from fudge.legacy.converting import endfFileToGND
     from fudge.processing import processingInfo
+
     rce = endfFileToGND.endfFileToGND( endfFile, toStdOut = False )
     xFileOne, cFileOne = rce['reactionSuite'], rce['covarianceSuite']
     MFMTListOne = [ section.rowData.attributes[ 'ENDF_MFMT' ] for section in cFileOne ]
@@ -1003,7 +1039,7 @@ def get_covariances_from_endf( endfFile, MT, MF = 33 ):
             if str(MF)+','+str(MT) == section.rowData.attributes[ 'ENDF_MFMT' ] and section.nativeData in [ 'covarianceMatrix', 'mixed' ]: 
                 sectionOne = section
                 break
-        if sectionOne == None: raise KeyError( 'File '+endfFile+' missing plain old covariance matrix for MF,MT='+str(MF)+','+str(MT) )
+        if sectionOne is None: raise KeyError( 'File '+endfFile+' missing plain old covariance matrix for MF,MT='+str(MF)+','+str(MT) )
     except KeyError as err: print( err.message )
     # sometimes the matrices are plain matrices, other times they are broken in components.  We'll make all of them a list of components
     componentListOne = []
@@ -1011,9 +1047,6 @@ def get_covariances_from_endf( endfFile, MT, MF = 33 ):
     else:
         for component in sectionOne.forms[ 'mixed' ].components: componentListOne.append( component )
     return [ numpy.matrix( x.matrix.data ) for x in componentListOne ]
-
-
-
 
 if __name__ == "__main__":
     # ------------------------- command line parser ------------------------- 
@@ -1044,7 +1077,7 @@ if __name__ == "__main__":
         except subprocess.CalledProcessError: pass
 
     # The test matrices
-    if args.endf != None: listOfA = get_covariances_from_endf( args.endf, args.mt, args.mf )
+    if args.endf is not None: listOfA = get_covariances_from_endf( args.endf, args.mt, args.mf )
     else: listOfA = [ get_test_matrix() ]
     
     for icomponent, A in enumerate( listOfA ):

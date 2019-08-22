@@ -8,22 +8,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 """
@@ -55,79 +66,105 @@ summarizes the classes.
     
         (e.g., n + Pu_239 --> n + Pu_239, n + Pu_239 --> n + Pu_239_e1, n + Pu_239 --> n + Pu_239_e2, n + Pu_239 --> 2n + Pu_239 ... )
 """
-from fudge.core.ancestry import ancestry
+import string
+
 from fudge.core.utilities import brb
-from .productData import distributions
-from . import channels, productData, tokens
+
+import xData.ancestry as ancestryModule
+from xData import standards as standardsModule
+
+from fudge.gnd import suites as suitesModule
+
+from .productData import distributions as distributionsModule
+from .productData.distributions import distribution as distributionModule
+from .productData.distributions import angular as angularModule
+from .productData.distributions import energy as energyModule
+from .productData.distributions import unspecified as unspecifiedModule
+from .productData.distributions import reference as referenceModule
+from .productData.distributions import KalbachMann as KalbachMannModule
+
+from .productData import multiplicity as multiplicityModule
+from .productData import energyDeposition as energyDepositionModule
+from .productData import momentumDeposition as momentumDepositionModule
+from . import channels
+from . import productData
 
 __metaclass__ = type
 
-class product( ancestry ) :
+class product( ancestryModule.ancestry ) :
     """This is the class for a gnd particle. A gnd particle can decay (i.e., breakup), the decay
     formula is defined via the decayChannel member."""
 
-    def __init__( self, particle, ancestryName, label = None, attributes = {}, multiplicity = 1, 
-            decayChannel = None ) :
+    moniker = 'product'
+
+    def __init__( self, particle, label = None, attributes = {}, decayChannel = None ) :
         """Creates a new product object."""
 
-        ancestry.__init__( self, ancestryName, None, attribute = 'label' )
+        ancestryModule.ancestry.__init__( self )
         self.particle = particle
-        self.label = label
+        self.__label = label
         self.attributes = {}
         for q in attributes : self.addAttribute( q, attributes[q] )
-        self.data = {}
         self.decayChannel = None
-        if( decayChannel != None ) : self.addDecayChannel( decayChannel )
-        if( isinstance( multiplicity, productData.multiplicity.component ) ) :
-            self.multiplicity = multiplicity
-        else:
-            if( ( type( multiplicity ) == type( 1 ) ) or ( type( multiplicity ) == type( 1. ) ) ) :
-                multiplicity = productData.multiplicity.constant( multiplicity )
-            self.multiplicity = productData.multiplicity.component( multiplicity.getForm( ) )
-            self.multiplicity.addForm( multiplicity )
-        self.distributions = distributions.base.distribution( distributions.base.noneComponentToken )
-        self.multiplicity.setParent( self )
-        self.distributions.setParent( self )
+        if( decayChannel is not None ) : self.addDecayChannel( decayChannel )
+
+        self.multiplicity = multiplicityModule.component( )
+        self.multiplicity.setAncestor( self )
+
+        self.energyDeposition = energyDepositionModule.component( )
+        self.energyDeposition.setAncestor( self )
+
+        self.momentumDeposition = momentumDepositionModule.component( )
+        self.momentumDeposition.setAncestor( self )
+
+        self.distribution = distributionModule.component( )
+        self.distribution.setAncestor( self )
 
     def __cmp__( self, other ) :
         """Compares self to other."""
 
-        if( self.getName( ) < other.getName( ) ) : return( -1 )
-        if( self.getName( ) > other.getName( ) ) : return(  1 )
+        if( self.name < other.name ) : return( -1 )
+        if( self.name > other.name ) : return(  1 )
         if( self.decayChannel < other.decayChannel ) : return( -1 )
         if( self.decayChannel > other.decayChannel ) : return(  1 )
         return( 0 )
-
-    def __len__( self ) :
-        """Returns the number of data sets for self."""
-
-        return( len( self.data ) )
 
     def  __str__( self ) :
         """Converts product object to a string representation."""
 
         return( self.toString( simpleString = False ) )
 
-    def addData( self, data ) :
+    @property
+    def name( self ) :
+        """Returns self's name"""
 
-        from productData import energyDeposition, momentumDeposition
-        genre = data.genre
-        if( genre not in [ energyDeposition.component.genre, momentumDeposition.component.genre ] ) : raise Exception( 'Unsupport genre = %s for data' % genre )
-        if( genre in self.data ) : raise Exception( 'genre = %s already exists' % genre )
-        self.data[genre] = data
+        return( self.particle.name )
+
+    @property
+    def label( self ) :
+        """Returns self's label."""
+
+        return( self.__label )
+
+    @label.setter
+    def label( self, value ) :
+
+        if( not( isinstance( value, str ) ) ) : raise TypeError( 'label must be a string' )
+        self.__label = value
+
 
     def addDecayChannel( self, decayChannel ) :
         """Adds decayChannel to particle."""
 
         if( isinstance( decayChannel, channels.channel ) ) :
-            decayChannel.setParent( self )
+            decayChannel.setAncestor( self )
             self.decayChannel = decayChannel
         else :
             raise Exception( 'Invalid decay channel = %s' % brb.getType( decayChannel ) )
 
     def addDistributionComponent( self, component ) : 
 
-        self.distributions.addComponent( component )
+        self.distribution.addComponent( component )
 
     def addAttribute( self, name, value ) :
         """Add name and value to attribute list."""
@@ -139,31 +176,8 @@ class product( ancestry ) :
         Calls checkProductFrame for self's distributions and if present for its decayChannel.
         """
 
-        self.distributions.checkProductFrame( )
+        self.distribution.checkProductFrame( )
         if( self.decayChannel is not None ) : self.decayChannel.checkProductFrame( )
-
-    def getDataTokens( self ) :
-        """Returns the list of data for this particle."""
-
-        return( self.data )
-
-    def getDataByToken( self, dataToken ) :
-        """Returns the data for dataToken."""
-
-        if( dataToken not in self.data ) : return( None )
-        return( self.data[dataToken] )
-
-    def getDistributionNativeData( self ) :
-
-        return( self.distributions.getNativeDataToken( ) )
-
-    def getDistributionGenreNames( self ) : 
-
-        return( self.distributions.keys( ) )
-
-    def getDistributionComponentByToken( self, componentToken ) : 
-
-        return( self.distributions[componentToken] )
 
     def domainMin( self, unitTo = None, asPQU = False ) :
 
@@ -173,38 +187,19 @@ class product( ancestry ) :
 
         return( self.multiplicity.domainMax( unitTo = unitTo, asPQU = asPQU ) )
 
-    def getDomain( self, unitTo = None, asPQU = False ) :
+    def domain( self, unitTo = None, asPQU = False ) :
 
         return( self.domainMin( unitTo = unitTo, asPQU = asPQU ), self.domainMax( unitTo = unitTo, asPQU = asPQU ) )
 
     def getLevelAsFloat( self, unit, default = 0. ) :
 
-        return( self.particle.getLevelAsFloat( unit, default = default ) )
+        if( hasattr( self.particle, 'getLevelAsFloat' ) ) : return( self.particle.getLevelAsFloat( unit, default = default ) )
+        return( default )
 
     def getMass( self, unit ) :
         """Returns the mass of the particle if possible, otherwise None is returned."""
 
         return( self.particle.getMass( unit ) )
-
-    def setMultiplicity( self, data ) :
-        """Sets the multiplicity nativeData to be data."""
-
-        self.multiplicity.addForm( data, asNativeData = True )
-
-    def getName( self ) :
-        """Returns self's name"""
-
-        return( self.particle.getName( ) )
-
-    def getToken( self ) :
-        """Returns self's token, same as getName."""
-
-        return( self.getName( ) )
-
-    def getLabel( self ) :
-        """Returns self's label."""
-
-        return( self.label )
 
     def getAttribute( self, name ) :
         """Returns value for attribute name if it exists; otherwise, returns None."""
@@ -214,188 +209,163 @@ class product( ancestry ) :
 
     def calculateDepositionData( self, processInfo, tempInfo, verbosityIndent ) :
 
-        if( processInfo['verbosity'] >= 20 ) : print '%s%s: label = %s: calculating deposition data' % ( verbosityIndent, self.getName( ), self.label )
-        if( self.distributions.nativeData not in [ distributions.base.noneComponentToken, distributions.base.unknownGenre ] ) :
+        if( processInfo.verbosity >= 20 ) :
+            print '%s%s: label = %s: calculating deposition data' % ( verbosityIndent, self.name, self.label )
+        if( len( self.distribution ) > 0 ) :
             tempInfo['multiplicity'] = self.multiplicity
             tempInfo['product'] = self
-            for newData in self.distributions.calculateDepositionData( processInfo, tempInfo ) :
-                if( newData.getGenre( ) not in self.data ) :
-                    self.data[newData.getGenre( )] = newData.getComponentsClass( )( newData.getForm( ) )
-                self.data[newData.getGenre( )].addForm( newData )
-        if( not ( self.decayChannel is None ) ) :
-            for product in self.decayChannel : product.calculateDepositionData( processInfo, tempInfo, verbosityIndent + '    ' )
+            for newData in self.distribution.calculateDepositionData( processInfo, tempInfo, verbosityIndent ) :
+                if isinstance( newData, productData.energyDeposition.pointwise ):
+                    self.energyDeposition.add( newData )
+                elif isinstance( newData, productData.momentumDeposition.pointwise ):
+                    self.momentumDeposition.add( newData )
+        if( self.decayChannel is not None ) :
+            for product in self.decayChannel :
+                product.calculateDepositionData( processInfo, tempInfo, verbosityIndent + processInfo.verbosityIndentStep )
 
     def process( self, processInfo, tempInfo, verbosityIndent ) :
 
         doProcess = True
         if( 'LLNL_Pn' in processInfo['styles'] ) :
-            if( not( processInfo.isProcessParticle( self.getName( ) ) ) ) : doProcess = False
+            if( not( processInfo.isProcessParticle( self.name ) ) ) : doProcess = False
 
         processInfo['workFile'].append( self.label )
         if( doProcess ) :
-            if( processInfo['verbosity'] >= 20 ) : print '%s%s: label = %s: processing: (%s)' % \
-                ( verbosityIndent, self.getName( ), self.label, self.distributions.nativeData )
+            if( processInfo.verbosity >= 20 ) : print '%s%s: label = %s: processing: (%s)' % \
+                ( verbosityIndent, self.name, self.label, self.distribution.nativeData )
 
             productMass = tempInfo['masses']['Product']             # Save to restore later
             tempInfo['masses']['Product'] = self.getMass( tempInfo['massUnit'] )
 
-            if( self.distributions.nativeData not in [ distributions.base.noneComponentToken, distributions.base.unknownGenre ] ) :
+            if( self.distribution.nativeData not in [ distributionsModule.base.unspecifiedComponentToken, distributionsModule.base.unknownGenre ] ) :
                 tempInfo['product'] = self
                 tempInfo['multiplicity'] = self.multiplicity
-                self.multiplicity.process( processInfo, tempInfo, verbosityIndent )
+                self.multiplicity.process( processInfo, tempInfo, verbosityIndent + processInfo.verbosityIndentStep )
                 try :
-                    self.distributions.process( processInfo, tempInfo, verbosityIndent + '    ' )
+                    self.distribution.process( processInfo, tempInfo, verbosityIndent + processInfo.verbosityIndentStep )
                 except :
                     if( processInfo['logFile'] is None ) :
                         raise
                     else :
                         import traceback
                         processInfo['logFile'].write( '\n' + self.toXLink() + ':\n' + traceback.format_exc( ) + '\n' )
-                for genre in self.data : self.data[genre].process( processInfo, tempInfo, verbosityIndent + '    ' )
+                for genre in self.data :
+                    self.data[genre].process( processInfo, tempInfo, verbosityIndent + processInfo.verbosityIndentStep )
             tempInfo['masses']['Product'] = productMass
 
         if( self.decayChannel is not None ) :
-            for product in self.decayChannel : product.process( processInfo, tempInfo, verbosityIndent + '    ' )
+            for product in self.decayChannel :
+                product.process( processInfo, tempInfo, verbosityIndent + processInfo.verbosityIndentStep )
         del processInfo['workFile'][-1]
 
     def check( self, info ):
         """ check product and distributions """
         from fudge.gnd import warning
-        base = distributions.base
+        base = distributionsModule.base
         warnings = []
 
         multWarnings = self.multiplicity.check( info )
         if multWarnings:
             warnings.append( warning.context("Multiplicity:", multWarnings) )
 
-        if self.getLabel() in info['transportables'] and self.distributions.nativeData == 'none':
-            warnings.append( warning.missingDistribution( self.getLabel(), self ) )
+        if( ( self.label in info['transportables'] ) and ( not self.distribution.hasData( ) ) ) :
+            warnings.append( warning.missingDistribution( self.label, self ) )
 
-        if info['isTwoBody']:
-            if self.distributions.nativeData not in (base.angularComponentToken, base.referenceComponentToken,
-                    base.CoulombElasticComponentToken, base.noneComponentToken):
-                warnings.append( warning.wrongDistributionComponent( self.distributions.nativeData, '2-body' ) )
-        else:
-            if self.distributions.nativeData in (base.angularComponentToken,base.energyComponentToken):
-                if not (self.getName()=='gamma' and 'discrete' in self.attributes):
-                    warnings.append( warning.wrongDistributionComponent( self.distributions.nativeData, 'N-body' ) )
-
-        for component in self.distributions.components.values():
+        for form in self.distribution:
 
             if info['isTwoBody']:
-                nativeForm = component.forms[ component.nativeData ]
-                from fudge.core.math.xData import axes
-                if nativeForm.getProductFrame() != axes.centerOfMassToken :
-                    warnings.append( warning.wrong2BodyFrame( nativeForm ) )
+                if( form.productFrame != standardsModule.frames.centerOfMassToken ) :
+                    warnings.append( warning.wrong2BodyFrame( form ) )
 
-            def checkForm( form, uncorrelatedComponent='' ):
+                if form.moniker not in (angularModule.twoBodyForm.moniker,
+                                        referenceModule.form.moniker,
+                                        angularModule.CoulombExpansionForm.moniker,
+                                        unspecifiedModule.form.moniker):
+                    warnings.append( warning.wrongDistributionComponent( form.moniker, '2-body' ) )
+            else:
+                if form.moniker in (angularModule.twoBodyForm.moniker,
+                                    angularModule.form.moniker,
+                                    energyModule.form.moniker):
+                    if not ( ( self.name =='gamma' ) and ( 'discrete' in self.attributes ) ) :
+                        warnings.append( warning.wrongDistributionComponent( form.moniker, 'N-body' ) )
+
+            def checkForm( form, uncorrelatedSubform='' ):
                 distributionErrors = []
-                if hasattr(form, 'getDomain') and form.getDomain() != info['crossSectionDomain']:
-                    distributionErrors.append( warning.domain_mismatch( *(form.getDomain() + info['crossSectionDomain']),
-                        obj=form ) )
+                try:
+                    if hasattr(form, 'domain') and form.domain() != info['crossSectionDomain']:
+                        for idx in range(2):    # check lower and upper edges: only warn if they disagree by > eps
+                            ratio = form.domain()[idx] / info['crossSectionDomain'][idx]
+                            if (ratio < 1-standardsModule.floats.epsilon or ratio > 1+standardsModule.floats.epsilon):
+                                distributionErrors.append( warning.domain_mismatch(
+                                        *(form.domain() + info['crossSectionDomain']), obj=form ) )
+                                break
+                except IndexError as err:
+                    distributionErrors.append(warning.ExceptionRaised(err))
+                    if info['failOnException']: raise
                 if not hasattr(form,'check'):
-                    warnings.append( warning.NotImplemented(form.name, form ) )
+                    warnings.append( warning.NotImplemented(form.moniker, form ) )
+                    if info['failOnException']:
+                        raise NotImplementedError("Checking distribution form '%s'" % form.moniker)
                 else:
                     distributionErrors += form.check( info )
                 if distributionErrors:
                     warnings.append( warning.context("Distribution %s %s - %s:"
-                        % (component.name, uncorrelatedComponent, form.name), distributionErrors ) )
+                        % (form.moniker, uncorrelatedSubform, form.moniker), distributionErrors ) )
 
-            if isinstance(component, distributions.uncorrelated.component):
-                # uncorrelated: same frame required for energy & angle distributions:
-                frames = []
-                for subcomponent in ('angularComponent','energyComponent'):
-                    form = getattr(component, subcomponent).forms[ getattr(component, subcomponent).nativeData]
-                    frames.append( form.getProductFrame() )
-                    checkForm( form, subcomponent )
-                if (len(frames)==2) and (frames[0] != frames[1]):
-                    warnings.append( warning.uncorrelatedFramesMismatch( frames[0], frames[1], component ) )
+            if isinstance(form, distributionsModule.uncorrelated.form):
+                for subformName in ('angularSubform','energySubform'):
+                    subform = getattr(form, subformName ).data
+                    checkForm( subform, subformName.replace('Subform','') )
+
+            elif isinstance(form, KalbachMannModule.form):
+                checkForm( form )
 
             else:
-                for form in component.forms.values():
-                    checkForm( form )
+                for subform in form.subforms:
+                    checkForm( subform )
 
         if self.decayChannel is not None:
+            from fudge import gnd
+            parentIsTwoBody = info['isTwoBody']
+            info['isTwoBody'] = (self.decayChannel.genre is gnd.channels.twoBodyGenre)
             for decayProduct in self.decayChannel:
                 decayWarnings = decayProduct.check( info )
                 if decayWarnings:
-                    warnings.append( warning.context("Decay product: %s" % decayProduct.getLabel(), decayWarnings) )
+                    warnings.append( warning.context("Decay product: %s" % decayProduct.label, decayWarnings) )
+            info['isTwoBody'] = parentIsTwoBody # reset to parent channel
 
         return warnings
 
-    def toXMLList( self, flags, indent = '' ) :
+    def toXMLList( self, indent = '', **kwargs ) :
 
-        indent2 = indent + '  '
+        indent2 = indent + kwargs.get( 'incrementalIndent', '  ' )
+
         attributeString = ''
-        for q in sorted(self.attributes) : attributeString += ' %s="%s"' % ( q, self.attributes[q] )
-        xmlString = [ '%s<product name="%s" label="%s" multiplicity="%s"%s>' % \
-            ( indent, self.getName( ), self.getLabel( ), self.multiplicity.getXMLAttribute( ), attributeString ) ]
-        xmlString += self.distributions.toXMLList( indent2 )
-        for genre in self.data : xmlString += self.data[genre].toXMLList( indent = indent2 )
-        xmlString += self.multiplicity.toXMLList( indent = indent2 )
+        for q in sorted(self.attributes) :
+            if( q in [ 'discrete', 'decayRate', 'primary' ] ) :
+                attributeString += ' %s="%s"' % ( q, self.attributes[q].toString( keepPeriod = False ) )
+            else :
+                attributeString += ' %s="%s"' % ( q, self.attributes[q] )
+        xmlString = [ '%s<product name="%s" label="%s"%s>' % ( indent, self.name, self.label, attributeString ) ]
+
+        xmlString += self.multiplicity.toXMLList( indent2, **kwargs )
+        xmlString += self.distribution.toXMLList( indent2, **kwargs )
+        xmlString += self.energyDeposition.toXMLList( indent2, **kwargs )
+        xmlString += self.momentumDeposition.toXMLList( indent2, **kwargs )
+
         if( not ( self.decayChannel is None ) ) :
-            xmlString += self.decayChannel.toXMLList( flags, indent = indent2 )
+            xmlString += self.decayChannel.toXMLList( indent2, **kwargs )
         xmlString[-1] += '</product>'
         return( xmlString )
 
-    def toENDF6( self, MT, endfMFList, flags, targetInfo, verbosityIndent = '' ) :
-
-        def getPromptOrTotalNubar( self ) :
-
-            nativeDataMultiplicity = self.multiplicity.getNativeDataToken( )
-            if( nativeDataMultiplicity == tokens.pointwiseFormToken ) :
-                return( self.multiplicity.getFormByToken( tokens.pointwiseFormToken ) )
-            elif( nativeDataMultiplicity == tokens.polynomialFormToken ) :
-                return( self.multiplicity.getFormByToken( tokens.polynomialFormToken ) )
-            else :
-                raise Exception( 'Unsupported nubar form = "%s"' % nativeDataMultiplicity )
-
-        targetInfo['product'] = self
-        targetInfo['delayedNubarWeight'] = None
-        if( 'emissionMode' in self.attributes ) :
-            if( self.getAttribute( 'emissionMode' ) == 'delayed' ) :
-                MT = 455
-                if( MT not in endfMFList[5] ) : endfMFList[5][MT] = [ ]
-                targetInfo['delayedNubarWeight'] = self.ENDF6_delayedNubarWeights
-            elif( self.getAttribute( 'emissionMode' ) == 'prompt' ) :
-                targetInfo['promptNubar'] = getPromptOrTotalNubar( self )
-            elif( self.getAttribute( 'emissionMode' ) == 'total' ) :
-                    targetInfo['totalNubar'] = getPromptOrTotalNubar( self )
-
-        if( flags['verbosity'] >= 10 ) : print '%s%s: label = %s: to ENDF6:' % ( verbosityIndent, self.getName( ), self.label )
-        priorMF6flag = targetInfo['doMF4AsMF6']
-        if self.attributes.get('ENDFconversionFlag') == 'MF6':
-            targetInfo['doMF4AsMF6'] = True # flag was set in reaction.py, but may need to be overwritten
-        if( self.distributions.components ) :
-            targetInfo['zapID'] = self.particle.getName( )
-            if hasattr(self.particle,'groundState'):
-                # ENDF wants ground state mass:
-                targetInfo['particleMass'] = self.particle.groundState.getMass( 'eV/c**2' )
-            else:
-                targetInfo['particleMass'] = self.getMass( 'eV/c**2' )
-            targetInfo['multiplicity'] = self.multiplicity
-            if 'primary' in self.attributes:
-                targetInfo['primaryGammaEnergy'] = self.attributes['primary'].getValueAs('eV')
-            self.distributions.toENDF6( MT, endfMFList, flags, targetInfo )
-        if( not( self.decayChannel is None ) ) :
-            priorIndex, priorToken, priorLabel = targetInfo['productIndex'], targetInfo['productToken'], targetInfo['productLabel']
-            for index, product in enumerate( self.decayChannel ) :
-                if( product.getName( ) == 'gamma' ) :
-                    targetInfo['gammas'].append( product )
-                    continue
-                targetInfo['productIndex'] = "%s.%s" % ( priorIndex, index )
-                targetInfo['productToken'] = product.getToken( )
-                targetInfo['productLabel'] = product.getLabel( )
-                product.toENDF6( MT, endfMFList, flags, targetInfo, verbosityIndent = verbosityIndent + '    ' )
-            targetInfo['productIndex'], targetInfo['productToken'], targetInfo['productLabel'] = priorIndex, priorToken, priorLabel
-        targetInfo['doMF4AsMF6'] = priorMF6flag
-
     def toString( self, simpleString = False, exposeGammaMultiplicity = False ) :
-        """Returns a string representation of self. If simpleString is True, the string contains only the final 
-    particles, and not any intermediate particles."""
+        """
+        Returns a string representation of self. If simpleString is True, the string contains only the final 
+        particles, and not any intermediate particles.
+        """
 
         if( simpleString == True ) :
-            s = self.getName( )
+            s = self.name
             multiplicity = self.multiplicity.getXMLAttribute( )
             if( ( s != 'gamma' ) or exposeGammaMultiplicity ) :
                 if( type( multiplicity ) == type( 1 ) ) :
@@ -403,7 +373,7 @@ class product( ancestry ) :
                 else :
                     s = "%s[multiplicity:'%s']" % ( s, multiplicity )
         else :
-            s = self.getName( )
+            s = self.name
             qs = ''
             c = '['
             if( ( s != 'gamma' ) or exposeGammaMultiplicity ) :
@@ -419,47 +389,55 @@ class product( ancestry ) :
                 c = ', '
             if( len( qs ) > 0 ) : qs += ']'
             s = '%s%s' % ( s, qs )
-            if( self.decayChannel != None ) : s = '(%s -> %s)' % ( s, self.decayChannel )
+            if( self.decayChannel is not None ) : s = '(%s -> %s)' % ( s, self.decayChannel )
         return( s )
 
-def parseXMLNode( productElement, xPath=[], linkData={} ):
-    """Translate a <product> element from xml."""
+    @staticmethod
+    def parseXMLNode( productElement, xPath, linkData ):
+        """Translate a <product> element from xml."""
 
-    xPath.append( '%s[@label="%s"]' % (productElement.tag, productElement.get('label')) )
-    attrs = dict( productElement.items() )
-    particle = linkData['particles'].getParticle( attrs.pop('name') )
-    mult = attrs.pop('multiplicity')
-    if mult == tokens.unknownFormToken:
-        mult = productData.multiplicity.unknown()
-    elif mult == productData.multiplicity.energyDependent:
-        mult = productData.multiplicity.parseXMLNode( productElement.find('multiplicity'), xPath, linkData )
-    elif mult == tokens.partialProductionFormToken:
-        mult = productData.multiplicity.partialProduction()
-    else:
-        mult = float( mult )
-        if mult.is_integer(): mult = int(mult)
-    prod = product( particle, productElement.tag, label=attrs.pop('label'), multiplicity=mult)
-    prod.distributions = productData.distributions.parseXMLNode( productElement.find('distributions'),
-            xPath, linkData )
-    prod.distributions.parent = prod
-    decayChannel = productElement.find( channels.decayChannelToken )
-    if decayChannel:
-        prod.decayChannel = channels.parseXMLNode( decayChannel, xPath, linkData )
-        prod.decayChannel.parent = prod
-    for attr in ('decayRate','primary','discrete'):
-        if attr in attrs:
-            from pqu import physicalQuantityWithUncertainty
-            attrs[attr] = physicalQuantityWithUncertainty.PhysicalQuantityWithUncertainty(attrs[attr])
-    prod.attributes = attrs
+        xPath.append( '%s[@label="%s"]' % ( productElement.tag, productElement.get( 'label' ) ) )
+        attrs = dict( productElement.items( ) )
+        particle = linkData['particles'].getParticle( attrs.pop( 'name' ) )
+        prod = product( particle, label = attrs.pop( 'label' ) )
+        prod.multiplicity.parseXMLNode( productElement.find( multiplicityModule.component.moniker ), xPath, linkData )
+        prod.distribution.parseXMLNode( productElement.find( distributionModule.component.moniker ), xPath, linkData )
+        decayChannel = productElement.find( channels.decayChannelToken )
+        if( decayChannel ) :
+            prod.addDecayChannel( channels.parseXMLNode( decayChannel, xPath, linkData ) )
+        for attr in ( 'decayRate', 'primary', 'discrete' ) :
+            if( attr in attrs ) :
+                from pqu import PQU
+                attrs[attr] = PQU.PQU( attrs[attr] )
+        prod.attributes = attrs
 
-    # extra data may be present in derived files:
-    depositionEnergyToken = productData.base.energyDepositionToken
-    if productElement.find(depositionEnergyToken) is not None:
-        prod.data[depositionEnergyToken] = productData.energyDeposition.parseXMLNode(
-                productElement.find(depositionEnergyToken), xPath )
-    depositionMomentumToken = productData.base.momentumDepositionToken
-    if productElement.find(depositionMomentumToken) is not None:
-        prod.data[depositionMomentumToken] = productData.momentumDeposition.parseXMLNode(
-                productElement.find(depositionMomentumToken), xPath )
-    xPath.pop()
-    return prod
+        depositionEnergyToken = productData.base.energyDepositionToken
+        if( productElement.find( depositionEnergyToken ) is not None ) :
+            prod.energyDeposition.parseXMLNode( productElement.find( depositionEnergyToken ), xPath, linkData )
+        depositionMomentumToken = productData.base.momentumDepositionToken
+        if( productElement.find( depositionMomentumToken ) is not None ) :
+            prod.momentumDeposition.parseXMLNode( productElement.find( depositionMomentumToken ), xPath, linkData )
+        xPath.pop( )
+        return( prod )
+
+class products( suitesModule.suite ) :
+
+    moniker = 'products'
+
+    def __init__( self ) :
+
+        suitesModule.suite.__init__( self, ( product, ) )
+
+    def add( self, product ) :
+
+        if( product.label is None ) : product.__label = product.name
+        if( product.label in self ) :
+            name = product.name
+            index = len( [ _product for _product in self if _product.name == name ] )
+            suffixCharacters = string.ascii_lowercase
+            suffix = ''
+            while( index > 0 ) :
+                index, index1 = divmod( index - 1, 26 )
+                suffix = suffixCharacters[index1] + suffix
+            product.label = name + '__' + suffix
+        suitesModule.suite.add( self, product )

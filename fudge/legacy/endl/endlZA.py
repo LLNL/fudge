@@ -8,22 +8,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 
 """
@@ -138,6 +149,7 @@ class endlZA :
                 self.filelist = []
                 for f in F :        # Process only yo##c##i###s### files and create list self.filelist[]
                     if( re.match( r"yo\d\dc\d\di\d\d\ds\d\d\d$", f ) ) :
+                        if( f[8:11] in [ '030', '032' ] ) : continue        # Skip fluorescence data that is not support in Fudge.
                         self.filelist.append( endlFile.endlFile( 0, f, self.source + os.sep + f, self.ZA, self.yi, bdflsFile = self.bdflsFile ) )
                 documentationFileName = os.path.join( self.source, 'documentation.txt' )
                 self.documentation = None
@@ -327,7 +339,7 @@ can be used to get a reference to the neutron in-elastic cross section,
                             E = data.EMin( )
                         else :
                             E = data.xMin( )
-                        if( E < EMinI0 ) : ErrMsgs.append( endlmisc.endlCheckerObject( yi = self.yi, ZA = self.ZA, suffix = self.suffix, data = data, \
+                        if( E < ( EMinI0 - dThreshold_MeV ) ) : ErrMsgs.append( endlmisc.endlCheckerObject( yi = self.yi, ZA = self.ZA, suffix = self.suffix, data = data, \
                             message = "first E value = %e is less than I = 0's first E value = %e" % ( E, EMinI0 ) ) )
                         if( E > ( EMinI0 + dThreshold_MeV ) ) : ErrMsgs.append( endlmisc.endlCheckerObject( yi = self.yi, ZA = self.ZA, suffix = self.suffix, data = data, \
                             message = "first E value = %e is greater than I = 0's first E value = %e" % ( E, EMinI0 ) ) )
@@ -447,7 +459,6 @@ can be used to get a reference to the neutron in-elastic cross section,
                     if( ( 10 < C < 50 ) and ( yo == 7 ) and ( not I9present ) ) :
                         ErrMsgs.append( endlmisc.endlCheckerObject( yi = self.yi, ZA = self.ZA, suffix = self.suffix, yo = yo, C = C, I = 9, S = S, X1 = X1, \
                             X2 = X2, X3 = X3, X4 = X4, Q = Q, message = 'missing I = 9 data for yo =  7' ) )
-                        if( not I9present ) : yoMsg = 'missing I = 9 data'
                     if( checkForEnDepData ) :
                         try :
                             data = self.findData( yo = yo, C = C, I = 10, S = S, X1 = X1, X2 = X2, X3 = X3, X4 = X4, Q = Q, ifMultipleReturnFirst = True )
@@ -834,24 +845,16 @@ can be used to get a reference to the neutron in-elastic cross section,
         except :
             pass
         I0s = self.findDatas( I = 0 )
+
+        S1Cs = []
         for I0 in I0s :
-            if( I0.C in [ 1, 6 ] ) : continue
+            if( I0.S == 1 ) : S1Cs.append( I0.C )
+
+        for I0 in I0s :
+            if( ( I0.C < 8 ) or ( 49 < I0.C < 58 ) ) : continue
             Ss = [ I0.S ]
             if( I0.C == 15 ) : Ss.append( 7 )
             datas = self.findDatas( C = I0.C, S = Ss, X1 = I0.X1, X2 = I0.X2, X3 = I0.X3, X4 = I0.X4, Q = I0.Q )
-            doFixQandThreshold = not ( ( I0.C < 8 ) or ( 49 < I0.C < 58 ) )
-            threshold = 0.
-            if( doFixQandThreshold ) : Q, threshold = I0.fixQandThreshold( specialCases = specialCases, fixThresholdMode = fixThresholdMode, 
-                dThreshold_MeV = dThreshold_MeV, threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
-            EMinI0 = I0.xMin( )
-            EMinNext = None
-            EMin13479 = EMinI0
-            for data in datas :
-                if( data.I > 9 ) : continue
-                EMin_, EMinNext_ = data.getEMin_EMinNext( )
-                if( ( EMinNext == None ) or ( EMinNext_ < EMinNext ) ) : EMinNext = EMinNext_
-                if( ( EMin_ != None ) and ( data.I in [ 1, 3, 4, 7, 9 ] ) ) : EMin13479 = min( EMin13479, EMin_ )
-            EMin = EMinI0
 
             yos = endl_C.endl_C_yoInfo( I0.C )                                  # Attempt to handle charged particle "Coulomb barrier" threshold.
             CoulombBarrier = False
@@ -862,31 +865,35 @@ can be used to get a reference to the neutron in-elastic cross section,
                     CoulombBarrier = True
                 elif( ( yos[0] == endl_C.yo_eq_yi ) and ( self.yi > 1 ) ) :     # yo = yi
                     CoulombBarrier = True
-            if( ( not CoulombBarrier ) and ( EMin13479 >= threshold ) ) :       # Additional check for "Coulomb barrier"
-                for data in datas :                                             # if I = 1, 3, 4, 7 and 9 data's EMin are all the same
-                    CoulombBarrier = True                                       # most (hopefully) likely a charged particle came out first,
-                    if( data.I in [ 1, 3, 4, 7, 9 ] ) :                         # at least ENDF data is like this.
-                        if( data.getEMin_EMinNext( )[0] != EMin13479 ) : CoulombBarrier = False
-            if( EMin < EFloor ) :
-                endlmisc.printWarning( 'Info endlZA.fixQandThresholds: moving EMin = %e to EFloor = %e for ZA = %d, C = %d, S = %d, X1 = %e' % \
-                    ( EMin, EFloor, I0.ZA, I0.C, I0.S, I0.X1 ) )
-                EMin = EFloor
-            if( EMin13479 < EFloor ) :
-                endlmisc.printWarning( 'Info endlZA.fixQandThresholds: moving EMin13479 = %e to EFloor = %e for ZA = %d, C = %d, S = %d, X1 = %e' % \
-                    ( EMin13479, EFloor, I0.ZA, I0.C, I0.S, I0.X1 ))
-                EMin13479 = EFloor
-            if( CoulombBarrier ) :
-                if( EMin13479 < threshold ) :
-                    EMin = threshold
-                else :
-                    EMin = EMin13479
-                if( EMin < EMinI0 ) : I0.data.insert( 0, [ EMin, I0.data[0][1] ] )
-            elif( threshold > 0. ) :
-                if( EMinNext <= threshold ) : EMin = threshold
-            if( doFixQandThreshold ) :
+
+            Q, threshold = I0.determineQandThreshold( specialCases = specialCases )
+            if( ( ( Q == 0 ) and ( I0.S == 0 ) and ( I0.C in S1Cs ) ) or ( CoulombBarrier ) ) :
+                EMin = I0.xMin( )
                 for data in datas :
-                    data.fixQandThreshold( Q = Q, specialCases = specialCases, fixThresholdMode = fixThresholdMode, dThreshold_MeV = dThreshold_MeV, 
-                        EMin = EMin, threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
+                    if( data.I > 9 ) : continue
+                    try :
+                        EMin_ = data.xMin( )
+                    except :
+                        EMin_ = data.EMin( )
+                    EMin = min( EMin, EMin_ )
+            else :
+                EMin = None
+                for data in datas :
+                    if( data.I > 9 ) : continue
+                    if( data.I in [ 2, 5, 6, 8 ] ) :
+                        print 'DATA I = ', data.I
+                        continue
+                    EMin_, EMinNext_ = data.getEMin_EMinNext( )
+                    if( EMin is None ) : EMin, EMinNext = EMin_, EMinNext_
+                    EMin, EMinNext = min( EMin, EMin_ ), min( EMinNext, EMinNext_ )
+
+                EMin = EFloor
+                if( ( threshold > 0. ) and ( EMinNext <= threshold ) ) : EMin = threshold
+
+            thresholdCrossSectionIsZero = I0.data[0][1] == 0
+            for data in datas :
+                data.setQandThreshold( thresholdCrossSectionIsZero, Q, threshold, fixThresholdMode = fixThresholdMode, 
+                        dThreshold_MeV = dThreshold_MeV, EMin = EMin, threshold_MeV_shiftWarning = threshold_MeV_shiftWarning )
 
     def getDocumentation( self ) :
         """Return None if there is not documentation file, otherwise, the text of the documentation file is returned."""
@@ -1165,10 +1172,10 @@ can be used to get a reference to the neutron in-elastic cross section,
                 if( datum.I == 9 ) : addFile( datum.toZAsFrame( newProjectileMass, newTargetMass, halflife, self.bdflsFile )[0], halflife )
         return( newTarget )
         
-    def toGND( self, xenslIsotopes = None, testing = False, verbose = 0 ) :
+    def toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = None, testing = False, verbose = 0 ) :
 
         import fudge.legacy.converting.endlToGND as endlToGND
-        return( endlToGND.toGND( self, xenslIsotopes = xenslIsotopes, testing = testing, verbose = verbose ) )
+        return( endlToGND.toGND( self, evaluationLibrary, evaluationVersion, xenslIsotopes = xenslIsotopes, verbose = verbose ) )
 
     def adjustcs( self, C = 10, S = None, X1 = None, X2 = None, X3 = None, X4 = None, Q = None, f = 5.e-5, csRelChangeNotice = .1 ) :
         """Adjust the cross section given by C, S, X1, X2, X3, X4 and Q  so that the total cross section remains fixed.  

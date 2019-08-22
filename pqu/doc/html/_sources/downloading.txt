@@ -1,6 +1,0 @@
-Downloading
-===========
-
-The latest version of pqu is included with Fudge and GND, available at https://ndclx4.bnl.gov/gf/project/gnd/.
-Users with access to the LLNL network can also checkout the source from svn on LC
-

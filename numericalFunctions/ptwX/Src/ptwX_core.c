@@ -9,28 +9,40 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <float.h>
 
 #include "ptwX.h"
 
@@ -65,11 +77,29 @@ nfu_status ptwX_setup( ptwXPoints *ptwX, int64_t size ) {
 /*
 ************************************************************
 */
-ptwXPoints *ptwX_create( int64_t size, int64_t length, double *xs, nfu_status *status ) {
+ptwXPoints *ptwX_create( int64_t size, int64_t length, double const *xs, nfu_status *status ) {
 
     ptwXPoints *ptwX = ptwX_new( size, status );
 
-    if( ( *status = ptwX_setData( ptwX, length, xs ) ) != nfu_Okay ) ptwX = ptwX_free( ptwX );
+    if( ptwX != NULL ) {
+        if( ( *status = ptwX_setData( ptwX, length, xs ) ) != nfu_Okay ) ptwX = ptwX_free( ptwX );
+    }
+    return( ptwX );
+}
+/*
+************************************************************
+*/
+ptwXPoints *ptwX_createLine( int64_t size, int64_t length, double slope, double offset, nfu_status *status ) {
+
+    int64_t i1;
+    double *p1;
+    ptwXPoints *ptwX;
+
+    if( size < length ) size = length;
+    if( ( ptwX = ptwX_new( size, status ) ) != NULL ) {
+        for( i1 = 0, p1 = ptwX->points; i1 < length; i1++, p1++ ) *p1 = slope * i1 + offset;
+        ptwX->length = length;
+    }
     return( ptwX );
 }
 /*
@@ -157,7 +187,7 @@ nfu_status ptwX_release( ptwXPoints *ptwX ) {
 */
 ptwXPoints *ptwX_free( ptwXPoints *ptwX ) {
 
-    ptwX_release( ptwX );
+    if( ptwX != NULL ) ptwX_release( ptwX );
     return( (ptwXPoints *) nfu_free( ptwX ) );
 }
 /*
@@ -170,7 +200,7 @@ int64_t ptwX_length( ptwXPoints *ptwX ) {
 /*
 ************************************************************
 */
-nfu_status ptwX_setData( ptwXPoints *ptwX, int64_t length, double *xs ) {
+nfu_status ptwX_setData( ptwXPoints *ptwX, int64_t length, double const *xs ) {
 
     int64_t  i;
 
@@ -235,7 +265,7 @@ nfu_status ptwX_setPointAtIndex( ptwXPoints *ptwX, int64_t index, double x ) {
 /*
 ************************************************************
 */
-nfu_status ptwX_insertPointsAtIndex( ptwXPoints *ptwX, int64_t index, int64_t n1, double *xs ) {
+nfu_status ptwX_insertPointsAtIndex( ptwXPoints *ptwX, int64_t index, int64_t n1, double const *xs ) {
 
     nfu_status status;
     int64_t i1, i2, n1p, size = n1 + ptwX->length;
@@ -284,13 +314,13 @@ int ptwX_ascendingOrder( ptwXPoints *ptwX ) {
 /*
 ************************************************************
 */
-ptwXPoints *ptwX_fromString( char const *str, char **endCharacter, nfu_status *status ) {
+ptwXPoints *ptwX_fromString( char const *str, char sep, char **endCharacter, nfu_status *status ) {
 
     int64_t numberConverted;
     double  *doublePtr;
     ptwXPoints *ptwX = NULL;
 
-    if( ( *status = nfu_stringToListOfDoubles( str, &numberConverted, &doublePtr, endCharacter ) ) != nfu_Okay ) return( NULL );
+    if( ( doublePtr = nfu_stringToListOfDoubles( str, sep, &numberConverted, endCharacter, status ) ) == NULL ) return( NULL );
     ptwX = ptwX_create( numberConverted, numberConverted, doublePtr, status );
     nfu_free( doublePtr );
     return( ptwX );
@@ -445,11 +475,81 @@ nfu_status ptwX_abs( ptwXPoints *ptwX ) {
 */
 nfu_status ptwX_neg( ptwXPoints *ptwX ) {
 
+    return( ptwX_slopeOffset( ptwX, -1, 0 ) );
+}
+/*
+************************************************************
+*/
+nfu_status ptwX_add_double( ptwXPoints *ptwX, double value ) {
+
+    return( ptwX_slopeOffset( ptwX, 1, value ) );
+}
+/*
+************************************************************
+*/
+nfu_status ptwX_mul_double( ptwXPoints *ptwX, double value ) {
+
+    return( ptwX_slopeOffset( ptwX, value, 0 ) );
+}
+/*
+************************************************************
+*/
+nfu_status ptwX_slopeOffset( ptwXPoints *ptwX, double slope, double offset ) {
+
     int64_t i1;
     double *p1;
 
     if( ptwX->status != nfu_Okay ) return( ptwX->status );
-    for( i1 = 0, p1 = ptwX->points; i1 < ptwX->length; i1++, p1++ ) *p1 *= -1.;
+    for( i1 = 0, p1 = ptwX->points; i1 < ptwX->length; i1++, p1++ ) *p1 = slope * *p1 + offset;
+    return( nfu_Okay );
+}
+/*
+************************************************************
+*/
+nfu_status ptwX_add_ptwX( ptwXPoints *ptwX1, ptwXPoints *ptwX2 ) {
+
+    int64_t i1;
+    double *p1 = ptwX1->points, *p2 = ptwX2->points;
+
+    if( ptwX1->status != nfu_Okay ) return( ptwX1->status );
+    if( ptwX2->status != nfu_Okay ) return( ptwX2->status );
+    if( ptwX1->length != ptwX2->length ) return( nfu_domainsNotMutual );
+
+    for( i1 = 0; i1 < ptwX1->length; i1++, p1++, p2++ ) *p1 += *p2;
+    return( nfu_Okay );
+}
+/*
+************************************************************
+*/
+nfu_status ptwX_sub_ptwX( ptwXPoints *ptwX1, ptwXPoints *ptwX2 ) {
+
+    int64_t i1;
+    double *p1 = ptwX1->points, *p2 = ptwX2->points;
+
+    if( ptwX1->status != nfu_Okay ) return( ptwX1->status );
+    if( ptwX2->status != nfu_Okay ) return( ptwX2->status );
+    if( ptwX1->length != ptwX2->length ) return( nfu_domainsNotMutual );
+
+    for( i1 = 0; i1 < ptwX1->length; i1++, p1++, p2++ ) *p1 -= *p2;
+    return( nfu_Okay );
+}
+/*
+************************************************************
+*/
+nfu_status ptwX_range( ptwXPoints *ptwX, double *rangeMin, double *rangeMax ) {
+
+    int64_t i1, n1 = ptwX->length;
+    *rangeMin = *rangeMax = 0;
+    double *p1 = ptwX->points;
+
+    if( ptwX->status != nfu_Okay ) return( ptwX->status );
+    if( n1 > 0 ) {
+        *rangeMin = *rangeMax = *(p1++);
+        for( i1 = 1; i1 < n1; ++i1, ++p1 ) {
+            if( *p1 < *rangeMin ) *rangeMin = *p1;
+            if( *p1 > *rangeMax ) *rangeMax = *p1;
+        }
+    }
     return( nfu_Okay );
 }
 /*
@@ -476,4 +576,30 @@ nfu_status ptwX_compare( ptwXPoints *ptwX1, ptwXPoints *ptwX2, int *comparison )
         *comparison = 1;
     }
     return( nfu_Okay );
+}
+/*
+************************************************************
+*/
+int ptwX_close( ptwXPoints *ptwX1, ptwXPoints *ptwX2, int epsilonFactor, double epsilon, nfu_status *status ) {
+
+    int64_t i1, n1 = ptwX1->length;
+    double larger;
+    double *p1 = ptwX1->points, *p2 = ptwX2->points;
+
+    epsilon = fabs( epsilon ) + abs( epsilonFactor ) * DBL_EPSILON;
+
+    *status = ptwX1->status;
+    if( ptwX1->status != nfu_Okay ) return( -1 );
+    *status = ptwX2->status;
+    if( ptwX2->status != nfu_Okay ) return( -1 );
+    *status = nfu_domainsNotMutual;
+    if( n1 != ptwX2->length ) return( -1 );
+
+    *status = nfu_Okay;
+    for( i1 = 0; i1 < n1; i1++, p1++, p2++ ) {
+        larger = fabs( *p1 );
+        if( fabs( *p2 ) > larger ) larger = fabs( *p2 );
+        if( fabs( *p2 - *p1 ) > epsilon * larger ) return( (int) ( i1 + 1 ) );
+    }
+    return( 0 );
 }

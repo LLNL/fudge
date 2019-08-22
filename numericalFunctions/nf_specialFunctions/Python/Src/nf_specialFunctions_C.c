@@ -9,22 +9,33 @@
 # This file is part of the FUDGE package (For Updating Data and 
 #         Generating Evaluations)
 # 
+# When citing FUDGE, please use the following reference:
+#   C.M. Mattoon, B.R. Beck, N.R. Patel, N.C. Summers, G.W. Hedstrom, D.A. Brown, "Generalized Nuclear Data: A New Structure (with Supporting Infrastructure) for Handling Nuclear Data", Nuclear Data Sheets, Volume 113, Issue 12, December 2012, Pages 3145-3171, ISSN 0090-3752, http://dx.doi.org/10. 1016/j.nds.2012.11.008
 # 
-#     Please also read this link - Our Notice and GNU General Public License.
 # 
-# This program is free software; you can redistribute it and/or modify it under 
-# the terms of the GNU General Public License (as published by the Free Software
-# Foundation) version 2, dated June 1991.
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the IMPLIED WARRANTY OF MERCHANTABILITY 
-# or FITNESS FOR A PARTICULAR PURPOSE. See the terms and conditions of 
-# the GNU General Public License for more details.
-# You should have received a copy of the GNU General Public License along with 
-# this program; if not, write to 
+#     Please also read this link - Our Notice and Modified BSD License
 # 
-# the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330,
-# Boston, MA 02111-1307 USA
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of Lawrence Livermore National Security, LLC. nor the
+#       names of its contributors may be used to endorse or promote products
+#       derived from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL LAWRENCE LIVERMORE NATIONAL SECURITY BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # <<END-copyright>>
 */
 
@@ -56,6 +67,7 @@ static PyObject *nf_amc_wigner_9j_C( PyObject *self, PyObject *args );
 static PyObject *nf_amc_racah_C( PyObject *self, PyObject *args );
 static PyObject *nf_amc_clebsh_gordan_C( PyObject *self, PyObject *args );
 static PyObject *nf_amc_z_coefficient_C( PyObject *self, PyObject *args );
+static PyObject *nf_amc_zbar_coefficient_C( PyObject *self, PyObject *args );
 static PyObject *nf_amc_reduced_matrix_element_C( PyObject *self, PyObject *args );
 static PyObject *nf_erf_C( PyObject *self, PyObject *args, PyObject *keywords );
 static PyObject *nf_specialFunctions_C_SetPyErrorExceptionReturnNull( const char *s, ... );
@@ -178,6 +190,17 @@ static PyObject *nf_amc_clebsh_gordan_C( PyObject *self, PyObject *args ) {
     if( !PyArg_ParseTuple( args, "iiiii", &j1, &j2, &m1, &m2, &j3 ) ) return( NULL );
 
     return( Py_BuildValue( "d", nf_amc_clebsh_gordan( j1, j2, m1, m2, j3 ) ) );
+}
+/*
+************************************************************
+*/
+static PyObject *nf_amc_zbar_coefficient_C( PyObject *self, PyObject *args ) {
+
+    int j1, j2, l1, l2, ll, s;
+
+    if( !PyArg_ParseTuple( args, "iiiiii", &l1, &j1, &l2, &j2, &s, &ll ) ) return( NULL );
+
+    return( Py_BuildValue( "d", nf_amc_zbar_coefficient( l1, j1, l2, j2, s, ll ) ) );
 }
 /*
 ************************************************************
@@ -339,13 +362,17 @@ Testing issues:
         "\nArguments are:\n" \
         "    j1, j2, j3, j4, j5, j6     all integers, 2x angular momenta\n" },
     { "racah", (PyCFunction) nf_amc_racah_C, METH_VARARGS,
-        "racah( j1, j2, j3, j4, j5, j6 )\n\n" \
+        "racah( j1, j2, l2, l1, j3, l3 )\n\n" \
         "Racah coefficient\n\n" \
-        "    = W(j1 j2 j3 j4 ; j5 j6)\n\n" \
-        "    = (-1)^(j1+j2+j4+j5) * { j1 j2 j3 }\n" \
-        "                           { j4 j5 j6 }\n\n" \
+        "    = W(j1, j2, l2, l1 ; j3, l3)\n\n" \
+        "    = (-1)^(j1+j2+l1+l2) * { j1 j2 j3 }\n" \
+        "                           { l1 l2 l3 }\n\n" \
         "\nArguments are: \n" \
-        "    j1, j2, j3, j4, j5, j6     all integers, 2x angular momenta\n" },
+        "    j1, j2, l2, l1, j3, l3     all integers, 2x angular momenta\n\n"\
+        "We use the Racah coefficient definition in Edmonds (A.R. Edmonds, 'Angular Momentum in Quantum Mechanics', Princeton (1980).\n"\
+        "Note that the call signature of W(...) appears jumbled, but hey, that's the convention.\n"\
+        "This convention is exactly that used by Blatt-Biedenharn (Rev. Mod. Phys. 24, 258 (1952)) too."
+    },
     { "clebsh_gordan", (PyCFunction) nf_amc_clebsh_gordan_C, METH_VARARGS,
         "clebsh_gordan( j1, j2, j3, m1, m2)\n\n" \
         "Clebsh-Gordan coefficient\n\n" \
@@ -360,6 +387,19 @@ Testing issues:
         "z_coefficient( j1, j2, l1, l2, ll, s )\n\n" \
         "Biedenharn's Z-coefficient coefficient\n\n" \
         "    =  Z(l1  j1  l2  j2 | S L )\n\n" \
+        "\nArguments are: \n" \
+        "    j1, j2     integers, 2x the total angular momentum (so for j=1/2 use j=1)\n" \
+        "    l1, l2     integers, 2x the orbital angular momentum\n" \
+        "    ll         integer, 2x the orbital angular momentum that l1 and l2 couple up to,\n" \
+        "    s          integer, 2x the projection of the ll onto the z axis\n" },
+    { "zbar_coefficient", (PyCFunction) nf_amc_zbar_coefficient_C, METH_VARARGS,
+        "zbar_coefficient( j1, j2, l1, l2, ll, s )\n\n" \
+        "Lane & Thomas's Zbar-coefficient coefficient\n\n" \
+        "    =  ZBar(l1  j1  l2  j2 | S L )\n\n" \
+        "    = (-i)^( -l1 + l2 + ll ) * Z(l1  j1  l2  j2 | S L )\n\n"
+        "From Lane & Thomas Rev. Mod. Phys. 30, 257-353 (1958).\n"
+        "Note, Lane & Thomas define this because they did not like the different phase convention in Blatt & Biedenharn's Z coefficient.  They changed it to get better time-reversal behavior.\n"
+        "Froehner uses Lane & Thomas convention as does T. Kawano.\n\n"
         "\nArguments are: \n" \
         "    j1, j2     integers, 2x the total angular momentum (so for j=1/2 use j=1)\n" \
         "    l1, l2     integers, 2x the orbital angular momentum\n" \
