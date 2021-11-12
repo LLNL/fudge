@@ -516,7 +516,7 @@ class XYsnd( baseModule.xDataFunctional ) :
         if( domainMin is None ) : domainMin = self.domainMin
         domainMin = max( domainMin, self.domainMin )
         if( domainMax is None ) : domainMax = self.domainMax
-        domainMax = max( domainMax, self.domainMax )
+        domainMax = min( domainMax, self.domainMax )
 
         newMultiD = self.__class__( interpolation = self.interpolation, axes = self.axes.copy( ), index = self.index, valueType = self.valueType, 
                 outerDomainValue = self.outerDomainValue, label = self.label, interpolationQualifier = self.interpolationQualifier )
