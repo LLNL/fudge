@@ -17,7 +17,6 @@ from PoPs import IDs as IDsPoPsModule
 
 import fudge as fudgeModule
 
-from fudge.core.utilities import brb
 from LUPY import subprocessing, times
 
 from xData import standards as standardsModule
@@ -124,7 +123,7 @@ def twoBodyTransferMatrix2( style, tempInfo, crossSection, angularData, Q, produ
     if reactionSuite.projectile == IDsPoPsModule.photon and tempInfo['productName'] == IDsPoPsModule.neutron:
         from fudge.processing import group as groupModule
 
-        cutoffEnergy = PQUModule.PQU( 1e-5, 'MeV' ).getValueAs(tempInfo['incidentEnergyUnit'])
+        cutoffEnergy = PQUModule.PQU( 1e-9, 'MeV' ).getValueAs(tempInfo['incidentEnergyUnit'])
         productName = tempInfo['productName']
         productGroupBoundaries = style.transportables[productName].group
         for modifiedProductGroupIndex, boundary in enumerate(productGroupBoundaries.boundaries.values):
@@ -170,9 +169,7 @@ def twoBodyTransferMatrix2( style, tempInfo, crossSection, angularData, Q, produ
             TM1atThreshold, TMEatThreshold = specialCasesModule.twoBodyPhotoNuclearAtThreshold(tempInfo['masses'], Q, 
                 modifiedProductGroupBoundaries, crossSection, angularData, tempInfo['legendreMax'], groupFlux)
             norm = TM1atThreshold.pop(-1)[0]
-            if norm != 0.0:
-                norm = row[len(TM1atThreshold)][0] / norm
-            norm = 1
+            if norm != 0.0: norm = row[len(TM1atThreshold)][0] / norm
             TMEatThreshold.pop(-1)
             for index, TM1atThresholdRow in enumerate(TM1atThreshold):
                 TM1atThresholdRow[0] *= norm
@@ -1062,10 +1059,7 @@ def twoDToString( label, data, addHeader = True, addExtraBlankLine = True ) :
         interpolationStr = 'Interpolation: %s' % data.interpolation
     else :
         print ('ERROR from %s' % __file__)
-        try :
-            brb.objectoutline( data )
-        except :
-            pass
+        print(type(data))
         raise TypeError( 'Unsupported data type: see prior output' )
     fmt = " %s %s" % ( doubleFmt, doubleFmt )
     a = [ fmt % ( x, y ) for x, y in data ]

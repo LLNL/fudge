@@ -58,12 +58,22 @@ def twoBodyPhotoNuclearAtThreshold(masses, Q, modifiedProductGroupBoundaries, cr
     productMass = masses['Product']
     residualMass = targetMass - productMass - Q
 
-    EgMin = findEgForK3(-Q, targetMass, productMass, residualMass, 0, 1)
-    crossSectionAtMin = crossSection.evaluate(EgMin)
-    PofMuAtMin = angularData.evaluate(EgMin)
-
     TM1 = []
     TME = []
+
+    EgMin = findEgForK3(-Q, targetMass, productMass, residualMass, 0, 1)
+    crossSectionAtMin = crossSection.evaluate(EgMin)
+    if crossSectionAtMin is None: crossSectionAtMin = 0.0
+    if crossSectionAtMin == 0.0:
+        for K_3_upper in modifiedProductGroupBoundaries[:-1]:
+            LegendreCoefficients = ( legendreMax + 1 ) * [ 0.0 ]
+            TM1.append(LegendreCoefficients)
+            LegendreCoefficients = ( legendreMax + 1 ) * [ 0.0 ]
+            TME.append(LegendreCoefficients)
+        return TM1, TME
+
+    PofMuAtMin = angularData.evaluate(EgMin)
+
     K_3_lower = None
     numberOfEgs = 10
     for K_3_upper in modifiedProductGroupBoundaries:
