@@ -1,11 +1,6 @@
 __pycache__
 *.so
 
-fudge/fudgeVersion.py
-
-.idea
-.vscode
-
 fudge.egg-info
 build
 
